@@ -191,7 +191,7 @@ public final class QueryContext extends Progress {
       } catch(final QueryException ex) {
         if(ex.err() != XPNOCTX) throw ex;
         // only {@link ParseExpr} instances may cause this error
-        CTXINIT.thrw(((ParseExpr) ctxItem).info, ex.getMessage());
+        CTXINIT.thrw(((ParseExpr) ctxItem).info, ex);
       }
     } else if(nodes != null) {
       // add full-text container reference

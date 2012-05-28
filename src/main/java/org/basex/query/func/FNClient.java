@@ -98,9 +98,9 @@ public class FNClient extends StandardFunc {
       cs.setOutputStream(null);
       return Str.get(result);
     } catch(final BaseXException ex) {
-      throw BXCL_COMMAND.thrw(info, ex.getMessage());
+      throw BXCL_COMMAND.thrw(info, ex);
     } catch(final IOException ex) {
-      throw BXCL_COMM.thrw(info, ex.getMessage());
+      throw BXCL_COMM.thrw(info, ex);
     }
   }
 
@@ -124,9 +124,9 @@ public class FNClient extends StandardFunc {
     } catch(final BaseXException ex) {
       final Matcher m = QUERYPAT.matcher(ex.getMessage());
       if(m.find()) throw new QueryException(info, new QNm(m.group(1)), m.group(2));
-      throw BXCL_QUERY.thrw(info, ex.getMessage());
+      throw BXCL_QUERY.thrw(info, ex);
     } catch(final IOException ex) {
-      throw BXCL_COMM.thrw(info, ex.getMessage());
+      throw BXCL_COMM.thrw(info, ex);
     }
   }
 
@@ -141,7 +141,7 @@ public class FNClient extends StandardFunc {
       session(ctx, true).close();
       return null;
     } catch(final IOException ex) {
-      throw BXCL_COMMAND.thrw(info, ex.getMessage());
+      throw BXCL_COMMAND.thrw(info, ex);
     }
   }
 

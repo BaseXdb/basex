@@ -74,7 +74,7 @@ public final class RepoManager {
     } catch(final IOException ex) {
       final Err err = ex instanceof FileNotFoundException ? BXRE_PARSENF : BXRE_PARSE;
       Util.debug(ex);
-      throw err.thrw(info, io.name(), ex.getMessage());
+      throw err.thrw(info, io.name(), ex);
     }
   }
 

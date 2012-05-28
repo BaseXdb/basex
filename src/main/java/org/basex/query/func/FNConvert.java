@@ -194,23 +194,32 @@ public final class FNConvert extends StandardFunc {
    */
   private Str toString(final QueryContext ctx) throws QueryException {
     final Bin bin = checkBinary(expr[0], ctx);
-    String enc = null;
-    if(expr.length == 2) {
-      enc = normEncoding(string(checkStr(expr[1], ctx)));
-      if(!Charset.isSupported(enc)) BXCO_ENCODING.thrw(info, enc);
-    }
+    final String enc = encoding(1, BXCO_ENCODING, ctx);
 
     try {
-      final InputStream is = bin.input(info);
-      try {
-        final NewlineInput nli = new NewlineInput(is).encoding(enc);
-        return Str.get(nli.content());
-      } finally {
-        is.close();
-      }
+      return Str.get(toString(bin.input(info), enc));
+    } catch(final IOException ex) {
+      throw BXCO_STRING.thrw(info, ex);
+    }
+  }
+
+  /**
+   * Converts the specified input to a string in the specified encoding.
+   * @param is input stream
+   * @param enc encoding
+   * @return resulting value
+   * @throws IOException I/O exception
+   */
+  public static byte[] toString(final InputStream is, final String enc)
+      throws IOException {
+
+    try {
+      return new NewlineInput(is).encoding(enc).content();
     } catch(final IOException ex) {
       Util.debug(ex);
-      throw BXCO_STRING.thrw(info, ex);
+      throw ex;
+    } finally {
+      is.close();
     }
   }
 
@@ -242,11 +251,7 @@ public final class FNConvert extends StandardFunc {
    */
   private byte[] toBinary(final QueryContext ctx) throws QueryException {
     final byte[] in = checkStr(expr[0], ctx);
-    String enc = null;
-    if(expr.length == 2) {
-      enc = normEncoding(string(checkStr(expr[1], ctx)));
-      if(!Charset.isSupported(enc)) BXCO_ENCODING.thrw(info, enc);
-    }
+    final String enc = encoding(1, BXCO_ENCODING, ctx);
     if(enc == null || enc == Token.UTF8) return in;
 
     try {

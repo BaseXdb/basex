@@ -4,7 +4,6 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.nio.charset.*;
 
 import org.basex.io.*;
 import org.basex.io.in.*;
@@ -194,13 +193,11 @@ public final class FNGen extends StandardFunc {
 
     checkCreate(ctx);
     final byte[] path = checkStr(expr[0], ctx);
-    final String enc = expr.length < 2 ? null : string(checkStr(expr[1], ctx));
+    final String enc = encoding(1, WHICHENC, ctx);
     final IO base = ctx.sc.baseIO();
     if(base == null) throw STBASEURI.thrw(info);
 
     try {
-      if(enc != null && !Charset.isSupported(enc)) WHICHENC.thrw(info, enc);
-
       final String p = string(path);
       if(p.indexOf('#') != -1) FRAGID.thrw(info, p);
       if(!Uri.uri(token(p)).isValid()) INVURL.thrw(info, p);
@@ -226,7 +223,7 @@ public final class FNGen extends StandardFunc {
     } catch(final IOException ex) {
       if(!full) return Bln.FALSE;
       if(ex instanceof InputException && enc == null) WHICHCHARS.thrw(info);
-      if(ex instanceof EncodingException) INVCHARS.thrw(info, ex.getMessage());
+      if(ex instanceof EncodingException) INVCHARS.thrw(info, ex);
       throw SERANY.thrw(info, ex);
     }
   }

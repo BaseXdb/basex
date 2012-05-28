@@ -100,7 +100,7 @@ public class FNValidate extends StandardFunc {
       Util.debug(ex);
       Throwable e = ex;
       while(e.getCause() != null) e = e.getCause();
-      throw BXVA_FAIL.thrw(info, e.getMessage());
+      throw BXVA_FAIL.thrw(info, e);
     } finally {
       if(tmp != null) tmp.delete();
     }

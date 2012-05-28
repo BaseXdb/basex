@@ -55,7 +55,7 @@ public final class JarParser {
       else if(desc.classes.isEmpty()) BXRE_JARDESC.thrw(info, NOCLASS);
       return desc;
     } catch(final IOException ex) {
-      throw BXRE_JARFAIL.thrw(info, ex.getMessage());
+      throw BXRE_JARFAIL.thrw(info, ex);
     }
   }
 }

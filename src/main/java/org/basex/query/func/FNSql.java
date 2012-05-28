@@ -156,7 +156,7 @@ public final class FNSql extends StandardFunc {
       }
       return Int.get(ctx.jdbc().add(getConnection(url)));
     } catch(final SQLException ex) {
-      throw BXSQ_ERROR.thrw(info, ex.getMessage());
+      throw BXSQ_ERROR.thrw(info, ex);
     }
   }
 
@@ -188,7 +188,7 @@ public final class FNSql extends StandardFunc {
       final PreparedStatement prep = conn.prepareStatement(string(prepStmt));
       return Int.get(ctx.jdbc().add(prep));
     } catch(final SQLException ex) {
-      throw BXSQ_ERROR.thrw(info, ex.getMessage());
+      throw BXSQ_ERROR.thrw(info, ex);
     }
   }
 
@@ -224,7 +224,7 @@ public final class FNSql extends StandardFunc {
       final boolean result = stmt.execute(query);
       return result ? buildResult(stmt.getResultSet()) : new NodeSeqBuilder();
     } catch(final SQLException ex) {
-      throw BXSQ_ERROR.thrw(info, ex.getMessage());
+      throw BXSQ_ERROR.thrw(info, ex);
     } finally {
       if(stmt != null) try { stmt.close(); } catch(final SQLException ex) { }
     }
@@ -250,7 +250,7 @@ public final class FNSql extends StandardFunc {
       final boolean result = stmt.execute();
       return result ? buildResult(stmt.getResultSet()) : new NodeSeqBuilder();
     } catch(final SQLException ex) {
-      throw BXSQ_ERROR.thrw(info, ex.getMessage());
+      throw BXSQ_ERROR.thrw(info, ex);
     }
   }
 
@@ -343,7 +343,7 @@ public final class FNSql extends StandardFunc {
         throw BXSQ_ERROR.thrw(info, "unsupported type: " + string(paramType));
       }
     } catch(final SQLException ex) {
-      throw BXSQ_ERROR.thrw(info, ex.getMessage());
+      throw BXSQ_ERROR.thrw(info, ex);
     } catch(final IllegalArgumentException ex) {
       throw BXSQ_FORMAT.thrw(info, string(paramType));
     }
@@ -385,7 +385,7 @@ public final class FNSql extends StandardFunc {
       }
       return rows;
     } catch(final SQLException ex) {
-      throw BXSQ_ERROR.thrw(info, ex.getMessage());
+      throw BXSQ_ERROR.thrw(info, ex);
     }
   }
 
@@ -400,7 +400,7 @@ public final class FNSql extends StandardFunc {
       connection(ctx, true).close();
       return null;
     } catch(final SQLException ex) {
-      throw BXSQ_ERROR.thrw(info, ex.getMessage());
+      throw BXSQ_ERROR.thrw(info, ex);
     }
   }
 
@@ -415,7 +415,7 @@ public final class FNSql extends StandardFunc {
       connection(ctx, false).commit();
       return null;
     } catch(final SQLException ex) {
-      throw BXSQ_ERROR.thrw(info, ex.getMessage());
+      throw BXSQ_ERROR.thrw(info, ex);
     }
   }
 
@@ -430,7 +430,7 @@ public final class FNSql extends StandardFunc {
       connection(ctx, false).rollback();
       return null;
     } catch(final SQLException ex) {
-      throw BXSQ_ERROR.thrw(info, ex.getMessage());
+      throw BXSQ_ERROR.thrw(info, ex);
     }
   }
 

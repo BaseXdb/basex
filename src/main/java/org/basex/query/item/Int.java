@@ -46,7 +46,7 @@ public class Int extends Num {
    * Constructor.
    * @param d date time
    */
-  Int(final Date d) {
+  public Int(final Date d) {
     this(d.xc.toGregorianCalendar().getTimeInMillis(), AtomType.LNG);
   }
 

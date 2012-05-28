@@ -174,6 +174,8 @@ public final class SeqType {
   public static final SeqType HEX = AtomType.HEX.seqType();
   /** Single xs:base64Binary. */
   public static final SeqType B64 = AtomType.B64.seqType();
+  /** Zero or more xs:base64Binary. */
+  public static final SeqType B64_ZM = new SeqType(AtomType.B64, Occ.ZERO_MORE);
 
   /** Sequence type. */
   public final Type type;
@@ -415,7 +417,7 @@ public final class SeqType {
    * @return same item
    */
   private boolean checkKind(final Item it) {
-    return kind == null || it.type.isNode() && kind.eq((ANode) it);
+    return kind == null || kind.eq(it);
   }
 
   /**

@@ -4,10 +4,13 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
+import java.nio.charset.*;
+
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.item.*;
+import org.basex.query.util.*;
 import org.basex.util.*;
 
 /**
@@ -110,5 +113,21 @@ public abstract class StandardFunc extends Arr {
       return ctx.resource.data(name, info);
     }
     throw STRNODTYPE.thrw(info, this, ip);
+  }
+
+  /**
+   * Returns an encoding.
+   * @param i index of encoding argument
+   * @param err error for invalid encoding
+   * @param ctx query context
+   * @return text entry
+   * @throws QueryException query exception
+   */
+  public String encoding(final int i, final Err err, final QueryContext ctx)
+      throws QueryException {
+    if(i >= expr.length) return null;
+    final String enc = string(checkStr(expr[i], ctx));
+    if(!Charset.isSupported(enc)) err.thrw(info, enc);
+    return enc;
   }
 }

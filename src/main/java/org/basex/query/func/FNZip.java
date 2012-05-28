@@ -41,7 +41,7 @@ public final class FNZip extends StandardFunc {
   private static final QNm A_NAME = new QNm("name");
   /** Attribute: src. */
   private static final QNm A_SRC = new QNm("src");
-  /** Attribute: src. */
+  /** Attribute: method. */
   private static final QNm A_METHOD = new QNm("method");
   /** Method "base64". */
   private static final String M_BASE64 = "base64";
@@ -96,7 +96,7 @@ public final class FNZip extends StandardFunc {
     try {
       return Str.get(new NewlineInput(io).encoding(enc).content());
     } catch(final IOException ex) {
-      throw ZIP_FAIL.thrw(info, ex.getMessage());
+      throw ZIP_FAIL.thrw(info, ex);
     }
   }
 
@@ -141,7 +141,7 @@ public final class FNZip extends StandardFunc {
       createEntries(paths(zf).iterator(), root, "");
       return root;
     } catch(final IOException ex) {
-      throw ZIP_FAIL.thrw(info, ex.getMessage());
+      throw ZIP_FAIL.thrw(info, ex);
     } finally {
       if(zf != null) try { zf.close(); } catch(final IOException e) { }
     }
@@ -233,7 +233,7 @@ public final class FNZip extends StandardFunc {
       zos.close();
     } catch(final IOException ex) {
       ok = false;
-      ZIP_FAIL.thrw(info, ex.getMessage());
+      ZIP_FAIL.thrw(info, ex);
     } finally {
       if(fos != null) {
         try { fos.close(); } catch(final IOException ex) { }
@@ -394,12 +394,12 @@ public final class FNZip extends StandardFunc {
         zos.close();
       } catch(final IOException ex) {
         ok = false;
-        ZIP_FAIL.thrw(info, ex.getMessage());
+        ZIP_FAIL.thrw(info, ex);
       } finally {
         if(fos != null) try { fos.close(); } catch(final IOException ex) { }
       }
     } catch(final IOException ex) {
-      throw ZIP_FAIL.thrw(info, ex.getMessage());
+      throw ZIP_FAIL.thrw(info, ex);
     } finally {
       if(zf != null) try { zf.close(); } catch(final IOException e) { }
       if(ok) {
@@ -473,7 +473,7 @@ public final class FNZip extends StandardFunc {
     } catch(final FileNotFoundException ex) {
       throw ZIP_NOTFOUND.thrw(info, file + "/" + path);
     } catch(final IOException ex) {
-      throw ZIP_FAIL.thrw(info, ex.getMessage());
+      throw ZIP_FAIL.thrw(info, ex);
     }
   }
 

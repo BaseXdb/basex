@@ -58,7 +58,7 @@ public final class PkgParser {
       parseChildren(node, pkg);
       return pkg;
     } catch(final IOException ex) {
-      throw BXRE_PARSE.thrw(info, io.name(), ex.getMessage());
+      throw BXRE_PARSE.thrw(info, io.name(), ex);
     }
   }
 

@@ -44,17 +44,17 @@ public class B64 extends Bin {
    * @throws QueryException query exception
    */
   B64(final Bin b, final InputInfo ii) throws QueryException {
-    this(b.val(ii));
+    this(b.binary(ii));
   }
 
   @Override
   public byte[] string(final InputInfo ii) throws QueryException {
-    return Base64.encode(val(ii));
+    return Base64.encode(binary(ii));
   }
 
   @Override
   public boolean eq(final InputInfo ii, final Item it) throws QueryException {
-    return Token.eq(val(ii), it instanceof Bin ? ((Bin) it).val(ii) :
+    return Token.eq(binary(ii), it instanceof Bin ? ((Bin) it).binary(ii) :
       decode(it.string(ii), ii));
   }
 

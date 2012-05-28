@@ -53,29 +53,14 @@ public final class Zip extends Progress {
    * @throws IOException I/O exception
    */
   public byte[] read(final String path) throws IOException {
-    ZipInputStream in = null;
+    final ZipInputStream in = new ZipInputStream(archive.inputStream());
     try {
-      in = new ZipInputStream(archive.inputStream());
-      for(ZipEntry ze; (ze = in.getNextEntry()) != null;) {
-        if(!path.equals(ze.getName())) continue;
-        final int s = (int) ze.getSize();
-        if(s >= 0) {
-          // known size: pre-allocate and fill array
-          final byte[] data = new byte[s];
-          int c, o = 0;
-          while(s - o != 0 && (c = in.read(data, o, s - o)) != -1) o += c;
-          return data;
-        }
-        // unknown size: use byte list
-        final byte[] data = new byte[IO.BLOCKSIZE];
-        final ByteList bl = new ByteList();
-        for(int c; (c = in.read(data)) != -1;) bl.add(data, 0, c);
-        return bl.toArray();
-      }
+      final byte[] cont = getEntry(in, path);
+      if(cont == null) throw new FileNotFoundException(path);
+      return cont;
     } finally {
-      if(in != null) try { in.close(); } catch(final IOException e) { }
+      try { in.close(); } catch(final IOException e) { }
     }
-    throw new FileNotFoundException(path);
   }
 
   /**
@@ -85,11 +70,10 @@ public final class Zip extends Progress {
    */
   public void unzip(final IOFile target) throws IOException {
     final byte[] data = new byte[IO.BLOCKSIZE];
-    ZipInputStream in = null;
+    ZipInputStream in = new ZipInputStream(archive.inputStream());
     total = size();
     curr = 0;
     try {
-      in = new ZipInputStream(archive.inputStream());
       for(ZipEntry ze; (ze = in.getNextEntry()) != null;) {
         curr++;
         final IOFile trg = new IOFile(target, ze.getName());
@@ -107,7 +91,7 @@ public final class Zip extends Progress {
         }
       }
     } finally {
-      if(in != null) try { in.close(); } catch(final IOException e) { }
+      try { in.close(); } catch(final IOException e) { }
     }
   }
 
@@ -157,5 +141,34 @@ public final class Zip extends Progress {
   @Override
   protected double prog() {
     return (double) curr / total;
+  }
+
+  /**
+   * Returns the contents of the specified entry, or {@code null}.
+   * @param in input stream
+   * @param entry entry to be found
+   * @return entry
+   * @throws IOException I/O exception
+   */
+  public static byte[] getEntry(final ZipInputStream in, final String entry)
+      throws IOException {
+
+    for(ZipEntry ze; (ze = in.getNextEntry()) != null;) {
+      if(!entry.equals(ze.getName())) continue;
+      final int s = (int) ze.getSize();
+      if(s >= 0) {
+        // known size: pre-allocate and fill array
+        final byte[] data = new byte[s];
+        int c, o = 0;
+        while(s - o != 0 && (c = in.read(data, o, s - o)) != -1) o += c;
+        return data;
+      }
+      // unknown size: use byte list
+      final byte[] data = new byte[IO.BLOCKSIZE];
+      final ByteList bl = new ByteList();
+      for(int c; (c = in.read(data)) != -1;) bl.add(data, 0, c);
+      return bl.toArray();
+    }
+    return null;
   }
 }

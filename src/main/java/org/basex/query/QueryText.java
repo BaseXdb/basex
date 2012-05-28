@@ -3,7 +3,6 @@ package org.basex.query;
 import static org.basex.util.Token.*;
 
 import org.basex.core.*;
-import org.basex.util.hash.*;
 
 /**
  * This class assembles text string and tokens required by the XQuery processor
@@ -459,6 +458,8 @@ public interface QueryText {
   byte[] XSLT = token("xslt");
   /** ZIP token. */
   byte[] ZIP = token("zip");
+  /** ZIP2 token. */
+  byte[] ZIP2 = token("zip2");
   /** HOF token. */
   byte[] HOF = token("hof");
   /** JSON token. */
@@ -529,6 +530,8 @@ public interface QueryText {
   byte[] PKGURI = token(EXPATH + "pkg");
   /** ZIP URI.*/
   byte[] ZIPURI = token(EXPATH + "zip");
+  /** ZIP2 URI.*/
+  byte[] ZIP2URI = token(EXPATH + "zip2");
   /** EXPath Error URI. */
   byte[] EXPERROR = token(EXPATH + "error");
 
@@ -569,9 +572,6 @@ public interface QueryText {
   byte[] JAVAPREF = token("java:");
   /** Default collation. */
   byte[] URLCOLL = concat(FNURI, token("/collation/codepoint"));
-
-  /** Static modules. */
-  TokenSet MODULES = new TokenSet(FILEURI, HTTPURI, PKGURI, ZIPURI, SQLURI, CRYPTOURI);
 
   // QUERY PLAN ===============================================================
 

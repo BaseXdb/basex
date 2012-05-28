@@ -4,7 +4,6 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.nio.charset.*;
 import java.util.regex.*;
 
 import org.basex.core.*;
@@ -292,7 +291,7 @@ public final class FNFile extends StandardFunc {
   private B64Stream readBinary(final File path) throws QueryException {
     if(!path.exists()) FL_WHICH.thrw(info, path.getAbsolutePath());
     if(path.isDirectory()) FL_DIR.thrw(info, path.getAbsolutePath());
-    return new B64Stream(new IOFile(path), FL_FILE);
+    return new B64Stream(new IOFile(path), FL_IO);
   }
 
   /**
@@ -305,11 +304,10 @@ public final class FNFile extends StandardFunc {
   private StrStream readText(final File path, final QueryContext ctx)
       throws QueryException {
 
-    final String enc = expr.length < 2 ? null : string(checkStr(expr[1], ctx));
+    final String enc = encoding(1, FL_ENCODING, ctx);
     if(!path.exists()) FL_WHICH.thrw(info, path.getAbsolutePath());
     if(path.isDirectory()) FL_DIR.thrw(info, path.getAbsolutePath());
-    if(enc != null && !Charset.isSupported(enc)) FL_ENCODING.thrw(info, enc);
-    return new StrStream(new IOFile(path), enc, FL_FILE);
+    return new StrStream(new IOFile(path), enc, FL_IO);
   }
 
   /**
@@ -336,11 +334,12 @@ public final class FNFile extends StandardFunc {
       throws QueryException {
 
     if(path.isDirectory()) FL_DIR.thrw(info, path);
+    final File dir = path.getParentFile();
+    if(!dir.exists()  && !dir.mkdirs()) FL_CREATE.thrw(info, dir);
 
     final Iter ir = expr[1].iter(ctx);
     try {
-      final PrintOutput out = PrintOutput.get(
-          new FileOutputStream(path, append));
+      final PrintOutput out = PrintOutput.get(new FileOutputStream(path, append));
       try {
         Item it = expr.length > 2 ? expr[2].item(ctx, info) : null;
         final Serializer ser = Serializer.get(out, FuncParams.serializerProp(it));
@@ -352,7 +351,7 @@ public final class FNFile extends StandardFunc {
         out.close();
       }
     } catch(final IOException ex) {
-      FL_FILE.thrw(info, ex);
+      FL_IO.thrw(info, ex);
     }
     return null;
   }
@@ -368,10 +367,13 @@ public final class FNFile extends StandardFunc {
   private Item writeBinary(final File path, final QueryContext ctx, final boolean append)
       throws QueryException {
 
-    if(path.isDirectory()) FL_DIR.thrw(info, path);
+    final IOFile io = new IOFile(path);
+    if(io.isDir()) FL_DIR.thrw(info, io);
+    final IOFile dir = new IOFile(io.dir());
+    if(!dir.exists() && !dir.md()) FL_CREATE.thrw(info, dir);
+
     try {
-      final FileOutputStream fos = new FileOutputStream(path, append);
-      final BufferOutput out = new BufferOutput(fos);
+      final BufferOutput out = new BufferOutput(new FileOutputStream(path, append));
       try {
         final Iter ir = expr[1].iter(ctx);
         for(Item it; (it = ir.next()) != null;) {
@@ -386,7 +388,7 @@ public final class FNFile extends StandardFunc {
         out.close();
       }
     } catch(final IOException ex) {
-      FL_FILE.thrw(info, ex);
+      FL_IO.thrw(info, ex);
     }
     return null;
   }
@@ -440,7 +442,7 @@ public final class FNFile extends StandardFunc {
       try {
         new IOFile(src).copyTo(new IOFile(trg));
       } catch(final IOException ex) {
-        FL_FILE.thrw(info, ex);
+        FL_IO.thrw(info, ex);
       }
     }
   }

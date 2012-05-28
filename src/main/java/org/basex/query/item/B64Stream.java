@@ -3,6 +3,7 @@ package org.basex.query.item;
 import java.io.*;
 
 import org.basex.io.*;
+import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
@@ -36,7 +37,7 @@ public final class B64Stream extends B64 implements Streamable {
   }
 
   @Override
-  protected byte[] val(final InputInfo ii) throws QueryException {
+  public byte[] binary(final InputInfo ii) throws QueryException {
     if(data == null) {
       try {
         data = input.read();
@@ -48,9 +49,10 @@ public final class B64Stream extends B64 implements Streamable {
   }
 
   @Override
-  public InputStream input(final InputInfo ii) throws QueryException {
+  public BufferInput input(final InputInfo ii) throws QueryException {
     try {
-      return input.inputStream();
+      final InputStream is = input.inputStream();
+      return is instanceof BufferInput ? (BufferInput) is : new BufferInput(is);
     } catch(final IOException ex) {
       throw error.thrw(ii, ex);
     }

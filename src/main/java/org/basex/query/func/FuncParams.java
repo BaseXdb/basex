@@ -56,7 +56,7 @@ public final class FuncParams {
     // initialize token map
     final TokenMap tm = new TokenMap();
     if(it == null) return tm;
-    if(it.type != NodeType.ELM || !test.eq((ANode) it)) ELMMAPTYPE.thrw(info, root, it);
+    if(!test.eq(it)) ELMMAPTYPE.thrw(info, root, it);
 
     // interpret options
     final AxisIter ai = ((ANode) it).children();

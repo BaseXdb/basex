@@ -37,17 +37,17 @@ public final class Hex extends Bin {
    * @throws QueryException query exception
    */
   Hex(final Bin b, final InputInfo ii) throws QueryException {
-    this(b.val(ii));
+    this(b.binary(ii));
   }
 
   @Override
   public byte[] string(final InputInfo ii) throws QueryException {
-    return Token.hex(val(ii), true);
+    return Token.hex(binary(ii), true);
   }
 
   @Override
   public boolean eq(final InputInfo ii, final Item it) throws QueryException {
-    return Token.eq(val(ii), it instanceof Bin ? ((Bin) it).val(ii) :
+    return Token.eq(binary(ii), it instanceof Bin ? ((Bin) it).binary(ii) :
       decode(it.string(ii), ii));
   }
 

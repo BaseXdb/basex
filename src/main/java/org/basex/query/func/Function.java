@@ -762,7 +762,24 @@ public enum Function {
   /** XQuery function */
   _ZIP_ZIP_FILE(FNZip.class, "zip-file(zip)", EMP, ELM),
   /** XQuery function */
-  _ZIP_UPDATE_ENTRIES(FNZip.class, "update-entries(zip,output)", EMP, ELM, STR);
+  _ZIP_UPDATE_ENTRIES(FNZip.class, "update-entries(zip,output)", EMP, ELM, STR),
+
+  /* FNZip2 functions (EXPath). */
+
+  /** XQuery function */
+  _ZIP2_CREATE(FNZip2.class, "create(entries,contents)", B64, ELM_ZM, ITEM_ZM),
+  /** XQuery function */
+  _ZIP2_ENTRIES(FNZip2.class, "entries(zip)", ELM_ZM, B64),
+  /** XQuery function */
+  _ZIP2_EXTRACT_TEXTS(FNZip2.class, "extract-texts(zip[,names[,encoding]])",
+      STR_ZM, 1, B64, STR_ZM, STR),
+  /** XQuery function */
+  _ZIP2_EXTRACT_BINARIES(FNZip2.class, "extract-binaries(zip[,names])",
+      B64_ZM, 1, B64, STR_ZM),
+  /** XQuery function */
+  _ZIP2_UPDATE(FNZip2.class, "update(zip,entries,contents)", B64, B64, ELM_ZM, ITEM_ZM),
+  /** XQuery function */
+  _ZIP2_DELETE(FNZip2.class, "delete(zip,entries)", B64, B64, STR_ZM);
 
   /** Updating functions. */
   static final Function[] UPDATING = {
@@ -773,7 +790,7 @@ public enum Function {
    * Mapping between function classes and namespace URIs.
    * If no mapping exists, {@link #FNURI} will be assumed as default mapping.
    */
-  private static final HashMap<Class<? extends StandardFunc>, byte[]> URIS =
+  public static final HashMap<Class<? extends StandardFunc>, byte[]> URIS =
     new HashMap<Class<? extends StandardFunc>, byte[]>();
 
   // initialization of class/uri mappings and statically known modules
@@ -786,6 +803,7 @@ public enum Function {
     URIS.put(FNFile.class,   FILEURI);
     URIS.put(FNHttp.class,   HTTPURI);
     URIS.put(FNZip.class,    ZIPURI);
+    URIS.put(FNZip2.class,   ZIP2URI);
     URIS.put(FNRepo.class,   REPOURI);
     // internal functions
     URIS.put(FNClient.class,   CLIENTURI);

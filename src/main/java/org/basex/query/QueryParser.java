@@ -711,7 +711,7 @@ public class QueryParser extends InputParser {
       }
 
       // check built-in modules
-      for(final byte[] u : MODULES) if(eq(uri, u)) return;
+      for(final byte[] u : Function.URIS.values()) if(eq(uri, u)) return;
 
       // resolve module uri
       if(ctx.modules.addImport(uri, info(), this)) return;

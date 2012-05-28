@@ -198,7 +198,7 @@ public enum Err {
   /** FOFL0007. */
   FL_ENCODING(FOFL, 5, "Encoding '%' is not supported."),
   /** FOFL9999. */
-  FL_FILE(FOFL, 9999, "Resource cannot be retrieved: %."),
+  FL_IO(FOFL, 9999, "%"),
   /** FOFL9999. */
   FL_CREATE(FOFL, 9999, "Directory '%' cannot be created."),
   /** FOFL9999. */
@@ -226,9 +226,26 @@ public enum Err {
   /** FOZP0002. */
   ZIP_INVALID(FOZP, 2, "% element: % attribute expected."),
   /** FOZP0002. */
-  ZIP_UNKNOWN(FOZP, 2, "ZIP Definition: unknown element %."),
+  ZIP_UNKNOWN(FOZP, 2, "ZIP definition: unknown element %."),
   /** FOZP0003. */
   ZIP_FAIL(FOZP, 3, "Operation failed: %."),
+
+  /** FOZ20001. */
+  ZIP2_DIFF(FOZ2, 1, "Number of entries (%) and contents (%) differs."),
+  /** FOZ20002. */
+  ZIP2_STRB64(FOZ2, 2, "xs:string or xs:base64Binary expected, % found"),
+  /** FOZ20003. */
+  ZIP2_NAME(FOZ2, 3, "Name of ZIP entry must not be empty."),
+  /** FOZ20003. */
+  ZIP2_LEVEL(FOZ2, 3, "Invalid compression level: '%'."),
+  /** FOZ20003. */
+  ZIP2_MODIFIED(FOZ2, 3, "xs:dateTime value is invalid : '%'."),
+  /** FOZ20004. */
+  ZIP2_ENCODING(FOZ2, 4, "Encoding is not supported: '%'."),
+  /** FOZ20004. */
+  ZIP2_ENCODE(FOZ2, 4, "String conversion: %."),
+   /** FOZ29999. */
+  ZIP2_FAIL(FOZ2, 9999, "Operation failed: %."),
 
   // W3 Functions
 
@@ -983,6 +1000,7 @@ public enum Err {
     /** FOFL Error type. */ FOFL(QueryText.EXPERR, QueryText.EXPERROR),
     /** FOHC Error type. */ FOHC(QueryText.EXPERR, QueryText.EXPERROR),
     /** FOZP Error type. */ FOZP(QueryText.EXPERR, QueryText.EXPERROR),
+    /** FOZ2 Error type. */ FOZ2(QueryText.EXPERR, QueryText.EXPERROR),
 
     // W3 errors
 

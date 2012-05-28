@@ -83,6 +83,15 @@ public abstract class Test {
   public abstract boolean eq(final ANode node);
 
   /**
+   * Tests if the test yields true.
+   * @param item item to be checked
+   * @return result of check
+   */
+  public boolean eq(final Item item) {
+    return item.type.isNode() && eq((ANode) item);
+  }
+
+  /**
    * Checks the current and specified test for equality.
    * @param t test to be compared
    * @return result of check

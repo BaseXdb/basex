@@ -174,7 +174,7 @@ public abstract class Item extends Value {
    * @return input stream
    * @throws QueryException query exception
    */
-  public InputStream input(final InputInfo ii) throws QueryException {
+  public BufferInput input(final InputInfo ii) throws QueryException {
     return new ArrayInput(string(ii));
   }
 

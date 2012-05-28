@@ -13,7 +13,7 @@ import org.basex.test.query.*;
 import org.junit.*;
 
 /**
- * This class tests the functions of the file library.
+ * This class tests the functions of the zip module.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -53,7 +53,7 @@ public final class FNZipTest extends AdvancedQueryTest {
    * Test method for the zip:binary-entry() function.
    */
   @Test
-  public void binaryEntry() {
+  public void zipBinaryEntry() {
     check(_ZIP_BINARY_ENTRY);
     query(_ZIP_BINARY_ENTRY.args(ZIP, ENTRY1));
     contains("xs:hexBinary(" + _ZIP_BINARY_ENTRY.args(ZIP, ENTRY1) + ")", "610A61626F");
@@ -66,7 +66,7 @@ public final class FNZipTest extends AdvancedQueryTest {
    * Test method for the zip:text-entry() function.
    */
   @Test
-  public void textEntry() {
+  public void zipTextEntry() {
     check(_ZIP_TEXT_ENTRY);
     query(_ZIP_TEXT_ENTRY.args(ZIP, ENTRY1));
     query(_ZIP_TEXT_ENTRY.args(ZIP, ENTRY1, "US-ASCII"));
@@ -79,7 +79,7 @@ public final class FNZipTest extends AdvancedQueryTest {
    * Test method for the zip:xml-entry() function.
    */
   @Test
-  public void xmlEntry() {
+  public void zipXmlEntry() {
     check(_ZIP_XML_ENTRY);
     query(_ZIP_XML_ENTRY.args(ZIP, ENTRY2));
     query(_ZIP_XML_ENTRY.args(ZIP, ENTRY2) + "//title/text()", "XML");
@@ -89,7 +89,7 @@ public final class FNZipTest extends AdvancedQueryTest {
    * Test method for the zip:entries() function.
    */
   @Test
-  public void entries() {
+  public void zipEntries() {
     check(_ZIP_ENTRIES);
     query(_ZIP_ENTRIES.args(ZIP));
   }
@@ -99,7 +99,7 @@ public final class FNZipTest extends AdvancedQueryTest {
    * @throws IOException I/O exception
    */
   @Test
-  public void zipFile() throws IOException {
+  public void zipZipFile() throws IOException {
     check(_ZIP_ZIP_FILE);
     // check first file
     query(_ZIP_ZIP_FILE.args(zipParams("<entry name='one'/>")));
@@ -134,7 +134,7 @@ public final class FNZipTest extends AdvancedQueryTest {
    * @throws IOException I/O exception
    */
   @Test
-  public void zipFileNS() throws IOException {
+  public void zipZipFileNS() throws IOException {
     // ZIP namespace must be removed from zipped node
     query(_ZIP_ZIP_FILE.args(zipParams("<entry name='1'><a/></entry>")));
     checkZipEntry("1", token("<a/>"));
@@ -180,7 +180,7 @@ public final class FNZipTest extends AdvancedQueryTest {
    * @throws IOException I/O exception
    */
   @Test
-  public void zipZip() throws IOException {
+  public void zipZipFile2() throws IOException {
     check(_ZIP_ZIP_FILE);
     // check fourth file
     query(_ZIP_ZIP_FILE.args(
@@ -192,7 +192,7 @@ public final class FNZipTest extends AdvancedQueryTest {
    * @throws IOException I/O exception
    */
   @Test
-  public void updateEntries() throws IOException {
+  public void zipUpdateEntries() throws IOException {
     check(_ZIP_UPDATE_ENTRIES);
     String list = query(_ZIP_ENTRIES.args(ZIP));
 

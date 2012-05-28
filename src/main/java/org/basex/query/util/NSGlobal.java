@@ -37,6 +37,7 @@ public final class NSGlobal {
     NS.add(FILE, FILEURI);
     NS.add(HTTP, HTTPURI);
     NS.add(ZIP, ZIPURI);
+    NS.add(ZIP2, ZIP2URI);
     NS.add(PKG, PKGURI);
     NS.add(EXPERR, EXPERROR);
     // BaseX namespaces

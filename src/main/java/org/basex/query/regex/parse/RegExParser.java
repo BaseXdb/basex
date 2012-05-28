@@ -66,9 +66,9 @@ public class RegExParser implements RegExParserConstants {
           (m & MULTILINE) != 0, (m & CASE_INSENSITIVE) != 0);
       return Pattern.compile(parser.parse().toString(), m);
     } catch(final ParseException pe) {
-      throw Err.REGERR.thrw(ii, pe.getMessage());
+      throw Err.REGERR.thrw(ii, pe);
     } catch(final TokenMgrError err) {
-      throw Err.REGERR.thrw(ii, err.getMessage());
+      throw Err.REGERR.thrw(ii, err);
     }
   }
 
