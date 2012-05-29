@@ -158,7 +158,7 @@ public final class FNFile extends StandardFunc {
     // get canonical representation to resolve symbolic links
     final File dir;
     try {
-      dir = new File(path.getCanonicalPath().replace("[\\/]$", ""));
+      dir = new File(path.getCanonicalPath().replaceAll("[\\\\/]$", ""));
     } catch(final IOException ex) {
       throw FL_PATH.thrw(info, path);
     }
@@ -333,10 +333,7 @@ public final class FNFile extends StandardFunc {
   private Item write(final File path, final QueryContext ctx, final boolean append)
       throws QueryException {
 
-    if(path.isDirectory()) FL_DIR.thrw(info, path);
-    final File dir = path.getParentFile();
-    if(!dir.exists()  && !dir.mkdirs()) FL_CREATE.thrw(info, dir);
-
+    md(path);
     final Iter ir = expr[1].iter(ctx);
     try {
       final PrintOutput out = PrintOutput.get(new FileOutputStream(path, append));
@@ -367,15 +364,11 @@ public final class FNFile extends StandardFunc {
   private Item writeBinary(final File path, final QueryContext ctx, final boolean append)
       throws QueryException {
 
-    final IOFile io = new IOFile(path);
-    if(io.isDir()) FL_DIR.thrw(info, io);
-    final IOFile dir = new IOFile(io.dir());
-    if(!dir.exists() && !dir.md()) FL_CREATE.thrw(info, dir);
-
+    md(path);
+    final Iter ir = expr[1].iter(ctx);
     try {
       final BufferOutput out = new BufferOutput(new FileOutputStream(path, append));
       try {
-        final Iter ir = expr[1].iter(ctx);
         for(Item it; (it = ir.next()) != null;) {
           final InputStream is = it.input(info);
           try {
@@ -391,6 +384,18 @@ public final class FNFile extends StandardFunc {
       FL_IO.thrw(info, ex);
     }
     return null;
+  }
+
+  /**
+   * Creates the target directory of the specified file.
+   * @param path file to be written
+   * @throws QueryException query exception
+   */
+  private void md(final File path) throws QueryException {
+    final IOFile io = new IOFile(path);
+    if(io.isDir()) FL_DIR.thrw(info, io);
+    final IOFile dir = new IOFile(io.dir());
+    if(!dir.exists() && !dir.md()) FL_CREATE.thrw(info, dir);
   }
 
   /**
