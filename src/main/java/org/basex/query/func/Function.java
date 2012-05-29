@@ -771,10 +771,10 @@ public enum Function {
   /** XQuery function */
   _ZIP2_ENTRIES(FNZip2.class, "entries(zip)", ELM_ZM, B64),
   /** XQuery function */
-  _ZIP2_EXTRACT_TEXTS(FNZip2.class, "extract-texts(zip[,names[,encoding]])",
+  _ZIP2_EXTRACT_TEXT(FNZip2.class, "extract-text(zip[,names[,encoding]])",
       STR_ZM, 1, B64, STR_ZM, STR),
   /** XQuery function */
-  _ZIP2_EXTRACT_BINARIES(FNZip2.class, "extract-binaries(zip[,names])",
+  _ZIP2_EXTRACT_BINARY(FNZip2.class, "extract-binary(zip[,names])",
       B64_ZM, 1, B64, STR_ZM),
   /** XQuery function */
   _ZIP2_UPDATE(FNZip2.class, "update(zip,entries,contents)", B64, B64, ELM_ZM, ITEM_ZM),

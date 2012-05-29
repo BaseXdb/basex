@@ -55,10 +55,10 @@ public class FNZip2 extends StandardFunc {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(sig) {
-      case _ZIP2_ENTRIES:          return entries(ctx);
-      case _ZIP2_EXTRACT_TEXTS:    return extractTexts(ctx);
-      case _ZIP2_EXTRACT_BINARIES: return extractBinaries(ctx);
-      default:                     return super.iter(ctx);
+      case _ZIP2_ENTRIES:        return entries(ctx);
+      case _ZIP2_EXTRACT_TEXT:   return extractText(ctx);
+      case _ZIP2_EXTRACT_BINARY: return extractBinary(ctx);
+      default:                   return super.iter(ctx);
     }
   }
 
@@ -151,7 +151,7 @@ public class FNZip2 extends StandardFunc {
    * @return text entry
    * @throws QueryException query exception
    */
-  private ValueBuilder extractTexts(final QueryContext ctx) throws QueryException {
+  private ValueBuilder extractText(final QueryContext ctx) throws QueryException {
     final String enc = encoding(2, ZIP2_ENCODING, ctx);
     final ValueBuilder vb = new ValueBuilder();
     for(final byte[] b : extract(ctx)) vb.add(Str.get(encode(b, enc)));
@@ -164,7 +164,7 @@ public class FNZip2 extends StandardFunc {
    * @return binary entry
    * @throws QueryException query exception
    */
-  private ValueBuilder extractBinaries(final QueryContext ctx) throws QueryException {
+  private ValueBuilder extractBinary(final QueryContext ctx) throws QueryException {
     final ValueBuilder vb = new ValueBuilder();
     for(final byte[] b : extract(ctx)) vb.add(new B64(b));
     return vb;

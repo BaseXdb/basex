@@ -68,16 +68,16 @@ public final class FNZip2Test extends AdvancedQueryTest {
    */
   @Test
   public void zip2ExtractTexts() {
-    check(_ZIP2_EXTRACT_TEXTS);
+    check(_ZIP2_EXTRACT_TEXT);
     // extract all entries
-    query(COUNT.args(_ZIP2_EXTRACT_TEXTS.args(_FILE_READ_BINARY.args(ZIP))), "5");
+    query(COUNT.args(_ZIP2_EXTRACT_TEXT.args(_FILE_READ_BINARY.args(ZIP))), "5");
     // extract all entries
     query("let $a := " + _FILE_READ_BINARY.args(ZIP) +
           "let $b := " + _ZIP2_ENTRIES.args("$a") +
-          "return " + COUNT.args(_ZIP2_EXTRACT_TEXTS.args("$a", "$b")), 5);
+          "return " + COUNT.args(_ZIP2_EXTRACT_TEXT.args("$a", "$b")), 5);
     // extract single entry
     query("let $a := " + _FILE_READ_BINARY.args(ZIP) +
-          "let $b := " + _ZIP2_EXTRACT_TEXTS.args("$a", "test/input.xml") +
+          "let $b := " + _ZIP2_EXTRACT_TEXT.args("$a", "test/input.xml") +
           "let $c := " + PARSE_XML.args("$b") +
           "return $c//title/text()", "XML");
   }
@@ -87,16 +87,16 @@ public final class FNZip2Test extends AdvancedQueryTest {
    */
   @Test
   public void zip2ExtractBinary() {
-    check(_ZIP2_EXTRACT_BINARIES);
+    check(_ZIP2_EXTRACT_BINARY);
     // extract all entries
-    query(COUNT.args(_ZIP2_EXTRACT_BINARIES.args(_FILE_READ_BINARY.args(ZIP))), "5");
+    query(COUNT.args(_ZIP2_EXTRACT_BINARY.args(_FILE_READ_BINARY.args(ZIP))), "5");
     // extract all entries
     query("let $a := " + _FILE_READ_BINARY.args(ZIP) +
           "let $b := " + _ZIP2_ENTRIES.args("$a") +
-          "return count(" + _ZIP2_EXTRACT_BINARIES.args("$a", "$b") + ")", 5);
+          "return count(" + _ZIP2_EXTRACT_BINARY.args("$a", "$b") + ")", 5);
     // extract single entry
     query("let $a := " + _FILE_READ_BINARY.args(ZIP) +
-          "let $b := " + _ZIP2_EXTRACT_BINARIES.args("$a", "test/input.xml") +
+          "let $b := " + _ZIP2_EXTRACT_BINARY.args("$a", "test/input.xml") +
           "let $c := " + _CONVERT_TO_STRING.args("$b") +
           "let $d := " + PARSE_XML.args("$c") +
           "return $d//title/text()", "XML");
@@ -114,11 +114,11 @@ public final class FNZip2Test extends AdvancedQueryTest {
         COUNT.args(_ZIP2_ENTRIES.args(" .")), 6);
     query(_ZIP2_CREATE.args("<entry>X</entry>", "X") + " ! " +
         _ZIP2_UPDATE.args(" .", "<entry>Y</entry>", "Y") + " ! " +
-        _ZIP2_EXTRACT_TEXTS.args(" ."), "X Y");
+        _ZIP2_EXTRACT_TEXT.args(" ."), "X Y");
     // updates an existing entry
     query(_ZIP2_CREATE.args("<entry>X</entry>", "X") + " ! " +
         _ZIP2_UPDATE.args(" .", "<entry>X</entry>", "Y") + " ! " +
-        _ZIP2_EXTRACT_TEXTS.args(" ."), "Y");
+        _ZIP2_EXTRACT_TEXT.args(" ."), "Y");
   }
 
   /**
