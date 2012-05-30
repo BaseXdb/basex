@@ -448,6 +448,8 @@ public interface QueryText {
   byte[] XSI = token("xsi");
   /** XS token. */
   byte[] LOCAL = token("local");
+  /** Archive module token. */
+  byte[] ARCHIVE = token("archive");
   /** File module token. */
   byte[] FILE = token("file");
   /** HTTP Client token. */
@@ -458,8 +460,6 @@ public interface QueryText {
   byte[] XSLT = token("xslt");
   /** ZIP token. */
   byte[] ZIP = token("zip");
-  /** ZIP2 token. */
-  byte[] ZIP2 = token("zip2");
   /** HOF token. */
   byte[] HOF = token("hof");
   /** JSON token. */
@@ -539,6 +539,8 @@ public interface QueryText {
   String BXMODULES = Text.URL + "/modules/";
   /** Project errors. */
   byte[] BXERRORS = token(Text.URL + "/errors");
+  /** Archive module URI.*/
+  byte[] ARCHIVEURI = token(BXMODULES + "archive");
   /** Client module URI. */
   byte[] CLIENTURI = token(BXMODULES + "client");
   /** Convert module URI. */
@@ -547,26 +549,24 @@ public interface QueryText {
   byte[] DBURI = token(BXMODULES + "db");
   /** Full-text module URI. */
   byte[] FTURI = token(BXMODULES + "ft");
-  /** Higher-order URI. */
+  /** Higher-order module URI. */
   byte[] HOFURI = token(BXMODULES + "hof");
-  /** Index URI. */
+  /** Index module URI. */
   byte[] INDEXURI = token(BXMODULES + "index");
-  /** JSON URI. */
+  /** JSON module URI. */
   byte[] JSONURI = token(BXMODULES + "json");
-  /** PROC URI. */
+  /** Process module URI. */
   byte[] PROCURI = token(BXMODULES + "proc");
   /** Utility module URI. */
   byte[] UTILURI = token(BXMODULES + "util");
   /** XSLT module URI. */
   byte[] XSLTURI = token(BXMODULES + "xslt");
-  /** SQL Module URI. */
+  /** SQL module URI. */
   byte[] SQLURI = token(BXMODULES + "sql");
-  /** Repo URI. */
+  /** Repository module URI. */
   byte[] REPOURI = token(BXMODULES + "repo");
-  /** Validate URI. */
+  /** Validate module URI. */
   byte[] VALIDATEURI = token(BXMODULES + "validate");
-  /** ZIP2 URI.*/
-  byte[] ZIP2URI = token(BXMODULES + "zip2");
 
   /** Java prefix. */
   byte[] JAVAPREF = token("java:");

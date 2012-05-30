@@ -442,6 +442,24 @@ public enum Function {
   /** XQuery math function (project specific). */
   _MATH_TANH(FNMath.class, "tanh(number)", DBL_ZO, DBL_ZO),
 
+  /* FNArchive functions. */
+
+  /** XQuery function */
+  _ARCHIVE_CREATE(FNArchive.class, "create(entries,contents)", B64, ELM_ZM, ITEM_ZM),
+  /** XQuery function */
+  _ARCHIVE_ENTRIES(FNArchive.class, "entries(archive)", ELM_ZM, B64),
+  /** XQuery function */
+  _ARCHIVE_EXTRACT_TEXT(FNArchive.class, "extract-text(archiveip[,names[,encoding]])",
+      STR_ZM, 1, B64, STR_ZM, STR),
+  /** XQuery function */
+  _ARCHIVE_EXTRACT_BINARY(FNArchive.class, "extract-binary(archive[,names])",
+      B64_ZM, 1, B64, STR_ZM),
+  /** XQuery function */
+  _ARCHIVE_UPDATE(FNArchive.class, "update(archive,entries,contents)",
+      B64, B64, ELM_ZM, ITEM_ZM),
+  /** XQuery function */
+  _ARCHIVE_DELETE(FNArchive.class, "delete(archive,entries)", B64, B64, STR_ZM),
+
   /* FNConvert functions. */
 
   /** Conversion function. */
@@ -762,24 +780,7 @@ public enum Function {
   /** XQuery function */
   _ZIP_ZIP_FILE(FNZip.class, "zip-file(zip)", EMP, ELM),
   /** XQuery function */
-  _ZIP_UPDATE_ENTRIES(FNZip.class, "update-entries(zip,output)", EMP, ELM, STR),
-
-  /* FNZip2 functions (EXPath). */
-
-  /** XQuery function */
-  _ZIP2_CREATE(FNZip2.class, "create(entries,contents)", B64, ELM_ZM, ITEM_ZM),
-  /** XQuery function */
-  _ZIP2_ENTRIES(FNZip2.class, "entries(zip)", ELM_ZM, B64),
-  /** XQuery function */
-  _ZIP2_EXTRACT_TEXT(FNZip2.class, "extract-text(zip[,names[,encoding]])",
-      STR_ZM, 1, B64, STR_ZM, STR),
-  /** XQuery function */
-  _ZIP2_EXTRACT_BINARY(FNZip2.class, "extract-binary(zip[,names])",
-      B64_ZM, 1, B64, STR_ZM),
-  /** XQuery function */
-  _ZIP2_UPDATE(FNZip2.class, "update(zip,entries,contents)", B64, B64, ELM_ZM, ITEM_ZM),
-  /** XQuery function */
-  _ZIP2_DELETE(FNZip2.class, "delete(zip,entries)", B64, B64, STR_ZM);
+  _ZIP_UPDATE_ENTRIES(FNZip.class, "update-entries(zip,output)", EMP, ELM, STR);
 
   /** Updating functions. */
   static final Function[] UPDATING = {
@@ -805,6 +806,7 @@ public enum Function {
     URIS.put(FNZip.class,    ZIPURI);
     URIS.put(FNRepo.class,   REPOURI);
     // internal functions
+    URIS.put(FNArchive.class,  ARCHIVEURI);
     URIS.put(FNClient.class,   CLIENTURI);
     URIS.put(FNConvert.class,  CONVERTURI);
     URIS.put(FNDb.class,       DBURI);
@@ -817,7 +819,6 @@ public enum Function {
     URIS.put(FNUtil.class,     UTILURI);
     URIS.put(FNValidate.class, VALIDATEURI);
     URIS.put(FNXslt.class,     XSLTURI);
-    URIS.put(FNZip2.class,     ZIP2URI);
   }
 
   /** Minimum number of arguments. */

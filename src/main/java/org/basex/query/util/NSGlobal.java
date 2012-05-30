@@ -36,13 +36,12 @@ public final class NSGlobal {
     NS.add(CRYPTO, CRYPTOURI);
     NS.add(FILE, FILEURI);
     NS.add(HTTP, HTTPURI);
-    NS.add(ZIP, ZIPURI);
-    NS.add(ZIP2, ZIP2URI);
     NS.add(PKG, PKGURI);
+    NS.add(ZIP, ZIPURI);
     NS.add(EXPERR, EXPERROR);
     // BaseX namespaces
+    NS.add(ARCHIVE, ARCHIVEURI);
     NS.add(BASEX, BASEXURI);
-    NS.add(BXERR, BXERRORS);
     NS.add(CLIENT, CLIENTURI);
     NS.add(CONVERT, CONVERTURI);
     NS.add(DB, DBURI);
@@ -56,6 +55,7 @@ public final class NSGlobal {
     NS.add(XSLT, XSLTURI);
     NS.add(REPO, REPOURI);
     NS.add(VLDT, VALIDATEURI);
+    NS.add(BXERR, BXERRORS);
   }
 
   /** Private constructor. */
