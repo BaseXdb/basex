@@ -26,7 +26,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public class FNZip2 extends StandardFunc {
+public class FNArchive extends StandardFunc {
   /** Entry. */
   private static final QNm Q_ENTRY = new QNm("entry");
   /** Level. */
@@ -48,16 +48,16 @@ public class FNZip2 extends StandardFunc {
    * @param f function definition
    * @param e arguments
    */
-  public FNZip2(final InputInfo ii, final Function f, final Expr... e) {
+  public FNArchive(final InputInfo ii, final Function f, final Expr... e) {
     super(ii, f, e);
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(sig) {
-      case _ZIP2_ENTRIES:        return entries(ctx);
-      case _ZIP2_EXTRACT_TEXT:   return extractText(ctx);
-      case _ZIP2_EXTRACT_BINARY: return extractBinary(ctx);
+      case _ARCHIVE_ENTRIES:        return entries(ctx);
+      case _ARCHIVE_EXTRACT_TEXT:   return extractText(ctx);
+      case _ARCHIVE_EXTRACT_BINARY: return extractBinary(ctx);
       default:                   return super.iter(ctx);
     }
   }
@@ -66,9 +66,9 @@ public class FNZip2 extends StandardFunc {
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     checkCreate(ctx);
     switch(sig) {
-      case _ZIP2_CREATE:         return create(ctx);
-      case _ZIP2_UPDATE:         return update(ctx);
-      case _ZIP2_DELETE:         return delete(ctx);
+      case _ARCHIVE_CREATE:         return create(ctx);
+      case _ARCHIVE_UPDATE:         return update(ctx);
+      case _ARCHIVE_DELETE:         return delete(ctx);
       default:                   return super.item(ctx, ii);
     }
   }
@@ -103,13 +103,13 @@ public class FNZip2 extends StandardFunc {
       // count remaining entries
       if(con != null) do c++; while(cont.next() != null);
       if(elm != null) do e++; while(elem.next() != null);
-      if(e != c) throw ZIP2_DIFF.thrw(info, e, c);
+      if(e != c) throw ARCH_DIFF.thrw(info, e, c);
 
       zos.close();
       return new B64(ao.toArray());
     } catch(final IOException ex) {
       Util.debug(ex);
-      throw ZIP2_FAIL.thrw(info, ex);
+      throw ARCH_FAIL.thrw(info, ex);
     }
   }
 
@@ -141,7 +141,7 @@ public class FNZip2 extends StandardFunc {
       return vb;
     } catch(final IOException ex) {
       Util.debug(ex);
-      throw ZIP2_FAIL.thrw(info, ex);
+      throw ARCH_FAIL.thrw(info, ex);
     }
   }
 
@@ -152,7 +152,7 @@ public class FNZip2 extends StandardFunc {
    * @throws QueryException query exception
    */
   private ValueBuilder extractText(final QueryContext ctx) throws QueryException {
-    final String enc = encoding(2, ZIP2_ENCODING, ctx);
+    final String enc = encoding(2, ARCH_ENCODING, ctx);
     final ValueBuilder vb = new ValueBuilder();
     for(final byte[] b : extract(ctx)) vb.add(Str.get(encode(b, enc)));
     return vb;
@@ -198,7 +198,7 @@ public class FNZip2 extends StandardFunc {
     // count remaining entries
     if(con != null) do c++; while(cont.next() != null);
     if(elm != null) do e++; while(elem.next() != null);
-    if(e != c) throw ZIP2_DIFF.thrw(info, e, c);
+    if(e != c) throw ARCH_DIFF.thrw(info, e, c);
 
     final ZipInputStream zis = new ZipInputStream(zip.input(info));
     final ArrayOutput ao = new ArrayOutput();
@@ -215,7 +215,7 @@ public class FNZip2 extends StandardFunc {
       }
     } catch(final IOException ex) {
       Util.debug(ex);
-      ZIP2_FAIL.thrw(info, ex);
+      ARCH_FAIL.thrw(info, ex);
     }
     return new B64(ao.toArray());
   }
@@ -247,7 +247,7 @@ public class FNZip2 extends StandardFunc {
       }
     } catch(final IOException ex) {
       Util.debug(ex);
-      ZIP2_FAIL.thrw(info, ex);
+      ARCH_FAIL.thrw(info, ex);
     }
     return new B64(ao.toArray());
   }
@@ -286,7 +286,7 @@ public class FNZip2 extends StandardFunc {
       }
     } catch(final IOException ex) {
       Util.debug(ex);
-      ZIP2_FAIL.thrw(info, ex);
+      ARCH_FAIL.thrw(info, ex);
     }
     return tl;
   }
@@ -326,7 +326,7 @@ public class FNZip2 extends StandardFunc {
 
     // create new zip entry
     final String name = string(el.string());
-    if(name.isEmpty()) ZIP2_NAME.thrw(info);
+    if(name.isEmpty()) ARCH_NAME.thrw(info);
     final ZipEntry ze = new ZipEntry(name);
 
     // compression level
@@ -334,7 +334,7 @@ public class FNZip2 extends StandardFunc {
     final byte[] level = el.attribute(Q_LEVEL);
     if(level != null) {
       lvl = toInt(level);
-      if(lvl < 0 || lvl > 9) ZIP2_LEVEL.thrw(info, level);
+      if(lvl < 0 || lvl > 9) ARCH_LEVEL.thrw(info, level);
     }
     zos.setLevel(lvl);
 
@@ -344,7 +344,7 @@ public class FNZip2 extends StandardFunc {
       try {
         ze.setTime(new Int(new Dtm(mod, info)).itr());
       } catch(final QueryException qe) {
-        ZIP2_MODIFIED.thrw(info, mod);
+        ARCH_MODIFIED.thrw(info, mod);
       }
     }
 
@@ -355,13 +355,13 @@ public class FNZip2 extends StandardFunc {
       final byte[] enc = el.attribute(Q_ENCODING);
       if(enc != null) {
         final String en = string(enc);
-        if(!Charset.isSupported(en)) ZIP2_ENCODING.thrw(info, enc);
+        if(!Charset.isSupported(en)) ARCH_ENCODING.thrw(info, enc);
         if(en != Token.UTF8) val = encode(val, en);
       }
     } else if(con.type == AtomType.B64) {
       val = ((Bin) con).binary(info);
     } else {
-      ZIP2_STRB64.thrw(info, con.type);
+      ARCH_STRB64.thrw(info, con.type);
     }
     zos.putNextEntry(ze);
     zos.write(val);
@@ -378,7 +378,7 @@ public class FNZip2 extends StandardFunc {
     try {
       return FNConvert.toString(new ArrayInput(val), en);
     } catch(final IOException ex) {
-      throw ZIP2_ENCODE.thrw(info, ex);
+      throw ARCH_ENCODE.thrw(info, ex);
     }
   }
 }
