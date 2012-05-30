@@ -299,15 +299,6 @@ public final class QT3TS {
 
       // run query
       result.value = query.value();
-      final Value v = result.value.internal();
-      if(v instanceof Streamable) {
-        // force retrieval of streamable items to trigger certain error messages
-        try {
-          ((Streamable) v).input(null).close();
-        } catch(final QueryException ex) {
-          throw new XQueryException(ex);
-        }
-      }
     } catch(final XQueryException ex) {
       result.exc = ex;
       result.value = null;

@@ -344,16 +344,6 @@ public abstract class QT3TestSet {
     final QT3Result res = new QT3Result();
     try {
       res.value = query.value();
-      final Value v = res.value.internal();
-      if(v instanceof Streamable) {
-        // force retrieval of streamable items to trigger certain error messages
-        try {
-          ((Streamable) v).input(null).close();
-        } catch(final QueryException ex) {
-          res.value = null;
-          throw new XQueryException(ex);
-        }
-      }
     } catch(final XQueryException xqe) {
       res.exc = xqe;
     } catch(final Throwable trw) {

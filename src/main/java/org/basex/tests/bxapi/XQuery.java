@@ -159,7 +159,7 @@ public final class XQuery implements Iterable<XdmItem> {
    */
   public XdmValue value() {
     try {
-      return XdmValue.get(qp.value());
+      return XdmValue.get(qp.value().materialize(null));
     } catch(final QueryException ex) {
       throw new XQueryException(ex);
     }
