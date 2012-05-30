@@ -15,7 +15,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class B64Stream extends B64 implements Streamable {
+public final class B64Stream extends B64 {
   /** File reference. */
   private final IO input;
   /** Error message. */
@@ -53,6 +53,15 @@ public final class B64Stream extends B64 implements Streamable {
     try {
       final InputStream is = input.inputStream();
       return is instanceof BufferInput ? (BufferInput) is : new BufferInput(is);
+    } catch(final IOException ex) {
+      throw error.thrw(ii, ex);
+    }
+  }
+
+  @Override
+  public Item materialize(final InputInfo ii) throws QueryException {
+    try {
+      return new B64(input(ii).content());
     } catch(final IOException ex) {
       throw error.thrw(ii, ex);
     }

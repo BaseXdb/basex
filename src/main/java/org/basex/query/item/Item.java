@@ -179,6 +179,11 @@ public abstract class Item extends Value {
   }
 
   @Override
+  public Item materialize(final InputInfo ii) throws QueryException {
+    return this;
+  }
+
+  @Override
   public final SeqType type() {
     return type.seqType();
   }

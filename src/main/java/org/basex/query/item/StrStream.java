@@ -15,7 +15,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class StrStream extends Item implements Streamable {
+public final class StrStream extends Item {
   /** Input reference. */
   private final IO input;
   /** Encoding (optional). */
@@ -77,6 +77,11 @@ public final class StrStream extends Item implements Streamable {
     } catch(final IOException ex) {
       throw error.thrw(ii, input);
     }
+  }
+
+  @Override
+  public Item materialize(final InputInfo ii) throws QueryException {
+    return Str.get(string(ii));
   }
 
   @Override

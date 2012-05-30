@@ -485,7 +485,7 @@ public final class QueryContext extends Progress {
     // use standard iterator
     while((it = ir.next()) != null) {
       checkStop();
-      if(vb.size() < max) vb.add(it);
+      if(vb.size() < max) vb.add(it.materialize(null));
     }
     return vb;
   }
