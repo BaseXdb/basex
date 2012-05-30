@@ -109,7 +109,7 @@ public final class FNUtil extends StandardFunc {
     checkCreate(ctx);
     final String path = string(checkStr(expr[0], ctx));
     final IO io = IO.get(path);
-    if(!io.exists()) FL_IO.thrw(info, path);
+    if(!io.exists()) FILE_IO.thrw(info, path);
     try {
       return eval(ctx, io.read());
     } catch(final IOException ex) {

@@ -142,94 +142,6 @@ public enum Err {
 
   // EXPath modules
 
-  /** FOCX0001. */
-  CRYPTO_CANINV(FOCX, 1, "Canonicalization algorithm is not supported."),
-  /** FOCX0002. */
-  CRYPTO_DIGINV(FOCX, 2, "Digest algorithm is not supported."),
-  /** FOCX0003. */
-  CRYPTO_SIGINV(FOCX, 3, "Signature algorithm is not supported."),
-  /** FOCX0004. */
-  CRYPTO_XPINV(FOCX, 4, "XPath expression is invalid."),
-  /** FOCX0005. */
-  CRYPTO_INVNM(FOCX, 5, "Invalid name for $digital-certificate root."),
-  /** FOCX0007. */
-  CRYPTO_KSNULL(FOCX, 7, "Key store is null."),
-  /** FOCX0012. */
-  CRYPTO_NOKEY(FOCX, 12, "Cannot find key for alias in given keystore."),
-  /** FOCX0013. */
-  CRYPTO_INVHASH(FOCX, 13, "Hashing algorithm is not supported."),
-  /** FOCX0014. */
-  CRYPTO_ENC(FOCX, 14, "The encoding method is not supported."),
-  /** FOCX0015. */
-  CRYPTO_NOSIG(FOCX, 15, "Cannot find signature element."),
-  /** FOCX0016. */
-  CRYPTO_NOPAD(FOCX, 16, "No such padding."),
-  /** FOCX0017. */
-  CRYPTO_BADPAD(FOCX, 17, "Incorrect padding."),
-  /** FOCX0018. */
-  CRYPTO_ENCTYP(FOCX, 18, "Encryption type is not supported."),
-  /** FOCX0019. */
-  CRYPTO_KEYINV(FOCX, 19, "Secret key is invalid."),
-  /** FOCX0020. */
-  CRYPTO_ILLBLO(FOCX, 20, "Illegal block size."),
-  /** FOCX0021. */
-  CRYPTO_INVALGO(FOCX, 21, "Algorithm is not supported."),
-  /** FOCX0023. */
-  CRYPTO_ALINV(FOCX, 23, "Invalid certificate alias %."),
-  /** FOCX0024. */
-  CRYPTO_ALGEXC(FOCX, 24, "Invalid algorithm."),
-  /** FOCX0025. */
-  CRYPTO_IOEXC(FOCX, 25, "IO Exception."),
-  /** FOCX0026. */
-  CRYPTO_KSEXC(FOCX, 26, "Keystore exception."),
-  /** FOCX0027. */
-  CRYPTO_SIGEXC(FOCX, 27, "Signature exception."),
-  /** FOCX0028. */
-  CRYPTO_SIGTYPINV(FOCX, 28, "Signature type is not supported."),
-
-  /** FOFL0001. */
-  FL_WHICH(FOFL, 1, "Path '%' does not exist."),
-  /** FOFL0002. */
-  FL_EXISTS(FOFL, 2, "File '%' already exists."),
-  /** FOFL0003. */
-  FL_NODIR(FOFL, 3, "Path '%' is not a directory."),
-  /** FOFL0004. */
-  FL_DIR(FOFL, 4, "Path '%' is a directory."),
-  /** FOFL0007. */
-  FL_ENCODING(FOFL, 5, "Encoding '%' is not supported."),
-  /** FOFL9999. */
-  FL_IO(FOFL, 9999, "%"),
-  /** FOFL9999. */
-  FL_CREATE(FOFL, 9999, "Directory '%' cannot be created."),
-  /** FOFL9999. */
-  FL_DEL(FOFL, 9999, "Path '%' cannot be deleted."),
-  /** FOFL9999. */
-  FL_MOVE(FOFL, 9999, "Moving '%' to '%' failed."),
-  /** FOFL9999. */
-  FL_LIST(FOFL, 9999, "Files of '%' cannot be accessed."),
-  /** FOFL9999. */
-  FL_PATH(FOFL, 9999, "Invalid file path: '%'."),
-
-  /** FOHC0001. */
-  HC_ERROR(FOHC, 1, "An HTTP error occurred: %."),
-  /** FOHC003. */
-  HC_ATTR(FOHC, 3, "No attribute beside 'src' and 'media-type' allowed."),
-  /** FOHC0004. */
-  HC_REQ(FOHC, 4, "Invalid request element: %."),
-  /** FOHC005. */
-  HC_URL(FOHC, 5, "No URL specified."),
-  /** FOHC006. */
-  HC_PARAMS(FOHC, 6, "Specify request element or HTTP URI."),
-
-  /** FOZP0001. */
-  ZIP_NOTFOUND(FOZP, 1, "Path '%' is not found."),
-  /** FOZP0002. */
-  ZIP_INVALID(FOZP, 2, "% element: % attribute expected."),
-  /** FOZP0002. */
-  ZIP_UNKNOWN(FOZP, 2, "ZIP definition: unknown element %."),
-  /** FOZP0003. */
-  ZIP_FAIL(FOZP, 3, "Operation failed: %."),
-
   /** ARCH0001. */
   ARCH_DIFF(ARCH, 1, "Number of entries (%) and contents (%) differs."),
   /** ARCH0002. */
@@ -246,6 +158,94 @@ public enum Err {
   ARCH_ENCODE(ARCH, 4, "String conversion: %."),
    /** ARCH9999. */
   ARCH_FAIL(ARCH, 9999, "Operation failed: %."),
+
+  /** CX0001. */
+  CX_CANINV(CX, 1, "Canonicalization algorithm is not supported."),
+  /** CX0002. */
+  CX_DIGINV(CX, 2, "Digest algorithm is not supported."),
+  /** CX0003. */
+  CX_SIGINV(CX, 3, "Signature algorithm is not supported."),
+  /** CX0004. */
+  CX_XPINV(CX, 4, "XPath expression is invalid."),
+  /** CX0005. */
+  CX_INVNM(CX, 5, "Invalid name for $digital-certificate root."),
+  /** CX0007. */
+  CX_KSNULL(CX, 7, "Key store is null."),
+  /** CX0012. */
+  CX_NOKEY(CX, 12, "Cannot find key for alias in given keystore."),
+  /** CX0013. */
+  CX_INVHASH(CX, 13, "Hashing algorithm is not supported."),
+  /** CX0014. */
+  CX_ENC(CX, 14, "The encoding method is not supported."),
+  /** CX0015. */
+  CX_NOSIG(CX, 15, "Cannot find signature element."),
+  /** CX0016. */
+  CX_NOPAD(CX, 16, "No such padding."),
+  /** CX0017. */
+  CX_BADPAD(CX, 17, "Incorrect padding."),
+  /** CX0018. */
+  CX_ENCTYP(CX, 18, "Encryption type is not supported."),
+  /** CX0019. */
+  CX_KEYINV(CX, 19, "Secret key is invalid."),
+  /** CX0020. */
+  CX_ILLBLO(CX, 20, "Illegal block size."),
+  /** CX0021. */
+  CX_INVALGO(CX, 21, "Algorithm is not supported."),
+  /** CX0023. */
+  CX_ALINV(CX, 23, "Invalid certificate alias %."),
+  /** CX0024. */
+  CX_ALGEXC(CX, 24, "Invalid algorithm."),
+  /** CX0025. */
+  CX_IOEXC(CX, 25, "IO Exception."),
+  /** CX0026. */
+  CX_KSEXC(CX, 26, "Keystore exception."),
+  /** CX0027. */
+  CX_SIGEXC(CX, 27, "Signature exception."),
+  /** CX0028. */
+  CX_SIGTYPINV(CX, 28, "Signature type is not supported."),
+
+  /** FILE0001. */
+  FILE_WHICH(FILE, 1, "Path '%' does not exist."),
+  /** FILE0002. */
+  FILE_EXISTS(FILE, 2, "File '%' already exists."),
+  /** FILE0003. */
+  FILE_NODIR(FILE, 3, "Path '%' is not a directory."),
+  /** FILE0004. */
+  FILE_DIR(FILE, 4, "Path '%' is a directory."),
+  /** FILE0007. */
+  FILE_ENCODING(FILE, 5, "Encoding '%' is not supported."),
+  /** FILE9999. */
+  FILE_IO(FILE, 9999, "%"),
+  /** FILE9999. */
+  FILE_CREATE(FILE, 9999, "Directory '%' cannot be created."),
+  /** FILE9999. */
+  FILE_DEL(FILE, 9999, "Path '%' cannot be deleted."),
+  /** FILE9999. */
+  FILE_MOVE(FILE, 9999, "Moving '%' to '%' failed."),
+  /** FILE9999. */
+  FILE_LIST(FILE, 9999, "Files of '%' cannot be accessed."),
+  /** FILE9999. */
+  FILE_PATH(FILE, 9999, "Invalid file path: '%'."),
+
+  /** HC0001. */
+  HC_ERROR(HC, 1, "An HTTP error occurred: %."),
+  /** HC0003. */
+  HC_ATTR(HC, 3, "No attribute beside 'src' and 'media-type' allowed."),
+  /** HC0004. */
+  HC_REQ(HC, 4, "Invalid request element: %."),
+  /** HC0005. */
+  HC_URL(HC, 5, "No URL specified."),
+  /** HC0006. */
+  HC_PARAMS(HC, 6, "Specify request element or HTTP URI."),
+
+  /** ZIP0001. */
+  ZIP_NOTFOUND(ZIP, 1, "Path '%' is not found."),
+  /** ZIP0002. */
+  ZIP_INVALID(ZIP, 2, "% element: % attribute expected."),
+  /** ZIP0002. */
+  ZIP_UNKNOWN(ZIP, 2, "ZIP definition: unknown element %."),
+  /** ZIP0003. */
+  ZIP_FAIL(ZIP, 3, "Operation failed: %."),
 
   // W3 Functions
 
@@ -996,10 +996,10 @@ public enum Err {
 
     // EXPath errors
 
-    /** FOCX Error type. */ FOCX(QueryText.EXPERR, QueryText.EXPERROR),
-    /** FOFL Error type. */ FOFL(QueryText.EXPERR, QueryText.EXPERROR),
-    /** FOHC Error type. */ FOHC(QueryText.EXPERR, QueryText.EXPERROR),
-    /** FOZP Error type. */ FOZP(QueryText.EXPERR, QueryText.EXPERROR),
+    /** CX Error type.   */ CX(QueryText.EXPERR, QueryText.EXPERROR),
+    /** FILE Error type. */ FILE(QueryText.EXPERR, QueryText.EXPERROR),
+    /** HC Error type.   */ HC(QueryText.EXPERR, QueryText.EXPERROR),
+    /** ZIP Error type. */  ZIP(QueryText.EXPERR, QueryText.EXPERROR),
     /** FOZ2 Error type. */ ARCH(QueryText.EXPERR, QueryText.EXPERROR),
 
     // W3 errors

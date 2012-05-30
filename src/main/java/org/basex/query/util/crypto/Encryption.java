@@ -81,9 +81,9 @@ public final class Encryption {
     final byte[] aa = a.length == 0 ? DES : a;
     final byte[] tivl = ALGE.get(lc(aa));
     if(!symmetric)
-      CRYPTO_ENCTYP.thrw(info, ec);
+      CX_ENCTYP.thrw(info, ec);
     if(tivl == null)
-      CRYPTO_INVALGO.thrw(info, s);
+      CX_INVALGO.thrw(info, s);
     // initialization vector length
     final int ivl = toInt(tivl);
 
@@ -96,17 +96,17 @@ public final class Encryption {
         t = decrypt(in, k, aa, ivl);
 
     } catch(final NoSuchPaddingException e) {
-      CRYPTO_NOPAD.thrw(info, e);
+      CX_NOPAD.thrw(info, e);
     } catch(final BadPaddingException e) {
-      CRYPTO_BADPAD.thrw(info, e);
+      CX_BADPAD.thrw(info, e);
     } catch(final NoSuchAlgorithmException e) {
-      CRYPTO_INVALGO.thrw(info, e);
+      CX_INVALGO.thrw(info, e);
     } catch(final InvalidKeyException e) {
-      CRYPTO_KEYINV.thrw(info, e);
+      CX_KEYINV.thrw(info, e);
     } catch(final IllegalBlockSizeException e) {
-      CRYPTO_ILLBLO.thrw(info, e);
+      CX_ILLBLO.thrw(info, e);
     } catch(final InvalidAlgorithmParameterException e) {
-      CRYPTO_INVALGO.thrw(info, e);
+      CX_INVALGO.thrw(info, e);
     }
 
     return Str.get(t);
@@ -197,11 +197,11 @@ public final class Encryption {
     byte[] hash = null;
 
     final byte[] aa = a.length == 0 ? DEFA : a;
-    if(!ALGHMAC.contains(lc(aa))) CRYPTO_INVHASH.thrw(info, aa);
+    if(!ALGHMAC.contains(lc(aa))) CX_INVHASH.thrw(info, aa);
 
     final boolean b64 = eq(lc(enc), BASE64) || enc.length == 0;
     if(!b64 && !eq(lc(enc), HEX))
-      CRYPTO_ENC.thrw(info, enc);
+      CX_ENC.thrw(info, enc);
 
     try {
       final Mac mac = Mac.getInstance(string(ALGHMAC.get(lc(aa))));
@@ -209,9 +209,9 @@ public final class Encryption {
       hash = mac.doFinal(msg);
 
     } catch(final NoSuchAlgorithmException e) {
-      CRYPTO_INVHASH.thrw(info, e);
+      CX_INVHASH.thrw(info, e);
     } catch(final InvalidKeyException e) {
-      CRYPTO_KEYINV.thrw(info, e);
+      CX_KEYINV.thrw(info, e);
     }
 
     // convert to specified encoding, base64 as a standard, else use hex

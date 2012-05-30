@@ -126,9 +126,9 @@ public final class FNFileTest extends AdvancedQueryTest {
   @Test
   public void fileList() {
     check(_FILE_LIST);
-    error(_FILE_LIST.args(PATH1), Err.FL_NODIR);
+    error(_FILE_LIST.args(PATH1), Err.FILE_NODIR);
     query(_FILE_WRITE.args(PATH1, "()"));
-    error(_FILE_LIST.args(PATH1), Err.FL_NODIR);
+    error(_FILE_LIST.args(PATH1), Err.FILE_NODIR);
     contains(_FILE_LIST.args(PATH), NAME);
     contains(_FILE_LIST.args(PATH, "false()"), NAME);
     contains(_FILE_LIST.args(PATH, "false()", "Sandbox"), NAME);
@@ -153,8 +153,8 @@ public final class FNFileTest extends AdvancedQueryTest {
     query(_FILE_CREATE_DIRECTORY.args(PATH3));
     query(_FILE_DELETE.args(PATH1, "true()"));
     query(_FILE_WRITE.args(PATH1, "()"));
-    error(_FILE_CREATE_DIRECTORY.args(PATH1), Err.FL_EXISTS);
-    error(_FILE_CREATE_DIRECTORY.args(PATH3), Err.FL_EXISTS);
+    error(_FILE_CREATE_DIRECTORY.args(PATH1), Err.FILE_EXISTS);
+    error(_FILE_CREATE_DIRECTORY.args(PATH3), Err.FILE_EXISTS);
     query(_FILE_DELETE.args(PATH1));
   }
 
@@ -169,7 +169,7 @@ public final class FNFileTest extends AdvancedQueryTest {
     query(_FILE_CREATE_DIRECTORY.args(PATH3));
     query(_FILE_WRITE.args(PATH4, "()"));
     query(_FILE_DELETE.args(PATH1, "true()"));
-    error(_FILE_DELETE.args(PATH1), Err.FL_WHICH);
+    error(_FILE_DELETE.args(PATH1), Err.FILE_WHICH);
   }
 
   /**
@@ -178,11 +178,11 @@ public final class FNFileTest extends AdvancedQueryTest {
   @Test
   public void fileReadText() {
     check(_FILE_READ_TEXT);
-    error(_FILE_READ_TEXT.args(PATH1), Err.FL_WHICH);
-    error(_FILE_READ_TEXT.args(PATH), Err.FL_DIR);
+    error(_FILE_READ_TEXT.args(PATH1), Err.FILE_WHICH);
+    error(_FILE_READ_TEXT.args(PATH), Err.FILE_DIR);
     query(_FILE_WRITE.args(PATH1, "a\u00e4"));
     query(_FILE_READ_TEXT.args(PATH1), "a\u00e4");
-    error(_FILE_READ_TEXT.args(PATH1, "UNKNOWN"), Err.FL_ENCODING);
+    error(_FILE_READ_TEXT.args(PATH1, "UNKNOWN"), Err.FILE_ENCODING);
     assertEquals(3, query(_FILE_READ_TEXT.args(PATH1, "CP1252")).length());
     query(_FILE_DELETE.args(PATH1));
   }
@@ -193,8 +193,8 @@ public final class FNFileTest extends AdvancedQueryTest {
   @Test
   public void fileReadBinary() {
     check(_FILE_READ_BINARY);
-    error(_FILE_READ_BINARY.args(PATH1), Err.FL_WHICH);
-    error(_FILE_READ_BINARY.args(PATH), Err.FL_DIR);
+    error(_FILE_READ_BINARY.args(PATH1), Err.FILE_WHICH);
+    error(_FILE_READ_BINARY.args(PATH), Err.FILE_DIR);
     query(_FILE_WRITE.args(PATH1, "0"));
     query(_FILE_READ_BINARY.args(PATH1), "MA==");
     query(_FILE_WRITE.args(PATH1, "a\u00e4"));
@@ -211,7 +211,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   public void fileWrite() {
     check(_FILE_WRITE);
 
-    error(_FILE_WRITE.args(PATH, "()"), Err.FL_DIR);
+    error(_FILE_WRITE.args(PATH, "()"), Err.FILE_DIR);
 
     query(_FILE_WRITE.args(PATH1, "0"));
     query(_FILE_SIZE.args(PATH1), "1");
@@ -236,7 +236,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   public void fileAppend() {
     check(_FILE_APPEND);
 
-    error(_FILE_APPEND.args(PATH, "()"), Err.FL_DIR);
+    error(_FILE_APPEND.args(PATH, "()"), Err.FILE_DIR);
 
     query(_FILE_APPEND.args(PATH1, "0"));
     query(_FILE_SIZE.args(PATH1), "1");
@@ -263,7 +263,7 @@ public final class FNFileTest extends AdvancedQueryTest {
     check(_FILE_WRITE_BINARY);
 
     final String bin = "xs:base64Binary('MA==')";
-    error(_FILE_WRITE_BINARY.args(PATH, bin), Err.FL_DIR);
+    error(_FILE_WRITE_BINARY.args(PATH, bin), Err.FILE_DIR);
     query(_FILE_WRITE_BINARY.args(PATH1, bin));
     query(_FILE_SIZE.args(PATH1), "1");
     query(_FILE_WRITE_BINARY.args(PATH1, bin));
@@ -279,7 +279,7 @@ public final class FNFileTest extends AdvancedQueryTest {
     check(_FILE_APPEND_BINARY);
 
     final String bin = "xs:base64Binary('MA==')";
-    error(_FILE_APPEND_BINARY.args(PATH, bin), Err.FL_DIR);
+    error(_FILE_APPEND_BINARY.args(PATH, bin), Err.FILE_DIR);
     query(_FILE_APPEND_BINARY.args(PATH1, bin));
     query(_FILE_SIZE.args(PATH1), "1");
     query(_FILE_APPEND_BINARY.args(PATH1, bin));
@@ -300,7 +300,7 @@ public final class FNFileTest extends AdvancedQueryTest {
     query(_FILE_COPY.args(PATH2, PATH2));
     query(_FILE_SIZE.args(PATH1), "1");
     query(_FILE_SIZE.args(PATH2), "1");
-    error(_FILE_COPY.args(PATH1, PATH3), Err.FL_NODIR);
+    error(_FILE_COPY.args(PATH1, PATH3), Err.FILE_NODIR);
 
     query(_FILE_DELETE.args(PATH1));
     query(_FILE_DELETE.args(PATH2));
@@ -313,12 +313,12 @@ public final class FNFileTest extends AdvancedQueryTest {
   public void fileMove() {
     check(_FILE_MOVE);
 
-    error(_FILE_MOVE.args(PATH1, PATH2), Err.FL_WHICH);
+    error(_FILE_MOVE.args(PATH1, PATH2), Err.FILE_WHICH);
     query(_FILE_WRITE.args(PATH1, "a"));
     query(_FILE_MOVE.args(PATH1, PATH2));
     query(_FILE_MOVE.args(PATH2, PATH1));
     query(_FILE_MOVE.args(PATH1, PATH1));
-    error(_FILE_MOVE.args(PATH1, PATH4), Err.FL_NODIR);
+    error(_FILE_MOVE.args(PATH1, PATH4), Err.FILE_NODIR);
     query(_FILE_SIZE.args(PATH1), "1");
     query(_FILE_EXISTS.args(PATH2), false);
     query(_FILE_DELETE.args(PATH1));
