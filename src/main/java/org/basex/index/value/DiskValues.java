@@ -133,7 +133,7 @@ public class DiskValues implements Index {
           if(token.descending ? --ix < 0 : ++ix == size) break;
           final long pos = idxr.read5(ix * 5l);
           nr = idxl.readNum(pos);
-          final byte[] key = data.text(idxl.readNum(), text);
+          final byte[] key = data.text(firstpre(), text);
           if(token.prefix && !startsWith(key, prefix)) break;
           if(prefix.length != 0) cache.add(key, nr, pos + Num.length(nr));
           return key;
@@ -259,6 +259,10 @@ public class DiskValues implements Index {
   protected int firstpre(final long pos) {
     // read the number of ids in the list
     idxl.readNum(pos);
+    return firstpre();
+  }
+
+  protected int firstpre() {
     return idxl.readNum();
   }
 
