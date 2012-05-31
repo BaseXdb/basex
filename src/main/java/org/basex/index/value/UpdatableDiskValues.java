@@ -109,8 +109,8 @@ public final class UpdatableDiskValues extends DiskValues {
   }
 
   @Override
-  protected int firstpre(final long pos) {
-    return data.pre(super.firstpre(pos));
+  protected int firstpre() {
+    return data.pre(super.firstpre());
   }
 
   @Override
