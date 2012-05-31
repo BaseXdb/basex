@@ -96,25 +96,27 @@ public final class FNIndex extends StandardFunc {
   private Iter values(final QueryContext ctx, final IndexType it) throws QueryException {
     final Data data = data(0, ctx);
     final byte[] entry = expr.length < 2 ? EMPTY : checkStr(expr[1], ctx);
-    final IndexEntries et = expr.length < 3 ? new IndexEntries(entry) :
-      new IndexEntries(entry, checkBln(expr[2], ctx));
-    return entries(data, et, it, this);
+    if(data.inMemory()) BXDB_MEM.thrw(info, data.meta.name);
+
+    final IndexEntries et = expr.length < 3 ? new IndexEntries(entry, it) :
+      new IndexEntries(entry, checkBln(expr[2], ctx), it);
+    return entries(data, et, this);
   }
 
   /**
    * Returns all entries of the specified value index.
    * @param data data reference
    * @param entries container for returning index entries
-   * @param it index type
    * @param call calling function
    * @return text entries
    * @throws QueryException query exception
    */
-  static Iter entries(final Data data, final IndexEntries entries, final IndexType it,
+  static Iter entries(final Data data, final IndexEntries entries,
       final StandardFunc call) throws QueryException {
 
     final Index index;
     final boolean avl;
+    final IndexType it = entries.type();
     if(it == IndexType.TEXT) {
       index = data.txtindex;
       avl = data.meta.textindex;
@@ -140,7 +142,7 @@ public final class FNIndex extends StandardFunc {
   private Iter names(final QueryContext ctx, final IndexType it) throws QueryException {
     final Data data = data(0, ctx);
     return entries(it == IndexType.TAG ? data.tagindex : data.atnindex,
-      new IndexEntries(EMPTY));
+      new IndexEntries(EMPTY, it));
   }
 
   /**

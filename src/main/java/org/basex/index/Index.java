@@ -18,10 +18,10 @@ public interface Index {
 
   /**
    * Returns all entries that match the specified token.
-   * @param token entries token
+   * @param entries index entries
    * @return entries
    */
-  EntryIterator entries(final IndexEntries token);
+  EntryIterator entries(final IndexEntries entries);
 
   /**
    * Returns an iterator for the index results.

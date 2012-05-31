@@ -3,6 +3,7 @@ package org.basex.index.value;
 import static org.basex.core.Text.*;
 
 import org.basex.data.*;
+import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.index.stats.*;
 import org.basex.util.*;
@@ -19,8 +20,43 @@ public final class UpdatableMemValues extends MemValues {
    * Constructor.
    * @param d data instance
    */
-  public UpdatableMemValues(final Data d) {
+  public UpdatableMemValues(final MemData d) {
     super(d);
+  }
+
+  @Override
+  public IndexIterator iter(final IndexToken tok) {
+    final byte k = tok.type() == IndexType.TEXT ? Data.TEXT : Data.ATTR;
+    final int i = id(tok.get());
+    if(i > 0) {
+      final int[] pres = data.pre(ids[i], 0, len[i]);
+      final int s = pres.length;
+      if(s > 0) {
+        return new IndexIterator() {
+          int p;
+          @Override
+          public boolean more() { return p < s; }
+          @Override
+          public int next() {
+            while(more() && data.kind(pres[p++]) != k);
+            return pres[p - 1];
+          }
+        };
+      }
+    }
+    return IndexIterator.EMPTY;
+  }
+
+  @Override
+  public byte[] info() {
+    final TokenBuilder tb = new TokenBuilder(LI_STRUCTURE).add(SORTED_LIST).add(NL);
+    final IndexStats stats = new IndexStats(data);
+    for(int m = 1; m < size; ++m) {
+      final int oc = len[m];
+      if(stats.adding(oc)) stats.add(key(m));
+    }
+    stats.print(tb);
+    return tb.finish();
   }
 
   @Override
@@ -35,38 +71,5 @@ public final class UpdatableMemValues extends MemValues {
     // if not the last element, we need to shift forwards
     if(p < len[i] - 1) Array.move(ids[i], p + 1, -1, len[i] - (p + 1));
     len[i]--;
-  }
-
-  @Override
-  public IndexIterator iter(final IndexToken tok) {
-    final int i = id(tok.get());
-    if(i > 0) {
-      final int[] pres = data.pre(ids[i], 0, len[i]);
-      if(pres.length > 0) {
-        return new IndexIterator() {
-          int p;
-          @Override
-          public boolean more() { return p < pres.length; }
-          @Override
-          public int next() { return pres[p++]; }
-          @Override
-          public int size() { return pres.length; }
-        };
-      }
-    }
-    return IndexIterator.EMPTY;
-  }
-
-  @Override
-  public byte[] info() {
-    final TokenBuilder tb = new TokenBuilder();
-    tb.add(LI_STRUCTURE + SORTED_LIST + NL);
-    final IndexStats stats = new IndexStats(data);
-    for(int m = 1; m < size; ++m) {
-      final int oc = len[m];
-      if(stats.adding(oc)) stats.add(key(m));
-    }
-    stats.print(tb);
-    return tb.finish();
   }
 }

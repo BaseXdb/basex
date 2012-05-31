@@ -70,16 +70,17 @@ public final class ValueAccess extends IndexAccess {
 
     return new AxisIter() {
       final byte kind = itype == IndexType.TEXT ? Data.TEXT : Data.ATTR;
-      final boolean mem = data.inMemory();
 
       @Override
       public ANode next() {
         while(ii.more()) {
-          final int p = ii.next();
-          // main memory instance: check if text is no comment, etc.
-          if(!mem || data.kind(p) == kind) return new DBNode(data, p, kind);
+          return new DBNode(data, ii.next(), kind);
         }
         return null;
+      }
+      @Override
+      public long size() {
+        return ii.size();
       }
     };
   }

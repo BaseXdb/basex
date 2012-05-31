@@ -38,8 +38,7 @@ public final class DataBuilder {
    * @param len length of extract
    * @return self reference
    */
-  public DataBuilder ftpos(final byte[] tag, final FTPosData pos,
-      final int len) {
+  public DataBuilder ftpos(final byte[] tag, final FTPosData pos, final int len) {
     ftbuilder = new DataFTBuilder(pos, len);
     marker = data.tagindex.index(tag, null, false);
     return this;

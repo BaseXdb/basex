@@ -1,12 +1,10 @@
 package org.basex.index.value;
 
 import static org.basex.data.DataText.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
 
 import org.basex.data.*;
-import org.basex.index.query.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
@@ -36,81 +34,14 @@ public final class UpdatableDiskValues extends DiskValues {
    * @param pref file prefix
    * @throws IOException I/O Exception
    */
-  private UpdatableDiskValues(final Data d, final boolean txt,
-      final String pref) throws IOException {
+  private UpdatableDiskValues(final Data d, final boolean txt, final String pref)
+      throws IOException {
     super(d, txt, pref);
   }
 
   @Override
-  protected IndexIterator iter(final int s, final long ps) {
-    final IntList pres = new IntList(s);
-    long p = ps;
-    for(int l = 0, v = 0; l < s; ++l) {
-      v += idxl.readNum(p);
-      p = idxl.cursor();
-      pres.add(data.pre(v));
-    }
-    return iter(pres.sort());
-  }
-
-  @Override
-  protected IndexIterator idRange(final StringRange tok) {
-    // check if min and max are positive integers with the same number of digits
-    final IntList pres = new IntList();
-    final int i = get(tok.min);
-    for(int l = i < 0 ? -i - 1 : tok.mni ? i : i + 1; l < size; l++) {
-      final int ps = idxl.readNum(idxr.read5(l * 5L));
-      int id = idxl.readNum();
-      final int pre = data.pre(id);
-
-      // value is too large: skip traversal
-      final int d = diff(data.text(pre, text), tok.max);
-      if(d > 0 || !tok.mxi && d == 0) break;
-      // add pre values
-      for(int p = 0; p < ps; ++p) {
-        pres.add(data.pre(id));
-        id += idxl.readNum();
-      }
-    }
-    return iter(pres.sort());
-  }
-
-  @Override
-  protected IndexIterator idRange(final NumericRange tok) {
-    final double min = tok.min;
-    final double max = tok.max;
-
-    // check if min and max are positive integers with the same number of digits
-    final int len = max > 0 && (long) max == max ? token(max).length : 0;
-    final boolean simple = len != 0 && min > 0 && (long) min == min &&
-        token(min).length == len;
-
-    final IntList pres = new IntList();
-    for(int l = 0; l < size; ++l) {
-      final int ds = idxl.readNum(idxr.read5(l * 5L));
-      int id = idxl.readNum();
-      final int pre = data.pre(id);
-
-      final double v = data.textDbl(pre, text);
-      if(v >= min && v <= max) {
-        // value is in range
-        for(int d = 0; d < ds; ++d) {
-          pres.add(data.pre(id));
-          id += idxl.readNum();
-        }
-      } else if(simple && v > max && data.textLen(pre, text) == len) {
-        // if limits are integers, if min, max and current value have the same
-        // string length, and if current value is larger than max, test can be
-        // skipped, as all remaining values will be bigger
-        break;
-      }
-    }
-    return iter(pres.sort());
-  }
-
-  @Override
-  protected int firstpre() {
-    return data.pre(super.firstpre());
+  protected int pre(final int id) {
+    return data.pre(id);
   }
 
   @Override

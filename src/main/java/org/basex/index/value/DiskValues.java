@@ -74,7 +74,7 @@ public class DiskValues implements Index {
     for(int m = 0; m < size; ++m) {
       final long pos = idxr.read5(m * 5L);
       final int oc = idxl.readNum(pos);
-      if(stats.adding(oc)) stats.add(data.text(firstpre(pos), text));
+      if(stats.adding(oc)) stats.add(data.text(pre(idxl.readNum()), text));
     }
     stats.print(tb);
     return tb.finish();
@@ -119,22 +119,22 @@ public class DiskValues implements Index {
   }
 
   @Override
-  public EntryIterator entries(final IndexEntries token) {
-    final byte[] prefix = token.get();
+  public EntryIterator entries(final IndexEntries entries) {
+    final byte[] prefix = entries.get();
     final int i = get(prefix);
     return new EntryIterator() {
-      int ix = (i >= 0 ? i : token.prefix ? (-i - 1) :
-        token.descending ? (-i - 2) : (-i - 1)) + (token.descending ? 1 : -1);
+      int ix = (i >= 0 ? i : entries.prefix ? (-i - 1) :
+        entries.descending ? (-i - 2) : (-i - 1)) + (entries.descending ? 1 : -1);
       int nr;
 
       @Override
       public synchronized byte[] next() {
         while(true) {
-          if(token.descending ? --ix < 0 : ++ix == size) break;
+          if(entries.descending ? --ix < 0 : ++ix == size) break;
           final long pos = idxr.read5(ix * 5l);
           nr = idxl.readNum(pos);
-          final byte[] key = data.text(firstpre(), text);
-          if(token.prefix && !startsWith(key, prefix)) break;
+          final byte[] key = data.text(pre(idxl.readNum()), text);
+          if(entries.prefix && !startsWith(key, prefix)) break;
           if(prefix.length != 0) cache.add(key, nr, pos + Num.length(nr));
           return key;
         }
@@ -153,15 +153,15 @@ public class DiskValues implements Index {
    * @param ps offset
    * @return iterator
    */
-  IndexIterator iter(final int s, final long ps) {
+  private IndexIterator iter(final int s, final long ps) {
     final IntList pres = new IntList(s);
     long p = ps;
-    for(int i = 0, pre = 0; i < s; i++) {
-      pre += idxl.readNum(p);
+    for(int i = 0, id = 0; i < s; i++) {
+      id += idxl.readNum(p);
       p = idxl.cursor();
-      pres.add(pre);
+      pres.add(pre(id));
     }
-    return iter(pres);
+    return iter(pres.sort());
   }
 
   /**
@@ -169,20 +169,22 @@ public class DiskValues implements Index {
    * @param tok index term
    * @return results
    */
-  protected IndexIterator idRange(final StringRange tok) {
+  private IndexIterator idRange(final StringRange tok) {
     // check if min and max are positive integers with the same number of digits
     final IntList pres = new IntList();
     final int i = get(tok.min);
     for(int l = i < 0 ? -i - 1 : tok.mni ? i : i + 1; l < size; l++) {
       final int ps = idxl.readNum(idxr.read5(l * 5L));
-      int pre = idxl.readNum();
+      int id = idxl.readNum();
+      final int pre = pre(id);
+
       // value is too large: skip traversal
       final int d = diff(data.text(pre, text), tok.max);
       if(d > 0 || !tok.mxi && d == 0) break;
       // add pre values
       for(int p = 0; p < ps; ++p) {
-        pres.add(pre);
-        pre += idxl.readNum();
+        pres.add(pre(id));
+        id += idxl.readNum();
       }
     }
     return iter(pres.sort());
@@ -193,7 +195,7 @@ public class DiskValues implements Index {
    * @param tok index term
    * @return results
    */
-  protected IndexIterator idRange(final NumericRange tok) {
+  protected final IndexIterator idRange(final NumericRange tok) {
     final double min = tok.min;
     final double max = tok.max;
 
@@ -205,14 +207,15 @@ public class DiskValues implements Index {
     final IntList pres = new IntList();
     for(int l = 0; l < size; ++l) {
       final int ds = idxl.readNum(idxr.read5(l * 5L));
-      int pre = idxl.readNum();
+      int id = idxl.readNum();
+      final int pre = pre(id);
 
       final double v = data.textDbl(pre, text);
       if(v >= min && v <= max) {
         // value is in range
         for(int d = 0; d < ds; ++d) {
-          pres.add(pre);
-          pre += idxl.readNum();
+          pres.add(pre(id));
+          id += idxl.readNum();
         }
       } else if(simple && v > max && data.textLen(pre, text) == len) {
         // if limits are integers, if min, max and current value have the same
@@ -252,18 +255,12 @@ public class DiskValues implements Index {
   }
 
   /**
-   * Gets the first pre value from the id-list at the specified position.
-   * @param pos position of the id-list in {@link #idxl}
+   * Returns the {@code pre} value for the specified id.
+   * @param id id value
    * @return pre value
    */
-  protected int firstpre(final long pos) {
-    // read the number of ids in the list
-    idxl.readNum(pos);
-    return firstpre();
-  }
-
-  protected int firstpre() {
-    return idxl.readNum();
+  protected int pre(final int id) {
+    return id;
   }
 
   /**
@@ -290,7 +287,10 @@ public class DiskValues implements Index {
       final int m = l + h >>> 1;
       byte[] txt = ctext.get(m);
       if(txt == null) {
-        txt = data.text(firstpre(idxr.read5(m * 5L)), text);
+        // read and ignore the number of ids in the list
+        final long pos = idxr.read5(m * 5L);
+        idxl.readNum(pos);
+        txt = data.text(pre(idxl.readNum()), text);
         ctext.add(m, txt);
       }
       final int d = diff(txt, key);

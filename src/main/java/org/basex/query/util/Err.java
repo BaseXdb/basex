@@ -56,7 +56,7 @@ public enum Err {
   /** BXDB0002. */
   BXDB_OPEN(BXDB, 2, "%"),
   /** BXDB0003. */
-  BXDB_MEM(BXDB, 3, "Database '%' is not persistent."),
+  BXDB_MEM(BXDB, 3, "Operation requires database '%' to be persistent."),
   /** BXDB0004. */
   BXDB_INDEX(BXDB, 4, "Database '%' has no % index."),
   /** BXDB0005. */

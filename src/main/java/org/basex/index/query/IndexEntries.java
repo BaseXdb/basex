@@ -9,6 +9,8 @@ import org.basex.index.*;
  * @author Christian Gruen
  */
 public final class IndexEntries implements IndexToken {
+  /** Index type. */
+  private final IndexType type;
   /** Text. */
   private final byte[] text;
   /** Ascending/descending traversal. */
@@ -17,11 +19,22 @@ public final class IndexEntries implements IndexToken {
   public boolean prefix;
 
   /**
-   * Constructor for prefix search.
+   * Private constructor.
+   * @param it index type
    * @param tok token
    */
-  public IndexEntries(final byte[] tok) {
+  private IndexEntries(final IndexType it, final byte[] tok) {
+    type = it;
     text = tok;
+  }
+
+  /**
+   * Constructor for prefix search.
+   * @param tok token
+   * @param it index type
+   */
+  public IndexEntries(final byte[] tok, final IndexType it) {
+    this(it, tok);
     prefix = true;
   }
 
@@ -29,15 +42,16 @@ public final class IndexEntries implements IndexToken {
    * Constructor for traversing entries.
    * @param tok token to start with
    * @param asc return results in ascending order
+   * @param it index type
    */
-  public IndexEntries(final byte[] tok, final boolean asc) {
+  public IndexEntries(final byte[] tok, final boolean asc, final IndexType it) {
+    this(it, tok);
     descending = !asc;
-    text = tok;
   }
 
   @Override
   public IndexType type() {
-    return null;
+    return type;
   }
 
   @Override

@@ -71,6 +71,10 @@ public final class FNIndexTest extends AdvancedQueryTest {
     query(COUNT.args(_INDEX_TEXTS.args(NAME, "X", "true()")), 1);
     // descending traversal
     query(_INDEX_TEXTS.args(NAME, "B", "false()") + "/text()", "Assignments");
+    // main memory traversal
+    // extract single entry
+    //query("let $a := copy $a := parse-xml('<a>A</a>') modify () return $a " +
+    //      "return " + _INDEX_TEXTS.args("$a") + "/text()", "A");
   }
 
   /**

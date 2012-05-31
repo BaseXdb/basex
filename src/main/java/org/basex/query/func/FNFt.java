@@ -234,7 +234,7 @@ public final class FNFt extends StandardFunc {
       ftl.init(entry);
       entry = ftl.nextToken();
     }
-    return FNIndex.entries(data, new IndexEntries(entry), IndexType.FULLTEXT, this);
+    return FNIndex.entries(data, new IndexEntries(entry, IndexType.FULLTEXT), this);
   }
 
   /**

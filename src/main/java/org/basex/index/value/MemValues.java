@@ -35,49 +35,23 @@ public class MemValues extends TokenSet implements Index {
     data = d;
   }
 
-  /**
-   * Indexes the specified keys and values.
-   * @param key key
-   * @param id id value
-   * @return index position
-   */
-  public int index(final byte[] key, final int id) {
-    int i = add(key);
-    if(i > 0) {
-      ids[i] = new int[] { id };
-    } else {
-      i = -i;
-      final int l = len[i];
-      if(l == ids[i].length) ids[i] = Arrays.copyOf(ids[i], l << 1);
-      ids[i][l] = id;
-    }
-    len[i]++;
-    return i;
-  }
-
-  /**
-   * Remove record from the index.
-   * @param key record key
-   * @param id record id
-   */
-  @SuppressWarnings("unused")
-  public void delete(final byte[] key, final int id) { }
-
   @Override
   public IndexIterator iter(final IndexToken tok) {
+    final byte k = tok.type() == IndexType.TEXT ? Data.TEXT : Data.ATTR;
     final int i = id(tok.get());
     if(i > 0) {
-      final int cnt = len[i];
-      if(cnt > 0) {
-        final int[] pres = ids[i];
+      final int[] pres = ids[i];
+      final int s = len[i];
+      if(s > 0) {
         return new IndexIterator() {
-          private int p;
+          int p;
           @Override
-          public boolean more() { return p < cnt; }
+          public boolean more() { return p < s; }
           @Override
-          public int next() { return pres[p++]; }
-          @Override
-          public int size() { return cnt; }
+          public int next() {
+            while(more() && data.kind(pres[p++]) != k);
+            return pres[p - 1];
+          }
         };
       }
     }
@@ -111,8 +85,7 @@ public class MemValues extends TokenSet implements Index {
 
   @Override
   public byte[] info() {
-    final TokenBuilder tb = new TokenBuilder();
-    tb.add(LI_STRUCTURE + SORTED_LIST + NL);
+    final TokenBuilder tb = new TokenBuilder(LI_STRUCTURE).add(SORTED_LIST).add(NL);
     final IndexStats stats = new IndexStats(data);
     for(int m = 1; m < size; ++m) {
       final int oc = len[m];
@@ -132,4 +105,32 @@ public class MemValues extends TokenSet implements Index {
     ids = Array.copyOf(ids, s);
     len = Arrays.copyOf(len, s);
   }
+
+  /**
+   * Indexes the specified keys and values.
+   * @param key key
+   * @param id id value
+   * @return index position
+   */
+  public int index(final byte[] key, final int id) {
+    int i = add(key);
+    if(i > 0) {
+      ids[i] = new int[] { id };
+    } else {
+      i = -i;
+      final int l = len[i];
+      if(l == ids[i].length) ids[i] = Arrays.copyOf(ids[i], l << 1);
+      ids[i][l] = id;
+    }
+    len[i]++;
+    return i;
+  }
+
+  /**
+   * Removes a record from the index.
+   * @param key record key
+   * @param id record id
+   */
+  @SuppressWarnings("unused")
+  public void delete(final byte[] key, final int id) { }
 }
