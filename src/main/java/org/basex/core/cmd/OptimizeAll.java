@@ -96,6 +96,16 @@ public final class OptimizeAll extends ACreate {
     final String tname = ctx.mprop.random(m.name);
     ctx.databases().add(tname);
 
+    // adopt original meta data
+    ctx.prop.set(Prop.CHOP, m.chop);
+    ctx.prop.set(Prop.UPDINDEX, m.updindex);
+    ctx.prop.set(Prop.STEMMING, m.stemming);
+    ctx.prop.set(Prop.CASESENS, m.casesens);
+    ctx.prop.set(Prop.DIACRITICS, m.diacritics);
+    ctx.prop.set(Prop.MAXCATS, m.maxcats);
+    ctx.prop.set(Prop.MAXLEN, m.maxlen);
+    ctx.prop.set(Prop.LANGUAGE, m.language.toString());
+
     // build database and index structures
     final DiskBuilder builder = new DiskBuilder(tname, new DBParser(old, cmd), ctx);
     try {
@@ -103,9 +113,14 @@ public final class OptimizeAll extends ACreate {
       if(m.createtext) create(IndexType.TEXT, d, cmd);
       if(m.createattr) create(IndexType.ATTRIBUTE, d, cmd);
       if(m.createftxt) create(IndexType.FULLTEXT, d, cmd);
+      // adopt original meta data
+      d.meta.createtext = m.createtext;
+      d.meta.createattr =  m.createattr;
+      d.meta.createftxt = m.createftxt;
       d.meta.filesize = m.filesize;
       d.meta.users    = m.users;
       d.meta.dirty    = true;
+
       // move binary files
       final IOFile bin = data.meta.binaries();
       if(bin.exists()) bin.rename(d.meta.binaries());
