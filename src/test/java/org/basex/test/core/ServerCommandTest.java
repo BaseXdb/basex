@@ -63,7 +63,5 @@ public final class ServerCommandTest extends CommandTest {
     ok(new Kill(NAME2));
     ok(new Kill(NAME2 + '?'));
     cs.close();
-    // may be superfluous
-    Performance.sleep(100);
   }
 }

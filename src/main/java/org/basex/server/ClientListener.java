@@ -249,7 +249,7 @@ public final class ClientListener extends Thread {
     context.delete(this);
 
     try {
-      new Close().execute(context);
+      new Close().run(context);
       socket.close();
       if(events) {
         esocket.close();
