@@ -78,10 +78,6 @@ public final class ValueAccess extends IndexAccess {
         }
         return null;
       }
-      @Override
-      public long size() {
-        return ii.size();
-      }
     };
   }
 
