@@ -128,7 +128,6 @@ public interface Text {
   String HTTPINFO =
     " [-dehlnpPRUWz] [stop]" + NL +
     "  stop       Stop running server" + NL +
-    "  -c         Start in client mode" + NL +
     "  -d         Activate debugging mode" + NL +
     "  -e<num>    Set event port" + NL +
     "  -h<num>    Set port of HTTP server" + NL +
