@@ -34,6 +34,7 @@ public final class CElem extends CName {
     super(ELEMENT, ii, t, cont);
     nspaces = ns == null ? new Atts() : ns;
     comp = ns == null;
+    type = SeqType.ELM;
   }
 
   @Override

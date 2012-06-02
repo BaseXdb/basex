@@ -34,15 +34,16 @@ public final class Arith extends Arr {
 
     final SeqType s0 = expr[0].type();
     final SeqType s1 = expr[1].type();
-    type = SeqType.ITEM_ZO;
-    if(s0.type.isNumber() && s1.type.isNumber()) {
+    final boolean t1 = s0.type.isNumber() || s0.type.isUntyped();
+    final boolean t2 = s0.type.isNumber() || s1.type.isUntyped();
+    if(t1 && t2) {
       type = s0.one() && s1.one() ? SeqType.ITR : SeqType.ITR_ZO;
     } else if(s0.one() && s1.one()) {
       type = SeqType.ITEM;
+    } else {
+      type = SeqType.ITEM_ZO;
     }
-
-    return optPre(oneIsEmpty() ? null : allAreValues() ?
-        item(ctx, info) : this, ctx);
+    return optPre(oneIsEmpty() ? null : allAreValues() ? item(ctx, info) : this, ctx);
   }
 
   @Override

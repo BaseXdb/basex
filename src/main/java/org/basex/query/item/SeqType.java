@@ -153,6 +153,10 @@ public final class SeqType {
   public static final SeqType FUN_O = FuncType.ANY_FUN.seqType();
   /** Zero or more bytes. */
   public static final SeqType BYT_ZM = new SeqType(AtomType.BYT, Occ.ZERO_MORE);
+  /** One attribute node. */
+  public static final SeqType ATT = NodeType.ATT.seqType();
+  /** One comment node. */
+  public static final SeqType COM = NodeType.COM.seqType();
   /** One document node. */
   public static final SeqType DOC_O = NodeType.DOC.seqType();
   /** Zero or one document node. */
@@ -163,6 +167,14 @@ public final class SeqType {
   public static final SeqType ELM = NodeType.ELM.seqType();
   /** Zero or more element nodes. */
   public static final SeqType ELM_ZM = new SeqType(NodeType.ELM, Occ.ZERO_MORE);
+  /** Namespace node. */
+  public static final SeqType NSP = NodeType.NSP.seqType();
+  /** Namespace node. */
+  public static final SeqType PI = NodeType.PI.seqType();
+  /** Namespace node. */
+  public static final SeqType TXT = NodeType.TXT.seqType();
+  /** Namespace node. */
+  public static final SeqType TXT_ZO = new SeqType(NodeType.TXT, Occ.ZERO_ONE);
 
   /** The general map type. */
   public static final MapType ANY_MAP = new MapType(AtomType.AAT, ITEM_ZM);

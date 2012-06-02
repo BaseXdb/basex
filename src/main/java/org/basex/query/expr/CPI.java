@@ -23,6 +23,7 @@ public final class CPI extends CName {
    */
   public CPI(final InputInfo ii, final Expr n, final Expr v) {
     super(PI, ii, n, v);
+    type = SeqType.PI;
   }
 
   @Override

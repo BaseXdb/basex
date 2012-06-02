@@ -21,7 +21,12 @@ public final class CTxt extends CFrag {
    */
   public CTxt(final InputInfo ii, final Expr t) {
     super(ii, t);
-    type = SeqType.NOD_ZO;
+    type = SeqType.TXT_ZO;
+  }
+
+  @Override
+  public Expr comp(final QueryContext ctx) throws QueryException {
+    return optPre(oneIsEmpty() ? null : this, ctx);
   }
 
   @Override

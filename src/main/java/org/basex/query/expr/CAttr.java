@@ -30,6 +30,7 @@ public final class CAttr extends CName {
   public CAttr(final InputInfo ii, final boolean c, final Expr n, final Expr... v) {
     super(ATTRIBUTE, ii, n, v);
     comp = c;
+    type = SeqType.ATT;
   }
 
   @Override

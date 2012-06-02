@@ -49,6 +49,7 @@ public final class Catch extends Single {
     final int s = prepare(ctx);
     super.comp(ctx);
     ctx.vars.size(s);
+    type = expr.type();
     return this;
   }
 

@@ -197,8 +197,9 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Returns the sequence type of the evaluated value. For simplicity,
-   * some types have been summarized. E.g., all numbers are treated as integers.
+   * Returns the static type of the evaluated value. For simplicity,
+   * some types have been merged to super types. As an example, many numeric types
+   * are treated as integers.
    * @return result of check
    */
   public abstract SeqType type();

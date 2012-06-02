@@ -21,6 +21,7 @@ public final class CComm extends CFrag {
    */
   public CComm(final InputInfo ii, final Expr c) {
     super(ii, c);
+    type = SeqType.COM;
   }
 
   @Override

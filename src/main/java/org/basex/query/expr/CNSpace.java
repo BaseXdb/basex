@@ -23,6 +23,7 @@ public final class CNSpace extends CName {
    */
   public CNSpace(final InputInfo ii, final Expr n, final Expr v) {
     super(NSPACE, ii, n, v);
+    type = SeqType.NSP;
   }
 
   @Override

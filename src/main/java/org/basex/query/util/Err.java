@@ -313,7 +313,7 @@ public enum Err {
   /** FORG0001. */
   INVALIDZONE(FORG, 1, "Invalid timezone: %."),
   /** FORG0001. */
-  FUNCAST(FORG, 1, "Invalid % cast: %."),
+  FUNCAST(FORG, 1, "Invalid % cast: '%'."),
   /** FORG0001. */
   DATERANGE(FORG, 1, "%('%') out of range."),
   /** FORG0001. */

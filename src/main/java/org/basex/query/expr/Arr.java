@@ -72,7 +72,7 @@ public abstract class Arr extends ParseExpr {
   }
 
   /**
-   * Returns true if at least one argument is empty, or will yield 0 results.
+   * Returns true if at least one argument is empty or will yield 0 results.
    * @return result of check
    */
   final boolean oneIsEmpty() {
