@@ -105,7 +105,10 @@ public final class FNNode extends StandardFunc {
       } else if(n.type == NodeType.ELM) {
         final QNm qnm = n.qname();
         final AxisIter ai = n.precedingSibling();
-        for(ANode fs; (fs = ai.next()) != null;) if(fs.qname().eq(qnm)) i++;
+        for(ANode fs; (fs = ai.next()) != null;) {
+          final QNm q = fs.qname();
+          if(q != null && q.eq(qnm)) i++;
+        }
         tb.add("Q{").add(qnm.uri()).add('}').add(qnm.local());
         tb.add('[').add(Integer.toString(i)).add(']');
       } else if(n.type == NodeType.COM || n.type == NodeType.TXT) {
