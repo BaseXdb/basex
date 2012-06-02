@@ -34,7 +34,7 @@ public final class BaseXHTTP {
   /** Activate RESTXQ. */
   private boolean restxq = true;
 
-  /** Start database server. */
+  /** Server/local mode. */
   private boolean server;
   /** Start as daemon. */
   private boolean service;
@@ -67,8 +67,8 @@ public final class BaseXHTTP {
   public BaseXHTTP(final String... args) throws Exception {
     parseArguments(args);
 
-    // flag for starting/stopping the database server
-    server = !Token.eqic(System.getProperty(DBMODE), LOCAL, CLIENT);
+    // flag for starting a database server
+    server = !LOCAL.equals(System.getProperty(DBMODE));
 
     final MainProp mprop = context.mprop;
     final int port = mprop.num(MainProp.SERVERPORT);
@@ -185,14 +185,10 @@ public final class BaseXHTTP {
    */
   private void parseArguments(final String[] args) throws IOException {
     final Args arg = new Args(args, this, HTTPINFO, Util.info(CONSOLE, HTTP));
-    boolean daemon = false, local = false, client = false;
+    boolean daemon = false;
     while(arg.more()) {
       if(arg.dash()) {
         switch(arg.next()) {
-          case 'c': // use client mode
-            System.setProperty(DBMODE, CLIENT);
-            client = true;
-            break;
           case 'd': // activate debug mode
             context.mprop.set(MainProp.DEBUG, true);
             break;
@@ -207,7 +203,6 @@ public final class BaseXHTTP {
             break;
           case 'l': // use local mode
             System.setProperty(DBMODE, LOCAL);
-            local = true;
             break;
           case 'n': // parse host name
             context.mprop.set(MainProp.HOST, arg.string());
@@ -250,12 +245,6 @@ public final class BaseXHTTP {
         if(!arg.string().equalsIgnoreCase("stop")) arg.usage();
         stopped = true;
       }
-    }
-
-    // only allow local or client mode
-    if(local && client) {
-      Util.errln(INVMODE);
-      arg.usage();
     }
   }
 

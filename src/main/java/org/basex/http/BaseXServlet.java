@@ -22,7 +22,11 @@ import org.basex.util.*;
 public abstract class BaseXServlet extends HttpServlet {
   @Override
   public final void init(final ServletConfig config) throws ServletException {
-    HTTPContext.init(config.getServletContext());
+    try {
+      HTTPContext.init(config.getServletContext());
+    } catch(final IOException ex) {
+      throw new ServletException(ex);
+    }
   }
 
   @Override

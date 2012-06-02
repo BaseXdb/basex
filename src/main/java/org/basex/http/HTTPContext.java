@@ -13,6 +13,7 @@ import java.util.Map.Entry;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
+import org.basex.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
@@ -233,9 +234,7 @@ public final class HTTPContext {
     if(user == null || user.isEmpty() || pass == null || pass.isEmpty())
       throw new LoginException(NOPASSWD);
 
-    if(session == null) session = CLIENT.equals(System.getProperty(DBMODE)) ?
-        new ClientSession(context(), user, pass) :
-        new LocalSession(context(), user, pass);
+    if(session == null) session = new LocalSession(context(), user, pass);
     return session;
   }
 
@@ -270,8 +269,9 @@ public final class HTTPContext {
    * Initializes the servlet context, based on the servlet context.
    * Parses all context parameters and passes them on to the database context.
    * @param sc servlet context
+   * @throws IOException I/O exception
    */
-  static synchronized void init(final ServletContext sc) {
+  static synchronized void init(final ServletContext sc) throws IOException {
     // skip process if context has already been initialized
     if(context != null) return;
 
@@ -304,6 +304,8 @@ public final class HTTPContext {
       }
     }
     context = new Context(map);
+
+    if(SERVER.equals(System.getProperty(DBMODE))) new BaseXServer(context);
   }
 
   /**

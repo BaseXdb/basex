@@ -11,24 +11,20 @@
   <!-- The following parameters may also be passed on as system properties: -->
 
   <!-- Operation mode: by default, the value is "local": the servlets will
-       access and store data locally using ${org.basex.path}. If "client" is
-       specified, all operations are performed on a remote server instance. -->
+       work with a local database context. If "server" is specified, a database
+       server instance will be started after the first call of a service. -->
   <context-param>
     <param-name>org.basex.mode</param-name>
     <param-value>local</param-value>
   </context-param>
 
-  <!-- Database user: by default, no value is specified, and the credentials
-       must be specified by the client. Note that it is a clear security risk to
-       store user credentials in this file. -->
+  <!-- Login data: by default, no user and password is specified, and the
+       credentials must be passed on by the client. Please check by yourself
+       if it is safe to store your credentials in this file. -->
   <context-param>
     <param-name>org.basex.user</param-name>
     <param-value></param-value>
   </context-param>
-
-  <!-- Database password: by default, no value is specified, and the credentials
-       must be specified by the client. Note that it is a clear security risk to
-       store user credentials in this file. -->
   <context-param>
     <param-name>org.basex.password</param-name>
     <param-value></param-value>

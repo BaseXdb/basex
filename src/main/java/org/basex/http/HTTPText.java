@@ -30,15 +30,13 @@ public interface HTTPText {
 
   /** Mode: local. */
   String LOCAL = "local";
-  /** Mode: client. */
-  String CLIENT = "client";
+  /** Mode: server. */
+  String SERVER = "server";
 
   /** Error: no password. */
   String NOPASSWD = "No username/password specified.";
   /** Error: unsupported authorization method. */
   String WHICHAUTH = "Unsupported Authorization method: %.";
-  /** Error: only allow local or client mode. */
-  String INVMODE = "You cannot use both local and client mode.";
   /** Error message. */
   String UNEXPECTED = "Unexpected error: %";
 }
