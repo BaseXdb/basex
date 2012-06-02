@@ -91,7 +91,6 @@ public final class BaseXClientTest extends BaseXTest {
     System.setOut(new PrintStream(ao));
 
     final StringList sl = new StringList();
-    sl.reset();
     sl.add("-p9999").add("-U" + Text.ADMIN).add("-P" + Text.ADMIN).add(args);
     try {
       new BaseXClient(sl.toArray());

@@ -48,13 +48,11 @@ public abstract class BaseXTest extends MainTest {
     INPUT.write(token("$a"));
     equals("4", "-ba=4", INPUT.toString());
     equals("5,6;7'", "-ba=5,6;7'", "-q$a");
-    // bind quote (to be checked in client/server mode)
-    //equals("\"", "-ba=\"", "-q$a");
     // bind variables with namespaces
     equals("8", "-b{}a=8", "-q$a");
-    equals("9", "-b'':a=9", "-q$a");
-    equals("A", "-b{URI}a=A", "-qdeclare namespace a='URI'; $a:a");
-    equals("B", "-b'URI':b=B", "-qdeclare namespace b='URI'; $b:b");
+    equals("9", "-b{URI}a=9", "-qdeclare namespace a='URI'; $a:a");
+    // check if parameters are evaluated in given order
+    equals("12", "-ba=1", "-q$a", "-ba=2", "-q$a");
   }
 
   /**
@@ -168,6 +166,8 @@ public abstract class BaseXTest extends MainTest {
   @Test
   public void serial() throws IOException {
     equals("1", "-smethod=text", "-q<a>1</a>");
+    // check if parameters are evaluated in given order
+    equals("1<x>1</x>", "-smethod=text", "-q<x>1</x>", "-smethod=xml", "-q<x>1</x>");
   }
 
   /**

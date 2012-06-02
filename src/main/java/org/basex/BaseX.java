@@ -3,12 +3,9 @@ package org.basex;
 import static org.basex.core.Text.*;
 
 import java.io.*;
-import java.util.*;
-import java.util.Map.Entry;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.core.cmd.Set;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
@@ -24,6 +21,10 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public class BaseX extends Main {
+  /** Commands to be executed. */
+  private IntList ops;
+  /** Command arguments. */
+  private StringList vals;
   /** User name. */
   String user;
   /** Password. */
@@ -31,8 +32,6 @@ public class BaseX extends Main {
 
   /** Flag for writing properties to disk. */
   private boolean writeProps;
-  /** Operations to be executed. */
-  private StringList ops;
 
   /**
    * Main method, launching the standalone mode.
@@ -60,15 +59,29 @@ public class BaseX extends Main {
     // create session to show optional login request
     session();
 
+    final StringBuilder serial = new StringBuilder();
+    final StringBuilder bind = new StringBuilder();
+    boolean v = false, qi = false, qp = false;
+
+    console = true;
     try {
-      // open initial document or database
-      for(int i = 0; i < ops.size(); i += 2) {
-        final String key = ops.get(i);
-        final String val = ops.get(i + 1);
-        if(key.equals("c")) {
-          // run single command
+      // loop through all commands
+      for(int i = 0; i < ops.size(); i++) {
+        final int c = ops.get(i);
+        String val = vals.get(i);
+        Object[] prop = null;
+
+        if(c == 'b') {
+          // set/add variable binding
+          if(bind.length() != 0) bind.append(',');
+          // commas are escaped by a second comma
+          val = bind.append(val.replaceAll(",", ",,")).toString();
+          prop = Prop.BINDINGS;
+        } else if(c == 'c') {
+          // evaluate command string
           execute(val);
-        } else if(key.equals("C")) {
+          console = false;
+        } else if(c == 'C') {
           // run commands from script file
           final IO io = IO.get(val);
           if(!io.exists()) throw new BaseXException(RES_NOT_FOUND_X, val);
@@ -82,23 +95,74 @@ public class BaseX extends Main {
           } finally {
             nli.close();
           }
-        } else if(key.equals("f")) {
-          // query file
+          console = false;
+        } else if(c == 'd') {
+          // toggle debug mode
+          context.mprop.set(MainProp.DEBUG, !context.mprop.is(MainProp.DEBUG));
+        } else if(c == 'D') {
+          // hidden option: show/hide dot query graph
+          prop = Prop.DOTPLAN;
+        } else if(c == 'f') {
+          // run query file
           final IO io = IO.get(val);
           if(!io.exists() || io.isDir()) throw new BaseXException(RES_NOT_FOUND_X, val);
           final String query = Token.string(new TextInput(io).content());
           execute(new Set(Prop.QUERYPATH, io.path()), false);
           execute(new XQuery(query), verbose);
-        } else if(key.equals("i")) {
-          // create main memory database if input is XML snippet
-          final boolean mem = IO.get(val) instanceof IOContent;
-          execute(new Set(Prop.MAINMEM, mem), false);
+          console = false;
+        } else if(c == 'i') {
+          // open database or create main memory representation
+          execute(new Set(Prop.MAINMEM, true), false);
           execute(new Check(val), verbose);
           execute(new Set(Prop.MAINMEM, false), false);
-        } else if(key.equals("q")) {
-          // run query
+        } else if(c == 'L') {
+          // toggle appending of newlines to results
+          newline = true;
+        } else if(c == 'o') {
+          // change output stream
+          if(out != System.out) out.close();
+          out = new PrintOutput(val);
+        } else if(c == 'q') {
+          // evaluate query string
           execute(new XQuery(val), verbose);
+          console = false;
+        } else if(c == 'r') {
+          // hidden option: parse number of runs
+          prop = Prop.RUNS;
+        } else if(c == 's') {
+          // set/add serialization parameter
+          if(serial.length() != 0) serial.append(',');
+          val = serial.append(val).toString();
+          prop = Prop.SERIALIZER;
+        } else if(c == 'u') {
+          // (de)activate write-back for updates
+          prop = Prop.WRITEBACK;
+        } else if(c == 'v') {
+          // show/hide verbose mode
+          v ^= true;
+        } else if(c == 'V') {
+          // show/hide query info
+          qi ^= true;
+          prop = Prop.QUERYINFO;
+        } else if(c == 'w') {
+          // toggle chopping of whitespaces
+          prop = Prop.CHOP;
+        } else if(c == 'W') {
+          // hidden option: toggle writing of properties before exit
+          writeProps ^= true;
+        } else if(c == 'x') {
+          // hidden option: show/hide xml query plan
+          prop = Prop.XMLPLAN;
+          qp ^= true;
+        } else if(c == 'X') {
+          // hidden option: show query plan before/after query compilation
+          prop = Prop.COMPPLAN;
+        } else if(c == 'z') {
+          // toggle result serialization
+          prop = Prop.SERIALIZE;
         }
+        if(prop != null) execute(new Set(prop, val), false);
+        verbose = qi || qp || v;
       }
 
       if(console) {
@@ -129,111 +193,52 @@ public class BaseX extends Main {
   }
 
   @Override
-  protected final void parseArguments(final String[] args) throws IOException {
-    final StringBuilder serial = new StringBuilder();
-    final StringBuilder bind = new StringBuilder();
-    ops = new StringList();
+  protected final void parseArguments(final String... args) throws IOException {
+    ops = new IntList();
+    vals = new StringList();
 
-    final HashMap<Object[], Object> options = new HashMap<Object[], Object>();
     final Args arg = new Args(args, this, sa() ? LOCALINFO : CLIENTINFO,
         Util.info(CONSOLE, sa() ? LOCALMODE : CLIENTMODE));
     while(arg.more()) {
+      final char c;
+      String v = null;
       if(arg.dash()) {
-        final char c = arg.next();
-        if(c == 'b') {
-          // set/add variable binding
-          if(bind.length() != 0) bind.append(',');
-          // commas are escaped by a second comma
-          bind.append(arg.string().replaceAll(",", ",,"));
-        } else if(c == 'c') {
-          // specify command to be evaluated
-          ops.add("c").add(arg.string());
-        } else if(c == 'C') {
-          // specify command script to be evaluated
-          ops.add("C").add(arg.string());
-        } else if(c == 'd') {
-          // activate debug mode
-          context.mprop.set(MainProp.DEBUG, true);
-        } else if(c == 'D' && sa()) {
-          // hidden option: show dot query graph
-          options.put(Prop.DOTPLAN, true);
-        } else if(c == 'i') {
-          // open initial file or database
-          ops.add("i").add(arg.string());
-        } else if(c == 'L') {
-          // add trailing newline
-          newline = true;
-        } else if(c == 'n' && !sa()) {
-          // set server name
-          context.mprop.set(MainProp.HOST, arg.string());
-        } else if(c == 'o') {
-          // specify file for result output
-          out = new PrintOutput(arg.string());
-          if(session != null) session.setOutputStream(out);
-        } else if(c == 'p' && !sa()) {
-          // set server port
-          context.mprop.set(MainProp.PORT, arg.number());
-        } else if(c == 'P' && !sa()) {
-          // specify password
-          pass = arg.string();
-        } else if(c == 'q') {
-          // specify query to be evaluated
-          ops.add("q").add(arg.string());
-        } else if(c == 'r') {
-          // hidden option: parse number of runs
-          options.put(Prop.RUNS, arg.string());
-        } else if(c == 's') {
-          // set/add serialization parameter
-          if(serial.length() != 0) serial.append(',');
-          serial.append(arg.string());
-        } else if(c == 'u') {
-          // activate write-back for updates
-          options.put(Prop.WRITEBACK, true);
-        } else if(c == 'U' && !sa()) {
-          // specify user name
-          user = arg.string();
-        } else if(c == 'v') {
-          // show command info
-          verbose = true;
-        } else if(c == 'V') {
-          // show query info
-          verbose = true;
-          options.put(Prop.QUERYINFO, true);
-        } else if(c == 'w') {
-          // do not chop text nodes
-          options.put(Prop.CHOP, false);
-        } else if(c == 'W') {
-          // hidden option: write properties before exit
-          writeProps = true;
-        } else if(c == 'x') {
-          // hidden option: show xml query plan
-          options.put(Prop.XMLPLAN, true);
-          verbose = true;
-        } else if(c == 'X') {
-          // hidden option: show query plan before compiling the query
-          options.put(Prop.COMPPLAN, false);
-        } else if(c == 'z') {
-          // turn off result serialization
-          options.put(Prop.SERIALIZE, false);
+        c = arg.next();
+        if(c == 'b' || c == 'c' || c == 'C' || c == 'i' || c == 'o' || c == 'q' ||
+           c == 'r' || c == 's') {
+          // options followed by a string
+          v = arg.string();
+        } else if(c == 'd' || c == 'D' && sa() || c == 'L' || c == 'u' || c == 'v' ||
+            c == 'V' || c == 'w' || c == 'W' || c == 'x' || c == 'X' || c == 'z') {
+          // options to be toggled
+          v = "";
+        } else if(!sa()) {
+          // client options: need to be set before other options
+          if(c == 'n') {
+            // set server name
+            context.mprop.set(MainProp.HOST, arg.string());
+          } else if(c == 'p') {
+            // set server port
+            context.mprop.set(MainProp.PORT, arg.number());
+          } else if(c == 'P') {
+            // specify password
+            pass = arg.string();
+          } else if(c == 'U') {
+            // specify user name
+            user = arg.string();
+          } else {
+            arg.usage();
+          }
         } else {
           arg.usage();
         }
       } else {
-        ops.add("f").add(arg.string());
+        c = 'f';
+        v = arg.string();
       }
-    }
-    console = ops.isEmpty();
-
-    // set cached options
-    if(serial.length() != 0) options.put(Prop.SERIALIZER, serial);
-    if(bind.length() != 0) options.put(Prop.BINDINGS, bind);
-    for(final Entry<Object[], Object> entry : options.entrySet()) {
-      try {
-        execute(new Set(entry.getKey(), entry.getValue()), false);
-      } catch(final IOException ex) {
-        Util.errln(ex);
-        out.close();
-        arg.usage();
+      if(v != null) {
+        ops.add(c);
+        vals.add(v);
       }
     }
   }

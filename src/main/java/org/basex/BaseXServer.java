@@ -229,7 +229,7 @@ public final class BaseXServer extends Main implements Runnable {
   }
 
   @Override
-  protected void parseArguments(final String[] args) throws IOException {
+  protected void parseArguments(final String... args) throws IOException {
     final Args arg = new Args(args, this, SERVERINFO, Util.info(CONSOLE, SERVERMODE));
 
     commands = new StringList();
