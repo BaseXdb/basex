@@ -2,7 +2,8 @@ package org.basex.tests.bxapi.xdm;
 
 import java.io.*;
 
-import org.basex.query.item.*;
+import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**

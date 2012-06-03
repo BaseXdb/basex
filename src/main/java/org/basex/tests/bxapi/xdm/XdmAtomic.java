@@ -1,7 +1,8 @@
 package org.basex.tests.bxapi.xdm;
 
 import org.basex.query.*;
-import org.basex.query.item.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.tests.bxapi.*;
 import org.basex.util.*;
 
