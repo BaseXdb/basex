@@ -4,7 +4,6 @@ import static org.basex.query.func.Function.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.Date;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
