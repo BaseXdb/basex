@@ -7,8 +7,8 @@ import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.query.item.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.item.*;
 
 /**
  * This example demonstrates three variants how XQuery expressions can be
