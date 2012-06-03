@@ -1,6 +1,7 @@
 package org.basex.query.ft;
 
 import java.util.*;
+
 import org.basex.util.*;
 
 /**

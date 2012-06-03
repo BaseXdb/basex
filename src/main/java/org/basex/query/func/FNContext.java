@@ -9,7 +9,6 @@ import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.item.Dat;
 import org.basex.util.*;
 
 /**

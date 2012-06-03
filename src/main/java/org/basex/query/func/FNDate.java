@@ -3,7 +3,7 @@ package org.basex.query.func;
 import static org.basex.query.util.Err.*;
 
 import java.math.*;
-import java.util.Calendar;
+import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;

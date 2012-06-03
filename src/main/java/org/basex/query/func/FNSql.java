@@ -7,7 +7,6 @@ import static org.basex.util.Token.*;
 
 import java.sql.*;
 import java.sql.Date;
-import java.sql.Time;
 import java.util.*;
 
 import org.basex.query.*;

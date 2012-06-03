@@ -12,7 +12,7 @@ import org.basex.query.expr.Expr.Use;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.*;
+import org.basex.query.value.type.SeqType.Occ;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 

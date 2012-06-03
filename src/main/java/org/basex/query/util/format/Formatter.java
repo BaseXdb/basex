@@ -8,7 +8,7 @@ import java.util.*;
 import javax.xml.datatype.*;
 
 import org.basex.query.*;
-import org.basex.query.value.item.ADate;
+import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;

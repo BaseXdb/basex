@@ -6,7 +6,7 @@ import static org.basex.util.Token.*;
 import static org.basex.util.Util.*;
 
 import java.io.*;
-import java.util.Date;
+import java.util.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
