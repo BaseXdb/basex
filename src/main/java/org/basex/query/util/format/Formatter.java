@@ -8,8 +8,8 @@ import java.util.*;
 import javax.xml.datatype.*;
 
 import org.basex.query.*;
-import org.basex.query.item.*;
-import org.basex.query.item.Date;
+import org.basex.query.value.item.ADate;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -112,7 +112,7 @@ public abstract class Formatter extends FormatUtil {
    * @return formatted string
    * @throws QueryException query exception
    */
-  public final byte[] formatDate(final Date date, final byte[] pic, final byte[] cal,
+  public final byte[] formatDate(final ADate date, final byte[] pic, final byte[] cal,
       final byte[] plc, final InputInfo ii) throws QueryException {
 
     // [CG] XQuery/Formatter: currently, calendars and places are ignored
@@ -153,7 +153,7 @@ public abstract class Formatter extends FormatUtil {
             err = tim;
             break;
           case 'd':
-            num = Date.days(0, gc.getMonth(), gc.getDay());
+            num = ADate.days(0, gc.getMonth(), gc.getDay());
             err = tim;
             break;
           case 'F':

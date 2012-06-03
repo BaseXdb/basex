@@ -3,7 +3,7 @@ package org.basex.server;
 import java.io.*;
 
 import org.basex.io.in.*;
-import org.basex.query.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 

@@ -1,13 +1,14 @@
 package org.basex.query.func;
 
-import static org.basex.query.item.AtomType.*;
 import static org.basex.query.util.Err.*;
+import static org.basex.query.value.type.AtomType.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.CmpV.OpV;
-import org.basex.query.item.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**

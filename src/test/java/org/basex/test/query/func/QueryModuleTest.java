@@ -1,7 +1,7 @@
 package org.basex.test.query.func;
 
 import org.basex.query.*;
-import org.basex.query.item.*;
+import org.basex.query.value.item.*;
 
 /**
  * This is a simple XQuery demo module written in Java.

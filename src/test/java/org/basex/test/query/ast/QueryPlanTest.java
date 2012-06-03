@@ -4,7 +4,8 @@ import static org.basex.core.Prop.*;
 import static org.junit.Assert.*;
 
 import org.basex.query.*;
-import org.basex.query.item.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.test.query.*;
 
 /**

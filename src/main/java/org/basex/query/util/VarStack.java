@@ -5,7 +5,8 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.query.*;
-import org.basex.query.item.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**

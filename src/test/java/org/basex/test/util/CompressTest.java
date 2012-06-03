@@ -6,8 +6,8 @@ import static org.junit.Assert.*;
 import java.util.*;
 
 import org.basex.query.*;
-import org.basex.query.item.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.item.*;
 import org.basex.test.*;
 import org.basex.util.*;
 import org.basex.util.list.*;

@@ -5,9 +5,9 @@ import static org.basex.query.util.Err.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
-import org.basex.query.item.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**

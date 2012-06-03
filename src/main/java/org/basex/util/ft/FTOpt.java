@@ -9,7 +9,7 @@ import java.util.Map.Entry;
 
 import org.basex.data.*;
 import org.basex.query.ft.*;
-import org.basex.query.item.*;
+import org.basex.query.value.node.*;
 
 /**
  * This class contains all full-text options.

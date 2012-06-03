@@ -3,7 +3,8 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.data.*;
-import org.basex.query.item.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**

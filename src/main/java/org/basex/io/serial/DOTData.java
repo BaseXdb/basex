@@ -7,9 +7,10 @@ import org.basex.query.expr.*;
 import org.basex.query.flwor.*;
 import org.basex.query.ft.*;
 import org.basex.query.func.*;
-import org.basex.query.item.*;
 import org.basex.query.path.*;
 import org.basex.query.util.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**

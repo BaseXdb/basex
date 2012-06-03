@@ -2,7 +2,7 @@ package org.basex.query.util;
 
 import java.util.*;
 
-import org.basex.query.item.*;
+import org.basex.query.value.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 

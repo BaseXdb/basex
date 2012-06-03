@@ -3,8 +3,10 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
-import org.basex.query.item.*;
-import org.basex.query.item.SeqType.Occ;
+import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.util.*;
 
 /**
@@ -26,25 +28,34 @@ public final class Cast extends Single {
   }
 
   @Override
+  public Expr analyze(final AnalyzeContext ctx) throws QueryException {
+    super.analyze(ctx);
+    checkType();
+    return this;
+  }
+
+  @Override
+  public void checkType() throws QueryException {
+    if(expr.type().one()) type = SeqType.get(type.type, Occ.ONE);
+  }
+
+  @Override
   public Expr compile(final QueryContext ctx) throws QueryException {
     super.compile(ctx);
+    checkType();
 
-    Expr e = this;
-    final SeqType t = expr.type();
-    if(expr.isValue()) {
-      // pre-evaluate value
-      e = preEval(ctx);
-    } else if(type.type == AtomType.BLN || type.type == AtomType.FLT ||
-        type.type == AtomType.DBL || type.type == AtomType.QNM ||
-        type.type == AtomType.URI) {
-      // skip cast if specified and return types are equal
-      if(t.eq(type) || t.type == type.type && t.one() && type.zeroOrOne())
-        e = expr;
-      if(e != this) optPre(e, ctx);
+    // pre-evaluate value
+    if(expr.isValue()) return preEval(ctx);
+
+    // skip cast if specified and return types are equal
+    // (the following types will always be correct)
+    final Type t = type.type;
+    if((t == AtomType.BLN || t == AtomType.FLT || t == AtomType.DBL ||
+        t == AtomType.QNM || t == AtomType.URI) && expr.type().eq(type)) {
+      optPre(expr, ctx);
+      return expr;
     }
-    // adopt occurrence of argument
-    if(e == this && t.one()) type = SeqType.get(type.type, Occ.ONE);
-    return e;
+    return this;
   }
 
   @Override

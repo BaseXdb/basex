@@ -7,9 +7,9 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
-import org.basex.query.item.*;
 import org.basex.query.util.*;
 import org.basex.query.util.json.*;
+import org.basex.query.value.node.*;
 
 /**
  * This class parses files in the JSON format

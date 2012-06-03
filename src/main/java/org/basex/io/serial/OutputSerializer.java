@@ -13,7 +13,7 @@ import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
-import org.basex.query.item.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;

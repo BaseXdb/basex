@@ -4,12 +4,12 @@ import static org.basex.util.Token.*;
 
 import java.text.*;
 import java.util.*;
-import java.util.Date;
 
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.item.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.item.Dat;
 import org.basex.util.*;
 
 /**
@@ -90,7 +90,7 @@ public final class FNContext extends StandardFunc {
    * @throws QueryException query exception
    */
   private void initDateTime(final QueryContext ctx) throws QueryException {
-    final Date d = Calendar.getInstance().getTime();
+    final java.util.Date d = Calendar.getInstance().getTime();
     final String zon = new SimpleDateFormat("Z").format(d);
     final String ymd = new SimpleDateFormat("yyyy-MM-dd").format(d);
     final String hms = new SimpleDateFormat("HH:mm:ss.S").format(d);
@@ -105,7 +105,7 @@ public final class FNContext extends StandardFunc {
    * @return current date
    */
   private static Item implZone() {
-    final Date d = Calendar.getInstance().getTime();
+    final java.util.Date d = Calendar.getInstance().getTime();
     final String zone = new SimpleDateFormat("Z").format(d);
     final byte[] z = token(zone);
     final int cshift = toInt(substring(z, 0, 3)) * 60 + toInt(substring(z, 3));

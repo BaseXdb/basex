@@ -4,8 +4,11 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
-import org.basex.query.item.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**

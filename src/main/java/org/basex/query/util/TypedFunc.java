@@ -2,7 +2,7 @@ package org.basex.query.util;
 
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
-import org.basex.query.item.*;
+import org.basex.query.value.type.*;
 
 /**
  * Wrapper that provides types for function expressions.

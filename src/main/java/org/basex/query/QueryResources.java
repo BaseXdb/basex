@@ -9,7 +9,9 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.io.*;
-import org.basex.query.item.*;
+import org.basex.query.value.*;
+import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 

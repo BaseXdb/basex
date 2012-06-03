@@ -9,7 +9,8 @@ import org.basex.query.*;
 import org.basex.query.QueryModule.Deterministic;
 import org.basex.query.QueryModule.FocusDependent;
 import org.basex.query.expr.*;
-import org.basex.query.item.*;
+import org.basex.query.value.*;
+import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**

@@ -6,8 +6,8 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.query.item.*;
 import org.basex.query.util.json.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;

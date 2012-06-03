@@ -1,7 +1,8 @@
 package org.basex.query.path;
 
-import org.basex.query.item.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 
 /**
  * Document kind test.

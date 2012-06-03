@@ -15,7 +15,9 @@ import org.basex.gui.layout.*;
 import org.basex.gui.view.*;
 import org.basex.io.*;
 import org.basex.query.func.*;
-import org.basex.query.item.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 

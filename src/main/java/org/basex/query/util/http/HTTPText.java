@@ -3,7 +3,7 @@ package org.basex.query.util.http;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
-import org.basex.query.item.*;
+import org.basex.query.value.item.*;
 
 /**
  * HTTP strings.

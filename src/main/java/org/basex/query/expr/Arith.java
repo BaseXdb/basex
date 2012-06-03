@@ -3,7 +3,10 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
-import org.basex.query.item.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.util.*;
 
 /**
@@ -26,23 +29,34 @@ public final class Arith extends Arr {
   public Arith(final InputInfo ii, final Expr e1, final Expr e2, final Calc c) {
     super(ii, e1, e2);
     calc = c;
+    type = SeqType.ITEM_ZO;
+  }
+
+  @Override
+  public Expr analyze(final AnalyzeContext ctx) throws QueryException {
+    super.analyze(ctx);
+    checkType();
+    return this;
+  }
+
+  @Override
+  public void checkType() throws QueryException {
+    final SeqType s0 = expr[0].type();
+    final SeqType s1 = expr[1].type();
+    final Type t0 = s0.type;
+    final Type t1 = s1.type;
+    if((t0.isNumber() || t0.isUntyped()) && (t1.isNumber() || t1.isUntyped())) {
+      final Occ occ = s0.one() && s1.one() ? Occ.ONE : Occ.ZERO_ONE;
+      type = SeqType.get(Calc.type(t0, t1), occ);
+    } else if(s0.one() && s1.one()) {
+      type = SeqType.ITEM;
+    }
   }
 
   @Override
   public Expr compile(final QueryContext ctx) throws QueryException {
     super.compile(ctx);
-
-    final SeqType s0 = expr[0].type();
-    final SeqType s1 = expr[1].type();
-    final boolean t1 = s0.type.isNumber() || s0.type.isUntyped();
-    final boolean t2 = s0.type.isNumber() || s1.type.isUntyped();
-    if(t1 && t2) {
-      type = s0.one() && s1.one() ? SeqType.ITR : SeqType.ITR_ZO;
-    } else if(s0.one() && s1.one()) {
-      type = SeqType.ITEM;
-    } else {
-      type = SeqType.ITEM_ZO;
-    }
+    checkType();
     return optPre(oneIsEmpty() ? null : allAreValues() ? item(ctx, info) : this, ctx);
   }
 

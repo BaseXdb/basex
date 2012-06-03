@@ -11,8 +11,6 @@ public final class AnalyzeContext {
   private final QueryContext qc;
   /** Static context of an expression. */
   public final StaticContext sc;
-  /** Updating flag. */
-  public boolean updating;
 
   /**
    * Constructor.
@@ -21,7 +19,6 @@ public final class AnalyzeContext {
   public AnalyzeContext(final QueryContext ctx) {
     qc = ctx;
     sc = ctx.sc;
-    updating = ctx.updating;
   }
 
   /**

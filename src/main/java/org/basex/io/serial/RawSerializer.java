@@ -4,7 +4,7 @@ import java.io.*;
 
 import org.basex.io.out.*;
 import org.basex.query.*;
-import org.basex.query.item.*;
+import org.basex.query.value.item.*;
 
 /**
  * This class serializes data in its internal format: no indentation and entity

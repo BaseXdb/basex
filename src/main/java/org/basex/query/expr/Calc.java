@@ -1,12 +1,13 @@
 package org.basex.query.expr;
 
-import static org.basex.query.item.AtomType.*;
 import static org.basex.query.util.Err.*;
+import static org.basex.query.value.type.AtomType.*;
 
 import java.math.*;
 
 import org.basex.query.*;
-import org.basex.query.item.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -42,13 +43,13 @@ public enum Calc {
       // dates or durations
       if(ta == tb) {
         if(!ta.isDuration()) errNum(ii, !t1 ? a : b);
-        if(ta == YMD) return new YMd((YMd) a, (YMd) b, true);
+        if(ta == YMD) return new YMDur((YMDur) a, (YMDur) b, true);
         if(ta == DTD) return new DTd((DTd) a, (DTd) b, true);
       }
-      if(ta == DTM) return new Dtm((Date) a, checkDur(ii, b), true, ii);
-      if(tb == DTM) return new Dtm((Date) b, checkDur(ii, a), true, ii);
-      if(ta == DAT) return new Dat((Date) a, checkDur(ii, b), true, ii);
-      if(tb == DAT) return new Dat((Date) b, checkDur(ii, a), true, ii);
+      if(ta == DTM) return new Dtm((ADate) a, checkDur(ii, b), true, ii);
+      if(tb == DTM) return new Dtm((ADate) b, checkDur(ii, a), true, ii);
+      if(ta == DAT) return new Dat((ADate) a, checkDur(ii, b), true, ii);
+      if(tb == DAT) return new Dat((ADate) b, checkDur(ii, a), true, ii);
       if(ta == TIM && tb == DTD) return new Tim((Tim) a, (DTd) b, true, ii);
       if(tb == TIM && ta == DTD) return new Tim((Tim) b, (DTd) a, true, ii);
       throw errType(ii, ta, tb);
@@ -80,13 +81,13 @@ public enum Calc {
 
       // dates or durations
       if(ta == tb) {
-        if(ta == DTM || ta == DAT || ta == TIM) return new DTd((Date) a, (Date) b);
-        if(ta == YMD) return new YMd((YMd) a, (YMd) b, false);
+        if(ta == DTM || ta == DAT || ta == TIM) return new DTd((ADate) a, (ADate) b);
+        if(ta == YMD) return new YMDur((YMDur) a, (YMDur) b, false);
         if(ta == DTD) return new DTd((DTd) a, (DTd) b, false);
         errNum(ii, !t1 ? a : b);
       }
-      if(ta == DTM) return new Dtm((Date) a, checkDur(ii, b), false, ii);
-      if(ta == DAT) return new Dat((Date) a, checkDur(ii, b), false, ii);
+      if(ta == DTM) return new Dtm((ADate) a, checkDur(ii, b), false, ii);
+      if(ta == DAT) return new Dat((ADate) a, checkDur(ii, b), false, ii);
       if(ta == TIM && tb == DTD) return new Tim((Tim) a, (DTd) b, false, ii);
       throw errType(ii, ta, tb);
     }
@@ -99,11 +100,11 @@ public enum Calc {
       final Type ta = a.type, tb = b.type;
       if(ta == YMD) {
         if(!tb.isNumber()) errNum(ii, b);
-        return new YMd((Dur) a, b.dbl(ii), true, ii);
+        return new YMDur((Dur) a, b.dbl(ii), true, ii);
       }
       if(tb == YMD) {
         if(!ta.isNumber()) errNum(ii, a);
-        return new YMd((Dur) b, a.dbl(ii), true, ii);
+        return new YMDur((Dur) b, a.dbl(ii), true, ii);
       }
       if(ta == DTD) {
         if(!tb.isNumber()) errNum(ii, b);
@@ -140,9 +141,9 @@ public enum Calc {
       final Type ta = a.type, tb = b.type;
       if(ta == tb) {
         if(ta == YMD) {
-          final BigDecimal bd = BigDecimal.valueOf(((YMd) b).ymd());
+          final BigDecimal bd = BigDecimal.valueOf(((YMDur) b).ymd());
           if(bd.equals(BigDecimal.ZERO)) DATEZERO.thrw(ii, info());
-          return Dec.get(BigDecimal.valueOf(((YMd) a).ymd()).divide(
+          return Dec.get(BigDecimal.valueOf(((YMDur) a).ymd()).divide(
               bd, 20, BigDecimal.ROUND_HALF_EVEN));
         }
         if(ta == DTD) {
@@ -154,7 +155,7 @@ public enum Calc {
       }
       if(ta == YMD) {
         if(!tb.isNumber()) errNum(ii, b);
-        return new YMd((Dur) a, b.dbl(ii), false, ii);
+        return new YMDur((Dur) a, b.dbl(ii), false, ii);
       }
       if(ta == DTD) {
         if(!tb.isNumber()) errNum(ii, b);

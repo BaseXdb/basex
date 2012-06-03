@@ -5,8 +5,10 @@ import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.item.*;
-import org.basex.query.item.SeqType.Occ;
+import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.util.*;
 
 /**

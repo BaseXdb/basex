@@ -1,8 +1,8 @@
 package org.basex.query.expr;
 
 import org.basex.query.*;
-import org.basex.query.item.*;
 import org.basex.query.util.*;
+import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**

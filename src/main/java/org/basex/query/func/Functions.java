@@ -9,9 +9,10 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.Expr.Use;
-import org.basex.query.item.*;
-import org.basex.query.item.SeqType.Occ;
 import org.basex.query.util.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 

@@ -7,10 +7,14 @@ import static org.basex.util.Token.*;
 import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.item.*;
-import org.basex.query.item.map.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
+import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**

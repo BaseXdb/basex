@@ -7,11 +7,13 @@ import org.basex.index.name.*;
 import org.basex.index.query.*;
 import org.basex.index.stats.*;
 import org.basex.query.*;
-import org.basex.query.item.*;
 import org.basex.query.iter.*;
 import org.basex.query.path.*;
 import org.basex.query.path.Test.Mode;
 import org.basex.query.util.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**

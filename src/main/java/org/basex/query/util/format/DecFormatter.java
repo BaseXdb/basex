@@ -10,7 +10,7 @@ import java.util.Map.Entry;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
-import org.basex.query.item.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;

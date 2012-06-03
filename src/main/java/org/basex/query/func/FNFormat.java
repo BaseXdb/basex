@@ -5,8 +5,9 @@ import static org.basex.util.Token.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.item.*;
 import org.basex.query.util.format.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -96,7 +97,7 @@ public final class FNFormat extends StandardFunc {
     final byte[] cal = expr.length == 5 ? checkEStr(expr[3], ctx) : EMPTY;
     final byte[] plc = expr.length == 5 ? checkEStr(expr[4], ctx) : EMPTY;
     if(it == null) return null;
-    final Date date = (Date) checkType(it, tp);
+    final ADate date = (ADate) checkType(it, tp);
 
     final Formatter form = Formatter.get(string(lng));
     return Str.get(form.formatDate(date, pic, cal, plc, info));

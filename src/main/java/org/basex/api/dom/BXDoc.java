@@ -2,7 +2,8 @@ package org.basex.api.dom;
 
 import static org.basex.util.Token.*;
 
-import org.basex.query.item.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.w3c.dom.*;
 

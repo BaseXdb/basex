@@ -4,10 +4,13 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.flwor.*;
 import org.basex.query.func.*;
-import org.basex.query.item.*;
 import org.basex.query.iter.*;
 import org.basex.query.path.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -35,6 +38,14 @@ public abstract class Expr extends ExprInfo {
    * @throws QueryException query exception
    */
   public abstract void checkUp() throws QueryException;
+
+  /**
+   * Updates the expression's return type.
+   * @throws QueryException query exception
+   */
+  @SuppressWarnings("unused")
+  public void checkType() throws QueryException {
+  }
 
   /**
    * Performs static compilation steps.

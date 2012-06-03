@@ -1,6 +1,6 @@
 package org.basex.api.dom;
 
-import org.basex.query.item.*;
+import org.basex.query.value.node.*;
 import org.w3c.dom.*;
 
 /**

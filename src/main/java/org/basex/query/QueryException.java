@@ -3,8 +3,10 @@ package org.basex.query;
 import static org.basex.core.Text.*;
 
 import org.basex.core.*;
-import org.basex.query.item.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 

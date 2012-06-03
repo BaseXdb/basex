@@ -1,13 +1,13 @@
 package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.query.item.SeqType.*;
+import static org.basex.query.value.type.SeqType.*;
 
 import java.util.*;
 
 import org.basex.query.expr.*;
-import org.basex.query.item.*;
 import org.basex.query.util.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**

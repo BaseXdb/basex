@@ -15,19 +15,22 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.CmpG.OpG;
 import org.basex.query.expr.CmpN.OpN;
 import org.basex.query.expr.CmpV.OpV;
-import org.basex.query.expr.Expr.*;
+import org.basex.query.expr.Expr.Use;
 import org.basex.query.expr.Context;
 import org.basex.query.expr.List;
 import org.basex.query.flwor.*;
 import org.basex.query.ft.*;
 import org.basex.query.func.*;
-import org.basex.query.item.*;
-import org.basex.query.item.SeqType.Occ;
 import org.basex.query.iter.*;
 import org.basex.query.path.*;
 import org.basex.query.up.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.format.*;
+import org.basex.query.value.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.Occ;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
@@ -201,13 +204,14 @@ public class QueryParser extends InputParser {
     if(ctx.sc.decFormats.get(empty) == null) {
       ctx.sc.decFormats.add(empty, new DecFormatter());
     }
-
     ctx.funcs.check();
-    // check updating flag
-    ctx.funcs.checkUp();
-    ctx.vars.checkUp();
-    expr.checkUp();
 
+    // check if any updating expressions have been found
+    if(ctx.updates != null) {
+      ctx.funcs.checkUp();
+      ctx.vars.checkUp();
+      expr.checkUp();
+    }
     return expr;
   }
 

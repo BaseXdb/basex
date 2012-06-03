@@ -5,8 +5,10 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
-import org.basex.query.item.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -33,14 +35,6 @@ public final class CElem extends CName {
     nspaces = ns == null ? new Atts() : ns;
     comp = ns == null;
     type = SeqType.ELM;
-  }
-
-  @Override
-  public CElem analyze(final AnalyzeContext ctx) throws QueryException {
-    final int s = prepare(ctx.sc);
-    super.analyze(ctx);
-    ctx.sc.ns.size(s);
-    return this;
   }
 
   @Override

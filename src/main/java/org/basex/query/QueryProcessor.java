@@ -11,9 +11,10 @@ import org.basex.core.Context;
 import org.basex.data.*;
 import org.basex.io.serial.*;
 import org.basex.query.expr.*;
-import org.basex.query.item.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.json.*;
+import org.basex.query.value.*;
+import org.basex.query.value.node.*;
 
 /**
  * This class is an entry point for evaluating XQuery implementations.

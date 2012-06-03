@@ -3,13 +3,13 @@ package org.basex.query.func;
 import static org.basex.query.util.Err.*;
 
 import java.math.*;
-import java.util.*;
+import java.util.Calendar;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.item.*;
-import org.basex.query.item.Date;
 import org.basex.query.util.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -100,7 +100,7 @@ public final class FNDate extends StandardFunc {
    */
   private static Item yea(final Item it) {
     return Int.get(it instanceof Dur ? ((Dur) it).yea() :
-      ((Date) it).xc.getYear());
+      ((ADate) it).xc.getYear());
   }
 
   /**
@@ -110,7 +110,7 @@ public final class FNDate extends StandardFunc {
    */
   private static Item mon(final Item it) {
     return Int.get(it instanceof Dur ? ((Dur) it).mon() :
-      ((Date) it).xc.getMonth());
+      ((ADate) it).xc.getMonth());
   }
 
   /**
@@ -120,7 +120,7 @@ public final class FNDate extends StandardFunc {
    */
   private static Item day(final Item it) {
     return Int.get(it instanceof Dur ? (int) ((Dur) it).day() :
-      ((Date) it).xc.getDay());
+      ((ADate) it).xc.getDay());
   }
 
   /**
@@ -130,7 +130,7 @@ public final class FNDate extends StandardFunc {
    */
   private static Item hou(final Item it) {
     return Int.get(it instanceof Dur ? (int) ((Dur) it).hou() :
-      ((Date) it).xc.getHour());
+      ((ADate) it).xc.getHour());
   }
 
   /**
@@ -140,7 +140,7 @@ public final class FNDate extends StandardFunc {
    */
   private static Item min(final Item it) {
     return Int.get(it instanceof Dur ? ((Dur) it).min() :
-      ((Date) it).xc.getMinute());
+      ((ADate) it).xc.getMinute());
   }
 
   /**
@@ -150,8 +150,8 @@ public final class FNDate extends StandardFunc {
    */
   private static Item sec(final Item it) {
     if(it instanceof Dur) return Dec.get(((Dur) it).sec().doubleValue());
-    final int s = ((Date) it).xc.getSecond();
-    final BigDecimal d = ((Date) it).xc.getFractionalSecond();
+    final int s = ((ADate) it).xc.getSecond();
+    final BigDecimal d = ((ADate) it).xc.getFractionalSecond();
     return Dec.get(s + (d != null ? d.doubleValue() : 0));
   }
 
@@ -161,7 +161,7 @@ public final class FNDate extends StandardFunc {
    * @return timezone
    */
   private static Item zon(final Item it) {
-    final int z = ((Date) it).xc.getTimezone();
+    final int z = ((ADate) it).xc.getTimezone();
     return z == Item.UNDEF ? null : new DTd(z);
   }
 
@@ -205,8 +205,8 @@ public final class FNDate extends StandardFunc {
       throws QueryException {
 
     final Item i = it.type.isUntyped() ? new Dat(it.string(info), info) :
-      new Dat((Date) checkType(it, AtomType.DAT));
-    return adjust((Date) i, zon, d);
+      new Dat((ADate) checkType(it, AtomType.DAT));
+    return adjust((ADate) i, zon, d);
   }
 
   /**
@@ -221,8 +221,8 @@ public final class FNDate extends StandardFunc {
       throws QueryException {
 
     final Item i = it.type.isUntyped() ? new Dtm(it.string(info), info) :
-      new Dtm((Date) checkType(it, AtomType.DTM));
-    return adjust((Date) i, zon, d);
+      new Dtm((ADate) checkType(it, AtomType.DTM));
+    return adjust((ADate) i, zon, d);
   }
 
   /**
@@ -237,8 +237,8 @@ public final class FNDate extends StandardFunc {
       throws QueryException {
 
     final Item i = it.type.isUntyped() ? new Tim(it.string(info), info) :
-      new Tim((Date) checkType(it, AtomType.TIM));
-    return adjust((Date) i, zon, d);
+      new Tim((ADate) checkType(it, AtomType.TIM));
+    return adjust((ADate) i, zon, d);
   }
 
   /**
@@ -279,7 +279,7 @@ public final class FNDate extends StandardFunc {
    * @return adjusted date
    * @throws QueryException query exception
    */
-  private Date adjust(final Date date, final Item zon, final boolean d)
+  private ADate adjust(final ADate date, final Item zon, final boolean d)
       throws QueryException {
 
     if(d && zon == null) {
@@ -299,7 +299,7 @@ public final class FNDate extends StandardFunc {
         INVALZONE.thrw(info, zon);
       }
     }
-    if(zn != Item.UNDEF) date.xc.add(Date.df.newDuration(-60000L * (zn - tz)));
+    if(zn != Item.UNDEF) date.xc.add(ADate.df.newDuration(-60000L * (zn - tz)));
     date.xc.setTimezone(tz);
     return date;
   }

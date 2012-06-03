@@ -2,7 +2,7 @@ package org.basex.query.iter;
 
 import java.util.*;
 
-import org.basex.query.item.*;
+import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**

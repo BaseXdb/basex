@@ -5,7 +5,9 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
-import org.basex.query.item.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
