@@ -43,8 +43,8 @@ public final class Let extends ForLet {
   }
 
   @Override
-  public Let comp(final QueryContext ctx) throws QueryException {
-    expr = checkUp(expr, ctx).comp(ctx);
+  public Let compile(final QueryContext ctx) throws QueryException {
+    expr = expr.compile(ctx);
     type = SeqType.ITEM;
     size = 1;
     var.size = expr.size();

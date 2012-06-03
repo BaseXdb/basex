@@ -25,8 +25,8 @@ public final class Range extends Arr {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
-    super.comp(ctx);
+  public Expr compile(final QueryContext ctx) throws QueryException {
+    super.compile(ctx);
 
     Expr e = this;
     if(oneIsEmpty()) {

@@ -77,9 +77,12 @@ public class AxisPath extends Path {
   }
 
   @Override
-  protected final Expr compPath(final QueryContext ctx) throws QueryException {
-    for(final Expr s : steps) checkUp(s, ctx);
+  protected Expr analyzePath(final AnalyzeContext ctx) throws QueryException {
+    return this;
+  }
 
+  @Override
+  protected final Expr compPath(final QueryContext ctx) throws QueryException {
     // merge two axis paths
     if(root instanceof AxisPath) {
       Expr[] st = ((AxisPath) root).steps;
@@ -95,7 +98,7 @@ public class AxisPath extends Path {
     if(s != null) COMPSELF.thrw(info, s);
 
     for(int i = 0; i != steps.length; ++i) {
-      final Expr e = steps[i].comp(ctx);
+      final Expr e = steps[i].compile(ctx);
       if(!(e instanceof AxisStep)) return e;
       steps[i] = e;
     }
@@ -109,7 +112,7 @@ public class AxisPath extends Path {
       // check children path rewriting
       if(e == this) e = children(ctx, data);
       // return optimized expression
-      if(e != this) return e.comp(ctx);
+      if(e != this) return e.compile(ctx);
     }
 
     // analyze if result set can be cached - no predicates/variables...

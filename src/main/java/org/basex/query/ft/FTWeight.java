@@ -31,9 +31,21 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
-  public FTExpr comp(final QueryContext ctx) throws QueryException {
-    weight = checkUp(weight, ctx).comp(ctx);
-    return super.comp(ctx);
+  public void checkUp() throws QueryException {
+    checkNoUp(weight);
+    super.checkUp();
+  }
+
+  @Override
+  public FTExpr analyze(final AnalyzeContext ctx) throws QueryException {
+    weight = weight.analyze(ctx);
+    return super.analyze(ctx);
+  }
+
+  @Override
+  public FTExpr compile(final QueryContext ctx) throws QueryException {
+    weight = weight.compile(ctx);
+    return super.compile(ctx);
   }
 
   // called by sequential variant

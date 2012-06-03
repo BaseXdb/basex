@@ -31,8 +31,8 @@ public final class FTAnd extends FTExpr {
   }
 
   @Override
-  public FTExpr comp(final QueryContext ctx) throws QueryException {
-    super.comp(ctx);
+  public FTExpr compile(final QueryContext ctx) throws QueryException {
+    super.compile(ctx);
     boolean not = true;
     for(final FTExpr e : expr) not &= e instanceof FTNot;
     if(not) {

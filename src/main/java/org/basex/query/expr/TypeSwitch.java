@@ -33,22 +33,33 @@ public final class TypeSwitch extends ParseExpr {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
-    ts = checkUp(ts, ctx).comp(ctx);
+  public void checkUp() throws QueryException {
+    checkNoUp(ts);
     final Expr[] tmp = new Expr[cases.length];
     for(int i = 0; i < cases.length; ++i) tmp[i] = cases[i].expr;
-    checkUp(ctx, tmp);
+    checkAllUp(tmp);
+  }
 
+  @Override
+  public Expr analyze(final AnalyzeContext ctx) throws QueryException {
+    ts = ts.analyze(ctx);
+    for(final TypeCase c : cases) c.analyze(ctx);
+    return this;
+  }
+
+  @Override
+  public Expr compile(final QueryContext ctx) throws QueryException {
+    ts = ts.compile(ctx);
     // static condition: return branch in question
     if(ts.isValue()) {
       for(final TypeCase c : cases) {
         if(c.var.type == null || c.var.type.instance(ts.value(ctx)))
-          return optPre(c.comp(ctx, (Value) ts).expr, ctx);
+          return optPre(c.compile(ctx, (Value) ts).expr, ctx);
       }
     }
 
     // compile branches
-    for(final TypeCase c : cases) c.comp(ctx);
+    for(final TypeCase c : cases) c.compile(ctx);
 
     // return result if all branches are equal (e.g., empty)
     boolean eq = true;

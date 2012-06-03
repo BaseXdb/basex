@@ -30,20 +30,32 @@ public class Filter extends Preds {
   }
 
   @Override
-  public final Expr comp(final QueryContext ctx) throws QueryException {
+  public void checkUp() throws QueryException {
+    checkNoUp(root);
+    super.checkUp();
+  }
+
+  @Override
+  public Expr analyze(final AnalyzeContext ctx) throws QueryException {
+    root = root.analyze(ctx);
+    return super.analyze(ctx);
+  }
+
+  @Override
+  public final Expr compile(final QueryContext ctx) throws QueryException {
     // invalidate current context value (will be overwritten by filter)
     final Value cv = ctx.value;
     ctx.value = null;
     try {
-      root = checkUp(root, ctx).comp(ctx);
+      root = root.compile(ctx);
       // return empty root
       if(root.isEmpty()) return optPre(null, ctx);
       // convert filters without numeric predicates to axis paths
       if(root instanceof AxisPath && !super.uses(Use.POS))
-        return ((AxisPath) root).copy().addPreds(preds).comp(ctx);
+        return ((AxisPath) root).copy().addPreds(preds).compile(ctx);
 
       // optimize filter expressions
-      final Expr e = super.comp(ctx);
+      final Expr e = super.compile(ctx);
       if(e != this) return e;
 
       // no predicates.. return root; otherwise, do some advanced compilations

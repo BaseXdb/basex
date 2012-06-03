@@ -25,9 +25,9 @@ public final class Or extends Logical {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
+  public Expr compile(final QueryContext ctx) throws QueryException {
     // remove atomic values
-    final Expr c = super.comp(ctx);
+    final Expr c = super.compile(ctx);
     if(c != this) return c;
 
     // merge predicates if possible

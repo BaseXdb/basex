@@ -28,8 +28,8 @@ public final class DynamicFunc extends Arr {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
-    super.comp(ctx);
+  public Expr compile(final QueryContext ctx) throws QueryException {
+    super.compile(ctx);
     final int ar = expr.length - 1;
     final Expr f = expr[ar];
     final Type t = f.type().type;
@@ -39,7 +39,6 @@ public final class DynamicFunc extends Arr {
         throw INVARITY.thrw(info, f, ar);
       if(ft.ret != null) type = ft.ret;
     }
-
     // maps can only contain fully evaluated Values, so this is safe
     return allAreValues() && f instanceof Map ? optPre(value(ctx), ctx) : this;
   }
@@ -100,8 +99,7 @@ public final class DynamicFunc extends Arr {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(expr[expr.length - 1].toString());
-    tb.add('(');
+    final TokenBuilder tb = new TokenBuilder(expr[expr.length - 1].toString()).add('(');
     for(int i = 0; i < expr.length - 1; i++) {
       tb.add(expr[i].toString());
       if(i < expr.length - 2) tb.add(", ");

@@ -24,8 +24,8 @@ public final class Except extends Set {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
-    super.comp(ctx);
+  public Expr compile(final QueryContext ctx) throws QueryException {
+    super.compile(ctx);
     if(expr[0].isEmpty()) return optPre(null, ctx);
 
     for(int e = 1; e < expr.length; ++e) {

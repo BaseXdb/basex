@@ -24,7 +24,7 @@ public final class Root extends Simple {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) {
+  public Expr compile(final QueryContext ctx) {
     return ctx.value != null && ctx.value.type == NodeType.DOC ? ctx.value : this;
   }
 

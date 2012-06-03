@@ -26,12 +26,12 @@ abstract class Set extends Arr {
    */
   Set(final InputInfo ii, final Expr[] l) {
     super(ii, l);
+    type = SeqType.NOD_ZM;
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
-    type = SeqType.NOD_ZM;
-    super.comp(ctx);
+  public Expr compile(final QueryContext ctx) throws QueryException {
+    super.compile(ctx);
     for(final Expr e : expr) {
       if(e.iterable()) continue;
       iterable = false;

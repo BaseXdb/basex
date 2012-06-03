@@ -96,17 +96,20 @@ public final class Var extends ParseExpr {
     return var;
   }
 
-  /**
-   * Checks if the variable contains no updating expression.
-   * @throws QueryException query exception
-   */
+  @Override
   public void checkUp() throws QueryException {
-    if(expr != null && expr.uses(Use.UPD)) UPNOT.thrw(info, description());
+    checkNoUp(expr);
   }
 
   @Override
-  public Var comp(final QueryContext ctx) throws QueryException {
-    if(expr != null) bind(checkUp(expr, ctx).comp(ctx), ctx);
+  public Var analyze(final AnalyzeContext ctx) throws QueryException {
+    expr.analyze(ctx);
+    return this;
+  }
+
+  @Override
+  public Var compile(final QueryContext ctx) throws QueryException {
+    if(expr != null) bind(expr.compile(ctx), ctx);
     return this;
   }
 
@@ -173,7 +176,7 @@ public final class Var extends ParseExpr {
       final Value v = ctx.value;
       ctx.value = null;
       try {
-        value = cast(ctx.value(expr.comp(ctx)), ctx);
+        value = cast(ctx.value(expr.compile(ctx)), ctx);
       } finally {
         ctx.value = v;
       }

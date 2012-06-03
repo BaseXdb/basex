@@ -123,8 +123,8 @@ public final class CmpG extends Cmp {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
-    super.comp(ctx);
+  public Expr compile(final QueryContext ctx) throws QueryException {
+    super.compile(ctx);
 
     // swap expressions; add text() to location paths to simplify optimizations
     if(swap()) {
@@ -271,7 +271,7 @@ public final class CmpG extends Cmp {
    */
   boolean union(final CmpG g, final QueryContext ctx) throws QueryException {
     if(op != g.op || !expr[0].sameAs(g.expr[0])) return false;
-    expr[1] = new List(info, expr[1], g.expr[1]).comp(ctx);
+    expr[1] = new List(info, expr[1], g.expr[1]).compile(ctx);
     atomic = atomic && expr[1].type().zeroOrOne();
     return true;
   }

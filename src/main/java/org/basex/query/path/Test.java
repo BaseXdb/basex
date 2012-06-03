@@ -71,7 +71,7 @@ public abstract class Test {
    * @return false if test always returns false
    */
   @SuppressWarnings("unused")
-  public boolean comp(final QueryContext ctx) {
+  public boolean compile(final QueryContext ctx) {
     return true;
   }
 

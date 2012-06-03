@@ -152,8 +152,8 @@ public final class CmpV extends Cmp {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
-    super.comp(ctx);
+  public Expr compile(final QueryContext ctx) throws QueryException {
+    super.compile(ctx);
 
     // swap expressions; add text() to location paths to simplify optimizations
     if(swap()) {

@@ -26,8 +26,19 @@ public abstract class Single extends ParseExpr {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
-    expr = expr.comp(ctx);
+  public void checkUp() throws QueryException {
+    checkNoUp(expr);
+  }
+
+  @Override
+  public Expr analyze(final AnalyzeContext ctx) throws QueryException {
+    expr = expr.analyze(ctx);
+    return this;
+  }
+
+  @Override
+  public Expr compile(final QueryContext ctx) throws QueryException {
+    expr = expr.compile(ctx);
     return this;
   }
 

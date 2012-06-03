@@ -170,12 +170,31 @@ public final class QueryContext extends Progress {
   }
 
   /**
+   * Will perform all static compilation steps (in progress).
+   * @throws QueryException query exception
+   */
+  public void analyze() throws QueryException {
+    final AnalyzeContext ctx = new AnalyzeContext(this);
+    try {
+      // compile global functions.
+      // variables will be compiled if called for the first time
+      funcs.analyze(ctx);
+      // compile the expression
+      if(root != null) root = root.analyze(ctx);
+    } catch(final StackOverflowError ex) {
+      Util.debug(ex);
+      XPSTACK.thrw(null);
+    }
+  }
+
+  /**
    * Compiles and optimizes the expression.
    * @throws QueryException query exception
    */
   public void compile() throws QueryException {
     // dump compilation info
     if(inf) compInfo(NL + COMPILING_C);
+    analyze();
 
     // temporarily set database values (size check added for better performance)
     if(!dbOptions.isEmpty()) {
@@ -210,7 +229,7 @@ public final class QueryContext extends Progress {
       // variables will be compiled if called for the first time
       funcs.comp(this);
       // compile the expression
-      if(root != null) root = root.comp(this);
+      if(root != null) root = root.compile(this);
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
       XPSTACK.thrw(null);
@@ -227,7 +246,7 @@ public final class QueryContext extends Progress {
    */
   public Iter iter() throws QueryException {
     try {
-      // evaluate lazily if no updates are possible
+      // evaluate lazily if query will perform no updates
       return updating ? value().iter() : iter(root);
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
@@ -307,7 +326,7 @@ public final class QueryContext extends Progress {
   }
 
   /**
-   * Adds some optimization info.
+   * Adds some compilation info.
    * @param string evaluation info
    * @param ext text text extensions
    */
@@ -389,20 +408,11 @@ public final class QueryContext extends Progress {
   }
 
   /**
-   * Returns {@code true} if the query may perform updates.
-   * @return updating flag
-   */
-  public boolean updating() {
-    return updating;
-  }
-
-  /**
    * Sets the updating flag.
    * @param up updating flag
    */
   public void updating(final boolean up) {
-    // initializes the update container
-    if(up && updates == null) updates = new Updates();
+    if(updates == null) updates = new Updates();
     updating = up;
   }
 

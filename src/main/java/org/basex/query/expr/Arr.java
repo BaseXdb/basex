@@ -26,8 +26,19 @@ public abstract class Arr extends ParseExpr {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
-    for(int e = 0; e != expr.length; ++e) expr[e] = checkUp(expr[e].comp(ctx), ctx);
+  public void checkUp() throws QueryException {
+    checkNoUp();
+  }
+
+  @Override
+  public Expr analyze(final AnalyzeContext ctx) throws QueryException {
+    for(int e = 0; e < expr.length; e++) expr[e] = expr[e].analyze(ctx);
+    return this;
+  }
+
+  @Override
+  public Expr compile(final QueryContext ctx) throws QueryException {
+    for(int e = 0; e < expr.length; e++) expr[e] = expr[e].compile(ctx);
     return this;
   }
 
@@ -78,6 +89,14 @@ public abstract class Arr extends ParseExpr {
   final boolean oneIsEmpty() {
     for(final Expr e : expr) if(e.isEmpty()) return true;
     return false;
+  }
+
+  /**
+   * Checks if none of the expressions are updating expressions.
+   * @throws QueryException query exception
+   */
+  public final void checkNoUp() throws QueryException {
+    checkNoneUp(expr);
   }
 
   @Override

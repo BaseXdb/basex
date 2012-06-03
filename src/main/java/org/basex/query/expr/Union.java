@@ -24,8 +24,8 @@ public final class Union extends Set {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
-    super.comp(ctx);
+  public Expr compile(final QueryContext ctx) throws QueryException {
+    super.compile(ctx);
 
     for(int e = 0; e != expr.length; ++e) {
       // remove empty operands
@@ -34,10 +34,8 @@ public final class Union extends Set {
         expr = Array.delete(expr, e--);
       }
     }
-
     // results must always be sorted
-    return expr.length == 0 ? Empty.SEQ :
-      expr.length == 1 && iterable ? expr[0] : this;
+    return expr.length == 0 ? Empty.SEQ : expr.length == 1 && iterable ? expr[0] : this;
   }
 
   @Override

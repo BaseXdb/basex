@@ -11,7 +11,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public class SwitchCase extends Arr {
+public final class SwitchCase extends Arr {
   /**
    * Constructor.
    * @param ii input info
@@ -22,19 +22,15 @@ public class SwitchCase extends Arr {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
-    final int el = expr.length;
-    expr[0] = expr[0].comp(ctx);
-    for(int e = 1; e < el; ++e) expr[e] = checkUp(expr[e], ctx).comp(ctx);
-    return this;
+  public void checkUp() throws QueryException {
+    for(int e = 1; e < expr.length; ++e) checkNoUp(expr[e]);
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    final int el = expr.length;
-    for(int e = 1; e < el; ++e) sb.append(' ' + CASE + ' ' + expr[e]);
-    if(el == 1) sb.append(' ' + DEFAULT);
+    for(int e = 1; e < expr.length; ++e) sb.append(' ' + CASE + ' ' + expr[e]);
+    if(expr.length == 1) sb.append(' ' + DEFAULT);
     sb.append(' ' + RETURN + ' ' + expr[0]);
     return sb.toString();
   }

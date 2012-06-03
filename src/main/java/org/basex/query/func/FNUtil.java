@@ -53,7 +53,7 @@ public final class FNUtil extends StandardFunc {
     switch(sig) {
       case _UTIL_EVAL: return eval(ctx);
       case _UTIL_RUN:  return run(ctx);
-      case _UTIL_TYPE: return cmp(ctx).value(ctx);
+      case _UTIL_TYPE: return comp(ctx).value(ctx);
       default:         return super.value(ctx);
     }
   }
@@ -118,8 +118,8 @@ public final class FNUtil extends StandardFunc {
   }
 
   @Override
-  Expr cmp(final QueryContext ctx) throws QueryException {
-    final Expr e = super.cmp(ctx);
+  Expr comp(final QueryContext ctx) throws QueryException {
+    final Expr e = super.comp(ctx);
     if(sig == Function._UTIL_TYPE) {
       FNInfo.dump(Util.inf("{ type: %, size: % }", expr[0].type(), expr[0].size()),
           Token.token(expr[0].toString()), ctx);

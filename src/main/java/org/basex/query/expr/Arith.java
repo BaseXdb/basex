@@ -29,8 +29,8 @@ public final class Arith extends Arr {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
-    super.comp(ctx);
+  public Expr compile(final QueryContext ctx) throws QueryException {
+    super.compile(ctx);
 
     final SeqType s0 = expr[0].type();
     final SeqType s1 = expr[1].type();

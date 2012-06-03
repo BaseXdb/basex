@@ -34,8 +34,19 @@ public final class OrderByExpr extends OrderBy {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
-    expr = checkUp(expr, ctx).comp(ctx);
+  public void checkUp() throws QueryException {
+    checkNoUp(expr);
+  }
+
+  @Override
+  public OrderByExpr analyze(final AnalyzeContext ctx) throws QueryException {
+    expr = expr.analyze(ctx);
+    return this;
+  }
+
+  @Override
+  public OrderByExpr compile(final QueryContext ctx) throws QueryException {
+    expr = expr.compile(ctx);
     type = expr.type();
     return this;
   }

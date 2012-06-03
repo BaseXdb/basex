@@ -68,8 +68,8 @@ public class AxisStep extends Preds {
   }
 
   @Override
-  public final Expr comp(final QueryContext ctx) throws QueryException {
-    if(!test.comp(ctx)) return Empty.SEQ;
+  public final Expr compile(final QueryContext ctx) throws QueryException {
+    if(!test.compile(ctx)) return Empty.SEQ;
 
     // leaf flag indicates that a context node can be replaced by a text() step
     final Data data = ctx.data();
@@ -85,7 +85,7 @@ public class AxisStep extends Preds {
     // the context item type is temporarily generalized
     final Type ct = ctx.value != null ? ctx.value.type : null;
     if(ct == NodeType.DOC) ctx.value.type = NodeType.NOD;
-    final Expr e = super.comp(ctx);
+    final Expr e = super.compile(ctx);
     if(ct == NodeType.DOC) ctx.value.type = ct;
     ctx.leaf = false;
 

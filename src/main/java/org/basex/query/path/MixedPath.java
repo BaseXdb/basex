@@ -28,13 +28,17 @@ public final class MixedPath extends Path {
   }
 
   @Override
+  protected Expr analyzePath(final AnalyzeContext ctx) throws QueryException {
+    return this;
+  }
+
+  @Override
   protected Expr compPath(final QueryContext ctx) throws QueryException {
-    for(final Expr s : steps) checkUp(s, ctx);
     final AxisStep v = voidStep(steps);
     if(v != null) COMPSELF.thrw(info, v);
 
     for(int s = 0; s != steps.length; ++s) {
-      steps[s] = steps[s].comp(ctx);
+      steps[s] = steps[s].compile(ctx);
       if(steps[s].isEmpty()) return Empty.SEQ;
     }
     optSteps(ctx);
@@ -44,7 +48,7 @@ public final class MixedPath extends Path {
     if(data != null && ctx.value.type == NodeType.DOC) {
       final Expr e = children(ctx, data);
       // return optimized expression
-      if(e != this) return e.comp(ctx);
+      if(e != this) return e.compile(ctx);
     }
 
     size = size(ctx);

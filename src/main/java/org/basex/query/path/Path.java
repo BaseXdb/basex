@@ -54,9 +54,21 @@ public abstract class Path extends ParseExpr {
   }
 
   @Override
-  public final Expr comp(final QueryContext ctx) throws QueryException {
+  public final void checkUp() throws QueryException {
+    checkNoUp(root);
+    checkNoneUp(steps);
+  }
+
+  @Override
+  public final Expr analyze(final AnalyzeContext ctx) throws QueryException {
+    if(root != null) root = root.analyze(ctx);
+    return analyzePath(ctx);
+  }
+
+  @Override
+  public final Expr compile(final QueryContext ctx) throws QueryException {
     if(root != null) {
-      root = checkUp(root, ctx).comp(ctx);
+      root = root.compile(ctx);
       if(root instanceof Context) root = null;
     }
 
@@ -68,6 +80,14 @@ public abstract class Path extends ParseExpr {
       ctx.value = v;
     }
   }
+
+  /**
+   * Analyzes the location path.
+   * @param ctx analyze context
+   * @return optimized expression
+   * @throws QueryException query exception
+   */
+  protected abstract Expr analyzePath(final AnalyzeContext ctx) throws QueryException;
 
   /**
    * Compiles the location path.

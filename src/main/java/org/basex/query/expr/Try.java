@@ -30,25 +30,34 @@ public final class Try extends Single {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
+  public void checkUp() throws QueryException {
     // check if none or all try/catch expressions are updating
     final Expr[] tmp = new Expr[ctch.length + 1];
     tmp[0] = expr;
     for(int c = 0; c < ctch.length; ++c) tmp[c + 1] = ctch[c].expr;
-    checkUp(ctx, tmp);
+    checkAllUp(tmp);
+  }
 
+  @Override
+  public Expr analyze(final AnalyzeContext ctx) throws QueryException {
+    for(final Catch c : ctch) c.analyze(ctx);
+    return super.analyze(ctx);
+  }
+
+  @Override
+  public Expr compile(final QueryContext ctx) throws QueryException {
     // compile expression
     try {
-      super.comp(ctx);
+      super.compile(ctx);
       // return value, which will never throw an error
-      if(expr.isValue()) return expr;
+      if(expr.isValue()) return optPre(expr, ctx);
     } catch(final QueryException ex) {
       // catch exception for evaluation if expression fails at compile time
       qe = ex;
     }
 
     // compile catch expressions
-    for(final Catch c : ctch) c.comp(ctx);
+    for(final Catch c : ctch) c.compile(ctx);
 
     // evaluate result type
     type = expr.type();

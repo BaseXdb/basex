@@ -34,10 +34,21 @@ public abstract class CName extends CFrag {
   }
 
   @Override
-  public CName comp(final QueryContext ctx) throws QueryException {
-    super.comp(ctx);
-    name = checkUp(name, ctx).comp(ctx);
-    return this;
+  public final void checkUp() throws QueryException {
+    checkNoUp(name);
+    super.checkUp();
+  }
+
+  @Override
+  public Expr analyze(final AnalyzeContext ctx) throws QueryException {
+    name = name.analyze(ctx);
+    return super.analyze(ctx);
+  }
+
+  @Override
+  public Expr compile(final QueryContext ctx) throws QueryException {
+    name = name.compile(ctx);
+    return super.compile(ctx);
   }
 
   /**

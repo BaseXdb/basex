@@ -75,17 +75,30 @@ public final class FTWords extends FTExpr {
     query = t;
     mode = m;
     data = d;
-    comp(ctx);
+    compile(ctx);
   }
 
   @Override
-  public FTWords comp(final QueryContext ctx) throws QueryException {
+  public void checkUp() throws QueryException {
+    checkNoneUp(occ);
+    checkNoUp(query);
+  }
+
+  @Override
+  public FTWords analyze(final AnalyzeContext ctx) throws QueryException {
+    if(occ != null) for(int o = 0; o < occ.length; ++o) occ[o] = occ[o].analyze(ctx);
+    query = query.analyze(ctx);
+    return this;
+  }
+
+  @Override
+  public FTWords compile(final QueryContext ctx) throws QueryException {
     // compile only once
     if(ftt == null) {
       if(occ != null) {
-        for(int o = 0; o < occ.length; ++o) occ[o] = occ[o].comp(ctx);
+        for(int o = 0; o < occ.length; ++o) occ[o] = occ[o].compile(ctx);
       }
-      query = query.comp(ctx);
+      query = query.compile(ctx);
       if(query.isValue()) txt = tokens(ctx);
 
       // choose fast evaluation for default settings

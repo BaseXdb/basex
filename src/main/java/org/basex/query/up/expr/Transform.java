@@ -36,21 +36,21 @@ public final class Transform extends Arr {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
-    final boolean u = ctx.updating();
-    ctx.updating(true);
+  public void checkUp() throws QueryException {
+    for(final Let c : copies) c.checkUp();
+    if(!expr[0].isVacuous() && !expr[0].uses(Use.UPD)) UPEXPECTT.thrw(info);
+    checkNoUp(expr[1]);
+  }
 
+  @Override
+  public Expr compile(final QueryContext ctx) throws QueryException {
     final int s = ctx.vars.size();
     for(final Let c : copies) {
-      c.expr = checkUp(c.expr, ctx).comp(ctx);
+      c.expr = c.expr.compile(ctx);
       ctx.vars.add(c.var);
     }
-    for(int e = 0; e != expr.length; ++e) expr[e] = expr[e].comp(ctx);
-
-    if(!expr[0].uses(Use.UPD) && !expr[0].isVacuous()) UPEXPECTT.thrw(info);
-    checkUp(expr[1], ctx);
+    super.compile(ctx);
     ctx.vars.size(s);
-    ctx.updating(u);
     return this;
   }
 

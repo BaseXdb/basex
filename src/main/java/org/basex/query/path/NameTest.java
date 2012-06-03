@@ -39,7 +39,7 @@ public final class NameTest extends Test {
   }
 
   @Override
-  public boolean comp(final QueryContext ctx) {
+  public boolean compile(final QueryContext ctx) {
     // retrieve current data reference
     final Data data = ctx.data();
     if(data == null) return true;

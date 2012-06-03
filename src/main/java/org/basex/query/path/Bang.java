@@ -23,8 +23,8 @@ public final class Bang extends Single {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
-    super.comp(ctx);
+  public Expr compile(final QueryContext ctx) throws QueryException {
+    super.compile(ctx);
     type = expr.type();
     return this;
   }

@@ -26,9 +26,8 @@ public final class Cast extends Single {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
-    checkUp(expr, ctx);
-    super.comp(ctx);
+  public Expr compile(final QueryContext ctx) throws QueryException {
+    super.compile(ctx);
 
     Expr e = this;
     final SeqType t = expr.type();

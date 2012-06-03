@@ -151,7 +151,10 @@ public final class JavaFunc extends JavaMapping {
 
   @Override
   public String description() {
-    return name() + (mth.equals(NEW) ? " constructor" : " method");
+    final StringBuilder sb = new StringBuilder();
+    if(mth.equals(NEW)) sb.append(NEW).append(' ').append(cls.getSimpleName());
+    else sb.append(name());
+    return sb.append("(...)").toString();
   }
 
   /**
@@ -159,7 +162,7 @@ public final class JavaFunc extends JavaMapping {
    * @return string
    */
   private String name() {
-    return cls.getSimpleName() + ':' + mth;
+    return cls.getSimpleName() + '.' + mth;
   }
 
   @Override

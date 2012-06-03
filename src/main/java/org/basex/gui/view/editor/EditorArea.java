@@ -136,6 +136,7 @@ final class EditorArea extends BaseXEditor {
         try {
           if(!executable) ctx.module(qu);
           else ctx.parse(qu);
+          ctx.analyze();
           view.info(OK, true);
         } catch(final QueryException ex) {
           view.info(ex.getMessage(), false);

@@ -6,7 +6,6 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.flwor.Group.Spec;
 import org.basex.query.item.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -27,7 +26,7 @@ final class GroupPartition {
   private final Order order;
 
   /** Grouping variables. */
-  private final Group.Spec[] gv;
+  private final GroupSpec[] gv;
   /** Non-grouping variables. */
   private final Var[][] ngv;
 
@@ -46,7 +45,7 @@ final class GroupPartition {
    * @param ob order by specifier
    * @param ii input info
    */
-  GroupPartition(final Spec[] groupby, final Var[][] ng, final Order ob,
+  GroupPartition(final GroupSpec[] groupby, final Var[][] ng, final Order ob,
       final InputInfo ii) {
     gv = groupby;
     ngv = ng;

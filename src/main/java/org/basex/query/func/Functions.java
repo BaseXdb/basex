@@ -103,7 +103,7 @@ public final class Functions extends TokenSet {
     // compile the function if it hasn't been done statically
     if(dyn && f.fun instanceof UserFuncCall) {
       final UserFunc usf = ((UserFuncCall) f.fun).func();
-      if(usf != null && usf.declared) usf.comp(ctx);
+      if(usf != null && usf.declared) usf.compile(ctx);
     }
 
     final FuncType ft = f.type;

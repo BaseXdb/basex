@@ -9,6 +9,7 @@ import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
+import org.basex.io.serial.*;
 import org.basex.server.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -92,6 +93,8 @@ public class BaseX extends Main {
               // ignore empty lines and comments
               if(!l.isEmpty() && !l.startsWith("#")) execute(l);
             }
+          } catch(final InputException ex) {
+            throw new BaseXException(val + ": " + ex.getMessage() + '.');
           } finally {
             nli.close();
           }
@@ -106,7 +109,12 @@ public class BaseX extends Main {
           // run query file
           final IO io = IO.get(val);
           if(!io.exists() || io.isDir()) throw new BaseXException(RES_NOT_FOUND_X, val);
-          final String query = Token.string(new TextInput(io).content());
+          final String query;
+          try {
+            query = Token.string(new TextInput(io).content());
+          } catch(final InputException ex) {
+            throw new BaseXException(val + ": " + ex.getMessage() + '.');
+          }
           execute(new Set(Prop.QUERYPATH, io.path()), false);
           execute(new XQuery(query), verbose);
           console = false;

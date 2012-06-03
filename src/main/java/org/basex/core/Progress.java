@@ -13,7 +13,7 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class Progress {
-  /** Updating flag. */
+  /** This flag indicates that a command may perform updates. */
   public boolean updating;
 
   /** Stopped flag. */

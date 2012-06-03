@@ -39,11 +39,24 @@ public final class Quantifier extends ParseExpr {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
+  public void checkUp() throws QueryException {
+    for(final For f : fl) f.checkUp();
+    checkNoUp(sat);
+  }
+
+  @Override
+  public Expr analyze(final AnalyzeContext ctx) throws QueryException {
+    for(final For f : fl) f.analyze(ctx);
+    sat = sat.analyze(ctx);
+    return this;
+  }
+
+  @Override
+  public Expr compile(final QueryContext ctx) throws QueryException {
     // compile for clauses
     final int vs = ctx.vars.size();
-    for(final For f : fl) f.comp(ctx);
-    sat = checkUp(sat, ctx).comp(ctx).compEbv(ctx);
+    for(final For f : fl) f.compile(ctx);
+    sat = sat.compile(ctx).compEbv(ctx);
     ctx.vars.size(vs);
 
     // find empty sequences

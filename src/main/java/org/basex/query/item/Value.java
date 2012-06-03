@@ -35,7 +35,16 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   @Override
-  public final Value comp(final QueryContext ctx) {
+  public final void checkUp() {
+  }
+
+  @Override
+  public final Value analyze(final AnalyzeContext ctx) {
+    return this;
+  }
+
+  @Override
+  public final Value compile(final QueryContext ctx) {
     return this;
   }
 

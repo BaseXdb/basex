@@ -28,6 +28,12 @@ public abstract class ForLet extends Single {
     var = v;
   }
 
+  @Override
+  public ForLet analyze(final AnalyzeContext ctx) throws QueryException {
+    expr = expr.analyze(ctx);
+    return this;
+  }
+
   /**
    * If possible, binds the variable at compile time.
    * @param ctx query context
@@ -54,7 +60,7 @@ public abstract class ForLet extends Single {
   }
 
   @Override
-  public abstract ForLet comp(final QueryContext ctx) throws QueryException;
+  public abstract ForLet compile(final QueryContext ctx) throws QueryException;
 
   /**
    * Checks if the clause contains a simple variable declaration, using

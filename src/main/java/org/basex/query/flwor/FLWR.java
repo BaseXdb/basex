@@ -28,8 +28,8 @@ public final class FLWR extends GFLWOR {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
-    final Expr ex = super.comp(ctx);
+  public Expr compile(final QueryContext ctx) throws QueryException {
+    final Expr ex = super.compile(ctx);
     if(ex != this) return ex;
 
     // simplify basic GFLWOR expression (for $i in A return $i -> A)

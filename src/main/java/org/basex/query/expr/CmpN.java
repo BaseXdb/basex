@@ -12,7 +12,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class CmpN extends Arr {
+public final class CmpN extends Cmp {
   /** Comparators. */
   public enum OpN {
     /** Node comparison: same. */
@@ -81,8 +81,8 @@ public final class CmpN extends Arr {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
-    super.comp(ctx);
+  public Expr compile(final QueryContext ctx) throws QueryException {
+    super.compile(ctx);
     return optPre(oneIsEmpty() ? null : allAreValues() ? item(ctx, info) : this, ctx);
   }
 
@@ -93,6 +93,11 @@ public final class CmpN extends Arr {
     final Item b = expr[1].item(ctx, info);
     if(b == null) return null;
     return Bln.get(op.eval(checkNode(a), checkNode(b)));
+  }
+
+  @Override
+  public CmpN invert() {
+    throw Util.notexpected();
   }
 
   @Override

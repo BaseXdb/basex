@@ -48,9 +48,9 @@ public final class QueryProcessor extends Progress {
    */
   public void parse() throws QueryException {
     if(parsed) return;
-    ctx.parse(query);
-    updating = ctx.updating();
     parsed = true;
+    ctx.parse(query);
+    updating = ctx.updating;
   }
 
   /**
@@ -58,10 +58,10 @@ public final class QueryProcessor extends Progress {
    * @throws QueryException query exception
    */
   public void compile() throws QueryException {
-    parse();
     if(compiled) return;
-    ctx.compile();
     compiled = true;
+    parse();
+    ctx.compile();
   }
 
   /**

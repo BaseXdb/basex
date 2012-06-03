@@ -194,8 +194,6 @@ public class QueryParser extends InputParser {
 
     // completes the parsing step
     assignURI(0);
-    ctx.funcs.check();
-    ctx.vars.checkUp();
     if(ctx.sc.nsElem != null) ctx.sc.ns.add(EMPTY, ctx.sc.nsElem, null);
 
     // set default decimal format
@@ -203,6 +201,13 @@ public class QueryParser extends InputParser {
     if(ctx.sc.decFormats.get(empty) == null) {
       ctx.sc.decFormats.add(empty, new DecFormatter());
     }
+
+    ctx.funcs.check();
+    // check updating flag
+    ctx.funcs.checkUp();
+    ctx.vars.checkUp();
+    expr.checkUp();
+
     return expr;
   }
 
@@ -982,13 +987,13 @@ public class QueryParser extends InputParser {
     if(ctx.xquery3 && wsConsumeWs(GROUP)) {
       wsCheck(BY);
       ap = ip;
-      Group.Spec[] grp = null;
+      GroupSpec[] grp = null;
       do grp = groupSpec(fl, grp); while(wsConsume(COMMA));
 
       // find all non-grouping variables that aren't shadowed
       final ArrayList<Var> ng = new ArrayList<Var>();
       final TokenSet set = new TokenSet();
-      for(final Group.Spec spec : grp) set.add(spec.grp.name.eqname());
+      for(final GroupSpec spec : grp) set.add(spec.grp.name.eqname());
       for(int i = fl.length; --i >= 0;) {
         for(final Var v : fl[i].vars()) {
           final byte[] eqn = v.name.eqname();
@@ -1133,7 +1138,7 @@ public class QueryParser extends InputParser {
    * @return new group array
    * @throws QueryException query exception
    */
-  private Group.Spec[] groupSpec(final ForLet[] fl, final Group.Spec[] group)
+  private GroupSpec[] groupSpec(final ForLet[] fl, final GroupSpec[] group)
       throws QueryException {
 
     final InputInfo ii = info();
@@ -1167,8 +1172,8 @@ public class QueryParser extends InputParser {
     // add the new grouping var
     ctx.vars.add(var);
 
-    final Group.Spec grp = new Group.Spec(ii, var, by);
-    return group == null ? new Group.Spec[] { grp } : Array.add(group, grp);
+    final GroupSpec grp = new GroupSpec(ii, var, by);
+    return group == null ? new GroupSpec[] { grp } : Array.add(group, grp);
   }
 
   /**
@@ -3331,9 +3336,9 @@ public class QueryParser extends InputParser {
    */
   private Expr transform() throws QueryException {
     if(!wsConsumeWs(COPY, DOLLAR, INCOMPLETE)) return null;
-    final boolean u = ctx.updating();
-    ctx.updating(false);
     final int s = ctx.vars.size();
+    final boolean u = ctx.updating;
+    ctx.updating(false);
 
     Let[] fl = { };
     do {
@@ -3350,7 +3355,7 @@ public class QueryParser extends InputParser {
     final Expr r = check(single(), INCOMPLETE);
 
     ctx.vars.size(s);
-    ctx.updating(u);
+    ctx.updating = u;
     return new Transform(info(), fl, m, r);
   }
 

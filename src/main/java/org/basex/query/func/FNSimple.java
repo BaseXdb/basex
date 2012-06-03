@@ -102,7 +102,7 @@ public final class FNSimple extends StandardFunc {
   }
 
   @Override
-  public Expr cmp(final QueryContext ctx) {
+  public Expr comp(final QueryContext ctx) {
     // all functions have at least 1 argument
     final Expr e = expr[0];
 

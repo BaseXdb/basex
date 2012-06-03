@@ -29,8 +29,19 @@ public abstract class FTExpr extends ParseExpr {
   }
 
   @Override
-  public FTExpr comp(final QueryContext ctx) throws QueryException {
-    for(int e = 0; e != expr.length; ++e) expr[e] = expr[e].comp(ctx);
+  public void checkUp() throws QueryException {
+    checkNoneUp(expr);
+  }
+
+  @Override
+  public FTExpr analyze(final AnalyzeContext ctx) throws QueryException {
+    for(int e = 0; e < expr.length; e++) expr[e] = expr[e].analyze(ctx);
+    return this;
+  }
+
+  @Override
+  public FTExpr compile(final QueryContext ctx) throws QueryException {
+    for(int e = 0; e < expr.length; e++) expr[e] = expr[e].compile(ctx);
     return this;
   }
 

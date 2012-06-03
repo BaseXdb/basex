@@ -70,12 +70,10 @@ public class UserFunc extends Single {
     updating = ann.contains(Ann.UPDATING);
   }
 
-  /**
-   * Checks the function for updating behavior.
-   * @throws QueryException query exception
-   */
-  final void checkUp() throws QueryException {
+  @Override
+  public final void checkUp() throws QueryException {
     final boolean u = expr.uses(Use.UPD);
+    if(u) expr.checkUp();
     if(updating) {
       // updating function
       if(ret != null) UPFUNCTYPE.thrw(info);
@@ -87,8 +85,8 @@ public class UserFunc extends Single {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
-    comp(ctx, true);
+  public Expr compile(final QueryContext ctx) throws QueryException {
+    compile(ctx, true);
     return this;
   }
 
@@ -98,7 +96,7 @@ public class UserFunc extends Single {
    * @param cache cache variables
    * @throws QueryException query exception
    */
-  void comp(final QueryContext ctx, final boolean cache) throws QueryException {
+  void compile(final QueryContext ctx, final boolean cache) throws QueryException {
     if(compiled) return;
     compiled = true;
 
@@ -106,7 +104,7 @@ public class UserFunc extends Single {
     final VarStack vl = cache ? ctx.vars.cache(args.length) : null;
     try {
       for(final Var v : args) ctx.vars.add(v);
-      expr = expr.comp(ctx);
+      expr = expr.compile(ctx);
     } finally {
       if(cache) ctx.vars.reset(vl);
       else ctx.vars.size(vs);

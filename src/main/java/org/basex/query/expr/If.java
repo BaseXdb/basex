@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.item.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.util.*;
 
 /**
@@ -15,56 +16,71 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class If extends Arr {
+  /** If expression. */
+  private Expr cond;
+
   /**
    * Constructor.
    * @param ii input info
-   * @param e expression
+   * @param c condition
    * @param t then clause
-   * @param s else clause
+   * @param e else clause
    */
-  public If(final InputInfo ii, final Expr e, final Expr t, final Expr s) {
-    super(ii, e, t, s);
+  public If(final InputInfo ii, final Expr c, final Expr t, final Expr e) {
+    super(ii, t, e);
+    cond = c;
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
-    // check for updating expressions
-    expr[0] = checkUp(expr[0], ctx).comp(ctx).compEbv(ctx);
-    checkUp(ctx, expr[1], expr[2]);
+  public void checkUp() throws QueryException {
+    checkNoneUp(cond);
+    checkAllUp(expr);
+  }
+
+  @Override
+  public Expr analyze(final AnalyzeContext ctx) throws QueryException {
+    cond = cond.analyze(ctx);
+    return super.analyze(ctx);
+  }
+
+  @Override
+  public Expr compile(final QueryContext ctx) throws QueryException {
+    // compile condition
+    cond = cond.compile(ctx).compEbv(ctx);
 
     // static condition: return branch in question
-    if(expr[0].isValue()) return optPre(eval(ctx).comp(ctx), ctx);
+    if(cond.isValue()) return optPre(eval(ctx).compile(ctx), ctx);
 
     // compile both branches
-    for(int e = 1; e != expr.length; ++e) expr[e] = expr[e].comp(ctx);
+    super.compile(ctx);
 
     // if A then B else B -> B (errors in A will be ignored)
-    if(expr[1].sameAs(expr[2])) return optPre(expr[1], ctx);
+    if(expr[0].sameAs(expr[1])) return optPre(expr[0], ctx);
 
     // if not(A) then B else C -> if A then C else B
-    if(expr[0].isFunction(Function.NOT)) {
+    if(cond.isFunction(Function.NOT)) {
       ctx.compInfo(OPTWRITE, this);
-      expr[0] = ((StandardFunc) expr[0]).expr[0];
-      final Expr tmp = expr[1];
-      expr[1] = expr[2];
-      expr[2] = tmp;
+      cond = ((StandardFunc) cond).expr[0];
+      final Expr tmp = expr[0];
+      expr[0] = expr[1];
+      expr[1] = tmp;
     }
 
     // if A then true() else false() -> boolean(A)
-    if(expr[1] == Bln.TRUE && expr[2] == Bln.FALSE) {
+    if(expr[0] == Bln.TRUE && expr[1] == Bln.FALSE) {
       ctx.compInfo(OPTWRITE, this);
-      return compBln(expr[0]);
+      return compBln(cond);
     }
 
     // if A then false() else true() -> not(A)
     // if A then B else true() -> not(A) or B
-    if(expr[1].type().eq(SeqType.BLN) && expr[2] == Bln.TRUE) {
+    if(expr[0].type().eq(SeqType.BLN) && expr[1] == Bln.TRUE) {
       ctx.compInfo(OPTWRITE, this);
-      final Expr e = Function.NOT.get(info, expr[0]);
-      return expr[1] == Bln.FALSE ? e : new Or(info, e, expr[1]);
+      final Expr e = Function.NOT.get(info, cond);
+      return expr[0] == Bln.FALSE ? e : new Or(info, e, expr[0]);
     }
 
-    type = expr[1].type().intersect(expr[2].type());
+    type = expr[0].type().intersect(expr[1].type());
     return this;
   }
 
@@ -84,34 +100,60 @@ public final class If extends Arr {
   }
 
   /**
-   * Evaluates the condition and returns the correct expression.
+   * Evaluates the condition and returns the matching expression.
    * @param ctx query context
    * @return resulting expression
    * @throws QueryException query exception
    */
   private Expr eval(final QueryContext ctx) throws QueryException {
-    return expr[expr[0].ebv(ctx, info).bool(info) ? 1 : 2];
+    return expr[cond.ebv(ctx, info).bool(info) ? 0 : 1];
+  }
+  @Override
+  public boolean uses(final Use u) {
+    return cond.uses(u) || super.uses(u);
+  }
+
+  @Override
+  public int count(final Var v) {
+    return cond.count(v) + super.count(v);
+  }
+
+  @Override
+  public boolean removable(final Var v) {
+    return cond.removable(v) || super.removable(v);
+  }
+
+  @Override
+  public Expr remove(final Var v) {
+    cond = cond.remove(v);
+    return super.remove(v);
+  }
+
+  @Override
+  public Expr indexEquivalent(final IndexContext ic) throws QueryException {
+    for(int e = 0; e < expr.length; ++e) expr[e] = expr[e].indexEquivalent(ic);
+    return this;
   }
 
   @Override
   public boolean isVacuous() {
-    return expr[1].isVacuous() || expr[2].isVacuous();
-  }
-
-  @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(), expr);
-  }
-
-  @Override
-  public String toString() {
-    return IF + '(' + expr[0] + ") " + THEN + ' ' + expr[1] + ' ' + ELSE + ' ' + expr[2];
+    return expr[0].isVacuous() || expr[1].isVacuous();
   }
 
   @Override
   public Expr markTailCalls() {
+    expr[0] = expr[0].markTailCalls();
     expr[1] = expr[1].markTailCalls();
-    expr[2] = expr[2].markTailCalls();
     return this;
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(), cond, expr);
+  }
+
+  @Override
+  public String toString() {
+    return IF + '(' + cond + ") " + THEN + ' ' + expr[0] + ' ' + ELSE + ' ' + expr[1];
   }
 }

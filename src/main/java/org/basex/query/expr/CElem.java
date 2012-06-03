@@ -28,9 +28,7 @@ public final class CElem extends CName {
    * @param ns namespaces, or {@code null} if this is a computed constructor.
    * @param cont element contents
    */
-  public CElem(final InputInfo ii, final Expr t, final Atts ns,
-      final Expr... cont) {
-
+  public CElem(final InputInfo ii, final Expr t, final Atts ns, final Expr... cont) {
     super(ELEMENT, ii, t, cont);
     nspaces = ns == null ? new Atts() : ns;
     comp = ns == null;
@@ -38,16 +36,24 @@ public final class CElem extends CName {
   }
 
   @Override
-  public CElem comp(final QueryContext ctx) throws QueryException {
-    final int s = prepare(ctx);
-    super.comp(ctx);
+  public CElem analyze(final AnalyzeContext ctx) throws QueryException {
+    final int s = prepare(ctx.sc);
+    super.analyze(ctx);
+    ctx.sc.ns.size(s);
+    return this;
+  }
+
+  @Override
+  public CElem compile(final QueryContext ctx) throws QueryException {
+    final int s = prepare(ctx.sc);
+    super.compile(ctx);
     ctx.sc.ns.size(s);
     return this;
   }
 
   @Override
   public FElem item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final int s = prepare(ctx);
+    final int s = prepare(ctx.sc);
     try {
       // adds in-scope namespaces
       final Atts ns = new Atts();
@@ -208,13 +214,13 @@ public final class CElem extends CName {
 
   /**
    * Adds namespaces to the namespace stack.
-   * @param ctx query context
+   * @param sc static context
    * @return old stack position
    */
-  private int prepare(final QueryContext ctx) {
-    final int s = ctx.sc.ns.size();
+  private int prepare(final StaticContext sc) {
+    final int s = sc.ns.size();
     for(int n = 0; n < nspaces.size(); n++) {
-      ctx.sc.ns.add(nspaces.name(n), nspaces.string(n));
+      sc.ns.add(nspaces.name(n), nspaces.string(n));
     }
     return s;
   }

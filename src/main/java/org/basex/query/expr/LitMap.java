@@ -23,18 +23,18 @@ public final class LitMap extends Arr {
   }
 
   @Override
+  public Expr compile(final QueryContext ctx) throws QueryException {
+    super.compile(ctx);
+    return allAreValues() ? preEval(ctx) : this;
+  }
+
+  @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     Map map = Map.EMPTY;
     for(int i = 0; i < expr.length; i++) {
       map = map.insert(checkItem(expr[i], ctx), ctx.value(expr[++i]), ii);
     }
     return map;
-  }
-
-  @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
-    super.comp(ctx);
-    return allAreValues() ? preEval(ctx) : this;
   }
 
   @Override

@@ -25,9 +25,13 @@ public final class List extends Arr {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
-    for(int e = expr.length; --e >= 0;) expr[e] = expr[e].comp(ctx);
-    checkUp(ctx, expr);
+  public void checkUp() throws QueryException {
+    checkAllUp(expr);
+  }
+
+  @Override
+  public Expr compile(final QueryContext ctx) throws QueryException {
+    for(int e = 0; e < expr.length; e++) expr[e] = expr[e].compile(ctx);
 
     // compute number of results
     size = 0;

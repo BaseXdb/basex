@@ -36,11 +36,11 @@ public abstract class StandardFunc extends Arr {
   }
 
   @Override
-  public final Expr comp(final QueryContext ctx) throws QueryException {
+  public final Expr compile(final QueryContext ctx) throws QueryException {
     // compile all arguments
-    super.comp(ctx);
+    super.compile(ctx);
     // skip context-based or non-deterministic functions, and non-values
-    if(uses(Use.CTX) || uses(Use.NDT) || !allAreValues()) return optPre(cmp(ctx), ctx);
+    if(uses(Use.CTX) || uses(Use.NDT) || !allAreValues()) return optPre(comp(ctx), ctx);
     // pre-evaluate function
     return optPre(sig.ret.zeroOrOne() ? item(ctx, info) : value(ctx), ctx);
   }
@@ -52,7 +52,7 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  Expr cmp(final QueryContext ctx) throws QueryException {
+  Expr comp(final QueryContext ctx) throws QueryException {
     return this;
   }
 

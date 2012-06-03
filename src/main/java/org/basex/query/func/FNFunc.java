@@ -96,7 +96,8 @@ public final class FNFunc extends StandardFunc {
       vals[j] = new VarRef(ii, vars[i]);
     }
 
-    return new PartFunc(ii, new DynamicFunc(ii, f, vals), vars).comp(ctx).item(ctx, ii);
+    return new PartFunc(ii, new DynamicFunc(ii, f, vals), vars).
+        compile(ctx).item(ctx, ii);
   }
 
   /**

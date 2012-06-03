@@ -30,8 +30,8 @@ public final class TypeCase extends Single {
   }
 
   @Override
-  public TypeCase comp(final QueryContext ctx) throws QueryException {
-    return comp(ctx, null);
+  public TypeCase compile(final QueryContext ctx) throws QueryException {
+    return compile(ctx, null);
   }
 
   /**
@@ -41,13 +41,13 @@ public final class TypeCase extends Single {
    * @return resulting item
    * @throws QueryException query exception
    */
-  TypeCase comp(final QueryContext ctx, final Value v) throws QueryException {
+  TypeCase compile(final QueryContext ctx, final Value v) throws QueryException {
     if(var.name == null) {
-      super.comp(ctx);
+      super.compile(ctx);
     } else {
       final int s = ctx.vars.size();
       ctx.vars.add(v == null ? var : var.bind(v, ctx).copy());
-      super.comp(ctx);
+      super.compile(ctx);
       ctx.vars.size(s);
     }
     type = expr.type();

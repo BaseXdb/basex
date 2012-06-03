@@ -39,10 +39,22 @@ public class FTContains extends ParseExpr {
   }
 
   @Override
-  public final Expr comp(final QueryContext ctx) throws QueryException {
-    expr = checkUp(expr, ctx).comp(ctx).addText(ctx);
+  public final void checkUp() throws QueryException {
+    checkNoUp(expr);
+  }
+
+  @Override
+  public final Expr analyze(final AnalyzeContext ctx) throws QueryException {
+    expr = expr.analyze(ctx);
+    ftexpr = ftexpr.analyze(ctx);
+    return this;
+  }
+
+  @Override
+  public final Expr compile(final QueryContext ctx) throws QueryException {
+    expr = expr.compile(ctx).addText(ctx);
+    ftexpr = ftexpr.compile(ctx);
     lex = new FTLexer(new FTOpt());
-    ftexpr = ftexpr.comp(ctx);
     return expr.isEmpty() ? optPre(Bln.FALSE, ctx) : this;
   }
 

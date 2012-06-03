@@ -30,7 +30,6 @@ public final class UserFuncs extends ExprInfo {
    * @return function instance
    */
   TypedFunc get(final QNm name, final Expr[] args, final InputInfo ii) {
-
     final int id = indexOf(name, args);
     if(id == -1) return null;
 
@@ -152,14 +151,31 @@ public final class UserFuncs extends ExprInfo {
         // function has not been declare yet
         for(final UserFunc uf : funcs) {
           // check if another function with same name exists
-          if(f != uf && f.name.eq(uf.name)) {
-            FUNCTYPE.thrw(f.info, uf.name.string());
-          }
+          if(f != uf && f.name.eq(uf.name)) FUNCTYPE.thrw(f.info, uf.name.string());
         }
         // if not, indicate that function is unknown
         FUNCUNKNOWN.thrw(f.info, f.name.string());
       }
-      f.checkUp();
+    }
+  }
+
+  /**
+   * Checks if the function performs updates.
+   * @throws QueryException query exception
+   */
+  public void checkUp() throws QueryException {
+    for(final UserFunc f : funcs) f.checkUp();
+  }
+
+  /**
+   * Performs static compilations in the functions.
+   * @param ctx query context
+   * @throws QueryException query exception
+   */
+  public void analyze(final AnalyzeContext ctx) throws QueryException {
+    for(int i = 0; i < funcs.length; i++) {
+      // only compile those functions that are used
+      if(calls[i].length != 0) funcs[i].analyze(ctx);
     }
   }
 
@@ -171,7 +187,7 @@ public final class UserFuncs extends ExprInfo {
   public void comp(final QueryContext ctx) throws QueryException {
     for(int i = 0; i < funcs.length; i++) {
       // only compile those functions that are used
-      if(calls[i].length != 0) funcs[i].comp(ctx);
+      if(calls[i].length != 0) funcs[i].compile(ctx);
     }
   }
 

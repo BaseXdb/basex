@@ -28,8 +28,8 @@ public final class FTNot extends FTExpr {
   }
 
   @Override
-  public FTExpr comp(final QueryContext ctx) throws QueryException {
-    super.comp(ctx);
+  public FTExpr compile(final QueryContext ctx) throws QueryException {
+    super.compile(ctx);
     return expr[0] instanceof FTNot ? expr[0].expr[0] : this;
   }
 

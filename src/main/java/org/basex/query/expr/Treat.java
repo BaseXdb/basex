@@ -27,9 +27,9 @@ public final class Treat extends Single {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
-    super.comp(ctx);
-    return checkUp(expr, ctx).isValue() ? optPre(value(ctx), ctx) : this;
+  public Expr compile(final QueryContext ctx) throws QueryException {
+    super.compile(ctx);
+    return expr.isValue() ? optPre(value(ctx), ctx) : this;
   }
 
   @Override

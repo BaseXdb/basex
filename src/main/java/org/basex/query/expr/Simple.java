@@ -21,7 +21,16 @@ public abstract class Simple extends ParseExpr {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) {
+  public final void checkUp() {
+  }
+
+  @Override
+  public final Expr analyze(final AnalyzeContext ctx) {
+    return this;
+  }
+
+  @Override
+  public Expr compile(final QueryContext ctx) {
     return this;
   }
 

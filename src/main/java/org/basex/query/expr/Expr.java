@@ -30,13 +30,28 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
+   * Checks if all updating expressions are correctly placed.
+   * This function is only called if any updating expression was found in the query.
+   * @throws QueryException query exception
+   */
+  public abstract void checkUp() throws QueryException;
+
+  /**
+   * Performs static compilation steps.
+   * @param ctx analyze context
+   * @return optimized expression
+   * @throws QueryException query exception
+   */
+  public abstract Expr analyze(final AnalyzeContext ctx) throws QueryException;
+
+  /**
    * Compiles and optimizes the expression, assigns data types and
    * cardinalities.
    * @param ctx query context
    * @return optimized expression
    * @throws QueryException query exception
    */
-  public abstract Expr comp(final QueryContext ctx) throws QueryException;
+  public abstract Expr compile(final QueryContext ctx) throws QueryException;
 
   /**
    * Evaluates the expression and returns an iterator on the resulting items.
@@ -133,8 +148,9 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Indicates if an expression uses the specified type or operation. This method is
-   * called by numerous {@link #comp} methods to test the properties of sub-expressions.
-   * It will return {@code true} as soon as at least one test is successful.
+   * called by numerous {@link #compile} methods to test the properties of
+   * sub-expressions. It will return {@code true} as soon as at least one test is
+   * successful.
    * @param u type/operation to be found
    * @return result of check
    */
@@ -144,7 +160,7 @@ public abstract class Expr extends ExprInfo {
    * Counts how often the specified variable is used by an expression.
    * This method is called by:
    * <ul>
-   * <li> {@link GFLWOR#comp} to rewrite where clauses as predicates and
+   * <li> {@link GFLWOR#compile} to rewrite where clauses as predicates and
    *  remove statically bound or unused clauses</li>
    * <li> {@link GFLWOR#compHoist} to hoist independent variables</li>
    * </ul>
@@ -164,7 +180,7 @@ public abstract class Expr extends ExprInfo {
    * <li>{@link Group#removable}, as the group by expression depends on
    * variable references.</li>
    * </ul>
-   * This method is called by {@link GFLWOR#comp} to rewrite where clauses
+   * This method is called by {@link GFLWOR#compile} to rewrite where clauses
    * into predicates.
    * @param v variable to be replaced
    * @return result of check
@@ -174,7 +190,7 @@ public abstract class Expr extends ExprInfo {
   /**
    * Substitutes all {@link VarRef} expressions for the given variable
    * by a {@link Context} reference. This method is called by
-   * {@link GFLWOR#comp} to rewrite where clauses as predicates.
+   * {@link GFLWOR#compile} to rewrite where clauses as predicates.
    * @param v variable to be replaced
    * @return new expression
    */

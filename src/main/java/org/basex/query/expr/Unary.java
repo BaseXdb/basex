@@ -29,8 +29,8 @@ public final class Unary extends Single {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
-    super.comp(ctx);
+  public Expr compile(final QueryContext ctx) throws QueryException {
+    super.compile(ctx);
     type = expr.type();
     if(!type.type.isNumber()) {
       // expression will always yield a number, empty sequence or error
@@ -41,7 +41,6 @@ public final class Unary extends Single {
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-
     final Item it = expr.item(ctx, info);
     if(it == null) return null;
     final Type ip = it.type;

@@ -68,7 +68,24 @@ public class GFLWOR extends ParseExpr {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
+  public void checkUp() throws QueryException {
+    for(final ForLet f : fl) f.checkUp();
+    checkNoneUp(where, group, order);
+    ret.checkUp();
+  }
+
+  @Override
+  public Expr analyze(final AnalyzeContext ctx) throws QueryException {
+    for(final ForLet f : fl) f.analyze(ctx);
+    if(where != null) where.analyze(ctx);
+    if(group != null) group.analyze(ctx);
+    if(order != null) order.analyze(ctx);
+    ret = ret.analyze(ctx);
+    return this;
+  }
+
+  @Override
+  public Expr compile(final QueryContext ctx) throws QueryException {
     compHoist(ctx);
     compWhere(ctx);
 
@@ -78,8 +95,7 @@ public class GFLWOR extends ParseExpr {
     // optimize for/let clauses
     final int vs = ctx.vars.size();
     for(int f = 0; f < fl.length; ++f) {
-      final ForLet flt = fl[f];
-      flt.comp(ctx);
+      final ForLet flt = fl[f].compile(ctx);
       // bind variable if it contains a value or occurs only once
       if(flt.expr.isValue() || count(flt.var, f) == 1) flt.bind(ctx);
 
@@ -95,7 +111,7 @@ public class GFLWOR extends ParseExpr {
     // optimize where clause
     boolean empty = false;
     if(where != null) {
-      where = checkUp(where, ctx).comp(ctx).compEbv(ctx);
+      where = where.compile(ctx).compEbv(ctx);
       if(where.isValue()) {
         // test is always false: no results
         empty = !where.ebv(ctx, info).bool(info);
@@ -107,9 +123,9 @@ public class GFLWOR extends ParseExpr {
       }
     }
 
-    if(group != null) group.comp(ctx);
-    if(order != null) order.comp(ctx);
-    ret = ret.comp(ctx);
+    if(group != null) group.compile(ctx);
+    if(order != null) order.compile(ctx);
+    ret = ret.compile(ctx);
     ctx.vars.size(vs);
     ctx.grouping = grp;
 
@@ -390,8 +406,7 @@ public class GFLWOR extends ParseExpr {
   @Override
   public final String toString() {
     final StringBuilder sb = new StringBuilder();
-    for(int i = 0; i != fl.length; ++i)
-      sb.append(i != 0 ? " " : "").append(fl[i]);
+    for(int i = 0; i != fl.length; ++i) sb.append(i != 0 ? " " : "").append(fl[i]);
     if(where != null) sb.append(' ' + WHERE + ' ' + where);
     if(group != null) sb.append(group);
     if(order != null) sb.append(order);

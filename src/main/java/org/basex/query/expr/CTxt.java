@@ -25,7 +25,7 @@ public final class CTxt extends CFrag {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
+  public Expr compile(final QueryContext ctx) throws QueryException {
     return optPre(oneIsEmpty() ? null : this, ctx);
   }
 

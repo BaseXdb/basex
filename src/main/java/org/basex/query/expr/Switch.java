@@ -33,15 +33,26 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
-    // operands may not be updating
-    cond = checkUp(cond, ctx).comp(ctx);
-    for(final SwitchCase sc : cases) sc.comp(ctx);
-
+  public void checkUp() throws QueryException {
+    checkNoUp(cond);
+    for(final SwitchCase sc : cases) sc.checkUp();
     // check if none or all return expressions are updating
     final Expr[] tmp = new Expr[cases.length];
     for(int i = 0; i < tmp.length; ++i) tmp[i] = cases[i].expr[0];
-    checkUp(ctx, tmp);
+    checkAllUp(tmp);
+  }
+
+  @Override
+  public Expr analyze(final AnalyzeContext ctx) throws QueryException {
+    for(final SwitchCase sc : cases) sc.analyze(ctx);
+    return this;
+  }
+
+  @Override
+  public Expr compile(final QueryContext ctx) throws QueryException {
+    // operands may not be updating
+    cond = cond.compile(ctx);
+    for(final SwitchCase sc : cases) sc.compile(ctx);
 
     // check if expression can be pre-evaluated
     Expr ex = this;

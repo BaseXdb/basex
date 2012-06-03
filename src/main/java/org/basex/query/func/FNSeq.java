@@ -126,7 +126,7 @@ public final class FNSeq extends StandardFunc {
   }
 
   @Override
-  public Expr cmp(final QueryContext ctx) throws QueryException {
+  public Expr comp(final QueryContext ctx) throws QueryException {
     // static typing:
     // index-of will create integers, insert-before might add new types
     if(sig == Function.INDEX_OF ||

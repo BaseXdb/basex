@@ -313,7 +313,7 @@ public enum Err {
   /** FORG0001. */
   INVALIDZONE(FORG, 1, "Invalid timezone: %."),
   /** FORG0001. */
-  FUNCAST(FORG, 1, "Invalid % cast: '%'."),
+  FUNCAST(FORG, 1, "Invalid % cast: %."),
   /** FORG0001. */
   DATERANGE(FORG, 1, "%('%') out of range."),
   /** FORG0001. */
@@ -870,7 +870,7 @@ public enum Err {
   /** XUDY0009. */
   UPNOPAR(XUDY, 9, "Target % has no parent."),
   /** XUDY0014. */
-  UPNOTCOPIED(XUDY, 14, "% was not copied by copy clause."),
+  UPNOTCOPIED(XUDY, 14, "% was not created by copy clause."),
   /** XUDY0015. */
   UPMULTREN(XUDY, 15, "Node can only be renamed once: %."),
   /** XUDY0015. */

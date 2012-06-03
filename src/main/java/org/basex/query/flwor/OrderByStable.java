@@ -1,7 +1,6 @@
 package org.basex.query.flwor;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.item.*;
 import org.basex.query.util.*;
 import org.basex.util.*;
@@ -22,7 +21,16 @@ public final class OrderByStable extends OrderBy {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
+  public void checkUp() {
+  }
+
+  @Override
+  public OrderByStable analyze(final AnalyzeContext ctx) throws QueryException {
+    return this;
+  }
+
+  @Override
+  public OrderByStable compile(final QueryContext ctx) throws QueryException {
     type = SeqType.ITEM_ZM;
     return this;
   }

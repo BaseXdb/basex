@@ -79,7 +79,7 @@ public final class FNInfo extends StandardFunc {
   }
 
   @Override
-  public Expr cmp(final QueryContext ctx) {
+  public Expr comp(final QueryContext ctx) {
     if(sig == Function.TRACE) type = expr[0].type();
     return this;
   }

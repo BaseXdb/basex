@@ -27,17 +27,28 @@ public final class FTDistance extends FTFilter {
    * @param d distances
    * @param u unit
    */
-  public FTDistance(final InputInfo ii, final FTExpr e, final Expr[] d,
-      final FTUnit u) {
+  public FTDistance(final InputInfo ii, final FTExpr e, final Expr[] d, final FTUnit u) {
     super(ii, e);
     dist = d;
     unit = u;
   }
 
   @Override
-  public FTExpr comp(final QueryContext ctx) throws QueryException {
-    for(int d = 0; d != dist.length; ++d) dist[d] = dist[d].comp(ctx);
-    return super.comp(ctx);
+  public void checkUp() throws QueryException {
+    checkNoneUp(dist);
+    super.checkUp();
+  }
+
+  @Override
+  public FTExpr analyze(final AnalyzeContext ctx) throws QueryException {
+    for(int d = 0; d < dist.length; d++) dist[d] = dist[d].analyze(ctx);
+    return super.analyze(ctx);
+  }
+
+  @Override
+  public FTExpr compile(final QueryContext ctx) throws QueryException {
+    for(int d = 0; d < dist.length; d++) dist[d] = dist[d].compile(ctx);
+    return super.compile(ctx);
   }
 
   @Override

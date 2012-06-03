@@ -30,7 +30,16 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
+  public void checkUp() throws QueryException {
+  }
+
+  @Override
+  public VarRef analyze(final AnalyzeContext ctx) throws QueryException {
+    return this;
+  }
+
+  @Override
+  public Expr compile(final QueryContext ctx) throws QueryException {
     var = ctx.vars.get(var);
     type = var.type();
     size = var.size();
@@ -46,16 +55,13 @@ public final class VarRef extends ParseExpr {
      *
      * [CG][LW] Variables are currently pre-evaluated if...
      * - they are global (mandatory)
-     * - namespaces are used
      * - they are given a type
      * - they contain an element constructor (mandatory)
      * - they contain a function call
      */
-    if(var.global || var.type != null || e.uses(Use.CNS) ||
-        e instanceof UserFuncCall) {
+    if(var.global || var.type != null || e.uses(Use.CNS) || e instanceof UserFuncCall) {
       e = var.value(ctx);
     }
-
     return e;
   }
 

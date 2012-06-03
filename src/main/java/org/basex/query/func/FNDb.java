@@ -195,7 +195,7 @@ public final class FNDb extends StandardFunc {
 
     final NameTest nt = new NameTest(nm, NameTest.Mode.STD, true);
     // no results expected: return empty sequence
-    if(!nt.comp(ctx)) return Empty.ITER;
+    if(!nt.compile(ctx)) return Empty.ITER;
 
     // wrap iterator with name test
     return new NodeIter() {

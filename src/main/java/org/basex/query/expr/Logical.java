@@ -26,12 +26,11 @@ public abstract class Logical extends Arr {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
-    for(final Expr e : expr) checkUp(e, ctx);
-
+  public Expr compile(final QueryContext ctx) throws QueryException {
+    super.compile(ctx);
     final boolean and = this instanceof And;
-    for(int e = 0; e < expr.length; ++e) {
-      expr[e] = expr[e].comp(ctx).compEbv(ctx);
+    for(int e = 0; e < expr.length; e++) {
+      expr[e] = expr[e].compEbv(ctx);
       if(!expr[e].isValue()) continue;
 
       // atomic items can be pre-evaluated

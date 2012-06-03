@@ -40,16 +40,15 @@ public final class For extends ForLet {
    * @param p positional variable
    * @param s score variable
    */
-  public For(final InputInfo ii, final Expr e, final Var v, final Var p,
-      final Var s) {
+  public For(final InputInfo ii, final Expr e, final Var v, final Var p, final Var s) {
     super(ii, e, v);
     pos = p;
     score = s;
   }
 
   @Override
-  public For comp(final QueryContext ctx) throws QueryException {
-    expr = checkUp(expr, ctx).comp(ctx);
+  public For compile(final QueryContext ctx) throws QueryException {
+    expr = expr.compile(ctx);
     type = expr.type();
     size = expr.size();
     if(ctx.grouping) {

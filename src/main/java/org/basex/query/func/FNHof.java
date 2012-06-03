@@ -64,9 +64,9 @@ public final class FNHof extends StandardFunc {
   }
 
   @Override
-  Expr cmp(final QueryContext ctx) throws QueryException {
+  Expr comp(final QueryContext ctx) throws QueryException {
     if(sig == Function._HOF_ID || sig == Function._HOF_CONST) return expr[0];
-    return super.cmp(ctx);
+    return super.comp(ctx);
   }
 
   /**
