@@ -13,7 +13,7 @@ import org.basex.core.cmd.Set;
 import org.basex.data.*;
 import org.basex.http.*;
 import org.basex.io.serial.*;
-import org.basex.query.item.*;
+import org.basex.query.value.node.*;
 import org.basex.server.*;
 import org.basex.util.*;
 import org.basex.util.list.*;

@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.basex.core.cmd.*;
 import org.basex.http.*;
-import org.basex.query.item.*;
+import org.basex.query.value.item.*;
 import org.basex.server.*;
 import org.basex.util.*;
 

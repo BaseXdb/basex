@@ -1,6 +1,7 @@
 package org.basex.http.restxq;
 
-import org.basex.query.item.*;
+import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 
 /**
  * This class contains a single RESTXQ parameter.

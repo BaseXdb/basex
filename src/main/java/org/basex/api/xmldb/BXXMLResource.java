@@ -15,7 +15,7 @@ import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
-import org.basex.query.item.*;
+import org.basex.query.value.node.*;
 import org.w3c.dom.*;
 import org.xml.sax.*;
 import org.xmldb.api.base.*;

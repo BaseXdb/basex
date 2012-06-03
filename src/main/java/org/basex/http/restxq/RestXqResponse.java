@@ -10,9 +10,12 @@ import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.item.*;
-import org.basex.query.item.SeqType.Occ;
 import org.basex.query.path.*;
+import org.basex.query.value.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.*;
 
 /**
  * This class creates a new HTTP response.
