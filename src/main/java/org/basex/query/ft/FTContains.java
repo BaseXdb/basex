@@ -46,7 +46,7 @@ public class FTContains extends ParseExpr {
   }
 
   @Override
-  public final Expr analyze(final AnalyzeContext ctx) throws QueryException {
+  public final Expr analyze(final QueryContext ctx) throws QueryException {
     expr = expr.analyze(ctx);
     ftexpr = ftexpr.analyze(ctx);
     return this;

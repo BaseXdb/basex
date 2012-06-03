@@ -40,7 +40,7 @@ public final class OrderByExpr extends OrderBy {
   }
 
   @Override
-  public OrderByExpr analyze(final AnalyzeContext ctx) throws QueryException {
+  public OrderByExpr analyze(final QueryContext ctx) throws QueryException {
     expr = expr.analyze(ctx);
     return this;
   }

@@ -41,7 +41,7 @@ public final class If extends Arr {
   }
 
   @Override
-  public Expr analyze(final AnalyzeContext ctx) throws QueryException {
+  public Expr analyze(final QueryContext ctx) throws QueryException {
     cond = cond.analyze(ctx);
     return super.analyze(ctx);
   }

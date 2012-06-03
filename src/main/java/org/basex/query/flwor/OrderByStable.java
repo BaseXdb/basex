@@ -27,7 +27,7 @@ public final class OrderByStable extends OrderBy {
   }
 
   @Override
-  public OrderByStable analyze(final AnalyzeContext ctx) throws QueryException {
+  public OrderByStable analyze(final QueryContext ctx) throws QueryException {
     return this;
   }
 

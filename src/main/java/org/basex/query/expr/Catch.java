@@ -48,7 +48,7 @@ public final class Catch extends Single {
   }
 
   @Override
-  public Catch analyze(final AnalyzeContext ctx) throws QueryException {
+  public Catch analyze(final QueryContext ctx) throws QueryException {
     super.analyze(ctx);
     type = expr.type();
     return this;

@@ -47,7 +47,7 @@ public final class Quantifier extends ParseExpr {
   }
 
   @Override
-  public Expr analyze(final AnalyzeContext ctx) throws QueryException {
+  public Expr analyze(final QueryContext ctx) throws QueryException {
     for(final For f : fl) f.analyze(ctx);
     sat = sat.analyze(ctx);
     return this;

@@ -33,7 +33,7 @@ public final class Arith extends Arr {
   }
 
   @Override
-  public Expr analyze(final AnalyzeContext ctx) throws QueryException {
+  public Expr analyze(final QueryContext ctx) throws QueryException {
     super.analyze(ctx);
     checkType();
     return this;

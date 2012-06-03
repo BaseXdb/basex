@@ -40,7 +40,7 @@ public final class Try extends Single {
   }
 
   @Override
-  public Expr analyze(final AnalyzeContext ctx) throws QueryException {
+  public Expr analyze(final QueryContext ctx) throws QueryException {
     for(final Catch c : ctch) c.analyze(ctx);
     return super.analyze(ctx);
   }

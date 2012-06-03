@@ -177,13 +177,12 @@ public final class QueryContext extends Progress {
    * @throws QueryException query exception
    */
   public void analyze() throws QueryException {
-    final AnalyzeContext ctx = new AnalyzeContext(this);
     try {
       // compile global functions.
       // variables will be compiled if called for the first time
-      funcs.analyze(ctx);
+      funcs.analyze(this);
       // compile the expression
-      if(root != null) root = root.analyze(ctx);
+      if(root != null) root = root.analyze(this);
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
       XPSTACK.thrw(null);

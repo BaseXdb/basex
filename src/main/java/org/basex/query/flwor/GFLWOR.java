@@ -78,7 +78,7 @@ public class GFLWOR extends ParseExpr {
   }
 
   @Override
-  public Expr analyze(final AnalyzeContext ctx) throws QueryException {
+  public Expr analyze(final QueryContext ctx) throws QueryException {
     for(final ForLet f : fl) f.analyze(ctx);
     if(where != null) where.analyze(ctx);
     if(group != null) group.analyze(ctx);

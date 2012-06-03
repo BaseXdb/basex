@@ -37,7 +37,7 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
-  public FTExpr analyze(final AnalyzeContext ctx) throws QueryException {
+  public FTExpr analyze(final QueryContext ctx) throws QueryException {
     weight = weight.analyze(ctx);
     return super.analyze(ctx);
   }

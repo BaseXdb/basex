@@ -40,20 +40,12 @@ public abstract class Expr extends ExprInfo {
   public abstract void checkUp() throws QueryException;
 
   /**
-   * Updates the expression's return type.
-   * @throws QueryException query exception
-   */
-  @SuppressWarnings("unused")
-  public void checkType() throws QueryException {
-  }
-
-  /**
    * Performs static compilation steps.
-   * @param ctx analyze context
+   * @param ctx query context
    * @return optimized expression
    * @throws QueryException query exception
    */
-  public abstract Expr analyze(final AnalyzeContext ctx) throws QueryException;
+  public abstract Expr analyze(final QueryContext ctx) throws QueryException;
 
   /**
    * Compiles and optimizes the expression, assigns data types and
@@ -63,6 +55,25 @@ public abstract class Expr extends ExprInfo {
    * @throws QueryException query exception
    */
   public abstract Expr compile(final QueryContext ctx) throws QueryException;
+
+  /**
+   * Updates the expression's return type.
+   * @throws QueryException query exception
+   */
+  @SuppressWarnings("unused")
+  public void checkType() throws QueryException {
+  }
+
+  /**
+   * If possible, simplifies the expression.
+   * @param ctx query context
+   * @return simplified or original expression
+   * @throws QueryException query exception
+   */
+  @SuppressWarnings("unused")
+  public Expr simplify(final QueryContext ctx) throws QueryException {
+    return this;
+  }
 
   /**
    * Evaluates the expression and returns an iterator on the resulting items.

@@ -29,7 +29,7 @@ public abstract class ForLet extends Single {
   }
 
   @Override
-  public ForLet analyze(final AnalyzeContext ctx) throws QueryException {
+  public ForLet analyze(final QueryContext ctx) throws QueryException {
     expr = expr.analyze(ctx);
     return this;
   }

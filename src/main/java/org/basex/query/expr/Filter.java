@@ -39,7 +39,7 @@ public class Filter extends Preds {
   }
 
   @Override
-  public Expr analyze(final AnalyzeContext ctx) throws QueryException {
+  public Expr analyze(final QueryContext ctx) throws QueryException {
     root = root.analyze(ctx);
     return super.analyze(ctx);
   }
@@ -103,8 +103,8 @@ public class Filter extends Preds {
       }
     }
 
-    // check if offset will not be deterministic; e.g.:
-    // (1 to 10)[xs:int(math:random() * 10)]
+    // only choose deterministic and context-independent offsets; e.g., skip:
+    // (1 to 10)[xs:int(math:random() * 10)]  or  (1 to 10)[.]
     boolean off = false;
     if(preds.length == 1) {
       final Expr p = preds[0];

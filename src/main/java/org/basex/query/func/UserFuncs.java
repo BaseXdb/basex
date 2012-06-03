@@ -174,7 +174,7 @@ public final class UserFuncs extends ExprInfo {
    * @param ctx query context
    * @throws QueryException query exception
    */
-  public void analyze(final AnalyzeContext ctx) throws QueryException {
+  public void analyze(final QueryContext ctx) throws QueryException {
     for(int i = 0; i < funcs.length; i++) {
       // only compile those functions that are used
       if(calls[i].length != 0) funcs[i].analyze(ctx);

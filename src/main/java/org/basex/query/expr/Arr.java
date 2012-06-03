@@ -31,7 +31,7 @@ public abstract class Arr extends ParseExpr {
   }
 
   @Override
-  public Expr analyze(final AnalyzeContext ctx) throws QueryException {
+  public Expr analyze(final QueryContext ctx) throws QueryException {
     for(int e = 0; e < expr.length; e++) expr[e] = expr[e].analyze(ctx);
     return this;
   }

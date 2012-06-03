@@ -36,7 +36,7 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
-  public VarRef analyze(final AnalyzeContext ctx) throws QueryException {
+  public VarRef analyze(final QueryContext ctx) throws QueryException {
     return this;
   }
 

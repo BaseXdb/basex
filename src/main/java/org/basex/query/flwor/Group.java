@@ -50,7 +50,7 @@ public final class Group extends ParseExpr {
   }
 
   @Override
-  public Expr analyze(final AnalyzeContext ctx) throws QueryException {
+  public Expr analyze(final QueryContext ctx) throws QueryException {
     for(final GroupSpec g : groupby) g.analyze(ctx);
     return this;
   }

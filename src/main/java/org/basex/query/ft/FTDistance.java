@@ -40,7 +40,7 @@ public final class FTDistance extends FTFilter {
   }
 
   @Override
-  public FTExpr analyze(final AnalyzeContext ctx) throws QueryException {
+  public FTExpr analyze(final QueryContext ctx) throws QueryException {
     for(int d = 0; d < dist.length; d++) dist[d] = dist[d].analyze(ctx);
     return super.analyze(ctx);
   }

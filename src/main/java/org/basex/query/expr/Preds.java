@@ -46,7 +46,7 @@ public abstract class Preds extends ParseExpr {
   }
 
   @Override
-  public Expr analyze(final AnalyzeContext ctx) throws QueryException {
+  public Expr analyze(final QueryContext ctx) throws QueryException {
     for(int p = 0; p < preds.length; p++) preds[p] = preds[p].analyze(ctx);
     return this;
   }

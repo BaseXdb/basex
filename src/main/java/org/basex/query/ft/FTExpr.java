@@ -35,7 +35,7 @@ public abstract class FTExpr extends ParseExpr {
   }
 
   @Override
-  public FTExpr analyze(final AnalyzeContext ctx) throws QueryException {
+  public FTExpr analyze(final QueryContext ctx) throws QueryException {
     for(int e = 0; e < expr.length; e++) expr[e] = expr[e].analyze(ctx);
     return this;
   }

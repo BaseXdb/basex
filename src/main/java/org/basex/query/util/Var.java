@@ -105,7 +105,7 @@ public final class Var extends ParseExpr {
   }
 
   @Override
-  public Var analyze(final AnalyzeContext ctx) throws QueryException {
+  public Var analyze(final QueryContext ctx) throws QueryException {
     expr.analyze(ctx);
     return this;
   }

@@ -28,15 +28,10 @@ public final class Cast extends Single {
   }
 
   @Override
-  public Expr analyze(final AnalyzeContext ctx) throws QueryException {
+  public Expr analyze(final QueryContext ctx) throws QueryException {
     super.analyze(ctx);
     checkType();
     return this;
-  }
-
-  @Override
-  public void checkType() throws QueryException {
-    if(expr.type().one()) type = SeqType.get(type.type, Occ.ONE);
   }
 
   @Override
@@ -56,6 +51,11 @@ public final class Cast extends Single {
       return expr;
     }
     return this;
+  }
+
+  @Override
+  public void checkType() throws QueryException {
+    if(expr.type().one()) type = SeqType.get(type.type, Occ.ONE);
   }
 
   @Override

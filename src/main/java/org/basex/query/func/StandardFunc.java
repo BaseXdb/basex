@@ -42,9 +42,8 @@ public abstract class StandardFunc extends Arr {
     // compile all arguments
     super.compile(ctx);
     // skip context-based or non-deterministic functions, and non-values
-    if(uses(Use.CTX) || uses(Use.NDT) || !allAreValues()) return optPre(comp(ctx), ctx);
-    // pre-evaluate function
-    return optPre(sig.ret.zeroOrOne() ? item(ctx, info) : value(ctx), ctx);
+    return optPre(uses(Use.CTX) || uses(Use.NDT) || !allAreValues() ? comp(ctx) :
+      sig.ret.zeroOrOne() ? item(ctx, info) : value(ctx), ctx);
   }
 
   /**

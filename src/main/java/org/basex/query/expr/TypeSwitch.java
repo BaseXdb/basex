@@ -42,7 +42,7 @@ public final class TypeSwitch extends ParseExpr {
   }
 
   @Override
-  public Expr analyze(final AnalyzeContext ctx) throws QueryException {
+  public Expr analyze(final QueryContext ctx) throws QueryException {
     ts = ts.analyze(ctx);
     for(final TypeCase c : cases) c.analyze(ctx);
     return this;

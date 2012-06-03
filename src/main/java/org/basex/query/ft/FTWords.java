@@ -87,7 +87,7 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public FTWords analyze(final AnalyzeContext ctx) throws QueryException {
+  public FTWords analyze(final QueryContext ctx) throws QueryException {
     if(occ != null) for(int o = 0; o < occ.length; ++o) occ[o] = occ[o].analyze(ctx);
     query = query.analyze(ctx);
     return this;

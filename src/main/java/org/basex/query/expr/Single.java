@@ -31,7 +31,7 @@ public abstract class Single extends ParseExpr {
   }
 
   @Override
-  public Expr analyze(final AnalyzeContext ctx) throws QueryException {
+  public Expr analyze(final QueryContext ctx) throws QueryException {
     expr = expr.analyze(ctx);
     return this;
   }

@@ -81,7 +81,7 @@ public class AxisPath extends Path {
   }
 
   @Override
-  protected Expr analyzePath(final AnalyzeContext ctx) throws QueryException {
+  protected Expr analyzePath(final QueryContext ctx) throws QueryException {
     return this;
   }
 

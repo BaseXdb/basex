@@ -320,7 +320,7 @@ public final class FNGen extends StandardFunc {
         sig == Function.UNPARSED_TEXT_AVAILABLE || sig == Function.PARSE_XML ||
         sig == Function.URI_COLLECTION || sig == Function.SERIALIZE) ||
       u == Use.CTX && (sig == Function.DATA && expr.length == 0 ||
-        sig == Function.PUT) && expr.length == 0 || super.uses(u);
+        sig == Function.PUT) || super.uses(u);
   }
 
   @Override

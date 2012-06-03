@@ -119,7 +119,7 @@ public enum NodeType implements Type {
     @Override
     public ANode cast(final Object o, final InputInfo ii) throws QueryException {
       if(o instanceof BXComm) return ((BXComm) o).getNod();
-      if(o instanceof FComm) return new FComm((Comment) o);
+      if(o instanceof Comment) return new FComm((Comment) o);
       final Matcher m = Pattern.compile("<!--(.*?)-->").matcher(o.toString());
       if(m.find()) return new FComm(Token.token(m.group(1)));
       throw NODEERR.thrw(ii, this, o);
