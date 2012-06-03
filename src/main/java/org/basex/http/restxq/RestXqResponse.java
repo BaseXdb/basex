@@ -69,7 +69,7 @@ final class RestXqResponse {
 
     // compile and evaluate function
     try {
-      Value result = qc.value(bfc.comp(qc));
+      Value result = qc.value(bfc.compile(qc));
       final Value update = qc.update();
       if(update != null) result = update;
 
