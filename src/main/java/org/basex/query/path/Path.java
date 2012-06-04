@@ -65,9 +65,6 @@ public abstract class Path extends ParseExpr {
 
   @Override
   public final Expr compile(final QueryContext ctx) throws QueryException {
-    // temporary restriction..
-    if(!ctx.dynamic) return this;
-
     if(root != null) {
       root = root.compile(ctx);
       if(root instanceof Context) root = null;

@@ -41,9 +41,6 @@ public abstract class StandardFunc extends Arr {
   public final Expr compile(final QueryContext ctx) throws QueryException {
     // compile all arguments
     super.compile(ctx);
-    // temporary restriction..
-    if(!ctx.dynamic) return this;
-
     // skip context-based or non-deterministic functions, and non-values
     return optPre(uses(Use.CTX) || uses(Use.NDT) || !allAreValues() ? comp(ctx) :
       sig.ret.zeroOrOne() ? item(ctx, info) : value(ctx), ctx);

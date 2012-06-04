@@ -79,9 +79,6 @@ public class GFLWOR extends ParseExpr {
 
   @Override
   public Expr compile(final QueryContext ctx) throws QueryException {
-    // temporary restriction..
-    if(!ctx.dynamic) return this;
-
     compHoist(ctx);
     compWhere(ctx);
 

@@ -56,8 +56,6 @@ public final class QueryContext extends Progress {
   public final Context context;
   /** XQuery version flag. */
   public boolean xquery3;
-  /** Dynamic/static compilation flag. */
-  public boolean dynamic;
 
   /** Cached stop word files. */
   public HashMap<String, IO> stop;
@@ -183,7 +181,7 @@ public final class QueryContext extends Progress {
     if(inf) compInfo(NL + COMPILING_C);
 
     // static compilation
-    analyze();
+    //analyze();
 
     // temporarily set database values (size check added for better performance)
     if(!dbOptions.isEmpty()) {
@@ -214,7 +212,6 @@ public final class QueryContext extends Progress {
     }
 
     // dynamic compilation
-    dynamic = true;
     analyze();
 
     // dump resulting query

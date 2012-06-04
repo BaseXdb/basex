@@ -89,8 +89,7 @@ public class UserFunc extends Single {
 
   @Override
   public Expr compile(final QueryContext ctx) throws QueryException {
-    // temporary restriction..
-    if(ctx.dynamic) compile(ctx, true);
+    compile(ctx, true);
     return this;
   }
 

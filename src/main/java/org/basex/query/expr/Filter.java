@@ -68,9 +68,6 @@ public class Filter extends Preds {
    * @return compiled expression
    */
   public final Expr comp2(final QueryContext ctx) {
-    // temporary restriction..
-    if(!ctx.dynamic) return this;
-
     // evaluate return type
     final SeqType t = root.type();
 
