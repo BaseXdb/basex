@@ -45,14 +45,7 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
-  public Expr analyze(final QueryContext ctx) throws QueryException {
-    for(final SwitchCase sc : cases) sc.analyze(ctx);
-    return this;
-  }
-
-  @Override
   public Expr compile(final QueryContext ctx) throws QueryException {
-    // operands may not be updating
     cond = cond.compile(ctx);
     for(final SwitchCase sc : cases) sc.compile(ctx);
 

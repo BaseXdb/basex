@@ -36,11 +36,6 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
-  public VarRef analyze(final QueryContext ctx) throws QueryException {
-    return this;
-  }
-
-  @Override
   public Expr compile(final QueryContext ctx) throws QueryException {
     var = ctx.vars.get(var);
     type = var.type();

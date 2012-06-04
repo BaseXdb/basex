@@ -87,25 +87,16 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public FTWords analyze(final QueryContext ctx) throws QueryException {
-    if(occ != null) for(int o = 0; o < occ.length; ++o) occ[o] = occ[o].analyze(ctx);
-    query = query.analyze(ctx);
-    return this;
-  }
-
-  @Override
   public FTWords compile(final QueryContext ctx) throws QueryException {
+    if(occ != null) for(int o = 0; o < occ.length; ++o) occ[o] = occ[o].compile(ctx);
+
     // compile only once
-    if(ftt == null) {
-      if(occ != null) {
-        for(int o = 0; o < occ.length; ++o) occ[o] = occ[o].compile(ctx);
-      }
+    if(txt == null) {
       query = query.compile(ctx);
       if(query.isValue()) txt = tokens(ctx);
-
       // choose fast evaluation for default settings
       fast = mode == FTMode.ANY && txt != null && occ == null;
-      ftt = new FTTokenizer(this, ctx.ftOpt(), ctx.context.prop);
+      if(ftt == null) ftt = new FTTokenizer(this, ctx.ftOpt(), ctx.context.prop);
     }
     return this;
   }

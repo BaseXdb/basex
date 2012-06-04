@@ -40,19 +40,19 @@ public final class PartFunc extends UserFunc {
   }
 
   @Override
+  public Expr compile(final QueryContext ctx) throws QueryException {
+    compile(ctx, false);
+    // defer creation of function item because of closure
+    return new InlineFunc(info, ret, args, expr, ann).compile(ctx);
+  }
+
+  @Override
   public void plan(final FElem plan) {
     final FElem el = planElem();
     addPlan(plan, el, expr);
     for(int i = 0; i < args.length; ++i) {
       el.add(planAttr(ARG + i, args[i].name.string()));
     }
-  }
-
-  @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    compile(ctx, false);
-    // defer creation of function item because of closure
-    return new InlineFunc(info, ret, args, expr, ann).compile(ctx);
   }
 
   @Override

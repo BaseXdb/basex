@@ -46,17 +46,10 @@ public class FTContains extends ParseExpr {
   }
 
   @Override
-  public final Expr analyze(final QueryContext ctx) throws QueryException {
-    expr = expr.analyze(ctx);
-    ftexpr = ftexpr.analyze(ctx);
-    return this;
-  }
-
-  @Override
   public final Expr compile(final QueryContext ctx) throws QueryException {
     expr = expr.compile(ctx).addText(ctx);
     ftexpr = ftexpr.compile(ctx);
-    lex = new FTLexer(new FTOpt());
+    if(lex == null) lex = new FTLexer(new FTOpt());
     return expr.isEmpty() ? optPre(Bln.FALSE, ctx) : this;
   }
 

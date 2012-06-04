@@ -67,10 +67,7 @@ public abstract class ANode extends Item {
       Token.diff(string(), it.string(ii));
   }
 
-  /**
-   * Returns a copy of the node.
-   * @return copy
-   */
+  @Override
   public abstract ANode copy();
 
   /**

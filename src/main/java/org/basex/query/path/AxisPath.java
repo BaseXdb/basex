@@ -81,12 +81,7 @@ public class AxisPath extends Path {
   }
 
   @Override
-  protected Expr analyzePath(final QueryContext ctx) throws QueryException {
-    return this;
-  }
-
-  @Override
-  protected final Expr compPath(final QueryContext ctx) throws QueryException {
+  protected final Expr compilePath(final QueryContext ctx) throws QueryException {
     // merge two axis paths
     if(root instanceof AxisPath) {
       Expr[] st = ((AxisPath) root).steps;
@@ -379,10 +374,7 @@ public class AxisPath extends Path {
     return (AxisStep) steps[i];
   }
 
-  /**
-   * Returns a copy of the path expression.
-   * @return copy
-   */
+  @Override
   public final Path copy() {
     final Expr[] stps = new Expr[steps.length];
     for(int s = 0; s < steps.length; ++s) stps[s] = AxisStep.get(step(s));

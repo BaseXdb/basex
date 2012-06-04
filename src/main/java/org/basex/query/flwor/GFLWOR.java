@@ -78,17 +78,10 @@ public class GFLWOR extends ParseExpr {
   }
 
   @Override
-  public Expr analyze(final QueryContext ctx) throws QueryException {
-    for(final ForLet f : fl) f.analyze(ctx);
-    if(where != null) where.analyze(ctx);
-    if(group != null) group.analyze(ctx);
-    if(order != null) order.analyze(ctx);
-    ret = ret.analyze(ctx);
-    return this;
-  }
-
-  @Override
   public Expr compile(final QueryContext ctx) throws QueryException {
+    // temporary restriction..
+    if(!ctx.dynamic) return this;
+
     compHoist(ctx);
     compWhere(ctx);
 

@@ -40,14 +40,6 @@ public abstract class Expr extends ExprInfo {
   public abstract void checkUp() throws QueryException;
 
   /**
-   * Performs static compilation steps.
-   * @param ctx query context
-   * @return optimized expression
-   * @throws QueryException query exception
-   */
-  public abstract Expr analyze(final QueryContext ctx) throws QueryException;
-
-  /**
    * Compiles and optimizes the expression, assigns data types and
    * cardinalities.
    * @param ctx query context
@@ -55,25 +47,6 @@ public abstract class Expr extends ExprInfo {
    * @throws QueryException query exception
    */
   public abstract Expr compile(final QueryContext ctx) throws QueryException;
-
-  /**
-   * Updates the expression's return type.
-   * @throws QueryException query exception
-   */
-  @SuppressWarnings("unused")
-  public void checkType() throws QueryException {
-  }
-
-  /**
-   * If possible, simplifies the expression.
-   * @param ctx query context
-   * @return simplified or original expression
-   * @throws QueryException query exception
-   */
-  @SuppressWarnings("unused")
-  public Expr simplify(final QueryContext ctx) throws QueryException {
-    return this;
-  }
 
   /**
    * Evaluates the expression and returns an iterator on the resulting items.
@@ -127,6 +100,15 @@ public abstract class Expr extends ExprInfo {
    */
   public abstract Item test(final QueryContext ctx, final InputInfo ii)
       throws QueryException;
+
+  /**
+   * Copies an expression. Returns {@code null} if expression cannot be copied.
+   * Will be useful for inlining functions, or for copying static queries.
+   * @return copied expression
+   */
+  public Expr copy() {
+    return null;
+  }
 
   /**
    * Tests if this is an empty sequence. This function is only overwritten
@@ -219,13 +201,14 @@ public abstract class Expr extends ExprInfo {
   public abstract Expr remove(final Var v);
 
   /**
-   * <p>This method is called at compile time by expressions that perform
+   * <p>This method is overwritten by {@link CmpG}, {@link CmpV} and {@link FNSimple}.
+   * It is called at compile time by expressions that perform
    * effective boolean value tests (e.g. {@link If} or {@link Preds}).
    * If the arguments of the called expression return a boolean anyway,
    * the expression will be simplified.</p>
    * <p>Example in {@link CmpV}:
    * {@code if($x eq true())} is rewritten to {@code if($x)}, if {@code $x}
-   * will always yield a single boolean.</p>
+   * is known to return a single boolean.</p>
    * @param ctx query context
    * @return optimized expression
    */

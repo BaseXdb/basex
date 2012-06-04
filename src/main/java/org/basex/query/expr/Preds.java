@@ -46,12 +46,6 @@ public abstract class Preds extends ParseExpr {
   }
 
   @Override
-  public Expr analyze(final QueryContext ctx) throws QueryException {
-    for(int p = 0; p < preds.length; p++) preds[p] = preds[p].analyze(ctx);
-    return this;
-  }
-
-  @Override
   public Expr compile(final QueryContext ctx) throws QueryException {
     for(int p = 0; p < preds.length; ++p) {
       Expr pr = preds[p].compile(ctx).compEbv(ctx);
@@ -111,8 +105,7 @@ public abstract class Preds extends ParseExpr {
     boolean np1 = true;
     boolean np2 = true;
     for(int p = 0; p < preds.length; p++) {
-      final boolean np = !preds[p].type().mayBeNumber() &&
-          !preds[p].uses(Use.POS);
+      final boolean np = !preds[p].type().mayBeNumber() && !preds[p].uses(Use.POS);
       np1 &= np;
       if(p > 0) np2 &= np;
     }

@@ -43,11 +43,6 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   @Override
-  public final Value analyze(final QueryContext ctx) {
-    return this;
-  }
-
-  @Override
   public final Value compile(final QueryContext ctx) {
     return this;
   }

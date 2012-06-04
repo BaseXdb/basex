@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -39,7 +40,7 @@ public final class CElem extends CName {
 
   @Override
   public CElem compile(final QueryContext ctx) throws QueryException {
-    final int s = prepare(ctx.sc);
+    final int s = prepare(ctx);
     super.compile(ctx);
     ctx.sc.ns.size(s);
     return this;
@@ -47,7 +48,7 @@ public final class CElem extends CName {
 
   @Override
   public FElem item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final int s = prepare(ctx.sc);
+    final int s = prepare(ctx);
     try {
       // adds in-scope namespaces
       final Atts ns = new Atts();
@@ -208,14 +209,13 @@ public final class CElem extends CName {
 
   /**
    * Adds namespaces to the namespace stack.
-   * @param sc static context
+   * @param ctx query context
    * @return old stack position
    */
-  private int prepare(final StaticContext sc) {
-    final int s = sc.ns.size();
-    for(int n = 0; n < nspaces.size(); n++) {
-      sc.ns.add(nspaces.name(n), nspaces.string(n));
-    }
+  private int prepare(final QueryContext ctx) {
+    final NSContext ns = ctx.sc.ns;
+    final int s = ns.size();
+    for(int n = 0; n < nspaces.size(); n++) ns.add(nspaces.name(n), nspaces.string(n));
     return s;
   }
 }

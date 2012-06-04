@@ -42,13 +42,6 @@ public final class TypeSwitch extends ParseExpr {
   }
 
   @Override
-  public Expr analyze(final QueryContext ctx) throws QueryException {
-    ts = ts.analyze(ctx);
-    for(final TypeCase c : cases) c.analyze(ctx);
-    return this;
-  }
-
-  @Override
   public Expr compile(final QueryContext ctx) throws QueryException {
     ts = ts.compile(ctx);
     // static condition: return branch in question
@@ -58,7 +51,6 @@ public final class TypeSwitch extends ParseExpr {
           return optPre(c.compile(ctx, (Value) ts).expr, ctx);
       }
     }
-
     // compile branches
     for(final TypeCase c : cases) c.compile(ctx);
 
@@ -69,7 +61,6 @@ public final class TypeSwitch extends ParseExpr {
     }
     if(eq) return optPre(null, ctx);
 
-    // evaluate return type
     type = cases[0].type();
     for(int c = 1; c < cases.length; ++c) {
       type = type.intersect(cases[c].type());

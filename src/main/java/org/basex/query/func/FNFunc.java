@@ -249,8 +249,7 @@ public final class FNFunc extends StandardFunc {
 
   @Override
   public boolean uses(final Use u) {
-    return (sig == Function.PARTIAL_APPLY ||
-        sig == Function.FUNCTION_LOOKUP) &&
+    return (sig == Function.PARTIAL_APPLY || sig == Function.FUNCTION_LOOKUP) &&
         u == Use.CTX || u == Use.X30 || super.uses(u);
   }
 }

@@ -33,14 +33,9 @@ public final class Arith extends Arr {
   }
 
   @Override
-  public Expr analyze(final QueryContext ctx) throws QueryException {
-    super.analyze(ctx);
-    checkType();
-    return this;
-  }
+  public Expr compile(final QueryContext ctx) throws QueryException {
+    super.compile(ctx);
 
-  @Override
-  public void checkType() throws QueryException {
     final SeqType s0 = expr[0].type();
     final SeqType s1 = expr[1].type();
     final Type t0 = s0.type;
@@ -51,12 +46,6 @@ public final class Arith extends Arr {
     } else if(s0.one() && s1.one()) {
       type = SeqType.ITEM;
     }
-  }
-
-  @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    super.compile(ctx);
-    checkType();
     return optPre(oneIsEmpty() ? null : allAreValues() ? item(ctx, info) : this, ctx);
   }
 

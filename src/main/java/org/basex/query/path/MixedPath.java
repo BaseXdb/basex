@@ -32,12 +32,7 @@ public final class MixedPath extends Path {
   }
 
   @Override
-  protected Expr analyzePath(final QueryContext ctx) throws QueryException {
-    return this;
-  }
-
-  @Override
-  protected Expr compPath(final QueryContext ctx) throws QueryException {
+  protected Expr compilePath(final QueryContext ctx) throws QueryException {
     final AxisStep v = voidStep(steps);
     if(v != null) COMPSELF.thrw(info, v);
 

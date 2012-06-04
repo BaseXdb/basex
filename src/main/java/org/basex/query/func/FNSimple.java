@@ -105,7 +105,7 @@ public final class FNSimple extends StandardFunc {
 
   @Override
   public Expr comp(final QueryContext ctx) {
-    // all functions have at least 1 argument
+    if(expr.length == 0) return this;
     final Expr e = expr[0];
 
     switch(sig) {
@@ -158,7 +158,7 @@ public final class FNSimple extends StandardFunc {
 
   @Override
   public Expr compEbv(final QueryContext ctx) {
-    // all functions have at least 1 argument
+    if(expr.length == 0) return this;
     final Expr e = expr[0];
 
     Expr ex = this;

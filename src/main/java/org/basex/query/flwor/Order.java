@@ -44,12 +44,6 @@ public final class Order extends ParseExpr {
   }
 
   @Override
-  public Expr analyze(final QueryContext ctx) throws QueryException {
-    for(final OrderBy o : ob) o.analyze(ctx);
-    return this;
-  }
-
-  @Override
   public Expr compile(final QueryContext ctx) throws QueryException {
     for(final OrderBy o : ob) o.compile(ctx);
     return this;

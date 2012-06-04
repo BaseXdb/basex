@@ -26,7 +26,7 @@ public abstract class Cmp extends Arr {
   }
 
   /**
-   * Swaps the operands of the expression, if better performance is expected.
+   * Swaps the operands of the expression if better performance is expected.
    * The operator itself needs to be swapped by the calling expression.
    * @return resulting expression
    */

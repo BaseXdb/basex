@@ -39,12 +39,6 @@ public class Filter extends Preds {
   }
 
   @Override
-  public Expr analyze(final QueryContext ctx) throws QueryException {
-    root = root.analyze(ctx);
-    return super.analyze(ctx);
-  }
-
-  @Override
   public final Expr compile(final QueryContext ctx) throws QueryException {
     // invalidate current context value (will be overwritten by filter)
     final Value cv = ctx.value;
@@ -74,6 +68,9 @@ public class Filter extends Preds {
    * @return compiled expression
    */
   public final Expr comp2(final QueryContext ctx) {
+    // temporary restriction..
+    if(!ctx.dynamic) return this;
+
     // evaluate return type
     final SeqType t = root.type();
 

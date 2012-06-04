@@ -64,13 +64,10 @@ public abstract class Path extends ParseExpr {
   }
 
   @Override
-  public final Expr analyze(final QueryContext ctx) throws QueryException {
-    if(root != null) root = root.analyze(ctx);
-    return analyzePath(ctx);
-  }
-
-  @Override
   public final Expr compile(final QueryContext ctx) throws QueryException {
+    // temporary restriction..
+    if(!ctx.dynamic) return this;
+
     if(root != null) {
       root = root.compile(ctx);
       if(root instanceof Context) root = null;
@@ -79,19 +76,11 @@ public abstract class Path extends ParseExpr {
     final Value v = ctx.value;
     try {
       ctx.value = root(ctx);
-      return compPath(ctx);
+      return compilePath(ctx);
     } finally {
       ctx.value = v;
     }
   }
-
-  /**
-   * Analyzes the location path.
-   * @param ctx analyze context
-   * @return optimized expression
-   * @throws QueryException query exception
-   */
-  protected abstract Expr analyzePath(final QueryContext ctx) throws QueryException;
 
   /**
    * Compiles the location path.
@@ -99,7 +88,7 @@ public abstract class Path extends ParseExpr {
    * @return optimized expression
    * @throws QueryException query exception
    */
-  protected abstract Expr compPath(final QueryContext ctx) throws QueryException;
+  protected abstract Expr compilePath(final QueryContext ctx) throws QueryException;
 
   /**
    * Returns the root of the current context or {@code null}.

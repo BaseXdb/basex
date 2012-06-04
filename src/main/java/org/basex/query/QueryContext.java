@@ -56,6 +56,8 @@ public final class QueryContext extends Progress {
   public final Context context;
   /** XQuery version flag. */
   public boolean xquery3;
+  /** Dynamic/static compilation flag. */
+  public boolean dynamic;
 
   /** Cached stop word files. */
   public HashMap<String, IO> stop;
@@ -173,29 +175,14 @@ public final class QueryContext extends Progress {
   }
 
   /**
-   * Will perform all static compilation steps (in progress).
-   * @throws QueryException query exception
-   */
-  public void analyze() throws QueryException {
-    try {
-      // compile global functions.
-      // variables will be compiled if called for the first time
-      funcs.analyze(this);
-      // compile the expression
-      if(root != null) root = root.analyze(this);
-    } catch(final StackOverflowError ex) {
-      Util.debug(ex);
-      XPSTACK.thrw(null);
-    }
-  }
-
-  /**
    * Compiles and optimizes the expression.
    * @throws QueryException query exception
    */
   public void compile() throws QueryException {
     // dump compilation info
     if(inf) compInfo(NL + COMPILING_C);
+
+    // static compilation
     analyze();
 
     // temporarily set database values (size check added for better performance)
@@ -226,19 +213,29 @@ public final class QueryContext extends Progress {
       value = sc.initType.promote(value, this, null);
     }
 
+    // dynamic compilation
+    dynamic = true;
+    analyze();
+
+    // dump resulting query
+    if(inf) info.add(NL + RESULT_C + funcs + root + NL);
+  }
+
+  /**
+   * Compiles all used functions and the root expression.
+   * @throws QueryException query exception
+   */
+  public void analyze() throws QueryException {
     try {
       // compile global functions.
       // variables will be compiled if called for the first time
-      funcs.comp(this);
+      funcs.compile(this);
       // compile the expression
       if(root != null) root = root.compile(this);
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
       XPSTACK.thrw(null);
     }
-
-    // dump resulting query
-    if(inf) info.add(NL + RESULT_C + funcs + root + NL);
   }
 
   /**

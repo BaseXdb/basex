@@ -39,12 +39,6 @@ public final class FTWindow extends FTFilter {
   }
 
   @Override
-  public FTExpr analyze(final QueryContext ctx) throws QueryException {
-    win = win.analyze(ctx);
-    return super.analyze(ctx);
-  }
-
-  @Override
   public FTExpr compile(final QueryContext ctx) throws QueryException {
     win = win.compile(ctx);
     return super.compile(ctx);

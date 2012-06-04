@@ -105,12 +105,6 @@ public final class Var extends ParseExpr {
   }
 
   @Override
-  public Var analyze(final QueryContext ctx) throws QueryException {
-    expr.analyze(ctx);
-    return this;
-  }
-
-  @Override
   public Var compile(final QueryContext ctx) throws QueryException {
     if(expr != null) bind(expr.compile(ctx), ctx);
     return this;
@@ -208,10 +202,7 @@ public final class Var extends ParseExpr {
     return type == null ? v : type.promote(v, ctx, info);
   }
 
-  /**
-   * Returns a copy of the variable.
-   * @return copy
-   */
+  @Override
   public Var copy() {
     final Var v = new Var(info, name, type, id, ann);
     v.global = global;

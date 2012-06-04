@@ -65,12 +65,15 @@ public final class FNGen extends StandardFunc {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    return sig == Function.COLLECTION ? collection(ctx) : super.value(ctx);
+    switch(sig) {
+      case COLLECTION: return collection(ctx);
+      default:         return super.value(ctx);
+    }
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) {
-    if(sig == Function.DATA &&  expr.length == 1) {
+  public Expr comp(final QueryContext ctx) throws QueryException {
+    if(sig == Function.DATA && expr.length == 1) {
       final SeqType t = expr[0].type();
       type = t.type.isNode() ? SeqType.get(AtomType.ATM, t.occ) : t;
     }
@@ -319,8 +322,8 @@ public final class FNGen extends StandardFunc {
         sig == Function.UNPARSED_TEXT || sig == Function.UNPARSED_TEXT_LINES ||
         sig == Function.UNPARSED_TEXT_AVAILABLE || sig == Function.PARSE_XML ||
         sig == Function.URI_COLLECTION || sig == Function.SERIALIZE) ||
-      u == Use.CTX && (sig == Function.DATA && expr.length == 0 ||
-        sig == Function.PUT) || super.uses(u);
+      u == Use.CTX && (
+        sig == Function.DATA && expr.length == 0 || sig == Function.PUT) || super.uses(u);
   }
 
   @Override

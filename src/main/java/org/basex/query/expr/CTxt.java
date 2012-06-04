@@ -28,6 +28,7 @@ public final class CTxt extends CFrag {
 
   @Override
   public Expr compile(final QueryContext ctx) throws QueryException {
+    super.compile(ctx);
     return optPre(oneIsEmpty() ? null : this, ctx);
   }
 

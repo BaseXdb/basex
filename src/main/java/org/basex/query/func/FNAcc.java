@@ -90,8 +90,7 @@ public final class FNAcc extends StandardFunc {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.CTX && expr.length == 0 ||
-        u == Use.POS && (sig == Function.POSITION ||
-        sig == Function.LAST) || super.uses(u);
+    return u == Use.POS && (sig == Function.POSITION || sig == Function.LAST) ||
+        u == Use.CTX && expr.length == 0 || super.uses(u);
   }
 }

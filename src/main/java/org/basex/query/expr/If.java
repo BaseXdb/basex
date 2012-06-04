@@ -41,20 +41,12 @@ public final class If extends Arr {
   }
 
   @Override
-  public Expr analyze(final QueryContext ctx) throws QueryException {
-    cond = cond.analyze(ctx);
-    return super.analyze(ctx);
-  }
-
-  @Override
   public Expr compile(final QueryContext ctx) throws QueryException {
-    // compile condition
     cond = cond.compile(ctx).compEbv(ctx);
-
     // static condition: return branch in question
     if(cond.isValue()) return optPre(eval(ctx).compile(ctx), ctx);
 
-    // compile both branches
+    // compile and simplify branches
     super.compile(ctx);
 
     // if A then B else B -> B (errors in A will be ignored)

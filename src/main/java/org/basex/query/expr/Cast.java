@@ -28,16 +28,9 @@ public final class Cast extends Single {
   }
 
   @Override
-  public Expr analyze(final QueryContext ctx) throws QueryException {
-    super.analyze(ctx);
-    checkType();
-    return this;
-  }
-
-  @Override
   public Expr compile(final QueryContext ctx) throws QueryException {
     super.compile(ctx);
-    checkType();
+    if(expr.type().one()) type = SeqType.get(type.type, Occ.ONE);
 
     // pre-evaluate value
     if(expr.isValue()) return preEval(ctx);
@@ -46,16 +39,11 @@ public final class Cast extends Single {
     // (the following types will always be correct)
     final Type t = type.type;
     if((t == AtomType.BLN || t == AtomType.FLT || t == AtomType.DBL ||
-        t == AtomType.QNM || t == AtomType.URI) && expr.type().eq(type)) {
+        t == AtomType.QNM || t == AtomType.URI) && type.eq(expr.type())) {
       optPre(expr, ctx);
       return expr;
     }
     return this;
-  }
-
-  @Override
-  public void checkType() throws QueryException {
-    if(expr.type().one()) type = SeqType.get(type.type, Occ.ONE);
   }
 
   @Override

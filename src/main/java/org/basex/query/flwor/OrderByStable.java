@@ -27,11 +27,6 @@ public final class OrderByStable extends OrderBy {
   }
 
   @Override
-  public OrderByStable analyze(final QueryContext ctx) throws QueryException {
-    return this;
-  }
-
-  @Override
   public OrderByStable compile(final QueryContext ctx) throws QueryException {
     type = SeqType.ITEM_ZM;
     return this;

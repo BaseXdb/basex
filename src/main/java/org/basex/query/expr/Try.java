@@ -40,27 +40,18 @@ public final class Try extends Single {
   }
 
   @Override
-  public Expr analyze(final QueryContext ctx) throws QueryException {
-    for(final Catch c : ctch) c.analyze(ctx);
-    return super.analyze(ctx);
-  }
-
-  @Override
   public Expr compile(final QueryContext ctx) throws QueryException {
-    // compile expression
-    try {
-      super.compile(ctx);
-      // return value, which will never throw an error
-      if(expr.isValue()) return optPre(expr, ctx);
-    } catch(final QueryException ex) {
-      // catch exception for evaluation if expression fails at compile time
-      qe = ex;
+    if(qe == null) {
+      try {
+        super.compile(ctx);
+        if(expr.isValue()) return optPre(expr, ctx);
+      } catch(final QueryException ex) {
+        // remember exception
+        qe = ex;
+      }
     }
 
-    // compile catch expressions
     for(final Catch c : ctch) c.compile(ctx);
-
-    // evaluate result type
     type = expr.type();
     for(final Catch c : ctch) type = type.intersect(c.type());
     return this;

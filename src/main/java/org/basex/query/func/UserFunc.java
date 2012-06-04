@@ -89,7 +89,8 @@ public class UserFunc extends Single {
 
   @Override
   public Expr compile(final QueryContext ctx) throws QueryException {
-    compile(ctx, true);
+    // temporary restriction..
+    if(ctx.dynamic) compile(ctx, true);
     return this;
   }
 
@@ -115,8 +116,8 @@ public class UserFunc extends Single {
 
     // convert all function calls in tail position to proper tail calls
     if(tco()) expr = expr.markTailCalls();
-
     if(ret == null) return;
+
     // adopt expected return type
     type = ret;
     // remove redundant casts
