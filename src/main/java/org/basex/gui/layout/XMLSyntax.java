@@ -25,6 +25,8 @@ public final class XMLSyntax extends BaseXSyntax {
   public void init() {
     quote = 0;
     tag = false;
+    comm = 0;
+    elem = false;
   }
 
   @Override
