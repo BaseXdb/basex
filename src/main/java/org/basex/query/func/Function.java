@@ -445,7 +445,8 @@ public enum Function {
   /* FNArchive functions. */
 
   /** XQuery function */
-  _ARCHIVE_CREATE(FNArchive.class, "create(entries,contents)", B64, ELM_ZM, ITEM_ZM),
+  _ARCHIVE_CREATE(FNArchive.class, "create(entries,contents[,options])",
+      B64, 2, ELM_ZM, ITEM_ZM, NOD),
   /** XQuery function */
   _ARCHIVE_ENTRIES(FNArchive.class, "entries(archive)", ELM_ZM, B64),
   /** XQuery function */
@@ -762,7 +763,7 @@ public enum Function {
 
   /** XSLT function: performs an XSLT transformation. */
   _UTIL_TRANSFORM(FNXslt.class, "transform(input,stylesheet[,params])",
-      NOD, 2, ITEM, ITEM, NOD_ZO),
+      NOD, 2, ITEM, ITEM, NOD),
 
   /* FNZip functions (EXPath). */
 

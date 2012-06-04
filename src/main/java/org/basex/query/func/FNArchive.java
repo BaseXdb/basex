@@ -1,5 +1,6 @@
 package org.basex.query.func;
 
+import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
@@ -20,6 +21,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -43,6 +45,17 @@ public class FNArchive extends StandardFunc {
   private static final QNm Q_SIZE = new QNm("size");
   /** Root node test. */
   private static final ExtTest TEST = new ExtTest(NodeType.ELM, Q_ENTRY);
+  /** Element: options. */
+  private static final QNm E_OPTIONS = new QNm("archive:options", ARCHIVEURI);
+
+  /** Option: format. */
+  private static final byte[] FORMAT = Token.token("format");
+  /** Option: format: zip. */
+  private static final byte[] ZIP = Token.token("zip");
+  /** Option: algorithm. */
+  private static final byte[] ALGORITHM = Token.token("algorithm");
+  /** Option: algorithm: deflate. */
+  private static final byte[] DEFLATE = Token.token("deflate");
 
   /**
    * Constructor.
@@ -60,7 +73,7 @@ public class FNArchive extends StandardFunc {
       case _ARCHIVE_ENTRIES:        return entries(ctx);
       case _ARCHIVE_EXTRACT_TEXT:   return extractText(ctx);
       case _ARCHIVE_EXTRACT_BINARY: return extractBinary(ctx);
-      default:                   return super.iter(ctx);
+      default:                      return super.iter(ctx);
     }
   }
 
@@ -68,10 +81,10 @@ public class FNArchive extends StandardFunc {
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     checkCreate(ctx);
     switch(sig) {
-      case _ARCHIVE_CREATE:         return create(ctx);
-      case _ARCHIVE_UPDATE:         return update(ctx);
-      case _ARCHIVE_DELETE:         return delete(ctx);
-      default:                   return super.item(ctx, ii);
+      case _ARCHIVE_CREATE: return create(ctx);
+      case _ARCHIVE_UPDATE: return update(ctx);
+      case _ARCHIVE_DELETE: return delete(ctx);
+      default:              return super.item(ctx, ii);
     }
   }
 
@@ -82,11 +95,20 @@ public class FNArchive extends StandardFunc {
    * @throws QueryException query exception
    */
   private B64 create(final QueryContext ctx) throws QueryException {
-    final ArrayOutput ao = new ArrayOutput();
-    final ZipOutputStream zos = new ZipOutputStream(ao);
     final Iter elem = ctx.iter(expr[0]);
     final Iter cont = ctx.iter(expr[1]);
+    final Item opt = expr.length > 2 ? expr[2].item(ctx, info) : null;
+    final TokenMap map = new FuncParams(E_OPTIONS, info).parse(opt);
 
+    // check format
+    final byte[] format = map.get(FORMAT);
+    if(format != null && !eq(format, ZIP)) ARCH_SUPP.thrw(info, FORMAT, format);
+    // check algorithm
+    final byte[] alg = map.get(ALGORITHM);
+    if(alg != null && !eq(alg, DEFLATE)) ARCH_SUPP.thrw(info, ALGORITHM, alg);
+
+    final ArrayOutput ao = new ArrayOutput();
+    final ZipOutputStream zos = new ZipOutputStream(ao);
     try {
       int e = 0;
       int c = 0;

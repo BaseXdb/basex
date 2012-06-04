@@ -158,6 +158,8 @@ public enum Err {
   ARCH_ENCODING(ARCH, 4, "Encoding is not supported: '%'."),
   /** ARCH0004. */
   ARCH_ENCODE(ARCH, 4, "String conversion: %."),
+  /** ARCH0005. */
+  ARCH_SUPP(ARCH, 5, "% not supported: '%'."),
    /** ARCH9999. */
   ARCH_FAIL(ARCH, 9999, "Operation failed: %."),
 

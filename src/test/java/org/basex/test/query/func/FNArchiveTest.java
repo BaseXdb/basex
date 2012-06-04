@@ -29,6 +29,15 @@ public final class FNArchiveTest extends AdvancedQueryTest {
         "1");
     query(COUNT.args(_ARCHIVE_CREATE.args(
         "<entry last-modified='2000-01-01T12:12:12'>X</entry>", "")), "1");
+    query(COUNT.args(_ARCHIVE_CREATE.args("<entry>X</entry>", "",
+        " map { }")), "1");
+    query(COUNT.args(_ARCHIVE_CREATE.args("<entry>X</entry>", "",
+        " map { 'format':='zip', 'algorithm':='deflate' }")), "1");
+    query(COUNT.args(_ARCHIVE_CREATE.args("<entry>X</entry>", "",
+        "<archive:options/>")), "1");
+    query(COUNT.args(_ARCHIVE_CREATE.args("<entry>X</entry>", "",
+        "<archive:options><archive:format value='zip'/>" +
+        "<archive:algorithm value='deflate'/></archive:options>")), "1");
 
     // different number of entries and contents
     error(_ARCHIVE_CREATE.args("<entry>X</entry>", "()"), Err.ARCH_DIFF);
@@ -49,6 +58,11 @@ public final class FNArchiveTest extends AdvancedQueryTest {
     // errors while converting a string
     error(_ARCHIVE_CREATE.args("<entry encoding='US-ASCII'>X</entry>", "\u00fc"),
         Err.ARCH_ENCODE);
+    error(COUNT.args(_ARCHIVE_CREATE.args("<entry>X</entry>", "",
+        " map { 'format':='rar' }")), Err.ARCH_SUPP);
+    error(COUNT.args(_ARCHIVE_CREATE.args("<entry>X</entry>", "",
+        "<archive:options><archive:format value='rar'/></archive:options>")),
+        Err.ARCH_SUPP);
   }
 
   /**
