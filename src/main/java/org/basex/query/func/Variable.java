@@ -19,7 +19,7 @@ import org.basex.util.*;
 public enum Variable {
 
   /** File variable. */
-  _FILE_DIRECTORY_SEPARATOR(FILEURI, "directory-separator", Str.get(File.separator)),
+  _FILE_DIR_SEPARATOR(FILEURI, "dir-separator", Str.get(File.separator)),
   /** File variable. */
   _FILE_PATH_SEPARATOR(FILEURI, "path-separator", Str.get(File.pathSeparator)),
 

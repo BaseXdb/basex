@@ -13,7 +13,9 @@ import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -50,28 +52,34 @@ public final class FNFile extends StandardFunc {
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     checkCreate(ctx);
     final File path = file(0, ctx);
-    switch(sig) {
-      case _FILE_APPEND:           return write(path, ctx, true);
-      case _FILE_APPEND_BINARY:    return writeBinary(path, ctx, true);
-      case _FILE_COPY:             return copy(path, ctx, true);
-      case _FILE_CREATE_DIRECTORY: return createDirectory(path);
-      case _FILE_DELETE:           return delete(path, ctx);
-      case _FILE_MOVE:             return copy(path, ctx, false);
-      case _FILE_READ_BINARY:      return readBinary(path);
-      case _FILE_READ_TEXT:        return readText(path, ctx);
-      case _FILE_WRITE:            return write(path, ctx, false);
-      case _FILE_WRITE_BINARY:     return writeBinary(path, ctx, false);
-      case _FILE_EXISTS:           return Bln.get(path.exists());
-      case _FILE_IS_DIRECTORY:     return Bln.get(path.isDirectory());
-      case _FILE_IS_FILE:          return Bln.get(path.isFile());
-      case _FILE_LAST_MODIFIED:    return lastModified(path);
-      case _FILE_SIZE:             return size(path);
-      case _FILE_BASE_NAME:        return baseName(path, ctx);
-      case _FILE_DIR_NAME:         return dirName(path);
-      case _FILE_PATH_TO_NATIVE:   return pathToNative(path);
-      case _FILE_RESOLVE_PATH:     return Str.get(path.getAbsolutePath());
-      case _FILE_PATH_TO_URI:      return pathToUri(path);
-      default:                     return super.item(ctx, ii);
+    try {
+      switch(sig) {
+        case _FILE_APPEND:         return write(path, false, true, ctx);
+        case _FILE_APPEND_BINARY:  return writeBinary(path, ctx, true);
+        case _FILE_APPEND_TEXT:    return write(path, true, true, ctx);
+        case _FILE_COPY:           return copy(path, ctx, true);
+        case _FILE_CREATE_DIR:     return createDirectory(path);
+        case _FILE_DELETE:         return delete(path, ctx);
+        case _FILE_MOVE:           return copy(path, ctx, false);
+        case _FILE_READ_BINARY:    return readBinary(path);
+        case _FILE_READ_TEXT:      return readText(path, ctx);
+        case _FILE_WRITE:          return write(path, false, false, ctx);
+        case _FILE_WRITE_BINARY:   return writeBinary(path, ctx, false);
+        case _FILE_WRITE_TEXT:     return write(path, true, false, ctx);
+        case _FILE_EXISTS:         return Bln.get(path.exists());
+        case _FILE_IS_DIR:         return Bln.get(path.isDirectory());
+        case _FILE_IS_FILE:        return Bln.get(path.isFile());
+        case _FILE_LAST_MODIFIED:  return lastModified(path);
+        case _FILE_SIZE:           return size(path);
+        case _FILE_BASE_NAME:      return baseName(path, ctx);
+        case _FILE_DIR_NAME:       return dirName(path);
+        case _FILE_PATH_TO_NATIVE: return pathToNative(path);
+        case _FILE_RESOLVE_PATH:   return Str.get(path.getAbsolutePath());
+        case _FILE_PATH_TO_URI:    return pathToUri(path);
+        default:                   return super.item(ctx, ii);
+      }
+    } catch(final IOException ex) {
+      throw FILE_IO.thrw(info, ex);
     }
   }
 
@@ -323,79 +331,90 @@ public final class FNFile extends StandardFunc {
   }
 
   /**
-   * Writes a sequence of items to a file.
+   * Writes items to a file.
    * @param path file to be written
-   * @param ctx query context
+   * @param text only write texts
    * @param append append flag
+   * @param ctx query context
    * @return true if file was successfully written
    * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  private Item write(final File path, final QueryContext ctx, final boolean append)
-      throws QueryException {
+  private Item write(final File path, final boolean text, final boolean append,
+      final QueryContext ctx) throws QueryException, IOException {
 
-    md(path);
+    check(path);
     final Iter ir = expr[1].iter(ctx);
+    final SerializerProp sp;
+    if(text) {
+      final String enc = encoding(2, FILE_ENCODING, ctx);
+      sp = new SerializerProp();
+      if(enc != null) sp.set(SerializerProp.S_ENCODING, enc);
+    } else {
+      Item it = expr.length > 2 ? expr[2].item(ctx, info) : null;
+      sp = FuncParams.serializerProp(it);
+    }
+
+    final PrintOutput out = PrintOutput.get(new FileOutputStream(path, append));
     try {
-      final PrintOutput out = PrintOutput.get(new FileOutputStream(path, append));
-      try {
-        Item it = expr.length > 2 ? expr[2].item(ctx, info) : null;
-        final Serializer ser = Serializer.get(out, FuncParams.serializerProp(it));
-        while((it = ir.next()) != null) ser.serialize(it);
-        ser.close();
-      } catch(final SerializerException ex) {
-        throw ex.getCause(info);
-      } finally {
-        out.close();
+      final Serializer ser = Serializer.get(out, sp);
+      for(Item it; (it = ir.next()) != null;) {
+        if(text) {
+          final Type ip = it.type;
+          if(!ip.isString() && !ip.isUntyped()) Err.type(this, AtomType.STR, it);
+        }
+        ser.serialize(it);
       }
-    } catch(final IOException ex) {
-      FILE_IO.thrw(info, ex);
+      ser.close();
+    } catch(final SerializerException ex) {
+      throw ex.getCause(info);
+    } finally {
+      out.close();
     }
     return null;
   }
 
   /**
-   * Writes an item to a file.
+   * Writes binary items to a file.
    * @param path file to be written
    * @param ctx query context
    * @param append append flag
    * @return result
    * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
   private Item writeBinary(final File path, final QueryContext ctx, final boolean append)
-      throws QueryException {
+      throws QueryException, IOException {
 
-    md(path);
+    check(path);
     final Iter ir = expr[1].iter(ctx);
+    final BufferOutput out = new BufferOutput(new FileOutputStream(path, append));
     try {
-      final BufferOutput out = new BufferOutput(new FileOutputStream(path, append));
-      try {
-        for(Item it; (it = ir.next()) != null;) {
-          final InputStream is = it.input(info);
-          try {
-            for(int i; (i = is.read()) != -1;)  out.write(i);
-          } finally {
-            is.close();
-          }
+      for(Item it; (it = ir.next()) != null;) {
+        if(!(it instanceof Bin)) BINARYTYPE.thrw(info, it.type);
+        final InputStream is = it.input(info);
+        try {
+          for(int i; (i = is.read()) != -1;)  out.write(i);
+        } finally {
+          is.close();
         }
-      } finally {
-        out.close();
       }
-    } catch(final IOException ex) {
-      FILE_IO.thrw(info, ex);
+    } finally {
+      out.close();
     }
     return null;
   }
 
   /**
-   * Creates the target directory of the specified file.
+   * Checks the target directory of the specified file.
    * @param path file to be written
    * @throws QueryException query exception
    */
-  private void md(final File path) throws QueryException {
+  private void check(final File path) throws QueryException {
     final IOFile io = new IOFile(path);
     if(io.isDir()) FILE_DIR.thrw(info, io);
     final IOFile dir = new IOFile(io.dir());
-    if(!dir.exists() && !dir.md()) FILE_CREATE.thrw(info, dir);
+    if(!dir.exists()) FILE_NODIR.thrw(info, dir);
   }
 
   /**
@@ -405,9 +424,10 @@ public final class FNFile extends StandardFunc {
    * @param copy copy flag (no move)
    * @return result
    * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
   private Item copy(final File src, final QueryContext ctx, final boolean copy)
-      throws QueryException {
+      throws QueryException, IOException {
 
     File trg = file(1, ctx).getAbsoluteFile();
     if(!src.exists()) FILE_WHICH.thrw(info, src.getAbsolutePath());
@@ -436,19 +456,16 @@ public final class FNFile extends StandardFunc {
    * @param src source path
    * @param trg target path
    * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  private void copy(final File src, final File trg) throws QueryException {
+  private void copy(final File src, final File trg) throws QueryException, IOException {
     if(src.isDirectory()) {
       if(!trg.mkdir()) FILE_CREATE.thrw(info, trg);
       final File[] files = src.listFiles();
       if(files == null) FILE_LIST.thrw(info, src);
       for(final File f : files) copy(f, new File(trg, f.getName()));
     } else {
-      try {
-        new IOFile(src).copyTo(new IOFile(trg));
-      } catch(final IOException ex) {
-        FILE_IO.thrw(info, ex);
-      }
+      new IOFile(src).copyTo(new IOFile(trg));
     }
   }
 

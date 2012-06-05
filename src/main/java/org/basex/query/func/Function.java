@@ -557,7 +557,7 @@ public enum Function {
   /** XQuery function */
   _FILE_EXISTS(FNFile.class, "exists(path)", BLN, STR),
   /** XQuery function */
-  _FILE_IS_DIRECTORY(FNFile.class, "is-directory(path)", BLN, STR),
+  _FILE_IS_DIR(FNFile.class, "is-dir(path)", BLN, STR),
   /** XQuery function */
   _FILE_IS_FILE(FNFile.class, "is-file(path)", BLN, STR),
   /** XQuery function */
@@ -577,7 +577,7 @@ public enum Function {
   /** XQuery function */
   _FILE_LIST(FNFile.class, "list(path[,recursive[,pattern]])", STR_ZM, 1, STR, BLN, STR),
   /** XQuery function */
-  _FILE_CREATE_DIRECTORY(FNFile.class, "create-directory(path)", EMP, STR),
+  _FILE_CREATE_DIR(FNFile.class, "create-dir(path)", EMP, STR),
   /** XQuery function */
   _FILE_DELETE(FNFile.class, "delete(path)", EMP, 1, STR, BLN),
   /** XQuery function */
@@ -590,11 +590,17 @@ public enum Function {
   /** XQuery function */
   _FILE_WRITE(FNFile.class, "write(path,data[,params])", EMP, 2, STR, ITEM_ZM, NOD),
   /** XQuery function */
-  _FILE_WRITE_BINARY(FNFile.class, "write-binary(path,item)", EMP, STR, ITEM_ZM),
+  _FILE_WRITE_BINARY(FNFile.class, "write-binary(path,item)", EMP, STR, BIN_ZM),
+  /** XQuery function */
+  _FILE_WRITE_TEXT(FNFile.class, "write-text(path,texts[,encoding])",
+      EMP, 2, STR, STR_ZM, STR),
   /** XQuery function */
   _FILE_APPEND(FNFile.class, "append(path,data[,params])", EMP, 2, STR, ITEM_ZM, NOD),
   /** XQuery function */
-  _FILE_APPEND_BINARY(FNFile.class, "append-binary(path,item)", EMP, STR, ITEM_ZM),
+  _FILE_APPEND_BINARY(FNFile.class, "append-binary(path,item)", EMP, STR, BIN_ZM),
+  /** XQuery function */
+  _FILE_APPEND_TEXT(FNFile.class, "append-text(path,texts[,encoding])",
+      EMP, 2, STR, STR_ZM, STR),
   /** XQuery function */
   _FILE_COPY(FNFile.class, "copy(source,target)", EMP, STR, STR),
   /** XQuery function */

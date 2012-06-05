@@ -191,6 +191,11 @@ public final class SeqType {
   /** Zero or more xs:base64Binary. */
   public static final SeqType B64_ZM = new SeqType(AtomType.B64, Occ.ZERO_MORE);
 
+  /** Single binary. */
+  public static final SeqType BIN = AtomType.BIN.seqType();
+  /** Zero or more binaries. */
+  public static final SeqType BIN_ZM = new SeqType(AtomType.BIN, Occ.ZERO_MORE);
+
   /** Sequence type. */
   public final Type type;
   /** Number of occurrences. */

@@ -250,6 +250,7 @@ public final class FNGen extends StandardFunc {
    * @return result
    */
   static Iter textIter(final byte[] str) {
+    // not I/O exception expected, as input is a main-memory array
     try {
       final NewlineInput nli = new NewlineInput(new ArrayInput(str));
       return new Iter() {

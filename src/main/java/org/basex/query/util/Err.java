@@ -213,7 +213,7 @@ public enum Err {
   /** FILE0002. */
   FILE_EXISTS(FILE, 2, "File '%' already exists."),
   /** FILE0003. */
-  FILE_NODIR(FILE, 3, "Path '%' is not a directory."),
+  FILE_NODIR(FILE, 3, "Path '%' is no directory."),
   /** FILE0004. */
   FILE_DIR(FILE, 4, "Path '%' is a directory."),
   /** FILE0005. */
