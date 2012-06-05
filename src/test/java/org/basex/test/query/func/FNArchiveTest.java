@@ -112,7 +112,7 @@ public final class FNArchiveTest extends AdvancedQueryTest {
     // extract single entry
     query("let $a := " + _FILE_READ_BINARY.args(ZIP) +
           "let $b := " + _ARCHIVE_EXTRACT_BINARY.args("$a", "test/input.xml") +
-          "let $c := " + _CONVERT_TO_STRING.args("$b") +
+          "let $c := " + _CONVERT_BINARY_TO_STRING.args("$b") +
           "let $d := " + PARSE_XML.args("$c") +
           "return $d//title/text()", "XML");
   }

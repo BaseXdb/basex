@@ -214,7 +214,7 @@ public abstract class SessionTest extends SandboxTest {
     session.execute("create db " + NAME);
     session.store("X", new ArrayInput(new byte[] { -128, -2, -1, 0, 1, 127 }));
     assertEqual("-128 -2 -1 0 1 127", session.query(
-        _CONVERT_TO_BYTES.args(_DB_RETRIEVE.args(NAME, "X"))).execute());
+        _CONVERT_BINARY_TO_BYTES.args(_DB_RETRIEVE.args(NAME, "X"))).execute());
   }
 
   /**

@@ -469,14 +469,19 @@ public enum Function {
   _CONVERT_INTEGER_FROM_BASE(FNConvert.class, "integer-from-base(str,base)",
       ITR, STR, ITR),
   /** Conversion function. */
-  _CONVERT_TO_BYTES(FNConvert.class, "to-bytes(binary)", BYT_ZM, ITEM),
+  _CONVERT_BINARY_TO_BYTES(FNConvert.class, "binary-to-bytes(binary)", BYT_ZM, ITEM),
   /** Conversion function. */
-  _CONVERT_TO_STRING(FNConvert.class, "to-string(binary[,encoding])", STR, 1, ITEM, STR),
+  _CONVERT_BINARY_TO_STRING(FNConvert.class, "binary-to-string(binary[,encoding])",
+      STR, 1, ITEM, STR),
   /** Conversion function. */
-  _CONVERT_TO_BASE64BINARY(FNConvert.class, "to-base64Binary(string[,encoding])",
+  _CONVERT_BYTES_TO_HEX(FNConvert.class, "bytes-to-hex(bytes)", HEX, BYT_ZM),
+  /** Conversion function. */
+  _CONVERT_BYTES_TO_BASE64(FNConvert.class, "bytes-to-base64(bytes)", B64, 1, BYT_ZM),
+  /** Conversion function. */
+  _CONVERT_STRING_TO_BASE64(FNConvert.class, "string-to-base64(string[,encoding])",
       B64, 1, STR, STR),
   /** Conversion function. */
-  _CONVERT_TO_HEXBINARY(FNConvert.class, "to-hexBinary(string[,encoding])",
+  _CONVERT_STRING_TO_HEX(FNConvert.class, "string-to-hex(string[,encoding])",
       HEX, 1, STR, STR),
 
   /* FNDb functions. */

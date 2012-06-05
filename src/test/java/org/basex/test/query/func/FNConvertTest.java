@@ -20,57 +20,77 @@ public final class FNConvertTest extends AdvancedQueryTest {
   static final PrintStream NULL = new PrintStream(new NullOutput());
 
   /**
-   * Test method for the util:to-string() function.
+   * Test method for the util:binary-to-string() function.
    */
   @Test
-  public void utilToString() {
-    check(_CONVERT_TO_STRING);
-    query(_CONVERT_TO_STRING.args("xs:base64Binary(xs:hexBinary('41'))"), "A");
-    query(_CONVERT_TO_STRING.args("xs:hexBinary('41')"), "A");
-    query(_CONVERT_TO_STRING.args("xs:hexBinary('41')", "CP1252"), "A");
-    error(_CONVERT_TO_STRING.args("xs:hexBinary('41')", "X"), Err.BXCO_ENCODING);
+  public void utilBinaryToString() {
+    check(_CONVERT_BINARY_TO_STRING);
+    query(_CONVERT_BINARY_TO_STRING.args("xs:base64Binary(xs:hexBinary('41'))"), "A");
+    query(_CONVERT_BINARY_TO_STRING.args("xs:hexBinary('41')"), "A");
+    query(_CONVERT_BINARY_TO_STRING.args("xs:hexBinary('41')", "CP1252"), "A");
+    error(_CONVERT_BINARY_TO_STRING.args("xs:hexBinary('41')", "X"), Err.BXCO_ENCODING);
   }
 
   /**
-   * Test method for the util:to-base64Binary() function.
+   * Test method for the util:string-to-base64() function.
    */
   @Test
-  public void utilToBase64Binary() {
-    check(_CONVERT_TO_BASE64BINARY);
-    query(_CONVERT_TO_BASE64BINARY.args("a"), "YQ==");
-    query(_CONVERT_TO_BASE64BINARY.args("a", "UTF-8"), "YQ==");
-    query(_CONVERT_TO_BASE64BINARY.args("a", "US-ASCII"), "YQ==");
-    error(_CONVERT_TO_BASE64BINARY.args("\u00fc", "US-ASCII"), Err.BXCO_BASE64);
-    error(_CONVERT_TO_BASE64BINARY.args("a", "X"), Err.BXCO_ENCODING);
+  public void utilStringToBase64() {
+    check(_CONVERT_STRING_TO_BASE64);
+    query(_CONVERT_STRING_TO_BASE64.args("a"), "YQ==");
+    query(_CONVERT_STRING_TO_BASE64.args("a", "UTF-8"), "YQ==");
+    query(_CONVERT_STRING_TO_BASE64.args("a", "US-ASCII"), "YQ==");
+    error(_CONVERT_STRING_TO_BASE64.args("\u00fc", "US-ASCII"), Err.BXCO_BASE64);
+    error(_CONVERT_STRING_TO_BASE64.args("a", "X"), Err.BXCO_ENCODING);
   }
 
   /**
-   * Test method for the util:to-hexBinary() function.
+   * Test method for the util:bytes-to-base64() function.
    */
   @Test
-  public void utilToHexBinary() {
-    check(_CONVERT_TO_HEXBINARY);
-    query(_CONVERT_TO_HEXBINARY.args("a"), "61");
-    query(_CONVERT_TO_HEXBINARY.args("a", "UTF-8"), "61");
-    query(_CONVERT_TO_HEXBINARY.args("a", "US-ASCII"), "61");
-    error(_CONVERT_TO_HEXBINARY.args("\u00fc", "US-ASCII"), Err.BXCO_BASE64);
-    error(_CONVERT_TO_HEXBINARY.args("a", "X"), Err.BXCO_ENCODING);
+  public void utilBytesToBase64() {
+    check(_CONVERT_BYTES_TO_BASE64);
+    query(_CONVERT_BYTES_TO_BASE64.args("xs:byte(97)"), "YQ==");
+    query(_CONVERT_BYTES_TO_BASE64.args("()"), "");
   }
 
   /**
-   * Test method for the util:to-bytes() function.
+   * Test method for the util:string-to-hex() function.
+   */
+  @Test
+  public void utilStringToHex() {
+    check(_CONVERT_STRING_TO_HEX);
+    query(_CONVERT_STRING_TO_HEX.args("a"), "61");
+    query(_CONVERT_STRING_TO_HEX.args("a", "UTF-8"), "61");
+    query(_CONVERT_STRING_TO_HEX.args("a", "US-ASCII"), "61");
+    error(_CONVERT_STRING_TO_HEX.args("\u00fc", "US-ASCII"), Err.BXCO_BASE64);
+    error(_CONVERT_STRING_TO_HEX.args("a", "X"), Err.BXCO_ENCODING);
+  }
+
+  /**
+   * Test method for the util:bytes-to-hex() function.
+   */
+  @Test
+  public void utilBytesToHex() {
+    check(_CONVERT_BYTES_TO_HEX);
+    query(_CONVERT_BYTES_TO_HEX.args("xs:byte(1)"), "01");
+    query(_CONVERT_BYTES_TO_HEX.args(" for $i in 1 to 3 return xs:byte($i)"), "010203");
+  }
+
+  /**
+   * Test method for the util:binary-to-bytes() function.
    */
   @Test
   public void utilToBytes() {
-    check(_CONVERT_TO_BYTES);
-    query(_CONVERT_TO_BYTES.args("xs:base64Binary('QmFzZVggaXMgY29vbA==')"),
+    check(_CONVERT_BINARY_TO_BYTES);
+    query(_CONVERT_BINARY_TO_BYTES.args("xs:base64Binary('QmFzZVggaXMgY29vbA==')"),
       "66 97 115 101 88 32 105 115 32 99 111 111 108");
-    query(_CONVERT_TO_BYTES.args("xs:base64Binary(xs:hexBinary('4261736558'))"),
+    query(_CONVERT_BINARY_TO_BYTES.args("xs:base64Binary(xs:hexBinary('4261736558'))"),
       "66 97 115 101 88");
-    query(_CONVERT_TO_BYTES.args("xs:base64Binary(<x>AAE=</x>)"), "0 1");
-    query(_CONVERT_TO_BYTES.args("a"), 97);
-    query(COUNT.args(_CONVERT_TO_BYTES.args("\u00e4")), 2);
-    query(COUNT.args(_CONVERT_TO_BYTES.args(123)), 3);
+    query(_CONVERT_BINARY_TO_BYTES.args("xs:base64Binary(<x>AAE=</x>)"), "0 1");
+    query(_CONVERT_BINARY_TO_BYTES.args("a"), 97);
+    query(COUNT.args(_CONVERT_BINARY_TO_BYTES.args("\u00e4")), 2);
+    query(COUNT.args(_CONVERT_BINARY_TO_BYTES.args(123)), 3);
   }
 
   /**

@@ -6,6 +6,7 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.lang.reflect.*;
+import java.lang.reflect.Array;
 import java.math.*;
 import java.net.*;
 
@@ -21,6 +22,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.value.type.Type;
 import org.basex.util.*;
 import org.w3c.dom.*;
@@ -100,34 +102,57 @@ public abstract class JavaMapping extends Arr {
     if(res instanceof Value) return (Value) res;
     if(res instanceof Iter) return ((Iter) res).value();
     // find XQuery mapping for specified type
-    final Type type = type(res);
+    Type type = type(res);
     if(type != null) return type.cast(res, null);
 
-    if(!res.getClass().isArray()) return new Jav(res);
+    // character array: string
+    if(res instanceof char[]) return Str.get(new String((char[]) res));
 
-    final ValueBuilder vb = new ValueBuilder();
+    // no array: return Java type
+    if(!res.getClass().isArray()) return new Jav(res);
+    final int s = Array.getLength(res);
+    // empty array: empty sequence
+    if(s == 0) return Empty.SEQ;
+
+    // byte array: byte sequence
+    if(res instanceof byte[]) {
+      final byte[] values = (byte[]) res;
+      return s > 1 ? new ByteSeq(values) : new Int(values[0], AtomType.BYT);
+    }
+
+    final Item[] items = new Item[s];
     if(res instanceof boolean[]) {
-      for(final boolean o : (boolean[]) res) vb.add(Bln.get(o));
-    } else if(res instanceof char[]) {
-      vb.add(Str.get(new String((char[]) res)));
-    } else if(res instanceof byte[]) {
-      for(final byte o : (byte[]) res) vb.add(new Int(o, AtomType.BYT));
+      type = AtomType.BLN;
+      final boolean[] values = (boolean[]) res;
+      for(int v = 0; v < s; v++) items[v] = Bln.get(values[v]);
     } else if(res instanceof short[]) {
-      for(final short o : (short[]) res) vb.add(new Int(o, AtomType.SHR));
+      type = AtomType.SHR;
+      final short[] values = (short[]) res;
+      for(int v = 0; v < s; v++) items[v] = new Int(values[v], type);
     } else if(res instanceof int[]) {
-      for(final int o : (int[]) res) vb.add(new Int(o, AtomType.INT));
+      type = AtomType.INT;
+      final int[] values = (int[]) res;
+      for(int v = 0; v < s; v++) items[v] = new Int(values[v], type);
     } else if(res instanceof long[]) {
-      for(final long o : (long[]) res) vb.add(Int.get(o));
+      type = AtomType.ITR;
+      final long[] values = (long[]) res;
+      for(int v = 0; v < s; v++) items[v] = Int.get(values[v]);
     } else if(res instanceof float[]) {
-      for(final float o : (float[]) res) vb.add(Flt.get(o));
+      type = AtomType.FLT;
+      final float[] values = (float[]) res;
+      for(int v = 0; v < s; v++) items[v] = Flt.get(values[v]);
     } else if(res instanceof double[]) {
-      for(final double o : (double[]) res) vb.add(Dbl.get(o));
+      type = AtomType.DBL;
+      final double[] values = (double[]) res;
+      for(int v = 0; v < s; v++) items[v] = Dbl.get(values[v]);
     } else {
+      final ValueBuilder vb = new ValueBuilder();
       for(final Object o : (Object[]) res) {
         vb.add(o instanceof Value ? (Value) o : new Jav(o));
       }
+      return vb.value();
     }
-    return vb.value();
+    return Seq.get(items, s, SeqType.get(type, Occ.ONE_MORE));
   }
 
   /**

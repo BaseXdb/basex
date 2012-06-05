@@ -66,7 +66,7 @@ public final class DBNodeSeq extends Seq {
 
   @Override
   public SeqType type() {
-    return SeqType.NOD_OM;
+    return SeqType.DOC_OM;
   }
 
   @Override
@@ -94,6 +94,6 @@ public final class DBNodeSeq extends Seq {
 
   @Override
   public boolean homogenous() {
-    return false;
+    return true;
   }
 }

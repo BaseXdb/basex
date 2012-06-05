@@ -46,7 +46,18 @@ public abstract class Seq extends Value {
    * @return resulting item or sequence
    */
   public static Value get(final Item[] v, final int s) {
-    return s == 0 ? Empty.SEQ : s == 1 ? v[0] : new ItemSeq(v, s);
+    return get(v, s, null);
+  }
+
+  /**
+   * Returns a value representation of the specified items.
+   * @param v value
+   * @param s size
+   * @param t sequence type
+   * @return resulting item or sequence
+   */
+  public static Value get(final Item[] v, final int s, final SeqType t) {
+    return s == 0 ? Empty.SEQ : s == 1 ? v[0] : new ItemSeq(v, s, t);
   }
 
   @Override

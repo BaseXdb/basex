@@ -32,6 +32,17 @@ public final class ItemSeq extends Seq {
     item = it;
   }
 
+  /**
+   * Constructor.
+   * @param it items
+   * @param s size
+   * @param t sequence type
+   */
+  ItemSeq(final Item[] it, final int s, final SeqType t) {
+    this(it, s);
+    seq = t;
+  }
+
   @Override
   public Item ebv(final QueryContext ctx, final InputInfo ii) throws QueryException {
     if(!item[0].type.isNode()) CONDTYPE.thrw(ii, this);
@@ -87,7 +98,6 @@ public final class ItemSeq extends Seq {
 
   @Override
   public boolean homogenous() {
-    // [LW] really check it?
-    return false;
+    return type != AtomType.ITEM;
   }
 }

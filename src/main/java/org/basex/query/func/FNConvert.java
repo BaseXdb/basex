@@ -39,19 +39,21 @@ public final class FNConvert extends StandardFunc {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(sig) {
-      case _CONVERT_TO_BYTES: return toBytes(ctx);
-      default:                return super.iter(ctx);
+      case _CONVERT_BINARY_TO_BYTES: return binaryToBytes(ctx);
+      default:                       return super.iter(ctx);
     }
   }
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
-      case _CONVERT_INTEGER_FROM_BASE: return fromBase(ctx, ii);
-      case _CONVERT_INTEGER_TO_BASE:   return toBase(ctx, ii);
-      case _CONVERT_TO_STRING:         return toString(ctx);
-      case _CONVERT_TO_BASE64BINARY:   return toBase64(ctx);
-      case _CONVERT_TO_HEXBINARY:      return toHex(ctx);
+      case _CONVERT_INTEGER_FROM_BASE: return integerFromBase(ctx, ii);
+      case _CONVERT_INTEGER_TO_BASE:   return integerToBase(ctx, ii);
+      case _CONVERT_BINARY_TO_STRING:  return toString(ctx);
+      case _CONVERT_STRING_TO_BASE64:  return new B64(stringToBinary(ctx));
+      case _CONVERT_BYTES_TO_BASE64:   return new B64(bytesToBinary(ctx));
+      case _CONVERT_STRING_TO_HEX:     return new Hex(stringToBinary(ctx));
+      case _CONVERT_BYTES_TO_HEX:      return new Hex(bytesToBinary(ctx));
       default:                         return super.item(ctx, ii);
     }
   }
@@ -92,7 +94,9 @@ public final class FNConvert extends StandardFunc {
    * @return string representation of the given number
    * @throws QueryException query exception
    */
-  private Str toBase(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  private Str integerToBase(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+
     final long num = checkItr(expr[0], ctx), base = checkItr(expr[1], ctx);
     if(base < 2 || base > 36) INVBASE.thrw(ii, base);
 
@@ -130,7 +134,9 @@ public final class FNConvert extends StandardFunc {
    * @return read integer
    * @throws QueryException exception
    */
-  private Int fromBase(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  private Int integerFromBase(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+
     final byte[] str = checkStr(expr[0], ctx);
     final long base = checkItr(expr[1], ctx);
     if(base < 2 || base > 36) INVBASE.thrw(ii, base);
@@ -154,7 +160,7 @@ public final class FNConvert extends StandardFunc {
    * @return resulting value
    * @throws QueryException query exception
    */
-  private Iter toBytes(final QueryContext ctx) throws QueryException {
+  private Iter binaryToBytes(final QueryContext ctx) throws QueryException {
     final Item it = checkItem(expr[0], ctx);
     final ByteList bl = new ByteList();
     final InputStream is = it.input(info);
@@ -227,36 +233,15 @@ public final class FNConvert extends StandardFunc {
   }
 
   /**
-   * Converts the specified string to base64Binary.
+   * Converts the first argument from a string to a byte array.
    * @param ctx query context
    * @return resulting value
    * @throws QueryException query exception
    */
-  private B64 toBase64(final QueryContext ctx) throws QueryException {
-    return new B64(toBinary(ctx));
-  }
-
-  /**
-   * Converts the specified string to hexBinary.
-   * @param ctx query context
-   * @return resulting value
-   * @throws QueryException query exception
-   */
-  private Hex toHex(final QueryContext ctx) throws QueryException {
-    return new Hex(toBinary(ctx));
-  }
-
-  /**
-   * Converts the specified string to Base64.
-   * @param ctx query context
-   * @return resulting value
-   * @throws QueryException query exception
-   */
-  private byte[] toBinary(final QueryContext ctx) throws QueryException {
+  private byte[] stringToBinary(final QueryContext ctx) throws QueryException {
     final byte[] in = checkStr(expr[0], ctx);
     final String enc = encoding(1, BXCO_ENCODING, ctx);
     if(enc == null || enc == Token.UTF8) return in;
-
     try {
       final CharsetEncoder ce = Charset.forName(enc).newEncoder();
       final CharBuffer cb = CharBuffer.wrap(Token.string(in));
@@ -264,5 +249,25 @@ public final class FNConvert extends StandardFunc {
     } catch(final CharacterCodingException ex) {
       throw BXCO_BASE64.thrw(info);
     }
+  }
+
+  /**
+   * Converts the first argument from a byte sequence to a byte array.
+   * @param ctx query context
+   * @return resulting value
+   * @throws QueryException query exception
+   */
+  private byte[] bytesToBinary(final QueryContext ctx) throws QueryException {
+    final Value v = expr[0].value(ctx);
+    // directly pass on byte array
+    if(v instanceof ByteSeq) return ((ByteSeq) v).bytes();
+
+    // check if all arguments are bytes
+    final Iter ir = v.iter();
+    final ByteList bl = new ByteList(Math.max(ElementList.CAP, (int) v.size()));
+    for(Item it; (it = ir.next()) != null;) {
+      bl.add((int) ((Int) checkType(it, AtomType.BYT)).itr());
+    }
+    return bl.toArray();
   }
 }

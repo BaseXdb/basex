@@ -226,9 +226,10 @@ public abstract class Expr extends ExprInfo {
   public abstract SeqType type();
 
   /**
-   * Returns true if the expression is iterable, i.e., if it does not contain
-   * any duplicates and if all results are sorted.
-   * This method is called e.g. by {@link AxisPath}.
+   * Returns true if the expression is iterable, i.e., if it will not contain
+   * any duplicate nodes and if all nodes will be are sorted.
+   * The return value of this method is only relevant for node sequences.
+   * It is e.g. called by {@link AxisPath}.
    * @return result of check
    */
   public boolean iterable() {
