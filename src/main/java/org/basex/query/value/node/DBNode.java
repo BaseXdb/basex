@@ -465,7 +465,8 @@ public class DBNode extends ANode {
   @Override
   public byte[] xdmInfo() {
     final ByteList bl = new ByteList().add(typeId());
-    if(type == NodeType.ATT) bl.add(qname().uri()).add(0);
+    if(type == NodeType.DOC) bl.add(baseURI()).add(0);
+    else if(type == NodeType.ATT) bl.add(qname().uri()).add(0);
     return bl.toArray();
   }
 
