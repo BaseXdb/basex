@@ -39,8 +39,16 @@ public final class FNConvert extends StandardFunc {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(sig) {
-      case _CONVERT_BINARY_TO_BYTES: return binaryToBytes(ctx);
+      case _CONVERT_BINARY_TO_BYTES: return binaryToBytes(ctx).iter();
       default:                       return super.iter(ctx);
+    }
+  }
+
+  @Override
+  public Value value(final QueryContext ctx) throws QueryException {
+    switch(sig) {
+      case _CONVERT_BINARY_TO_BYTES: return binaryToBytes(ctx);
+      default:                       return super.value(ctx);
     }
   }
 
@@ -160,39 +168,12 @@ public final class FNConvert extends StandardFunc {
    * @return resulting value
    * @throws QueryException query exception
    */
-  private Iter binaryToBytes(final QueryContext ctx) throws QueryException {
-    final Item it = checkItem(expr[0], ctx);
-    final ByteList bl = new ByteList();
-    final InputStream is = it.input(info);
+  private Value binaryToBytes(final QueryContext ctx) throws QueryException {
     try {
-      try {
-        for(int ch; (ch = is.read()) != -1;) bl.add(ch);
-      } finally {
-        is.close();
-      }
+      return new ByteSeq(checkItem(expr[0], ctx).input(info).content());
     } catch(final IOException ex) {
-      BXCO_STRING.thrw(info, ex);
+      throw BXCO_STRING.thrw(info, ex);
     }
-
-    return new ValueIter() {
-      final int bs = bl.size();
-      int pos;
-
-      @Override
-      public Value value() {
-        final long[] tmp = new long[bs - pos];
-        for(int i = 0; i < tmp.length; i++) tmp[i] = bl.get(pos + i);
-        return IntSeq.get(tmp, AtomType.BYT);
-      }
-      @Override
-      public Item get(final long i) { return Int.get(bl.get((int) i), AtomType.BYT); }
-      @Override
-      public Item next() { return pos < size() ? get(pos++) : null; }
-      @Override
-      public boolean reset() { pos = 0; return true; }
-      @Override
-      public long size() { return bs; }
-    };
   }
 
   /**
