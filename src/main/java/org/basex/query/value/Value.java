@@ -1,5 +1,7 @@
 package org.basex.query.value;
 
+import static org.basex.query.QueryText.*;
+
 import java.io.*;
 import java.util.*;
 
@@ -125,7 +127,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
 
   @Override
   public String description() {
-    return type.toString();
+    return type + " " + SEQUENCE;
   }
 
   /**

@@ -19,8 +19,8 @@ import org.basex.util.*;
 public final class ItemSeq extends Seq {
   /** Item array. */
   private final Item[] item;
-  /** Sequence type. */
-  private SeqType seq;
+  /** Item Types. */
+  private Type ret;
 
   /**
    * Constructor.
@@ -38,9 +38,9 @@ public final class ItemSeq extends Seq {
    * @param s size
    * @param t sequence type
    */
-  ItemSeq(final Item[] it, final int s, final SeqType t) {
+  ItemSeq(final Item[] it, final int s, final Type t) {
     this(it, s);
-    seq = t;
+    ret = t;
   }
 
   @Override
@@ -51,14 +51,14 @@ public final class ItemSeq extends Seq {
 
   @Override
   public SeqType type() {
-    if(seq == null) {
+    if(ret == null) {
       Type t = item[0].type;
-      for(int s = 1; s != size && t != AtomType.ITEM; ++s) {
+      for(int s = 1; s < size && t != AtomType.ITEM; s++) {
         if(t != item[s].type) t = AtomType.ITEM;
       }
-      seq = SeqType.get(t, Occ.ONE_MORE);
+      ret = t;
     }
-    return seq;
+    return SeqType.get(ret, Occ.ONE_MORE);
   }
 
   @Override
@@ -98,6 +98,6 @@ public final class ItemSeq extends Seq {
 
   @Override
   public boolean homogenous() {
-    return type != AtomType.ITEM;
+    return ret != null && ret != AtomType.ITEM;
   }
 }

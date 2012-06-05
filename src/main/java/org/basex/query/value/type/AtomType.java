@@ -662,12 +662,6 @@ public enum AtomType implements Type {
   /** NOTATION Type. */
   NOT("NOTATION", AAT, XSURI, false, false, false, false, false, 83),
 
-  /** Empty sequence type. */
-  EMP("empty-sequence", null, EMPTY, false, false, false, false, false, 84),
-
-  /** Sequence type. */
-  SEQ("sequence", null, EMPTY, false, false, false, false, false, 85),
-
   /** Java type. */
   JAVA("java", null, EMPTY, true, true, true, false, false, 86) {
     @Override

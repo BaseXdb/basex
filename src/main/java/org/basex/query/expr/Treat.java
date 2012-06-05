@@ -10,6 +10,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.Occ;
 import org.basex.util.*;
 
 /**
@@ -40,14 +41,17 @@ public final class Treat extends Single {
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Iter iter = ctx.iter(expr);
     final Item it = iter.next();
+    // input is empty
     if(it == null) {
       if(type.mayBeZero()) return Empty.ITER;
       throw XPEMPTY.thrw(info, description());
     }
+    // treat as empty sequence
+    if(type.occ == Occ.ZERO) NOTREAT.thrw(info, description(), it.type, type);
+
     if(type.zeroOrOne()) {
       if(iter.next() != null) NOTREATS.thrw(info, description(), type);
-      if(!it.type.instanceOf(type.type))
-        NOTREAT.thrw(info, description(), it.type, type);
+      if(!it.type.instanceOf(type.type)) NOTREAT.thrw(info, description(), it.type, type);
       return it.iter();
     }
 
@@ -71,15 +75,18 @@ public final class Treat extends Single {
     final Value val = ctx.value(expr);
 
     final long len = val.size();
+    // input is empty
     if(len == 0) {
       if(type.mayBeZero()) return val;
       throw XPEMPTY.thrw(info, description());
     }
+    // treat as empty sequence
+    if(type.occ == Occ.ZERO) NOTREAT.thrw(info, description(), val.type, type);
+
     if(type.zeroOrOne()) {
-      if(len > 1) throw NOTREATS.thrw(info, description(), type);
+      if(len > 1) NOTREATS.thrw(info, description(), type);
       final Item it = val.itemAt(0);
-      if(!it.type.instanceOf(type.type))
-        NOTREAT.thrw(info, description(), it.type, type);
+      if(!it.type.instanceOf(type.type)) NOTREAT.thrw(info, description(), it.type, type);
       return it;
     }
 
@@ -88,7 +95,6 @@ public final class Treat extends Single {
       if(!it.type.instanceOf(type.type))
         NOTREAT.thrw(info, description(), it.type, type);
     }
-
     return val;
   }
 

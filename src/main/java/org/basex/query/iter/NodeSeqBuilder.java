@@ -6,6 +6,7 @@ import org.basex.data.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -117,7 +118,7 @@ public final class NodeSeqBuilder extends AxisIter {
   @Override
   public Value value() {
     if(check) sort(sort);
-    return Seq.get(item, size);
+    return Seq.get(item, size, NodeType.NOD);
   }
 
   /**

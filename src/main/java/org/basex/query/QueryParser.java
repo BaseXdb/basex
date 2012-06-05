@@ -50,7 +50,7 @@ public class QueryParser extends InputParser {
   /** Reserved function names (sorted). */
   private static final byte[][] KEYWORDS = {
     NodeType.ATT.string(), NodeType.COM.string(), NodeType.DOC.string(),
-    NodeType.ELM.string(), AtomType.EMP.string(), FuncType.ANY_FUN.string(),
+    NodeType.ELM.string(), token(EMPTY_SEQUENCE), FuncType.ANY_FUN.string(),
     token(IF), AtomType.ITEM.string(),
     NodeType.NSP.string(), NodeType.NOD.string(), NodeType.PI.string(),
     token(SCHEMA_ATTRIBUTE), token(SCHEMA_ELEMENT), token(SWITCH),
@@ -779,7 +779,7 @@ public class QueryParser extends InputParser {
     if(module != null) error(DECITEM);
 
     final SeqType st = optAsType();
-    if(st != null && st.type == AtomType.EMP) error(NOTYPE, st);
+    if(st != null && st.occ == Occ.ZERO) error(NOTYPE, st);
     ctx.sc.initType = st;
     if(!wsConsumeWs(EXTERNAL)) wsCheck(ASSIGN);
     else if(!wsConsumeWs(ASSIGN)) return;
@@ -2626,10 +2626,10 @@ public class QueryParser extends InputParser {
    */
   private SeqType sequenceType() throws QueryException {
     // empty sequence
-    if(wsConsumeWs(string(AtomType.EMP.string()), PAR1, null)) {
+    if(wsConsumeWs(EMPTY_SEQUENCE, PAR1, null)) {
       wsCheck(PAR1);
       wsCheck(PAR2);
-      return SeqType.get(AtomType.EMP, Occ.ONE, null);
+      return SeqType.get(AtomType.ITEM, Occ.ZERO, null);
     }
 
     // parse item type and occurrence indicator

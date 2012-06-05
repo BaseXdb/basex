@@ -1114,7 +1114,7 @@ public enum Err {
    */
   public static QueryException promote(final InputInfo ii, final SeqType t, final Value v)
       throws QueryException {
-    throw XPINVPROM.thrw(ii, v.type, t, v);
+    throw XPINVPROM.thrw(ii, v.description(), t, v);
   }
 
   /**

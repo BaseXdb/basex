@@ -26,7 +26,7 @@ public abstract class Seq extends Value {
    * @param s size
    */
   Seq(final long s) {
-    this(s, AtomType.SEQ);
+    this(s, AtomType.ITEM);
   }
 
   /**
@@ -56,7 +56,7 @@ public abstract class Seq extends Value {
    * @param t sequence type
    * @return resulting item or sequence
    */
-  public static Value get(final Item[] v, final int s, final SeqType t) {
+  public static Value get(final Item[] v, final int s, final Type t) {
     return s == 0 ? Empty.SEQ : s == 1 ? v[0] : new ItemSeq(v, s, t);
   }
 

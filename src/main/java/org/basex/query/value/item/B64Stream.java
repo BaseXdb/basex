@@ -51,8 +51,7 @@ public final class B64Stream extends B64 {
   @Override
   public BufferInput input(final InputInfo ii) throws QueryException {
     try {
-      final InputStream is = input.inputStream();
-      return is instanceof BufferInput ? (BufferInput) is : new BufferInput(is);
+      return new BufferInput(input);
     } catch(final IOException ex) {
       throw error.thrw(ii, ex);
     }

@@ -252,6 +252,11 @@ public abstract class Item extends Value {
   }
 
   @Override
+  public String description() {
+    return type.toString();
+  }
+
+  @Override
   public void plan(final FElem plan) {
     try {
       addPlan(plan, planElem(VAL, string(null), TYP, type));

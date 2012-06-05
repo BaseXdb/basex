@@ -12,6 +12,7 @@ import org.basex.io.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -216,7 +217,7 @@ public final class QueryResources {
       final QueryInput qi = new QueryInput(paths[n]);
       nodes[n] = new DBNode(create(qi, true, null), 0, Data.DOC);
     }
-    addCollection(Seq.get(nodes, ns), name);
+    addCollection(Seq.get(nodes, ns, NodeType.DOC), name);
   }
 
   // PRIVATE METHODS ====================================================================

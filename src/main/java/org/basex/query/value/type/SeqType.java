@@ -1,5 +1,6 @@
 package org.basex.query.value.type;
 
+import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
@@ -72,7 +73,7 @@ public final class SeqType {
   }
 
   /** Zero items. */
-  public static final SeqType EMP = new SeqType(AtomType.EMP, Occ.ZERO);
+  public static final SeqType EMP = new SeqType(AtomType.ITEM, Occ.ZERO);
   /** Single item. */
   public static final SeqType ITEM = AtomType.ITEM.seqType();
   /** Zero or one item. */
@@ -215,7 +216,7 @@ public final class SeqType {
   }
 
   /**
-   * Constructor. This one is only called by {@link Type#seqType} to create
+   * Constructor. This one is called by {@link Type#seqType} to create
    * unique sequence type instances.
    * @param t type
    */
@@ -231,7 +232,7 @@ public final class SeqType {
    */
   private SeqType(final Type t, final Occ o, final Test k) {
     type = t;
-    occ = t == AtomType.EMP ? Occ.ZERO : t == AtomType.SEQ ? Occ.ONE_MORE : o;
+    occ = o;
     kind = k;
   }
 
@@ -461,7 +462,8 @@ public final class SeqType {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder().append(type);
+    final StringBuilder sb = new StringBuilder();
+    sb.append(occ == Occ.ZERO ? EMPTY_SEQUENCE + "()" : type);
     if(kind != null) sb.deleteCharAt(sb.length() - 1).append(kind).append(')');
     return sb.append(occ).toString();
   }

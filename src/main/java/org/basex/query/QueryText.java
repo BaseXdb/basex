@@ -85,6 +85,8 @@ public interface QueryText {
   /** Parser token. */
   String ELEMENT = "element";
   /** Parser token. */
+  String EMPTY_SEQUENCE = "empty-sequence";
+  /** Parser token. */
   String ELSE = "else";
   /** Parser token. */
   String EMPTYORD = "empty";
@@ -240,6 +242,8 @@ public interface QueryText {
   String SENTENCE = "sentence";
   /** Parser token. */
   String SENTENCES = "sentences";
+  /** Parser token. */
+  String SEQUENCE = "sequence";
   /** Parser token. */
   String SKIP = "skip";
   /** Parser token. */

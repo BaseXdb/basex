@@ -22,7 +22,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.value.type.Type;
 import org.basex.util.*;
 import org.w3c.dom.*;
@@ -152,7 +151,7 @@ public abstract class JavaMapping extends Arr {
       }
       return vb.value();
     }
-    return Seq.get(items, s, SeqType.get(type, Occ.ONE_MORE));
+    return Seq.get(items, s, type);
   }
 
   /**

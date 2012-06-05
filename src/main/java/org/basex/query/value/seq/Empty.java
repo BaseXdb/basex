@@ -32,7 +32,7 @@ public final class Empty extends Value {
    * Private constructor.
    */
   private Empty() {
-    super(AtomType.EMP);
+    super(AtomType.ITEM);
   }
 
   @Override
@@ -93,6 +93,10 @@ public final class Empty extends Value {
   @Override
   public int hash(final InputInfo ii) {
     return 0;
+  }
+  @Override
+  public String description() {
+    return EMPTY_SEQUENCE + "()";
   }
 
   @Override
