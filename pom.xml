@@ -17,27 +17,12 @@
       <url>http://files.basex.org/maven</url>
     </repository>
     <repository>
-      <id>xqj</id>
-      <name>XQJ Maven Repository</name>
-      <url>http://xqj.net/maven</url>
-    </repository> 
-    <repository>
       <id>central</id>
       <name>Central Maven Repository</name>
       <url>http://repo2.maven.org/maven2/</url>
     </repository>
   </repositories>
   <dependencies>
-    <dependency>
-      <groupId>net.xqj</groupId>
-      <artifactId>basex-xqj</artifactId>
-      <version>1.0.0</version>
-    </dependency>
-    <dependency>
-      <groupId>com.xqj2</groupId>
-      <artifactId>xqj2</artifactId>
-      <version>0.0.1</version>
-    </dependency>
     <dependency>
       <groupId>org.basex</groupId>
       <artifactId>basex-api</artifactId>
