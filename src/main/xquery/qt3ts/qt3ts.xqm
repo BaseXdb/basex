@@ -25,7 +25,7 @@ declare function qt3ts:to-junit(
   $out-path as xs:string,
   $supports as function(xs:string, xs:string*) as xs:boolean
 ) as empty-sequence() {
-  let $catalog := doc($path || $file:directory-separator || 'catalog.xml'),
+  let $catalog := doc($path || $file:dir-separator || 'catalog.xml'),
       $root    := replace(base-uri($catalog), 'catalog\.xml$', ''),
       $files   := qt3ts:get-files($root, $catalog),
       $envs    := qt3ts:environments(map:new(), $catalog/catalog/environment, $files)
@@ -43,9 +43,9 @@ declare function qt3ts:to-junit(
           ))
         )
   for $name in map:keys($files)
-  let $path := $out-path || $file:directory-separator || $name || '.java'
+  let $path := $out-path || $file:dir-separator || $name || '.java'
   return (
-    file:create-directory(replace($path, '[^/\\]+$', '')),
+    file:create-dir(replace($path, '[^/\\]+$', '')),
     file:write($path, $files($name), map{ 'method' := 'text' })
   )
 };
