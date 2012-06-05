@@ -105,11 +105,13 @@ public final class Add extends ACreate {
     if(prop.is(Prop.MAINMEM)) large = false;
 
     // create random database name for disk-based creation
+    large = true;
     final String db = large ? context.mprop.random(data.meta.name) : name;
     build = large ? new DiskBuilder(db, parser, context) : new MemBuilder(db, parser);
 
+    Data tmp = null;
     try {
-      final Data tmp = build.build();
+      tmp = build.build();
       // skip update if fragment is empty
       if(tmp.meta.size > 1) {
         if(lock && !data.startUpdate()) return error(DB_PINNED_X, data.meta.name);
@@ -124,6 +126,7 @@ public final class Add extends ACreate {
       return error(Util.message(ex));
     } finally {
       // close and drop intermediary database instance
+      if(tmp != null) tmp.close();
       if(large) DropDB.drop(db, context);
     }
   }
