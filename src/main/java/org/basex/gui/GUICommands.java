@@ -110,7 +110,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Closes the database. */
-  C_CLOSE(CLOSE, "% W", H_CLOSE, true, false) {
+  C_CLOSE(CLOSE, null, H_CLOSE, true, false) {
     @Override
     public void execute(final GUI gui) {
       gui.execute(new Close());
@@ -127,7 +127,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Opens a query file. */
-  C_EDITNEW(NEW + DOTS, "% shift N", H_NEW_FILE, false, false) {
+  C_EDITNEW(NEW + DOTS, "% T", H_NEW_FILE, false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.newFile();
@@ -164,7 +164,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Closes the current editor file. */
-  C_EDITCLOSE(CLOSE, "% shift W", H_CLOSE_FILE, false, false) {
+  C_EDITCLOSE(CLOSE, "% W", H_CLOSE_FILE, false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.close(null);
