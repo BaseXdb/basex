@@ -1,5 +1,6 @@
 package org.basex.build;
 
+import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 
 import java.io.*;
@@ -36,6 +37,8 @@ public final class DiskBuilder extends Builder {
   final Context context;
   /** Text compressor. */
   private final Compress comp;
+  /** Debug counter. */
+  private int c;
 
   /**
    * Constructor.
@@ -76,7 +79,12 @@ public final class DiskBuilder extends Builder {
       xout = new DataOutput(md.dbfile(DATATXT), bs);
       vout = new DataOutput(md.dbfile(DATAATV), bs);
       sout = new DataOutput(md.dbfile(DATATMP), bs);
+
+      final Performance perf = Prop.debug ? new Performance() : null;
+      Util.debug(tit() + DOTS);
       parse();
+      Util.memory(perf);
+
     } finally {
       close();
     }
@@ -137,6 +145,8 @@ public final class DiskBuilder extends Builder {
     tout.write4(dist);
     tout.write4(asize);
     tout.write4(meta.size++);
+
+    if(Prop.debug && (c++ & 0x7FFFF) == 0) Util.err(".");
   }
 
   @Override

@@ -51,8 +51,6 @@ public abstract class Builder extends Progress {
   private final IntList tstack = new IntList();
   /** Current tree height. */
   private int level;
-  /** Element counter. */
-  private int c;
 
   /**
    * Constructor.
@@ -71,9 +69,6 @@ public abstract class Builder extends Progress {
    * @throws IOException I/O exception
    */
   final void parse() throws IOException {
-    final Performance perf = Prop.debug ? new Performance() : null;
-    Util.debug(tit() + DOTS);
-
     // add document node and parse document
     parser.parse(this);
 
@@ -85,8 +80,6 @@ public abstract class Builder extends Progress {
     }
     // lastid should reflect the fact that the default document was added
     meta.lastid = meta.size - 1;
-
-    Util.memory(perf);
   }
 
   /**
@@ -312,8 +305,6 @@ public abstract class Builder extends Progress {
 
     // set leaf node information in index
     if(level > 1) tags.stat(tstack.get(level - 1)).setLeaf(false);
-
-    if(Prop.debug && (c++ & 0x7FFFF) == 0) Util.err(".");
 
     // check if data ranges exceed database limits,
     // based on the storage details in {@link Data}

@@ -1014,7 +1014,9 @@ final class XMLScanner extends Progress {
 
   @Override
   public String det() {
-    return Util.info(SCANPOS_X_X, input.io().path(), input.line());
+    final String path = input.io().path();
+    return path.isEmpty() ? Util.info(LINE_X, input.line()) :
+        Util.info(SCANPOS_X_X, input.io().path(), input.line());
   }
 
   @Override
