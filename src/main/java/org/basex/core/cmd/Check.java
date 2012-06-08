@@ -4,7 +4,7 @@ import org.basex.core.*;
 import org.basex.io.*;
 
 /**
- * Evaluates the 'checks' command: opens an existing database or
+ * Evaluates the 'check' command: opens an existing database or
  * creates a new one.
  *
  * @author BaseX Team 2005-12, BSD License
@@ -25,13 +25,13 @@ public final class Check extends Command {
     new Close().run(context);
 
     // get path and database name
-    final QueryInput input = new QueryInput(args[0]);
-    input.db = input.io.dbname();
+    final QueryInput qi = new QueryInput(args[0]);
+    qi.db = qi.io.dbname();
 
     // choose OPEN if user has no create permissions, or if database exists
     final boolean create = context.user.has(Perm.CREATE);
-    final Command cmd = !create || mprop.dbpath(input.db).exists() ?
-      new Open(input.db) : new CreateDB(input.db, input.original);
+    final Command cmd = !create || mprop.dbpath(qi.db).exists() ?
+      new Open(qi.db) : new CreateDB(qi.db, qi.io.exists() ? qi.original : "");
 
     // execute command
     final boolean ok = cmd.run(context);
