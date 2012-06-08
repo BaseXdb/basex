@@ -107,8 +107,8 @@ public final class QueryProcessor extends Progress {
    * @return self reference
    * @throws QueryException query exception
    */
-  public QueryProcessor bind(final String name, final Object value,
-      final String type) throws QueryException {
+  public QueryProcessor bind(final String name, final Object value, final String type)
+      throws QueryException {
     ctx.bind(name, value, type);
     return this;
   }

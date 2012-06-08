@@ -5,7 +5,7 @@ import java.net.*;
 import java.util.*;
 
 import org.basex.core.*;
-import org.basex.core.Commands.Cmd;
+import org.basex.core.parse.Commands.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.util.*;

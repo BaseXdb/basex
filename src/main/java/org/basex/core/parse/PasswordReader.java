@@ -1,4 +1,4 @@
-package org.basex.core;
+package org.basex.core.parse;
 
 /**
    * Reads a password from a specified source (eg. command line or GUI).

@@ -84,20 +84,7 @@ public class BaseX extends Main {
           console = false;
         } else if(c == 'C') {
           // run commands from script file
-          final IO io = IO.get(val);
-          if(!io.exists()) throw new BaseXException(RES_NOT_FOUND_X, val);
-          final NewlineInput nli = new NewlineInput(io);
-          try {
-            for(TokenBuilder line; (line = nli.readLine()) != null;) {
-              final String l = line.toString().trim();
-              // ignore empty lines and comments
-              if(!l.isEmpty() && !l.startsWith("#")) execute(l);
-            }
-          } catch(final InputException ex) {
-            throw new BaseXException(val + ": " + ex.getMessage() + '.');
-          } finally {
-            nli.close();
-          }
+          script(val);
           console = false;
         } else if(c == 'd') {
           // toggle debug mode
@@ -106,17 +93,7 @@ public class BaseX extends Main {
           // hidden option: show/hide dot query graph
           prop = Prop.DOTPLAN;
         } else if(c == 'f') {
-          // run query file
-          final IO io = IO.get(val);
-          if(!io.exists() || io.isDir()) throw new BaseXException(RES_NOT_FOUND_X, val);
-          final String query;
-          try {
-            query = Token.string(new TextInput(io).content());
-          } catch(final InputException ex) {
-            throw new BaseXException(val + ": " + ex.getMessage() + '.');
-          }
-          execute(new Set(Prop.QUERYPATH, io.path()), false);
-          execute(new XQuery(query), verbose);
+          query(val);
           console = false;
         } else if(c == 'i') {
           // open database or create main memory representation
@@ -182,6 +159,52 @@ public class BaseX extends Main {
       if(writeProps) context.mprop.write();
     } finally {
       quit();
+    }
+  }
+
+  /**
+   * Runs a query file.
+   * @param val value
+   * @throws IOException I/O exception
+   */
+  private void query(final String val) throws IOException {
+    // run query file
+    final IO io = IO.get(val);
+    if(!io.exists() || io.isDir()) throw new BaseXException(RES_NOT_FOUND_X, val);
+    final String query;
+    try {
+      query = Token.string(new TextInput(io).content());
+    } catch(final InputException ex) {
+      throw new BaseXException(val + ": " + ex.getMessage() + '.');
+    }
+    execute(new Set(Prop.QUERYPATH, io.path()), false);
+    execute(new XQuery(query), verbose);
+  }
+
+  /**
+   * Runs a command script.
+   * @param val value
+   * @throws IOException I/O exception
+   */
+  private void script(final String val) throws IOException {
+    final IO io = IO.get(val);
+    if(!io.exists()) throw new BaseXException(RES_NOT_FOUND_X, val);
+    final String cmd = Token.string(io.read());
+    if(cmd.startsWith("<")) {
+      execute(cmd);
+    } else {
+      final NewlineInput nli = new NewlineInput(new IOContent(cmd));
+      try {
+        for(TokenBuilder line; (line = nli.readLine()) != null;) {
+          final String l = line.toString().trim();
+          // ignore empty lines and comments
+          if(!l.isEmpty() && !l.startsWith("#")) execute(l);
+        }
+      } catch(final InputException ex) {
+        throw new BaseXException(val + ": " + ex.getMessage() + '.');
+      } finally {
+        nli.close();
+      }
     }
   }
 

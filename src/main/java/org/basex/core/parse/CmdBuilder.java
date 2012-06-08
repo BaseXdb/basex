@@ -1,7 +1,8 @@
-package org.basex.core;
+package org.basex.core.parse;
 
 import java.util.*;
 
+import org.basex.core.*;
 import org.basex.util.*;
 
 /**
@@ -11,7 +12,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class CommandBuilder {
+public final class CmdBuilder {
   /** String representation of the database command. */
   private final TokenBuilder tb = new TokenBuilder();
   /** Command to be output. */
@@ -21,7 +22,7 @@ public final class CommandBuilder {
    * Constructor.
    * @param c command
    */
-  public CommandBuilder(final Command c) {
+  public CmdBuilder(final Command c) {
     cmd = c;
   }
 
@@ -29,7 +30,7 @@ public final class CommandBuilder {
    * Initializes the builder with the class name of the command in upper case.
    * @return self instance
    */
-  public CommandBuilder init() {
+  public CmdBuilder init() {
     init(Util.name(cmd).toUpperCase(Locale.ENGLISH));
     return this;
   }
@@ -39,7 +40,7 @@ public final class CommandBuilder {
    * @param s command string
    * @return self instance
    */
-  public CommandBuilder init(final String s) {
+  public CmdBuilder init(final String s) {
     tb.reset();
     tb.add(s);
     return this;
@@ -49,7 +50,7 @@ public final class CommandBuilder {
    * Returns a string representation of all arguments.
    * @return self instance
    */
-  public CommandBuilder args() {
+  public CmdBuilder args() {
     final int as = cmd.args.length;
     for(int a = 0; a < as; ++a) arg(a);
     return this;
@@ -60,7 +61,7 @@ public final class CommandBuilder {
    * @param arg argument index
    * @return self instance
    */
-  public CommandBuilder xquery(final int arg) {
+  public CmdBuilder xquery(final int arg) {
     tb.add(' ').add(cmd.args[arg]);
     return this;
   }
@@ -70,7 +71,7 @@ public final class CommandBuilder {
    * @param arg argument index
    * @return self instance
    */
-  public CommandBuilder arg(final int arg) {
+  public CmdBuilder arg(final int arg) {
     arg(null, arg);
     return this;
   }
@@ -81,7 +82,7 @@ public final class CommandBuilder {
    * @param arg argument index
    * @return self instance
    */
-  public CommandBuilder arg(final String key, final int arg) {
+  public CmdBuilder arg(final String key, final int arg) {
     final String a = cmd.args.length > arg ? cmd.args[arg] : null;
     if(a != null && !a.isEmpty()) {
       if(key != null) tb.add(' ').add(key);

@@ -29,7 +29,7 @@ import org.xml.sax.helpers.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Michael Seiferle
  */
-public class FNValidate extends StandardFunc {
+public final class FNValidate extends StandardFunc {
   /**
    * Constructor.
    * @param ii input info
@@ -151,8 +151,7 @@ public class FNValidate extends StandardFunc {
       }
       final SAXParserFactory sf = SAXParserFactory.newInstance();
       sf.setValidating(true);
-      final InputSource is = in.inputSource();
-      sf.newSAXParser().parse(is, new SchemaHandler());
+      sf.newSAXParser().parse(in.inputSource(), new SchemaHandler());
       return null;
     } catch(final QueryException ex) {
       throw ex;
@@ -172,7 +171,7 @@ public class FNValidate extends StandardFunc {
    * @return resulting file
    * @throws IOException I/O exception
    */
-  private IOFile createTmp(final IO in) throws IOException {
+  private static IOFile createTmp(final IO in) throws IOException {
     if(!(in instanceof IOContent || in instanceof IOStream)) return null;
     final IOFile tmp = new IOFile(File.createTempFile("validate", IO.BASEXSUFFIX));
     tmp.write(in.read());
@@ -180,7 +179,7 @@ public class FNValidate extends StandardFunc {
   }
 
   /** Schema error handler. */
-  static class SchemaHandler extends DefaultHandler {
+  public static class SchemaHandler extends DefaultHandler {
     @Override
     public void fatalError(final SAXParseException ex) throws SAXException {
       error(ex);

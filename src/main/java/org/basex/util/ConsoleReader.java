@@ -8,6 +8,7 @@ import java.io.*;
 import java.lang.reflect.*;
 
 import org.basex.core.*;
+import org.basex.core.parse.*;
 import org.basex.io.*;
 
 /**

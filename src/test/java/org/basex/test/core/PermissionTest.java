@@ -7,8 +7,8 @@ import java.io.*;
 
 import org.basex.*;
 import org.basex.core.*;
-import org.basex.core.Commands.CmdIndex;
 import org.basex.core.cmd.*;
+import org.basex.core.parse.Commands.*;
 import org.basex.server.*;
 import org.basex.test.*;
 import org.basex.util.*;
@@ -95,7 +95,7 @@ public final class PermissionTest extends SandboxTest {
     ok(new Password(Token.md5(NAME)), testSession);
     ok(new Help("list"), testSession);
     ok(new Close(), testSession);
-    no(new ListDB(NAME), testSession);
+    no(new List(NAME), testSession);
     ok(new List(), testSession);
     no(new Open(NAME), testSession);
     no(new InfoDB(), testSession);
@@ -138,7 +138,7 @@ public final class PermissionTest extends SandboxTest {
     ok(new Grant("read", NAME), adminSession);
 
     ok(new Open(NAME), testSession);
-    ok(new ListDB(NAME), testSession);
+    ok(new List(NAME), testSession);
     ok(new InfoDB(), testSession);
     ok(new InfoStorage("1", "2"), testSession);
     no(new Get("DBPATH"), testSession);

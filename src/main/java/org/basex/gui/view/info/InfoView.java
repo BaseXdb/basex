@@ -109,8 +109,8 @@ public final class InfoView extends View {
   /**
    * Displays the specified information.
    * @param info info string
-   * @param cmd command string
-   * @param time time needed
+   * @param cmd command
+   * @param time time required
    * @param ok flag indicating if command execution was successful
    */
   public void setInfo(final String info, final Command cmd, final String time,
@@ -150,8 +150,8 @@ public final class InfoView extends View {
         --i;
       } else if(!ok) {
         err += line + NL;
-      } else if(line.startsWith(HITS_X_CC) || line.startsWith(UPDATED_CC)
-          || line.startsWith(PRINTED_CC)) {
+      } else if(line.startsWith(HITS_X_CC) || line.startsWith(UPDATED_CC) ||
+          line.startsWith(PRINTED_CC)) {
           stats.add("- " + line);
       }
     }
@@ -160,22 +160,7 @@ public final class InfoView extends View {
     strings = sl;
     String total = time;
 
-    final boolean q = cmd instanceof XQuery;
-    if(!ok || !q) {
-      text.bold();
-      if(q) {
-        add(QUERY_C + ' ', cmd.toString().replaceAll("^.*? ", "").trim());
-      } else if(cmd != null) {
-        text.bold().add(COMMAND + COLS).norm().addExt(cmd).nline();
-      }
-      if(ok) {
-        text.add(info).nline();
-      } else {
-        add(COMPILING_C, comp);
-        add(QUERY_PLAN_C, plan);
-        add(ERROR_C, err.replaceAll(STOPPED_AT + ".*\\r?\\n", ""));
-      }
-    } else if(!sl.isEmpty()) {
+    if(ok && cmd instanceof XQuery) {
       text.reset();
       add(EVALUATING_C, eval);
       add(QUERY_C + ' ', qu);
@@ -186,11 +171,33 @@ public final class InfoView extends View {
       add(QUERY_PLAN_C, plan);
       final int runs = Math.max(1, gui.context.prop.num(Prop.RUNS));
       total = Performance.getTime(il.get(il.size() - 1) * 10000L * runs, runs);
+    } else {
+      if(ok) {
+        add(cmd);
+        text.add(info).nline();
+      } else {
+        add(ERROR_C, err);
+        add(cmd);
+        add(COMPILING_C, comp);
+        add(QUERY_PLAN_C, plan);
+      }
     }
 
     area.setText(text.finish());
     if(total != null) timer.setText(TOTAL_TIME_CC + total);
     repaint();
+  }
+
+  /**
+   * Adds the command representation.
+   * @param cmd command
+   */
+  private void add(final Command cmd) {
+    if(cmd instanceof XQuery) {
+      add(QUERY_C + ' ', cmd.args[0].toString().trim());
+    } else if(cmd != null) {
+      text.bold().add(COMMAND + COLS).norm().addExt(cmd).nline();
+    }
   }
 
   /**
@@ -225,8 +232,7 @@ public final class InfoView extends View {
    * @param txt text
    */
   private void add(final String head, final String txt) {
-    if(txt.isEmpty()) return;
-    text.bold().add(head).norm().add(txt).nline().hline();
+    if(!txt.isEmpty()) text.bold().add(head).norm().add(txt).nline().hline();
   }
 
   @Override

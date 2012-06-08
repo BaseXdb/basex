@@ -23,44 +23,48 @@ public final class FNArchiveTest extends AdvancedQueryTest {
   public void archiveCreate() {
     check(_ARCHIVE_CREATE);
     // simple zip files
-    query(COUNT.args(_ARCHIVE_CREATE.args("<entry>X</entry>", "")), "1");
-    query(COUNT.args(_ARCHIVE_CREATE.args("<entry level='9'>X</entry>", "")), "1");
-    query(COUNT.args(_ARCHIVE_CREATE.args("<entry encoding='US-ASCII'>X</entry>", "")),
-        "1");
+    query(COUNT.args(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "")), "1");
     query(COUNT.args(_ARCHIVE_CREATE.args(
-        "<entry last-modified='2000-01-01T12:12:12'>X</entry>", "")), "1");
-    query(COUNT.args(_ARCHIVE_CREATE.args("<entry>X</entry>", "",
+        "<archive:entry level='9'>X</archive:entry>", "")), "1");
+    query(COUNT.args(_ARCHIVE_CREATE.args(
+        "<archive:entry encoding='US-ASCII'>X</archive:entry>", "")),
+        "1");
+    query(COUNT.args(_ARCHIVE_CREATE.args("<archive:entry " +
+        "last-modified='2000-01-01T12:12:12'>X</archive:entry>", "")), "1");
+    query(COUNT.args(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
         " map { }")), "1");
-    query(COUNT.args(_ARCHIVE_CREATE.args("<entry>X</entry>", "",
+    query(COUNT.args(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
         " map { 'format':='zip', 'algorithm':='deflate' }")), "1");
-    query(COUNT.args(_ARCHIVE_CREATE.args("<entry>X</entry>", "",
+    query(COUNT.args(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
         "<archive:options/>")), "1");
-    query(COUNT.args(_ARCHIVE_CREATE.args("<entry>X</entry>", "",
+    query(COUNT.args(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
         "<archive:options><archive:format value='zip'/>" +
         "<archive:algorithm value='deflate'/></archive:options>")), "1");
 
     // different number of entries and contents
-    error(_ARCHIVE_CREATE.args("<entry>X</entry>", "()"), Err.ARCH_DIFF);
+    error(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "()"), Err.ARCH_DIFF);
     // name must not be empty
-    error(_ARCHIVE_CREATE.args("<entry/>", ""), Err.ARCH_NAME);
+    error(_ARCHIVE_CREATE.args("<archive:entry/>", ""), Err.ARCH_NAME);
     // invalid compression level
-    error(_ARCHIVE_CREATE.args("<entry compression-level='x'>X</entry>", ""),
-        Err.ARCH_LEVEL);
-    error(_ARCHIVE_CREATE.args("<entry compression-level='10'>X</entry>", ""),
-        Err.ARCH_LEVEL);
+    error(_ARCHIVE_CREATE.args("<archive:entry compression-level='x'>X</archive:entry>",
+        ""), Err.ARCH_LEVEL);
+    error(_ARCHIVE_CREATE.args("<archive:entry compression-level='10'>X</archive:entry>",
+        ""), Err.ARCH_LEVEL);
     // invalid modification date
-    error(_ARCHIVE_CREATE.args("<entry last-modified='2020'>X</entry>", ""),
-        Err.ARCH_MODIFIED);
+    error(_ARCHIVE_CREATE.args("<archive:entry last-modified='2020'>X</archive:entry>",
+        ""), Err.ARCH_MODIFIED);
     // content must be string or base64Binary
-    error(_ARCHIVE_CREATE.args("<entry>X</entry>", " 123"), Err.ARCH_STRB64);
+    error(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", " 123"),
+        Err.ARCH_STRB64);
     // wrong encoding
-    error(_ARCHIVE_CREATE.args("<entry encoding='x'>X</entry>", ""), Err.ARCH_ENCODING);
+    error(_ARCHIVE_CREATE.args("<archive:entry encoding='x'>X</archive:entry>", ""),
+        Err.ARCH_ENCODING);
     // errors while converting a string
-    error(_ARCHIVE_CREATE.args("<entry encoding='US-ASCII'>X</entry>", "\u00fc"),
-        Err.ARCH_ENCODE);
-    error(COUNT.args(_ARCHIVE_CREATE.args("<entry>X</entry>", "",
+    error(_ARCHIVE_CREATE.args("<archive:entry encoding='US-ASCII'>X</archive:entry>",
+        "\u00fc"), Err.ARCH_ENCODE);
+    error(COUNT.args(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
         " map { 'format':='rar' }")), Err.ARCH_SUPP);
-    error(COUNT.args(_ARCHIVE_CREATE.args("<entry>X</entry>", "",
+    error(COUNT.args(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
         "<archive:options><archive:format value='rar'/></archive:options>")),
         Err.ARCH_SUPP);
   }
@@ -125,14 +129,14 @@ public final class FNArchiveTest extends AdvancedQueryTest {
     check(_ARCHIVE_UPDATE);
     // add a new entry
     query(_FILE_READ_BINARY.args(ZIP) + " ! " +
-        _ARCHIVE_UPDATE.args(" .", "<entry>X</entry>", "X") + " ! " +
+        _ARCHIVE_UPDATE.args(" .", "<archive:entry>X</archive:entry>", "X") + " ! " +
         COUNT.args(_ARCHIVE_ENTRIES.args(" .")), 6);
-    query(_ARCHIVE_CREATE.args("<entry>X</entry>", "X") + " ! " +
-        _ARCHIVE_UPDATE.args(" .", "<entry>Y</entry>", "Y") + " ! " +
+    query(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "X") + " ! " +
+        _ARCHIVE_UPDATE.args(" .", "<archive:entry>Y</archive:entry>", "Y") + " ! " +
         _ARCHIVE_EXTRACT_TEXT.args(" ."), "X Y");
     // updates an existing entry
-    query(_ARCHIVE_CREATE.args("<entry>X</entry>", "X") + " ! " +
-        _ARCHIVE_UPDATE.args(" .", "<entry>X</entry>", "Y") + " ! " +
+    query(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "X") + " ! " +
+        _ARCHIVE_UPDATE.args(" .", "<archive:entry>X</archive:entry>", "Y") + " ! " +
         _ARCHIVE_EXTRACT_TEXT.args(" ."), "Y");
   }
 

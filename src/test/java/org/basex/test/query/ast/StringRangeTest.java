@@ -3,8 +3,8 @@ package org.basex.test.query.ast;
 import java.util.*;
 
 import org.basex.core.*;
-import org.basex.core.Commands.CmdIndex;
 import org.basex.core.cmd.*;
+import org.basex.core.parse.Commands.*;
 import org.basex.query.expr.*;
 import org.basex.util.*;
 import org.junit.*;

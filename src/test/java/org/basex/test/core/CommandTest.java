@@ -6,8 +6,8 @@ import static org.junit.Assert.*;
 import java.io.*;
 
 import org.basex.core.*;
-import org.basex.core.Commands.CmdIndex;
 import org.basex.core.cmd.*;
+import org.basex.core.parse.Commands.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.server.*;
@@ -345,9 +345,9 @@ public class CommandTest extends SandboxTest {
   /** Command test. */
   @Test
   public final void listdb() {
-    no(new ListDB(NAME));
+    no(new List(NAME));
     ok(new CreateDB(NAME, FILE));
-    ok(new ListDB(NAME));
+    ok(new List(NAME));
   }
 
   /** Command test. */
@@ -575,6 +575,7 @@ public class CommandTest extends SandboxTest {
       session.execute(cmd);
       fail("\"" + cmd + "\" was supposed to fail.");
     } catch(final IOException ex) {
+      /* expected */
     }
   }
 }

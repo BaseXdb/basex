@@ -8,7 +8,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.plaf.basic.*;
 
-import org.basex.core.*;
+import org.basex.core.parse.*;
 import org.basex.data.*;
 import org.basex.gui.layout.*;
 import org.basex.query.*;
@@ -172,7 +172,7 @@ public final class GUIInput extends BaseXTextField {
     try {
       pre = excl ? "!" : "";
       final String suf = getText().substring(pre.length());
-      new CommandParser(suf, gui.context).parse(true);
+      new CommandParser(suf, gui.context).suggest();
     } catch(final QueryException ex) {
       sl = ex.suggest();
       final int marked = ex.markedCol() + (excl ? 2 : 1);

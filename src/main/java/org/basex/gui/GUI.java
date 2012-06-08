@@ -13,6 +13,7 @@ import javax.swing.border.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.core.parse.*;
 import org.basex.data.*;
 import org.basex.gui.dialog.*;
 import org.basex.gui.layout.*;
@@ -346,11 +347,11 @@ public final class GUI extends AGUI {
 
   /**
    * Executes the specified command.
-   * @param c command to be executed
+   * @param cmd command to be executed
    * @param edit call from editor panel
    * @return success flag
    */
-  boolean exec(final Command c, final boolean edit) {
+  boolean exec(final Command cmd, final boolean edit) {
     // wait when command is still running
     final int thread = ++threadID;
     while(command != null) {
@@ -371,11 +372,11 @@ public final class GUI extends AGUI {
 
       // cache some variables before executing the command
       final Nodes current = context.current();
-      command = c;
+      command = cmd;
 
       // execute command and cache result
       final ArrayOutput ao = new ArrayOutput().max(gprop.num(GUIProp.MAXTEXT));
-      updating = c.updating(context);
+      updating = cmd.updating(context);
 
       // updates the query editor
       if(edit) {
@@ -387,8 +388,8 @@ public final class GUI extends AGUI {
       // evaluate command
       String inf = null;
       try {
-        c.execute(context, ao);
-        inf = c.info();
+        cmd.execute(context, ao);
+        inf = cmd.info();
       } catch(final BaseXException ex) {
         ok = false;
         inf = ex.getMessage();
@@ -398,7 +399,7 @@ public final class GUI extends AGUI {
       final String time = perf.getTime();
 
       // show query info
-      info.setInfo(inf, c, time, ok);
+      if(info.visible()) info.setInfo(inf, cmd, time, ok);
       info.reset();
 
       // sends feedback to the query editor
@@ -415,7 +416,7 @@ public final class GUI extends AGUI {
         }
       } else {
         // get query result
-        final Result result = c.result();
+        final Result result = cmd.result();
         final Nodes nodes = result instanceof Nodes &&
             result.size() != 0 ? (Nodes) result : null;
 
@@ -425,7 +426,7 @@ public final class GUI extends AGUI {
         if(ndata != data) {
           // database reference has changed - notify views
           notify.init();
-        } else if(c.updated()) {
+        } else if(cmd.updated()) {
           // data has been updated
           notify.update();
           //if(ao.size() != 0) text.setText(ao, c);
@@ -454,7 +455,7 @@ public final class GUI extends AGUI {
           // assign textual output if no node result was created
           if(nodes == null) {
             if(!text.visible()) GUICommands.C_SHOWTEXT.execute(this);
-            text.setText(ao, c);
+            text.setText(ao, cmd);
           }
           // show status info
           status.setText(Util.info(TIME_NEEDED_X, time));
@@ -465,7 +466,7 @@ public final class GUI extends AGUI {
     } catch(final Exception ex) {
       // unexpected error
       Util.stack(ex);
-      BaseXDialog.error(this, Util.info(EXEC_ERROR, c,
+      BaseXDialog.error(this, Util.info(EXEC_ERROR, cmd,
           !ex.toString().isEmpty() ? ex.toString() : ex.getMessage()));
       updating = false;
     }

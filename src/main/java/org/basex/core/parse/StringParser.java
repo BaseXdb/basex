@@ -1,24 +1,15 @@
-package org.basex.core;
+package org.basex.core.parse;
 
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 
 import java.util.*;
 
-import org.basex.core.Commands.Cmd;
-import org.basex.core.Commands.CmdAlter;
-import org.basex.core.Commands.CmdCreate;
-import org.basex.core.Commands.CmdDrop;
-import org.basex.core.Commands.CmdIndex;
-import org.basex.core.Commands.CmdIndexInfo;
-import org.basex.core.Commands.CmdInfo;
-import org.basex.core.Commands.CmdOptimize;
-import org.basex.core.Commands.CmdPerm;
-import org.basex.core.Commands.CmdRepo;
-import org.basex.core.Commands.CmdShow;
+import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.cmd.List;
 import org.basex.core.cmd.Set;
+import org.basex.core.parse.Commands.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
@@ -32,90 +23,48 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class CommandParser extends InputParser {
+final class StringParser extends CmdParser {
+  /** Context. */
+  private final InputParser parser;
   /** Context. */
   private final Context ctx;
-
-  /** Password reader. */
-  private PasswordReader passwords;
-  /** Suggest possible completions. */
-  private boolean suggest;
 
   /**
    * Constructor.
    * @param in input
    * @param c context
    */
-  public CommandParser(final String in, final Context c) {
-    super(in);
+  StringParser(final String in, final Context c) {
+    parser = new InputParser(in);
     ctx = c;
   }
 
-  /**
-   * Attaches a password reader.
-   * @param pr password reader
-   * @return self reference
-   */
-  public CommandParser password(final PasswordReader pr) {
-    passwords = pr;
-    return this;
-  }
-
-  /**
-   * Parses the input as single command and returns the result.
-   * @return command
-   * @throws QueryException query exception
-   */
-  public Command parseSingle() throws QueryException {
-    final Cmd cmd = consume(Cmd.class, null);
-    final Command command = parse(cmd, true);
-    consumeWS();
-    if(more()) throw help(null, cmd);
-    return command;
-  }
-
-  /**
-   * Parses the input and returns a command list.
-   * @return commands
-   * @throws QueryException query exception
-   */
-  public Command[] parse() throws QueryException {
-    Command[] list = new Command[0];
+  @Override
+  void parse(final ArrayList<Command> list) throws QueryException {
     while(true) {
       final Cmd cmd = consume(Cmd.class, null);
-      list = Array.add(list, parse(cmd, false));
+      list.add(parse(cmd));
       consumeWS();
-      if(!more()) return list;
-      if(!consume(';')) throw help(null, cmd);
+      if(!parser.more()) break;
+      if(single) throw help(null, cmd);
+      if(!parser.consume(';')) throw help(null, cmd);
     }
-  }
-
-  /**
-   * Parses the input and returns a command list.
-   * @param s suggest flag
-   * @return commands
-   * @throws QueryException query exception
-   */
-  public Command[] parse(final boolean s) throws QueryException {
-    suggest = s;
-    return parse();
   }
 
   /**
    * Parses a single command.
    * @param cmd command definition
-   * @param s single command expected
    * @return resulting command
    * @throws QueryException query exception
    */
-  private Command parse(final Cmd cmd, final boolean s) throws QueryException {
+  private Command parse(final Cmd cmd) throws QueryException {
     switch(cmd) {
       case CREATE:
         switch(consume(CmdCreate.class, cmd)) {
           case BACKUP:
             return new CreateBackup(glob(cmd));
           case DATABASE: case DB:
-            return new CreateDB(name(cmd), s ? remaining(null) : string(null));
+            return new CreateDB(name(cmd), single ? remaining(null) : string(null));
           case INDEX:
             return new CreateIndex(consume(CmdIndex.class, cmd));
           case USER:
@@ -140,10 +89,10 @@ public final class CommandParser extends InputParser {
         return new Check(string(cmd));
       case ADD:
         String arg = key(C_TO, null) ? string(cmd) : null;
-        return new Add(arg, s ? remaining(cmd) : string(cmd));
+        return new Add(arg, single ? remaining(cmd) : string(cmd));
       case STORE:
         arg = key(C_TO, null) ? string(cmd) : null;
-        return new Store(arg, s ? remaining(cmd) : string(cmd));
+        return new Store(arg, single ? remaining(cmd) : string(cmd));
       case RETRIEVE:
         return new Retrieve(string(cmd));
       case DELETE:
@@ -151,7 +100,7 @@ public final class CommandParser extends InputParser {
       case RENAME:
         return new Rename(string(cmd), string(cmd));
       case REPLACE:
-        return new Replace(string(cmd), s ? remaining(cmd) : string(cmd));
+        return new Replace(string(cmd), single ? remaining(cmd) : string(cmd));
       case INFO:
         switch(consume(CmdInfo.class, cmd)) {
           case NULL:
@@ -170,8 +119,7 @@ public final class CommandParser extends InputParser {
       case CLOSE:
         return new Close();
       case LIST:
-        final String in = string(null);
-        return in == null ? new List() : new ListDB(in);
+        return new List(string(null));
       case DROP:
         switch(consume(CmdDrop.class, cmd)) {
           case DATABASE: case DB:
@@ -244,9 +192,9 @@ public final class CommandParser extends InputParser {
       case REPO:
         switch(consume(CmdRepo.class, cmd)) {
           case INSTALL:
-            return new RepoInstall(string(cmd), new InputInfo(this));
+            return new RepoInstall(string(cmd), new InputInfo(parser));
           case DELETE:
-            return new RepoDelete(string(cmd), new InputInfo(this));
+            return new RepoDelete(string(cmd), new InputInfo(parser));
           case LIST:
             return new RepoList();
           default:
@@ -268,12 +216,12 @@ public final class CommandParser extends InputParser {
     final StringBuilder sb = new StringBuilder();
     consumeWS();
     boolean q = false;
-    while(more()) {
-      final char c = curr();
+    while(parser.more()) {
+      final char c = parser.curr();
       if(!q && (c <= ' ' || c == ';')) break;
       if(c == '"') q ^= true;
       else sb.append(c);
-      consume();
+      parser.consume();
     }
     return finish(cmd, sb);
   }
@@ -288,7 +236,7 @@ public final class CommandParser extends InputParser {
   private String remaining(final Cmd cmd) throws QueryException {
     final StringBuilder sb = new StringBuilder();
     consumeWS();
-    while(more()) sb.append(consume());
+    while(parser.more()) sb.append(parser.consume());
     String arg = finish(cmd, sb);
     if(arg != null) {
       // chop quotes; substrings are faster than replaces...
@@ -307,12 +255,12 @@ public final class CommandParser extends InputParser {
   private String xquery(final Cmd cmd) throws QueryException {
     consumeWS();
     final StringBuilder sb = new StringBuilder();
-    if(more() && !curr(';')) {
-      final QueryParser p = new QueryParser(input, new QueryContext(ctx));
-      p.ip = ip;
+    if(parser.more() && !parser.curr(';')) {
+      final QueryParser p = new QueryParser(parser.input, new QueryContext(ctx));
+      p.ip = parser.ip;
       p.parse(null);
-      sb.append(input.substring(ip, p.ip));
-      ip = p.ip;
+      sb.append(parser.input.substring(parser.ip, p.ip));
+      parser.ip = p.ip;
     }
     return finish(cmd, sb);
   }
@@ -327,8 +275,11 @@ public final class CommandParser extends InputParser {
   private String name(final Cmd cmd) throws QueryException {
     consumeWS();
     final StringBuilder sb = new StringBuilder();
-    while(letterOrDigit(curr()) || curr('-')) sb.append(consume());
-    return finish(cmd, !more() || curr(';') || ws(curr()) ? sb : null);
+    while(letterOrDigit(parser.curr()) || parser.curr('-')) {
+      sb.append(parser.consume());
+    }
+    return finish(cmd, !parser.more() || parser.curr(';') ||
+        ws(parser.curr()) ? sb : null);
   }
 
   /**
@@ -353,11 +304,12 @@ public final class CommandParser extends InputParser {
     consumeWS();
     final StringBuilder sb = new StringBuilder();
     while(true) {
-      final char c = curr();
+      final char c = parser.curr();
       if(!letterOrDigit(c) && c != '-' && c != '*' && c != '?' && c != ',') {
-        return finish(cmd, !more() || curr(';') || ws(curr()) ? sb : null);
+        return finish(cmd, !parser.more() || parser.curr(';') ||
+            ws(parser.curr()) ? sb : null);
       }
-      sb.append(consume());
+      sb.append(parser.consume());
     }
   }
 
@@ -370,11 +322,11 @@ public final class CommandParser extends InputParser {
    */
   private boolean key(final String key, final Cmd cmd) throws QueryException {
     consumeWS();
-    final int p = ip;
-    final boolean ok = (consume(key) ||
-        consume(key.toLowerCase(Locale.ENGLISH))) && (curr(0) || ws(curr()));
+    final int p = parser.ip;
+    final boolean ok = (parser.consume(key) || parser.consume(
+        key.toLowerCase(Locale.ENGLISH))) && (parser.curr(0) || ws(parser.curr()));
     if(!ok) {
-      ip = p;
+      parser.ip = p;
       if(cmd != null) throw help(null, cmd);
     }
     return ok;
@@ -402,9 +354,10 @@ public final class CommandParser extends InputParser {
   private String number(final Cmd cmd) throws QueryException {
     consumeWS();
     final StringBuilder sb = new StringBuilder();
-    if(curr() == '-') sb.append(consume());
-    while(digit(curr())) sb.append(consume());
-    return finish(cmd, !more() || curr(';') || ws(curr()) ? sb : null);
+    if(parser.curr() == '-') sb.append(parser.consume());
+    while(digit(parser.curr())) sb.append(parser.consume());
+    return finish(cmd, !parser.more() || parser.curr(';') ||
+        ws(parser.curr()) ? sb : null);
   }
 
   /**
@@ -412,8 +365,8 @@ public final class CommandParser extends InputParser {
    * query.
    */
   private void consumeWS() {
-    while(ip < il && input.charAt(ip) <= ' ') ++ip;
-    im = ip - 1;
+    while(parser.ip < parser.il && parser.input.charAt(parser.ip) <= ' ') ++parser.ip;
+    parser.im = parser.ip - 1;
   }
 
   /**
@@ -428,7 +381,6 @@ public final class CommandParser extends InputParser {
       throws QueryException {
 
     final String token = name(null);
-
     if(!(suggest && token != null && token.length() <= 1)) {
     try {
       // return command reference; allow empty strings as input ("NULL")
@@ -441,8 +393,7 @@ public final class CommandParser extends InputParser {
     final Enum<?>[] alt = list(cmp, token);
     if(token == null) {
       // show command error or available command extensions
-      throw par == null ? error(list(alt), EXPECTING_CMD) :
-        help(list(alt), par);
+      throw par == null ? error(list(alt), EXPECTING_CMD) : help(list(alt), par);
     }
 
     // output error for similar commands
@@ -455,8 +406,7 @@ public final class CommandParser extends InputParser {
     }
 
     // show unknown command error or available command extensions
-    throw par == null ? error(list(alt), UNKNOWN_TRY_X, token) :
-      help(list(alt), par);
+    throw par == null ? error(list(alt), UNKNOWN_TRY_X, token) : help(list(alt), par);
   }
 
   /**
@@ -471,9 +421,9 @@ public final class CommandParser extends InputParser {
   }
 
   /**
-   * Returns the command list.
+   * Returns all commands that start with the specified user input.
    * @param <T> token type
-   * @param en enumeration
+   * @param en available commands
    * @param i user input
    * @return completions
    */
@@ -500,7 +450,7 @@ public final class CommandParser extends InputParser {
    * @return query exception
    */
   private QueryException error(final StringList comp, final String m, final Object... e) {
-    return new QueryException(info(), new QNm(), m, e).suggest(this, comp);
+    return new QueryException(parser.info(), new QNm(), m, e).suggest(parser, comp);
   }
 
   /**

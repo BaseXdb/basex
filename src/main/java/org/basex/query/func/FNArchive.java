@@ -25,14 +25,17 @@ import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * Functions on zip files.
+ * Functions on archives.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public class FNArchive extends StandardFunc {
-  /** Entry. */
-  private static final QNm Q_ENTRY = new QNm("entry");
+  /** Element: Entry. */
+  private static final QNm Q_ENTRY = new QNm("archive:entry", ARCHIVEURI);
+  /** Root node test. */
+  private static final ExtTest TEST = new ExtTest(NodeType.ELM, Q_ENTRY);
+
   /** Level. */
   private static final QNm Q_LEVEL = new QNm("compression-level");
   /** Encoding. */
@@ -43,11 +46,9 @@ public class FNArchive extends StandardFunc {
   private static final QNm Q_COMP_SIZE = new QNm("compressed-size");
   /** Uncompressed size. */
   private static final QNm Q_SIZE = new QNm("size");
-  /** Root node test. */
-  private static final ExtTest TEST = new ExtTest(NodeType.ELM, Q_ENTRY);
+
   /** Element: options. */
   private static final QNm E_OPTIONS = new QNm("archive:options", ARCHIVEURI);
-
   /** Option: format. */
   private static final byte[] FORMAT = Token.token("format");
   /** Option: format: zip. */

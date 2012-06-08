@@ -12,7 +12,7 @@ import org.basex.io.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public abstract class InputParser {
+public class InputParser {
   /** Parsing exception. */
   private static final String FOUND = ", found '%'";
 
@@ -32,7 +32,7 @@ public abstract class InputParser {
    * Constructor.
    * @param in input
    */
-  protected InputParser(final String in) {
+  public InputParser(final String in) {
     input = in;
     il = input.length();
   }
@@ -50,7 +50,7 @@ public abstract class InputParser {
    * Checks if more characters are found.
    * @return current character
    */
-  protected final boolean more() {
+  public final boolean more() {
     return ip < il;
   }
 
@@ -58,7 +58,7 @@ public abstract class InputParser {
    * Returns the current character.
    * @return current character
    */
-  protected final char curr() {
+  public final char curr() {
     final int i = ip;
     return i < il ? input.charAt(i) : 0;
   }
@@ -68,7 +68,7 @@ public abstract class InputParser {
    * @param ch character to be checked
    * @return result of check
    */
-  protected final boolean curr(final int ch) {
+  public final boolean curr(final int ch) {
     final int i = ip;
     return i < il && ch == input.charAt(i);
   }
@@ -93,7 +93,7 @@ public abstract class InputParser {
    * Returns next character.
    * @return next character
    */
-  protected final char consume() {
+  public final char consume() {
     return ip < il ? input.charAt(ip++) : 0;
   }
 
@@ -102,7 +102,7 @@ public abstract class InputParser {
    * @param ch character to consume
    * @return true if character was found
    */
-  protected final boolean consume(final int ch) {
+  public final boolean consume(final int ch) {
     final int i = ip;
     if(i >= il || ch != input.charAt(i)) return false;
     ++ip;
@@ -123,7 +123,7 @@ public abstract class InputParser {
    * @param str string to consume
    * @return true if string was found
    */
-  protected final boolean consume(final String str) {
+  public final boolean consume(final String str) {
     int i = ip;
     final int l = str.length();
     if(i + l > il) return false;
@@ -155,7 +155,7 @@ public abstract class InputParser {
    * Creates input information.
    * @return input information
    */
-  protected final InputInfo info() {
+  public final InputInfo info() {
     return new InputInfo(this);
   }
 }

@@ -162,6 +162,9 @@ public final class Util {
     else if(ex instanceof SocketTimeoutException) return TIMEOUT_EXCEEDED;
     else if(ex instanceof SocketException) return CONNECTION_ERROR;
     else if(ex instanceof UnknownHostException) return info(UNKNOWN_HOST_X, msg);
+    else if(ex instanceof RuntimeException) {
+      return ex.getStackTrace()[0].getClassName() + ": " + ex;
+    }
     return msg != null && !msg.isEmpty() ? msg : ex.toString();
   }
 

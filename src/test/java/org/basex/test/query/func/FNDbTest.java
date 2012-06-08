@@ -7,6 +7,7 @@ import java.util.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.core.parse.*;
 import org.basex.io.*;
 import org.basex.query.util.*;
 import org.basex.test.query.*;
