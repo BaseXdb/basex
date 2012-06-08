@@ -42,7 +42,13 @@ final class XMLParser extends CmdParser {
   void parse(final ArrayList<Command> list) throws QueryException {
     try {
       final DBNode node = new DBNode(IO.get(input), ctx.prop);
-      final QueryProcessor qa = new QueryProcessor(COMMANDS + "/*", ctx).context(node);
+      String query = "/*";
+      if(!execute(COMMANDS, node).isEmpty()) {
+        query = COMMANDS + query;
+        if(execute(query + "[not(text())]", node).isEmpty())
+          throw error("Expected syntax: <commands><...></commands>");
+      }
+      final QueryProcessor qa = new QueryProcessor(query, ctx).context(node);
       for(final Item ia : qa.value()) list.add(command(ia));
     } catch(final IOException ex) {
       throw error("Command parsing: %", ex);
@@ -143,6 +149,8 @@ final class XMLParser extends CmdParser {
       return new Retrieve(value(root, PATH));
     if(e.equals(RUN) && check(root, FILE))
       return new Run(value(root, FILE));
+    if(e.equals(INSPECT) && check(root))
+      return new Inspect();
     if(e.equals(SET) && check(root, OPTION, "#" + VALUE + "?"))
       return new Set(value(root, OPTION), value(root));
     if(e.equals(SHOW_BACKUPS) && check(root))
@@ -159,7 +167,7 @@ final class XMLParser extends CmdParser {
       return new Store(value(root, PATH), xml(root));
     if(e.equals(XQUERY) && check(root, "#" + QUERY))
       return new XQuery(value(root));
-    throw error("Unknown command: " + e);
+    throw error("Unknown command <%/>.", e);
   }
 
   /**
@@ -194,7 +202,7 @@ final class XMLParser extends CmdParser {
   }
 
   /**
-   * Executes the specified query and returns the serialized result.
+   * Executes the specified query and returns a string representation.
    * @param query query
    * @param context context node
    * @return query exception
@@ -204,13 +212,26 @@ final class XMLParser extends CmdParser {
     final QueryProcessor qp = new QueryProcessor(query, ctx).context(context);
     final Iter ir = qp.iter();
     final Item it = ir.next();
-    return it == null ? null : it.toJava().toString().trim();
+    return it == null ? "" : it.toJava().toString().trim();
   }
 
   /**
-   * Checks the syntax of the specified command.
+   * Checks the syntax of the specified command. Returns an error with the expected
+   * syntax if the check fails. The passed on strings describe the arguments of a
+   * command. They may be:
+   * <ul>
+   * <li> attribute names</li>
+   * <li> labels for text nodes, if prefixed with "#"</li>
+   * <li> labels for text or descendant nodes, if prefixed with "<"</li>
+   * </ul>
+   * Arguments are optional, if they suffixed with "?". Examples:
+   * <ul>
+   * <li> <code>{"name","#input?"}</code> means that the command must have one "name"
+   *   attribute and may have one text node, but nothing else</li>
+   * <li> <code>{}</code> means that the command must not have any arguments }</li>
+   * </ul>
    * @param root root node
-   * @param checks checks to be performed
+   * @param checks checks to be performed.
    * @return success flag
    * @throws QueryException query exception
    */

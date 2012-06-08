@@ -116,6 +116,8 @@ final class StringParser extends CmdParser {
             return new InfoStorage(arg1, arg2);
         }
         break;
+      case INSPECT:
+        return new Inspect();
       case CLOSE:
         return new Close();
       case LIST:
