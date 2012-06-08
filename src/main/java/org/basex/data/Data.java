@@ -257,8 +257,7 @@ public abstract class Data {
    * @return pre value or -1 if id was not found
    */
   public final int pre(final int id) {
-    if(meta.updindex) return idmap.pre(id);
-    return preold(id);
+    return meta.updindex ? idmap.pre(id) : preold(id);
   }
 
   /**

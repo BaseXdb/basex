@@ -96,6 +96,7 @@ public final class InfoStorage extends AQuery {
     t.header.add(TABLEDIST);
     t.header.add(TABLESIZE);
     t.header.add(TABLEATS);
+    t.header.add(TABLEID);
     t.header.add(TABLENS);
     t.header.add(TABLEKND);
     t.header.add(TABLECON);
@@ -116,6 +117,7 @@ public final class InfoStorage extends AQuery {
     tl.add(p - data.parent(p, k));
     tl.add(data.size(p, k));
     tl.add(data.attSize(p, k));
+    tl.add(data.id(p));
     final int u = data.uri(p, k);
     if(data.nsFlag(p)) tl.add("+" + u);
     else tl.add(u);

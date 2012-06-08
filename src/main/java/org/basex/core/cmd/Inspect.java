@@ -38,6 +38,7 @@ public final class Inspect extends Command {
     final Check invKind = new Check();
     final Check parRef = new Check();
     final Check parChild = new Check();
+    final Check idPre = md.updindex ? new Check() : null;
     // loop through all database nodes
     for(int pre = 0; pre < md.size; pre++) {
       // check node kind
@@ -47,8 +48,9 @@ public final class Inspect extends Command {
       final int par = data.parent(pre, kind);
       if(par >= pre || (kind == Data.DOC ? par != -1 : par < 0)) parRef.add(pre);
       // check if node is a descendant of its parent node
-      if(par >= 0 && par < 100)
       if(par >= 0 && par + data.size(par, data.kind(par)) < pre) parChild.add(pre);
+      // check if id/pre mapping is correct
+      if(idPre != null && data.pre(data.id(pre)) != pre) idPre.add(pre);
     }
 
     final TokenBuilder info = new TokenBuilder();
@@ -56,9 +58,9 @@ public final class Inspect extends Command {
     info.add(invKind.info("invalid node kinds"));
     info.add(parRef.info("invalid parent references"));
     info.add(parChild.info("wrong parent/child relationships"));
-    info.add(Prop.NL);
+    if(idPre != null) info.add(idPre.info("wrong id/pre mappings"));
     if(invKind.invalid + parRef.invalid + parChild.invalid == 0) {
-      info.add("Good News: No inconsistencies found.").add(Prop.NL);
+      info.add("No inconsistencies found.").add(Prop.NL);
     } else {
       info.add("Warning: Database is inconsistent.").add(Prop.NL);
     }
