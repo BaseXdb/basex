@@ -417,6 +417,16 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
+   * Test method for the db:flush() function.
+   */
+  @Test
+  public void dbFlush() {
+    check(_DB_FLUSH);
+    query(_DB_FLUSH.args(NAME));
+    error(_DB_FLUSH.args(NAME + 'x'), Err.BXDB_OPEN);
+  }
+
+  /**
    * Test method for the db:is-raw() function.
    */
   @Test

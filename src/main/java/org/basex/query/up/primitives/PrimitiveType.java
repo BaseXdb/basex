@@ -85,5 +85,6 @@ public enum PrimitiveType {
   /** DBStore.                 */ DBSTORE,
   /** DBRename.                */ DBRENAME,
   /** DBDelete.                */ DBDELETE,
-  /** DBOptimize.              */ DBOPTIMIZE
+  /** DBOptimize.              */ DBOPTIMIZE,
+  /** DBFlush.                 */ DBFLUSH,
 }

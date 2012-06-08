@@ -542,6 +542,8 @@ public enum Function {
   _DB_EXISTS(FNDb.class, "exists(database[,path])", BLN, 1, STR, STR),
   /** Database function: returns the content type of a database file. */
   _DB_CONTENT_TYPE(FNDb.class, "content-type(database,path)", ITEM, STR, STR),
+  /** Database function: flushes all data. */
+  _DB_FLUSH(FNDb.class, "flush(database)", EMP, STR),
 
   /* FNIndex functions. */
 
@@ -796,7 +798,8 @@ public enum Function {
 
   /** Updating functions. */
   static final Function[] UPDATING = {
-    PUT, _DB_ADD, _DB_DELETE, _DB_RENAME, _DB_REPLACE, _DB_OPTIMIZE, _DB_STORE, _DB_OUTPUT
+    PUT, _DB_ADD, _DB_DELETE, _DB_RENAME, _DB_REPLACE, _DB_OPTIMIZE, _DB_STORE,
+    _DB_OUTPUT, _DB_FLUSH
   };
 
   /**

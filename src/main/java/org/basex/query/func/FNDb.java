@@ -109,6 +109,7 @@ public final class FNDb extends StandardFunc {
       case _DB_OPTIMIZE:     return optimize(ctx);
       case _DB_STORE:        return store(ctx);
       case _DB_RETRIEVE:     return retrieve(ctx);
+      case _DB_FLUSH:        return flush(ctx);
       case _DB_IS_RAW:       return isRaw(ctx);
       case _DB_EXISTS:       return exists(ctx);
       case _DB_IS_XML:       return isXML(ctx);
@@ -621,6 +622,18 @@ public final class FNDb extends StandardFunc {
   }
 
   /**
+   * Performs the flush function.
+   * @param ctx query context
+   * @return {@code null}
+   * @throws QueryException query exception
+   */
+  private Item flush(final QueryContext ctx) throws QueryException {
+    checkWrite(ctx);
+    ctx.updates.add(new DBFlush(data(0, ctx), info), ctx);
+    return null;
+  }
+
+  /**
    * Performs the retrieve function.
    * @param ctx query context
    * @return {@code null}
@@ -709,7 +722,7 @@ public final class FNDb extends StandardFunc {
       sig == Function._DB_ADD || sig == Function._DB_DELETE ||
       sig == Function._DB_RENAME || sig == Function._DB_REPLACE ||
       sig == Function._DB_OPTIMIZE || sig == Function._DB_STORE ||
-      sig == Function._DB_OUTPUT;
+      sig == Function._DB_OUTPUT || sig == Function._DB_FLUSH;
     return
       // skip evaluation at compile time
       u == Use.CTX && (
