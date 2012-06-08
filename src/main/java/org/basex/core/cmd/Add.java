@@ -106,7 +106,6 @@ public final class Add extends ACreate {
     if(prop.is(Prop.MAINMEM)) large = false;
 
     // create random database name for disk-based creation
-    large = true;
     final String db = large ? context.mprop.random(data.meta.name) : name;
     build = large ? new DiskBuilder(db, parser, context) : new MemBuilder(db, parser);
 
