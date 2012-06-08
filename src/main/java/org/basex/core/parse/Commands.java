@@ -99,6 +99,8 @@ public interface Commands {
   String RETRIEVE = "retrieve";
   /** Command string: "run". */
   String RUN = "run";
+  /** Command string: "inspect". */
+  String INSPECT = "inspect";
   /** Command string: "set". */
   String SET = "set";
   /** Command string: "show-backups". */
@@ -174,7 +176,8 @@ public interface Commands {
     HELP(HELPHELP), INFO(HELPINFO), KILL(HELPKILL), LIST(HELPLIST), OPEN(HELPOPEN),
     OPTIMIZE(HELPOPTIMIZE), PASSWORD(HELPPASSWORD), RENAME(HELPRENAME),
     REPLACE(HELPREPLACE), REPO(HELPREPO), RESTORE(HELPRESTORE), RETRIEVE(HELPRETRIEVE),
-    RUN(HELPRUN), SET(HELPSET), SHOW(HELPSHOW), STORE(HELPSTORE), XQUERY(HELPXQUERY);
+    RUN(HELPRUN), INSPECT(null), SET(HELPSET), SHOW(HELPSHOW), STORE(HELPSTORE),
+    XQUERY(HELPXQUERY);
 
     /** Help texts. */
     private final String[] help;
