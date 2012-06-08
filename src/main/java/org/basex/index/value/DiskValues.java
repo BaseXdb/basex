@@ -311,6 +311,7 @@ public class DiskValues implements Index {
 
   @Override
   public synchronized void close() {
+    flush();
     idxl.close();
     idxr.close();
   }
