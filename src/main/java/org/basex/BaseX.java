@@ -151,6 +151,7 @@ public class BaseX extends Main {
       }
 
       if(console) {
+        verbose = true;
         // enter interactive mode
         Util.outln(CONSOLE + TRY_MORE_X, sa() ? LOCALMODE : CLIENTMODE);
         console();
