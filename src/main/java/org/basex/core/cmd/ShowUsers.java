@@ -5,8 +5,8 @@ import static org.basex.core.Text.*;
 import java.io.*;
 
 import org.basex.core.*;
-import org.basex.core.Commands.Cmd;
-import org.basex.core.Commands.CmdShow;
+import org.basex.core.parse.*;
+import org.basex.core.parse.Commands.*;
 import org.basex.data.*;
 import org.basex.util.*;
 
@@ -34,7 +34,7 @@ public final class ShowUsers extends Command {
 
   @Override
   protected boolean run() throws IOException {
-    final String name = args[0];
+    final String name = args[0] == null || args[0].isEmpty() ? null : args[0];
     if(name != null && !MetaData.validName(name, false))
       return error(NAME_INVALID_X, name);
 
@@ -56,7 +56,7 @@ public final class ShowUsers extends Command {
   }
 
   @Override
-  public void build(final CommandBuilder cb) {
+  public void build(final CmdBuilder cb) {
     cb.init(Cmd.SHOW + " " + CmdShow.USERS).arg(ON, 0);
   }
 }

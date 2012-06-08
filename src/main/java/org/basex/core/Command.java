@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.core.cmd.*;
+import org.basex.core.parse.*;
 import org.basex.data.*;
 import org.basex.io.out.*;
 import org.basex.util.*;
@@ -20,10 +21,8 @@ import org.xml.sax.*;
  * @author Christian Gruen
  */
 public abstract class Command extends Progress {
-  /** Container for query information. */
-  private final TokenBuilder info = new TokenBuilder();
   /** Command arguments. */
-  protected final String[] args;
+  public final String[] args;
 
   /** Performance measurements. */
   protected Performance perf;
@@ -38,6 +37,8 @@ public abstract class Command extends Progress {
   /** Main properties. */
   protected MainProp mprop;
 
+  /** Container for query information. */
+  private final TokenBuilder info = new TokenBuilder();
   /** Permission required to execute this command. */
   private final Perm perm;
   /** Indicates if command requires opened database. */
@@ -183,7 +184,7 @@ public abstract class Command extends Progress {
 
   @Override
   public final String toString() {
-    final CommandBuilder cb = new CommandBuilder(this);
+    final CmdBuilder cb = new CmdBuilder(this);
     build(cb);
     return cb.toString();
   }
@@ -202,7 +203,7 @@ public abstract class Command extends Progress {
    * correctly built, as commands are sent to the server as strings.
    * @param cb command builder
    */
-  protected void build(final CommandBuilder cb) {
+  protected void build(final CmdBuilder cb) {
     cb.init().args();
   }
 

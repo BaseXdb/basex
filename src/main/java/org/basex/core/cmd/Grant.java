@@ -5,7 +5,8 @@ import static org.basex.core.Text.*;
 import java.io.*;
 
 import org.basex.core.*;
-import org.basex.core.Commands.CmdPerm;
+import org.basex.core.parse.*;
+import org.basex.core.parse.Commands.*;
 import org.basex.data.*;
 import org.basex.util.*;
 
@@ -97,7 +98,7 @@ public final class Grant extends AUser {
   }
 
   @Override
-  public void build(final CommandBuilder cb) {
+  public void build(final CmdBuilder cb) {
     cb.init().arg(0).arg(ON, 2).arg(C_TO, 1);
   }
 }

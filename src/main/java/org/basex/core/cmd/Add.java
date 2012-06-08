@@ -6,6 +6,7 @@ import java.io.*;
 
 import org.basex.build.*;
 import org.basex.core.*;
+import org.basex.core.parse.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.util.*;
@@ -132,7 +133,7 @@ public final class Add extends ACreate {
   }
 
   @Override
-  public void build(final CommandBuilder cb) {
+  public void build(final CmdBuilder cb) {
     cb.init().arg(C_TO, 0).arg(1);
   }
 

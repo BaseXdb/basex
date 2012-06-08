@@ -4,13 +4,7 @@ import static org.basex.core.Lang.*;
 
 import java.util.*;
 
-import org.basex.core.Commands.CmdCreate;
-import org.basex.core.Commands.CmdDrop;
-import org.basex.core.Commands.CmdIndex;
-import org.basex.core.Commands.CmdInfo;
-import org.basex.core.Commands.CmdPerm;
-import org.basex.core.Commands.CmdRepo;
-import org.basex.core.Commands.CmdShow;
+import org.basex.core.parse.Commands.*;
 
 /**
  * This class contains internationalized text strings, which are used

@@ -3,8 +3,8 @@ package org.basex.core.cmd;
 import java.io.*;
 
 import org.basex.core.*;
-import org.basex.core.Commands.Cmd;
-import org.basex.core.Commands.CmdShow;
+import org.basex.core.parse.*;
+import org.basex.core.parse.Commands.*;
 
 /**
  * Evaluates the 'show databases' command and shows opened databases.
@@ -27,7 +27,7 @@ public final class ShowDatabases extends Command {
   }
 
   @Override
-  public void build(final CommandBuilder cb) {
+  public void build(final CmdBuilder cb) {
     cb.init(Cmd.SHOW + " " + CmdShow.DATABASES);
   }
 }

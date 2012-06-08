@@ -5,9 +5,8 @@ import static org.basex.core.Text.*;
 import java.io.*;
 
 import org.basex.core.*;
-import org.basex.core.Commands.Cmd;
-import org.basex.core.Commands.CmdIndexInfo;
-import org.basex.core.Commands.CmdInfo;
+import org.basex.core.parse.*;
+import org.basex.core.parse.Commands.*;
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.util.*;
@@ -97,7 +96,7 @@ public final class InfoIndex extends AInfo {
   }
 
   @Override
-  public void build(final CommandBuilder cb) {
+  public void build(final CmdBuilder cb) {
     cb.init(Cmd.INFO + " " + CmdInfo.INDEX).args();
   }
 }

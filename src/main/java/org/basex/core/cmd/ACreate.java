@@ -58,14 +58,15 @@ public abstract class ACreate extends Command {
   }
 
   /**
-   * Converts the input source to an {@link IO} reference.
+   * Converts the input (second argument of {@link #args}, or {@link #in} reference)
+   * to an {@link IO} reference.
    * @param name name of source
    * @return IO reference
    * @throws IOException I/O exception
    */
   protected IO sourceToIO(final String name) throws IOException {
     IO io = null;
-    if(args[1] != null) {
+    if(args[1] != null && !args[1].isEmpty()) {
       io = IO.get(args[1]);
     } else if(in != null) {
       if(in.getCharacterStream() != null) {

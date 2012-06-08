@@ -5,6 +5,7 @@ import static org.basex.core.Text.*;
 import java.io.*;
 
 import org.basex.core.*;
+import org.basex.core.parse.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
@@ -109,7 +110,7 @@ public final class Store extends ACreate {
   }
 
   @Override
-  public void build(final CommandBuilder cb) {
+  public void build(final CmdBuilder cb) {
     cb.init().arg(C_TO, 0).arg(1);
   }
 }

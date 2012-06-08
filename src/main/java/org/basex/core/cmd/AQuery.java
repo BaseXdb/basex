@@ -6,6 +6,7 @@ import static org.basex.query.util.Err.*;
 import java.io.*;
 
 import org.basex.core.*;
+import org.basex.core.parse.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
@@ -266,7 +267,7 @@ abstract class AQuery extends Command {
   }
 
   @Override
-  public void build(final CommandBuilder cb) {
+  public void build(final CmdBuilder cb) {
     cb.init().xquery(0);
   }
 

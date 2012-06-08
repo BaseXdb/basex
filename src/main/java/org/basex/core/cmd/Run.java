@@ -5,6 +5,7 @@ import static org.basex.core.Text.*;
 import java.io.*;
 
 import org.basex.core.*;
+import org.basex.core.parse.*;
 import org.basex.io.*;
 import org.basex.util.*;
 
@@ -63,7 +64,7 @@ public final class Run extends AQuery {
   }
 
   @Override
-  public void build(final CommandBuilder cb) {
+  public void build(final CmdBuilder cb) {
     cb.init().arg(0);
   }
 }

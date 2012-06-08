@@ -5,7 +5,7 @@ import static org.basex.core.Text.*;
 import java.io.*;
 
 import org.basex.core.*;
-import org.basex.core.Commands.Cmd;
+import org.basex.core.parse.Commands.*;
 
 /**
  * Evaluates the 'help' command and returns help on the database commands.
@@ -25,7 +25,7 @@ public final class Help extends Command {
   @Override
   protected boolean run() throws IOException {
     final String key = args[0];
-    if(key != null) {
+    if(key != null && !key.isEmpty()) {
       final Cmd cmd = getOption(key, Cmd.class);
       if(cmd == null) return error(UNKNOWN_CMD_X, this);
       out.print(cmd.help(true));

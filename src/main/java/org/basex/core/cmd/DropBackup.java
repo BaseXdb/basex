@@ -3,8 +3,8 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 
 import org.basex.core.*;
-import org.basex.core.Commands.Cmd;
-import org.basex.core.Commands.CmdDrop;
+import org.basex.core.parse.*;
+import org.basex.core.parse.Commands.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.util.list.*;
@@ -62,7 +62,7 @@ public final class DropBackup extends Command {
   }
 
   @Override
-  public void build(final CommandBuilder cb) {
+  public void build(final CmdBuilder cb) {
     cb.init(Cmd.DROP + " " + CmdDrop.BACKUP).args();
   }
 }

@@ -7,8 +7,8 @@ import static org.basex.util.Token.*;
 import java.io.*;
 
 import org.basex.core.*;
-import org.basex.core.Commands.Cmd;
-import org.basex.core.Commands.CmdInfo;
+import org.basex.core.parse.*;
+import org.basex.core.parse.Commands.*;
 import org.basex.data.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -135,7 +135,7 @@ public final class InfoStorage extends AQuery {
   }
 
   @Override
-  public void build(final CommandBuilder cb) {
+  public void build(final CmdBuilder cb) {
     cb.init(Cmd.INFO + " " + CmdInfo.STORAGE);
     if(args.length > 0 && args[0] != null && toInt(args[0]) ==
       Integer.MIN_VALUE) {

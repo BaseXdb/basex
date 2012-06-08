@@ -6,7 +6,8 @@ import java.io.*;
 
 import org.basex.build.*;
 import org.basex.core.*;
-import org.basex.core.Commands.Cmd;
+import org.basex.core.parse.*;
+import org.basex.core.parse.Commands.*;
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.io.*;
@@ -67,7 +68,7 @@ public final class OptimizeAll extends ACreate {
   }
 
   @Override
-  public void build(final CommandBuilder cb) {
+  public void build(final CmdBuilder cb) {
     cb.init(Cmd.OPTIMIZE + " " + C_ALL);
   }
 
