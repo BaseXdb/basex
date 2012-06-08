@@ -45,7 +45,7 @@ final class XMLParser extends CmdParser {
       String query = "/*";
       if(!execute(COMMANDS, node).isEmpty()) {
         query = COMMANDS + query;
-        if(execute(query + "[not(text())]", node).isEmpty())
+        if(execute(COMMANDS + "[not(text())]", node).isEmpty())
           throw error("Expected syntax: <commands><...></commands>");
       }
       final QueryProcessor qa = new QueryProcessor(query, ctx).context(node);

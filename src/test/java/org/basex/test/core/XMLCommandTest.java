@@ -18,6 +18,9 @@ public class XMLCommandTest extends SandboxTest {
   /** Check syntax of all commands. */
   @Test
   public final void commands() {
+    // surrounded by <commands/> element (required to process more than one command)
+    ok("<commands><add>x</add></commands>");
+
     ok("<add>x</add>");
     ok("<add path='X'>X</add>");
     ok("<add path='X'><X/></add>");
@@ -153,7 +156,7 @@ public class XMLCommandTest extends SandboxTest {
    */
   static final void ok(final String xml) {
     try {
-      new CommandParser("<commands>" + xml + "</commands>", context).parse();
+      new CommandParser(xml, context).parse();
     } catch(final QueryException ex) {
       fail(Util.message(ex));
     }
@@ -165,7 +168,7 @@ public class XMLCommandTest extends SandboxTest {
    */
   static final void no(final String xml) {
     try {
-      new CommandParser("<commands>" + xml + "</commands>", context).parse();
+      new CommandParser(xml, context).parse();
       fail("\"" + xml + "\" was supposed to fail.");
     } catch(final QueryException ex) {
       /* expected */
