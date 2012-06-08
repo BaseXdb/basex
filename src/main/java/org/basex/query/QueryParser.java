@@ -778,9 +778,7 @@ public class QueryParser extends InputParser {
     declItem = true;
     if(module != null) error(DECITEM);
 
-    final SeqType st = optAsType();
-    if(st != null && st.occ == Occ.ZERO) error(NOTYPE, st);
-    ctx.sc.initType = st;
+    ctx.sc.initType = wsConsumeWs(AS) ? itemType().type : null;
     if(!wsConsumeWs(EXTERNAL)) wsCheck(ASSIGN);
     else if(!wsConsumeWs(ASSIGN)) return;
     ctx.ctxItem = check(single(), NOVARDECL);

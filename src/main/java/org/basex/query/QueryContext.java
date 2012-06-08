@@ -26,6 +26,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.Occ;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
@@ -208,7 +209,7 @@ public final class QueryContext extends Progress {
 
     // if specified, convert context item to specified type
     if(value != null && sc.initType != null) {
-      value = sc.initType.promote(value, this, null);
+      value = SeqType.get(sc.initType, Occ.ONE).promote(value, this, null);
     }
 
     // dynamic compilation
