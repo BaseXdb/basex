@@ -346,20 +346,8 @@ public final class DiskData extends Data {
 
   @Override
   protected void indexEnd() {
-    // update all indexes in parallel
-    // [DP] Full-text index updates: update the existing indexes
-    final Thread txtupdater = txts.size() > 0 ?
-        runIndexInsert((DiskValues) txtindex, txts) : null;
-    final Thread atvupdater = atvs.size() > 0 ?
-        runIndexInsert((DiskValues) atvindex, atvs) : null;
-
-    // wait for all tasks to finish
-    try {
-      if(txtupdater != null) txtupdater.join();
-      if(atvupdater != null) atvupdater.join();
-    } catch(final InterruptedException ex) {
-      Util.stack(ex);
-    }
+    if(!txts.isEmpty()) ((DiskValues) txtindex).index(txts);
+    if(!atvs.isEmpty()) ((DiskValues) atvindex).index(atvs);
   }
 
   @Override
@@ -430,54 +418,7 @@ public final class DiskData extends Data {
         }
       }
     }
-
-    // update all indexes in parallel
-    // [DP] Full-text index updates: update the existing indexes
-    final Thread txtupdater = txts.size() > 0 ?
-        runIndexDelete((DiskValues) txtindex, txts) : null;
-    final Thread atvupdater = atvs.size() > 0 ?
-        runIndexDelete((DiskValues) atvindex, atvs) : null;
-
-    // wait for all tasks to finish
-    try {
-      if(txtupdater != null) txtupdater.join();
-      if(atvupdater != null) atvupdater.join();
-    } catch(final InterruptedException ex) {
-      Util.errln(ex);
-    }
-  }
-
-  /**
-   * Starts a new thread which inserts records into an index.
-   * @param dv index
-   * @param m records to be inserted
-   * @return the new thread
-   */
-  private static Thread runIndexInsert(final DiskValues dv,
-      final TokenObjMap<IntList> m) {
-
-    final Thread t = new Thread() {
-      @Override
-      public void run() { dv.index(m); }
-    };
-    t.start();
-    return t;
-  }
-
-  /**
-   * Starts a new thread which deletes records from an index.
-   * @param dv index
-   * @param m records to be deleted
-   * @return the new thread
-   */
-  private static Thread runIndexDelete(final DiskValues dv,
-      final TokenObjMap<IntList> m) {
-
-    final Thread t = new Thread() {
-      @Override
-      public void run() { dv.delete(m); }
-    };
-    t.start();
-    return t;
+    if(!txts.isEmpty()) ((DiskValues) txtindex).delete(txts);
+    if(!atvs.isEmpty()) ((DiskValues) atvindex).delete(atvs);
   }
 }
