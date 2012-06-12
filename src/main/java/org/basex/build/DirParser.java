@@ -63,8 +63,7 @@ public final class DirParser extends Parser {
     skipCorrupt = prop.is(Prop.SKIPCORRUPT);
     archives = prop.is(Prop.ADDARCHIVES);
     addRaw = prop.is(Prop.ADDRAW);
-    rawParser = prop.get(Prop.PARSER).toLowerCase(Locale.ENGLISH).
-        equals(DataText.M_RAW);
+    rawParser = prop.get(Prop.PARSER).toLowerCase(Locale.ENGLISH).equals(DataText.M_RAW);
 
     filter = !source.isDir() && !source.isArchive() ? null :
       Pattern.compile(IOFile.regex(pr.get(Prop.CREATEFILTER)));

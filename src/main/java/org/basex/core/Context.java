@@ -249,12 +249,12 @@ public final class Context {
   }
 
   /**
-   * Locks a writing process and starts the timeout.
+   * Locks the specified process and starts a timeout thread.
    * @param pr process
    */
   public void register(final Progress pr) {
     // administrators will not be affected by the timeout
-    pr.startTimeout(user.has(Perm.ADMIN) ? 0 : mprop.num(MainProp.TIMEOUT));
+    if(!user.has(Perm.ADMIN)) pr.startTimeout(mprop.num(MainProp.TIMEOUT));
     lock.lock(pr);
   }
 
