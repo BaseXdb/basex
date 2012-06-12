@@ -758,10 +758,6 @@ public enum Function {
   /** XQuery function. */
   _UTIL_SLEEP(FNUtil.class, "sleep(ms)", EMP, ITR),
   /** XQuery function. */
-  _UTIL_MD5(FNUtil.class, "md5(str)", HEX, STR),
-  /** XQuery function. */
-  _UTIL_SHA1(FNUtil.class, "sha1(str)", HEX, STR),
-  /** XQuery function. */
   _UTIL_CRC32(FNUtil.class, "crc32(str)", HEX, STR),
   /** XQuery function. */
   _UTIL_UUID(FNUtil.class, "uuid()", STR),
@@ -772,6 +768,19 @@ public enum Function {
   _UTIL_PATH(FNUtil.class, "path()", STR),
   /** XQuery function. */
   _UTIL_TYPE(FNUtil.class, "type(expr)", ITEM_ZM, ITEM_ZM),
+
+  /* FNHash functions. */
+
+  /** XQuery function. */
+  _HASH_MD5(FNHash.class, "md5(string)", HEX, STR),
+  /** XQuery function. */
+  _HASH_SHA1(FNHash.class, "sha1(string)", HEX, STR),
+  /** XQuery function. */
+  _HASH_SHA256(FNHash.class, "sha256(string)", HEX, STR),
+  /** XQuery function. */
+  _HASH_HASH(FNHash.class, "hash(string,alg)", HEX, STR, STR),
+  /** XQuery function. */
+  _HASH_HASH_BINARY(FNHash.class, "hash-binary(value,alg)", HEX, BIN, STR),
 
   /* FNValidate functions. */
 
@@ -844,6 +853,7 @@ public enum Function {
     URIS.put(FNProc.class,     PROCURI);
     URIS.put(FNSql.class,      SQLURI);
     URIS.put(FNUtil.class,     UTILURI);
+    URIS.put(FNHash.class,     HASHURI);
     URIS.put(FNValidate.class, VALIDATEURI);
     URIS.put(FNXslt.class,     XSLTURI);
   }

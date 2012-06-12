@@ -460,6 +460,8 @@ public interface QueryText {
   byte[] HTTP = token("http");
   /** Util token. */
   byte[] UTIL = token("util");
+  /** Hash token. */
+  byte[] HASH = token("hash");
   /** XSLT token. */
   byte[] XSLT = token("xslt");
   /** ZIP token. */
@@ -563,6 +565,8 @@ public interface QueryText {
   byte[] PROCURI = token(BXMODULES + "proc");
   /** Utility module URI. */
   byte[] UTILURI = token(BXMODULES + "util");
+  /** Hash module URI. */
+  byte[] HASHURI = token(BXMODULES + "hash");
   /** XSLT module URI. */
   byte[] XSLTURI = token(BXMODULES + "xslt");
   /** SQL module URI. */

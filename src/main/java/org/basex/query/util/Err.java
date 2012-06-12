@@ -233,6 +233,9 @@ public enum Err {
   /** FILE9999. */
   FILE_PATH(FILE, 9999, "Invalid file path: '%'."),
 
+  /** HASH0001. */
+  HASH_ALG(HASH, 1, "Algorithm not supported: '%'."),
+
   /** HC0001. */
   HC_ERROR(HC, 1, "An HTTP error occurred: %."),
   /** HC0003. */
@@ -981,7 +984,6 @@ public enum Err {
 
   /**
    * Error types.
-   *
    * @author BaseX Team 2005-12, BSD License
    * @author Leo Woerteler
    */
@@ -999,6 +1001,7 @@ public enum Err {
     /** BXRE Error type. */ BXRE(QueryText.BXERR, QueryText.BXERRORS),
     /** BXSQ Error type. */ BXSQ(QueryText.BXERR, QueryText.BXERRORS),
     /** BXVA Error type. */ BXVA(QueryText.BXERR, QueryText.BXERRORS),
+    /** HASH Error type. */ HASH(QueryText.BXERR, QueryText.BXERRORS),
 
     // EXPath errors
 
@@ -1006,7 +1009,7 @@ public enum Err {
     /** FILE Error type. */ FILE(QueryText.EXPERR, QueryText.EXPERROR),
     /** HC Error type.   */ HC(QueryText.EXPERR, QueryText.EXPERROR),
     /** ZIP Error type. */  ZIP(QueryText.EXPERR, QueryText.EXPERROR),
-    /** FOZ2 Error type. */ ARCH(QueryText.EXPERR, QueryText.EXPERROR),
+    /** ARCH Error type. */ ARCH(QueryText.EXPERR, QueryText.EXPERROR),
 
     // W3 errors
 

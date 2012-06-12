@@ -4,7 +4,6 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.security.*;
 import java.util.*;
 import java.util.zip.*;
 
@@ -20,7 +19,7 @@ import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
- * Project specific functions.
+ * Utility functions.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -71,8 +70,6 @@ public final class FNUtil extends StandardFunc {
       case _UTIL_TAB:        return TAB;
       case _UTIL_SLEEP:      return sleep(ctx);
       case _UTIL_FORMAT:     return format(ctx);
-      case _UTIL_MD5:        return hash(ctx, "MD5");
-      case _UTIL_SHA1:       return hash(ctx, "SHA");
       case _UTIL_CRC32:      return crc32(ctx);
       case _UTIL_UUID:       return uuid();
       case _UTIL_DEEP_EQUAL: return deep(ctx);
@@ -240,22 +237,6 @@ public final class FNUtil extends StandardFunc {
   private Item sleep(final QueryContext ctx) throws QueryException {
     Performance.sleep(checkItr(expr[0], ctx));
     return null;
-  }
-
-  /**
-   * Creates the hash of the given xs:string, using the algorithm {@code algo}.
-   * @param ctx query context
-   * @param algo hashing algorithm
-   * @return xs:hexBinary instance containing the hash
-   * @throws QueryException exception
-   */
-  private Hex hash(final QueryContext ctx, final String algo) throws QueryException {
-    final byte[] str = checkStr(expr[0], ctx);
-    try {
-      return new Hex(MessageDigest.getInstance(algo).digest(str));
-    } catch(final NoSuchAlgorithmException ex) {
-      throw Util.notexpected(ex);
-    }
   }
 
   /**

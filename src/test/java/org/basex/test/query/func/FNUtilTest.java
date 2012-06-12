@@ -103,23 +103,6 @@ public final class FNUtilTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the util:{md5, sha1}() function.
-   */
-  @Test
-  public void utilHashing() {
-    check(_UTIL_MD5);
-    check(_UTIL_SHA1);
-    query(_UTIL_MD5.args(""), "D41D8CD98F00B204E9800998ECF8427E");
-    query(_UTIL_SHA1.args(""), "DA39A3EE5E6B4B0D3255BFEF95601890AFD80709");
-
-    query(_UTIL_MD5.args("BaseX"), "0D65185C9E296311C0A2200179E479A2");
-    query(_UTIL_SHA1.args("BaseX"), "3AD5958F0F27D5AFFDCA2957560F121D0597A4ED");
-
-    error(_UTIL_MD5.args("()"), Err.XPEMPTY);
-    error(_UTIL_SHA1.args("()"), Err.XPEMPTY);
-  }
-
-  /**
    * Test method for the util:crc32() function.
    */
   @Test

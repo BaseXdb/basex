@@ -52,6 +52,7 @@ public final class NSGlobal {
     NS.add(PROC, PROCURI);
     NS.add(SQL, SQLURI);
     NS.add(UTIL, UTILURI);
+    NS.add(HASH, HASHURI);
     NS.add(XSLT, XSLTURI);
     NS.add(REPO, REPOURI);
     NS.add(VLDT, VALIDATEURI);
