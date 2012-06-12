@@ -574,9 +574,7 @@ final class XMLScanner extends Progress {
   private int consume() throws IOException {
     while(true) {
       final int ch = input.read();
-      if(ch < 0) return 0;
-      if(ch > 0 && ch < ' ' && !ws(ch)) error(XMLCHAR, ch);
-
+      if(ch == -1) return 0;
       if(ch == '%' && pe) { // [69]
         final byte[] key = name(true);
         final byte[] val = pents.get(key);

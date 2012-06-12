@@ -81,6 +81,21 @@ public final class FNXslt extends StandardFunc {
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+    switch(sig) {
+      case _XSLT_PROCESSOR: return Str.get(get(true));
+      case _XSLT_VERSION:   return Str.get(get(false));
+      case _XSLT_TRANSFORM: return transform(ctx);
+      default:              return super.item(ctx, ii);
+    }
+  }
+
+  /**
+   * Performs an XSL transformation.
+   * @param ctx query context
+   * @return item
+   * @throws QueryException query exception
+   */
+  private Item transform(final QueryContext ctx) throws QueryException {
     checkCreate(ctx);
 
     try {
@@ -120,7 +135,7 @@ public final class FNXslt extends StandardFunc {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.NDT && sig == Function._UTIL_TRANSFORM || super.uses(u);
+    return u == Use.NDT && sig == Function._XSLT_TRANSFORM || super.uses(u);
   }
 
   /**

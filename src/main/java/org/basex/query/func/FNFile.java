@@ -1,5 +1,6 @@
 package org.basex.query.func;
 
+import static org.basex.query.func.Function.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
@@ -66,6 +67,8 @@ public final class FNFile extends StandardFunc {
         case _FILE_WRITE:          return write(path, false, false, ctx);
         case _FILE_WRITE_BINARY:   return writeBinary(path, ctx, false);
         case _FILE_WRITE_TEXT:     return write(path, true, false, ctx);
+        case _FILE_PATH_SEPARATOR: return Str.get(File.pathSeparator);
+        case _FILE_DIR_SEPARATOR:  return Str.get(File.separator);
         case _FILE_EXISTS:         return Bln.get(path.exists());
         case _FILE_IS_DIR:         return Bln.get(path.isDirectory());
         case _FILE_IS_FILE:        return Bln.get(path.isFile());
@@ -274,8 +277,11 @@ public final class FNFile extends StandardFunc {
    */
   private Item delete(final File path, final QueryContext ctx) throws QueryException {
     if(!path.exists()) FILE_WHICH.thrw(info, path.getAbsolutePath());
-    if(optionalBool(1, ctx)) deleteRec(path);
-    else if(!path.delete()) FILE_DEL.thrw(info, path);
+    if(optionalBool(1, ctx)) {
+      deleteRec(path);
+    } else if(!path.delete()) {
+      throw (path.isDirectory() ? FILE_NEDIR : FILE_DEL).thrw(info, path);
+    }
     return null;
   }
 
@@ -351,7 +357,7 @@ public final class FNFile extends StandardFunc {
       sp = new SerializerProp();
       if(enc != null) sp.set(SerializerProp.S_ENCODING, enc);
     } else {
-      Item it = expr.length > 2 ? expr[2].item(ctx, info) : null;
+      final Item it = expr.length > 2 ? expr[2].item(ctx, info) : null;
       sp = FuncParams.serializerProp(it);
     }
 
@@ -435,6 +441,7 @@ public final class FNFile extends StandardFunc {
     if(trg.isDirectory()) {
       // target is a directory: attach file name
       trg = new File(trg, src.getName());
+      if(trg.isDirectory()) FILE_DIR.thrw(info, trg);
     } else if(!trg.isFile()) {
       // target does not exist: ensure that parent exists
       if(!trg.getParentFile().isDirectory()) FILE_NODIR.thrw(info, trg);
@@ -495,6 +502,8 @@ public final class FNFile extends StandardFunc {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.NDT || super.uses(u);
+    return u == Use.NDT && !oneOf(sig, _FILE_BASE_NAME, _FILE_DIR_NAME,
+        _FILE_DIR_SEPARATOR, _FILE_PATH_SEPARATOR, _FILE_PATH_TO_NATIVE,
+        _FILE_PATH_TO_URI, _FILE_RESOLVE_PATH) || super.uses(u);
   }
 }

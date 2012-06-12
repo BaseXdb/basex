@@ -11,18 +11,18 @@ import org.basex.util.*;
 public final class ArrayInput extends BufferInput {
   /**
    * Constructor, specifying the byte array to be read.
-   * @param input input bytes
+   * @param in input bytes
    */
-  public ArrayInput(final byte[] input) {
-    super(input);
+  public ArrayInput(final byte[] in) {
+    super(in);
   }
 
   /**
    * Constructor, specifying the string to be read.
-   * @param input input bytes
+   * @param in input bytes
    */
-  public ArrayInput(final String input) {
-    this(Token.token(input));
+  public ArrayInput(final String in) {
+    this(Token.token(in));
   }
 
   @Override

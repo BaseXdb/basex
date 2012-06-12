@@ -111,11 +111,8 @@ public final class StoreTest extends SandboxTest {
     final String input = "<a>0</a>";
     run(new Add("a.xml", input));
     final String query = "doc('" + NAME + "')//*[text()='0']";
-    System.out.println("Q1");
     assertEquals(input, run(new XQuery(query)));
-    System.out.println("C");
     run(new Close());
-    System.out.println("Q2");
     assertEquals(input, run(new XQuery(query)));
   }
 

@@ -3561,7 +3561,6 @@ public class QueryParser extends InputParser {
     // dynamically assign variables from function modules
     if(v == null && !declVars) {
       declVars = true;
-      Variable.init(ctx);
       v = ctx.vars.get(name);
     }
     if(v == null) error(err, '$' + string(name.string()));

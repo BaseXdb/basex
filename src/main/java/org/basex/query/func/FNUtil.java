@@ -27,6 +27,11 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public final class FNUtil extends StandardFunc {
+  /** Newline character. */
+  private static final Str NL = Str.get("\n");
+  /** Tab character. */
+  private static final Str TAB = Str.get("\t");
+
   /**
    * Constructor.
    * @param ii input info
@@ -62,15 +67,17 @@ public final class FNUtil extends StandardFunc {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
-      case _UTIL_SLEEP:             return sleep(ctx);
-      case _UTIL_FORMAT:            return format(ctx);
-      case _UTIL_MD5:               return hash(ctx, "MD5");
-      case _UTIL_SHA1:              return hash(ctx, "SHA");
-      case _UTIL_CRC32:             return crc32(ctx);
-      case _UTIL_UUID:              return uuid();
-      case _UTIL_DEEP_EQUAL:        return deep(ctx);
-      case _UTIL_PATH:              return filename(ctx);
-      default:                      return super.item(ctx, ii);
+      case _UTIL_NL:         return NL;
+      case _UTIL_TAB:        return TAB;
+      case _UTIL_SLEEP:      return sleep(ctx);
+      case _UTIL_FORMAT:     return format(ctx);
+      case _UTIL_MD5:        return hash(ctx, "MD5");
+      case _UTIL_SHA1:       return hash(ctx, "SHA");
+      case _UTIL_CRC32:      return crc32(ctx);
+      case _UTIL_UUID:       return uuid();
+      case _UTIL_DEEP_EQUAL: return deep(ctx);
+      case _UTIL_PATH:       return filename(ctx);
+      default:               return super.item(ctx, ii);
     }
   }
 

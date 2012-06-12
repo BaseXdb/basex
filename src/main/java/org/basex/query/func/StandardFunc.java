@@ -131,4 +131,15 @@ public abstract class StandardFunc extends Arr {
     if(!Charset.isSupported(enc)) err.thrw(info, enc);
     return enc;
   }
+
+  /**
+   * Compares several signatures for equality.
+   * @param sig signature to be found
+   * @param sigs signatures to be compared
+   * @return result of check
+   */
+  protected static boolean oneOf(final Function sig, final Function... sigs) {
+    for(final Function s : sigs) if(sig == s) return true;
+    return false;
+  }
 }

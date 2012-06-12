@@ -6,7 +6,6 @@ import static org.junit.Assert.*;
 import java.io.*;
 
 import org.basex.io.out.*;
-import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.test.query.*;
 import org.junit.*;
@@ -26,8 +25,8 @@ public final class FNUtilTest extends AdvancedQueryTest {
    */
   @Test
   public void utilNl() {
-    // compared with empty string, because query() removes all newlines
-    query(Variable._UTIL_NL.toString(), "");
+    // compared with empty string, because query() function removes all newlines
+    query(_UTIL_NL.args(), "");
   }
 
   /**
@@ -35,7 +34,7 @@ public final class FNUtilTest extends AdvancedQueryTest {
    */
   @Test
   public void utilTab() {
-    query(Variable._UTIL_TAB.toString(), "\t");
+    query(_UTIL_TAB.args(), "\t");
   }
 
   /**

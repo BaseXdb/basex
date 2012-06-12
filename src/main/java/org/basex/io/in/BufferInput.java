@@ -14,13 +14,15 @@ import org.basex.util.list.*;
  */
 public class BufferInput extends InputStream {
   /** Byte buffer. */
-  final byte[] buffer;
+  protected final byte[] buffer;
   /** Current buffer position. */
-  int bpos;
+  protected int bpos;
   /** Current buffer size. */
-  int bsize;
+  protected int bsize;
   /** Total length of input to be processed ({@code -1} if unknown). */
-  long length;
+  protected long length;
+  /** Input file. */
+  protected IO input;
 
   /** Reference to the data input stream. */
   private final InputStream in;
@@ -37,6 +39,7 @@ public class BufferInput extends InputStream {
   public BufferInput(final IO io) throws IOException {
     this(io.inputStream());
     length = io.length();
+    input = io;
   }
 
   /**
@@ -66,6 +69,14 @@ public class BufferInput extends InputStream {
     bsize = buf.length;
     length = bsize;
     in = null;
+  }
+
+  /**
+   * Returns the IO reference, or {@code null}.
+   * @return file reference
+   */
+  public IO io() {
+    return input;
   }
 
   /**

@@ -20,6 +20,8 @@ import org.basex.util.*;
 abstract class TextDecoder {
   /** Encoding. */
   String encoding;
+  /** Indicates if input must be valid. */
+  boolean valid;
 
   /**
    * Returns the next character.
@@ -47,12 +49,14 @@ abstract class TextDecoder {
   }
 
   /**
-   * Processes an invalid character.
+   * Processes an invalid character. Throws an exception if input must be valid,
+   * or returns a question mark as replacement.
    * @throws IOException I/O exception
-   * @return exception
+   * @return question mark
    */
-  static InputException invalid() throws IOException {
-    throw new InputException();
+  int invalid() throws IOException {
+    if(valid) throw new InputException();
+    return '?';
   }
 
   /** UTF8 Decoder. */
@@ -68,7 +72,7 @@ abstract class TextDecoder {
       final int cl = cl((byte) ch);
       for(int c = 1; c < cl; ++c) {
         ch = ti.next();
-        if(ch < 0) invalid();
+        if(ch < 0) return invalid();
         cache[c] = (byte) ch;
       }
       return cp(cache, 0);
@@ -82,7 +86,7 @@ abstract class TextDecoder {
       final int a = ti.next();
       if(a < 0) return a;
       final int b = ti.next();
-      if(b < 0) invalid();
+      if(b < 0) return invalid();
       return a | b << 8;
     }
   }
@@ -94,7 +98,7 @@ abstract class TextDecoder {
       final int a = ti.next();
       if(a < 0) return a;
       final int b = ti.next();
-      if(b < 0) invalid();
+      if(b < 0) return invalid();
       return a << 8 | b;
     }
   }
@@ -106,11 +110,11 @@ abstract class TextDecoder {
       final int a = ti.next();
       if(a < 0) return a;
       final int b = ti.next();
-      if(b < 0) invalid();
+      if(b < 0) return invalid();
       final int c = ti.next();
-      if(c < 0) invalid();
+      if(c < 0) return invalid();
       final int d = ti.next();
-      if(d < 0) invalid();
+      if(d < 0) return invalid();
       return a << 24 | b << 16 | c << 8 | d;
     }
   }
@@ -159,8 +163,7 @@ abstract class TextDecoder {
         for(int o = 0; o < os; ++o) i |= outc.get(o) << (o << 3);
         return i;
       }
-      if(c == 0) return -1;
-      throw invalid();
+      return c == 0 ? -1 : invalid();
     }
   }
 }

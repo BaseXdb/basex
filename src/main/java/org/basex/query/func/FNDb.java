@@ -1,5 +1,6 @@
 package org.basex.query.func;
 
+import static org.basex.query.func.Function.*;
 import static org.basex.data.DataText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
@@ -195,7 +196,7 @@ public final class FNDb extends StandardFunc {
     // parse and compile the name test
     final Item name = checkNoEmpty(expr[a].item(ctx, info));
     final QNm nm = new QNm(checkStr(name, ctx), ctx);
-    if(!nm.hasPrefix()) nm.uri(ctx.sc.ns.uri(EMPTY));
+    if(!nm.hasPrefix()) nm.uri(ctx.sc.ns.uri(Token.EMPTY));
 
     final NameTest nt = new NameTest(nm, NameTest.Mode.STD, true);
     // no results expected: return empty sequence
@@ -236,7 +237,7 @@ public final class FNDb extends StandardFunc {
       for(final String s : ctx.context.databases().listDBs()) tl.add(s);
     } else {
       final Data data = data(0, ctx);
-      final String path = string(el == 1 ? EMPTY : checkStr(expr[1], ctx));
+      final String path = string(el == 1 ? Token.EMPTY : checkStr(expr[1], ctx));
       // add xml resources
       final Resources res = data.resources;
       final IntList il = res.docs(path);
@@ -270,7 +271,7 @@ public final class FNDb extends StandardFunc {
     if(expr.length == 0) return listDBs(ctx);
 
     final Data data = data(0, ctx);
-    final String path = string(expr.length == 1 ? EMPTY : checkStr(expr[1], ctx));
+    final String path = string(expr.length == 1 ? Token.EMPTY : checkStr(expr[1], ctx));
     final IntList il = data.resources.docs(path);
     final TokenList tl = data.resources.binaries(path);
 
@@ -718,17 +719,12 @@ public final class FNDb extends StandardFunc {
 
   @Override
   public boolean uses(final Use u) {
-    final boolean up =
-      sig == Function._DB_ADD || sig == Function._DB_DELETE ||
-      sig == Function._DB_RENAME || sig == Function._DB_REPLACE ||
-      sig == Function._DB_OPTIMIZE || sig == Function._DB_STORE ||
-      sig == Function._DB_OUTPUT || sig == Function._DB_FLUSH;
+    final boolean up = oneOf(sig, _DB_ADD, _DB_DELETE, _DB_RENAME, _DB_REPLACE,
+        _DB_OPTIMIZE, _DB_STORE, _DB_OUTPUT, _DB_FLUSH);
     return
       // skip evaluation at compile time
-      u == Use.CTX && (
-        sig == Function._DB_TEXT || sig == Function._DB_ATTRIBUTE ||
-        sig == Function._DB_TEXT_RANGE || sig == Function._DB_ATTRIBUTE_RANGE ||
-        sig == Function._DB_FULLTEXT || sig == Function._DB_EVENT || up) ||
+      u == Use.NDT && (up || oneOf(sig, _DB_TEXT, _DB_ATTRIBUTE, _DB_TEXT_RANGE,
+          _DB_ATTRIBUTE_RANGE, _DB_FULLTEXT, _DB_EVENT)) ||
       u == Use.UPD && up ||
       super.uses(u);
   }
@@ -736,8 +732,7 @@ public final class FNDb extends StandardFunc {
   @Override
   public boolean iterable() {
     // index functions will always yield ordered and duplicate-free results
-    return sig == Function._DB_OPEN || sig == Function._DB_TEXT ||
-      sig == Function._DB_ATTRIBUTE || sig == Function._DB_FULLTEXT ||
+    return oneOf(sig, _DB_OPEN, _DB_TEXT, _DB_ATTRIBUTE, _DB_FULLTEXT) ||
       super.iterable();
   }
 

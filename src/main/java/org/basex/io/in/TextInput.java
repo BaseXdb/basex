@@ -19,6 +19,8 @@ import org.basex.util.list.*;
 public class TextInput extends BufferInput {
   /** Decoder. */
   private TextDecoder decoder;
+  /** Indicates if input is checked for valid XML 1.0. */
+  private boolean valid;
 
   /**
    * Constructor.
@@ -78,6 +80,17 @@ public class TextInput extends BufferInput {
   }
 
   /**
+   * Checks input for valid XML 1.0 and throws exception if invalid characters are found.
+   * @param v flag to be set
+   * @return self reference
+   */
+  public TextInput valid(final boolean v) {
+    valid = v;
+    decoder.valid = v;
+    return this;
+  }
+
+  /**
    * Sets a new encoding if none has been set yet, or if specified encoding is not UTF-8.
    * @param enc encoding
    * @return self reference
@@ -92,7 +105,7 @@ public class TextInput extends BufferInput {
   @Override
   public int read() throws IOException {
     final int ch = decoder.read(this);
-    if(ch != -1 && !XMLToken.valid(ch)) throw new EncodingException(ch);
+    if(ch != -1 && valid && !XMLToken.valid(ch)) throw new EncodingException(ch);
     return ch;
   }
 

@@ -14,9 +14,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public class XMLInput extends InputStream {
-  /** Input file. */
-  private final IO input;
-
   /** Input streams. */
   private NewlineInput[] inputs = new NewlineInput[1];
   /** Input pointer. */
@@ -38,7 +35,6 @@ public class XMLInput extends InputStream {
    */
   public XMLInput(final IO io) throws IOException {
     inputs[0] = new NewlineInput(io);
-    input = io;
   }
 
   /**
@@ -55,7 +51,7 @@ public class XMLInput extends InputStream {
    * @return file reference
    */
   public IO io() {
-    return input;
+    return inputs[0].io();
   }
 
   /**

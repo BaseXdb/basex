@@ -54,8 +54,8 @@ public final class FNGen extends StandardFunc {
     switch(sig) {
       case DOC:                     return doc(ctx);
       case DOC_AVAILABLE:           return docAvailable(ctx);
-      case UNPARSED_TEXT:           return unparsedText(ctx, true);
-      case UNPARSED_TEXT_AVAILABLE: return unparsedText(ctx, false);
+      case UNPARSED_TEXT:           return unparsedText(ctx, false);
+      case UNPARSED_TEXT_AVAILABLE: return unparsedText(ctx, true);
       case PUT:                     return put(ctx);
       case PARSE_XML:               return parseXml(ctx);
       case SERIALIZE:               return serialize(ctx);
@@ -190,11 +190,11 @@ public final class FNGen extends StandardFunc {
   /**
    * Performs the unparsed-text function.
    * @param ctx query context
-   * @param full return text (otherwise: check if text is available)
-   * @return lines
+   * @param check only check if text is available
+   * @return content
    * @throws QueryException query exception
    */
-  private Item unparsedText(final QueryContext ctx, final boolean full)
+  private Item unparsedText(final QueryContext ctx, final boolean check)
       throws QueryException {
 
     checkCreate(ctx);
@@ -215,19 +215,19 @@ public final class FNGen extends StandardFunc {
 
       final InputStream is = io.inputStream();
       try {
-        final TextInput ti = new TextInput(io);
+        final TextInput ti = new TextInput(io).valid(true);
         if(enc != null) ti.encoding(enc);
-        if(full) return Str.get(ti.content());
+        if(!check) return Str.get(ti.content());
         while(ti.read() != -1);
         return Bln.TRUE;
       } finally {
         is.close();
       }
     } catch(final QueryException ex) {
-      if(!full) return Bln.FALSE;
+      if(check) return Bln.FALSE;
       throw ex;
     } catch(final IOException ex) {
-      if(!full) return Bln.FALSE;
+      if(check) return Bln.FALSE;
       if(ex instanceof EncodingException) INVCHARS.thrw(info, ex);
       if(ex instanceof InputException && enc == null) WHICHCHARS.thrw(info);
       throw SERANY.thrw(info, ex);
@@ -241,7 +241,7 @@ public final class FNGen extends StandardFunc {
    * @throws QueryException query exception
    */
   Iter unparsedTextLines(final QueryContext ctx) throws QueryException {
-    return textIter(unparsedText(ctx, true).string(info));
+    return textIter(unparsedText(ctx, false).string(info));
   }
 
   /**

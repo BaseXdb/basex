@@ -8,7 +8,6 @@ import java.util.*;
 
 import org.basex.core.*;
 import org.basex.io.*;
-import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.test.query.*;
 import org.junit.*;
@@ -45,7 +44,7 @@ public final class FNFileTest extends AdvancedQueryTest {
    */
   @Test
   public void fileDirSeparator() {
-    assertTrue(!query(Variable._FILE_DIR_SEPARATOR.toString()).isEmpty());
+    assertTrue(!query(_FILE_DIR_SEPARATOR.args()).isEmpty());
   }
 
   /**
@@ -53,7 +52,7 @@ public final class FNFileTest extends AdvancedQueryTest {
    */
   @Test
   public void filePathSeparator() {
-    assertTrue(!query(Variable._FILE_PATH_SEPARATOR.toString()).isEmpty());
+    assertTrue(!query(_FILE_PATH_SEPARATOR.args()).isEmpty());
   }
 
   /**

@@ -3,7 +3,6 @@ package org.basex.test.query.func;
 import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
 
-import org.basex.query.func.*;
 import org.basex.test.query.*;
 import org.junit.*;
 
@@ -19,7 +18,7 @@ public final class FNXsltTest extends AdvancedQueryTest {
    */
   @Test
   public void xsltProcessor() {
-    assertTrue(!query(Variable._XSLT_PROCESSOR.toString()).isEmpty());
+    assertTrue(!query(_XSLT_PROCESSOR.args()).isEmpty());
   }
 
   /**
@@ -27,7 +26,7 @@ public final class FNXsltTest extends AdvancedQueryTest {
    */
   @Test
   public void xsltVersion() {
-    assertTrue(!query(Variable._XSLT_VERSION.toString()).isEmpty());
+    assertTrue(!query(_XSLT_VERSION.args()).isEmpty());
   }
 
   /**
@@ -35,19 +34,19 @@ public final class FNXsltTest extends AdvancedQueryTest {
    */
   @Test
   public void xsltTransform() {
-    check(_UTIL_TRANSFORM);
+    check(_XSLT_TRANSFORM);
 
     final String doc = "<a/>";
     String style = wrap("<xsl:template match='/'><X/></xsl:template>");
-    query(_UTIL_TRANSFORM.args(doc, style), "<X/>");
-    query(_UTIL_TRANSFORM.args(doc, '"' + style + '"'), "<X/>");
+    query(_XSLT_TRANSFORM.args(doc, style), "<X/>");
+    query(_XSLT_TRANSFORM.args(doc, '"' + style + '"'), "<X/>");
 
     style = wrap("<xsl:param name='t'/><xsl:template match='/'>" +
       "<X><xsl:value-of select='$t'/></X></xsl:template>");
     final String param =
       "<xslt:parameters><xslt:t>1</xslt:t></xslt:parameters>";
 
-    query(_UTIL_TRANSFORM.args(doc, style, param), "<X>1</X>");
+    query(_XSLT_TRANSFORM.args(doc, style, param), "<X>1</X>");
   }
 
   /**

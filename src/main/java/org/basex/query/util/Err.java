@@ -216,6 +216,8 @@ public enum Err {
   FILE_NODIR(FILE, 3, "Path '%' is no directory."),
   /** FILE0004. */
   FILE_DIR(FILE, 4, "Path '%' is a directory."),
+  /** FILE0004. */
+  FILE_NEDIR(FILE, 4, "Path '%' is a non-empty directory."),
   /** FILE0005. */
   FILE_ENCODING(FILE, 5, "Encoding '%' is not supported."),
   /** FILE9999. */
