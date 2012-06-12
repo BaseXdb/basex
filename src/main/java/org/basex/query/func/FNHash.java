@@ -1,10 +1,11 @@
 package org.basex.query.func;
 
+import static org.basex.query.util.Err.*;
+
 import java.security.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -32,7 +33,6 @@ public final class FNHash extends StandardFunc {
       case _HASH_SHA1:        return hash("SHA", ctx);
       case _HASH_SHA256:      return hash("SHA-256", ctx);
       case _HASH_HASH:        return hash(ctx);
-      case _HASH_HASH_BINARY: return hashBinary(ctx);
       default:                return super.item(ctx, ii);
     }
   }
@@ -48,17 +48,6 @@ public final class FNHash extends StandardFunc {
   }
 
   /**
-   * Creates the hash of the given binary value.
-   * @param ctx query context
-   * @return xs:hexBinary instance containing the hash
-   * @throws QueryException exception
-   */
-  private Hex hashBinary(final QueryContext ctx) throws QueryException {
-    return hashBinary(checkBinary(expr[0], ctx).binary(info),
-        Token.string(checkStr(expr[1], ctx)));
-  }
-
-  /**
    * Creates the hash of the given xs:string, using the algorithm {@code algo}.
    * @param algo hashing algorithm
    * @param ctx query context
@@ -66,7 +55,16 @@ public final class FNHash extends StandardFunc {
    * @throws QueryException exception
    */
   private Hex hash(final String algo, final QueryContext ctx) throws QueryException {
-    return hashBinary(checkStr(expr[0], ctx), algo);
+    final Item it = checkItem(expr[0], ctx);
+    final byte[] val;
+    if(it.type.isString()) {
+      val = it.string(info);
+    } else if(it instanceof Bin) {
+      val = ((Bin) it).binary(info);
+    } else {
+      throw BINSTRTYPE.thrw(info, it.type);
+    }
+    return hashBinary(val, algo);
   }
 
   /**
@@ -80,7 +78,7 @@ public final class FNHash extends StandardFunc {
     try {
       return new Hex(MessageDigest.getInstance(algo).digest(val));
     } catch(final NoSuchAlgorithmException ex) {
-      throw Err.HASH_ALG.thrw(info, algo);
+      throw HASH_ALG.thrw(info, algo);
     }
   }
 }

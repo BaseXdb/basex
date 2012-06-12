@@ -50,17 +50,8 @@ public final class FNHashTest extends AdvancedQueryTest {
     query(_HASH_HASH.args("", "SHA-1"), "DA39A3EE5E6B4B0D3255BFEF95601890AFD80709");
     query(_HASH_HASH.args("", "SHA-256"),
         "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855");
+    query(_HASH_HASH.args("xs:hexBinary('')", "md5"),
+        "D41D8CD98F00B204E9800998ECF8427E");
     error(_HASH_HASH.args("", ""), Err.HASH_ALG);
-  }
-
-  /** Test method for the util:hash-binary() function. */
-  @Test
-  public void utilHashBinary() {
-    check(_HASH_HASH_BINARY);
-    query(_HASH_HASH_BINARY.args("xs:hexBinary('')", "md5"),
-        "D41D8CD98F00B204E9800998ECF8427E");
-    query(_HASH_HASH_BINARY.args("xs:base64Binary('')", "MD5"),
-        "D41D8CD98F00B204E9800998ECF8427E");
-    error(_HASH_HASH_BINARY.args("xs:hexBinary('')", ""), Err.HASH_ALG);
   }
 }
