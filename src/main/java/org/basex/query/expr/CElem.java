@@ -110,8 +110,8 @@ public final class CElem extends CName {
         final byte[] auri = qnm.uri();
         final byte[] npref = addNS(apref, auri, ns);
         if(npref != null) {
-          constr.atts.item[a] = new FAttr(
-              new QNm(concat(npref, COLON, qnm.local()), auri), att.string());
+          constr.atts.set(a, new FAttr(
+              new QNm(concat(npref, COLON, qnm.local()), auri), att.string()));
         }
       }
 

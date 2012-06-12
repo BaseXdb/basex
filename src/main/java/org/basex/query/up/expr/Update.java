@@ -5,7 +5,7 @@ import static org.basex.util.Token.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -39,7 +39,7 @@ abstract class Update extends Arr {
    * @throws QueryException query exception
    * @return specified node list
    */
-  final NodeSeqBuilder checkNS(final NodeSeqBuilder list, final ANode targ,
+  final ANodeList checkNS(final ANodeList list, final ANode targ,
       final QueryContext ctx) throws QueryException {
 
     for(int a = 0; a < list.size(); ++a) {

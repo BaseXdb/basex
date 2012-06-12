@@ -51,16 +51,17 @@ public final class DataBuilder {
    * @param n node
    */
   public void build(final ANode n) {
-    build(new NodeSeqBuilder(new ANode[] { n }, 1));
+    build(new ANodeList(n));
   }
 
   /**
    * Fills the data instance with the specified nodes.
-   * @param nc node iterator
+   * @param nl node list
    */
-  public void build(final NodeSeqBuilder nc) {
+  public void build(final ANodeList nl) {
     int pre = 1;
-    for(ANode n; (n = nc.next()) != null;) pre = addNode(n, pre, 0, null);
+    final int ns = nl.size();
+    for(int n = 0; n < ns; n++) pre = addNode(nl.get(n), pre, 0, null);
   }
 
   /**
@@ -72,9 +73,7 @@ public final class DataBuilder {
    * @return pre value of next node
    * @param ndPar parent of node to be added
    */
-  private int addNode(final ANode nd, final int pre, final int par,
-      final ANode ndPar) {
-
+  private int addNode(final ANode nd, final int pre, final int par, final ANode ndPar) {
     switch(nd.nodeType()) {
       case DOC: return addDoc(nd, pre);
       case ELM: return addElem(nd, pre, par);

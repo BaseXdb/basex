@@ -1,6 +1,6 @@
 package org.basex.api.dom;
 
-import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.util.*;
 import org.w3c.dom.*;
 
@@ -15,7 +15,7 @@ public final class BXNNode extends BXNList implements NamedNodeMap {
    * Constructor.
    * @param nb nodes
    */
-  public BXNNode(final NodeSeqBuilder nb) {
+  public BXNNode(final ANodeList nb) {
     super(nb);
   }
 
@@ -24,7 +24,7 @@ public final class BXNNode extends BXNList implements NamedNodeMap {
     final byte[] nm = Token.token(name);
     final int s = getLength();
     for(int i = 0; i < s; ++i) {
-      if(Token.eq(nc.get(i).name(), nm)) return item(i);
+      if(Token.eq(nl.get(i).name(), nm)) return item(i);
     }
     return null;
   }

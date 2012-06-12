@@ -4,8 +4,8 @@ import static org.basex.query.util.Err.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
-import org.basex.query.iter.*;
 import org.basex.query.up.*;
+import org.basex.query.util.*;
 import org.basex.util.*;
 
 /**
@@ -22,8 +22,7 @@ public final class ReplaceNode extends NodeCopy {
    * @param i input info
    * @param c node copy
    */
-  public ReplaceNode(final int p, final Data d, final InputInfo i,
-      final NodeSeqBuilder c) {
+  public ReplaceNode(final int p, final Data d, final InputInfo i, final ANodeList c) {
     super(PrimitiveType.REPLACENODE, p, d, i, c);
   }
 

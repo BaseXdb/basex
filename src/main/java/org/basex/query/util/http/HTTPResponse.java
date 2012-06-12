@@ -15,6 +15,7 @@ import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -56,8 +57,8 @@ public final class HTTPResponse {
   public ValueIter getResponse(final HttpURLConnection conn, final byte[] status,
       final byte[] mediaTypeOvr) throws IOException, QueryException {
 
-    final NodeSeqBuilder attrs = extractAttrs(conn);
-    final NodeSeqBuilder hdrs = extractHdrs(conn);
+    final ANodeList attrs = extractAttrs(conn);
+    final ANodeList hdrs = extractHdrs(conn);
     final String cType = mediaTypeOvr == null ?
         extractContentType(conn.getContentType()) : string(mediaTypeOvr);
     final ValueBuilder payloads = new ValueBuilder();
@@ -67,9 +68,8 @@ public final class HTTPResponse {
     // multipart response
     if(cType.startsWith(MULTIPART)) {
       final byte[] boundary = extractBoundary(conn.getContentType());
-      final NodeSeqBuilder a = new NodeSeqBuilder();
-      a.add(new FAttr(Q_MEDIA_TYPE, token(cType)));
-      a.add(new FAttr(Q_BOUNDARY, boundary));
+      final ANodeList a = new ANodeList(
+          new FAttr(Q_MEDIA_TYPE, token(cType)), new FAttr(Q_BOUNDARY, boundary));
       body = new FElem(HTTP_MULTIPART, extractParts(conn.getInputStream(), s,
           payloads, concat(token("--"), boundary)), a, new Atts(HTTP, HTTPURI));
       // single part response
@@ -98,13 +98,10 @@ public final class HTTPResponse {
    * @return node cache with attributes
    * @throws IOException I/O Exception
    */
-  private static NodeSeqBuilder extractAttrs(final HttpURLConnection conn)
-      throws IOException {
-
-    final NodeSeqBuilder a = new NodeSeqBuilder();
-    a.add(new FAttr(Q_STATUS, token(conn.getResponseCode())));
-    a.add(new FAttr(Q_MESSAGE, token(conn.getResponseMessage())));
-    return a;
+  private static ANodeList extractAttrs(final HttpURLConnection conn) throws IOException {
+    return new ANodeList(
+        new FAttr(Q_STATUS, token(conn.getResponseCode())),
+        new FAttr(Q_MESSAGE, token(conn.getResponseMessage())));
   }
 
   /**
@@ -113,8 +110,8 @@ public final class HTTPResponse {
    * @param conn HTTP connection
    * @return node cache with http:header elements
    */
-  private static NodeSeqBuilder extractHdrs(final HttpURLConnection conn) {
-    final NodeSeqBuilder h = new NodeSeqBuilder();
+  private static ANodeList extractHdrs(final HttpURLConnection conn) {
+    final ANodeList h = new ANodeList();
     for(final String headerName : conn.getHeaderFields().keySet()) {
       if(headerName != null) {
         final FElem hdr = new FElem(HTTP_HEADER, new Atts(HTTP, HTTPURI));
@@ -194,7 +191,7 @@ public final class HTTPResponse {
    * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
-  private NodeSeqBuilder extractParts(final InputStream io, final boolean status,
+  private ANodeList extractParts(final InputStream io, final boolean status,
       final ValueBuilder payloads, final byte[] sep) throws IOException, QueryException {
 
     try {
@@ -207,7 +204,7 @@ public final class HTTPResponse {
 
       final byte[] end = concat(sep, token("--"));
       FElem nextPart = extractNextPart(io, status, payloads, sep, end);
-      final NodeSeqBuilder p = new NodeSeqBuilder();
+      final ANodeList p = new ANodeList();
       while(nextPart != null) {
         p.add(nextPart);
         nextPart = extractNextPart(io, status, payloads, sep, end);

@@ -12,6 +12,7 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -361,11 +362,11 @@ public final class FNSql extends StandardFunc {
   private NodeSeqBuilder buildResult(final ResultSet rs) throws QueryException {
     try {
       final ResultSetMetaData metadata = rs.getMetaData();
-      final int columnCount = metadata.getColumnCount();
+      final int cc = metadata.getColumnCount();
       final NodeSeqBuilder rows = new NodeSeqBuilder();
       while(rs.next()) {
-        final NodeSeqBuilder columns = new NodeSeqBuilder();
-        for(int k = 1; k <= columnCount; k++) {
+        final ANodeList columns = new ANodeList(cc);
+        for(int k = 1; k <= cc; k++) {
           // For each row add column values as children
           final String label = metadata.getColumnLabel(k);
           final Object value = rs.getObject(label);
@@ -373,12 +374,10 @@ public final class FNSql extends StandardFunc {
           if(value != null) {
             // Column name
             final FAttr columnName = new FAttr(Q_NAME, token(label));
-            final NodeSeqBuilder attr = new NodeSeqBuilder();
-            attr.add(columnName);
+            final ANodeList attr = new ANodeList(columnName);
             // Column value
             final FTxt columnValue = new FTxt(token(value.toString()));
-            final NodeSeqBuilder ch = new NodeSeqBuilder();
-            ch.add(columnValue);
+            final ANodeList ch = new ANodeList(columnValue);
             // Element <sql:column name='...'>...</sql:column>
             columns.add(new FElem(Q_COLUMN, ch, attr, NS_SQL));
           }

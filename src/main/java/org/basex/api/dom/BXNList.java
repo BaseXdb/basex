@@ -1,6 +1,6 @@
 package org.basex.api.dom;
 
-import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.w3c.dom.*;
 
@@ -12,26 +12,25 @@ import org.w3c.dom.*;
  */
 class BXNList implements NodeList {
   /** XQuery node set. */
-  final NodeSeqBuilder nc;
+  final ANodeList nl;
 
   /**
    * Constructor.
    * @param nb nodes
    */
-  BXNList(final NodeSeqBuilder nb) {
-    nc = nb;
-    nc.sort();
+  BXNList(final ANodeList nb) {
+    nl = nb;
   }
 
   @Override
   public BXNode item(final int i) {
     ANode n = null;
-    if(i < nc.size()) n = nc.get(i);
+    if(i < nl.size()) n = nl.get(i);
     return n != null ? n.toJava() : null;
   }
 
   @Override
   public int getLength() {
-    return (int) nc.size();
+    return nl.size();
   }
 }

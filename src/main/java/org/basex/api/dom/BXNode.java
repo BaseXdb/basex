@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -258,7 +259,7 @@ public abstract class BXNode implements Node {
    * @return nodes
    */
   final BXNList getElements(final String tag) {
-    final NodeSeqBuilder nb = new NodeSeqBuilder();
+    final ANodeList nb = new ANodeList();
     final AxisIter ai = node.descendant();
     final byte[] nm = tag.equals("*") ? null : token(tag);
     for(ANode n; (n = ai.next()) != null;) {
@@ -272,10 +273,10 @@ public abstract class BXNode implements Node {
    * @param ai axis iterator
    * @return node cache
    */
-  static NodeSeqBuilder finish(final AxisIter ai) {
-    final NodeSeqBuilder nc = new NodeSeqBuilder();
-    for(ANode n; (n = ai.next()) != null;) nc.add(n.finish());
-    return nc;
+  static ANodeList finish(final AxisIter ai) {
+    final ANodeList nl = new ANodeList();
+    for(ANode n; (n = ai.next()) != null;) nl.add(n.finish());
+    return nl;
   }
 
   /**

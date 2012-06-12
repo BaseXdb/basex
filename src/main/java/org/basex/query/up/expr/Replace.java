@@ -8,6 +8,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.up.primitives.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -53,8 +54,8 @@ public final class Replace extends Update {
     final DBNode dbn = ctx.updates.determineDataRef(targ, ctx);
 
     // replace node
-    final NodeSeqBuilder aList = c.atts;
-    NodeSeqBuilder list = c.children;
+    final ANodeList aList = c.atts;
+    ANodeList list = c.children;
     if(value) {
       // replace value of node
       final byte[] txt = list.size() < 1 ? EMPTY : list.get(0).string();

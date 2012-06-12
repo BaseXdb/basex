@@ -1,7 +1,7 @@
 package org.basex.query.up.primitives;
 
 import org.basex.data.*;
-import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.util.*;
 
 /**
@@ -23,8 +23,7 @@ public final class InsertBefore extends InsertBase {
    * @param i input info
    * @param c node copy
    */
-  public InsertBefore(final int p, final Data d, final InputInfo i,
-      final NodeSeqBuilder c) {
+  public InsertBefore(final int p, final Data d, final InputInfo i, final ANodeList c) {
     super(PrimitiveType.INSERTBEFORE, p, d, i, c);
     par = d.parent(p, d.kind(p));
   }

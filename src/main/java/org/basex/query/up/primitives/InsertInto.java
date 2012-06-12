@@ -1,7 +1,7 @@
 package org.basex.query.up.primitives;
 
 import org.basex.data.*;
-import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.util.*;
 
 /**
@@ -16,13 +16,12 @@ public final class InsertInto extends InsertBase {
    * @param p pre
    * @param d data
    * @param i input info
-   * @param nc node copy
+   * @param n node copy
    * @param l insert into as last
    */
-  public InsertInto(final int p, final Data d, final InputInfo i,
-      final NodeSeqBuilder nc, final boolean l) {
-    super(l ? PrimitiveType.INSERTINTOLAST :
-      PrimitiveType.INSERTINTO, p, d, i, nc);
+  public InsertInto(final int p, final Data d, final InputInfo i, final ANodeList n,
+      final boolean l) {
+    super(l ? PrimitiveType.INSERTINTOLAST : PrimitiveType.INSERTINTO, p, d, i, n);
   }
 
   @Override

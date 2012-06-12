@@ -1,6 +1,6 @@
 package org.basex.api.dom;
 
-import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.w3c.dom.*;
@@ -93,18 +93,14 @@ public final class BXAttr extends BXNode implements Attr {
 
   @Override
   public BXNList getChildNodes() {
-    final NodeSeqBuilder nb = new NodeSeqBuilder();
-    nb.add(text());
-    return new BXNList(nb);
+    return new BXNList(new ANodeList(text()));
   }
 
   /**
    * Returns the attribute value as text node.
    * @return text node
    */
-  private FTxt text() {
-    final FTxt n = new FTxt(node.string());
-    n.parent(node);
-    return n;
+  private FNode text() {
+    return new FTxt(node.string()).parent(node);
   }
 }

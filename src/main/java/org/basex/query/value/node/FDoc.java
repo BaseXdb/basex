@@ -3,6 +3,7 @@ package org.basex.query.value.node;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -17,7 +18,7 @@ import org.w3c.dom.*;
  */
 public final class FDoc extends FNode {
   /** Child nodes. */
-  private final NodeSeqBuilder children;
+  private final ANodeList children;
   /** Base URI. */
   private final byte[] base;
 
@@ -26,7 +27,7 @@ public final class FDoc extends FNode {
    * @param b base uri
    */
   public FDoc(final byte[] b) {
-    this(new NodeSeqBuilder(), b);
+    this(new ANodeList(), b);
   }
 
   /**
@@ -34,12 +35,12 @@ public final class FDoc extends FNode {
    * @param ch children
    * @param b base uri
    */
-  public FDoc(final NodeSeqBuilder ch, final byte[] b) {
+  public FDoc(final ANodeList ch, final byte[] b) {
     super(NodeType.DOC);
     children = ch;
     base = b;
     // update parent references
-    final long ns = (int) ch.size();
+    final long ns = ch.size();
     for(int n = 0; n < ns; ++n) ch.get(n).parent(this);
   }
 

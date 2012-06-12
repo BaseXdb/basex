@@ -3,6 +3,7 @@ package org.basex.query.value.node;
 import java.util.*;
 
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -134,7 +135,7 @@ public abstract class FNode extends ANode {
    * @param iter iterator
    * @return node iterator
    */
-  static final AxisMoreIter iter(final NodeSeqBuilder iter) {
+  static final AxisMoreIter iter(final ANodeList iter) {
     return new AxisMoreIter() {
       /** Child counter. */ int c;
       @Override
@@ -142,7 +143,7 @@ public abstract class FNode extends ANode {
       @Override
       public ANode next() { return more() ? iter.get(c++) : null; }
       @Override
-      public ANode get(final long i) { return iter.get(i); }
+      public ANode get(final long i) { return iter.get((int) i); }
       @Override
       public long size() { return iter.size(); }
       @Override
@@ -157,7 +158,7 @@ public abstract class FNode extends ANode {
    * @param iter iterator
    * @return node iterator
    */
-  final byte[] string(final NodeSeqBuilder iter) {
+  final byte[] string(final ANodeList iter) {
     if(val == null) {
       final TokenBuilder tb = new TokenBuilder();
       for(int c = 0; c < iter.size(); ++c) {

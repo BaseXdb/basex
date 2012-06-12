@@ -1,8 +1,8 @@
 package org.basex.query.up.primitives;
 
 import org.basex.data.*;
-import org.basex.query.iter.*;
 import org.basex.query.up.*;
+import org.basex.query.util.*;
 import org.basex.util.*;
 
 /**
@@ -20,7 +20,7 @@ public final class InsertAttribute extends InsertBase {
    * @param c node copy
    */
   public InsertAttribute(final int p, final Data d, final InputInfo i,
-      final NodeSeqBuilder c) {
+      final ANodeList c) {
     super(PrimitiveType.INSERTATTR, p, d, i, c);
   }
 

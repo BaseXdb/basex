@@ -1,7 +1,7 @@
 package org.basex.query.up.primitives;
 
 import org.basex.data.*;
-import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.util.*;
 
 /**
@@ -17,11 +17,11 @@ abstract class InsertBase extends NodeCopy {
    * @param p pre
    * @param d data
    * @param i input info
-   * @param nc node copy
+   * @param n node copy
    */
-  InsertBase(final PrimitiveType t, final int p, final Data d,
-             final InputInfo i, final NodeSeqBuilder nc) {
-    super(t, p, d, i, nc);
+  InsertBase(final PrimitiveType t, final int p, final Data d, final InputInfo i,
+      final ANodeList n) {
+    super(t, p, d, i, n);
   }
 
   @Override

@@ -4,7 +4,6 @@ import java.util.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
-import org.basex.query.iter.*;
 import org.basex.query.up.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
@@ -20,7 +19,7 @@ import org.basex.util.*;
  */
 public abstract class NodeCopy extends StructuralUpdate {
   /** Nodes to be inserted. */
-  ArrayList<NodeSeqBuilder> insert = new ArrayList<NodeSeqBuilder>(1);
+  ArrayList<ANodeList> insert = new ArrayList<ANodeList>(1);
   /** Final copy of insertion nodes. */
   MemData md;
   /** Number of insert operations (initialized by {@link #prepare}). */
@@ -32,12 +31,12 @@ public abstract class NodeCopy extends StructuralUpdate {
    * @param p pre
    * @param d data
    * @param i input info
-   * @param nc node copy
+   * @param n node copy
    */
   NodeCopy(final PrimitiveType t, final int p, final Data d, final InputInfo i,
-      final NodeSeqBuilder nc) {
+      final ANodeList n) {
     super(t, p, d, i);
-    insert.add(nc);
+    insert.add(n);
   }
 
   /**
@@ -49,13 +48,12 @@ public abstract class NodeCopy extends StructuralUpdate {
   public void prepare() throws QueryException {
     // build main memory representation of nodes to be copied
     md = new MemData(data);
-    final NodeSeqBuilder seq = new NodeSeqBuilder();
+    final ANodeList seq = new ANodeList();
     for(int i = 0; i < insert.size(); i++) {
-      final NodeSeqBuilder nc = insert.get(i);
-      for(ANode n; (n = nc.next()) != null;) {
-        seq.add(n);
-        size++;
-      }
+      final ANodeList nl = insert.get(i);
+      final int ns = nl.size();
+      for(int n = 0; n < ns; n++) seq.add(nl.get(n));
+      size += ns;
       // clear entries to recover memory
       insert.set(i, null);
     }
@@ -84,23 +82,27 @@ public abstract class NodeCopy extends StructuralUpdate {
 
   /**
    * Merges all adjacent text nodes in the given sequence.
-   * @param n iterator
+   * @param nl iterator
    * @return iterator with merged text nodes
    */
-  private static NodeSeqBuilder mergeNodeCacheText(final NodeSeqBuilder n) {
-    final NodeSeqBuilder s = new NodeSeqBuilder();
-    ANode i = n.next();
-    while(i != null) {
-      if(i.type == NodeType.TXT) {
+  private static ANodeList mergeNodeCacheText(final ANodeList nl) {
+    int ns = nl.size();
+    final ANodeList s = new ANodeList(ns);
+    if(ns == 0) return s;
+
+    ANode n = nl.get(0);
+    for(int c = 0; c < ns;) {
+      if(n.type == NodeType.TXT) {
         final TokenBuilder tb = new TokenBuilder();
-        while(i != null && i.type == NodeType.TXT) {
-          tb.add(i.string());
-          i = n.next();
+        while(n.type == NodeType.TXT) {
+          tb.add(n.string());
+          if(++c == ns) break;
+          n = nl.get(c);
         }
         s.add(new FTxt(tb.finish()));
       } else {
-        s.add(i);
-        i = n.next();
+        s.add(n);
+        if(++c < ns) n = nl.get(c);
       }
     }
     return s;

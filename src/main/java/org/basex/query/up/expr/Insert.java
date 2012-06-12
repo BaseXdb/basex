@@ -7,6 +7,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.up.primitives.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -50,8 +51,8 @@ public final class Insert extends Update {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final Constr c = new Constr(ii, ctx).add(expr[1]);
-    final NodeSeqBuilder cList = c.children;
-    final NodeSeqBuilder aList = c.atts;
+    final ANodeList cList = c.children;
+    final ANodeList aList = c.atts;
     if(c.errAtt) UPNOATTRPER.thrw(info);
     if(c.duplAtt != null) UPATTDUPL.thrw(info, c.duplAtt);
 

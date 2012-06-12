@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.iter.*;
+import org.basex.query.util.ANodeList;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -20,11 +21,11 @@ public final class FElem extends FNode {
   /** Element name. */
   private final QNm name;
 
-  /** Child nodes. */
-  private NodeSeqBuilder children;
-  /** Attributes. */
-  private NodeSeqBuilder atts;
-  /** Namespaces. */
+  /** Child nodes (may be set to {@code null} to save memory). */
+  private ANodeList children;
+  /** Attributes (may be set to {@code null} to save memory). */
+  private ANodeList atts;
+  /** Namespaces (may be set to {@code null} to save memory). */
   private Atts ns;
 
   /**
@@ -68,8 +69,7 @@ public final class FElem extends FNode {
    * @param at attributes; can be {@code null}
    * @param nsp namespaces; can be {@code null}
    */
-  public FElem(final QNm nm, final NodeSeqBuilder ch, final NodeSeqBuilder at,
-      final Atts nsp) {
+  public FElem(final QNm nm, final ANodeList ch, final ANodeList at, final Atts nsp) {
     super(NodeType.ELM);
     name = nm;
     children = ch;
@@ -78,11 +78,11 @@ public final class FElem extends FNode {
 
     // update parent references
     if(ch != null) {
-      final long nl = (int) ch.size();
+      final long nl = ch.size();
       for(int n = 0; n < nl; ++n) ch.get(n).parent(this);
     }
     if(at != null) {
-      final long al = (int) at.size();
+      final long al = at.size();
       for(int a = 0; a < al; ++a) at.get(a).parent(this);
     }
   }
@@ -205,15 +205,13 @@ public final class FElem extends FNode {
    * @return self reference
    */
   public FElem add(final ANode node) {
-    final NodeSeqBuilder nc;
     if(node.type == NodeType.ATT) {
-      if(atts == null) atts = new NodeSeqBuilder();
-      nc = atts;
+      if(atts == null) atts = new ANodeList(node);
+      else atts.add(node);
     } else {
-      if(children == null) children = new NodeSeqBuilder();
-      nc = children;
+      if(children == null) children = new ANodeList(node);
+      else children.add(node);
     }
-    nc.add(node);
     node.parent(this);
     return this;
   }
@@ -225,9 +223,9 @@ public final class FElem extends FNode {
    */
   public FElem add(final byte[] text) {
     if(text.length != 0) {
-      if(children == null) children = new NodeSeqBuilder();
       final FTxt txt = new FTxt(text);
-      children.add(txt);
+      if(children == null) children = new ANodeList(txt);
+      else children.add(txt);
       txt.parent(this);
     }
     return this;
