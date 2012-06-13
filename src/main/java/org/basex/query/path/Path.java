@@ -159,8 +159,13 @@ public abstract class Path extends ParseExpr {
    */
   long size(final QueryContext ctx) {
     final Value rt = root(ctx);
-    final Data data = rt != null && rt.type == NodeType.DOC ? rt.data() : null;
-    if(data == null || !data.meta.uptodate) return -1;
+    // skip computation if value contains document nodes
+    if(rt == null || rt.type != NodeType.DOC) return -1;
+    final Data data = rt.data();
+    // skip computation if no database instance is available, is out-of-dated or
+    // if context does not contain all database nodes
+    if(data == null || !data.meta.uptodate ||
+        data.resources.docs().size() != rt.size()) return -1;
 
     ArrayList<PathNode> nodes = data.paths.root();
     long m = 1;

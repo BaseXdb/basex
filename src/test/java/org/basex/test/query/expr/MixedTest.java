@@ -1,5 +1,7 @@
 package org.basex.test.query.expr;
 
+import static org.basex.query.func.Function.*;
+
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.query.util.*;
@@ -50,5 +52,19 @@ public final class MixedTest extends AdvancedQueryTest {
     new CreateDB(NAME, "<A a='' b=''/>").execute(context);
     query("replace value of node /A/@a with 'A'");
     query("/", "<A a=\"A\" b=\"\"/>");
+  }
+
+  /**
+   * Performs count() on parts of a collection.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void countCollection() throws BaseXException {
+    new CreateDB(NAME).execute(context);
+    new Add("a", "<a/>").execute(context);
+    new Add("b", "<a/>").execute(context);
+    new Optimize().execute(context);
+    query(COUNT.args(_DB_OPEN.args(NAME, "a") + "/a"), "1");
+    query(COUNT.args(_DB_OPEN.args(NAME) + "/a"), "2");
   }
 }
