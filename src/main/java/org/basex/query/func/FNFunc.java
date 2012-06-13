@@ -1,5 +1,6 @@
 package org.basex.query.func;
 
+import static org.basex.query.func.Function.*;
 import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
@@ -249,7 +250,7 @@ public final class FNFunc extends StandardFunc {
 
   @Override
   public boolean uses(final Use u) {
-    return (sig == Function.PARTIAL_APPLY || sig == Function.FUNCTION_LOOKUP) &&
-        u == Use.CTX || u == Use.X30 || super.uses(u);
+    return u == Use.CTX && oneOf(sig, PARTIAL_APPLY, FUNCTION_LOOKUP) ||
+        u == Use.X30 || super.uses(u);
   }
 }

@@ -1,5 +1,6 @@
 package org.basex.query.func;
 
+import static org.basex.query.func.Function.*;
 import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
@@ -138,10 +139,8 @@ public final class FNNode extends StandardFunc {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X30 && (sig == Function.GENERATE_ID ||
-        sig == Function.PATH || sig == Function.HAS_CHILDREN ||
-        expr.length == 0 &&
-        (sig == Function.DOCUMENT_URI || sig == Function.NODE_NAME)) ||
+    return u == Use.X30 && (oneOf(sig, GENERATE_ID, PATH, HAS_CHILDREN) ||
+        expr.length == 0 && oneOf(sig, DOCUMENT_URI, NODE_NAME)) ||
         u == Use.CTX && expr.length == 0 || super.uses(u);
   }
 }

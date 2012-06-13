@@ -1,5 +1,6 @@
 package org.basex.query.func;
 
+import static org.basex.query.func.Function.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
@@ -320,9 +321,8 @@ public final class FNGen extends StandardFunc {
       u == Use.CNS && sig == Function.PARSE_XML ||
       u == Use.UPD && sig == Function.PUT ||
       u == Use.X30 && (sig == Function.DATA && expr.length == 0 ||
-        sig == Function.UNPARSED_TEXT || sig == Function.UNPARSED_TEXT_LINES ||
-        sig == Function.UNPARSED_TEXT_AVAILABLE || sig == Function.PARSE_XML ||
-        sig == Function.URI_COLLECTION || sig == Function.SERIALIZE) ||
+        oneOf(sig, UNPARSED_TEXT, UNPARSED_TEXT_LINES, UNPARSED_TEXT_AVAILABLE,
+            Function.PARSE_XML, URI_COLLECTION, SERIALIZE)) ||
       u == Use.CTX && (
         sig == Function.DATA && expr.length == 0 || sig == Function.PUT) || super.uses(u);
   }

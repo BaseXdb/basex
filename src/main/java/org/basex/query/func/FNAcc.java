@@ -1,5 +1,6 @@
 package org.basex.query.func;
 
+import static org.basex.query.func.Function.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
@@ -90,7 +91,7 @@ public final class FNAcc extends StandardFunc {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.POS && (sig == Function.POSITION || sig == Function.LAST) ||
+    return u == Use.POS && oneOf(sig, POSITION, LAST) ||
         u == Use.CTX && expr.length == 0 || super.uses(u);
   }
 }

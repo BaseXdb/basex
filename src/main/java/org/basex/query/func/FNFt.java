@@ -1,5 +1,6 @@
 package org.basex.query.func;
 
+import static org.basex.query.func.Function.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
@@ -231,7 +232,7 @@ public final class FNFt extends StandardFunc {
    */
   private Iter tokens(final QueryContext ctx) throws QueryException {
     final Data data = data(0, ctx);
-    byte[] entry = expr.length < 2 ? EMPTY : checkStr(expr[1], ctx);
+    byte[] entry = expr.length < 2 ? Token.EMPTY : checkStr(expr[1], ctx);
     if(entry.length != 0) {
       final FTLexer ftl = new FTLexer(new FTOpt().copy(data.meta));
       ftl.init(entry);
@@ -266,7 +267,6 @@ public final class FNFt extends StandardFunc {
   @Override
   public boolean uses(final Use u) {
     // skip evaluation at compile time
-    return u == Use.CTX && (sig == Function._FT_SEARCH || sig == Function._FT_TOKENS) ||
-        super.uses(u);
+    return u == Use.CTX && oneOf(sig, _FT_SEARCH, _FT_TOKENS) || super.uses(u);
   }
 }

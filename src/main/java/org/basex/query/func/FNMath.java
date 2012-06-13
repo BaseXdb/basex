@@ -75,8 +75,6 @@ public final class FNMath extends StandardFunc {
 
   @Override
   public boolean uses(final Use u) {
-    // random() is non-deterministic; don't pre-evaluate
-    return u == Use.X30 || u == Use.NDT && sig == Function._MATH_RANDOM ||
-      super.uses(u);
+    return u == Use.X30 || u == Use.NDT && sig == Function._MATH_RANDOM || super.uses(u);
   }
 }

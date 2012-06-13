@@ -1,5 +1,7 @@
 package org.basex.query.func;
 
+import static org.basex.query.func.Function.*;
+
 import java.util.*;
 
 import org.basex.query.*;
@@ -68,8 +70,7 @@ public final class FNHof extends StandardFunc {
 
   @Override
   Expr comp(final QueryContext ctx) throws QueryException {
-    if(sig == Function._HOF_ID || sig == Function._HOF_CONST) return expr[0];
-    return super.comp(ctx);
+    return oneOf(sig, _HOF_ID, _HOF_CONST) ? expr[0] : super.comp(ctx);
   }
 
   /**

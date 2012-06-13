@@ -1,5 +1,6 @@
 package org.basex.query.func;
 
+import static org.basex.query.func.Function.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
@@ -248,10 +249,9 @@ public final class FNUtil extends StandardFunc {
   private Hex crc32(final QueryContext ctx) throws QueryException {
     final CRC32 crc = new CRC32();
     crc.update(checkStr(expr[0], ctx));
-    final byte[] res = new byte[4];
-    for(int i = res.length, c = (int) crc.getValue(); i-- > 0; c >>>= 8)
-      res[i] = (byte) (c & 0xFF);
-    return new Hex(res);
+    final byte[] r = new byte[4];
+    for(int i = r.length, c = (int) crc.getValue(); i-- > 0; c >>>= 8) r[i] = (byte) c;
+    return new Hex(r);
   }
 
   /**
@@ -301,9 +301,7 @@ public final class FNUtil extends StandardFunc {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.NDT && (sig == Function._UTIL_EVAL || sig == Function._UTIL_SLEEP ||
-        sig == Function._UTIL_RUN || sig == Function._UTIL_MEM ||
-        sig == Function._UTIL_TIME || sig == Function._UTIL_UUID) ||
-      super.uses(u);
+    return u == Use.NDT && oneOf(sig, _UTIL_EVAL, _UTIL_SLEEP, _UTIL_RUN,
+        _UTIL_MEM, _UTIL_TIME, _UTIL_UUID) || super.uses(u);
   }
 }

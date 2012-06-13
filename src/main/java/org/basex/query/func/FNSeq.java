@@ -1,5 +1,7 @@
 package org.basex.query.func;
 
+import static org.basex.query.func.Function.*;
+
 import java.util.*;
 
 import org.basex.data.*;
@@ -418,7 +420,6 @@ public final class FNSeq extends StandardFunc {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X30 && (sig == Function.HEAD || sig == Function.TAIL) ||
-      super.uses(u);
+    return u == Use.X30 && oneOf(sig, HEAD, TAIL) || super.uses(u);
   }
 }

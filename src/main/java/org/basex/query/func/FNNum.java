@@ -157,7 +157,6 @@ public final class FNNum extends StandardFunc {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X30 && sig == Function.ROUND && expr.length == 2 ||
-      super.uses(u);
+    return u == Use.X30 && sig == Function.ROUND && expr.length == 2 || super.uses(u);
   }
 }
