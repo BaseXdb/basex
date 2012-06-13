@@ -254,12 +254,12 @@ public final class FNGen extends StandardFunc {
     // not I/O exception expected, as input is a main-memory array
     try {
       final NewlineInput nli = new NewlineInput(new ArrayInput(str));
+      final TokenBuilder tb = new TokenBuilder();
       return new Iter() {
         @Override
         public Item next() {
           try {
-            final TokenBuilder tb = nli.readLine();
-            return tb == null ? null : Str.get(tb.finish());
+            return nli.readLine(tb) == null ? null : Str.get(tb.finish());
           } catch(final IOException ex) {
             throw Util.notexpected(ex);
           }

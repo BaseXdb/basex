@@ -57,12 +57,23 @@ public final class NewlineInput extends TextInput {
   }
 
   /**
-   * Reads a single line.
-   * @return line
+   * Reads and returns a single line.
+   * @return line, or {@code null}
    * @throws IOException I/O exception
    */
-  public TokenBuilder readLine() throws IOException {
-    final TokenBuilder tb = new TokenBuilder();
+  public String readLine() throws IOException {
+    final TokenBuilder tb = readLine(new TokenBuilder());
+    return tb == null ? null : tb.toString();
+  }
+
+  /**
+   * Copies a single line to the specified token builder.
+   * @param tb token builder to be filled.
+   * @return token builder, or {@code null}
+   * @throws IOException I/O exception
+   */
+  public TokenBuilder readLine(final TokenBuilder tb) throws IOException {
+    tb.reset();
     while(true) {
       final int ch = read();
       if(ch == -1) return tb.isEmpty() ? null : tb;

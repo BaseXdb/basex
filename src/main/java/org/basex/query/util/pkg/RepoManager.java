@@ -233,8 +233,8 @@ public final class RepoManager {
     final Zip zip = new Zip(new IOContent(cont));
     final IOContent mf = new IOContent(zip.read(MANIFEST_MF));
     final NewlineInput nli = new NewlineInput(mf);
-    for(TokenBuilder tb; (tb = nli.readLine()) != null;) {
-      final Matcher m = MAIN_CLASS.matcher(tb.toString());
+    for(String s; (s = nli.readLine()) != null;) {
+      final Matcher m = MAIN_CLASS.matcher(s);
       if(!m.find()) continue;
 
       // copy file to rewritten file path

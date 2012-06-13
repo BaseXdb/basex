@@ -196,8 +196,8 @@ public class BaseX extends Main {
     } else {
       final NewlineInput nli = new NewlineInput(new IOContent(cmd));
       try {
-        for(TokenBuilder line; (line = nli.readLine()) != null;) {
-          final String l = line.toString().trim();
+        for(String line; (line = nli.readLine()) != null;) {
+          final String l = line.trim();
           // ignore empty lines and comments
           if(!l.isEmpty() && !l.startsWith("#")) execute(l);
         }
