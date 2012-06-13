@@ -93,12 +93,17 @@ final class EditorArea extends BaseXEditor {
 
   @Override
   public void keyPressed(final KeyEvent e) {
+    final byte[] t = text.text();
     super.keyPressed(e);
-    if(Character.isDefined(e.getKeyChar())) {
-      error(-1);
-    } else {
-      view.pos.setText(pos());
-    }
+    if(t != text.text()) error(-1);
+    else view.pos.setText(pos());
+  }
+
+  @Override
+  public void keyTyped(final KeyEvent e) {
+    final byte[] t = text.text();
+    super.keyTyped(e);
+    if(t != text.text()) error(-1);
   }
 
   @Override
@@ -173,14 +178,17 @@ final class EditorArea extends BaseXEditor {
   /**
    * Highlights the error.
    * @param pos error position
-   * @param cursor move cursor to error position
    */
-  void markError(final int pos, final boolean cursor) {
-    if(cursor) {
-      requestFocusInWindow();
-      setCaret(pos);
-    }
+  void jumpError(final int pos) {
+    requestFocusInWindow();
+    setCaret(pos);
+  }
 
+  /**
+   * Highlights the error.
+   * @param pos error position
+   */
+  void markError(final int pos) {
     final int thread = threadID;
     new Thread() {
       @Override

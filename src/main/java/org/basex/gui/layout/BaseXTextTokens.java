@@ -2,8 +2,6 @@ package org.basex.gui.layout;
 
 import static org.basex.util.Token.*;
 
-import java.util.*;
-
 import org.basex.util.*;
 
 /**
@@ -15,11 +13,9 @@ import org.basex.util.*;
 public final class BaseXTextTokens {
   /** Tab width. */
   static final int TAB = 2;
-  /** Text array to be written. */
-  byte[] text = EMPTY;
 
-  /** Text length. */
-  private int size;
+  /** Text array to be written. */
+  private byte[] text = EMPTY;
   /** Current start position. */
   private int ps;
   /** Current end position. */
@@ -38,17 +34,7 @@ public final class BaseXTextTokens {
    * @param t text
    */
   BaseXTextTokens(final byte[] t) {
-    this(t, t.length);
-  }
-
-  /**
-   * Constructor.
-   * @param t text
-   * @param s buffer size
-   */
-  BaseXTextTokens(final byte[] t, final int s) {
     text = t;
-    size = s;
   }
 
   /**
@@ -65,7 +51,7 @@ public final class BaseXTextTokens {
    */
   boolean moreWords() {
     // quit if text has ended
-    if(pe >= size) return false;
+    if(pe >= text.length) return false;
     ps = pe;
 
     // find next token boundary
@@ -73,7 +59,7 @@ public final class BaseXTextTokens {
     pe += cl(text, ps);
     if(!ftChar(ch)) return true;
 
-    while(pe < size) {
+    while(pe < text.length) {
       ch = cp(text, pe);
       if(!ftChar(ch)) break;
       pe += cl(text, pe);
@@ -123,7 +109,7 @@ public final class BaseXTextTokens {
           !Character.isWhitespace(ch)) ch = next();
       while(ch != '\n' && Character.isWhitespace(ch)) ch = next();
     }
-    if(ps != size) prev();
+    if(ps != text.length) prev();
   }
 
   /**
@@ -158,7 +144,15 @@ public final class BaseXTextTokens {
    * @return current character
    */
   public int curr() {
-    return ps >= size ? '\n' : cp(text, ps);
+    return ps >= text.length ? '\n' : cp(text, ps);
+  }
+
+  /**
+   * Returns the original text array.
+   * @return text
+   */
+  public byte[] text() {
+    return text;
   }
 
   /**
@@ -167,7 +161,7 @@ public final class BaseXTextTokens {
    */
   int next() {
     final int c = curr();
-    if(ps < size) ps += cl(text, ps);
+    if(ps < text.length) ps += cl(text, ps);
     return c;
   }
 
@@ -185,14 +179,6 @@ public final class BaseXTextTokens {
    */
   int pos() {
     return ps;
-  }
-
-  /**
-   * Returns the byte array, chopping the unused bytes.
-   * @return character array
-   */
-  byte[] toArray() {
-    return text.length == size ? text : Arrays.copyOf(text, size);
   }
 
   // POSITION =================================================================
@@ -269,9 +255,8 @@ public final class BaseXTextTokens {
       tb.add(ch);
       ++cc;
     }
-    tb.add(text, ps, size);
+    tb.add(text, ps, text.length);
     text = tb.finish();
-    size = tb.size();
     for(int c = 0; c < cc; ++c) next();
   }
 
@@ -293,7 +278,8 @@ public final class BaseXTextTokens {
 
     // decide if to use tab or spaces
     boolean tab = false;
-    for(int p = 0; p < size; ++p) tab |= text[p] == '\t';
+    final int pl = text.length;
+    for(int p = 0; p < pl; ++p) tab |= text[p] == '\t';
     byte[] add = { '\t' };
     if(!tab) {
       add = new byte[TAB];
@@ -313,7 +299,7 @@ public final class BaseXTextTokens {
           }
           if(text[p] == ' ') {
             me--;
-            for(int i = 1; i < TAB && p + i < size && text[p + i] == ' '; i++) {
+            for(int i = 1; i < TAB && p + i < pl && text[p + i] == ' '; i++) {
               me--;
               p++;
             }
@@ -327,10 +313,9 @@ public final class BaseXTextTokens {
       }
       tb.add(cp(text, p));
     }
-    tb.add(text, ps, size);
+    tb.add(text, ps, text.length);
     ps = me;
     text = tb.finish();
-    size = tb.size();
   }
 
 
@@ -350,14 +335,12 @@ public final class BaseXTextTokens {
       max = ps > ms ? ps : ms;
       // marked
       final int mn = Math.max(min + start.length, max - end.length);
-      if(indexOf(text, start, min) == min &&
-         indexOf(text, end, mn) == mn) {
+      if(indexOf(text, start, min) == min && indexOf(text, end, mn) == mn) {
         final TokenBuilder tb = new TokenBuilder();
         tb.add(text, 0, min);
         tb.add(text, min + start.length, max - end.length);
-        tb.add(text, max, size);
+        tb.add(text, max, text.length);
         text = tb.finish();
-        size = tb.size();
         ms = min;
         me = max - start.length - end.length;
         ps = me;
@@ -384,14 +367,13 @@ public final class BaseXTextTokens {
    * Assumes that the current position allows a deletion.
    */
   void delete() {
-    if(size == 0) return;
+    if(text.length == 0) return;
     final TokenBuilder tb = new TokenBuilder();
     final int s = marked() ? Math.min(ms, me) : ps;
     final int e = marked() ? Math.max(ms, me) : ps + cl(text, ps);
     tb.add(text, 0, s);
-    if(e < size) tb.add(text, e, size);
+    if(e < text.length) tb.add(text, e, text.length);
     text = tb.finish();
-    size = tb.size();
     ps = s;
     noMark();
   }
@@ -548,22 +530,30 @@ public final class BaseXTextTokens {
   // ERROR MARK ===============================================================
 
   /**
-   * Tests if the current token is erroneous.
-   * @return result of check
+   * Returns the error marker.
+   * @return error marker
    */
-  boolean error() {
-    return es >= ps && es <= pe;
+  int error() {
+    return es;
   }
 
   /**
-   * Tests if the cursor moves over the current token.
-   * @param s start
+   * Sets the error marker.
+   * @param s start position
    */
-  void error(final int s) {
+  public void error(final int s) {
     es = s;
   }
 
   // CURSOR ===================================================================
+
+  /**
+   * Tests if the current token is erroneous.
+   * @return result of check
+   */
+  boolean erroneous() {
+    return es >= ps && es <= pe;
+  }
 
   /**
    * Checks if the cursor moves over the current token.
@@ -601,7 +591,7 @@ public final class BaseXTextTokens {
    * @return text size
    */
   int size() {
-    return size;
+    return text.length;
   }
 
   @Override

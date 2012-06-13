@@ -27,7 +27,7 @@ import org.basex.util.*;
  */
 public class BaseXEditor extends BaseXPanel {
   /** Text array to be written. */
-  transient BaseXTextTokens text = new BaseXTextTokens(EMPTY);
+  protected transient BaseXTextTokens text = new BaseXTextTokens(EMPTY);
   /** Renderer reference. */
   final BaseXTextRenderer rend;
   /** Undo history; if set to {@code null}, text will be read-only. */
@@ -166,7 +166,7 @@ public class BaseXEditor extends BaseXPanel {
     // remove invalid characters and compare old with new string
     int ns = 0;
     final int ts = text.size();
-    final byte[] tt = text.text;
+    final byte[] tt = text.text();
     boolean eq = true;
     for(int r = 0; r < s; ++r) {
       final byte b = t[r];
@@ -180,7 +180,7 @@ public class BaseXEditor extends BaseXPanel {
 
     // new text is different...
     if(!eq) {
-      text = new BaseXTextTokens(t, ns);
+      text = new BaseXTextTokens(Arrays.copyOf(t, ns));
       rend.setText(text);
       scroll.pos(0);
     }
@@ -238,7 +238,7 @@ public class BaseXEditor extends BaseXPanel {
    * @return output text
    */
   public final byte[] getText() {
-    return text.toArray();
+    return text.text();
   }
 
   @Override
@@ -251,7 +251,7 @@ public class BaseXEditor extends BaseXPanel {
   }
 
   /**
-   * Refreshes the syntax highlighting.
+   * Moves the error marker. {@code -1} removes the marker.
    * @param s start of optional error mark
    */
   public final void error(final int s) {
@@ -400,7 +400,7 @@ public class BaseXEditor extends BaseXPanel {
     boolean consumed = true;
 
     // operations that consider the last text mark..
-    final byte[] txt = text.text;
+    final byte[] txt = text.text();
     if(NEXTWORD.is(e)) {
       text.nextToken(marking);
     } else if(PREVWORD.is(e)) {
@@ -433,6 +433,9 @@ public class BaseXEditor extends BaseXPanel {
       down = false;
     } else if(NEXTLINE.is(e)) {
       down(1, marking);
+    } else if(FINDERROR.is(e)) {
+      final int p = text.error();
+      if(p != -1) setCaret(p);
     } else {
       consumed = false;
     }
@@ -493,7 +496,7 @@ public class BaseXEditor extends BaseXPanel {
     if(consumed) e.consume();
 
     text.setCaret();
-    if(txt != text.text) rend.calc();
+    if(txt != text.text()) rend.calc();
     showCursor(down ? 2 : 0);
   }
 
@@ -554,7 +557,7 @@ public class BaseXEditor extends BaseXPanel {
   private int lastCol = -1;
 
   @Override
-  public final void keyTyped(final KeyEvent e) {
+  public void keyTyped(final KeyEvent e) {
     if(undo == null || control(e) || DELNEXT.is(e) || DELPREV.is(e) || ESCAPE.is(e))
       return;
 
@@ -564,12 +567,13 @@ public class BaseXEditor extends BaseXPanel {
 
     // remember if marked text is to be deleted
     boolean del = true;
+    final byte[] txt = text.text();
     if(TAB.is(e)) {
       if(text.marked()) {
         // check if lines are to be indented
         final int s = Math.min(text.pos(), text.start());
         final int l = Math.max(text.pos(), text.start()) - 1;
-        for(int p = s; p <= l && p < text.size(); p++) del &= text.text[p] != '\n';
+        for(int p = s; p <= l && p < txt.length; p++) del &= txt[p] != '\n';
         if(!del) {
           text.indent(s, l, e.isShiftDown());
           ch = null;
@@ -577,7 +581,7 @@ public class BaseXEditor extends BaseXPanel {
       } else {
         boolean c = true;
         for(int p = text.pos() - 1; p >= 0 && c; p--) {
-          final byte b = text.text[p];
+          final byte b = txt[p];
           c = ws(b);
           if(b == '\n') break;
         }
@@ -593,7 +597,7 @@ public class BaseXEditor extends BaseXPanel {
       final StringBuilder sb = new StringBuilder(1).append(e.getKeyChar());
       int s = 0;
       for(int p = text.pos() - 1; p >= 0; p--) {
-        final byte b = text.text[p];
+        final byte b = txt[p];
         if(b == '\n') break;
         if(b == '\t') {
           s += 2;
@@ -616,7 +620,7 @@ public class BaseXEditor extends BaseXPanel {
 
   @Override
   public void keyReleased(final KeyEvent e) {
-    if(undo != null) undo.store(text.toArray(), text.cursor());
+    if(undo != null) undo.store(text.text(), text.cursor());
   }
 
   /**
@@ -694,7 +698,7 @@ public class BaseXEditor extends BaseXPanel {
     undo.cursor(text.cursor());
     if(text.marked()) text.delete();
     text.add(txt);
-    undo.store(text.toArray(), text.cursor());
+    undo.store(text.text(), text.cursor());
     return true;
   }
 
@@ -706,7 +710,7 @@ public class BaseXEditor extends BaseXPanel {
     text.pos(text.cursor());
     undo.cursor(text.cursor());
     text.delete();
-    undo.store(text.toArray(), text.cursor());
+    undo.store(text.text(), text.cursor());
     text.setCaret();
   }
 

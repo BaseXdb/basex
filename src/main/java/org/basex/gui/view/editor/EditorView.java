@@ -185,7 +185,7 @@ public final class EditorView extends View {
           tabs.setSelectedComponent(edit);
         }
         if(errPos == -1) return;
-        edit.markError(errPos, true);
+        edit.jumpError(errPos);
         pos.setText(edit.pos());
       }
     });
@@ -449,7 +449,7 @@ public final class EditorView extends View {
         c = 0;
       }
     }
-    edit.markError(errPos, false);
+    edit.markError(errPos);
     return errPos != -1;
   }
 

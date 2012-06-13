@@ -320,7 +320,7 @@ final class BaseXTextRenderer extends BaseXBack {
       }
 
       // mark error
-      if(text.error()) {
+      if(text.erroneous()) {
         g.setColor(GUIConstants.LRED);
         g.fillRect(x, y - fontH + 4, wordW, fontH);
       }

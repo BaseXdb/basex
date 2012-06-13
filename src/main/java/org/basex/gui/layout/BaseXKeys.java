@@ -40,6 +40,7 @@ public enum BaseXKeys {
   /** Find next hit.         */ FINDNEXT2(MAC ? SC : 0, VK_F3, true),
   /** Find previous hit.     */ FINDPREV(SC | SHF, VK_G, true),
   /** Find previous hit.     */ FINDPREV2(MAC ? SC | SHF : SHF, VK_F3, true),
+  /** Jump to error.         */ FINDERROR(SC, VK_PERIOD),
 
   // Editing
 
