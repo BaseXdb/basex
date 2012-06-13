@@ -46,9 +46,14 @@ public final class Inspect extends Command {
       if(kind > 6) invKind.add(pre);
       // check parent reference
       final int par = data.parent(pre, kind);
-      if(par >= pre || (kind == Data.DOC ? par != -1 : par < 0)) parRef.add(pre);
-      // check if node is a descendant of its parent node
-      if(par >= 0 && par + data.size(par, data.kind(par)) < pre) parChild.add(pre);
+      if(par >= 0) {
+        final int parKind = data.kind(par);
+        if(par >= pre || (kind == Data.DOC ? par != -1 : par < 0)) parRef.add(pre);
+        // check if parent is no doc and no element, or if node is a descendant
+        // of its parent node
+        if(parKind != Data.DOC && parKind != Data.ELEM ||
+            par + data.size(par, parKind) < pre) parChild.add(pre);
+      }
       // check if id/pre mapping is correct
       if(idPre != null && data.pre(data.id(pre)) != pre) idPre.add(pre);
     }
@@ -57,7 +62,7 @@ public final class Inspect extends Command {
     info.addExt("Checking main table (% nodes):", md.size).add(Prop.NL);
     info.add(invKind.info("invalid node kinds"));
     info.add(parRef.info("invalid parent references"));
-    info.add(parChild.info("wrong parent/child relationships"));
+    info.add(parChild.info("wrong parent/descendant relationships"));
     if(idPre != null) info.add(idPre.info("wrong id/pre mappings"));
     if(invKind.invalid + parRef.invalid + parChild.invalid == 0) {
       info.add("No inconsistencies found.").add(Prop.NL);
