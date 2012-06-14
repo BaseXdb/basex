@@ -265,7 +265,7 @@ public final class DialogServer extends BaseXDialog {
         gui.setMain(MainProp.SERVERPORT, p);
         if(host.getText().equals(LOCALHOST)) {
           gui.setMain(MainProp.PORT, p);
-          gui.setMain(MainProp.EVENTPORT, p + 1);
+          gui.setMain(MainProp.EVENTPORT, Integer.toString(Integer.valueOf(p) + 1));
           portc.setText(p);
         }
         try {
