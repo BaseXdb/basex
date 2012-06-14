@@ -56,16 +56,14 @@ public interface Text {
   String LOCALMODE = "Standalone";
   /** Start information. */
   String LOCALINFO =
-    " [-bcCdiLoqsuvVwxz] [file]" + NL +
-    "  [file]      Execute XQuery file" + NL +
+    " [-bcdiLosuvVwxz] [query]" + NL +
+    "  [query]     Execute query file or expression" + NL +
     "  -b<pars>    Bind external XQuery variables" + NL +
-    "  -c<cmds>    Execute database commands" + NL +
-    "  -C<file>    Execute commands from script" + NL +
+    "  -c<input>   Execute commands from file or string" + NL +
     "  -d          Activate debugging mode" + NL +
     "  -i<input>   Open initial file or database" + NL +
     "  -L          Add trailing newline after query result" + NL +
-    "  -o<file>    Write output to file" + NL +
-    "  -q<expr>    Execute XQuery expression" + NL +
+    "  -o<output>  Write output to file" + NL +
     "  -s<pars>    Set serialization parameter(s)" + NL +
     "  -u          Write updates back to original files" + NL +
     "  -v/V        Show (all) process info" + NL +
@@ -77,19 +75,17 @@ public interface Text {
   String CLIENTMODE = "Client";
   /** Client start information. */
   String CLIENTINFO =
-    " [-bcCdiLnopPqsUvVwxz] [file]" + NL +
-    "  [file]      Execute XQuery file" + NL +
+    " [-bcdiLnopPsUvVwxz] [query]" + NL +
+    "  [query]     Execute query file or expression" + NL +
     "  -b<pars>    Bind external XQuery variables" + NL +
-    "  -c<cmds>    Execute database commands" + NL +
-    "  -C<file>    Execute commands from script" + NL +
+    "  -c<input>   Execute commands from file or string" + NL +
     "  -d          Activate debugging mode" + NL +
     "  -i<input>   Open initial file or database" + NL +
     "  -L          Add trailing newline after query result" + NL +
     "  -n<name>    Set server (host) name" + NL +
-    "  -o<file>    Write output to file" + NL +
+    "  -o<output>  Write output to file" + NL +
     "  -p<num>     Set server port" + NL +
     "  -P<pass>    Specify user password" + NL +
-    "  -q<expr>    Execute XQuery expression" + NL +
     "  -s<pars>    Set serialization parameter(s)" + NL +
     "  -U<name>    Specify user name" + NL +
     "  -v/V        Show (all) process info" + NL +
@@ -121,21 +117,21 @@ public interface Text {
   /** HTTP information. */
   String HTTPINFO =
     " [-dehlnpPRUWz] [stop]" + NL +
-    "  stop       Stop running server" + NL +
-    "  -d         Activate debugging mode" + NL +
-    "  -e<num>    Set event port" + NL +
-    "  -h<num>    Set port of HTTP server" + NL +
-    "  -l         Start in local mode" + NL +
-    "  -n<name>   Set host name of database server" + NL +
-    "  -p<num>    Set port of database server" + NL +
-    "  -P<pass>   Specify user password" + NL +
-    "  -R         Deactivate REST service" + NL +
-    "  -s         Specify port to stop HTTP server" + NL +
-    "  -S         Start as service" + NL +
-    "  -U<name>   Specify user name" + NL +
-    "  -W         Deactivate WebDAV service" + NL +
-    "  -X         Deactivate RESTXQ service" + NL +
-    "  -z         Suppress logging";
+    "  stop      Stop running server" + NL +
+    "  -d        Activate debugging mode" + NL +
+    "  -e<num>   Set event port" + NL +
+    "  -h<num>   Set port of HTTP server" + NL +
+    "  -l        Start in local mode" + NL +
+    "  -n<name>  Set host name of database server" + NL +
+    "  -p<num>   Set port of database server" + NL +
+    "  -P<pass>  Specify user password" + NL +
+    "  -R        Deactivate REST service" + NL +
+    "  -s        Specify port to stop HTTP server" + NL +
+    "  -S        Start as service" + NL +
+    "  -U<name>  Specify user name" + NL +
+    "  -W        Deactivate WebDAV service" + NL +
+    "  -X        Deactivate RESTXQ service" + NL +
+    "  -z        Suppress logging";
 
   /** Bug info. */
   String BUGINFO = "Improper use? Potential bug? Your feedback is welcome:";

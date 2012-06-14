@@ -443,7 +443,7 @@ public enum Err {
   /** XPDY0002. */
   VAREMPTY(XPDY, 2, "No value assigned to %."),
   /** XPDY0002. */
-  XPNOCTX(XPDY, 2, "No context item set to process '%'."),
+  XPNOCTX(XPDY, 2, "No context item defined to evaluate '%'."),
   /** XPDY0050. */
   CTXNODE(XPDY, 50, "Root of the context item must be a document node."),
   /** XPDY0050. */

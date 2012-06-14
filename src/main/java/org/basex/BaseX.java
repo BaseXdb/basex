@@ -9,7 +9,6 @@ import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
-import org.basex.io.serial.*;
 import org.basex.server.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -78,13 +77,14 @@ public class BaseX extends Main {
           // commas are escaped by a second comma
           val = bind.append(val.replaceAll(",", ",,")).toString();
           prop = Prop.BINDINGS;
-        } else if(c == 'c') {
-          // evaluate command string
-          execute(val);
-          console = false;
-        } else if(c == 'C') {
-          // run commands from script file
-          script(val);
+        } else if(c == 'c' || c == 'C') {
+          // evaluate commands
+          final IO io = IO.get(val);
+          if(io.exists() && !io.isDir()) {
+            script(io);
+          } else {
+            execute(val);
+          }
           console = false;
         } else if(c == 'd') {
           // toggle debug mode
@@ -92,9 +92,6 @@ public class BaseX extends Main {
         } else if(c == 'D') {
           // hidden option: show/hide dot query graph
           prop = Prop.DOTPLAN;
-        } else if(c == 'f') {
-          query(val);
-          console = false;
         } else if(c == 'i') {
           // open database or create main memory representation
           execute(new Set(Prop.MAINMEM, true), false);
@@ -107,9 +104,14 @@ public class BaseX extends Main {
           // change output stream
           if(out != System.out) out.close();
           out = new PrintOutput(val);
-        } else if(c == 'q') {
-          // evaluate query string
-          execute(new XQuery(val), verbose);
+        } else if(c == 'q' || c == 'Q') {
+          // evaluate query
+          final IO io = IO.get(val);
+          if(io.exists() && !io.isDir()) {
+            query(io);
+          } else {
+            execute(new XQuery(val), verbose);
+          }
           console = false;
         } else if(c == 'r') {
           // hidden option: parse number of runs
@@ -165,46 +167,31 @@ public class BaseX extends Main {
 
   /**
    * Runs a query file.
-   * @param val value
+   * @param io input file
    * @throws IOException I/O exception
    */
-  private void query(final String val) throws IOException {
-    // run query file
-    final IO io = IO.get(val);
-    if(!io.exists() || io.isDir()) throw new BaseXException(RES_NOT_FOUND_X, val);
-    final String query;
-    try {
-      query = Token.string(new TextInput(io).content());
-    } catch(final InputException ex) {
-      throw new BaseXException(val + ": " + ex.getMessage() + '.');
-    }
+  private void query(final IO io) throws IOException {
+    final String query = Token.string(new TextInput(io).content());
     execute(new Set(Prop.QUERYPATH, io.path()), false);
     execute(new XQuery(query), verbose);
   }
 
   /**
    * Runs a command script.
-   * @param val value
+   * @param io input file
    * @throws IOException I/O exception
    */
-  private void script(final String val) throws IOException {
-    final IO io = IO.get(val);
-    if(!io.exists()) throw new BaseXException(RES_NOT_FOUND_X, val);
+  private void script(final IO io) throws IOException {
     final String cmd = Token.string(io.read());
     if(cmd.startsWith("<")) {
       execute(cmd);
     } else {
-      final NewlineInput nli = new NewlineInput(new IOContent(cmd));
-      try {
-        for(String line; (line = nli.readLine()) != null;) {
-          final String l = line.trim();
-          // ignore empty lines and comments
-          if(!l.isEmpty() && !l.startsWith("#")) execute(l);
-        }
-      } catch(final InputException ex) {
-        throw new BaseXException(val + ": " + ex.getMessage() + '.');
-      } finally {
-        nli.close();
+      final IOContent cmds = new IOContent(new TextInput(io).content());
+      final NewlineInput nli = new NewlineInput(cmds);
+      for(String line; (line = nli.readLine()) != null;) {
+        final String l = line.trim();
+        // ignore empty lines and comments
+        if(!l.isEmpty() && !l.startsWith("#")) execute(l);
       }
     }
   }
@@ -265,7 +252,7 @@ public class BaseX extends Main {
           arg.usage();
         }
       } else {
-        c = 'f';
+        c = 'Q';
         v = arg.string();
       }
       if(v != null) {

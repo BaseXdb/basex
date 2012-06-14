@@ -96,4 +96,18 @@ public final class IOUrl extends IO {
     }
     return sb.toString();
   }
+
+  /**
+   * Checks if the specified uri starts with a valid scheme.
+   * @param url url to be converted
+   * @return file path
+   */
+  static boolean isValid(final String url) {
+    int u = -1, us = url.length();
+    while(++u < us) {
+      final char c = url.charAt(u);
+      if(!Token.letterOrDigit(c) && c != '+' && c != '-' && c != '.') break;
+    }
+    return u > 2 && u < us && url.charAt(u) == ':';
+  }
 }

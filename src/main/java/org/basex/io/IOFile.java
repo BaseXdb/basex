@@ -285,6 +285,17 @@ public final class IOFile extends IO {
   }
 
   /**
+   * Checks if the specified string is a valid file reference.
+   * @param s source
+   * @return result of check
+   */
+  public static boolean isValid(final String s) {
+    // accept short strings, string without colons and strings with Windows drive letters
+    return s.length() < 3 || s.indexOf(':') == -1 ||
+        Token.letter(s.charAt(0)) && s.charAt(1) == ':';
+  }
+
+  /**
    * Converts a file filter (glob) to a regular expression.
    * @param glob filter
    * @return regular expression

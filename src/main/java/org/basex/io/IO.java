@@ -106,13 +106,12 @@ public abstract class IO {
    * <p>Returns a class instance for the specified string. The type of the
    * returned instance depends on the string value:</p>
    * <ul>
-   * <li>{@link IOContent}: if the string starts with an angle bracket (&lt;)
-   *   or if it is {@code null} it is interpreted as XML fragment and internally
-   *   represented as byte array</li>
    * <li>{@link IOFile}: if the string starts with <code>file:</code>, or if it
    *   does not contain the substring <code>://</code>, it is interpreted as
    *   local file instance</li>
-   * <li>{@link IOUrl}: otherwise, it is handled as URL</li>
+   * <li>{@link IOUrl}: if it starts with a valid scheme, it is handled as URL</li>
+   * <li>{@link IOContent}: otherwise, it is interpreted as XML fragment and internally
+   *   represented as byte array</li>
    * </ul>
    * If the content of the string value is known in advance, it is advisable
    * to call the direct constructors of the correspondent sub class.
@@ -123,21 +122,11 @@ public abstract class IO {
   public static IO get(final String source) {
     if(source == null) return new IOContent(Token.EMPTY);
     final String s = source.trim();
-    if(s.startsWith("<"))      return new IOContent(s);
-    if(s.startsWith(FILEPREF)) return new IOFile(IOUrl.file(s));
-    if(IO.isFile(s))           return new IOFile(s);
-    return new IOUrl(s);
-  }
-
-  /**
-   * Checks if the specified string is a valid file reference.
-   * @param s source
-   * @return result of check
-   */
-  private static boolean isFile(final String s) {
-    if(s.length() < 3 || s.indexOf(':') == -1) return true;
-    final char c = Character.toLowerCase(s.charAt(0));
-    return c >= 'a' && c <= 'z' && s.charAt(1) == ':';
+    return s.indexOf('<') == 0    ? new IOContent(s) :
+           s.startsWith(FILEPREF) ? new IOFile(IOUrl.file(s)) :
+           IOFile.isValid(s)      ? new IOFile(s) :
+           IOUrl.isValid(s)       ? new IOUrl(s) :
+           new IOContent(s);
   }
 
   /**
