@@ -117,7 +117,7 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Returns an encoding.
+   * Returns a normalized encoding representation.
    * @param i index of encoding argument
    * @param err error for invalid encoding
    * @param ctx query context
@@ -129,7 +129,7 @@ public abstract class StandardFunc extends Arr {
     if(i >= expr.length) return null;
     final String enc = string(checkStr(expr[i], ctx));
     if(!Charset.isSupported(enc)) err.thrw(info, enc);
-    return enc;
+    return normEncoding(enc);
   }
 
   /**

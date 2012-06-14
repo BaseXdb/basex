@@ -661,8 +661,6 @@ public enum Err {
   /** XPTY0004. */
   BINARYTYPE(XPTY, 4, "Binary type expected, % found"),
   /** XPTY0004. */
-  BINSTRTYPE(XPTY, 2, "Binary or string expected, % found"),
-  /** XPTY0004. */
   ELMOPTION(XPTY, 4, "Unknown option: %."),
 
   /** XPTY0004. */

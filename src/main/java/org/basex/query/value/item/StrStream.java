@@ -74,7 +74,7 @@ public final class StrStream extends Item {
   @Override
   public TextInput input(final InputInfo ii) throws QueryException {
     try {
-      return new NewlineInput(input).encoding(encoding);
+      return new NewlineInput(input).encoding(encoding).valid(true);
     } catch(final IOException ex) {
       throw error.thrw(ii, input);
     }

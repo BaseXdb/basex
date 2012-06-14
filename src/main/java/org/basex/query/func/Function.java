@@ -566,6 +566,8 @@ public enum Function {
   /** XQuery function. */
   _FILE_DIR_SEPARATOR(FNFile.class, "dir-separator()", STR),
   /** XQuery function. */
+  _FILE_LINE_SEPARATOR(FNFile.class, "line-separator()", STR),
+  /** XQuery function. */
   _FILE_EXISTS(FNFile.class, "exists(path)", BLN, STR),
   /** XQuery function. */
   _FILE_IS_DIR(FNFile.class, "is-dir(path)", BLN, STR),
@@ -603,14 +605,20 @@ public enum Function {
   /** XQuery function. */
   _FILE_WRITE_BINARY(FNFile.class, "write-binary(path,item)", EMP, STR, BIN_ZM),
   /** XQuery function. */
-  _FILE_WRITE_TEXT(FNFile.class, "write-text(path,texts[,encoding])",
+  _FILE_WRITE_TEXT(FNFile.class, "write-text(path,text[,encoding])",
+      EMP, 2, STR, STR, STR),
+  /** XQuery function. */
+  _FILE_WRITE_TEXT_LINES(FNFile.class, "write-text-lines(path,texts[,encoding])",
       EMP, 2, STR, STR_ZM, STR),
   /** XQuery function. */
   _FILE_APPEND(FNFile.class, "append(path,data[,params])", EMP, 2, STR, ITEM_ZM, NOD),
   /** XQuery function. */
   _FILE_APPEND_BINARY(FNFile.class, "append-binary(path,item)", EMP, STR, BIN_ZM),
   /** XQuery function. */
-  _FILE_APPEND_TEXT(FNFile.class, "append-text(path,texts[,encoding])",
+  _FILE_APPEND_TEXT(FNFile.class, "append-text(path,text[,encoding])",
+      EMP, 2, STR, STR, STR),
+  /** XQuery function. */
+  _FILE_APPEND_TEXT_LINES(FNFile.class, "append-text-lines(path,texts[,encoding])",
       EMP, 2, STR, STR_ZM, STR),
   /** XQuery function. */
   _FILE_COPY(FNFile.class, "copy(source,target)", EMP, STR, STR),
@@ -772,13 +780,17 @@ public enum Function {
   /* FNHash functions. */
 
   /** XQuery function. */
-  _HASH_MD5(FNHash.class, "md5(value)", HEX, ITEM),
+  _HASH_MD5(FNHash.class, "md5(string)", B64, STR),
   /** XQuery function. */
-  _HASH_SHA1(FNHash.class, "sha1(value)", HEX, ITEM),
+  _HASH_MD5_BINARY(FNHash.class, "md5-binary(value)", B64, BIN),
   /** XQuery function. */
-  _HASH_SHA256(FNHash.class, "sha256(value)", HEX, ITEM),
+  _HASH_SHA1(FNHash.class, "sha1(string)", B64, STR),
   /** XQuery function. */
-  _HASH_HASH(FNHash.class, "hash(value,algorithm)", HEX, ITEM, STR),
+  _HASH_SHA1_BINARY(FNHash.class, "sha1-binary(value)", B64, BIN),
+  /** XQuery function. */
+  _HASH_HASH(FNHash.class, "hash(string,algorithm)", B64, STR, STR),
+  /** XQuery function. */
+  _HASH_HASH_BINARY(FNHash.class, "hash-binary(value,algorithm)", B64, BIN, STR),
 
   /* FNValidate functions. */
 

@@ -44,6 +44,7 @@ public final class FNFileTest extends AdvancedQueryTest {
    */
   @Test
   public void fileDirSeparator() {
+    check(_FILE_DIR_SEPARATOR);
     assertTrue(!query(_FILE_DIR_SEPARATOR.args()).isEmpty());
   }
 
@@ -52,7 +53,16 @@ public final class FNFileTest extends AdvancedQueryTest {
    */
   @Test
   public void filePathSeparator() {
+    check(_FILE_PATH_SEPARATOR);
     assertTrue(!query(_FILE_PATH_SEPARATOR.args()).isEmpty());
+  }
+
+  /**
+   * Test method for the file:line-separator() function.
+   */
+  @Test
+  public void fileLineSeparator() {
+    check(_FILE_LINE_SEPARATOR);
   }
 
   /**
@@ -274,6 +284,23 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
+   * Test method for the file:write-text-lines() function.
+   */
+  @Test
+  public void fileWriteTextLines() {
+    check(_FILE_WRITE_TEXT_LINES);
+
+    error(_FILE_WRITE_TEXT_LINES.args(PATH, "x"), Err.FILE_DIR);
+    error(_FILE_WRITE_TEXT_LINES.args(PATH1, " 123"), Err.XPTYPE);
+
+    query(_FILE_WRITE_TEXT_LINES.args(PATH1, "x"));
+    query(_FILE_SIZE.args(PATH1), 1 + Prop.NL.length());
+    query(_FILE_WRITE_TEXT_LINES.args(PATH1, "\u00fc", "US-ASCII"));
+    query(_FILE_READ_TEXT.args(PATH1), "?");
+    query(_FILE_DELETE.args(PATH1));
+  }
+
+  /**
    * Test method for the file:write-binary() function.
    */
   @Test
@@ -317,12 +344,31 @@ public final class FNFileTest extends AdvancedQueryTest {
     check(_FILE_APPEND_TEXT);
 
     error(_FILE_APPEND_TEXT.args(PATH, "x"), Err.FILE_DIR);
-    error(_FILE_APPEND_TEXT.args(PATH1, " 123"), Err.BINARYTYPE);
+    error(_FILE_APPEND_TEXT.args(PATH1, " 123"), Err.XPTYPE);
 
     query(_FILE_APPEND_TEXT.args(PATH1, "x"));
     query(_FILE_SIZE.args(PATH1), "1");
     query(_FILE_APPEND_TEXT.args(PATH1, "\u00fc", "US-ASCII"));
     query(_FILE_READ_TEXT.args(PATH1), "x?");
+    query(_FILE_DELETE.args(PATH1));
+  }
+
+  /**
+   * Test method for the file:append-text-lines() function.
+   */
+  @Test
+  public void fileAppendTextLines() {
+    check(_FILE_APPEND_TEXT_LINES);
+
+    error(_FILE_APPEND_TEXT_LINES.args(PATH, "x"), Err.FILE_DIR);
+    error(_FILE_APPEND_TEXT_LINES.args(PATH1, " 123"), Err.XPTYPE);
+
+    query(_FILE_APPEND_TEXT_LINES.args(PATH1, "x"));
+    query(_FILE_SIZE.args(PATH1), 1 + Prop.NL.length());
+    query(_FILE_APPEND_TEXT_LINES.args(PATH1, "('y','z')"));
+    query(_FILE_SIZE.args(PATH1), 3 * (1 + Prop.NL.length()));
+    query(_FILE_APPEND_TEXT_LINES.args(PATH1, "\u00fc", "US-ASCII"));
+    query(_FILE_READ_TEXT.args(PATH1), "xyz?");
     query(_FILE_DELETE.args(PATH1));
   }
 

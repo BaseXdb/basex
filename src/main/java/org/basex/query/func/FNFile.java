@@ -5,6 +5,7 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.nio.charset.*;
 import java.util.regex.*;
 
 import org.basex.core.*;
@@ -28,6 +29,9 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class FNFile extends StandardFunc {
+  /** Line separator. */
+  private static final byte[] NL = Token.token(Prop.NL);
+
   /**
    * Constructor.
    * @param ii input info
@@ -55,31 +59,34 @@ public final class FNFile extends StandardFunc {
     final File path = file(0, ctx);
     try {
       switch(sig) {
-        case _FILE_APPEND:         return write(path, false, true, ctx);
-        case _FILE_APPEND_BINARY:  return writeBinary(path, ctx, true);
-        case _FILE_APPEND_TEXT:    return write(path, true, true, ctx);
-        case _FILE_COPY:           return copy(path, ctx, true);
-        case _FILE_CREATE_DIR:     return createDirectory(path);
-        case _FILE_DELETE:         return delete(path, ctx);
-        case _FILE_MOVE:           return copy(path, ctx, false);
-        case _FILE_READ_BINARY:    return readBinary(path);
-        case _FILE_READ_TEXT:      return readText(path, ctx);
-        case _FILE_WRITE:          return write(path, false, false, ctx);
-        case _FILE_WRITE_BINARY:   return writeBinary(path, ctx, false);
-        case _FILE_WRITE_TEXT:     return write(path, true, false, ctx);
-        case _FILE_PATH_SEPARATOR: return Str.get(File.pathSeparator);
-        case _FILE_DIR_SEPARATOR:  return Str.get(File.separator);
-        case _FILE_EXISTS:         return Bln.get(path.exists());
-        case _FILE_IS_DIR:         return Bln.get(path.isDirectory());
-        case _FILE_IS_FILE:        return Bln.get(path.isFile());
-        case _FILE_LAST_MODIFIED:  return lastModified(path);
-        case _FILE_SIZE:           return size(path);
-        case _FILE_BASE_NAME:      return baseName(path, ctx);
-        case _FILE_DIR_NAME:       return dirName(path);
-        case _FILE_PATH_TO_NATIVE: return pathToNative(path);
-        case _FILE_RESOLVE_PATH:   return Str.get(path.getAbsolutePath());
-        case _FILE_PATH_TO_URI:    return pathToUri(path);
-        default:                   return super.item(ctx, ii);
+        case _FILE_APPEND:            return write(path, true, ctx);
+        case _FILE_APPEND_BINARY:     return writeBinary(path, ctx, true);
+        case _FILE_APPEND_TEXT:       return writeText(path, true, ctx);
+        case _FILE_APPEND_TEXT_LINES: return writeTextLines(path, true, ctx);
+        case _FILE_COPY:              return copy(path, ctx, true);
+        case _FILE_CREATE_DIR:        return createDirectory(path);
+        case _FILE_DELETE:            return delete(path, ctx);
+        case _FILE_MOVE:              return copy(path, ctx, false);
+        case _FILE_READ_BINARY:       return readBinary(path);
+        case _FILE_READ_TEXT:         return readText(path, ctx);
+        case _FILE_WRITE:             return write(path, false, ctx);
+        case _FILE_WRITE_BINARY:      return writeBinary(path, ctx, false);
+        case _FILE_WRITE_TEXT:        return writeText(path, false, ctx);
+        case _FILE_WRITE_TEXT_LINES:  return writeTextLines(path, false, ctx);
+        case _FILE_PATH_SEPARATOR:    return Str.get(File.pathSeparator);
+        case _FILE_DIR_SEPARATOR:     return Str.get(File.separator);
+        case _FILE_LINE_SEPARATOR:    return Str.get(NL);
+        case _FILE_EXISTS:            return Bln.get(path.exists());
+        case _FILE_IS_DIR:            return Bln.get(path.isDirectory());
+        case _FILE_IS_FILE:           return Bln.get(path.isFile());
+        case _FILE_LAST_MODIFIED:     return lastModified(path);
+        case _FILE_SIZE:              return size(path);
+        case _FILE_BASE_NAME:         return baseName(path, ctx);
+        case _FILE_DIR_NAME:          return dirName(path);
+        case _FILE_PATH_TO_NATIVE:    return pathToNative(path);
+        case _FILE_RESOLVE_PATH:      return Str.get(path.getAbsolutePath());
+        case _FILE_PATH_TO_URI:       return pathToUri(path);
+        default:                      return super.item(ctx, ii);
       }
     } catch(final IOException ex) {
       throw FILE_IO.thrw(info, ex);
@@ -339,41 +346,85 @@ public final class FNFile extends StandardFunc {
   /**
    * Writes items to a file.
    * @param path file to be written
-   * @param text only write texts
    * @param append append flag
    * @param ctx query context
    * @return true if file was successfully written
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private Item write(final File path, final boolean text, final boolean append,
-      final QueryContext ctx) throws QueryException, IOException {
+  private Item write(final File path, final boolean append, final QueryContext ctx)
+      throws QueryException, IOException {
 
     check(path);
     final Iter ir = expr[1].iter(ctx);
-    final SerializerProp sp;
-    if(text) {
-      final String enc = encoding(2, FILE_ENCODING, ctx);
-      sp = new SerializerProp();
-      if(enc != null) sp.set(SerializerProp.S_ENCODING, enc);
-    } else {
-      final Item it = expr.length > 2 ? expr[2].item(ctx, info) : null;
-      sp = FuncParams.serializerProp(it);
-    }
+    final SerializerProp sp = FuncParams.serializerProp(
+        expr.length > 2 ? expr[2].item(ctx, info) : null);
 
     final PrintOutput out = PrintOutput.get(new FileOutputStream(path, append));
     try {
       final Serializer ser = Serializer.get(out, sp);
-      for(Item it; (it = ir.next()) != null;) {
-        if(text) {
-          final Type ip = it.type;
-          if(!ip.isString() && !ip.isUntyped()) Err.type(this, AtomType.STR, it);
-        }
-        ser.serialize(it);
-      }
+      for(Item it; (it = ir.next()) != null;) ser.serialize(it);
       ser.close();
     } catch(final SerializerException ex) {
       throw ex.getCause(info);
+    } finally {
+      out.close();
+    }
+    return null;
+  }
+
+  /**
+   * Writes items to a file.
+   * @param path file to be written
+   * @param append append flag
+   * @param ctx query context
+   * @return true if file was successfully written
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   */
+  private Item writeText(final File path, final boolean append, final QueryContext ctx)
+      throws QueryException, IOException {
+
+    check(path);
+    final byte[] s = checkStr(expr[1], ctx);
+    final String enc = encoding(2, FILE_ENCODING, ctx);
+    final Charset cs = enc == null || enc == UTF8 ? null : Charset.forName(enc);
+
+    final PrintOutput out = PrintOutput.get(new FileOutputStream(path, append));
+    try {
+      out.write(cs == null ? s : Token.string(s).getBytes(cs));
+    } finally {
+      out.close();
+    }
+    return null;
+  }
+
+  /**
+   * Writes items to a file.
+   * @param path file to be written
+   * @param append append flag
+   * @param ctx query context
+   * @return true if file was successfully written
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   */
+  private Item writeTextLines(final File path, final boolean append,
+      final QueryContext ctx) throws QueryException, IOException {
+
+    check(path);
+    final Iter ir = expr[1].iter(ctx);
+    final String enc = encoding(2, FILE_ENCODING, ctx);
+    final Charset cs = enc == null || enc == UTF8 ? null : Charset.forName(enc);
+
+    final PrintOutput out = PrintOutput.get(new FileOutputStream(path, append));
+    try {
+      for(Item it; (it = ir.next()) != null;) {
+        final Type ip = it.type;
+        if(!ip.isString() && !ip.isUntyped()) Err.type(this, AtomType.STR, it);
+        final byte[] s = it.string(info);
+        out.write(cs == null ? s : Token.string(s).getBytes(cs));
+        out.write(cs == null ? NL : Prop.NL.getBytes(cs));
+      }
     } finally {
       out.close();
     }
