@@ -58,7 +58,7 @@ public interface Text {
   String LOCALINFO =
     " [-bcdiLosuvVwxz] [query]" + NL +
     "  [query]     Execute query file or expression" + NL +
-    "  -b<pars>    Bind external XQuery variables" + NL +
+    "  -b<pars>    Bind external query variables" + NL +
     "  -c<input>   Execute commands from file or string" + NL +
     "  -d          Activate debugging mode" + NL +
     "  -i<input>   Open initial file or database" + NL +
@@ -77,7 +77,7 @@ public interface Text {
   String CLIENTINFO =
     " [-bcdiLnopPsUvVwxz] [query]" + NL +
     "  [query]     Execute query file or expression" + NL +
-    "  -b<pars>    Bind external XQuery variables" + NL +
+    "  -b<pars>    Bind external query variables" + NL +
     "  -c<input>   Execute commands from file or string" + NL +
     "  -d          Activate debugging mode" + NL +
     "  -i<input>   Open initial file or database" + NL +
