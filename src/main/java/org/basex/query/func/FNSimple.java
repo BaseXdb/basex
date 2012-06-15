@@ -1,11 +1,13 @@
 package org.basex.query.func;
 
 import static org.basex.query.util.Err.*;
+import static org.basex.util.Token.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.util.Compare.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -88,6 +90,8 @@ public final class FNSimple extends StandardFunc {
         return Bln.get(!e.ebv(ctx, info).bool(info));
       case DEEP_EQUAL:
         return Bln.get(deep(ctx));
+      case DEEP_EQUAL_OPT:
+        return Bln.get(deepOpt(ctx));
       case ZERO_OR_ONE:
         Iter ir = e.iter(ctx);
         Item it = ir.next();
@@ -182,5 +186,32 @@ public final class FNSimple extends StandardFunc {
   private boolean deep(final QueryContext ctx) throws QueryException {
     if(expr.length == 3) checkColl(expr[2], ctx);
     return Compare.deep(ctx.iter(expr[0]), ctx.iter(expr[1]), info);
+  }
+
+  /**
+   * Checks items for deep equality.
+   * @param ctx query context
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  private boolean deepOpt(final QueryContext ctx) throws QueryException {
+    final Compare cmp = new Compare(info);
+    final Flag[] flags = Flag.values();
+    if(expr.length == 3) {
+      final Iter ir = expr[2].iter(ctx);
+      for(Item it; (it = ir.next()) != null;) {
+        final byte[] key = uc(checkEStr(it));
+        boolean found = false;
+        for(final Flag f : flags) {
+          found = eq(key, token(f.name()));
+          if(found) {
+            cmp.set(f);
+            break;
+          }
+        }
+        if(!found) ELMOPTION.thrw(info, key);
+      }
+    }
+    return cmp.deep(ctx.iter(expr[0]), ctx.iter(expr[1]));
   }
 }

@@ -1,6 +1,10 @@
 package org.basex.query.func;
 
 import static java.lang.StrictMath.*;
+import static org.basex.query.func.Function.*;
+
+import java.util.*;
+import java.util.zip.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -27,7 +31,7 @@ public final class FNMath extends StandardFunc {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     double d = 0;
-    if(expr.length > 0) {
+    if(expr.length > 0 && sig != _MATH_CRC32) {
       if(expr[0].isEmpty()) return null;
       d = checkDbl(expr[0], ctx);
     }
@@ -50,10 +54,12 @@ public final class FNMath extends StandardFunc {
       case _MATH_ATAN2:  return Dbl.get(atan2(d, e));
       case _MATH_POW:    return Dbl.get(power(d, e));
       // project-specific
-      case _MATH_RANDOM: return Dbl.get(random());
       case _MATH_SINH:   return Dbl.get(sinh(d));
       case _MATH_COSH:   return Dbl.get(cosh(d));
       case _MATH_TANH:   return Dbl.get(tanh(d));
+      case _MATH_RANDOM: return Dbl.get(random());
+      case _MATH_UUID:   return Str.get(UUID.randomUUID());
+      case _MATH_CRC32:  return crc32(ctx);
       default:           return super.item(ctx, ii);
     }
   }
@@ -73,8 +79,23 @@ public final class FNMath extends StandardFunc {
     return pow(b, e);
   }
 
+  /**
+   * Creates the CRC32 hash of the given xs:string.
+   * @param ctx query context
+   * @return xs:hexBinary instance containing the hash
+   * @throws QueryException exception
+   */
+  private Hex crc32(final QueryContext ctx) throws QueryException {
+    final CRC32 crc = new CRC32();
+    crc.update(checkStr(expr[0], ctx));
+    final byte[] r = new byte[4];
+    for(int i = r.length, c = (int) crc.getValue(); i-- > 0; c >>>= 8) r[i] = (byte) c;
+    return new Hex(r);
+  }
+
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X30 || u == Use.NDT && sig == Function._MATH_RANDOM || super.uses(u);
+    return u == Use.X30 || u == Use.NDT && oneOf(sig, _MATH_RANDOM, _MATH_UUID) ||
+        super.uses(u);
   }
 }

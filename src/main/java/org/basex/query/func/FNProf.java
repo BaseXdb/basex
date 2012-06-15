@@ -47,7 +47,7 @@ public final class FNProf extends StandardFunc {
   @Override
   Expr comp(final QueryContext ctx) throws QueryException {
     final Expr e = super.comp(ctx);
-    if(sig == Function._UTIL_TYPE) {
+    if(sig == Function._XQUERY_TYPE) {
       FNInfo.dump(Util.inf("{ type: %, size: % }", expr[0].type(), expr[0].size()),
           Token.token(expr[0].toString()), ctx);
       return expr[0];

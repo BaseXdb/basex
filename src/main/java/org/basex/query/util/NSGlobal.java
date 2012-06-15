@@ -51,13 +51,14 @@ public final class NSGlobal {
     NS.add(HOF, HOFURI);
     NS.add(INDEX, INDEXURI);
     NS.add(JSON, JSONURI);
+    NS.add(OUT, OUTURI);
     NS.add(PROC, PROCURI);
     NS.add(PROF, PROFURI);
     NS.add(REPO, REPOURI);
     NS.add(SQL, SQLURI);
-    NS.add(UTIL, UTILURI);
     NS.add(VLDT, VALIDATEURI);
     NS.add(XSLT, XSLTURI);
+    NS.add(XQRY, XQUERYURI);
   }
 
   /** Private constructor. */

@@ -337,6 +337,9 @@ public enum Function {
   /** XQuery function. */
   DEEP_EQUAL(FNSimple.class, "deep-equal(item,item[,coll])",
       BLN, 2, ITEM_ZM, ITEM_ZM, STR),
+  /** XQuery function (project specific). */
+  DEEP_EQUAL_OPT(FNOut.class, "deep-equal-opt(item,item[,options])",
+      BLN, 2, ITEM_ZM, ITEM_ZM, ITEM),
 
   /* FNStr functions. */
 
@@ -432,8 +435,6 @@ public enum Function {
   _MATH_LOG10(FNMath.class, "log10(number)", DBL_ZO, DBL_ZO),
 
   /** XQuery function. */
-  _MATH_RANDOM(FNMath.class, "random()", DBL),
-  /** XQuery function. */
   _MATH_E(FNMath.class, "e()", DBL),
   /** XQuery function. */
   _MATH_SINH(FNMath.class, "sinh(number)", DBL_ZO, DBL_ZO),
@@ -441,6 +442,12 @@ public enum Function {
   _MATH_COSH(FNMath.class, "cosh(number)", DBL_ZO, DBL_ZO),
   /** XQuery function. */
   _MATH_TANH(FNMath.class, "tanh(number)", DBL_ZO, DBL_ZO),
+  /** XQuery function. */
+  _MATH_RANDOM(FNMath.class, "random()", DBL),
+  /** XQuery function. */
+  _MATH_CRC32(FNMath.class, "crc32(string)", HEX, STR),
+  /** XQuery function. */
+  _MATH_UUID(FNMath.class, "uuid()", STR),
 
   /* FNArchive functions. */
 
@@ -747,29 +754,23 @@ public enum Function {
   /** XQuery function. */
   _JSON_SERIALIZE_ML(FNJson.class, "serialize-ml(node)", STR, NOD),
 
-  /* FNUtil functions. */
+  /* FNOut functions. */
 
   /** XQuery function. */
-  _UTIL_NL(FNUtil.class, "nl()", STR),
+  _OUT_NL(FNOut.class, "nl()", STR),
   /** XQuery function. */
-  _UTIL_TAB(FNUtil.class, "tab()", STR),
+  _OUT_TAB(FNOut.class, "tab()", STR),
   /** XQuery function. */
-  _UTIL_EVAL(FNUtil.class, "eval(string)", ITEM_ZM, STR_ZO),
+  _OUT_FORMAT(FNOut.class, "format(format,item1[,...])", STR, -2, STR, ITEM),
+
+  /* FNXQuery functions. */
+
   /** XQuery function. */
-  _UTIL_RUN(FNUtil.class, "run(string)", ITEM_ZM, STR),
+  _XQUERY_EVAL(FNXQuery.class, "eval(string)", ITEM_ZM, STR_ZO),
   /** XQuery function. */
-  _UTIL_FORMAT(FNUtil.class, "format(format,item1[,...])", STR, -2, STR, ITEM),
+  _XQUERY_INVOKE(FNXQuery.class, "invoke(string)", ITEM_ZM, STR),
   /** XQuery function. */
-  _UTIL_CRC32(FNUtil.class, "crc32(str)", HEX, STR),
-  /** XQuery function. */
-  _UTIL_UUID(FNUtil.class, "uuid()", STR),
-  /** XQuery function. */
-  _UTIL_DEEP_EQUAL(FNUtil.class, "deep-equal(item,item[,options])",
-      BLN, 2, ITEM_ZM, ITEM_ZM, ITEM),
-  /** XQuery function. */
-  _UTIL_PATH(FNUtil.class, "path()", STR),
-  /** XQuery function. */
-  _UTIL_TYPE(FNUtil.class, "type(expr)", ITEM_ZM, ITEM_ZM),
+  _XQUERY_TYPE(FNXQuery.class, "type(expr)", ITEM_ZM, ITEM_ZM),
 
   /* FNProf functions. */
 
@@ -861,15 +862,16 @@ public enum Function {
     URIS.put(FNDb.class,       DBURI);
     URIS.put(FNFt.class,       FTURI);
     URIS.put(FNHof.class,      HOFURI);
+    URIS.put(FNHash.class,     HASHURI);
     URIS.put(FNIndex.class,    INDEXURI);
     URIS.put(FNJson.class,     JSONURI);
+    URIS.put(FNOut.class,      OUTURI);
     URIS.put(FNProc.class,     PROCURI);
-    URIS.put(FNSql.class,      SQLURI);
-    URIS.put(FNUtil.class,     UTILURI);
     URIS.put(FNProf.class,     PROFURI);
-    URIS.put(FNHash.class,     HASHURI);
+    URIS.put(FNSql.class,      SQLURI);
     URIS.put(FNValidate.class, VALIDATEURI);
     URIS.put(FNXslt.class,     XSLTURI);
+    URIS.put(FNXQuery.class,   XQUERYURI);
   }
 
   /** Minimum number of arguments. */

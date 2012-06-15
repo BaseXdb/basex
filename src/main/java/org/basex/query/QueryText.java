@@ -458,8 +458,8 @@ public interface QueryText {
   byte[] FILE = token("file");
   /** HTTP Client token. */
   byte[] HTTP = token("http");
-  /** Util token. */
-  byte[] UTIL = token("util");
+  /** Output token. */
+  byte[] OUT = token("out");
   /** Profiling token. */
   byte[] PROF = token("prof");
   /** Hash token. */
@@ -480,12 +480,14 @@ public interface QueryText {
   byte[] PROC = token("proc");
   /** SQL token. */
   byte[] SQL = token("sql");
-  /** Crypto token. */
+  /** Cryptography token. */
   byte[] CRYPTO = token("crytpo");
-  /** Repo token. */
+  /** Repository token. */
   byte[] REPO = token("repo");
-  /** Val token. */
+  /** Validate token. */
   byte[] VLDT = token("validate");
+  /** XQuery token. */
+  byte[] XQRY = token(XQUERY);
   /** EXErr token. */
   byte[] EXPERR = token("experr");
 
@@ -563,8 +565,10 @@ public interface QueryText {
   byte[] JSONURI = token(BXMODULES + "json");
   /** Process module URI. */
   byte[] PROCURI = token(BXMODULES + "proc");
-  /** Utility module URI. */
-  byte[] UTILURI = token(BXMODULES + "util");
+  /** Output module URI. */
+  byte[] OUTURI = token(BXMODULES + "out");
+  /** XQuery module URI. */
+  byte[] XQUERYURI = token(BXMODULES + "xquery");
   /** Profiling module URI. */
   byte[] PROFURI = token(BXMODULES + "prof");
   /** Hash module URI. */
