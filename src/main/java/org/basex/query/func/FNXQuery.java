@@ -11,6 +11,9 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -34,7 +37,7 @@ public final class FNXQuery extends StandardFunc {
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(sig) {
       case _XQUERY_EVAL:   return eval(ctx).iter();
-      case _XQUERY_INVOKE: return run(ctx).iter();
+      case _XQUERY_INVOKE: return invoke(ctx).iter();
       case _XQUERY_TYPE:   return value(ctx).iter();
       default:             return super.iter(ctx);
     }
@@ -44,7 +47,7 @@ public final class FNXQuery extends StandardFunc {
   public Value value(final QueryContext ctx) throws QueryException {
     switch(sig) {
       case _XQUERY_EVAL:   return eval(ctx);
-      case _XQUERY_INVOKE: return run(ctx);
+      case _XQUERY_INVOKE: return invoke(ctx);
       case _XQUERY_TYPE:   return comp(ctx).value(ctx);
       default:             return super.value(ctx);
     }
@@ -67,7 +70,7 @@ public final class FNXQuery extends StandardFunc {
    * @throws QueryException query exception
    */
   private Value eval(final QueryContext ctx) throws QueryException {
-    return eval(ctx, checkEStr(expr[0], ctx));
+    return eval(ctx, checkStr(expr[0], ctx));
   }
 
   /**
@@ -77,26 +80,51 @@ public final class FNXQuery extends StandardFunc {
    * @return resulting value
    * @throws QueryException query exception
    */
-  private static Value eval(final QueryContext ctx, final byte[] qu)
-      throws QueryException {
-
+  private Value eval(final QueryContext ctx, final byte[] qu) throws QueryException {
     final QueryContext qc = new QueryContext(ctx.context);
-    qc.parse(string(qu));
-    qc.compile();
-    return qc.value();
+    final Value bind = expr.length > 1 ? expr[1].item(ctx, info) : null;
+
+    if(bind instanceof Map) {
+      final Map map = (Map) bind;
+      for(final Item it : map.keys()) {
+        byte[] key;
+        if(it.type.isString()) {
+          key = it.string(null);
+        } else {
+          final QNm qnm = (QNm) checkType(it, AtomType.QNM);
+          final TokenBuilder tb = new TokenBuilder();
+          if(qnm.uri() != null) tb.add('{').add(qnm.uri()).add('}');
+          key = tb.add(qnm.local()).finish();
+        }
+        if(key.length == 0) {
+          qc.context(map.get(it, info), null);
+        } else {
+          qc.bind(string(key), map.get(it, info), null);
+        }
+      }
+    }
+
+    try {
+      qc.parse(string(qu));
+      if(qc.updating) BXXQ_UPDATING.thrw(info);
+      qc.compile();
+      return qc.value();
+    } finally {
+      qc.close();
+    }
   }
 
   /**
-   * Performs the run function.
+   * Performs the invoke function.
    * @param ctx query context
    * @return resulting value
    * @throws QueryException query exception
    */
-  private Value run(final QueryContext ctx) throws QueryException {
+  private Value invoke(final QueryContext ctx) throws QueryException {
     checkCreate(ctx);
     final String path = string(checkStr(expr[0], ctx));
     final IO io = IO.get(path);
-    if(!io.exists()) FILE_IO.thrw(info, path);
+    if(!io.exists()) WHICHRES.thrw(info, path);
     try {
       return eval(ctx, io.read());
     } catch(final IOException ex) {

@@ -65,6 +65,9 @@ public final class BaseXGUI {
     context.prop.set(Prop.CACHEQUERY, true);
     // reduce number of results to save memory
     context.prop.set(Prop.MAXHITS, gprop.num(GUIProp.MAXHITS));
+    // overwrite some properties
+    gprop.set(GUIProp.EXECRT, false);
+    gprop.set(GUIProp.FILTERRT, false);
     // initialize fonts and colors
     GUIConstants.init(gprop);
 

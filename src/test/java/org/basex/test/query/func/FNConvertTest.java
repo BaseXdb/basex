@@ -20,7 +20,7 @@ public final class FNConvertTest extends AdvancedQueryTest {
   static final PrintStream NULL = new PrintStream(new NullOutput());
 
   /**
-   * Test method for the util:binary-to-string() function.
+   * Test method for the convert:binary-to-string() function.
    */
   @Test
   public void utilBinaryToString() {
@@ -32,7 +32,7 @@ public final class FNConvertTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the util:string-to-base64() function.
+   * Test method for the convert:string-to-base64() function.
    */
   @Test
   public void utilStringToBase64() {
@@ -45,7 +45,7 @@ public final class FNConvertTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the util:bytes-to-base64() function.
+   * Test method for the convert:bytes-to-base64() function.
    */
   @Test
   public void utilBytesToBase64() {
@@ -55,7 +55,7 @@ public final class FNConvertTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the util:string-to-hex() function.
+   * Test method for the convert:string-to-hex() function.
    */
   @Test
   public void utilStringToHex() {
@@ -68,7 +68,7 @@ public final class FNConvertTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the util:bytes-to-hex() function.
+   * Test method for the convert:bytes-to-hex() function.
    */
   @Test
   public void utilBytesToHex() {
@@ -78,7 +78,7 @@ public final class FNConvertTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the util:binary-to-bytes() function.
+   * Test method for the convert:binary-to-bytes() function.
    */
   @Test
   public void utilToBytes() {
@@ -94,7 +94,7 @@ public final class FNConvertTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the util:integer-to-base() function.
+   * Test method for the convert:integer-to-base() function.
    */
   @Test
   public void utilToBase() {
@@ -114,7 +114,7 @@ public final class FNConvertTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the util:integer-from-base() function.
+   * Test method for the convert:integer-from-base() function.
    */
   @Test
   public void utilFromBase() {

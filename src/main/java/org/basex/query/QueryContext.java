@@ -504,7 +504,7 @@ public final class QueryContext extends Progress {
    * @param type data type (may be {@code null})
    * @throws QueryException query exception
    */
-  void context(final Object val, final String type) throws QueryException {
+  public void context(final Object val, final String type) throws QueryException {
     ctxItem = cast(val, type);
   }
 
@@ -523,7 +523,7 @@ public final class QueryContext extends Progress {
    * @param type data type (may be {@code null})
    * @throws QueryException query exception
    */
-  void bind(final String name, final Object val, final String type)
+  public void bind(final String name, final Object val, final String type)
       throws QueryException {
     bind(name, cast(val, type));
   }

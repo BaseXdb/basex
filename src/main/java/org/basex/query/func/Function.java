@@ -766,9 +766,9 @@ public enum Function {
   /* FNXQuery functions. */
 
   /** XQuery function. */
-  _XQUERY_EVAL(FNXQuery.class, "eval(string)", ITEM_ZM, STR_ZO),
+  _XQUERY_EVAL(FNXQuery.class, "eval(string[,bindings])", ITEM_ZM, 1, STR, ITEM),
   /** XQuery function. */
-  _XQUERY_INVOKE(FNXQuery.class, "invoke(string)", ITEM_ZM, STR),
+  _XQUERY_INVOKE(FNXQuery.class, "invoke(string[,bindings])", ITEM_ZM, 1, STR, ITEM),
   /** XQuery function. */
   _XQUERY_TYPE(FNXQuery.class, "type(expr)", ITEM_ZM, ITEM_ZM),
 

@@ -143,6 +143,11 @@ public enum Err {
   /** BXVA0001. */
   BXVA_FAIL(BXVA, 1, "Validation failed: %"),
 
+  // Fulltext module
+
+  /** BXXQ0001. */
+  BXXQ_UPDATING(BXXQ, 1, "No updating expression allowed."),
+
   // EXPath modules
 
   /** ARCH0001. */
@@ -1000,6 +1005,7 @@ public enum Err {
     /** BXRE Error type. */ BXRE(QueryText.BXERR, QueryText.BXERRORS),
     /** BXSQ Error type. */ BXSQ(QueryText.BXERR, QueryText.BXERRORS),
     /** BXVA Error type. */ BXVA(QueryText.BXERR, QueryText.BXERRORS),
+    /** BXFT Error type. */ BXXQ(QueryText.BXERR, QueryText.BXERRORS),
     /** HASH Error type. */ HASH(QueryText.BXERR, QueryText.BXERRORS),
 
     // EXPath errors

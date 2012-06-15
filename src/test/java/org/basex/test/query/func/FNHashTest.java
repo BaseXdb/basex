@@ -13,7 +13,7 @@ import org.junit.*;
  * @author Christian Gruen
  */
 public final class FNHashTest extends AdvancedQueryTest {
-  /** Test method for the util:md5() function. */
+  /** Test method for the hash:md5() function. */
   @Test
   public void utilMd5() {
     check(_HASH_MD5);
@@ -21,7 +21,7 @@ public final class FNHashTest extends AdvancedQueryTest {
     query(_HASH_MD5.args("BaseX"), "0D65185C9E296311C0A2200179E479A2");
   }
 
-  /** Test method for the util:md5-binary() function. */
+  /** Test method for the hash:md5-binary() function. */
   @Test
   public void utilMd5Binary() {
     check(_HASH_MD5_BINARY);
@@ -30,7 +30,7 @@ public final class FNHashTest extends AdvancedQueryTest {
         "0D65185C9E296311C0A2200179E479A2");
   }
 
-  /** Test method for the util:sha1() function. */
+  /** Test method for the hash:sha1() function. */
   @Test
   public void utilSha1() {
     check(_HASH_SHA1);
@@ -38,7 +38,7 @@ public final class FNHashTest extends AdvancedQueryTest {
     query(_HASH_SHA1.args("BaseX"), "3AD5958F0F27D5AFFDCA2957560F121D0597A4ED");
   }
 
-  /** Test method for the util:sha1-binary() function. */
+  /** Test method for the hash:sha1-binary() function. */
   @Test
   public void utilSha1Binary() {
     check(_HASH_SHA1_BINARY);
@@ -48,7 +48,7 @@ public final class FNHashTest extends AdvancedQueryTest {
         "3AD5958F0F27D5AFFDCA2957560F121D0597A4ED");
   }
 
-  /** Test method for the util:hash() function. */
+  /** Test method for the hash:hash() function. */
   @Test
   public void utilHash() {
     check(_HASH_HASH);
@@ -62,7 +62,7 @@ public final class FNHashTest extends AdvancedQueryTest {
     error(_HASH_HASH.args("", ""), Err.HASH_ALG);
   }
 
-  /** Test method for the util:hash-binary() function. */
+  /** Test method for the hash:hash-binary() function. */
   @Test
   public void utilHashBinary() {
     check(_HASH_HASH_BINARY);

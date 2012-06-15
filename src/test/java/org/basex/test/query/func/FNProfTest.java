@@ -19,7 +19,7 @@ public final class FNProfTest extends AdvancedQueryTest {
   static final PrintStream NULL = new PrintStream(new NullOutput());
 
   /**
-   * Test method for the util:mem() function.
+   * Test method for the prof:mem() function.
    */
   @Test
   public void utilMem() {
@@ -34,7 +34,7 @@ public final class FNProfTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the util:time() function.
+   * Test method for the prof:time() function.
    */
   @Test
   public void utilTime() {
@@ -49,7 +49,7 @@ public final class FNProfTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the util:sleep() function.
+   * Test method for the prof:sleep() function.
    */
   @Test
   public void utilSleep() {

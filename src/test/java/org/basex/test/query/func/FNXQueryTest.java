@@ -10,7 +10,7 @@ import org.basex.test.query.*;
 import org.junit.*;
 
 /**
- * This class tests the XQuery utility functions prefixed with "util".
+ * This class tests the XQuery functions prefixed with "xquery".
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -20,33 +20,38 @@ public final class FNXQueryTest extends AdvancedQueryTest {
   static final PrintStream NULL = new PrintStream(new NullOutput());
 
   /**
-   * Test method for the util:eval() function.
+   * Test method for the xquery:eval() function.
    */
   @Test
-  public void utilEval() {
+  public void xqueryEval() {
     check(_XQUERY_EVAL);
     query(_XQUERY_EVAL.args("1"), 1);
     query(_XQUERY_EVAL.args("1 + 2"), 3);
+    query(_XQUERY_EVAL.args("\"$a\"", " map { '$a' := 'b' }"), "b");
+    query(_XQUERY_EVAL.args("\"$a\"", " map { 'a' := 'b' }"), "b");
+    query(_XQUERY_EVAL.args("\"$a\"", " map { 'a' := (1,2) }"), "1 2");
+    query(_XQUERY_EVAL.args("\"$local:a\"", " map { xs:QName('local:a') := 1 }"), "1");
+    query(_XQUERY_EVAL.args(".", " map { '' := 1 }"), "1");
     error(_XQUERY_EVAL.args("1+"), Err.INCOMPLETE);
     error("declare variable $a:=1;" + _XQUERY_EVAL.args("\"$a\""), Err.VARUNDEF);
     error("for $a in (1,2) return " + _XQUERY_EVAL.args("\"$a\""), Err.VARUNDEF);
   }
 
   /**
-   * Test method for the util:run() function.
+   * Test method for the xquery:invoke() function.
    */
   @Test
-  public void utilRun() {
+  public void xqueryInvoke() {
     check(_XQUERY_INVOKE);
     query(_XQUERY_INVOKE.args("src/test/resources/input.xq"), "XML");
-    error(_XQUERY_INVOKE.args("src/test/resources/xxx.xq"), Err.FILE_IO);
+    error(_XQUERY_INVOKE.args("src/test/resources/xxx.xq"), Err.WHICHRES);
   }
 
   /**
-   * Test method for the util:type() function.
+   * Test method for the xquery:type() function.
    */
   @Test
-  public void utilType() {
+  public void xqueryType() {
     final PrintStream err = System.err;
     System.setErr(NULL);
     check(_XQUERY_TYPE);

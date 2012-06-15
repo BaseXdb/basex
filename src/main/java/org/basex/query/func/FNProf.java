@@ -30,17 +30,17 @@ public final class FNProf extends StandardFunc {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(sig) {
-      case _PROF_MEM:      return mem(ctx);
-      case _PROF_TIME:     return time(ctx);
-      default:             return super.iter(ctx);
+      case _PROF_MEM:  return mem(ctx);
+      case _PROF_TIME: return time(ctx);
+      default:         return super.iter(ctx);
     }
   }
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
-      case _PROF_SLEEP:      return sleep(ctx);
-      default:               return super.item(ctx, ii);
+      case _PROF_SLEEP: return sleep(ctx);
+      default:          return super.item(ctx, ii);
     }
   }
 
