@@ -175,7 +175,7 @@ public enum Err {
   /** CX0005. */
   CX_INVNM(CX, 5, "Invalid name for $digital-certificate root."),
   /** CX0007. */
-  CX_KSNULL(CX, 7, "Key store is null."),
+  CX_KSNULL(CX, 7, "Key store is null: %"),
   /** CX0012. */
   CX_NOKEY(CX, 12, "Cannot find key for alias in given keystore."),
   /** CX0013. */
@@ -433,8 +433,6 @@ public enum Err {
   SERILL(SERE, 14, "Illegal HTML character found: #x%."),
   /** SERE0015. */
   SERPI(SERE, 15, "Processing construction contains '>'."),
-  /** SEPM0016. */
-  SERINVALID(SEPM, 16, "Parameter '%' is unknown."),
   /** SEPM0016. */
   SERMAP(SEPM, 16, "Character map '%' is not defined."),
   /** SEPM0016. */

@@ -73,9 +73,13 @@ public final class StrStream extends Item {
 
   @Override
   public TextInput input(final InputInfo ii) throws QueryException {
+    TextInput nli = null;
     try {
-      return new NewlineInput(input).encoding(encoding).valid(true);
+      nli = new TextInput(input);
+      nli.encoding(encoding).valid(true);
+      return nli;
     } catch(final IOException ex) {
+      if(nli != null) try { nli.close(); } catch(final IOException e) { }
       throw error.thrw(ii, input);
     }
   }

@@ -23,7 +23,7 @@ import org.basex.util.hash.*;
  */
 public final class Names extends TokenSet implements Index {
   /** Statistical information. */
-  protected Stats[] stats;
+  Stats[] stats;
   /** Meta data. */
   private final MetaData meta;
 

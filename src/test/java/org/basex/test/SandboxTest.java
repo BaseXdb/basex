@@ -23,9 +23,9 @@ public abstract class SandboxTest {
   /** Test name. */
   public static final String NAME = Util.name(SandboxTest.class);
   /** Database context. */
-  public static Context context;
+  protected static Context context;
   /** Clean up files. */
-  public static boolean cleanup = true;
+  protected static boolean cleanup = true;
 
   /**
    * Creates the sandbox.

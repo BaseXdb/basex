@@ -45,12 +45,15 @@ public class WindowsScripts {
   private void libraries(final String name, final HashSet<String> libs) throws Exception {
     final HashSet<String> sl = new HashSet<String>();
     final NewlineInput nli = new NewlineInput(IO.get("etc/" + name));
-    for(String s; (s = nli.readLine()) != null;) {
-      for(final String p : s.split(";")) {
-        if(p.contains("%LIB%")) sl.add(p.replace("%LIB%/", ""));
+    try {
+      for(String s; (s = nli.readLine()) != null;) {
+        for(final String p : s.split(";")) {
+          if(p.contains("%LIB%")) sl.add(p.replace("%LIB%/", ""));
+        }
       }
+    } finally {
+      nli.close();
     }
-    nli.close();
 
     for(final String l : libs) {
       if(l.contains("basex")) continue;

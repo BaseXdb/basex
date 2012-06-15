@@ -38,6 +38,8 @@ public final class BaseXServer extends Main implements Runnable {
   private final TokenIntMap blocked = new TokenIntMap();
   /** New sessions. */
   private final HashSet<ClientListener> auth = new HashSet<ClientListener>();
+  /** Initial commands. */
+  private StringList commands;
 
   /** Quiet mode (no logging). */
   private boolean quiet;
@@ -48,8 +50,6 @@ public final class BaseXServer extends Main implements Runnable {
 
   /** Server socket. */
   private ServerSocket socket;
-  /** Initial commands. */
-  private StringList commands;
 
   /**
    * Main method, launching the server process.
@@ -231,9 +231,9 @@ public final class BaseXServer extends Main implements Runnable {
   @Override
   protected void parseArguments(final String... args) throws IOException {
     final Args arg = new Args(args, this, SERVERINFO, Util.info(CONSOLE, SERVERMODE));
-
     commands = new StringList();
     boolean daemon = false;
+
     while(arg.more()) {
       if(arg.dash()) {
         switch(arg.next()) {

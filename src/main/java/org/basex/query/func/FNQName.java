@@ -159,7 +159,7 @@ public final class FNQName extends StandardFunc {
     final ANode an = (ANode) checkType(it2, NodeType.ELM);
     if(eq(pref, XML)) return Uri.uri(XMLURI, false);
     final Atts at = an.nsScope();
-    final int i = at != null ? at.get(pref) : -1;
+    final int i = at.get(pref);
     return i == -1 || at.string(i).length == 0 ? null : Uri.uri(at.string(i), false);
   }
 

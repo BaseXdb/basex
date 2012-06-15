@@ -54,9 +54,7 @@ public final class Lang {
           if(val.contains("\\n")) val = val.replaceAll("\\\\n", Prop.NL);
           if(Prop.langkeys) val = '[' + key + ": " + val + ']';
           if(TEXTS.put(key, val) != null) {
-            Util.errln("%." + SUFFIX + ": '%' found twice in language file", lang, key);
-            Util.stack(10);
-            System.exit(0);
+            Util.errln("%." + SUFFIX + ": '%' is declared twice", lang, key);
           }
           CHECK.put(key, true);
         }
@@ -76,18 +74,14 @@ public final class Lang {
   static synchronized String lang(final String key) {
     if(key == null) {
       for(final String s : CHECK.keySet()) {
-        Util.errln("%." + SUFFIX + ": '%' not defined in Text class", Prop.language, s);
-        Util.stack(10);
-        System.exit(0);
+        Util.errln("%." + SUFFIX + ": '%' can be removed", Prop.language, s);
       }
       return null;
     }
 
     final String val = TEXTS.get(key);
     if(val == null) {
-      Util.errln("%." + SUFFIX + ": '%' missing in Text class", Prop.language, key);
-      Util.stack(10);
-      System.exit(0);
+      Util.errln("%." + SUFFIX + ": '%' is missing", Prop.language, key);
       return '[' + key + ']';
     }
     CHECK.remove(key);

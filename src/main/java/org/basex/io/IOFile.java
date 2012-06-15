@@ -74,7 +74,7 @@ public final class IOFile extends IO {
       try {
         if(file.createNewFile()) return true;
       } catch(final IOException ex) {
-        Performance.sleep(i * 10);
+        Performance.sleep(i * 10l);
         Util.debug(ex);
       }
     }
@@ -229,7 +229,7 @@ public final class IOFile extends IO {
       // some file systems require several runs
       for(int i = 0; i < 5; i++) {
         if(file.delete() && !file.exists()) return ok;
-        Performance.sleep(i * 10);
+        Performance.sleep(i * 10l);
       }
     }
     return false;

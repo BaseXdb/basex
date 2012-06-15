@@ -11,7 +11,7 @@ import org.basex.util.list.*;
  */
 public final class ExprList extends ElementList {
   /** Element container. */
-  protected Expr[] list;
+  private Expr[] list;
 
   /**
    * Default constructor.

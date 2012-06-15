@@ -16,7 +16,7 @@ public final class ANodeList {
   /** Element container. */
   private ANode[] list;
   /** Number of elements. */
-  protected int size;
+  private int size;
 
   /**
    * Constructor.

@@ -42,7 +42,7 @@ public final class DirParser extends Parser {
   private final boolean rawParser;
 
   /** Database path for storing binary files. */
-  protected IOFile rawPath;
+  private IOFile rawPath;
   /** Last source. */
   private IO lastSrc;
   /** Parser reference. */
@@ -69,8 +69,7 @@ public final class DirParser extends Parser {
       Pattern.compile(IOFile.regex(pr.get(Prop.CREATEFILTER)));
     // choose binary storage if (disk-based) database path is known and
     // if raw parser or "add raw" option were chosen
-    rawPath = path != null && (addRaw || rawParser) ?
-        new IOFile(path, M_RAW) : null;
+    rawPath = path != null && (addRaw || rawParser) ? new IOFile(path, M_RAW) : null;
   }
 
   @Override

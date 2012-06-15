@@ -2750,7 +2750,7 @@ public class QueryParser extends InputParser {
       case ELM: tp = elementTest(); break;
       case ATT: tp = attributeTest(); break;
       case PI:  tp = piTest(); break;
-      case SCE: tp = schemaTest(); break;
+      case SCE:
       case SCA: tp = schemaTest(); break;
       default:  break;
     }

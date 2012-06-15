@@ -8,6 +8,7 @@ import java.io.*;
 import java.util.zip.*;
 
 import org.basex.core.*;
+import org.basex.io.*;
 import org.basex.query.util.*;
 import org.basex.test.query.*;
 import org.junit.*;
@@ -37,9 +38,7 @@ public final class FNZipTest extends AdvancedQueryTest {
   @BeforeClass
   public static void init() throws IOException {
     // create temporary file
-    final FileOutputStream fos = new FileOutputStream(TMPFILE);
-    fos.write('!');
-    fos.close();
+    new IOFile(TMPFILE).write(token("!"));
   }
 
   /** Finishes the test. */

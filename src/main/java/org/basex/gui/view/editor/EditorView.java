@@ -426,12 +426,11 @@ public final class EditorView extends View {
    * @return true if error was found
    */
   private boolean error(final String msg) {
-    EditorArea edit = getEditor();
     final Matcher m = FILEPATTERN.matcher(msg.replaceAll("[\\r\\n].*", ""));
     if(!m.matches()) return true;
 
     errFile = m.group(3);
-    edit = find(IO.get(errFile), false);
+    final EditorArea edit = find(IO.get(errFile), false);
     if(edit == null) return true;
 
     final int el = Integer.parseInt(m.group(1));

@@ -245,7 +245,7 @@ public final class ClientListener extends Thread {
     // wait until running command was stopped
     if(command != null) {
       command.stop();
-      while(command != null) Performance.sleep(50);
+      do Performance.sleep(50); while(command != null);
     }
     context.delete(this);
 

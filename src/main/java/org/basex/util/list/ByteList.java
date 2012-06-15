@@ -65,15 +65,6 @@ public class ByteList extends ElementList {
   }
 
   /**
-   * Returns the byte at the specified position.
-   * @param p position
-   * @return byte
-   */
-  public byte get(final int p) {
-    return list[p];
-  }
-
-  /**
    * Returns an array with all elements.
    * @return array
    */

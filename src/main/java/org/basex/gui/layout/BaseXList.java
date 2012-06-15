@@ -4,6 +4,7 @@ import static org.basex.gui.layout.BaseXKeys.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -126,15 +127,14 @@ public final class BaseXList extends BaseXBack {
 
       @Override
       public void keyReleased(final KeyEvent e) {
-        String txt = text.getText().trim().toLowerCase();
-
+        String txt = text.getText().trim().toLowerCase(Locale.ENGLISH);
         if(!txt.equals(old) && !multi) {
           final boolean glob = txt.matches("^.*[*?,].*$");
           final String regex = glob ? IOFile.regex(txt, false) : null;
 
           final IntList il = new IntList();
           for(int v = 0; v < values.length; ++v) {
-            final String value = values[v].trim().toLowerCase();
+            final String value = values[v].trim().toLowerCase(Locale.ENGLISH);
             if(glob) {
               if(value.matches(regex)) il.add(v);
             } else if(value.startsWith(txt)) {

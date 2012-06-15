@@ -194,7 +194,7 @@ public final class InfoView extends View {
    */
   private void add(final Command cmd) {
     if(cmd instanceof XQuery) {
-      add(QUERY_C + ' ', cmd.args[0].toString().trim());
+      add(QUERY_C + ' ', cmd.args[0].trim());
     } else if(cmd != null) {
       text.bold().add(COMMAND + COLS).norm().addExt(cmd).nline();
     }

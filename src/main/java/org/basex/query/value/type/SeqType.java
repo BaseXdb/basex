@@ -114,8 +114,6 @@ public final class SeqType {
   public static final SeqType NOD_ZO = new SeqType(NodeType.NOD, Occ.ZERO_ONE);
   /** Zero or more nodes. */
   public static final SeqType NOD_ZM = new SeqType(NodeType.NOD, Occ.ZERO_MORE);
-  /** One or more nodes. */
-  public static final SeqType NOD_OM = new SeqType(NodeType.NOD, Occ.ONE_MORE);
   /** Single QName. */
   public static final SeqType QNM = AtomType.QNM.seqType();
   /** Zero or one QNames. */
@@ -176,8 +174,6 @@ public final class SeqType {
   public static final SeqType NSP = NodeType.NSP.seqType();
   /** Namespace node. */
   public static final SeqType PI = NodeType.PI.seqType();
-  /** Namespace node. */
-  public static final SeqType TXT = NodeType.TXT.seqType();
   /** Namespace node. */
   public static final SeqType TXT_ZO = new SeqType(NodeType.TXT, Occ.ZERO_ONE);
 

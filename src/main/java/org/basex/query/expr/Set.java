@@ -95,7 +95,7 @@ abstract class Set extends Arr {
      * @return true if another item was found
      * @throws QueryException query exception
      */
-    boolean next(final int i) throws QueryException {
+    protected boolean next(final int i) throws QueryException {
       final Item it = iter[i].next();
       item[i] = it == null ? null : checkNode(it);
       return it != null;

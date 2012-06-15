@@ -296,7 +296,7 @@ public final class FNFileTest extends AdvancedQueryTest {
     query(_FILE_WRITE_TEXT_LINES.args(PATH1, "x"));
     query(_FILE_SIZE.args(PATH1), 1 + Prop.NL.length());
     query(_FILE_WRITE_TEXT_LINES.args(PATH1, "\u00fc", "US-ASCII"));
-    query(_FILE_READ_TEXT.args(PATH1), "?");
+    query(_FILE_READ_TEXT_LINES.args(PATH1), "?");
     query(_FILE_DELETE.args(PATH1));
   }
 
@@ -368,7 +368,7 @@ public final class FNFileTest extends AdvancedQueryTest {
     query(_FILE_APPEND_TEXT_LINES.args(PATH1, "('y','z')"));
     query(_FILE_SIZE.args(PATH1), 3 * (1 + Prop.NL.length()));
     query(_FILE_APPEND_TEXT_LINES.args(PATH1, "\u00fc", "US-ASCII"));
-    query(_FILE_READ_TEXT.args(PATH1), "xyz?");
+    query(_FILE_READ_TEXT_LINES.args(PATH1), "x y z ?");
     query(_FILE_DELETE.args(PATH1));
   }
 
@@ -417,7 +417,7 @@ public final class FNFileTest extends AdvancedQueryTest {
     check(_FILE_RESOLVE_PATH);
     final String path = query(_FILE_RESOLVE_PATH.args(PATH1));
     final String can = new File(PATH1).getAbsolutePath();
-    assertEquals(path.toLowerCase(Locale.ENGLISH), can.toLowerCase());
+    assertEquals(path.toLowerCase(Locale.ENGLISH), can.toLowerCase(Locale.ENGLISH));
   }
 
   /**
@@ -428,7 +428,7 @@ public final class FNFileTest extends AdvancedQueryTest {
     check(_FILE_PATH_TO_URI);
     final String path = query(_FILE_PATH_TO_URI.args(PATH1));
     final String uri = new File(PATH1).toURI().toString();
-    assertEquals(path.toLowerCase(Locale.ENGLISH), uri.toLowerCase());
+    assertEquals(path.toLowerCase(Locale.ENGLISH), uri.toLowerCase(Locale.ENGLISH));
   }
 
   /**

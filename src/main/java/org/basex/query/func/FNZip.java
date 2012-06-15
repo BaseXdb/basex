@@ -229,8 +229,7 @@ public final class FNZip extends StandardFunc {
     boolean ok = true;
     try {
       fos = new FileOutputStream(file);
-      final ZipOutputStream zos =
-        new ZipOutputStream(new BufferedOutputStream(fos));
+      final ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(fos));
       create(zos, elm.children(), "", null, ctx);
       zos.close();
     } catch(final IOException ex) {
@@ -389,8 +388,7 @@ public final class FNZip extends StandardFunc {
       FileOutputStream fos = null;
       try {
         fos = new FileOutputStream(out.path());
-        final ZipOutputStream zos =
-          new ZipOutputStream(new BufferedOutputStream(fos));
+        final ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(fos));
         // fill new zip file with entries from old file and description
         create(zos, elm.children(), "", zf, ctx);
         zos.close();

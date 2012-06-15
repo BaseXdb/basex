@@ -179,9 +179,12 @@ public final class DigitalSignature {
         }
 
         // initialize the keystore
-        final KeyStore ks = KeyStore.getInstance(ksTY);
-
-        if(ks == null) CX_KSNULL.thrw(info, ks);
+        KeyStore ks = null;
+        try {
+          ks = KeyStore.getInstance(ksTY);
+        } catch(final KeyStoreException ex) {
+          CX_KSNULL.thrw(info, ex);
+        }
 
         ks.load(new FileInputStream(ksURI), ksPW.toCharArray());
         pk = (PrivateKey) ks.getKey(kAlias, pkPW.toCharArray());
@@ -271,19 +274,16 @@ public final class DigitalSignature {
       } else {
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
-        final XMLStructure cont = new DOMStructure(
-            inputNode.getDocumentElement());
+        final XMLStructure cont = new DOMStructure(inputNode.getDocumentElement());
         final XMLObject obj = fac.newXMLObject(Collections.singletonList(cont),
             "", null, null);
-        xmlSig = fac.newXMLSignature(si, ki, Collections.singletonList(obj),
-            null, null);
+        xmlSig = fac.newXMLSignature(si, ki, Collections.singletonList(obj), null, null);
         signContext = new DOMSignContext(pk, inputNode);
       }
 
 
       // set Signature element namespace prefix, if given
-      if(ns.length > 0)
-        signContext.setDefaultNamespacePrefix(new String(ns));
+      if(ns.length > 0) signContext.setDefaultNamespacePrefix(string(ns));
 
       // actually sign the document
       xmlSig.sign(signContext);

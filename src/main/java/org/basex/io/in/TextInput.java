@@ -29,7 +29,12 @@ public class TextInput extends BufferInput {
    */
   public TextInput(final InputStream is) throws IOException {
     super(is);
-    guess();
+    try {
+      guess();
+    } catch(final IOException ex) {
+      close();
+      throw ex;
+    }
   }
 
   /**
@@ -39,7 +44,12 @@ public class TextInput extends BufferInput {
    */
   public TextInput(final IO io) throws IOException {
     super(io);
-    guess();
+    try {
+      guess();
+    } catch(final IOException ex) {
+      close();
+      throw ex;
+    }
   }
 
   /**

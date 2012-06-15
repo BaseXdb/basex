@@ -182,12 +182,11 @@ public class BaseX extends Main {
    * @throws IOException I/O exception
    */
   private void script(final IO io) throws IOException {
-    final String cmd = Token.string(io.read());
-    if(cmd.startsWith("<")) {
-      execute(cmd);
+    final byte[] cmd = new TextInput(io).content();
+    if(Token.startsWith(cmd, '<')) {
+      execute(Token.string(cmd));
     } else {
-      final IOContent cmds = new IOContent(new TextInput(io).content());
-      final NewlineInput nli = new NewlineInput(cmds);
+      final NewlineInput nli = new NewlineInput(new IOContent(cmd));
       for(String line; (line = nli.readLine()) != null;) {
         final String l = line.trim();
         // ignore empty lines and comments
