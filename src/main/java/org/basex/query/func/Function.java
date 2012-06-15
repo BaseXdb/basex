@@ -760,12 +760,6 @@ public enum Function {
   /** XQuery function. */
   _UTIL_FORMAT(FNUtil.class, "format(format,item1[,...])", STR, -2, STR, ITEM),
   /** XQuery function. */
-  _UTIL_MEM(FNUtil.class, "mem(expr[,cache[,label]])", ITEM_ZM, 1, ITEM_ZM, BLN, STR),
-  /** XQuery function. */
-  _UTIL_TIME(FNUtil.class, "time(expr[,cache[,label]])", ITEM_ZM, 1, ITEM_ZM, BLN, STR),
-  /** XQuery function. */
-  _UTIL_SLEEP(FNUtil.class, "sleep(ms)", EMP, ITR),
-  /** XQuery function. */
   _UTIL_CRC32(FNUtil.class, "crc32(str)", HEX, STR),
   /** XQuery function. */
   _UTIL_UUID(FNUtil.class, "uuid()", STR),
@@ -776,6 +770,15 @@ public enum Function {
   _UTIL_PATH(FNUtil.class, "path()", STR),
   /** XQuery function. */
   _UTIL_TYPE(FNUtil.class, "type(expr)", ITEM_ZM, ITEM_ZM),
+
+  /* FNProf functions. */
+
+  /** XQuery function. */
+  _PROF_MEM(FNProf.class, "mem(expr[,cache[,label]])", ITEM_ZM, 1, ITEM_ZM, BLN, STR),
+  /** XQuery function. */
+  _PROF_TIME(FNProf.class, "time(expr[,cache[,label]])", ITEM_ZM, 1, ITEM_ZM, BLN, STR),
+  /** XQuery function. */
+  _PROF_SLEEP(FNProf.class, "sleep(ms)", EMP, ITR),
 
   /* FNHash functions. */
 
@@ -863,6 +866,7 @@ public enum Function {
     URIS.put(FNProc.class,     PROCURI);
     URIS.put(FNSql.class,      SQLURI);
     URIS.put(FNUtil.class,     UTILURI);
+    URIS.put(FNProf.class,     PROFURI);
     URIS.put(FNHash.class,     HASHURI);
     URIS.put(FNValidate.class, VALIDATEURI);
     URIS.put(FNXslt.class,     XSLTURI);

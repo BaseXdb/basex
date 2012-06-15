@@ -61,45 +61,18 @@ public final class FNUtilTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the util:mem() function.
+   * Test method for the util:type() function.
    */
   @Test
-  public void utilMem() {
+  public void utilType() {
     final PrintStream err = System.err;
     System.setErr(NULL);
-    check(_UTIL_MEM);
-    query(_UTIL_MEM.args("()"));
-    query(COUNT.args(_UTIL_MEM.args(" 1 to 100 ", false)), "100");
-    query(COUNT.args(_UTIL_MEM.args(" 1 to 100 ", true)), "100");
-    query(COUNT.args(_UTIL_MEM.args(" 1 to 100 ", true, "label")), "100");
+    check(_UTIL_TYPE);
+    query(_UTIL_TYPE.args("()"), "");
+    query(_UTIL_TYPE.args("1"), "1");
+    query(_UTIL_TYPE.args("(1, 2, 3)"), "1 2 3");
+    query(_UTIL_TYPE.args("<x a='1' b='2' c='3'/>/@*/data()"), "1 2 3");
     System.setErr(err);
-  }
-
-  /**
-   * Test method for the util:time() function.
-   */
-  @Test
-  public void utilTime() {
-    final PrintStream err = System.err;
-    System.setErr(NULL);
-    check(_UTIL_TIME);
-    query(_UTIL_TIME.args("()"));
-    query(COUNT.args(_UTIL_TIME.args(" 1 to 100 ", false)), "100");
-    query(COUNT.args(_UTIL_TIME.args(" 1 to 100 ", true)), "100");
-    query(COUNT.args(_UTIL_TIME.args(" 1 to 100 ", true, "label")), "100");
-    System.setErr(err);
-  }
-
-  /**
-   * Test method for the util:sleep() function.
-   */
-  @Test
-  public void utilSleep() {
-    check(_UTIL_SLEEP);
-    query(_UTIL_SLEEP.args(" 10"));
-    query(_UTIL_SLEEP.args(" 1"));
-    query(_UTIL_SLEEP.args(" 0"));
-    query(_UTIL_SLEEP.args(" -1"));
   }
 
   /**
@@ -121,29 +94,5 @@ public final class FNUtilTest extends AdvancedQueryTest {
     final String s1 = query(_UTIL_UUID.args());
     final String s2 = query(_UTIL_UUID.args());
     assertTrue(!s1.equals(s2));
-  }
-
-  /**
-   * Test method for the util:path() function.
-   */
-  @Test
-  public void utilPath() {
-    check(_UTIL_PATH);
-    query(_UTIL_PATH.args(), "");
-  }
-
-  /**
-   * Test method for the util:type() function.
-   */
-  @Test
-  public void utilType() {
-    final PrintStream err = System.err;
-    System.setErr(NULL);
-    check(_UTIL_TYPE);
-    query(_UTIL_TYPE.args("()"), "");
-    query(_UTIL_TYPE.args("1"), "1");
-    query(_UTIL_TYPE.args("(1, 2, 3)"), "1 2 3");
-    query(_UTIL_TYPE.args("<x a='1' b='2' c='3'/>/@*/data()"), "1 2 3");
-    System.setErr(err);
   }
 }

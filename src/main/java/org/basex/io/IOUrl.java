@@ -108,6 +108,15 @@ public final class IOUrl extends IO {
       final char c = url.charAt(u);
       if(!Token.letterOrDigit(c) && c != '+' && c != '-' && c != '.') break;
     }
-    return u > 2 && u < us && url.charAt(u) == ':';
+    return u > 2 && u + 1 < us && url.charAt(u) == ':' && url.charAt(u + 1) == '/';
+  }
+
+  /**
+   * Checks if the specified string is a valid file URI.
+   * @param s source
+   * @return result of check
+   */
+  static boolean isFileURL(final String s) {
+    return s.startsWith(FILEPREF + '/');
   }
 }

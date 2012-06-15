@@ -1,0 +1,150 @@
+package org.basex.query.func;
+
+import static org.basex.query.func.Function.*;
+import static org.basex.util.Token.*;
+
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.iter.*;
+import org.basex.query.value.*;
+import org.basex.query.value.item.*;
+import org.basex.util.*;
+
+/**
+ * Profiling functions.
+ *
+ * @author BaseX Team 2005-12, BSD License
+ * @author Christian Gruen
+ */
+public final class FNProf extends StandardFunc {
+  /**
+   * Constructor.
+   * @param ii input info
+   * @param f function definition
+   * @param e arguments
+   */
+  public FNProf(final InputInfo ii, final Function f, final Expr... e) {
+    super(ii, f, e);
+  }
+
+  @Override
+  public Iter iter(final QueryContext ctx) throws QueryException {
+    switch(sig) {
+      case _PROF_MEM:      return mem(ctx);
+      case _PROF_TIME:     return time(ctx);
+      default:             return super.iter(ctx);
+    }
+  }
+
+  @Override
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+    switch(sig) {
+      case _PROF_SLEEP:      return sleep(ctx);
+      default:               return super.item(ctx, ii);
+    }
+  }
+
+  @Override
+  Expr comp(final QueryContext ctx) throws QueryException {
+    final Expr e = super.comp(ctx);
+    if(sig == Function._UTIL_TYPE) {
+      FNInfo.dump(Util.inf("{ type: %, size: % }", expr[0].type(), expr[0].size()),
+          Token.token(expr[0].toString()), ctx);
+      return expr[0];
+    }
+    return e;
+  }
+
+  /**
+   * Measures the memory consumption for the specified expression in MB.
+   * @param ctx query context
+   * @return memory consumption
+   * @throws QueryException query exception
+   */
+  private Iter mem(final QueryContext ctx) throws QueryException {
+    // measure initial memory consumption
+    Performance.gc(3);
+    final long min = Performance.memory();
+
+    // optional message
+    final byte[] msg = expr.length > 2 ? checkStr(expr[2], ctx) : null;
+
+    // check caching flag
+    if(expr.length > 1 && checkBln(expr[1], ctx)) {
+      final Value v = ctx.value(expr[0]).cache().value();
+      dump(min, msg, ctx);
+      return v.iter();
+    }
+
+    return new Iter() {
+      final Iter ir = expr[0].iter(ctx);
+      @Override
+      public Item next() throws QueryException {
+        final Item i = ir.next();
+        if(i == null) dump(min, msg, ctx);
+        return i;
+      }
+    };
+  }
+
+  /**
+   * Dumps the memory consumption.
+   * @param min initial memory usage
+   * @param msg message (can be {@code null})
+   * @param ctx query context
+   */
+  static void dump(final long min, final byte[] msg, final QueryContext ctx) {
+    Performance.gc(2);
+    final long max = Performance.memory();
+    final long mb = Math.max(0, max - min);
+    FNInfo.dump(token(Performance.format(mb)), msg, ctx);
+  }
+
+  /**
+   * Measures the execution time for the specified expression in milliseconds.
+   * @param ctx query context
+   * @return time in milliseconds
+   * @throws QueryException query exception
+   */
+  private Iter time(final QueryContext ctx) throws QueryException {
+    // create timer
+    final Performance p = new Performance();
+
+    // optional message
+    final byte[] msg = expr.length > 2 ? checkStr(expr[2], ctx) : null;
+
+    // check caching flag
+    if(expr.length > 1 && checkBln(expr[1], ctx)) {
+      final Value v = ctx.value(expr[0]).cache().value();
+      FNInfo.dump(token(p.getTime()), msg, ctx);
+      return v.iter();
+    }
+
+    return new Iter() {
+      final Iter ir = expr[0].iter(ctx);
+      @Override
+      public Item next() throws QueryException {
+        final Item i = ir.next();
+        if(i == null) FNInfo.dump(token(p.getTime()), msg, ctx);
+        return i;
+      }
+    };
+  }
+
+  /**
+   * Sleeps for the specified number of milliseconds.
+   * @param ctx query context
+   * @return {@code null}
+   * @throws QueryException query exception
+   */
+  private Item sleep(final QueryContext ctx) throws QueryException {
+    Performance.sleep(checkItr(expr[0], ctx));
+    return null;
+  }
+
+  @Override
+  public boolean uses(final Use u) {
+    return u == Use.NDT && oneOf(sig, _PROF_SLEEP, _PROF_MEM, _PROF_TIME) ||
+        super.uses(u);
+  }
+}

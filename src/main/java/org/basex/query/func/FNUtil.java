@@ -8,7 +8,6 @@ import java.io.*;
 import java.util.*;
 import java.util.zip.*;
 
-import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -47,8 +46,6 @@ public final class FNUtil extends StandardFunc {
     switch(sig) {
       case _UTIL_EVAL:     return eval(ctx).iter();
       case _UTIL_RUN:      return run(ctx).iter();
-      case _UTIL_MEM:      return mem(ctx);
-      case _UTIL_TIME:     return time(ctx);
       case _UTIL_TYPE:     return value(ctx).iter();
       default:             return super.iter(ctx);
     }
@@ -69,12 +66,10 @@ public final class FNUtil extends StandardFunc {
     switch(sig) {
       case _UTIL_NL:         return NL;
       case _UTIL_TAB:        return TAB;
-      case _UTIL_SLEEP:      return sleep(ctx);
       case _UTIL_FORMAT:     return format(ctx);
       case _UTIL_CRC32:      return crc32(ctx);
       case _UTIL_UUID:       return uuid();
       case _UTIL_DEEP_EQUAL: return deep(ctx);
-      case _UTIL_PATH:       return filename(ctx);
       default:               return super.item(ctx, ii);
     }
   }
@@ -125,13 +120,12 @@ public final class FNUtil extends StandardFunc {
 
   @Override
   Expr comp(final QueryContext ctx) throws QueryException {
-    final Expr e = super.comp(ctx);
     if(sig == Function._UTIL_TYPE) {
       FNInfo.dump(Util.inf("{ type: %, size: % }", expr[0].type(), expr[0].size()),
           Token.token(expr[0].toString()), ctx);
       return expr[0];
     }
-    return e;
+    return this;
   }
 
   /**
@@ -154,38 +148,6 @@ public final class FNUtil extends StandardFunc {
   }
 
   /**
-   * Measures the memory consumption for the specified expression in MB.
-   * @param ctx query context
-   * @return memory consumption
-   * @throws QueryException query exception
-   */
-  private Iter mem(final QueryContext ctx) throws QueryException {
-    // measure initial memory consumption
-    Performance.gc(3);
-    final long min = Performance.memory();
-
-    // optional message
-    final byte[] msg = expr.length > 2 ? checkStr(expr[2], ctx) : null;
-
-    // check caching flag
-    if(expr.length > 1 && checkBln(expr[1], ctx)) {
-      final Value v = ctx.value(expr[0]).cache().value();
-      dump(min, msg, ctx);
-      return v.iter();
-    }
-
-    return new Iter() {
-      final Iter ir = expr[0].iter(ctx);
-      @Override
-      public Item next() throws QueryException {
-        final Item i = ir.next();
-        if(i == null) dump(min, msg, ctx);
-        return i;
-      }
-    };
-  }
-
-  /**
    * Dumps the memory consumption.
    * @param min initial memory usage
    * @param msg message (can be {@code null})
@@ -196,48 +158,6 @@ public final class FNUtil extends StandardFunc {
     final long max = Performance.memory();
     final long mb = Math.max(0, max - min);
     FNInfo.dump(token(Performance.format(mb)), msg, ctx);
-  }
-
-  /**
-   * Measures the execution time for the specified expression in milliseconds.
-   * @param ctx query context
-   * @return time in milliseconds
-   * @throws QueryException query exception
-   */
-  private Iter time(final QueryContext ctx) throws QueryException {
-    // create timer
-    final Performance p = new Performance();
-
-    // optional message
-    final byte[] msg = expr.length > 2 ? checkStr(expr[2], ctx) : null;
-
-    // check caching flag
-    if(expr.length > 1 && checkBln(expr[1], ctx)) {
-      final Value v = ctx.value(expr[0]).cache().value();
-      FNInfo.dump(token(p.getTime()), msg, ctx);
-      return v.iter();
-    }
-
-    return new Iter() {
-      final Iter ir = expr[0].iter(ctx);
-      @Override
-      public Item next() throws QueryException {
-        final Item i = ir.next();
-        if(i == null) FNInfo.dump(token(p.getTime()), msg, ctx);
-        return i;
-      }
-    };
-  }
-
-  /**
-   * Sleeps for the specified number of milliseconds.
-   * @param ctx query context
-   * @return {@code null}
-   * @throws QueryException query exception
-   */
-  private Item sleep(final QueryContext ctx) throws QueryException {
-    Performance.sleep(checkItr(expr[0], ctx));
-    return null;
   }
 
   /**
@@ -289,19 +209,9 @@ public final class FNUtil extends StandardFunc {
     return Bln.get(cmp.deep(ctx.iter(expr[0]), ctx.iter(expr[1])));
   }
 
-  /**
-   * Returns the name of the query file, or {@code null} if none is given.
-   * @param ctx query context
-   * @return filename
-   */
-  private static Str filename(final QueryContext ctx) {
-    final String fn = ctx.context.prop.get(Prop.QUERYPATH);
-    return fn.isEmpty() ? null : Str.get(fn);
-  }
-
   @Override
   public boolean uses(final Use u) {
-    return u == Use.NDT && oneOf(sig, _UTIL_EVAL, _UTIL_SLEEP, _UTIL_RUN,
-        _UTIL_MEM, _UTIL_TIME, _UTIL_UUID) || super.uses(u);
+    return u == Use.NDT && oneOf(sig, _UTIL_EVAL, _UTIL_RUN, _UTIL_UUID) ||
+        super.uses(u);
   }
 }

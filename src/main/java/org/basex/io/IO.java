@@ -122,10 +122,10 @@ public abstract class IO {
   public static IO get(final String source) {
     if(source == null) return new IOContent(Token.EMPTY);
     final String s = source.trim();
-    return s.indexOf('<') == 0    ? new IOContent(s) :
-           s.startsWith(FILEPREF) ? new IOFile(IOUrl.file(s)) :
-           IOFile.isValid(s)      ? new IOFile(s) :
-           IOUrl.isValid(s)       ? new IOUrl(s) :
+    return s.indexOf('<') == 0 ? new IOContent(s) :
+           IOUrl.isFileURL(s)  ? new IOFile(IOUrl.file(s)) :
+           IOFile.isValid(s)   ? new IOFile(s) :
+           IOUrl.isValid(s)    ? new IOUrl(s) :
            new IOContent(s);
   }
 
