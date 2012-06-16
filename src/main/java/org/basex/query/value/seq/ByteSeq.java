@@ -19,7 +19,7 @@ public final class ByteSeq extends Seq {
   /** Byte array. */
   private final byte[] bytes;
   /** Sequence type. */
-  private SeqType seq = SeqType.get(AtomType.BYT, Occ.ONE_MORE);
+  private final SeqType seq = SeqType.get(AtomType.BYT, Occ.ONE_MORE);
 
   /**
    * Constructor.

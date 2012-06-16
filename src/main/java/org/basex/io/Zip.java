@@ -70,7 +70,7 @@ public final class Zip extends Progress {
    */
   public void unzip(final IOFile target) throws IOException {
     final byte[] data = new byte[IO.BLOCKSIZE];
-    ZipInputStream in = new ZipInputStream(archive.inputStream());
+    final ZipInputStream in = new ZipInputStream(archive.inputStream());
     total = size();
     curr = 0;
     try {

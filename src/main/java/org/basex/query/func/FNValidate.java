@@ -146,7 +146,7 @@ public final class FNValidate extends StandardFunc {
         if(!sc.exists()) WHICHRES.thrw(info, dtd);
         tmp = createTmp(sc);
         if(tmp != null) sc = tmp;
-        sp.set(SerializerProp.S_DOCTYPE_SYSTEM, sc.path());
+        sp.set(SerializerProp.S_DOCTYPE_SYSTEM, sc.url());
         in = read(0, ctx, sp);
       }
       final SAXParserFactory sf = SAXParserFactory.newInstance();

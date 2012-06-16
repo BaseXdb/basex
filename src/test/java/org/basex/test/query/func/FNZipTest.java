@@ -121,8 +121,6 @@ public final class FNZipTest extends AdvancedQueryTest {
         TMPFILE + "'/></dir>")));
     checkZipEntry("a/b", new byte[] { '!' });
 
-    // error: no entry specified
-    error(_ZIP_ZIP_FILE.args(zipParams("")), Err.ZIP_FAIL);
     // error: duplicate entry specified
     error(_ZIP_ZIP_FILE.args(zipParams("<entry src='" + TMPFILE + "'/>" +
         "<entry src='" + TMPFILE + "'/>")), Err.ZIP_FAIL);
@@ -188,10 +186,9 @@ public final class FNZipTest extends AdvancedQueryTest {
 
   /**
    * Test method for the zip:update-entries() function.
-   * @throws IOException I/O exception
    */
   @Test
-  public void zipUpdateEntries() throws IOException {
+  public void zipUpdateEntries() {
     check(_ZIP_UPDATE_ENTRIES);
     String list = query(_ZIP_ENTRIES.args(ZIP));
 
@@ -204,11 +201,6 @@ public final class FNZipTest extends AdvancedQueryTest {
     // remove one directory
     list = list.replaceAll("<zip:dir name=.test.>.*</zip:dir>", "");
     query(_ZIP_UPDATE_ENTRIES.args(list, TMPZIP));
-
-    // new file has no entries
-    list = list.replaceAll("<zip:dir.*</zip:dir>", "");
-    error(_ZIP_UPDATE_ENTRIES.args(list,
-        new File(TMPZIP).getCanonicalPath()), Err.ZIP_FAIL);
   }
 
   /**

@@ -103,7 +103,8 @@ public final class IOUrl extends IO {
    * @return file path
    */
   static boolean isValid(final String url) {
-    int u = -1, us = url.length();
+    int u = -1;
+    final int us = url.length();
     while(++u < us) {
       final char c = url.charAt(u);
       if(!Token.letterOrDigit(c) && c != '+' && c != '-' && c != '.') break;

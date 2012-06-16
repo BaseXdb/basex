@@ -88,9 +88,9 @@ public final class FNClientTest extends AdvancedQueryTest {
   @Test
   public void clientQueryTypes() {
     final Object[][] types = XdmInfoTest.TYPES;
-    for(int t = 0; t < types.length; t++) {
-      if(types[t] == null || types[t].length < 3) continue;
-      query(_CLIENT_QUERY.args(connect(), " " + "\"" + types[t][1] + "\""), types[t][2]);
+    for(final Object[] type : types) {
+      if(type == null || type.length < 3) continue;
+      query(_CLIENT_QUERY.args(connect(), " " + "\"" + type[1] + "\""), type[2]);
     }
   }
 

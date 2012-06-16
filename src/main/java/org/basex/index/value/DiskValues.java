@@ -123,8 +123,8 @@ public class DiskValues implements Index {
     final byte[] prefix = entries.get();
     final int i = get(prefix);
     return new EntryIterator() {
-      int ix = (i >= 0 ? i : entries.prefix ? (-i - 1) :
-        entries.descending ? (-i - 2) : (-i - 1)) + (entries.descending ? 1 : -1);
+      int ix = (i >= 0 ? i : entries.prefix ? -i - 1 :
+        entries.descending ? -i - 2 : -i - 1) + (entries.descending ? 1 : -1);
       int nr;
 
       @Override

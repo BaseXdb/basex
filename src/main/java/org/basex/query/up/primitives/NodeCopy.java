@@ -86,7 +86,7 @@ public abstract class NodeCopy extends StructuralUpdate {
    * @return iterator with merged text nodes
    */
   private static ANodeList mergeNodeCacheText(final ANodeList nl) {
-    int ns = nl.size();
+    final int ns = nl.size();
     final ANodeList s = new ANodeList(ns);
     if(ns == 0) return s;
 

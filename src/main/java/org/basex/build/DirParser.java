@@ -40,9 +40,9 @@ public final class DirParser extends Parser {
   private final boolean addRaw;
   /** Raw parsing. */
   private final boolean rawParser;
-
   /** Database path for storing binary files. */
-  private IOFile rawPath;
+  private final IOFile rawPath;
+
   /** Last source. */
   private IO lastSrc;
   /** Parser reference. */

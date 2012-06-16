@@ -193,9 +193,10 @@ public final class TextView extends View implements ActionListener {
 
     PrintOutput out = null;
     gui.cursor(CURSORWAIT, true);
-    final int mh = gui.context.prop.num(Prop.MAXHITS);
-    gui.context.prop.set(Prop.MAXHITS, -1);
-    gui.context.prop.set(Prop.CACHEQUERY, false);
+    final Prop prop = gui.context.prop;
+    final int mh = prop.num(Prop.MAXHITS);
+    prop.set(Prop.MAXHITS, -1);
+    prop.set(Prop.CACHEQUERY, false);
 
     try {
       out = new PrintOutput(file.toString());
@@ -211,8 +212,8 @@ public final class TextView extends View implements ActionListener {
       BaseXDialog.error(gui, FILE_NOT_SAVED);
     } finally {
       if(out != null) try { out.close(); } catch(final IOException ex) { }
-      gui.context.prop.set(Prop.MAXHITS, mh);
-      gui.context.prop.set(Prop.CACHEQUERY, true);
+      prop.set(Prop.MAXHITS, mh);
+      prop.set(Prop.CACHEQUERY, true);
       gui.cursor(CURSORARROW, true);
     }
   }
