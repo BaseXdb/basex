@@ -9,6 +9,7 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.core.cmd.Set;
 import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.query.util.Compare.Flag;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -177,8 +178,8 @@ public abstract class QT3TestSet {
     // include check for comments, processing instructions and namespaces
     String flags = "'" + Flag.ALLNODES + '\'';
     if(!ignorePref) flags += ",'" + Flag.NAMESPACES + '\'';
-    final String query = "util:deep-equal(<X>" + expect + "</X>," +
-        "<X>" + res + "</X>,(" + flags + "))";
+    final String query = Function.DEEP_EQUAL_OPT.args("<X>" + expect + "</X>",
+        "<X>" + res + "</X>" , "(" + flags + ")");
     return result(asBoolean(query, null), expect);
   }
 

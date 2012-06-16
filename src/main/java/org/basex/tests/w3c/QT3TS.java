@@ -629,8 +629,8 @@ public final class QT3TS {
       // include check for comments, processing instructions and namespaces
       String flags = "'" + Flag.ALLNODES + '\'';
       if(!pref) flags += ",'" + Flag.NAMESPACES + '\'';
-      final String query = "util:deep-equal(<X>" + exp + "</X>," +
-          "<X>" + res + "</X>,(" + flags + "))";
+      final String query = Function.DEEP_EQUAL_OPT.args("<X>" + exp + "</X>",
+          "<X>" + res + "</X>" , "(" + flags + ")");
       return asBoolean(query, expect) ? null : exp;
     } catch(final IOException ex) {
       return Util.message(ex);
