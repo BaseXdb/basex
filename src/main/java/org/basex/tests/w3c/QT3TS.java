@@ -627,8 +627,8 @@ public final class QT3TS {
       if(exp.equals(r)) return null;
 
       // include check for comments, processing instructions and namespaces
-      String flags = "'" + Flag.ALLNODES + '\'';
-      if(!pref) flags += ",'" + Flag.NAMESPACES + '\'';
+      String flags = "'" + Flag.ALLNODES + "'";
+      if(!pref) flags += ",'" + Flag.NAMESPACES + "'";
       final String query = Function.DEEP_EQUAL_OPT.args("<X>" + exp + "</X>",
           "<X>" + res + "</X>" , "(" + flags + ")");
       return asBoolean(query, expect) ? null : exp;

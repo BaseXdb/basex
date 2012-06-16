@@ -176,8 +176,8 @@ public abstract class QT3TestSet {
     if(expect.equals(res)) return true;
 
     // include check for comments, processing instructions and namespaces
-    String flags = "'" + Flag.ALLNODES + '\'';
-    if(!ignorePref) flags += ",'" + Flag.NAMESPACES + '\'';
+    String flags = "'" + Flag.ALLNODES + "'";
+    if(!ignorePref) flags += ",'" + Flag.NAMESPACES + "'";
     final String query = Function.DEEP_EQUAL_OPT.args("<X>" + expect + "</X>",
         "<X>" + res + "</X>" , "(" + flags + ")");
     return result(asBoolean(query, null), expect);
