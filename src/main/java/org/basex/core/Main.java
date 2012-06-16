@@ -30,7 +30,7 @@ public abstract class Main {
   protected Session session;
   /** Verbose mode. */
   protected boolean verbose;
-  /** Trailing newline. */
+  /** Separate serialized items with newlines. */
   protected boolean newline;
 
   /**

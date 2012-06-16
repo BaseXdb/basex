@@ -2677,7 +2677,7 @@ public class QueryParser extends InputParser {
         if(t != null) return new TypeWrapper(functionTest(t));
       }
       // no type found
-      if(t == null) error(NOTYPE, new TokenBuilder(name.string()));
+      if(t == null) error(NOTYPE, name.string());
     } else {
       // attach default element namespace
       if(!name.hasURI()) name.uri(ctx.sc.nsElem);

@@ -42,6 +42,8 @@ public enum Err {
   BXCL_COMMAND(BXCL, 4, "Command could not be executed: %"),
   /** BXCL0005. */
   BXCL_QUERY(BXCL, 5, "Query could not be executed: %"),
+  /** BXCL0006. */
+  BXCL_ITEM(BXCL, 6, "Value to be bound is no single item: %"),
 
   // Convert module (to be moved from Utility module)
 

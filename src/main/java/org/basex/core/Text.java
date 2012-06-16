@@ -62,7 +62,7 @@ public interface Text {
     "  -c<input>   Execute commands from file or string" + NL +
     "  -d          Activate debugging mode" + NL +
     "  -i<input>   Open initial file or database" + NL +
-    "  -L          Add trailing newline after query result" + NL +
+    "  -L          Append newlines to query results" + NL +
     "  -o<output>  Write output to file" + NL +
     "  -s<pars>    Set serialization parameter(s)" + NL +
     "  -u          Write updates back to original files" + NL +
@@ -81,7 +81,7 @@ public interface Text {
     "  -c<input>   Execute commands from file or string" + NL +
     "  -d          Activate debugging mode" + NL +
     "  -i<input>   Open initial file or database" + NL +
-    "  -L          Add trailing newline after query result" + NL +
+    "  -L          Append newlines to query results" + NL +
     "  -n<name>    Set server (host) name" + NL +
     "  -o<output>  Write output to file" + NL +
     "  -p<num>     Set server port" + NL +

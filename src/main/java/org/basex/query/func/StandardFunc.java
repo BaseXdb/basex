@@ -5,12 +5,15 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.nio.charset.*;
+import java.util.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.Map;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -130,6 +133,35 @@ public abstract class StandardFunc extends Arr {
     final String enc = string(checkStr(expr[i], ctx));
     if(!Charset.isSupported(enc)) err.thrw(info, enc);
     return normEncoding(enc);
+  }
+
+  /**
+   * Returns all keys and values of the specified binding argument.
+   * @param i index of argument
+   * @param ctx query context
+   * @return resulting map
+   * @throws QueryException query exception
+   */
+  HashMap<String, Value> bindings(final int i, final QueryContext ctx)
+      throws QueryException {
+
+    final HashMap<String, Value> hm = new HashMap<String, Value>();
+    if(i < expr.length) {
+      final Map map = checkMap(expr[i].item(ctx, info));
+      for(final Item it : map.keys()) {
+        byte[] key;
+        if(it.type.isString()) {
+          key = it.string(null);
+        } else {
+          final QNm qnm = (QNm) checkType(it, AtomType.QNM);
+          final TokenBuilder tb = new TokenBuilder();
+          if(qnm.uri() != null) tb.add('{').add(qnm.uri()).add('}');
+          key = tb.add(qnm.local()).finish();
+        }
+        hm.put(string(key), map.get(it, info));
+      }
+    }
+    return hm;
   }
 
   /**

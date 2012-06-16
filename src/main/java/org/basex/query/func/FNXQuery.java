@@ -5,15 +5,13 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.util.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
-import org.basex.query.value.map.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -82,28 +80,14 @@ public final class FNXQuery extends StandardFunc {
    */
   private Value eval(final QueryContext ctx, final byte[] qu) throws QueryException {
     final QueryContext qc = new QueryContext(ctx.context);
-    final Value bind = expr.length > 1 ? expr[1].item(ctx, info) : null;
-
-    if(bind instanceof Map) {
-      final Map map = (Map) bind;
-      for(final Item it : map.keys()) {
-        byte[] key;
-        if(it.type.isString()) {
-          key = it.string(null);
-        } else {
-          final QNm qnm = (QNm) checkType(it, AtomType.QNM);
-          final TokenBuilder tb = new TokenBuilder();
-          if(qnm.uri() != null) tb.add('{').add(qnm.uri()).add('}');
-          key = tb.add(qnm.local()).finish();
-        }
-        if(key.length == 0) {
-          qc.context(map.get(it, info), null);
-        } else {
-          qc.bind(string(key), map.get(it, info), null);
-        }
-      }
+    // bind variables and context item
+    for(final Map.Entry<String, Value> it : bindings(1, ctx).entrySet()) {
+      final String k = it.getKey();
+      final Value v = it.getValue();
+      if(k.isEmpty()) qc.context(v, null);
+      else qc.bind(k, v, null);
     }
-
+    // evaluate query
     try {
       qc.parse(string(qu));
       if(qc.updating) BXXQ_UPDATING.thrw(info);

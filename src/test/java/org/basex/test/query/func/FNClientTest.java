@@ -76,6 +76,7 @@ public final class FNClientTest extends AdvancedQueryTest {
     contains(_CLIENT_EXECUTE.args(connect(), new ShowUsers()), Text.USERHEAD[0]);
     query("let $a := " + connect() + ", $b := " + connect() + " return " +
         _CLIENT_QUERY.args("$a", "1") + "+" + _CLIENT_QUERY.args("$b", "2"), "3");
+    query(_CLIENT_QUERY.args(connect(), "\"$a*2\"", " map{ 'a':=1 }"), "2");
     // query errors
     error(_CLIENT_QUERY.args(connect(), "x"), Err.XPNOCTX);
   }

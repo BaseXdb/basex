@@ -3,6 +3,7 @@ package org.basex.query.func;
 import static org.basex.query.util.Err.*;
 
 import java.io.*;
+import java.util.*;
 import java.util.regex.*;
 
 import org.basex.core.*;
@@ -118,6 +119,17 @@ public class FNClient extends StandardFunc {
     try {
       final ValueBuilder vb = new ValueBuilder();
       final ClientQuery cq = cs.query(query);
+      // bind variables and context item
+      for(final Map.Entry<String, Value> it : bindings(2, ctx).entrySet()) {
+        final String k = it.getKey();
+        final Value v = it.getValue();
+        final ArrayOutput val = v.serialize();
+        if(!v.isItem()) BXCL_ITEM.thrw(info, v);
+        final String t = v.type().toString();
+        if(k.isEmpty()) cq.context(val, t);
+        else cq.bind(k, val, t);
+      }
+      // evaluate query
       while(cq.more()) {
         final String result = cq.next();
         vb.add(cq.type().castString(result, info));

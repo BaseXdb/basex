@@ -9,6 +9,7 @@ import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
+import org.basex.io.serial.*;
 import org.basex.server.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -98,8 +99,10 @@ public class BaseX extends Main {
           execute(new Check(val), verbose);
           execute(new Set(Prop.MAINMEM, false), false);
         } else if(c == 'L') {
-          // toggle appending of newlines to results
-          newline = true;
+          // toggle newline separators
+          newline ^= true;
+          execute(new Set(Prop.SERIALIZER, newline ?
+            SerializerProp.S_SEPARATOR[0] + "=\\n" : ""), false);
         } else if(c == 'o') {
           // change output stream
           if(out != System.out) out.close();
@@ -138,7 +141,7 @@ public class BaseX extends Main {
           // hidden option: toggle writing of properties before exit
           writeProps ^= true;
         } else if(c == 'x') {
-          // hidden option: show/hide xml query plan
+          // show/hide xml query plan
           prop = Prop.XMLPLAN;
           qp ^= true;
         } else if(c == 'X') {
@@ -227,7 +230,7 @@ public class BaseX extends Main {
           // options followed by a string
           v = arg.string();
         } else if(c == 'd' || c == 'D' && sa() || c == 'L' || c == 'u' || c == 'v' ||
-            c == 'V' || c == 'w' || c == 'W' || c == 'x' || c == 'X' || c == 'z') {
+           c == 'V' || c == 'w' || c == 'W' || c == 'x' || c == 'X' || c == 'z') {
           // options to be toggled
           v = "";
         } else if(!sa()) {

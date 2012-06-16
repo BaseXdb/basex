@@ -5,7 +5,6 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.io.*;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.regex.*;
@@ -600,20 +599,12 @@ public final class QueryContext extends Progress {
       return JsonMapConverter.parse(token(val.toString()), null);
     }
 
-    // convert to xml
-    if(type.equalsIgnoreCase(XMLSTR)) {
-      try {
-        return new DBNode(new IOContent(val.toString()), context.prop);
-      } catch(final IOException ex) {
-        throw SAXERR.thrw(null, ex);
-      }
-    }
-
     // convert to the specified type
-    final QNm nm = new QNm(token(type), this);
+    final QNm nm = new QNm(token(type.replaceAll("\\(.*?\\)$", "")), this);
     if(!nm.hasURI() && nm.hasPrefix()) NOURI.thrw(null, nm);
-    final Type typ = AtomType.find(nm, false);
-    if(typ == null) NOTYPE.thrw(null, nm);
+
+    final Type typ = type.endsWith(")") ? NodeType.find(nm) : AtomType.find(nm, false);
+    if(typ == null) NOTYPE.thrw(null, type);
     return typ.cast(val, null);
   }
 }

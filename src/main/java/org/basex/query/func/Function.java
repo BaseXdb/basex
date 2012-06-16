@@ -648,7 +648,7 @@ public enum Function {
   /** XQuery function. */
   _CLIENT_EXECUTE(FNClient.class, "execute(id,command)", STR, URI, STR),
   /** XQuery function. */
-  _CLIENT_QUERY(FNClient.class, "query(id,query)", ITEM_ZO, URI, STR),
+  _CLIENT_QUERY(FNClient.class, "query(id,query[,bindings])", ITEM_ZO, 2, URI, STR, ITEM),
   /** XQuery function. */
   _CLIENT_CLOSE(FNClient.class, "close(id)", EMP, URI),
 

@@ -455,12 +455,12 @@ public abstract class SessionTest extends SandboxTest {
     query.close();
   }
 
-  /** Binds XML to an external variable.
+  /** Binds a document node to an external variable.
    * @throws IOException I/O exception */
   @Test
-  public void queryBindXML() throws IOException {
+  public void queryBindDoc() throws IOException {
     final Query query = session.query("declare variable $a external; $a//text()");
-    query.bind("$a", "<a>XML</a>", "xml");
+    query.bind("$a", "<a>XML</a>", "document-node()");
     assertEqual("XML", query.execute());
   }
 
