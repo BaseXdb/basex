@@ -10,6 +10,7 @@ import javax.swing.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.gui.*;
+import org.basex.gui.dialog.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -65,9 +66,6 @@ public final class BaseXGUI {
     context.prop.set(Prop.CACHEQUERY, true);
     // reduce number of results to save memory
     context.prop.set(Prop.MAXHITS, gprop.num(GUIProp.MAXHITS));
-    // overwrite some properties
-    gprop.set(GUIProp.EXECRT, false);
-    gprop.set(GUIProp.FILTERRT, false);
     // initialize fonts and colors
     GUIConstants.init(gprop);
 
@@ -83,17 +81,16 @@ public final class BaseXGUI {
         // open specified document or database
         boolean xml = false;
         for(final String file : files) {
-          final String input = file.replace('\\', '/');
-          final IOFile io = new IOFile(input);
+          final IOFile io = new IOFile(file);
           boolean xq = false;
-          for(final String suf : IO.XQSUFFIXES) xq |= input.endsWith(suf);
+          for(final String suf : IO.XQSUFFIXES) xq |= file.endsWith(suf);
           if(xq) {
             gui.editor.open(io);
           } else if(!xml) {
             // only parse first xml file
-            gui.execute(new Check(input));
             gprop.set(GUIProp.CREATEPATH, io.path());
             gprop.set(GUIProp.CREATENAME, io.dbname());
+            DialogProgress.execute(gui, new Check(file));
             xml = true;
           }
         }

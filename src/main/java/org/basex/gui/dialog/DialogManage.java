@@ -236,7 +236,7 @@ public final class DialogManage extends BaseXDialog {
 
     // run all commands
     if(!cmds.isEmpty()) {
-      DialogProgress.execute(this, "", cmds.toArray(new Command[cmds.size()]));
+      DialogProgress.execute(this, cmds.toArray(new Command[cmds.size()]));
     }
   }
 
@@ -244,7 +244,7 @@ public final class DialogManage extends BaseXDialog {
   public void close() {
     final String db = choice.getValue();
     if(gui.context.mprop.dbexists(db)) {
-      DialogProgress.execute(this, "", new Open(db));
+      DialogProgress.execute(this, new Open(db));
       dispose();
     }
   }

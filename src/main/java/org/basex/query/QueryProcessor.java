@@ -296,11 +296,11 @@ public final class QueryProcessor extends Progress {
 
   @Override
   public String tit() {
-    return EVALUATING_C;
+    return PLEASE_WAIT_D;
   }
 
   @Override
   public String det() {
-    return EVALUATING_C;
+    return PLEASE_WAIT_D;
   }
 }

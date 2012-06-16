@@ -283,7 +283,7 @@ public class DialogResources extends BaseXBack {
           refreshNewFolder(n.path());
         }
       };
-      DialogProgress.execute(dialog, "", run, new Delete(n.path()));
+      DialogProgress.execute(dialog, run, new Delete(n.path()));
     }
 
     @Override
@@ -315,7 +315,7 @@ public class DialogResources extends BaseXBack {
           refreshNewFolder(p);
         }
       };
-      DialogProgress.execute(dialog, "", run, new Rename(n.path(), p));
+      DialogProgress.execute(dialog, run, new Rename(n.path(), p));
     }
 
     @Override

@@ -151,7 +151,8 @@ public final class FNValidate extends StandardFunc {
       }
       final SAXParserFactory sf = SAXParserFactory.newInstance();
       sf.setValidating(true);
-      sf.newSAXParser().parse(in.inputSource(), new SchemaHandler());
+      final InputSource is = in.inputSource();
+      sf.newSAXParser().parse(is, new SchemaHandler());
       return null;
     } catch(final QueryException ex) {
       throw ex;

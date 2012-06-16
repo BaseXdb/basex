@@ -8,3 +8,7 @@ notifications:
     on_failure: always
     recipients:
       - bxb@inf.uni-konstanz.de
+jdk:
+  - openjdk7
+  - openjdk6
+  - oraclejdk7

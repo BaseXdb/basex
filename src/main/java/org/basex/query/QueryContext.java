@@ -436,12 +436,12 @@ public final class QueryContext extends Progress {
 
   @Override
   public String tit() {
-    return EVALUATING_C;
+    return SAVE;
   }
 
   @Override
   public String det() {
-    return EVALUATING_C;
+    return PLEASE_WAIT_D;
   }
 
   @Override

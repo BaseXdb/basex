@@ -78,10 +78,10 @@ class DialogAdd extends BaseXBack {
           dialog.resources.refreshNewFolder(trg);
         }
       };
-      DialogProgress.execute(dialog, "", run, new Add(trg, src));
+      DialogProgress.execute(dialog, run, new Add(trg, src));
 
     } else if (comp == optimize) {
-      DialogProgress.execute(dialog, "", new Optimize());
+      DialogProgress.execute(dialog, new Optimize());
 
     } else {
       boolean ok = general.action(comp, false);

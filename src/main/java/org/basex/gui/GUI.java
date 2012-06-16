@@ -452,15 +452,15 @@ public final class GUI extends AGUI {
         }
 
         if(thread == threadID && !interrupted) {
-          // assign textual output if no node result was created
-          if(nodes == null) {
-            if(!text.visible()) GUICommands.C_SHOWTEXT.execute(this);
-            text.setText(ao, cmd);
-          }
           // show status info
           status.setText(Util.info(TIME_NEEDED_X, time));
           // show number of hits
           if(result != null) setResults(result.size());
+
+          // assign textual output if no node result was created
+          if(!text.visible() && nodes == null && ao.size() != 0)
+            GUICommands.C_SHOWTEXT.execute(this);
+          text.setText(ao, cmd, result);
         }
       }
     } catch(final Exception ex) {

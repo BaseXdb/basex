@@ -10,13 +10,13 @@ import org.basex.io.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class Check extends Command {
+public final class Check extends ACreate {
   /**
    * Default constructor.
    * @param path file path
    */
   public Check(final String path) {
-    super(Perm.NONE, path);
+    super(path);
   }
 
   @Override
@@ -30,8 +30,8 @@ public final class Check extends Command {
 
     // choose OPEN if user has no create permissions, or if database exists
     final boolean create = context.user.has(Perm.CREATE);
-    final Command cmd = !create || mprop.dbpath(qi.db).exists() ?
-      new Open(qi.db) : new CreateDB(qi.db, qi.io.exists() ? qi.original : "");
+    final Command cmd = progress(!create || mprop.dbpath(qi.db).exists() ?
+      new Open(qi.db) : new CreateDB(qi.db, qi.io.exists() ? qi.original : null));
 
     // execute command
     final boolean ok = cmd.run(context);

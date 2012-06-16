@@ -133,12 +133,11 @@ public final class TextView extends View implements ActionListener {
    * @param n nodes to display
    */
   private void setText(final Nodes n) {
-    ns = n;
     if(visible()) {
       try {
         final ArrayOutput ao = new ArrayOutput().max(gui.gprop.num(GUIProp.MAXTEXT));
         if(n != null) n.serialize(Serializer.get(ao));
-        setText(ao, null);
+        setText(ao);
       } catch(final IOException ex) {
         Util.debug(ex);
       }
@@ -151,8 +150,27 @@ public final class TextView extends View implements ActionListener {
    * Sets the output text.
    * @param out cached output
    * @param c command
+   * @param r result
    */
-  public void setText(final ArrayOutput out, final Command c) {
+  public void setText(final ArrayOutput out, final Command c, final Result r) {
+    setText(out);
+    // cache command or node set
+    cmd = null;
+    ns = null;
+    final int mh = gui.context.prop.num(Prop.MAXHITS);
+    if(mh >= 0 && r != null && r.size() >= mh) {
+      cmd = c;
+    } else if(out.finished()) {
+      if(r instanceof Nodes) ns = (Nodes) r;
+      else cmd = c;
+    }
+  }
+
+  /**
+   * Sets the output text.
+   * @param out cached output
+   */
+  private void setText(final ArrayOutput out) {
     final byte[] buf = out.buffer();
     final int size = (int) out.size();
     final byte[] chop = token(DOTS);
@@ -162,23 +180,22 @@ public final class TextView extends View implements ActionListener {
     area.setText(buf, size);
     header.setText(TEXT + (out.finished() ? CHOPPED : ""));
     home.setEnabled(gui.context.data() != null);
-    if(!out.finished()) {
-      cmd = null;
-      ns = null;
-    } else {
-      cmd = c;
-    }
   }
 
   @Override
   public void actionPerformed(final ActionEvent e) {
     final BaseXFileChooser fc = new BaseXFileChooser(SAVE_AS,
         gui.gprop.get(GUIProp.SAVEPATH), gui);
+
     final IO file = fc.select(Mode.FSAVE);
     if(file == null) return;
     gui.gprop.set(GUIProp.SAVEPATH, file.path());
 
     PrintOutput out = null;
+    gui.cursor(CURSORWAIT, true);
+    final int mh = gui.context.prop.num(Prop.MAXHITS);
+    gui.context.prop.set(Prop.MAXHITS, -1);
+
     try {
       out = new PrintOutput(file.toString());
       if(cmd != null) {
@@ -193,6 +210,8 @@ public final class TextView extends View implements ActionListener {
       BaseXDialog.error(gui, FILE_NOT_SAVED);
     } finally {
       if(out != null) try { out.close(); } catch(final IOException ex) { }
+      gui.context.prop.set(Prop.MAXHITS, mh);
+      gui.cursor(CURSORARROW, true);
     }
   }
 }

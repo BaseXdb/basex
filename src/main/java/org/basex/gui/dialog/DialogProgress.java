@@ -22,7 +22,7 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
   /** Maximum value of progress bar. */
   private static final int MAX = 600;
   /** Refresh action. */
-  private final Timer timer = new Timer(100, this);
+  private final Timer timer = new Timer(50, this);
    /** Information label. */
   private BaseXLabel info;
   /** Memory usage. */
@@ -35,23 +35,20 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
   /**
    * Default constructor.
    * @param main main window
-   * @param title dialog title
    * @param cmd progress reference
    */
-  private DialogProgress(final GUI main, final String title, final Command cmd) {
-    super(main, title);
+  private DialogProgress(final GUI main, final Command cmd) {
+    super(main, "");
     init(main, cmd);
   }
 
   /**
    * Default constructor.
    * @param dialog dialog window
-   * @param title dialog title
    * @param cmd progress reference
    */
-  private DialogProgress(final BaseXDialog dialog, final String title,
-      final Command cmd) {
-    super(dialog, title);
+  private DialogProgress(final BaseXDialog dialog, final Command cmd) {
+    super(dialog, "");
     init(dialog, cmd);
   }
 
@@ -121,38 +118,53 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
    * Runs the specified commands, decorated by a progress dialog, and
    * calls {@link BaseXDialog#action} if the dialog is closed.
    * @param dialog reference to the dialog window
-   * @param title dialog title (may be an empty string)
    * @param cmds commands to be run
    */
-  public static void execute(final BaseXDialog dialog, final String title,
-      final Command... cmds) {
-    execute(dialog, title, null, cmds);
+  public static void execute(final BaseXDialog dialog, final Command... cmds) {
+    execute(dialog, null, cmds);
   }
 
   /**
    * Runs the specified commands, decorated by a progress dialog, and
    * calls {@link BaseXDialog#action} if the dialog is closed.
-   * @param dialog reference to the dialog window
-   * @param title dialog title (may be an empty string)
+   * @param gui reference to the main window
+   * @param cmds commands to be run
+   */
+  public static void execute(final GUI gui, final Command... cmds) {
+    execute(gui, null, null, cmds);
+  }
+
+  /**
+   * Runs the specified commands, decorated by a progress dialog, and
+   * calls {@link BaseXDialog#action} if the dialog is closed.
+   * @param dialog reference to the calling dialog window
    * @param post post-processing step
    * @param cmds commands to be run
    */
-  public static void execute(final BaseXDialog dialog, final String title,
+  public static void execute(final BaseXDialog dialog, final Runnable post,
+      final Command... cmds) {
+    execute(dialog.gui, dialog, post, cmds);
+  }
+
+  /**
+   * Runs the specified commands, decorated by a progress dialog, and
+   * calls {@link BaseXDialog#action} if the dialog is closed.
+   * @param gui reference to the main window
+   * @param dialog reference to the dialog window (may be {@code null})
+   * @param post post-processing step
+   * @param cmds commands to be run
+   */
+  public static void execute(final GUI gui, final BaseXDialog dialog,
       final Runnable post, final Command... cmds) {
 
-    final GUI gui = dialog.gui;
     for(final Command cmd : cmds) {
       // reset views
       final boolean newData = cmd.newData(gui.context);
       if(newData) gui.notify.init();
 
       // create wait dialog
-      final DialogProgress wait;
-      if(dialog.isVisible()) {
-        wait = new DialogProgress(dialog, title, cmd);
-      } else {
-        wait = new DialogProgress(gui, title, cmd);
-      }
+      final DialogProgress wait = dialog != null ? new DialogProgress(dialog, cmd) :
+        new DialogProgress(gui, cmd);
 
       // start command thread
       new Thread() {
@@ -161,9 +173,17 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
           // execute command
           final Performance perf = new Performance();
           gui.updating = cmd.updating(gui.context);
-          final boolean ok = cmd.run(gui.context);
-          gui.updating = false;
-          final String info = cmd.info();
+          boolean ok = true;
+          String info;
+          try {
+            cmd.execute(gui.context);
+            info = cmd.info();
+          } catch(final BaseXException ex) {
+            ok = false;
+            info = ex.getMessage();
+          } finally {
+            gui.updating = false;
+          }
 
           // return status information
           final String time = perf.toString();
@@ -185,9 +205,7 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
       if(newData) gui.notify.init();
       else if(cmd.updating(gui.context)) gui.notify.update();
     }
-
-    dialog.setEnabled(true);
-    dialog.action(dialog);
+    if(dialog != null) dialog.action(dialog);
     if(post != null) post.run();
   }
 }

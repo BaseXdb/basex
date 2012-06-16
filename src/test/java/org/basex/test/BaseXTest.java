@@ -109,7 +109,7 @@ public abstract class BaseXTest extends MainTest {
   @Test
   public void commands() throws IOException {
     INPUT.write(token("xquery 1" + Prop.NL + "xquery 2" + Prop.NL));
-    equals("12", "-C" + INPUT.path());
+    equals("12", "-c" + INPUT.path());
   }
 
   /**

@@ -78,7 +78,7 @@ public class BaseX extends Main {
           // commas are escaped by a second comma
           val = bind.append(val.replaceAll(",", ",,")).toString();
           prop = Prop.BINDINGS;
-        } else if(c == 'c' || c == 'C') {
+        } else if(c == 'c') {
           // evaluate commands
           final IO io = IO.get(val);
           if(io.exists() && !io.isDir()) {
@@ -107,7 +107,7 @@ public class BaseX extends Main {
           // change output stream
           if(out != System.out) out.close();
           out = new PrintOutput(val);
-        } else if(c == 'q' || c == 'Q') {
+        } else if(c == 'q') {
           // evaluate query
           final IO io = IO.get(val);
           if(io.exists() && !io.isDir()) {
@@ -254,7 +254,7 @@ public class BaseX extends Main {
           arg.usage();
         }
       } else {
-        c = 'Q';
+        c = 'q';
         v = arg.string();
       }
       if(v != null) {
