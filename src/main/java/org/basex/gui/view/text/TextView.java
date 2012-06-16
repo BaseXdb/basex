@@ -195,6 +195,7 @@ public final class TextView extends View implements ActionListener {
     gui.cursor(CURSORWAIT, true);
     final int mh = gui.context.prop.num(Prop.MAXHITS);
     gui.context.prop.set(Prop.MAXHITS, -1);
+    gui.context.prop.set(Prop.CACHEQUERY, false);
 
     try {
       out = new PrintOutput(file.toString());
@@ -211,6 +212,7 @@ public final class TextView extends View implements ActionListener {
     } finally {
       if(out != null) try { out.close(); } catch(final IOException ex) { }
       gui.context.prop.set(Prop.MAXHITS, mh);
+      gui.context.prop.set(Prop.CACHEQUERY, true);
       gui.cursor(CURSORARROW, true);
     }
   }
