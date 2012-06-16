@@ -99,7 +99,12 @@ public final class StaticContext {
    * @param uri uri to be set
    */
   public void baseURI(final String uri) {
-    baseURI = uri.length() == 0 ? Uri.EMPTY : Uri.uri(token(IO.get(uri).url()));
+    if(uri.length() == 0) {
+      baseURI = Uri.EMPTY;
+    } else {
+      final IO io = IO.get(uri);
+      baseURI = Uri.uri(token(io instanceof IOFile ? io.url() : uri));
+    }
   }
 
   @Override

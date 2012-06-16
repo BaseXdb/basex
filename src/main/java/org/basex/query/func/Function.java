@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.value.type.SeqType.*;
 
 import java.util.*;
+import java.util.regex.*;
 
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
@@ -967,6 +968,10 @@ public enum Function {
     return FuncType.get(ret, arg);
   }
 
+  /** Argument pattern. */
+  private static final Pattern ARG = Pattern.compile("^([-\\w_:\\.]*\\(|<|\"|\\$| ).*",
+      Pattern.DOTALL);
+
   /**
    * Returns a string representation of the function with the specified
    * arguments. All objects are wrapped with quotes,
@@ -985,8 +990,7 @@ public enum Function {
     for(final Object a : arg) {
       if(!tb.isEmpty()) tb.add(',');
       final String s = a.toString();
-      if(s.matches("^([-\\w_:\\.]*\\(|<|\"|\\$| ).*") ||
-          a instanceof Integer) {
+      if(ARG.matcher(s).matches() || a instanceof Integer) {
         tb.add(s);
       } else if(a instanceof Boolean) {
         tb.add(s + "()");

@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 import java.text.*;
 import java.util.*;
 
-import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
@@ -42,8 +41,8 @@ public final class FNContext extends StandardFunc {
       case DEFAULT_COLLATION:
         return ctx.sc.baseURI().resolve(ctx.sc.collation);
       case STATIC_BASE_URI:
-        final IO base = ctx.sc.baseIO();
-        return base == null ? null : Uri.uri(token(base.url()), false);
+        final Uri uri = ctx.sc.baseURI();
+        return uri == Uri.EMPTY ? null : uri;
       default:
         return super.item(ctx, ii);
     }

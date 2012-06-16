@@ -79,6 +79,7 @@ public final class FNClientTest extends AdvancedQueryTest {
     query(_CLIENT_QUERY.args(connect(), "\"$a*2\"", " map{ 'a':=1 }"), "2");
     // query errors
     error(_CLIENT_QUERY.args(connect(), "x"), Err.XPNOCTX);
+    error(_CLIENT_QUERY.args(connect(), "\"$a\"", " map{ 'a':=(1,2) }"), Err.BXCL_ITEM);
   }
 
   /**
