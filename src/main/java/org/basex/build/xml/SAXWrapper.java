@@ -137,8 +137,9 @@ public final class SAXWrapper extends SingleParser {
     length = src.length();
     try {
       if(length <= 0) length = in.available();
-    } finally {
+    } catch(final IOException ex) {
       in.close();
+      throw ex;
     }
 
     // create wrapper

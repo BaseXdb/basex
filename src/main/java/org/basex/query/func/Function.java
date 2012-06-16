@@ -338,7 +338,7 @@ public enum Function {
   DEEP_EQUAL(FNSimple.class, "deep-equal(item,item[,coll])",
       BLN, 2, ITEM_ZM, ITEM_ZM, STR),
   /** XQuery function (project specific). */
-  DEEP_EQUAL_OPT(FNOut.class, "deep-equal-opt(item,item[,options])",
+  DEEP_EQUAL_OPT(FNSimple.class, "deep-equal-opt(item,item[,options])",
       BLN, 2, ITEM_ZM, ITEM_ZM, ITEM),
 
   /* FNStr functions. */
