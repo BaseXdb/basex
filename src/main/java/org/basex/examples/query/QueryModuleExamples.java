@@ -28,8 +28,7 @@ public class QueryModuleExamples extends QueryModule {
    */
   public ANode create() {
     FDoc doc = new FDoc(Token.token("http://www.example.com"));
-    FElem elem = new FElem(new QNm("root"));
-    elem.add(new FAttr(new QNm("attr"), Token.token("value")));
+    FElem elem = new FElem(new QNm("root")).add(new QNm("attr"), Token.token("value"));
     doc.add(elem);
     return doc;
   }
