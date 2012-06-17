@@ -38,7 +38,11 @@ abstract class RESTCode {
   static void open(final HTTPContext http) throws HTTPException {
     if(http.db() == null) return;
     try {
-      http.session().execute(new Open(http.path()));
+      final String p = http.path();
+      final int s = p.indexOf('/');
+      final String db = s == -1 ? p : p.substring(0, s);
+      final String path = s == -1 ? "" : p.substring(s + 1);
+      http.session().execute(new Open(db, path));
     } catch(final IOException ex) {
       HTTPErr.NOT_FOUND_X.thrw(ex);
     }
