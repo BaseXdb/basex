@@ -557,6 +557,7 @@ public enum GUICommands implements GUICommand {
     public void execute(final GUI gui) {
       gui.gprop.invert(GUIProp.EXECRT);
       gui.refreshControls();
+      gui.stop();
       gui.notify.layout();
     }
 
@@ -572,6 +573,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       final boolean rt = gui.gprop.invert(GUIProp.FILTERRT);
+      gui.stop();
       gui.refreshControls();
       gui.notify.layout();
 
