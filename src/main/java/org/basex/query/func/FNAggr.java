@@ -86,8 +86,7 @@ public final class FNAggr extends StandardFunc {
 
     Item res = it.type.isUntyped() ? Dbl.get(it.string(info), info) : it;
     Type t = res.type;
-    if(!t.isNumber() && (!t.isDuration() || t == DUR))
-      SUMTYPE.thrw(info, this, t);
+    if(!t.isNumber() && (!t.isDuration() || t == DUR)) SUMTYPE.thrw(info, this, t);
     final boolean n = t.isNumber();
 
     int c = 1;

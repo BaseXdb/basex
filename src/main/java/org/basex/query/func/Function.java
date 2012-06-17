@@ -468,6 +468,8 @@ public enum Function {
       B64, B64, ELM_ZM, ITEM_ZM),
   /** XQuery function. */
   _ARCHIVE_DELETE(FNArchive.class, "delete(archive,entries)", B64, B64, STR_ZM),
+  /** XQuery function. */
+  _ARCHIVE_OPTIONS(FNArchive.class, "options(archive)", ELM, B64),
 
   /* FNConvert functions. */
 
@@ -611,7 +613,7 @@ public enum Function {
   /** XQuery function. */
   _FILE_WRITE(FNFile.class, "write(path,data[,params])", EMP, 2, STR, ITEM_ZM, NOD),
   /** XQuery function. */
-  _FILE_WRITE_BINARY(FNFile.class, "write-binary(path,item)", EMP, STR, BIN_ZM),
+  _FILE_WRITE_BINARY(FNFile.class, "write-binary(path,item)", EMP, STR, BIN),
   /** XQuery function. */
   _FILE_WRITE_TEXT(FNFile.class, "write-text(path,text[,encoding])",
       EMP, 2, STR, STR, STR),
@@ -621,7 +623,7 @@ public enum Function {
   /** XQuery function. */
   _FILE_APPEND(FNFile.class, "append(path,data[,params])", EMP, 2, STR, ITEM_ZM, NOD),
   /** XQuery function. */
-  _FILE_APPEND_BINARY(FNFile.class, "append-binary(path,item)", EMP, STR, BIN_ZM),
+  _FILE_APPEND_BINARY(FNFile.class, "append-binary(path,item)", EMP, STR, BIN),
   /** XQuery function. */
   _FILE_APPEND_TEXT(FNFile.class, "append-text(path,text[,encoding])",
       EMP, 2, STR, STR, STR),

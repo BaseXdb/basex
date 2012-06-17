@@ -15,6 +15,8 @@ import org.junit.*;
 public final class FNArchiveTest extends AdvancedQueryTest {
   /** Test ZIP file. */
   private static final String ZIP = "src/test/resources/xml.zip";
+  /** Test GZIP file. */
+  private static final String GZIP = "src/test/resources/xml.gz";
 
   /**
    * Test method for the archive:create() function.
@@ -55,7 +57,7 @@ public final class FNArchiveTest extends AdvancedQueryTest {
         ""), Err.ARCH_MODIFIED);
     // content must be string or base64Binary
     error(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", " 123"),
-        Err.ARCH_STRB64);
+        Err.STRB64TYPE);
     // wrong encoding
     error(_ARCHIVE_CREATE.args("<archive:entry encoding='x'>X</archive:entry>", ""),
         Err.ARCH_ENCODING);
@@ -80,6 +82,19 @@ public final class FNArchiveTest extends AdvancedQueryTest {
     // simple zip files
     query(COUNT.args(_ARCHIVE_ENTRIES.args(_FILE_READ_BINARY.args(ZIP)) +
         "[@size][@last-modified][@compressed-size]"), "5");
+  }
+
+  /**
+   * Test method for the archive:options() function.
+   */
+  @Test
+  public void archiveOptions() {
+    check(_ARCHIVE_OPTIONS);
+    // read entries
+    query(_ARCHIVE_OPTIONS.args(_FILE_READ_BINARY.args(ZIP)) + "//@value/data()",
+        "zip deflate");
+    query(_ARCHIVE_OPTIONS.args(_FILE_READ_BINARY.args(GZIP)) + "//@value/data()",
+        "gzip deflate");
   }
 
   /**

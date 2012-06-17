@@ -82,8 +82,7 @@ public abstract class ParseExpr extends Expr {
     } else {
       final Iter ir = iter(ctx);
       it = ir.next();
-      if(it != null && !it.type.isNode() && ir.next() != null)
-        CONDTYPE.thrw(info, this);
+      if(it != null && !it.type.isNode() && ir.next() != null) CONDTYPE.thrw(info, this);
     }
     return it == null ? Bln.FALSE : it;
   }

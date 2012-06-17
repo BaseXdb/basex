@@ -155,7 +155,7 @@ public enum Err {
   /** ARCH0001. */
   ARCH_DIFF(ARCH, 1, "Number of entries (%) and contents (%) differs."),
   /** ARCH0002. */
-  ARCH_STRB64(ARCH, 2, "xs:string or xs:base64Binary expected, % found"),
+  ARCH_UNKNOWN(ARCH, 2, "Packing format not supported."),
   /** ARCH0003. */
   ARCH_NAME(ARCH, 3, "Name of ZIP entry must not be empty."),
   /** ARCH0003. */
@@ -351,7 +351,7 @@ public enum Err {
   /** FORG0006. */
   CONDTYPE(FORG, 6, "% not allowed as condition type."),
   /** FORG0006. */
-  SUMTYPE(FORG, 6, "%: % not allowed as input type."),
+  SUMTYPE(FORG, 6, "%: invalid argument type '%'."),
   /** FORG0006. */
   FUNNUM(FORG, 6, "%: number expected, % found."),
   /** FORG0006. */
@@ -370,10 +370,22 @@ public enum Err {
   JAVAERR(FORG, 6, "Java function call failed: %."),
   /** FORG0006. */
   ERRFORM(FORG, 6, "%: %."),
-  /** FORG0008. */
-  FUNZONE(FORG, 8, "% and % have different timezones."),
   /** FORG0006. */
   BINSTRTYPE(FORG, 6, "Binary or string expected, % found"),
+  /** FORG0006. */
+  BINARYTYPE(FORG, 6, "Binary item expected, % found"),
+  /** FORG0006. */
+  STRNODTYPE(FORG, 6, "%: string or node expected, % found."),
+  /** FORG0006. */
+  ELMMAPTYPE(FORG, 6, "element(%) or map expected, % found"),
+  /** FORG0006. */
+  STRB64TYPE(ARCH, 2, "String or Base64 expected, % found"),
+  /** FORG0006. */
+  ELMOPTION(FORG, 6, "Unknown option: %."),
+
+  /** FORG0008. */
+  FUNZONE(FORG, 8, "% and % have different timezones."),
+
 
   /** FORX0001. */
   REGMOD(FORX, 1, "Invalid regular modifier: '%'."),
@@ -656,19 +668,11 @@ public enum Err {
   /** XPTY0004. */
   XPINVCAST(XPTY, 4, "Invalid cast from % to %: %."),
   /** XPTY0004. */
-  XPINVPROM(XPTY, 4, "Cannot treat % as %: %."),
+  XPINVTREAT(XPTY, 4, "Cannot treat % as %: %."),
   /** XPTY0004. */
   XPTYPE(XPTY, 4, "%: % expected, % found."),
   /** XPTY0004. */
   CALCTYPE(XPTY, 4, "% not defined for % and %."),
-  /** XPTY0004. */
-  STRNODTYPE(XPTY, 4, "%: xs:string or node() expected, % found."),
-  /** XPTY0004. */
-  ELMMAPTYPE(XPTY, 4, "element(%) or map expected, % found"),
-  /** XPTY0004. */
-  BINARYTYPE(XPTY, 4, "Binary type expected, % found"),
-  /** XPTY0004. */
-  ELMOPTION(XPTY, 4, "Unknown option: %."),
 
   /** XPTY0004. */
   SIMPLDUR(XPTY, 4, "%: only supported on subtypes of xs:duration, not %."),
@@ -1128,7 +1132,7 @@ public enum Err {
    */
   public static QueryException promote(final InputInfo ii, final SeqType t, final Value v)
       throws QueryException {
-    throw XPINVPROM.thrw(ii, v.description(), t, v);
+    throw XPINVTREAT.thrw(ii, v.description(), t, v);
   }
 
   /**

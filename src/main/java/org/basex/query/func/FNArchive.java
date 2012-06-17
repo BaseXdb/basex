@@ -33,6 +33,12 @@ import org.basex.util.list.*;
 public class FNArchive extends StandardFunc {
   /** Element: Entry. */
   private static final QNm Q_ENTRY = new QNm("archive:entry", ARCHIVEURI);
+  /** Element: options. */
+  private static final QNm Q_OPTIONS = new QNm("archive:options", ARCHIVEURI);
+  /** Option: algorithm. */
+  private static final QNm Q_FORMAT = new QNm("archive:format", ARCHIVEURI);
+  /** Option: algorithm. */
+  private static final QNm Q_ALGORITHM = new QNm("archive:algorithm", ARCHIVEURI);
   /** Root node test. */
   private static final ExtTest TEST = new ExtTest(NodeType.ELM, Q_ENTRY);
 
@@ -46,17 +52,21 @@ public class FNArchive extends StandardFunc {
   private static final QNm Q_COMP_SIZE = new QNm("compressed-size");
   /** Uncompressed size. */
   private static final QNm Q_SIZE = new QNm("size");
+  /** Value. */
+  private static final QNm VALUE = new QNm("value");
 
-  /** Element: options. */
-  private static final QNm E_OPTIONS = new QNm("archive:options", ARCHIVEURI);
   /** Option: format. */
   private static final byte[] FORMAT = Token.token("format");
   /** Option: format: zip. */
   private static final byte[] ZIP = Token.token("zip");
+  /** Option: format: zip. */
+  private static final byte[] GZIP = Token.token("gzip");
   /** Option: algorithm. */
   private static final byte[] ALGORITHM = Token.token("algorithm");
   /** Option: algorithm: deflate. */
   private static final byte[] DEFLATE = Token.token("deflate");
+  /** Option: algorithm: stored. */
+  private static final byte[] STORED = Token.token("stored");
 
   /**
    * Constructor.
@@ -82,9 +92,10 @@ public class FNArchive extends StandardFunc {
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     checkCreate(ctx);
     switch(sig) {
-      case _ARCHIVE_CREATE: return create(ctx);
-      case _ARCHIVE_UPDATE: return update(ctx);
-      case _ARCHIVE_DELETE: return delete(ctx);
+      case _ARCHIVE_CREATE:  return create(ctx);
+      case _ARCHIVE_UPDATE:  return update(ctx);
+      case _ARCHIVE_DELETE:  return delete(ctx);
+      case _ARCHIVE_OPTIONS: return options(ctx);
       default:              return super.item(ctx, ii);
     }
   }
@@ -99,7 +110,7 @@ public class FNArchive extends StandardFunc {
     final Iter elem = ctx.iter(expr[0]);
     final Iter cont = ctx.iter(expr[1]);
     final Item opt = expr.length > 2 ? expr[2].item(ctx, info) : null;
-    final TokenMap map = new FuncParams(E_OPTIONS, info).parse(opt);
+    final TokenMap map = new FuncParams(Q_OPTIONS, info).parse(opt);
 
     // check format
     final byte[] format = map.get(FORMAT);
@@ -136,6 +147,46 @@ public class FNArchive extends StandardFunc {
       Util.debug(ex);
       throw ARCH_FAIL.thrw(info, ex);
     }
+  }
+
+  /**
+   * Returns the options of an archive.
+   * @param ctx query context
+   * @return entries
+   * @throws QueryException query exception
+   */
+  private FElem options(final QueryContext ctx) throws QueryException {
+    final B64 archive = (B64) checkType(checkItem(expr[0], ctx), AtomType.B64);
+
+    final Atts ns = new Atts(ARCHIVE, ARCHIVEURI);
+    LookupInput li = null;
+    byte[] format = null, alg = null;
+    try {
+      li = new LookupInput(archive.input(info));
+      if(li.lookup() == 0x50) {
+        format = ZIP;
+        final ZipInputStream zis = new ZipInputStream(li);
+        for(ZipEntry ze; (ze = zis.getNextEntry()) != null;) {
+          if(ze.isDirectory()) continue;
+          if(ze.getMethod() == ZipEntry.DEFLATED) alg = DEFLATE;
+          else if(ze.getMethod() == ZipEntry.STORED) alg = STORED;
+          break;
+        }
+      } else if(li.lookup() == 0x1F) {
+        format = GZIP;
+        alg = DEFLATE;
+      } else {
+        ARCH_UNKNOWN.thrw(info);
+      }
+    } catch(final IOException ex) {
+      Util.debug(ex);
+      if(li != null) try { li.close(); } catch(final IOException e) { }
+      throw ARCH_FAIL.thrw(info, ex);
+    }
+    final FElem e = new FElem(Q_OPTIONS, ns);
+    if(format != null) e.add(new FElem(Q_FORMAT).add(new FAttr(VALUE, format)));
+    if(alg != null) e.add(new FElem(Q_ALGORITHM).add(new FAttr(VALUE, alg)));
+    return e;
   }
 
   /**
@@ -386,7 +437,7 @@ public class FNArchive extends StandardFunc {
     } else if(con.type == AtomType.B64) {
       val = ((Bin) con).binary(info);
     } else {
-      ARCH_STRB64.thrw(info, con.type);
+      STRB64TYPE.thrw(info, con.type);
     }
     zos.putNextEntry(ze);
     zos.write(val);
