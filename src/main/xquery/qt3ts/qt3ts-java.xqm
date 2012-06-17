@@ -285,16 +285,16 @@ declare function qt3ts-java:escape-string(
       case 92 return '\\'
       default return
         if($cp ge 0 and $cp le 31 or $cp ge 127 and $cp le 159)
-        then util:format('\u%04x', $cp)
+        then out:format('\u%04x', $cp)
         else
           let $ch := codepoints-to-string($cp) return
           if($cp le 255 or matches($ch, '\w')) then $ch
-          else if($cp lt 65536) then util:format('\u%04x', $cp)
+          else if($cp lt 65536) then out:format('\u%04x', $cp)
           else
             let $offset := $cp - 65536,
                 $high   := xs:int(($offset idiv 1024) + 55296),
                 $low    := xs:int(($offset mod 1024) + 56320)
-            return util:format('\u%04x\u%04x', $high, $low)
+            return out:format('\u%04x\u%04x', $high, $low)
   ))
 };
 
