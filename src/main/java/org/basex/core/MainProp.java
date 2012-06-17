@@ -54,9 +54,9 @@ public final class MainProp extends AProp {
   public static final Object[] NONPROXYHOSTS = { "NONPROXYHOSTS", "" };
 
   /** Timeout (seconds) for processing client requests; deactivated if set to 0. */
-  public static final Object[] TIMEOUT = { "TIMEOUT", 0 };
+  public static final Object[] TIMEOUT = { "TIMEOUT", 30 };
   /** Keep alive time of clients; deactivated if set to 0. */
-  public static final Object[] KEEPALIVE = { "KEEPALIVE", 0 };
+  public static final Object[] KEEPALIVE = { "KEEPALIVE", 600 };
   /** Debug mode. */
   public static final Object[] DEBUG = { "DEBUG", false };
   /** Defines the number of parallel readers. */
