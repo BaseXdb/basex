@@ -33,7 +33,7 @@ declare function fots:test($case, $envir, $base) {
   let $query := concat($prolog, $query)
   return
   try {
-    let $val := util:eval($query)
+    let $val := xquery:eval($query)
     return if
      (fots:allof($result, $val) or
       fots:anyof($result, $val) or
@@ -43,10 +43,10 @@ declare function fots:test($case, $envir, $base) {
       fots:string($result, $val))
       then fots:wrong($case, $val, $result/*)
       else ()
-  } catch *($code, $msg) {
-    if(xs:string($code) = $result//*:error/@code)
+  } catch * {
+    if(xs:string($err:code) = $result//*:error/@code)
     then ()
-    else fots:wrong($case, concat($code,': ',$msg), $result/*)
+    else fots:wrong($case, concat($err:code,': ',$err:description), $result/*)
   }
 };
 
@@ -68,9 +68,9 @@ declare function fots:convert($type, $val) {
   if($type)
   then
     try {
-      util:eval(concat($type, '("', $val, '")'))
-    } catch *($c,$m) {
-      trace('', concat($c, ': ', $m))
+      xquery:eval(concat($type, '("', $val, '")'))
+    } catch * {
+      trace('', concat($err:code, ': ', $err:description))
     }
   else $val
 };
@@ -122,15 +122,15 @@ declare function fots:eq($result, $val) {
   for $i in $result/*:assert-eq
   return
     try {
-      let $r := util:eval($i)
+      let $r := xquery:eval($i)
       return (typeswitch($val)
         case xs:string  return xs:string($r)
         case xs:double  return xs:double($r)
         case xs:float   return xs:float($r)
         case xs:integer return xs:integer($r)
         default return $val) ne $val
-    } catch *($c,$m) {
-      trace('', concat($c, ': ', $m))
+    } catch * {
+      trace('', concat($err:code, ': ', $err:description))
     }
 };
 
