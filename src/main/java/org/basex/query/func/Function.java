@@ -785,17 +785,13 @@ public enum Function {
   /* FNHash functions. */
 
   /** XQuery function. */
-  _HASH_MD5(FNHash.class, "md5(string)", B64, STR),
+  _HASH_MD5(FNHash.class, "md5(value)", B64, ITEM),
   /** XQuery function. */
-  _HASH_MD5_BINARY(FNHash.class, "md5-binary(value)", B64, BIN),
+  _HASH_SHA1(FNHash.class, "sha1(value)", B64, ITEM),
   /** XQuery function. */
-  _HASH_SHA1(FNHash.class, "sha1(string)", B64, STR),
+  _HASH_SHA256(FNHash.class, "sha256(value)", B64, ITEM),
   /** XQuery function. */
-  _HASH_SHA1_BINARY(FNHash.class, "sha1-binary(value)", B64, BIN),
-  /** XQuery function. */
-  _HASH_HASH(FNHash.class, "hash(string,algorithm)", B64, STR, STR),
-  /** XQuery function. */
-  _HASH_HASH_BINARY(FNHash.class, "hash-binary(value,algorithm)", B64, BIN, STR),
+  _HASH_HASH(FNHash.class, "hash(value,algorithm)", B64, ITEM, STR),
 
   /* FNValidate functions. */
 

@@ -372,6 +372,8 @@ public enum Err {
   ERRFORM(FORG, 6, "%: %."),
   /** FORG0008. */
   FUNZONE(FORG, 8, "% and % have different timezones."),
+  /** FORG0006. */
+  BINSTRTYPE(FORG, 6, "Binary or string expected, % found"),
 
   /** FORX0001. */
   REGMOD(FORX, 1, "Invalid regular modifier: '%'."),
