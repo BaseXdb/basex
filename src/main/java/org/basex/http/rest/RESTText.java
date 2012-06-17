@@ -3,6 +3,7 @@ package org.basex.http.rest;
 import static org.basex.util.Token.*;
 
 import org.basex.core.*;
+import org.basex.query.value.item.*;
 
 /**
  * This class assembles texts which are used in the HTTP classes.
@@ -23,7 +24,9 @@ public interface RESTText {
   /** Element. */
   byte[] RESOURCE = concat(REST, COLON, token("resource"));
   /** Attribute. */
-  byte[] RESOURCES = token("resources");
+  QNm Q_RESOURCES = new QNm("resources");
+  /** Attribute. */
+  QNm Q_NAME = new QNm("name");
 
   /** Command operation. */
   String COMMAND = "command";

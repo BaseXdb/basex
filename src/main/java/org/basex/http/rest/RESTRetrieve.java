@@ -10,9 +10,9 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.cmd.List;
 import org.basex.core.cmd.Set;
-import org.basex.data.*;
 import org.basex.http.*;
 import org.basex.io.serial.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.server.*;
 import org.basex.util.*;
@@ -50,7 +50,7 @@ final class RESTRetrieve extends RESTQuery {
       http.initResponse(sprop);
 
       final FElem el = new FElem(DATABASES, new Atts(REST, RESTURI));
-      el.add(new FAttr(RESOURCES, token(table.contents.size())));
+      el.add(Q_RESOURCES, token(table.contents.size()));
       list(table, el, DATABASE, 1);
       ser.serialize(el);
       ser.close();
@@ -65,8 +65,8 @@ final class RESTRetrieve extends RESTQuery {
       http.initResponse(sprop);
 
       final FElem el = new FElem(DATABASE, new Atts(REST, RESTURI));
-      el.add(new FAttr(DataText.T_NAME, token(http.db())));
-      el.add(new FAttr(RESOURCES, token(table.contents.size())));
+      el.add(Q_NAME, token(http.db()));
+      el.add(Q_RESOURCES, token(table.contents.size()));
       list(table, el, RESOURCE, 0);
       ser.serialize(el);
       ser.close();
@@ -92,16 +92,16 @@ final class RESTRetrieve extends RESTQuery {
    * @param header table header
    * @param skip number of columns to skip
    */
-  private static void list(final Table table, final FElem root,
-      final byte[] header, final int skip) {
+  private static void list(final Table table, final FElem root, final byte[] header,
+      final int skip) {
 
     for(final TokenList l : table.contents) {
       final FElem el = new FElem(header);
       // don't show last attribute (input path)
       for(int i = 1; i < l.size() - skip; i++) {
-        el.add(new FAttr(lc(table.header.get(i)), l.get(i)));
+        el.add(new QNm(lc(table.header.get(i))), l.get(i));
       }
-      el.add(new FTxt(l.get(0)));
+      el.add(l.get(0));
       root.add(el);
     }
   }

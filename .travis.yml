@@ -1,7 +1,0 @@
-language: java
-notifications:
-  email:
-    on_success: never
-    on_failure: never
-    recipients:
-      - bxb@inf.uni-konstanz.de
