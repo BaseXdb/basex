@@ -165,7 +165,7 @@ public final class BaseXServer extends Main implements Runnable {
           }
           final ClientListener cl = new ClientListener(s, context, log, this);
           // start authentication timeout
-          final long to = context.mprop.num(MainProp.AUTHTIMEOUT) * 1000L;
+          final long to = context.mprop.num(MainProp.KEEPALIVE) * 1000L;
           if(to > 0) {
             cl.auth.schedule(new TimerTask() {
               @Override
