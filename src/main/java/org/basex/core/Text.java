@@ -270,7 +270,8 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPOPEN = {
-    '[' + C_PATH + ']', lang("c_open1"), lang("c_open2", C_PATH)
+    '[' + C_NAME + "] ([" + C_PATH + "])", lang("c_open1"), lang("c_open2",
+        C_NAME, C_PATH)
   };
   /** Command help. */
   String[] HELPINFO = {
@@ -290,7 +291,8 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPLIST = {
-    "([" + C_PATH + "])", lang("c_list1"), lang("c_list2", C_PATH)
+    "([" + C_NAME + "] ([" + C_PATH + "]))", lang("c_list1"), lang("c_list2",
+        C_NAME, C_PATH)
   };
   /** Command help. */
   String[] HELPDROP = {

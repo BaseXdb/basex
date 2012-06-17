@@ -84,7 +84,7 @@ final class StringParser extends CmdParser {
         }
         break;
       case OPEN:
-        return new Open(string(cmd));
+        return new Open(name(cmd), string(null));
       case CHECK:
         return new Check(string(cmd));
       case ADD:
@@ -121,7 +121,7 @@ final class StringParser extends CmdParser {
       case CLOSE:
         return new Close();
       case LIST:
-        return new List(string(null));
+        return new List(string(null), string(null));
       case DROP:
         switch(consume(CmdDrop.class, cmd)) {
           case DATABASE: case DB:

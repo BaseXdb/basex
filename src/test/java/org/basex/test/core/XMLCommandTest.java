@@ -87,10 +87,12 @@ public class XMLCommandTest extends SandboxTest {
 
     ok("<kill target='X'/>");
 
-    ok("<list path='X'/>");
     ok("<list/>");
+    ok("<list name='X'/>");
+    ok("<list name='X' path='X'/>");
 
-    ok("<open path='X'/>");
+    ok("<open name='X'/>");
+    ok("<open name='X' path='X'/>");
 
     ok("<optimize/>");
 

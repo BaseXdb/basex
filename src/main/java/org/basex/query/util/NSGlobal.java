@@ -41,8 +41,8 @@ public final class NSGlobal {
     NS.add(ZIP, ZIPURI);
     // BaseX namespaces
     NS.add(BXERR, BXERRORS);
-    NS.add(ARCHIVE, ARCHIVEURI);
     NS.add(BASEX, BASEXURI);
+    NS.add(ARCHIVE, ARCHIVEURI);
     NS.add(CLIENT, CLIENTURI);
     NS.add(CONVERT, CONVERTURI);
     NS.add(DB, DBURI);

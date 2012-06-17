@@ -17,10 +17,19 @@ import org.basex.util.*;
 public final class Open extends Command {
   /**
    * Default constructor.
-   * @param path database name and optional path
+   * @param name name of database
    */
-  public Open(final String path) {
-    super(Perm.NONE, path);
+  public Open(final String name) {
+    this(name, null);
+  }
+
+  /**
+   * Default constructor.
+   * @param name name of database
+   * @param path database path
+   */
+  public Open(final String name, final String path) {
+    super(Perm.NONE, name, path);
   }
 
   @Override
@@ -28,14 +37,8 @@ public final class Open extends Command {
     // close existing database
     new Close().run(context);
 
-    // split database name and path
-    String db = args[0];
-    final int i = db.indexOf('/');
-    String path = null;
-    if(i != -1) {
-      path = db.substring(i + 1);
-      db = db.substring(0, i);
-    }
+    final String db = args[0];
+    final String path = args[1];
     if(!MetaData.validName(db, false)) return error(NAME_INVALID_X, db);
 
     try {

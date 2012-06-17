@@ -123,10 +123,10 @@ final class XMLParser extends CmdParser {
       return new InfoStorage(value(root));
     if(e.equals(KILL) && check(root, TARGET + "?"))
       return new Kill(value(root, TARGET));
-    if(e.equals(LIST) && check(root, PATH + "?"))
-      return new List(value(root, PATH));
-    if(e.equals(OPEN) && check(root, PATH))
-      return new Open(value(root, PATH));
+    if(e.equals(LIST) && check(root, NAME + "?", PATH + "?"))
+      return new List(value(root, NAME), value(root, PATH));
+    if(e.equals(OPEN) && check(root, NAME, PATH + "?"))
+      return new Open(value(root, NAME), value(root, PATH));
     if(e.equals(OPTIMIZE) && check(root))
       return new Optimize();
     if(e.equals(OPTIMIZE_ALL) && check(root))
@@ -283,11 +283,11 @@ final class XMLParser extends CmdParser {
     syntax.reset().add('<').add(nm);
     for(final Item i : ma) {
       final byte[] a = i.string(null);
-      syntax.add(' ').add(a).add("='[").add(a).add("]'");
+      syntax.add(' ').add(a).add("=\"...\"");
     }
     for(final Item i : oa) {
       final byte[] a = i.string(null);
-      syntax.add(" (").add(a).add("='[").add(a).add("]')");
+      syntax.add(" (").add(a).add("=\"...\")");
     }
     if(t != null) {
       syntax.add('>');

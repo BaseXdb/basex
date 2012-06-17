@@ -23,8 +23,7 @@ import org.basex.util.list.*;
  */
 public final class List extends Command {
   /** Pattern to extract the database name from a backup file name. */
-  private static final Pattern PA =
-      Pattern.compile(IO.DATEPATTERN + IO.ZIPSUFFIX + '$');
+  private static final Pattern PA = Pattern.compile(IO.DATEPATTERN + IO.ZIPSUFFIX + '$');
 
   /**
    * Default constructor.
@@ -35,15 +34,24 @@ public final class List extends Command {
 
   /**
    * Default constructor.
-   * @param path database name and optional path
+   * @param name database name
    */
-  public List(final String path) {
-    super(Perm.NONE, path);
+  public List(final String name) {
+    this(name, null);
+  }
+
+  /**
+   * Default constructor.
+   * @param name database name
+   * @param path database path
+   */
+  public List(final String name, final String path) {
+    super(Perm.NONE, name, path);
   }
 
   @Override
   protected boolean run() throws IOException {
-    return args[0] == null || args[0].isEmpty() ? list() : list(args[0]);
+    return args[0] == null || args[0].isEmpty() ? list() : listDB();
   }
 
   /**
@@ -100,14 +108,12 @@ public final class List extends Command {
 
   /**
    * Lists resources of the specified database.
-   * @param str database path
    * @return success flag
    * @throws IOException I/O exception
    */
-  private boolean list(final String str) throws IOException {
-    final int s = str.indexOf('/');
-    final String db = s == -1 ? str : str.substring(0, s);
-    final String path = s == -1 ? "" : str.substring(s + 1);
+  private boolean listDB() throws IOException {
+    final String db = args[0];
+    final String path = args[1] != null ? args[1] : "";
     if(!MetaData.validName(db, false)) return error(NAME_INVALID_X, db);
 
     final Table table = new Table();
