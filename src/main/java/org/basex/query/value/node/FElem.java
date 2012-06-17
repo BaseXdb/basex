@@ -217,7 +217,17 @@ public final class FElem extends FNode {
   }
 
   /**
-   * Creates and adds a text node, if the specified value is not empty.
+   * Adds an attribute and updates its parent reference.
+   * @param nm attribute name
+   * @param value attribute value
+   * @return self reference
+   */
+  public FElem add(final QNm nm, final byte[] value) {
+    return add(new FAttr(nm, value));
+  }
+
+  /**
+   * Creates and adds a text node if the specified value is not empty.
    * @param text value of text node
    * @return self reference
    */

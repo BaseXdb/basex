@@ -54,7 +54,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the db:open() function.
+   * Test method for the open() function.
    * @throws BaseXException database exception
    */
   @Test
@@ -75,7 +75,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the db:open-pre() function.
+   * Test method for the open-pre() function.
    */
   @Test
   public void dbOpenPre() {
@@ -85,7 +85,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the db:open-id() function.
+   * Test method for the open-id() function.
    */
   @Test
   public void dbOpenId() {
@@ -95,7 +95,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the db:text() function.
+   * Test method for the text() function.
    * @throws BaseXException database exception
    */
   @Test
@@ -110,7 +110,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the db:text-range() function.
+   * Test method for the text-range() function.
    * @throws BaseXException database exception
    */
   @Test
@@ -125,7 +125,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the db:attribute() function.
+   * Test method for the attribute() function.
    * @throws BaseXException database exception
    */
   @Test
@@ -142,7 +142,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the db:attribute-range() function.
+   * Test method for the attribute-range() function.
    * @throws BaseXException database exception
    */
   @Test
@@ -157,7 +157,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the db:fulltext() function.
+   * Test method for the fulltext() function.
    * @throws BaseXException database exception
    */
   @Test
@@ -172,7 +172,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the db:list() function.
+   * Test method for the list() function.
    * @throws BaseXException database exception
    */
   @Test
@@ -190,7 +190,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the db:list-details() function.
+   * Test method for the list-details() function.
    */
   @Test
   public void dbListDetails() {
@@ -218,7 +218,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the db:system() function.
+   * Test method for the system() function.
    */
   @Test
   public void dbSystem() {
@@ -227,7 +227,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the db:info() function.
+   * Test method for the info() function.
    */
   @Test
   public void dbInfo() {
@@ -237,7 +237,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for db:node-id() function.
+   * Test method for node-id() function.
    */
   @Test
   public void dbNodeID() {
@@ -247,7 +247,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for db:node-pre() function.
+   * Test method for node-pre() function.
    */
   @Test
   public void dbNodePre() {
@@ -257,7 +257,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for db:event() function.
+   * Test method for event() function.
    */
   @Test
   public void dbEvent() {
@@ -266,7 +266,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for db:output() function.
+   * Test method for output() function.
    */
   @Test
   public void dbOutput() {
@@ -279,7 +279,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the db:add() function.
+   * Test method for the add() function.
    */
   @Test
   public void dbAdd() {
@@ -313,7 +313,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the db:add() function with document with namespaces.
+   * Test method for the add() function with document with namespaces.
    */
   @Test
   public void dbAddWithNS() {
@@ -321,7 +321,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the db:delete() function.
+   * Test method for the delete() function.
    * @throws BaseXException database exception
    */
   @Test
@@ -333,7 +333,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the db:rename() function.
+   * Test method for the rename() function.
    * @throws BaseXException database exception
    */
   @Test
@@ -356,7 +356,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the db:replace() function.
+   * Test method for the replace() function.
    * @throws BaseXException database exception
    */
   @Test
@@ -380,7 +380,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the db:optimize() function.
+   * Test method for the optimize() function.
    */
   @Test
   public void dbOptimize() {
@@ -391,7 +391,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the db:retrieve() function.
+   * Test method for the retrieve() function.
    */
   @Test
   public void dbRetrieve() {
@@ -404,7 +404,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the db:store() function.
+   * Test method for the store() function.
    */
   @Test
   public void dbStore() {
@@ -417,7 +417,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the db:flush() function.
+   * Test method for the flush() function.
    */
   @Test
   public void dbFlush() {
@@ -427,7 +427,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the db:is-raw() function.
+   * Test method for the is-raw() function.
    */
   @Test
   public void dbIsRaw() {
@@ -440,7 +440,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the db:exists() function.
+   * Test method for the exists() function.
    * @throws BaseXException database exception
    */
   @Test
@@ -461,7 +461,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the db:is-xml() function.
+   * Test method for the is-xml() function.
    */
   @Test
   public void dbIsXML() {
@@ -474,7 +474,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the db:content-type() function.
+   * Test method for the content-type() function.
    */
   @Test
   public void dbContentType() {

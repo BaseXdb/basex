@@ -454,20 +454,20 @@ public enum Function {
 
   /** XQuery function. */
   _ARCHIVE_CREATE(FNArchive.class, "create(entries,contents[,options])",
-      B64, 2, ELM_ZM, ITEM_ZM, NOD),
+      B64, 2, ITEM_ZM, ITEM_ZM, NOD),
   /** XQuery function. */
   _ARCHIVE_ENTRIES(FNArchive.class, "entries(archive)", ELM_ZM, B64),
   /** XQuery function. */
-  _ARCHIVE_EXTRACT_TEXT(FNArchive.class, "extract-text(archiveip[,names[,encoding]])",
-      STR_ZM, 1, B64, STR_ZM, STR),
+  _ARCHIVE_EXTRACT_TEXT(FNArchive.class, "extract-text(archiveip[,entries[,encoding]])",
+      STR_ZM, 1, B64, ITEM_ZM, STR),
   /** XQuery function. */
-  _ARCHIVE_EXTRACT_BINARY(FNArchive.class, "extract-binary(archive[,names])",
-      B64_ZM, 1, B64, STR_ZM),
+  _ARCHIVE_EXTRACT_BINARY(FNArchive.class, "extract-binary(archive[,entries])",
+      B64_ZM, 1, B64, ITEM_ZM),
   /** XQuery function. */
   _ARCHIVE_UPDATE(FNArchive.class, "update(archive,entries,contents)",
-      B64, B64, ELM_ZM, ITEM_ZM),
+      B64, B64, ITEM_ZM, ITEM_ZM),
   /** XQuery function. */
-  _ARCHIVE_DELETE(FNArchive.class, "delete(archive,entries)", B64, B64, STR_ZM),
+  _ARCHIVE_DELETE(FNArchive.class, "delete(archive,entries)", B64, B64, ITEM_ZM),
   /** XQuery function. */
   _ARCHIVE_OPTIONS(FNArchive.class, "options(archive)", ELM, B64),
 
@@ -787,13 +787,13 @@ public enum Function {
   /* FNHash functions. */
 
   /** XQuery function. */
-  _HASH_MD5(FNHash.class, "md5(value)", B64, ITEM),
+  _HASH_MD5(FNHash.class, "md5(value)", B64, AAT),
   /** XQuery function. */
-  _HASH_SHA1(FNHash.class, "sha1(value)", B64, ITEM),
+  _HASH_SHA1(FNHash.class, "sha1(value)", B64, AAT),
   /** XQuery function. */
-  _HASH_SHA256(FNHash.class, "sha256(value)", B64, ITEM),
+  _HASH_SHA256(FNHash.class, "sha256(value)", B64, AAT),
   /** XQuery function. */
-  _HASH_HASH(FNHash.class, "hash(value,algorithm)", B64, ITEM, STR),
+  _HASH_HASH(FNHash.class, "hash(value,algorithm)", B64, AAT, STR),
 
   /* FNValidate functions. */
 

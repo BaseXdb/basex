@@ -43,7 +43,7 @@ public final class FNHash extends StandardFunc {
    * @return xs:hexBinary instance containing the hash
    * @throws QueryException exception
    */
-  private Hex hash(final QueryContext ctx) throws QueryException {
+  private B64 hash(final QueryContext ctx) throws QueryException {
     return hash(Token.string(checkStr(expr[1], ctx)), ctx);
   }
 
@@ -54,15 +54,15 @@ public final class FNHash extends StandardFunc {
    * @return xs:hexBinary instance containing the hash
    * @throws QueryException exception
    */
-  private Hex hash(final String algo, final QueryContext ctx) throws QueryException {
+  private B64 hash(final String algo, final QueryContext ctx) throws QueryException {
     final Item it = checkItem(expr[0], ctx);
     final byte[] val;
     if(it.type.isString()) {
       val = it.string(info);
-    } else if(it instanceof Bin) {
-      val = ((Bin) it).binary(info);
+    } else if(it instanceof B64) {
+      val = ((B64) it).binary(info);
     } else {
-      throw BINSTRTYPE.thrw(info, it.type);
+      throw STRB64TYPE.thrw(info, it.type);
     }
     return hashBinary(val, algo);
   }
@@ -74,9 +74,9 @@ public final class FNHash extends StandardFunc {
    * @return xs:hexBinary instance containing the hash
    * @throws QueryException exception
    */
-  private Hex hashBinary(final byte[] val, final String algo) throws QueryException {
+  private B64 hashBinary(final byte[] val, final String algo) throws QueryException {
     try {
-      return new Hex(MessageDigest.getInstance(algo).digest(val));
+      return new B64(MessageDigest.getInstance(algo).digest(val));
     } catch(final NoSuchAlgorithmException ex) {
       throw HASH_ALG.thrw(info, algo);
     }

@@ -20,13 +20,13 @@ import org.basex.util.*;
  */
 public final class FNRepo extends StandardFunc {
   /** Element name. */
-  private static final QNm PACKAGE = new QNm("package");
+  private static final QNm Q_PACKAGE = new QNm("package");
   /** Header attribute: name. */
-  private static final QNm NAME = new QNm("name");
+  private static final QNm Q_NAME = new QNm("name");
   /** Header attribute: type. */
-  private static final QNm TYPE = new QNm("type");
+  private static final QNm Q_TYPE = new QNm("type");
   /** Header attribute: version. */
-  private static final QNm VERSION = new QNm("version");
+  private static final QNm Q_VERSION = new QNm("version");
 
   /**
    * Constructor.
@@ -74,20 +74,20 @@ public final class FNRepo extends StandardFunc {
     final NodeSeqBuilder cache = new NodeSeqBuilder();
     for(final byte[] p : ctx.context.repo.pkgDict()) {
       if(p == null) continue;
-      final FElem elem = new FElem(PACKAGE);
-      elem.add(new FAttr(NAME, Package.name(p)));
-      elem.add(new FAttr(VERSION, Package.version(p)));
-      elem.add(new FAttr(TYPE, token(PkgText.EXPATH)));
+      final FElem elem = new FElem(Q_PACKAGE);
+      elem.add(Q_NAME, Package.name(p));
+      elem.add(Q_VERSION, Package.version(p));
+      elem.add(Q_TYPE, token(PkgText.EXPATH));
       cache.add(elem);
     }
     // traverse all directories, ignore root entries with dashes
     for(final IOFile dir : ctx.context.repo.path().children()) {
       if(dir.name().indexOf('-') != -1) continue;
       for(final String s : dir.descendants()) {
-        final FElem elem = new FElem(PACKAGE);
+        final FElem elem = new FElem(Q_PACKAGE);
         final String n = dir.name() + '.' + s.replaceAll("\\..*", "").replace('/', '.');
-        elem.add(new FAttr(NAME, token(n)));
-        elem.add(new FAttr(TYPE, token(PkgText.INTERNAL)));
+        elem.add(Q_NAME, token(n));
+        elem.add(Q_TYPE, token(PkgText.INTERNAL));
         cache.add(elem);
       }
     }

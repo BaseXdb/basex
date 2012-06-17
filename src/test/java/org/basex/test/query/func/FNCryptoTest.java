@@ -38,7 +38,7 @@ public class FNCryptoTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for crypto:encrypt and crypto:decrypt with symmetric keys.
+   * Test method for encrypt and decrypt with symmetric keys.
    */
   @Test
   public void encryption1() {
@@ -51,7 +51,7 @@ public class FNCryptoTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for crypto:encrypt and crypto:decrypt with symmetric keys.
+   * Test method for encrypt and decrypt with symmetric keys.
    */
   @Test
   public void encryption2() {

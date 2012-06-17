@@ -27,15 +27,15 @@ public final class FNPat extends StandardFunc {
   private static final Pattern BSLASH = Pattern.compile("\\\\");
 
   /** Root element for the analyze-string-result function. */
-  private static final QNm ANALYZE = new QNm("fn:analyze-string-result", FNURI);
+  private static final QNm Q_ANALYZE = new QNm("fn:analyze-string-result", FNURI);
   /** Element for the analyze-string-result function. */
-  private static final QNm MATCH = new QNm("fn:match", FNURI);
+  private static final QNm Q_MATCH = new QNm("fn:match", FNURI);
   /** Element for the analyze-string-result function. */
-  private static final QNm NONMATCH = new QNm("fn:non-match", FNURI);
+  private static final QNm Q_NONMATCH = new QNm("fn:non-match", FNURI);
   /** Element for the analyze-string-result function. */
-  private static final QNm MGROUP = new QNm("fn:group", FNURI);
+  private static final QNm Q_MGROUP = new QNm("fn:group", FNURI);
   /** Attribute for the analyze-string-result function. */
-  private static final QNm NR = new QNm("nr");
+  private static final QNm Q_NR = new QNm("nr");
 
   /**
    * Constructor.
@@ -50,8 +50,8 @@ public final class FNPat extends StandardFunc {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(sig) {
-      case TOKENIZE:   return tokenize(checkEStr(expr[0], ctx), ctx);
-      default:         return super.iter(ctx);
+      case TOKENIZE: return tokenize(checkEStr(expr[0], ctx), ctx);
+      default:       return super.iter(ctx);
     }
   }
 
@@ -92,7 +92,7 @@ public final class FNPat extends StandardFunc {
     final String str = string(val);
     final Matcher m = p.matcher(str);
 
-    final FElem root = new FElem(ANALYZE, new Atts(FN, FNURI));
+    final FElem root = new FElem(Q_ANALYZE, new Atts(FN, FNURI));
     int s = 0;
     while(m.find()) {
       if(s != m.start()) nonmatch(str.substring(s, m.start()), root);
@@ -114,8 +114,8 @@ public final class FNPat extends StandardFunc {
   private static int[] match(final Matcher m, final String str, final FElem par,
       final int g) {
 
-    final FElem nd = new FElem(g == 0 ? MATCH : MGROUP);
-    if(g > 0) nd.add(new FAttr(NR, token(g)));
+    final FElem nd = new FElem(g == 0 ? Q_MATCH : Q_MGROUP);
+    if(g > 0) nd.add(Q_NR, token(g));
 
     final int start = m.start(g), end = m.end(g), gc = m.groupCount();
     int[] pos = { g + 1, start }; // group and position in string
@@ -140,9 +140,7 @@ public final class FNPat extends StandardFunc {
    * @param par root node
    */
   private static void nonmatch(final String text, final FElem par) {
-    final FElem sub = new FElem(NONMATCH);
-    sub.add(token(text));
-    par.add(sub);
+    par.add(new FElem(Q_NONMATCH).add(token(text)));
   }
 
   /**

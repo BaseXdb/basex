@@ -19,11 +19,13 @@ public final class FNArchiveTest extends AdvancedQueryTest {
   private static final String GZIP = "src/test/resources/xml.gz";
 
   /**
-   * Test method for the archive:create() function.
+   * Test method for the create() function.
    */
   @Test
   public void archiveCreate() {
     check(_ARCHIVE_CREATE);
+    // simple zip files
+    query(COUNT.args(_ARCHIVE_CREATE.args("X", "")), "1");
     // simple zip files
     query(COUNT.args(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "")), "1");
     query(COUNT.args(_ARCHIVE_CREATE.args(
@@ -37,16 +39,19 @@ public final class FNArchiveTest extends AdvancedQueryTest {
         " map { }")), "1");
     query(COUNT.args(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
         " map { 'format':='zip', 'algorithm':='deflate' }")), "1");
-    query(COUNT.args(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
-        "<archive:options/>")), "1");
+    query(COUNT.args(_ARCHIVE_CREATE.args("X", "", "<archive:options/>")), "1");
     query(COUNT.args(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
         "<archive:options><archive:format value='zip'/>" +
         "<archive:algorithm value='deflate'/></archive:options>")), "1");
+    query(COUNT.args(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
+        "<archive:options><archive:format value='zip'/></archive:options>")), "1");
+    query(COUNT.args(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
+        "<archive:options><archive:format value='gzip'/></archive:options>")), "1");
 
     // different number of entries and contents
-    error(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "()"), Err.ARCH_DIFF);
+    error(_ARCHIVE_CREATE.args("X", "()"), Err.ARCH_DIFF);
     // name must not be empty
-    error(_ARCHIVE_CREATE.args("<archive:entry/>", ""), Err.ARCH_NAME);
+    error(_ARCHIVE_CREATE.args("<archive:entry/>", ""), Err.ARCH_EMPTY);
     // invalid compression level
     error(_ARCHIVE_CREATE.args("<archive:entry compression-level='x'>X</archive:entry>",
         ""), Err.ARCH_LEVEL);
@@ -54,7 +59,7 @@ public final class FNArchiveTest extends AdvancedQueryTest {
         ""), Err.ARCH_LEVEL);
     // invalid modification date
     error(_ARCHIVE_CREATE.args("<archive:entry last-modified='2020'>X</archive:entry>",
-        ""), Err.ARCH_MODIFIED);
+        ""), Err.ARCH_DATETIME);
     // content must be string or base64Binary
     error(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", " 123"),
         Err.STRB64TYPE);
@@ -66,13 +71,22 @@ public final class FNArchiveTest extends AdvancedQueryTest {
         "\u00fc"), Err.ARCH_ENCODE);
     error(COUNT.args(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
         " map { 'format':='rar' }")), Err.ARCH_SUPP);
+    // format not supported
     error(COUNT.args(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
         "<archive:options><archive:format value='rar'/></archive:options>")),
         Err.ARCH_SUPP);
+    // algorithm not supported
+    error(COUNT.args(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
+        "<archive:options><archive:algorithm value='unknown'/></archive:options>")),
+        Err.ARCH_SUPP);
+    // algorithm not supported
+    error(COUNT.args(_ARCHIVE_CREATE.args("('x','y')", "('a','b')",
+        "<archive:options><archive:format value='gzip'/></archive:options>")),
+        Err.ARCH_ONE);
   }
 
   /**
-   * Test method for the archive:entries() function.
+   * Test method for the entries() function.
    */
   @Test
   public void archiveEntries() {
@@ -82,10 +96,13 @@ public final class FNArchiveTest extends AdvancedQueryTest {
     // simple zip files
     query(COUNT.args(_ARCHIVE_ENTRIES.args(_FILE_READ_BINARY.args(ZIP)) +
         "[@size][@last-modified][@compressed-size]"), "5");
+    // simple gzip files
+    query(COUNT.args(_ARCHIVE_ENTRIES.args(_FILE_READ_BINARY.args(GZIP)) +
+        "[not(@size)][not(@last-modified)][not(@compressed-size)][not(text())]"), "1");
   }
 
   /**
-   * Test method for the archive:options() function.
+   * Test method for the options() function.
    */
   @Test
   public void archiveOptions() {
@@ -98,7 +115,7 @@ public final class FNArchiveTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the archive:extract-texts() function.
+   * Test method for the extract-texts() function.
    */
   @Test
   public void archiveExtractTexts() {
@@ -114,10 +131,16 @@ public final class FNArchiveTest extends AdvancedQueryTest {
           "let $b := " + _ARCHIVE_EXTRACT_TEXT.args("$a", "test/input.xml") +
           "let $c := " + PARSE_XML.args("$b") +
           "return $c//title/text()", "XML");
+    // extract single entry
+    query("let $a := " + _FILE_READ_BINARY.args(ZIP) +
+          "let $b := " + _ARCHIVE_EXTRACT_TEXT.args("$a",
+              "<archive:entry>test/input.xml</archive:entry>") +
+          "let $c := " + PARSE_XML.args("$b") +
+          "return $c//title/text()", "XML");
   }
 
   /**
-   * Test method for the archive:extract-binaries() function.
+   * Test method for the extract-binaries() function.
    */
   @Test
   public void archiveExtractBinary() {
@@ -134,14 +157,25 @@ public final class FNArchiveTest extends AdvancedQueryTest {
           "let $c := " + _CONVERT_BINARY_TO_STRING.args("$b") +
           "let $d := " + PARSE_XML.args("$c") +
           "return $d//title/text()", "XML");
+    // extract single entry
+    query("let $a := " + _FILE_READ_BINARY.args(ZIP) +
+          "let $b := " + _ARCHIVE_EXTRACT_BINARY.args("$a",
+              "<archive:entry>test/input.xml</archive:entry>") +
+          "let $c := " + _CONVERT_BINARY_TO_STRING.args("$b") +
+          "let $d := " + PARSE_XML.args("$c") +
+          "return $d//title/text()", "XML");
   }
 
   /**
-   * Test method for the archive:update() function.
+   * Test method for the update() function.
    */
   @Test
   public void archiveUpdate() {
     check(_ARCHIVE_UPDATE);
+    // add a new entry
+    query(_FILE_READ_BINARY.args(ZIP) + " ! " +
+        _ARCHIVE_UPDATE.args(" .", "X", "X") + " ! " +
+        COUNT.args(_ARCHIVE_ENTRIES.args(" .")), 6);
     // add a new entry
     query(_FILE_READ_BINARY.args(ZIP) + " ! " +
         _ARCHIVE_UPDATE.args(" .", "<archive:entry>X</archive:entry>", "X") + " ! " +
@@ -153,10 +187,14 @@ public final class FNArchiveTest extends AdvancedQueryTest {
     query(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "X") + " ! " +
         _ARCHIVE_UPDATE.args(" .", "<archive:entry>X</archive:entry>", "Y") + " ! " +
         _ARCHIVE_EXTRACT_TEXT.args(" ."), "Y");
+    // updates an existing entry
+    error(_ARCHIVE_CREATE.args("X", "X",
+        "<archive:options><archive:format value='gzip'/></archive:options>") + " ! " +
+        _ARCHIVE_UPDATE.args(" .", "X", "Y"), Err.ARCH_MODIFY);
   }
 
   /**
-   * Test method for the archive:delete() function.
+   * Test method for the delete() function.
    */
   @Test
   public void archiveDelete() {
@@ -169,7 +207,11 @@ public final class FNArchiveTest extends AdvancedQueryTest {
     // delete all entries except for the first
     query("let $a := " + _FILE_READ_BINARY.args(ZIP) +
           "let $b := " + _ARCHIVE_ENTRIES.args("$a") +
-          "let $c := " + _ARCHIVE_DELETE.args("$a", "($b/text())[position() > 1]") +
+          "let $c := " + _ARCHIVE_DELETE.args("$a", "$b[position() > 1]") +
           "return count(archive:entries($c))", "1");
+    // updates an existing entry
+    error(_ARCHIVE_CREATE.args("X", "X",
+        "<archive:options><archive:format value='gzip'/></archive:options>") + " ! " +
+        _ARCHIVE_DELETE.args(" .", "X"), Err.ARCH_MODIFY);
   }
 }

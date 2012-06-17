@@ -1,0 +1,77 @@
+package org.basex.query.util.archive;
+
+import static org.basex.query.util.Err.*;
+
+import java.io.*;
+import java.util.zip.*;
+
+import org.basex.io.*;
+import org.basex.io.out.*;
+import org.basex.query.*;
+import org.basex.util.*;
+
+/**
+ * Archive writer.
+ *
+ * @author BaseX Team 2005-12, BSD License
+ * @author Christian Gruen
+ */
+public abstract class ArchiveOut {
+  /** Output. */
+  final ArrayOutput ao = new ArrayOutput();
+  /** Buffer. */
+  final byte[] data = new byte[IO.BLOCKSIZE];
+
+  /**
+   * Returns a new instance of an archive writer.
+   * @param format archive format
+   * @param info input info
+   * @return writer
+   * @throws QueryException query exception
+   */
+  public static ArchiveOut get(final String format, final InputInfo info)
+      throws QueryException {
+
+    try {
+      if(format.equals("zip")) return new ZIPOut();
+      if(format.equals("gzip")) return new GZIPOut();
+    } catch(final IOException ex) {
+      throw ARCH_FAIL.thrw(info, ex);
+    }
+    throw ARCH_UNKNOWN.thrw(info);
+  }
+
+  /**
+   * Sets the compression level.
+   * @param l level
+   */
+  public abstract void level(final int l);
+
+  /**
+   * Writes data from the specified archive.
+   * @param in input archive
+   * @throws IOException I/O exception
+   */
+  public abstract void write(final ArchiveIn in) throws IOException;
+
+  /**
+   * Writes the specified entry.
+   * @param entry zip entry
+   * @param val value to be written
+   * @throws IOException I/O exception
+   */
+  public abstract void write(final ZipEntry entry, final byte[] val) throws IOException;
+
+  /**
+   * Closes the stream.
+   */
+  public abstract void close();
+
+  /**
+   * Returns the output as byte array.
+   * @return byte array
+   */
+  public final byte[] toArray() {
+    return ao.toArray();
+  }
+}

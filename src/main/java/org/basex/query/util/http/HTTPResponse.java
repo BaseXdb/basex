@@ -115,8 +115,8 @@ public final class HTTPResponse {
     for(final String headerName : conn.getHeaderFields().keySet()) {
       if(headerName != null) {
         final FElem hdr = new FElem(HTTP_HEADER, new Atts(HTTP, HTTPURI));
-        hdr.add(new FAttr(Q_NAME, token(headerName)));
-        hdr.add(new FAttr(Q_VALUE, token(conn.getHeaderField(headerName))));
+        hdr.add(Q_NAME, token(headerName));
+        hdr.add(Q_VALUE, token(conn.getHeaderField(headerName)));
         h.add(hdr);
       }
     }
@@ -130,7 +130,7 @@ public final class HTTPResponse {
    */
   private static FElem createBody(final String mediaType) {
     final FElem b = new FElem(HTTP_BODY, new Atts(HTTP, HTTPURI));
-    b.add(new FAttr(Q_MEDIA_TYPE, token(mediaType)));
+    b.add(Q_MEDIA_TYPE, token(mediaType));
     return b;
   }
 
@@ -262,8 +262,8 @@ public final class HTTPResponse {
                 nextHdr.length));
             // construct attributes
             final FElem hdr = new FElem(HTTP_HEADER);
-            hdr.add(new FAttr(Q_NAME, name));
-            hdr.add(new FAttr(Q_VALUE, value));
+            hdr.add(Q_NAME, name);
+            hdr.add(Q_VALUE, value);
             root.add(hdr);
             if(eq(lc(name), CONTENT_TYPE_LC)) partCType = string(value);
           }

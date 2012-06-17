@@ -160,9 +160,7 @@ public final class FNIndex extends StandardFunc {
       public ANode next() {
         final byte[] token = ei.next();
         if(token == null) return null;
-        final FElem elem = new FElem(Q_ENTRY);
-        elem.add(new FAttr(Q_COUNT, token(ei.count())));
-        elem.add(token);
+        final FElem elem = new FElem(Q_ENTRY).add(Q_COUNT, token(ei.count())).add(token);
         return elem;
       }
     };
@@ -188,8 +186,7 @@ public final class FNIndex extends StandardFunc {
    */
   private static void index(final Names names, final QNm name, final FElem root) {
     for(int i = 0; i < names.size(); ++i) {
-      final FElem sub = new FElem(name);
-      sub.add(new FAttr(Q_NAME, names.key(i + 1)));
+      final FElem sub = new FElem(name).add(Q_NAME, names.key(i + 1));
       stats(names.stat(i + 1), sub);
       root.add(sub);
     }
@@ -205,9 +202,7 @@ public final class FNIndex extends StandardFunc {
     final FElem elem = new FElem(new QNm(ANode.type(root.kind).string()));
     final boolean elm = root.kind == Data.ELEM;
     final Names names = elm ? data.tagindex : data.atnindex;
-    if(root.kind == Data.ATTR || elm) {
-      elem.add(new FAttr(Q_NAME, names.key(root.name)));
-    }
+    if(root.kind == Data.ATTR || elm) elem.add(Q_NAME, names.key(root.name));
     stats(root.stats, elem);
     for(final PathNode p : root.ch) elem.add(tree(data, p));
     return elem;
@@ -220,20 +215,20 @@ public final class FNIndex extends StandardFunc {
    */
   private static void stats(final Stats stats, final FElem elem) {
     final String k = stats.type.toString().toLowerCase(Locale.ENGLISH);
-    elem.add(new FAttr(Q_TYPE, token(k)));
-    elem.add(new FAttr(Q_COUNT, token(stats.count)));
+    elem.add(Q_TYPE, token(k));
+    elem.add(Q_COUNT, token(stats.count));
     switch(stats.type) {
       case CATEGORY:
         for(final byte[] c : stats.cats) {
           final FElem sub = new FElem(Q_ENTRY);
-          sub.add(new FAttr(Q_COUNT, token(stats.cats.value(c)))).add(c);
+          sub.add(Q_COUNT, token(stats.cats.value(c))).add(c);
           elem.add(sub);
         }
         break;
       case DOUBLE:
       case INTEGER:
-        elem.add(new FAttr(Q_MIN, token(stats.min)));
-        elem.add(new FAttr(Q_MAX, token(stats.max)));
+        elem.add(Q_MIN, token(stats.min));
+        elem.add(Q_MAX, token(stats.max));
         break;
       default:
         break;

@@ -88,7 +88,7 @@ public final class JsonMLConverter extends XMLConverter {
   private void attr(final FElem elem, final JObject attr) throws QueryException {
     for(int s = 0; s < attr.size(); s++) {
       final JString v = (JString) check(attr.value(s), T_STRING, "attribute value");
-      elem.add(new FAttr(qname(attr.name(s)), v.value));
+      elem.add(qname(attr.name(s)), v.value);
     }
   }
 

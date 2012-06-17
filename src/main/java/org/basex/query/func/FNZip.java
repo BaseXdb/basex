@@ -32,19 +32,19 @@ import org.basex.util.list.*;
  */
 public final class FNZip extends StandardFunc {
   /** Element: zip:file. */
-  private static final QNm E_FILE = new QNm("zip:file", ZIPURI);
+  private static final QNm Q_FILE = new QNm("zip:file", ZIPURI);
   /** Element: zip:dir. */
-  private static final QNm E_DIR = new QNm("zip:dir", ZIPURI);
+  private static final QNm Q_DIR = new QNm("zip:dir", ZIPURI);
   /** Element: zip:entry. */
-  private static final QNm E_ENTRY = new QNm("zip:entry", ZIPURI);
+  private static final QNm Q_ENTRY = new QNm("zip:entry", ZIPURI);
   /** Attribute: href. */
-  private static final QNm A_HREF = new QNm("href");
+  private static final QNm Q_HREF = new QNm("href");
   /** Attribute: name. */
-  private static final QNm A_NAME = new QNm("name");
+  private static final QNm Q_NAME = new QNm("name");
   /** Attribute: src. */
-  private static final QNm A_SRC = new QNm("src");
+  private static final QNm Q_SRC = new QNm("src");
   /** Attribute: method. */
-  private static final QNm A_METHOD = new QNm("method");
+  private static final QNm Q_METHOD = new QNm("method");
   /** Method "base64". */
   private static final String M_BASE64 = "base64";
   /** Method "hex". */
@@ -138,8 +138,8 @@ public final class FNZip extends StandardFunc {
     try {
       zf = new ZipFile(file);
       // create result node
-      final FElem root = new FElem(E_FILE, new Atts(ZIP, ZIPURI));
-      root.add(new FAttr(A_HREF, token(path.path())));
+      final FElem root = new FElem(Q_FILE, new Atts(ZIP, ZIPURI));
+      root.add(Q_HREF, token(path.path()));
       createEntries(paths(zf).iterator(), root, "");
       return root;
     } catch(final IOException ex) {
@@ -194,8 +194,7 @@ public final class FNZip extends StandardFunc {
    * @return element
    */
   private static FElem createDir(final FElem par, final String name) {
-    final FElem e = new FElem(E_DIR);
-    e.add(new FAttr(A_NAME, token(name)));
+    final FElem e = new FElem(Q_DIR).add(Q_NAME, token(name));
     par.add(e);
     return e;
   }
@@ -206,9 +205,7 @@ public final class FNZip extends StandardFunc {
    * @param name name of directory
    */
   private static void createFile(final FElem par, final String name) {
-    final FElem e = new FElem(E_ENTRY);
-    e.add(new FAttr(A_NAME, token(name)));
-    par.add(e);
+    par.add(new FElem(Q_ENTRY).add(Q_NAME, token(name)));
   }
 
   /**
@@ -220,9 +217,9 @@ public final class FNZip extends StandardFunc {
   private Item zipFile(final QueryContext ctx) throws QueryException {
     // check argument
     final ANode elm = (ANode) checkType(expr[0].item(ctx, info), NodeType.ELM);
-    if(!elm.qname().eq(E_FILE)) ZIP_UNKNOWN.thrw(info, elm.qname());
+    if(!elm.qname().eq(Q_FILE)) ZIP_UNKNOWN.thrw(info, elm.qname());
     // get file
-    final String file = attribute(elm, A_HREF, true);
+    final String file = attribute(elm, Q_HREF, true);
 
     // write zip file
     FileOutputStream fos = null;
@@ -262,18 +259,18 @@ public final class FNZip extends StandardFunc {
     for(ANode node; (node = ai.next()) != null;) {
       // get entry type
       final QNm mode = node.qname();
-      final boolean dir = mode.eq(E_DIR);
-      if(!dir && !mode.eq(E_ENTRY)) ZIP_UNKNOWN.thrw(info, mode);
+      final boolean dir = mode.eq(Q_DIR);
+      if(!dir && !mode.eq(Q_ENTRY)) ZIP_UNKNOWN.thrw(info, mode);
 
       // file path: if null, the zip base name is used
-      String name = attribute(node, A_NAME, false);
+      String name = attribute(node, Q_NAME, false);
       // source: if null, the node's children are serialized
-      String src = attribute(node, A_SRC, false);
+      String src = attribute(node, Q_SRC, false);
       if(src != null) src = src.replaceAll("\\\\", "/");
 
       if(name == null) {
         // throw exception if both attributes are null
-        if(src == null) throw ZIP_INVALID.thrw(info, node.qname(), A_SRC);
+        if(src == null) throw ZIP_INVALID.thrw(info, node.qname(), Q_SRC);
         name = src;
       }
       name = name.replaceAll(".*/", "");
@@ -299,7 +296,7 @@ public final class FNZip extends StandardFunc {
         } else {
           // no source reference: the child nodes are treated as file contents
           final AxisIter ch = node.children();
-          final String m = attribute(node, A_METHOD, false);
+          final String m = attribute(node, Q_METHOD, false);
           // retrieve first child (might be null)
           ANode n = ch.next();
 
@@ -350,7 +347,7 @@ public final class FNZip extends StandardFunc {
     final AxisIter ati = node.attributes();
     for(ANode at; (at = ati.next()) != null;) {
       final QNm name = at.qname();
-      if(name.eq(A_NAME) || name.eq(A_SRC)) continue;
+      if(name.eq(Q_NAME) || name.eq(Q_SRC)) continue;
       if(!tb.isEmpty()) tb.add(',');
       tb.add(name.local()).add('=').add(at.string());
     }
@@ -366,10 +363,10 @@ public final class FNZip extends StandardFunc {
   private Item updateEntries(final QueryContext ctx) throws QueryException {
     // check argument
     final ANode elm = (ANode) checkType(expr[0].item(ctx, info), NodeType.ELM);
-    if(!elm.qname().eq(E_FILE)) ZIP_UNKNOWN.thrw(info, elm.qname());
+    if(!elm.qname().eq(Q_FILE)) ZIP_UNKNOWN.thrw(info, elm.qname());
 
     // sorted paths in original file
-    final String in = attribute(elm, A_HREF, true);
+    final String in = attribute(elm, Q_HREF, true);
 
     // target and temporary output file
     final IOFile target = new IOFile(string(checkStr(expr[1], ctx)));

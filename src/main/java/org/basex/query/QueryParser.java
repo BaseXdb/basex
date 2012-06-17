@@ -387,7 +387,7 @@ public class QueryParser extends InputParser {
         final Ann ann = new Ann();
         while(true) {
           if(wsConsumeWs(UPDATING)) {
-            addAnnotation(ann, Ann.UPDATING, Empty.SEQ);
+            addAnnotation(ann, Ann.Q_UPDATING, Empty.SEQ);
           } else if(ctx.xquery3 && consume('%')) {
             annotation(ann);
           } else {
@@ -396,7 +396,7 @@ public class QueryParser extends InputParser {
         }
         if(wsConsumeWs(VARIABLE)) {
           // variables cannot be updating
-          if(ann.contains(Ann.UPDATING)) error(UPDATINGVAR);
+          if(ann.contains(Ann.Q_UPDATING)) error(UPDATINGVAR);
           varDecl(ann);
         } else if(wsConsumeWs(FUNCTION)) {
           functionDecl(ann);
@@ -454,11 +454,11 @@ public class QueryParser extends InputParser {
   private void addAnnotation(final Ann ann, final QNm name, final Value value)
       throws QueryException {
 
-    if(name.eq(Ann.UPDATING)) {
-      if(ann.contains(Ann.UPDATING)) error(DUPLUPD);
-    } else if(name.eq(Ann.PUBLIC) || name.eq(Ann.PRIVATE)) {
+    if(name.eq(Ann.Q_UPDATING)) {
+      if(ann.contains(Ann.Q_UPDATING)) error(DUPLUPD);
+    } else if(name.eq(Ann.Q_PUBLIC) || name.eq(Ann.Q_PRIVATE)) {
       // only one visibility modifier allowed
-      if(ann.contains(Ann.PUBLIC) || ann.contains(Ann.PRIVATE)) error(DUPLVIS);
+      if(ann.contains(Ann.Q_PUBLIC) || ann.contains(Ann.Q_PRIVATE)) error(DUPLVIS);
     } else if(NSGlobal.reserved(name.uri())) {
       // no global namespaces allowed
       error(ANNRES, name);

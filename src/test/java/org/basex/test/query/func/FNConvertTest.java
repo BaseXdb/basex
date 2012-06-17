@@ -20,10 +20,10 @@ public final class FNConvertTest extends AdvancedQueryTest {
   static final PrintStream NULL = new PrintStream(new NullOutput());
 
   /**
-   * Test method for the convert:binary-to-string() function.
+   * Test method for the binary-to-string() function.
    */
   @Test
-  public void utilBinaryToString() {
+  public void convertBinaryToString() {
     check(_CONVERT_BINARY_TO_STRING);
     query(_CONVERT_BINARY_TO_STRING.args("xs:base64Binary(xs:hexBinary('41'))"), "A");
     query(_CONVERT_BINARY_TO_STRING.args("xs:hexBinary('41')"), "A");
@@ -32,10 +32,10 @@ public final class FNConvertTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the convert:string-to-base64() function.
+   * Test method for the string-to-base64() function.
    */
   @Test
-  public void utilStringToBase64() {
+  public void convertStringToBase64() {
     check(_CONVERT_STRING_TO_BASE64);
     query(_CONVERT_STRING_TO_BASE64.args("a"), "YQ==");
     query(_CONVERT_STRING_TO_BASE64.args("a", "UTF-8"), "YQ==");
@@ -45,20 +45,20 @@ public final class FNConvertTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the convert:bytes-to-base64() function.
+   * Test method for the bytes-to-base64() function.
    */
   @Test
-  public void utilBytesToBase64() {
+  public void convertBytesToBase64() {
     check(_CONVERT_BYTES_TO_BASE64);
     query(_CONVERT_BYTES_TO_BASE64.args("xs:byte(97)"), "YQ==");
     query(_CONVERT_BYTES_TO_BASE64.args("()"), "");
   }
 
   /**
-   * Test method for the convert:string-to-hex() function.
+   * Test method for the string-to-hex() function.
    */
   @Test
-  public void utilStringToHex() {
+  public void convertStringToHex() {
     check(_CONVERT_STRING_TO_HEX);
     query(_CONVERT_STRING_TO_HEX.args("a"), "61");
     query(_CONVERT_STRING_TO_HEX.args("a", "UTF-8"), "61");
@@ -68,20 +68,20 @@ public final class FNConvertTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the convert:bytes-to-hex() function.
+   * Test method for the bytes-to-hex() function.
    */
   @Test
-  public void utilBytesToHex() {
+  public void convertBytesToHex() {
     check(_CONVERT_BYTES_TO_HEX);
     query(_CONVERT_BYTES_TO_HEX.args("xs:byte(1)"), "01");
     query(_CONVERT_BYTES_TO_HEX.args(" for $i in 1 to 3 return xs:byte($i)"), "010203");
   }
 
   /**
-   * Test method for the convert:binary-to-bytes() function.
+   * Test method for the binary-to-bytes() function.
    */
   @Test
-  public void utilToBytes() {
+  public void convertToBytes() {
     check(_CONVERT_BINARY_TO_BYTES);
     query(_CONVERT_BINARY_TO_BYTES.args("xs:base64Binary('QmFzZVggaXMgY29vbA==')"),
       "66 97 115 101 88 32 105 115 32 99 111 111 108");
@@ -94,10 +94,10 @@ public final class FNConvertTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the convert:integer-to-base() function.
+   * Test method for the integer-to-base() function.
    */
   @Test
-  public void utilToBase() {
+  public void convertToBase() {
     check(_CONVERT_INTEGER_TO_BASE);
     query(_CONVERT_INTEGER_TO_BASE.args(4, 2), 100);
     query(_CONVERT_INTEGER_TO_BASE.args(65535, 2), "1111111111111111");
@@ -114,10 +114,10 @@ public final class FNConvertTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the convert:integer-from-base() function.
+   * Test method for the integer-from-base() function.
    */
   @Test
-  public void utilFromBase() {
+  public void convertFromBase() {
     check(_CONVERT_INTEGER_FROM_BASE);
     query(_CONVERT_INTEGER_FROM_BASE.args("100", 2), "4");
     query(_CONVERT_INTEGER_FROM_BASE.args("1111111111111111", 2), 65535);

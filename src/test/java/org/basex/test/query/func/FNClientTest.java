@@ -41,7 +41,7 @@ public final class FNClientTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the client:connect() function.
+   * Test method for the connect() function.
    */
   @Test
   public void clientConnect() {
@@ -54,7 +54,7 @@ public final class FNClientTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the client:execute() function.
+   * Test method for the execute() function.
    */
   @Test
   public void clientExecute() {
@@ -68,7 +68,7 @@ public final class FNClientTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the client:query() function.
+   * Test method for the query() function.
    */
   @Test
   public void clientQuery() {
@@ -95,7 +95,7 @@ public final class FNClientTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the client:close() function.
+   * Test method for the close() function.
    */
   @Test
   public void clientClose() {

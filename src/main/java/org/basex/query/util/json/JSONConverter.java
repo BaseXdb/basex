@@ -127,14 +127,14 @@ public final class JSONConverter extends XMLConverter {
 
     if(value instanceof JStruct) {
       final boolean obj = value instanceof JObject;
-      if(type) root.add(new FAttr(Q_TYPE, value.type()));
+      if(type) root.add(Q_TYPE, value.type());
       final JStruct n = (JStruct) value;
       for(int s = 0; s < n.size(); s++) {
         root.add(create(obj ? ((JObject) n).name(s) : T_VALUE, n.value(s)));
       }
     } else {
       final JAtom a = (JAtom) value;
-      if(type && !(a instanceof JString)) root.add(new FAttr(Q_TYPE, a.type()));
+      if(type && !(a instanceof JString)) root.add(Q_TYPE, a.type());
       final byte[] v = a.value();
       if(v != null) root.add(v);
     }
@@ -161,7 +161,7 @@ public final class JSONConverter extends XMLConverter {
     }
     for(int b = 0; b < builders.length; b++) {
       if(builders[b].isEmpty()) continue;
-      root.add(new FAttr(qname(ATTRS[b]), builders[b].trim().finish()));
+      root.add(qname(ATTRS[b]), builders[b].trim().finish());
     }
   }
 

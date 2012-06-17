@@ -41,23 +41,23 @@ import org.basex.util.list.*;
  */
 public final class FNDb extends StandardFunc {
   /** Resource element name. */
-  static final QNm SYSTEM = new QNm("system");
+  static final QNm Q_SYSTEM = new QNm("system");
   /** Resource element name. */
-  static final QNm DATABASE = new QNm("database");
+  static final QNm Q_DATABASE = new QNm("database");
   /** Resource element name. */
-  static final QNm RESOURCE = new QNm("resource");
+  static final QNm Q_RESOURCE = new QNm("resource");
   /** Resource element name. */
-  static final QNm RESOURCES = new QNm("resources");
+  static final QNm Q_RESOURCES = new QNm("resources");
   /** Path element name. */
-  static final QNm PATH = new QNm("path");
+  static final QNm Q_PATH = new QNm("path");
   /** Raw element name. */
-  static final QNm RAW = new QNm("raw");
+  static final QNm Q_RAW = new QNm("raw");
   /** Size element name. */
-  static final QNm SIZE = new QNm("size");
+  static final QNm Q_SIZE = new QNm("size");
   /** Content type element name. */
-  static final QNm CTYPE = new QNm("content-type");
+  static final QNm Q_CTYPE = new QNm("content-type");
   /** Modified date element name. */
-  static final QNm MDATE = new QNm("modified-date");
+  static final QNm Q_MDATE = new QNm("modified-date");
 
   /**
    * Constructor.
@@ -315,18 +315,17 @@ public final class FNDb extends StandardFunc {
       int pos;
       @Override
       public ANode get(final long i) throws QueryException {
-        final FElem res = new FElem(DATABASE);
+        final FElem res = new FElem(Q_DATABASE);
         final String name = sl.get((int) i);
         final MetaData meta = new MetaData(name, ctx.context);
         DataInput di = null;
         try {
           di = new DataInput(meta.dbfile(DATAINF));
           meta.read(di);
-          res.add(new FAttr(RESOURCES, token(meta.ndocs)));
+          res.add(Q_RESOURCES, token(meta.ndocs));
           final String tstamp = formatDate(new Date(meta.dbtime()), Dtm.FORMAT);
-          res.add(new FAttr(MDATE, token(tstamp)));
-          if(ctx.context.perm(Perm.CREATE, meta))
-            res.add(new FAttr(PATH, token(meta.original)));
+          res.add(Q_MDATE, token(tstamp));
+          if(ctx.context.perm(Perm.CREATE, meta)) res.add(Q_PATH, token(meta.original));
           res.add(token(name));
         } catch(final IOException ex) {
           BXDB_OPEN.thrw(info, ex);
@@ -426,11 +425,9 @@ public final class FNDb extends StandardFunc {
       final byte[] ctype, final long mdate) {
 
     final String tstamp = formatDate(new Date(mdate), Dtm.FORMAT);
-    final FElem res = new FElem(RESOURCE).add(path).
-        add(new FAttr(RAW, token(raw))).
-        add(new FAttr(CTYPE, ctype)).
-        add(new FAttr(MDATE, token(tstamp)));
-    return raw ? res.add(new FAttr(SIZE, token(size))) : res;
+    final FElem res = new FElem(Q_RESOURCE).add(path).
+        add(Q_RAW, token(raw)).add(Q_CTYPE, ctype).add(Q_MDATE, token(tstamp));
+    return raw ? res.add(Q_SIZE, token(size)) : res;
   }
 
   /**
@@ -439,7 +436,7 @@ public final class FNDb extends StandardFunc {
    * @return node
    */
   private static ANode system(final QueryContext ctx) {
-    return toNode(Info.info(ctx.context), SYSTEM);
+    return toNode(Info.info(ctx.context), Q_SYSTEM);
   }
 
   /**
@@ -451,7 +448,7 @@ public final class FNDb extends StandardFunc {
   private ANode info(final QueryContext ctx) throws QueryException {
     final Data data = data(0, ctx);
     final boolean create = ctx.context.user.has(Perm.CREATE);
-    return toNode(InfoDB.db(data.meta, false, true, create), DATABASE);
+    return toNode(InfoDB.db(data.meta, false, true, create), Q_DATABASE);
   }
 
   /**

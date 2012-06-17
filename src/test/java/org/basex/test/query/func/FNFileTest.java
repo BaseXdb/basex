@@ -40,7 +40,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:dir-separator() function.
+   * Test method for the dir-separator() function.
    */
   @Test
   public void fileDirSeparator() {
@@ -49,7 +49,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:path-separator() function.
+   * Test method for the path-separator() function.
    */
   @Test
   public void filePathSeparator() {
@@ -58,7 +58,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:line-separator() function.
+   * Test method for the line-separator() function.
    */
   @Test
   public void fileLineSeparator() {
@@ -66,7 +66,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:exists() function.
+   * Test method for the exists() function.
    */
   @Test
   public void fileExists() {
@@ -80,7 +80,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:is-dir() function.
+   * Test method for the is-dir() function.
    */
   @Test
   public void fileIsDir() {
@@ -95,7 +95,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:is-file() function.
+   * Test method for the is-file() function.
    */
   @Test
   public void fileIsFile() {
@@ -110,7 +110,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:last-modified() function.
+   * Test method for the last-modified() function.
    */
   @Test
   public void fileLastModified() {
@@ -119,7 +119,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:size() function.
+   * Test method for the size() function.
    */
   @Test
   public void fileSize() {
@@ -130,7 +130,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:list() function.
+   * Test method for the list() function.
    */
   @Test
   public void fileList() {
@@ -152,7 +152,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:create-dir() function.
+   * Test method for the create-dir() function.
    */
   @Test
   public void fileCreateDir() {
@@ -168,7 +168,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:delete() function.
+   * Test method for the delete() function.
    */
   @Test
   public void fileDelete() {
@@ -182,7 +182,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:read-text() function.
+   * Test method for the read-text() function.
    */
   @Test
   public void fileReadText() {
@@ -197,7 +197,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:read-binary() function.
+   * Test method for the read-binary() function.
    */
   @Test
   public void fileReadBinary() {
@@ -214,7 +214,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:write() function.
+   * Test method for the write() function.
    */
   @Test
   public void fileWrite() {
@@ -240,7 +240,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:append() function.
+   * Test method for the append() function.
    */
   @Test
   public void fileAppend() {
@@ -267,7 +267,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:write-text() function.
+   * Test method for the write-text() function.
    */
   @Test
   public void fileWriteText() {
@@ -284,7 +284,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:write-text-lines() function.
+   * Test method for the write-text-lines() function.
    */
   @Test
   public void fileWriteTextLines() {
@@ -301,7 +301,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:write-binary() function.
+   * Test method for the write-binary() function.
    */
   @Test
   public void fileWriteBinary() {
@@ -319,7 +319,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:append-binary() function.
+   * Test method for the append-binary() function.
    */
   @Test
   public void fileAppendBinary() {
@@ -337,7 +337,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:append-text() function.
+   * Test method for the append-text() function.
    */
   @Test
   public void fileAppendText() {
@@ -354,7 +354,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:append-text-lines() function.
+   * Test method for the append-text-lines() function.
    */
   @Test
   public void fileAppendTextLines() {
@@ -373,7 +373,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:copy() function.
+   * Test method for the copy() function.
    */
   @Test
   public void fileCopy() {
@@ -392,7 +392,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:move() function.
+   * Test method for the move() function.
    */
   @Test
   public void fileMove() {
@@ -410,7 +410,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:resolve-path() function.
+   * Test method for the resolve-path() function.
    */
   @Test
   public void fileResolvePath() {
@@ -421,7 +421,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:path-to-uri() function.
+   * Test method for the path-to-uri() function.
    */
   @Test
   public void filePathToURI() {
@@ -432,7 +432,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Tests method for file:base-name() function.
+   * Tests method for base-name() function.
    */
   @Test
   public void fileBaseName() {
@@ -451,7 +451,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Tests method for file:dir-name() function.
+   * Tests method for dir-name() function.
    */
   @Test
   public void fileDirName() {
@@ -466,7 +466,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Tests method for file:path-to-native() function.
+   * Tests method for path-to-native() function.
    * @throws IOException I/O exception
    */
   @Test

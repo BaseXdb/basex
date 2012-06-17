@@ -70,7 +70,7 @@ public class UserFunc extends Single {
     cast = r != null;
     ann = a == null ? new Ann() : a;
     declared = d;
-    updating = ann.contains(Ann.UPDATING);
+    updating = ann.contains(Ann.Q_UPDATING);
   }
 
   @Override

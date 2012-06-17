@@ -30,7 +30,7 @@ public final class FNFtTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the 'ft:search()' function.
+   * Test method for the search() function.
    * @throws BaseXException database exception
    */
   @Test
@@ -72,7 +72,7 @@ public final class FNFtTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the 'ft:count()' function.
+   * Test method for the count() function.
    */
   @Test
   public void ftCount() {
@@ -85,7 +85,7 @@ public final class FNFtTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the 'ft:mark()' function.
+   * Test method for the mark() function.
    */
   @Test
   public void ftMark() {
@@ -105,7 +105,7 @@ public final class FNFtTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the 'ft:extract()' function.
+   * Test method for the extract() function.
    */
   @Test
   public void ftExtract() {
@@ -121,7 +121,7 @@ public final class FNFtTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the 'ft:score()' function.
+   * Test method for the score() function.
    */
   @Test
   public void ftScore() {
@@ -131,7 +131,7 @@ public final class FNFtTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the 'ft:tokens()' function.
+   * Test method for the tokens() function.
    * @throws BaseXException database exception
    */
   @Test
@@ -151,7 +151,7 @@ public final class FNFtTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the 'ft:tokenize()' function.
+   * Test method for the tokenize() function.
    */
   @Test
   public void ftTokenize() {

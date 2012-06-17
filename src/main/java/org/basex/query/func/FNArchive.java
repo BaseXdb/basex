@@ -9,14 +9,12 @@ import java.nio.charset.*;
 import java.util.*;
 import java.util.zip.*;
 
-import org.basex.io.*;
 import org.basex.io.in.*;
-import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.path.*;
-import org.basex.query.util.*;
+import org.basex.query.util.archive.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -31,6 +29,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public class FNArchive extends StandardFunc {
+  /** Archive namespace. */
+  private static final Atts NS = new Atts(ARCHIVE, ARCHIVEURI);
   /** Element: Entry. */
   private static final QNm Q_ENTRY = new QNm("archive:entry", ARCHIVEURI);
   /** Element: options. */
@@ -53,20 +53,18 @@ public class FNArchive extends StandardFunc {
   /** Uncompressed size. */
   private static final QNm Q_SIZE = new QNm("size");
   /** Value. */
-  private static final QNm VALUE = new QNm("value");
+  private static final QNm Q_VALUE = new QNm("value");
 
   /** Option: format. */
   private static final byte[] FORMAT = Token.token("format");
-  /** Option: format: zip. */
-  private static final byte[] ZIP = Token.token("zip");
-  /** Option: format: zip. */
-  private static final byte[] GZIP = Token.token("gzip");
   /** Option: algorithm. */
   private static final byte[] ALGORITHM = Token.token("algorithm");
   /** Option: algorithm: deflate. */
   private static final byte[] DEFLATE = Token.token("deflate");
   /** Option: algorithm: stored. */
   private static final byte[] STORED = Token.token("stored");
+  /** Option: algorithm: unknown. */
+  private static final byte[] UNKNOWN = Token.token("unknown");
 
   /**
    * Constructor.
@@ -96,7 +94,7 @@ public class FNArchive extends StandardFunc {
       case _ARCHIVE_UPDATE:  return update(ctx);
       case _ARCHIVE_DELETE:  return delete(ctx);
       case _ARCHIVE_OPTIONS: return options(ctx);
-      default:              return super.item(ctx, ii);
+      default:               return super.item(ctx, ii);
     }
   }
 
@@ -107,46 +105,50 @@ public class FNArchive extends StandardFunc {
    * @throws QueryException query exception
    */
   private B64 create(final QueryContext ctx) throws QueryException {
-    final Iter elem = ctx.iter(expr[0]);
+    final Iter entr = ctx.iter(expr[0]);
     final Iter cont = ctx.iter(expr[1]);
     final Item opt = expr.length > 2 ? expr[2].item(ctx, info) : null;
     final TokenMap map = new FuncParams(Q_OPTIONS, info).parse(opt);
 
-    // check format
-    final byte[] format = map.get(FORMAT);
-    if(format != null && !eq(format, ZIP)) ARCH_SUPP.thrw(info, FORMAT, format);
+    final byte[] f = map.get(FORMAT);
+    final String format = f != null ? string(lc(f)) : "zip";
+    final ArchiveOut out = ArchiveOut.get(format, info);
     // check algorithm
     final byte[] alg = map.get(ALGORITHM);
-    if(alg != null && !eq(alg, DEFLATE)) ARCH_SUPP.thrw(info, ALGORITHM, alg);
+    if(alg != null) {
+      if(format.equals("zip") && !eq(alg, STORED, DEFLATE) ||
+         format.equals("gzip") && !eq(alg, DEFLATE)) {
+        ARCH_SUPP.thrw(info, ALGORITHM, alg);
+      }
+      if(alg.equals(STORED)) out.level(ZipEntry.STORED);
+      else if(alg.equals(DEFLATE)) out.level(ZipEntry.DEFLATED);
+    }
 
-    final ArrayOutput ao = new ArrayOutput();
-    final ZipOutputStream zos = new ZipOutputStream(ao);
     try {
       int e = 0;
       int c = 0;
-      Item elm, con;
+      Item en, cn;
       while(true) {
-        elm = elem.next();
-        con = cont.next();
-        if(elm == null || con == null) break;
-
-        // check entry
-        if(!TEST.eq(elm)) Err.type(this, NodeType.ELM, elm);
-        add((ANode) elm, con, zos);
+        en = entr.next();
+        cn = cont.next();
+        if(en == null || cn == null) break;
+        if(out instanceof GZIPOut && c > 0)
+          ARCH_ONE.thrw(info, format.toUpperCase(Locale.ENGLISH));
+        add(checkElmStr(en), cn, out);
         e++;
         c++;
       }
       // count remaining entries
-      if(con != null) do c++; while(cont.next() != null);
-      if(elm != null) do e++; while(elem.next() != null);
+      if(cn != null) do c++; while(cont.next() != null);
+      if(en != null) do e++; while(entr.next() != null);
       if(e != c) throw ARCH_DIFF.thrw(info, e, c);
-
-      zos.close();
-      return new B64(ao.toArray());
     } catch(final IOException ex) {
       Util.debug(ex);
       throw ARCH_FAIL.thrw(info, ex);
+    } finally {
+      out.close();
     }
+    return new B64(out.toArray());
   }
 
   /**
@@ -157,35 +159,32 @@ public class FNArchive extends StandardFunc {
    */
   private FElem options(final QueryContext ctx) throws QueryException {
     final B64 archive = (B64) checkType(checkItem(expr[0], ctx), AtomType.B64);
+    String format = null;
+    int level = -1;
 
-    final Atts ns = new Atts(ARCHIVE, ARCHIVEURI);
-    LookupInput li = null;
-    byte[] format = null, alg = null;
+    final ArchiveIn arch = ArchiveIn.get(archive.input(info), info);
     try {
-      li = new LookupInput(archive.input(info));
-      if(li.lookup() == 0x50) {
-        format = ZIP;
-        final ZipInputStream zis = new ZipInputStream(li);
-        for(ZipEntry ze; (ze = zis.getNextEntry()) != null;) {
-          if(ze.isDirectory()) continue;
-          if(ze.getMethod() == ZipEntry.DEFLATED) alg = DEFLATE;
-          else if(ze.getMethod() == ZipEntry.STORED) alg = STORED;
-          break;
-        }
-      } else if(li.lookup() == 0x1F) {
-        format = GZIP;
-        alg = DEFLATE;
-      } else {
-        ARCH_UNKNOWN.thrw(info);
+      format = arch.format();
+      while(arch.more()) {
+        final ZipEntry ze = arch.entry();
+        if(ze.isDirectory()) continue;
+        level = ze.getMethod();
+        break;
       }
     } catch(final IOException ex) {
       Util.debug(ex);
-      if(li != null) try { li.close(); } catch(final IOException e) { }
-      throw ARCH_FAIL.thrw(info, ex);
+      ARCH_FAIL.thrw(info, ex);
+    } finally {
+      arch.close();
     }
-    final FElem e = new FElem(Q_OPTIONS, ns);
-    if(format != null) e.add(new FElem(Q_FORMAT).add(new FAttr(VALUE, format)));
-    if(alg != null) e.add(new FElem(Q_ALGORITHM).add(new FAttr(VALUE, alg)));
+
+    // create result element
+    final FElem e = new FElem(Q_OPTIONS, NS);
+    if(format != null) e.add(new FElem(Q_FORMAT).add(Q_VALUE, token(format)));
+    if(level >= 0) {
+      final byte[] lvl = level == 8 ? DEFLATE : level == 0 ? STORED : UNKNOWN;
+      e.add(new FElem(Q_ALGORITHM).add(Q_VALUE, lvl));
+    }
     return e;
   }
 
@@ -199,25 +198,27 @@ public class FNArchive extends StandardFunc {
     final B64 archive = (B64) checkType(checkItem(expr[0], ctx), AtomType.B64);
 
     final ValueBuilder vb = new ValueBuilder();
-    final ZipInputStream zis = new ZipInputStream(archive.input(info));
+    final ArchiveIn in = ArchiveIn.get(archive.input(info), info);
     try {
-      try {
-        for(ZipEntry ze; (ze = zis.getNextEntry()) != null;) {
-          if(ze.isDirectory()) continue;
-          final FElem e = new FElem(Q_ENTRY);
-          e.add(new FAttr(Q_SIZE, token(ze.getSize())));
-          e.add(new FAttr(Q_LAST_MOD, new Dtm(ze.getTime(), info).string(info)));
-          e.add(new FAttr(Q_COMP_SIZE, token(ze.getCompressedSize())));
-          e.add(new FTxt(token(ze.getName())));
-          vb.add(e);
-        }
-      } finally {
-        zis.close();
+      while(in.more()) {
+        final ZipEntry ze = in.entry();
+        if(ze.isDirectory()) continue;
+        final FElem e = new FElem(Q_ENTRY, NS);
+        long s = ze.getSize();
+        if(s != -1) e.add(Q_SIZE, token(s));
+        s = ze.getTime();
+        if(s != -1) e.add(Q_LAST_MOD, new Dtm(s, info).string(info));
+        s = ze.getCompressedSize();
+        if(s != -1) e.add(Q_COMP_SIZE, token(s));
+        e.add(token(ze.getName()));
+        vb.add(e);
       }
       return vb;
     } catch(final IOException ex) {
       Util.debug(ex);
       throw ARCH_FAIL.thrw(info, ex);
+    } finally {
+      in.close();
     }
   }
 
@@ -255,45 +256,47 @@ public class FNArchive extends StandardFunc {
   private B64 update(final QueryContext ctx) throws QueryException {
     final B64 archive = (B64) checkType(checkItem(expr[0], ctx), AtomType.B64);
     // entries to be updated
-    final HashMap<String, Item[]> entries = new HashMap<String, Item[]>();
+    final TokenObjMap<Item[]> hm = new TokenObjMap<Item[]>();
 
-    final Iter elem = ctx.iter(expr[1]);
+    final Iter entr = ctx.iter(expr[1]);
     final Iter cont = ctx.iter(expr[2]);
     int e = 0;
     int c = 0;
-    Item elm, con;
+    Item en, cn;
     while(true) {
-      elm = elem.next();
-      con = cont.next();
-      if(elm == null || con == null) break;
-      if(!TEST.eq(elm)) Err.type(this, NodeType.ELM, elm);
-      entries.put(string(elm.string(info)), new Item[] { elm, con });
+      en = entr.next();
+      cn = cont.next();
+      if(en == null || cn == null) break;
+      hm.add(checkElmStr(en).string(info), new Item[] { en, cn });
       e++;
       c++;
     }
     // count remaining entries
-    if(con != null) do c++; while(cont.next() != null);
-    if(elm != null) do e++; while(elem.next() != null);
-    if(e != c) throw ARCH_DIFF.thrw(info, e, c);
+    if(cn != null) do c++; while(cont.next() != null);
+    if(en != null) do e++; while(entr.next() != null);
+    if(e != c) ARCH_DIFF.thrw(info, e, c);
 
-    final ZipInputStream zis = new ZipInputStream(archive.input(info));
-    final ArrayOutput ao = new ArrayOutput();
-    final ZipOutputStream zos = new ZipOutputStream(ao);
+    ArchiveIn in = ArchiveIn.get(archive.input(info), info);
+    ArchiveOut out = ArchiveOut.get(in.format(), info);
     try {
-      try {
-        // delete entries to be updated
-        delete(entries, zis, zos);
-        // add new and updated entries
-        for(final Item[] it : entries.values()) add((ANode) it[0], it[1], zos);
-      } finally {
-        zos.close();
-        zis.close();
+      if(in instanceof GZIPIn)
+        ARCH_MODIFY.thrw(info, in.format().toUpperCase(Locale.ENGLISH));
+      // delete entries to be updated
+      while(in.more()) if(!hm.contains(token(in.entry().getName()))) out.write(in);
+      // add new and updated entries
+      for(final byte[] h : hm) {
+        if(h == null) continue;
+        final Item[] it = hm.get(h);
+        add(it[0], it[1], out);
       }
     } catch(final IOException ex) {
       Util.debug(ex);
       ARCH_FAIL.thrw(info, ex);
+    } finally {
+      in.close();
+      out.close();
     }
-    return new B64(ao.toArray());
+    return new B64(out.toArray());
   }
 
   /**
@@ -305,27 +308,26 @@ public class FNArchive extends StandardFunc {
   private B64 delete(final QueryContext ctx) throws QueryException {
     final B64 archive = (B64) checkType(checkItem(expr[0], ctx), AtomType.B64);
     // entries to be deleted
-    final HashMap<String, Item[]> entries = new HashMap<String, Item[]>();
+    final TokenObjMap<Item[]> hm = new TokenObjMap<Item[]>();
     final Iter names = ctx.iter(expr[1]);
-    for(Item it; (it = names.next()) != null;) {
-      entries.put(string(checkStr(it, ctx)), null);
+    for(Item en; (en = names.next()) != null;) {
+      hm.add(checkElmStr(en).string(info), null);
     }
 
-    final ZipInputStream zis = new ZipInputStream(archive.input(info));
-    final ArrayOutput ao = new ArrayOutput();
-    final ZipOutputStream zos = new ZipOutputStream(ao);
+    ArchiveIn in = ArchiveIn.get(archive.input(info), info);
+    ArchiveOut out = ArchiveOut.get(in.format(), info);
     try {
-      try {
-        delete(entries, zis, zos);
-      } finally {
-        zos.close();
-        zis.close();
-      }
+      if(in instanceof GZIPIn)
+        ARCH_MODIFY.thrw(info, in.format().toUpperCase(Locale.ENGLISH));
+      while(in.more()) if(!hm.contains(token(in.entry().getName()))) out.write(in);
     } catch(final IOException ex) {
       Util.debug(ex);
       ARCH_FAIL.thrw(info, ex);
+    } finally {
+      in.close();
+      out.close();
     }
-    return new B64(ao.toArray());
+    return new B64(out.toArray());
   }
 
   /**
@@ -336,91 +338,75 @@ public class FNArchive extends StandardFunc {
    */
   private TokenList extract(final QueryContext ctx) throws QueryException {
     final B64 archive = (B64) checkType(checkItem(expr[0], ctx), AtomType.B64);
-    HashSet<String> entries = null;
+    TokenSet hs = null;
     if(expr.length > 1) {
       // filter result to specified entries
-      entries = new HashSet<String>();
+      hs = new TokenSet();
       final Iter names = ctx.iter(expr[1]);
-      for(Item it; (it = names.next()) != null;) entries.add(string(checkStr(it, ctx)));
+      for(Item en; (en = names.next()) != null;) {
+        hs.add(checkElmStr(en).string(info));
+      }
     }
 
     final TokenList tl = new TokenList();
-    final byte[] data = new byte[IO.BLOCKSIZE];
-    final ZipInputStream zis = new ZipInputStream(archive.input(info));
+    final ArchiveIn in = ArchiveIn.get(archive.input(info), info);
     try {
-      try {
-        for(ZipEntry ze; (ze = zis.getNextEntry()) != null;) {
-          if(ze.isDirectory()) continue;
-          final String name = ze.getName();
-          if(entries != null && !entries.remove(name)) continue;
-          final ArrayOutput ao = new ArrayOutput();
-          for(int c; (c = zis.read(data)) != -1;) ao.write(data, 0, c);
-          tl.add(ao.toArray());
-        }
-      } finally {
-        zis.close();
+      while(in.more()) {
+        final ZipEntry ze = in.entry();
+        if(ze.isDirectory()) continue;
+        if(hs == null || hs.delete(token(ze.getName())) != 0) tl.add(in.read());
       }
     } catch(final IOException ex) {
       Util.debug(ex);
       ARCH_FAIL.thrw(info, ex);
+    } finally {
+      in.close();
     }
     return tl;
   }
 
   /**
-   * Adds all files to the output stream that are not specified in the map.
-   * @param entries entries to be deleted
-   * @param zis input stream
-   * @param zos output stream
-   * @throws IOException I/O exception
-   */
-  private void delete(final HashMap<String, Item[]> entries, final ZipInputStream zis,
-      final ZipOutputStream zos) throws IOException {
-
-    final byte[] data = new byte[IO.BLOCKSIZE];
-    for(ZipEntry ze; (ze = zis.getNextEntry()) != null;) {
-      final String name = ze.getName();
-      if(entries.containsKey(name)) continue;
-      final ZipEntry zen = new ZipEntry(name);
-      zen.setTime(ze.getTime());
-      zen.setComment(ze.getComment());
-      zos.putNextEntry(zen);
-      for(int c; (c = zis.read(data)) != -1;) zos.write(data, 0, c);
-    }
-  }
-
-  /**
    * Adds the specified entry to the output stream.
-   * @param el entry descriptor
+   * @param entry entry descriptor
    * @param con contents
-   * @param zos output stream
+   * @param out output archive
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private void add(final ANode el, final Item con, final ZipOutputStream zos)
+  private void add(final Item entry, final Item con, final ArchiveOut out)
       throws QueryException, IOException {
 
     // create new zip entry
-    final String name = string(el.string());
-    if(name.isEmpty()) ARCH_NAME.thrw(info);
+    final String name = string(entry.string(info));
+    if(name.isEmpty()) ARCH_EMPTY.thrw(info);
     final ZipEntry ze = new ZipEntry(name);
+    String en = null;
 
     // compression level
-    int lvl = Deflater.DEFAULT_COMPRESSION;
-    final byte[] level = el.attribute(Q_LEVEL);
-    if(level != null) {
-      lvl = toInt(level);
-      if(lvl < 0 || lvl > 9) ARCH_LEVEL.thrw(info, level);
-    }
-    zos.setLevel(lvl);
+    if(entry instanceof ANode) {
+      final ANode el = (ANode) entry;
+      final byte[] level = el.attribute(Q_LEVEL);
+      if(level != null) {
+        int l = toInt(level);
+        if(l < 0 || l > 9) ARCH_LEVEL.thrw(info, level);
+        ze.setMethod(l);
+      }
 
-    // last modified
-    final byte[] mod = el.attribute(Q_LAST_MOD);
-    if(mod != null) {
-      try {
-        ze.setTime(new Int(new Dtm(mod, info)).itr());
-      } catch(final QueryException qe) {
-        ARCH_MODIFIED.thrw(info, mod);
+      // last modified
+      final byte[] mod = el.attribute(Q_LAST_MOD);
+      if(mod != null) {
+        try {
+          ze.setTime(new Int(new Dtm(mod, info)).itr());
+        } catch(final QueryException qe) {
+          ARCH_DATETIME.thrw(info, mod);
+        }
+      }
+
+      // encoding
+      final byte[] enc = el.attribute(Q_ENCODING);
+      if(enc != null) {
+        en = string(enc);
+        if(!Charset.isSupported(en)) ARCH_ENCODING.thrw(info, enc);
       }
     }
 
@@ -428,19 +414,13 @@ public class FNArchive extends StandardFunc {
     byte[] val = null;
     if(con.type.isString()) {
       val = con.string(info);
-      final byte[] enc = el.attribute(Q_ENCODING);
-      if(enc != null) {
-        final String en = string(enc);
-        if(!Charset.isSupported(en)) ARCH_ENCODING.thrw(info, enc);
-        if(en != Token.UTF8) val = encode(val, en);
-      }
+      if(en != null && en != Token.UTF8) val = encode(val, en);
     } else if(con.type == AtomType.B64) {
       val = ((Bin) con).binary(info);
     } else {
       STRB64TYPE.thrw(info, con.type);
     }
-    zos.putNextEntry(ze);
-    zos.write(val);
+    out.write(ze, val);
   }
 
   /**
@@ -456,5 +436,16 @@ public class FNArchive extends StandardFunc {
     } catch(final IOException ex) {
       throw ARCH_ENCODE.thrw(info, ex);
     }
+  }
+
+  /**
+   * Checks if the specified item is a string or element.
+   * @param it item to be checked
+   * @return item
+   * @throws QueryException query exception
+   */
+  private Item checkElmStr(final Item it) throws QueryException {
+    if(it.type.isString() || TEST.eq(it)) return it;
+    throw ELMSTRTYPE.thrw(info, Q_ENTRY.string(), it.type);
   }
 }

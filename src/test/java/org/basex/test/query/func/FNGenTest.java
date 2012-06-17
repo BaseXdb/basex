@@ -17,7 +17,7 @@ public final class FNGenTest extends AdvancedQueryTest {
   private static final String TEXT = "src/test/resources/input.xml";
 
   /**
-   * Test method for the fn:unparsed-text() function.
+   * Test method for the unparsed-text() function.
    */
   @Test
   public void fnUnparsedText() {
@@ -28,7 +28,7 @@ public final class FNGenTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the fn:parse-xml() function.
+   * Test method for the parse-xml() function.
    */
   @Test
   public void fnParseXML() {
@@ -37,7 +37,7 @@ public final class FNGenTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the fn:serialize() function.
+   * Test method for the serialize() function.
    */
   @Test
   public void fnSerialize() {

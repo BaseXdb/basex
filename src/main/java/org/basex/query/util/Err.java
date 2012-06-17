@@ -156,18 +156,22 @@ public enum Err {
   ARCH_DIFF(ARCH, 1, "Number of entries (%) and contents (%) differs."),
   /** ARCH0002. */
   ARCH_UNKNOWN(ARCH, 2, "Packing format not supported."),
+  /** ARCH0002. */
+  ARCH_SUPP(ARCH, 2, "% not supported: '%'."),
   /** ARCH0003. */
-  ARCH_NAME(ARCH, 3, "Name of ZIP entry must not be empty."),
+  ARCH_EMPTY(ARCH, 3, "Name of ZIP entry must not be empty."),
   /** ARCH0003. */
   ARCH_LEVEL(ARCH, 3, "Invalid compression level: '%'."),
   /** ARCH0003. */
-  ARCH_MODIFIED(ARCH, 3, "xs:dateTime value is invalid : '%'."),
+  ARCH_DATETIME(ARCH, 3, "xs:dateTime value is invalid : '%'."),
   /** ARCH0004. */
   ARCH_ENCODING(ARCH, 4, "Encoding is not supported: '%'."),
   /** ARCH0004. */
   ARCH_ENCODE(ARCH, 4, "String conversion: %."),
   /** ARCH0005. */
-  ARCH_SUPP(ARCH, 5, "% not supported: '%'."),
+  ARCH_MODIFY(ARCH, 5, "Entries of % archive cannot be modified."),
+  /** ARCH0006. */
+  ARCH_ONE(ARCH, 6, "% archives are limited to a single entry."),
    /** ARCH9999. */
   ARCH_FAIL(ARCH, 9999, "Operation failed: %."),
 
@@ -371,15 +375,15 @@ public enum Err {
   /** FORG0006. */
   ERRFORM(FORG, 6, "%: %."),
   /** FORG0006. */
-  BINSTRTYPE(FORG, 6, "Binary or string expected, % found"),
-  /** FORG0006. */
   BINARYTYPE(FORG, 6, "Binary item expected, % found"),
   /** FORG0006. */
   STRNODTYPE(FORG, 6, "%: string or node expected, % found."),
   /** FORG0006. */
   ELMMAPTYPE(FORG, 6, "element(%) or map expected, % found"),
   /** FORG0006. */
-  STRB64TYPE(ARCH, 2, "String or Base64 expected, % found"),
+  ELMSTRTYPE(FORG, 6, "element(%) or string expected, % found"),
+  /** FORG0006. */
+  STRB64TYPE(FORG, 6, "String or Base64 expected, % found"),
   /** FORG0006. */
   ELMOPTION(FORG, 6, "Unknown option: %."),
 
