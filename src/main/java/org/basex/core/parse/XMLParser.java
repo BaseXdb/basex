@@ -46,12 +46,12 @@ final class XMLParser extends CmdParser {
       if(!execute(COMMANDS, node).isEmpty()) {
         query = COMMANDS + query;
         if(execute(COMMANDS + "[not(text())]", node).isEmpty())
-          throw error("Expected syntax: <commands><...></commands>");
+          throw error(Text.SYNTAX_X, "<commands><...></commands>");
       }
       final QueryProcessor qa = new QueryProcessor(query, ctx).context(node);
       for(final Item ia : qa.value()) list.add(command(ia));
     } catch(final IOException ex) {
-      throw error("Command parsing: %", ex);
+      throw error(Text.PARSING_CC + "%", ex);
     }
   }
 
@@ -167,7 +167,7 @@ final class XMLParser extends CmdParser {
       return new Store(value(root, PATH), xml(root));
     if(e.equals(XQUERY) && check(root, "#" + QUERY))
       return new XQuery(value(root));
-    throw error("Unknown command <%/>.", e);
+    throw error(Text.UNKNOWN_CMD_X, "<" + e + "/>");
   }
 
   /**
@@ -298,7 +298,7 @@ final class XMLParser extends CmdParser {
     } else {
       syntax.add("/>");
     }
-    throw error("Syntax: %", syntax);
+    throw error(Text.SYNTAX_X, syntax);
   }
 
   /**
