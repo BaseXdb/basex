@@ -64,7 +64,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Exports a database. */
-  C_EXPORT(EXPORT + DOTS, null, H_EXPORT, true, false) {
+  C_EXPORT(EXPORT + DOTS, "% shift E", H_EXPORT, true, false) {
     @Override
     public void execute(final GUI gui) {
       final DialogExport dialog = new DialogExport(gui);
@@ -109,7 +109,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Closes the database. */
-  C_CLOSE(CLOSE, null, H_CLOSE, true, false) {
+  C_CLOSE(CLOSE, "% shift W", H_CLOSE, true, false) {
     @Override
     public void execute(final GUI gui) {
       gui.execute(new Close());
