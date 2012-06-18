@@ -49,7 +49,7 @@ public class TokenMgrError extends Error {
    * @return escaped string
    */
   protected static final String addEscapes(final String str) {
-    StringBuffer retval = new StringBuffer();
+    final StringBuilder retval = new StringBuilder();
     char ch;
     for (int i = 0; i < str.length(); i++) {
       switch (str.charAt(i)) {
@@ -81,7 +81,7 @@ public class TokenMgrError extends Error {
           continue;
         default:
           if ((ch = str.charAt(i)) < 0x20 || ch > 0x7e) {
-            String s = "0000" + Integer.toString(ch, 16);
+            final String s = "0000" + Integer.toString(ch, 16);
             retval.append("\\u" + s.substring(s.length() - 4, s.length()));
           } else {
             retval.append(ch);
@@ -108,7 +108,7 @@ public class TokenMgrError extends Error {
   protected static String lexicalError(final boolean eof, final int state, final int line,
       final int col, final String after, final char curr) {
     return "Lexical error at line " + line + ", column " + col + ".  Encountered: " +
-      (eof ? "<EOF> " : ("\"" + addEscapes(String.valueOf(curr)) + "\"") +
+      (eof ? "<EOF> " : "\"" + addEscapes(String.valueOf(curr)) + "\"" +
         " (" + (int) curr + "), ") + "after : \"" + addEscapes(after) + "\"";
   }
 

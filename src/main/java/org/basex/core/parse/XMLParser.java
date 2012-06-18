@@ -46,7 +46,7 @@ final class XMLParser extends CmdParser {
       if(!execute(COMMANDS, node).isEmpty()) {
         query = COMMANDS + query;
         if(execute(COMMANDS + "[not(text())]", node).isEmpty())
-          throw error(Text.SYNTAX_X, "<commands><...></commands>");
+          throw error(Text.SYNTAX_X, "<" + COMMANDS + "><...></" + COMMANDS + ">");
       }
       final QueryProcessor qa = new QueryProcessor(query, ctx).context(node);
       for(final Item ia : qa.value()) list.add(command(ia));

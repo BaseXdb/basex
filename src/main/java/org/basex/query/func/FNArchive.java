@@ -276,8 +276,8 @@ public class FNArchive extends StandardFunc {
     if(en != null) do e++; while(entr.next() != null);
     if(e != c) ARCH_DIFF.thrw(info, e, c);
 
-    ArchiveIn in = ArchiveIn.get(archive.input(info), info);
-    ArchiveOut out = ArchiveOut.get(in.format(), info);
+    final ArchiveIn in = ArchiveIn.get(archive.input(info), info);
+    final ArchiveOut out = ArchiveOut.get(in.format(), info);
     try {
       if(in instanceof GZIPIn)
         ARCH_MODIFY.thrw(info, in.format().toUpperCase(Locale.ENGLISH));
@@ -314,8 +314,8 @@ public class FNArchive extends StandardFunc {
       hm.add(checkElmStr(en).string(info), null);
     }
 
-    ArchiveIn in = ArchiveIn.get(archive.input(info), info);
-    ArchiveOut out = ArchiveOut.get(in.format(), info);
+    final ArchiveIn in = ArchiveIn.get(archive.input(info), info);
+    final ArchiveOut out = ArchiveOut.get(in.format(), info);
     try {
       if(in instanceof GZIPIn)
         ARCH_MODIFY.thrw(info, in.format().toUpperCase(Locale.ENGLISH));
@@ -387,7 +387,7 @@ public class FNArchive extends StandardFunc {
       final ANode el = (ANode) entry;
       final byte[] level = el.attribute(Q_LEVEL);
       if(level != null) {
-        int l = toInt(level);
+        final int l = toInt(level);
         if(l < 0 || l > 9) ARCH_LEVEL.thrw(info, level);
         ze.setMethod(l);
       }

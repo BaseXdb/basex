@@ -92,17 +92,17 @@ public class ParseException extends Exception {
    */
   private static String initialise(final Token curr, final int[][] exps,
       final String[] img) {
-    String eol = System.getProperty("line.separator", "\n");
-    StringBuffer expected = new StringBuffer();
+    final String eol = System.getProperty("line.separator", "\n");
+    final StringBuilder expected = new StringBuilder();
     int maxSize = 0;
-    for (int i = 0; i < exps.length; i++) {
-      if (maxSize < exps[i].length) {
-        maxSize = exps[i].length;
+    for(final int[] exp : exps) {
+      if (maxSize < exp.length) {
+        maxSize = exp.length;
       }
-      for (int j = 0; j < exps[i].length; j++) {
-        expected.append(img[exps[i][j]]).append(' ');
+      for (int j = 0; j < exp.length; j++) {
+        expected.append(img[exp[j]]).append(' ');
       }
-      if (exps[i][exps[i].length - 1] != 0) {
+      if (exp[exp.length - 1] != 0) {
         expected.append("...");
       }
       expected.append(eol).append("    ");
@@ -145,7 +145,7 @@ public class ParseException extends Exception {
    * @return escaped string
    */
   static String addEscapes(final String str) {
-      StringBuffer retval = new StringBuffer();
+      final StringBuilder retval = new StringBuilder();
       char ch;
       for (int i = 0; i < str.length(); i++) {
         switch (str.charAt(i)) {
@@ -177,7 +177,7 @@ public class ParseException extends Exception {
               continue;
            default:
               if ((ch = str.charAt(i)) < 0x20 || ch > 0x7e) {
-                 String s = "0000" + Integer.toString(ch, 16);
+                 final String s = "0000" + Integer.toString(ch, 16);
                  retval.append("\\u" + s.substring(s.length() - 4, s.length()));
               } else {
                  retval.append(ch);
