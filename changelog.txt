@@ -3,6 +3,24 @@
  Welcome to the changelog. This file contains all code changes since
  BaseX 6.5:
 
+VERSION 7.3 (June 18, 2012) --------------------------------------------
+
+  - Many new internal XQuery Modules have been added, and existing
+    ones have been revised to ensure long-term stability of your future 
+    XQuery applications: http://docs.basex.org/wiki/Module_Library
+  - A new powerful Command API is provided to specify BaseX commands
+    and scripts as XML: http://docs.basex.org/wiki/Commands#Basics
+  - The full-text fuzzy index was extended to also support wildcard
+    queries: http://docs.basex.org/wiki/Full-Text
+  - The XQuery 3.0 simple map operator gives you a compact syntax to
+    process items of sequences: http://docs.basex.org/wiki/XQuery_3.0
+  - BaseX as Web Application can now start its own server instance:
+    http://docs.basex.org/wiki/Web_Application
+  - All command-line options will now be executed in the given order: 
+    http://docs.basex.org/wiki/Startup_Options
+  - Charles Foster's latest XQJ Driver supports XQuery 3.0 and the
+    Update and Full Text extensions: http://xqj.net/basex/
+
 VERSION 7.2.1 (April 27, 2012) -----------------------------------------
 
   - Our value indexes now support string-based range queries:
