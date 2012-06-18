@@ -90,6 +90,9 @@ public final class SimpleTest extends QueryTest {
       { "ContextItem 7", node(0), "try { <a/>/(1+'') } catch * {.}" },
 
       { "Path 1", empty(), "<a/>[./(@*)]" },
+
+      { "Cast 1", itr(1), "xs:integer('+1')" },
+      { "Cast 2", "xs:integer('++1')" },
     };
   }
 }

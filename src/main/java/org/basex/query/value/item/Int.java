@@ -147,10 +147,9 @@ public class Int extends Num {
     // try fast conversion
     final long l = Token.toLong(val);
     if(l != Long.MIN_VALUE) return l;
-
+    // fails; choose default conversion
     try {
-      final String v = Token.string(Token.trim(val));
-      return Long.parseLong(v.startsWith("+") ? v.substring(1) : v);
+      return Long.parseLong(Token.string(val).trim());
     } catch(final NumberFormatException ex) {
       throw NUMS[0].castErr(val, ii);
     }
