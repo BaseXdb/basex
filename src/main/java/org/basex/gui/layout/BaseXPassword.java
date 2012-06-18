@@ -23,6 +23,7 @@ public final class BaseXPassword extends JPasswordField {
 
     if(!(win instanceof BaseXDialog)) return;
 
+    addKeyListener(((BaseXDialog) win).keys);
     addMouseListener(new MouseAdapter() {
       @Override
       public void mouseEntered(final MouseEvent e) {

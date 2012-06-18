@@ -1,6 +1,7 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
+import static org.basex.gui.GUIConstants.*;
 
 import java.awt.*;
 import java.io.*;
@@ -26,7 +27,7 @@ import org.basex.util.list.*;
  */
 public final class DialogServer extends BaseXDialog {
   /** Password textfield. */
-  private final BaseXPassword logpass;
+  private final BaseXPassword admpass;
 
   /** Tabulators. */
   final BaseXTabs tabs;
@@ -41,7 +42,7 @@ public final class DialogServer extends BaseXDialog {
   /** Log panel. */
   final BaseXBack logs = new BaseXBack();
   /** Username textfield. */
-  final BaseXTextField loguser;
+  final BaseXTextField admuser;
   /** Disconnect button. */
   final BaseXButton disconnect;
   /** Refresh button. */
@@ -109,8 +110,8 @@ public final class DialogServer extends BaseXDialog {
     host = new BaseXTextField(mprop.get(MainProp.HOST), this);
     ports = new BaseXTextField(Integer.toString(mprop.num(MainProp.SERVERPORT)), this);
     portc = new BaseXTextField(Integer.toString(mprop.num(MainProp.PORT)), this);
-    loguser = new BaseXTextField(gui.gprop.get(GUIProp.SERVERUSER), this);
-    logpass = new BaseXPassword(this);
+    admuser = new BaseXTextField(gui.gprop.get(GUIProp.SERVERUSER), this);
+    admpass = new BaseXPassword(this);
     infoC = new BaseXLabel(" ").border(12, 0, 0, 0);
 
     // local server panel
@@ -133,9 +134,9 @@ public final class DialogServer extends BaseXDialog {
     // login panel
     pp = new BaseXBack(new TableLayout(5, 2, 8, 4));
     pp.add(new BaseXLabel(USERNAME + COLS));
-    pp.add(loguser);
+    pp.add(admuser);
     pp.add(new BaseXLabel(PASSWORD + COLS));
-    pp.add(logpass);
+    pp.add(admpass);
     pp.add(new BaseXLabel(S_HOST + COLS));
     pp.add(host);
     pp.add(new BaseXLabel(S_PORT + COLS));
@@ -259,13 +260,16 @@ public final class DialogServer extends BaseXDialog {
     String msg = null;
     String msg2 = null;
 
+    final boolean wait = cmp == start || cmp == stop || cmp == connect;
+    if(wait) setCursor(CURSORWAIT);
+
     try {
       if(cmp == start) {
         final String p = ports.getText();
         gui.setMain(MainProp.SERVERPORT, p);
         if(host.getText().equals(LOCALHOST)) {
           gui.setMain(MainProp.PORT, p);
-          gui.setMain(MainProp.EVENTPORT, Integer.toString(Integer.valueOf(p) + 1));
+          gui.setMain(MainProp.EVENTPORT, Integer.valueOf(p) + 1);
           portc.setText(p);
         }
         try {
@@ -278,30 +282,30 @@ public final class DialogServer extends BaseXDialog {
           icon = Msg.ERROR;
         }
       } else if(cmp == stop) {
-        gui.gprop.set(GUIProp.SERVERUSER, loguser.getText());
+        gui.gprop.set(GUIProp.SERVERUSER, admuser.getText());
         if(running) BaseXServer.stop(mprop.num(MainProp.SERVERPORT),
             mprop.num(MainProp.EVENTPORT));
         running = ping(true);
         connected = connected && ping(false);
         if(!connected) msg = SRV_STOPPED;
-        if(host.getText().equals(LOCALHOST)) logpass.setText("");
+        if(host.getText().equals(LOCALHOST)) admpass.setText("");
         if(!connected) setTitle(S_SERVER_ADMIN);
       } else if(cmp == connect) {
-        final String pw = new String(logpass.getPassword());
+        final String pw = new String(admpass.getPassword());
+        admpass.setText("");
         gui.setMain(MainProp.HOST, host.getText());
         gui.setMain(MainProp.PORT, Integer.parseInt(portc.getText()));
         cs = new ClientSession(ctx, gui.gprop.get(GUIProp.SERVERUSER), pw);
         user.setSess(cs);
         dbsP.setSess(cs);
         connected = true;
-        setTitle(S_SERVER_ADMIN + LI + loguser.getText() + '@' +
+        setTitle(S_SERVER_ADMIN + LI + admuser.getText() + '@' +
                 host.getText() + COL + portc.getText());
         msg = Util.info(S_CONNECTED, host.getText(), portc.getText());
         refreshSess();
       } else if(cmp == disconnect) {
         cs.execute(new Exit());
         connected = false;
-        logpass.setText("");
         setTitle(S_SERVER_ADMIN);
         msg = S_DISCONNECTED;
       } else if(cmp == refreshSess) {
@@ -350,13 +354,14 @@ public final class DialogServer extends BaseXDialog {
         }
       }
     }
+    if(wait) setCursor(CURSORARROW);
 
     final boolean valp = portc.getText().matches("[\\d]+") &&
       Integer.parseInt(portc.getText()) <= 65535;
     final boolean valpl = ports.getText().matches("[\\d]+") &&
       Integer.parseInt(ports.getText()) <= 65535;
-    final boolean vallu = loguser.getText().matches("[\\w]*");
-    final boolean vallp = new String(logpass.getPassword()).matches("[^ ;'\"]*");
+    final boolean vallu = admuser.getText().matches("[\\w]*");
+    final boolean vallp = new String(admpass.getPassword()).matches("[^ ;'\"]*");
     final boolean valh = host.getText().matches("([\\w]+://)?[\\w.-]+");
 
     if(msg == null && msg2 == null &&
@@ -371,12 +376,12 @@ public final class DialogServer extends BaseXDialog {
     ports.setEnabled(!running);
     start.setEnabled(!running && valpl);
     stop.setEnabled(running);
-    loguser.setEnabled(!connected);
-    logpass.setEnabled(!connected);
+    admuser.setEnabled(!connected);
+    admpass.setEnabled(!connected);
     host.setEnabled(!connected);
     portc.setEnabled(!connected);
     connect.setEnabled(!connected && vallu && vallp && valh && valp &&
-        !loguser.getText().isEmpty() && logpass.getPassword().length != 0);
+        !admuser.getText().isEmpty() && admpass.getPassword().length != 0);
     disconnect.setEnabled(connected);
     tabs.setEnabledAt(1, connected);
     tabs.setEnabledAt(2, connected);
@@ -385,8 +390,8 @@ public final class DialogServer extends BaseXDialog {
     refreshLog.setEnabled(logc.getSelectedIndex() != -1);
     delete.setEnabled(logc.getSelectedIndex() != -1);
     deleteAll.setEnabled(logc.getItemCount() > 0);
-    if(loguser.hasFocus()) {
-      logpass.setText("");
+    if(admuser.hasFocus()) {
+      admpass.setText("");
       connect.setEnabled(false);
     }
     mprop.write();

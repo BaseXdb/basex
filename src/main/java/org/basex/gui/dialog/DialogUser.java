@@ -141,7 +141,7 @@ final class DialogUser extends BaseXBack {
         final Perm perm = Perm.values()[(Integer) o[2] - (g ? 0 : 1)];
         final String uname = table.getModel().getValueAt((Integer) o[1], 0).toString();
 
-        final boolean confirm = !g && uname.equals(dia.loguser.getText());
+        final boolean confirm = !g && uname.equals(dia.admuser.getText());
         if(confirm && !BaseXDialog.confirm(dia.gui, Util.info(S_DBREVOKE))) return;
 
         sess.execute(new Grant(perm, uname, db));

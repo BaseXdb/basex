@@ -169,7 +169,7 @@ public final class BaseXLayout {
     }
 
     if(!(win instanceof GUI)) {
-      Util.notexpected("Reference to main window required to add shortcuts.");
+      Util.notexpected("Reference to main window expected.");
       return;
     }
     final GUI gui = (GUI) win;
