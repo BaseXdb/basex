@@ -23,6 +23,8 @@ interface RestXqText {
   byte[] HEADER_PARAM = token("header-param");
   /** Annotation "cookie-param". */
   byte[] COOKIE_PARAM = token("cookie-param");
+  /** Annotation "session-id". */
+  byte[] SESSION_ID = token("session-id");
 
   /** Token "header". */
   byte[] HEADER = token("header");
@@ -65,6 +67,8 @@ interface RestXqText {
   String HEAD_METHOD = "HEAD method must only return 'rest:reponse' element.";
   /** Error message. */
   String METHOD_VALUE = "Method % does not allow values.";
+  /** Error message. */
+  String SESSION_VALUE = "Annotation % requires a value.";
   /** Error message. */
   String INPUT_CONV = "Input could not be converted: %";
 }

@@ -271,6 +271,13 @@ public final class RestXqTest extends HTTPTest {
         "function m:f($v) {$v};", "?a=1", "1");
   }
 
+  /** Retrieve session id.
+   * @throws Exception exception */
+  @Test public void sessionID() throws Exception {
+    get("declare %R:path('') %R:session-id('{$a}') function m:f($a) { count($a) };",
+        "", "1");
+  }
+
   // PRIVATE METHODS ==========================================================
 
   /**

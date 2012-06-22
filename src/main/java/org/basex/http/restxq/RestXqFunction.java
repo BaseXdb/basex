@@ -63,6 +63,8 @@ final class RestXqFunction {
   private String[] segments;
   /** Post/Put variable. */
   private QNm requestBody;
+  /** Session id variable. */
+  private QNm sessionID;
 
   /**
    * Constructor.
@@ -115,6 +117,11 @@ final class RestXqFunction {
         } else if(eq(COOKIE_PARAM, local)) {
           // annotation "cookie-param"
           cookieParams.add(param(value, name));
+        } else if(eq(SESSION_ID, local)) {
+          // remember post/put variable
+          if(sessionID != null) error(ANN_TWICE, "%", name.string());
+          if(value.isEmpty()) error(SESSION_VALUE, name);
+          sessionID = checkVariable(toString(value, name));
         } else {
           // method annotations
           final HTTPMethod m = HTTPMethod.get(string(local));
@@ -191,6 +198,10 @@ final class RestXqFunction {
       } catch(final IOException ex) {
         error(INPUT_CONV, ex);
       }
+    }
+
+    if(sessionID != null) {
+      bind(sessionID, Str.get(http.req.getSession().getId()));
     }
 
     // bind query parameters
