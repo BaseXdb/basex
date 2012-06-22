@@ -48,7 +48,7 @@ public final class HTTPContext {
   /** Full path. */
   private final String path;
   /** Current user session. */
-  private Session session;
+  private LocalSession session;
   /** User name. */
   private String user;
   /** Password. */
@@ -224,25 +224,23 @@ public final class HTTPContext {
   }
 
   /**
-   * Creates a new session instance. By default, a {@link LocalSession}
-   * instance will be generated. A {@link ClientSession} will be created
-   * if "client" has been chosen an operation mode.
+   * Creates a new {@link LocalSession} instance.
    * @return database session
    * @throws IOException I/O exception
    */
-  public Session session() throws IOException {
-    if(user == null || user.isEmpty() || pass == null || pass.isEmpty())
-      throw new LoginException(NOPASSWD);
-
-    if(session == null) session = new LocalSession(context(), user, pass);
+  public LocalSession session() throws IOException {
+    if(session == null) {
+      if(user == null || user.isEmpty() || pass == null || pass.isEmpty())
+        throw new LoginException(NOPASSWD);
+      session = new LocalSession(context(), user, pass);
+    }
     return session;
   }
 
   /**
    * Closes an open database session.
-   * @throws IOException I/O exception
    */
-  public void close() throws IOException {
+  public void close() {
     if(session != null) session.close();
   }
 

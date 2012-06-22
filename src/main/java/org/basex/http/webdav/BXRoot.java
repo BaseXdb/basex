@@ -67,7 +67,8 @@ public final class BXRoot extends BXFolder {
       @Override
       public List<BXResource> get() throws IOException {
         final List<BXResource> dbs = new ArrayList<BXResource>();
-        final Query q = http.session().query("for $d in " + _DB_LIST_DETAILS.args() +
+        final LocalQuery q = http.session().query(
+            "for $d in " + _DB_LIST_DETAILS.args() +
             "return ($d/text(), $d/@modified-date/data())");
         try {
           while(q.more()) {
@@ -117,7 +118,7 @@ public final class BXRoot extends BXFolder {
 
   @Override
   protected void addRaw(final String n, final InputStream in) throws IOException {
-    final Session session = http.session();
+    final LocalSession session = http.session();
     session.execute(new CreateDB(dbname(n)));
     session.store(n, in);
   }

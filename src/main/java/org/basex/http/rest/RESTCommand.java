@@ -35,7 +35,7 @@ public class RESTCommand extends RESTCode {
     http.initResponse(new SerializerProp(sprop));
 
     // perform command
-    final Session session = http.session();
+    final LocalSession session = http.session();
     session.setOutputStream(http.res.getOutputStream());
     session.execute(input);
   }

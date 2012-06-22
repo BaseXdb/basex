@@ -79,7 +79,7 @@ public final class BXFile extends BXAbstractResource implements FileResource {
     new BXCode<Object>(this) {
       @Override
       public void run() throws IOException {
-        final Session session = http.session();
+        final LocalSession session = http.session();
         session.setOutputStream(out);
         final Query q = session.query(raw ? "declare option output:method 'raw'; " +
             _DB_RETRIEVE.args("$db", "$path") : _DB_OPEN.args("$db", "$path"));
@@ -94,8 +94,7 @@ public final class BXFile extends BXAbstractResource implements FileResource {
   protected void copyToRoot(final String n) throws IOException {
     // document is copied to the root: create new database with it
     final String nm = dbname(n);
-    final Session session = http.session();
-    session.execute(new CreateDB(nm));
+    http.session().execute(new CreateDB(nm));
     add(nm, n);
   }
 
@@ -113,8 +112,8 @@ public final class BXFile extends BXAbstractResource implements FileResource {
    * @throws IOException I/O exception
    */
   protected void add(final String tdb, final String tpath) throws IOException {
-    final Session session = http.session();
-    final Query q = session.query(
+    final LocalSession session = http.session();
+    final LocalQuery q = session.query(
         "if(" + _DB_IS_RAW.args("$db", "$path") + ") then " +
         _DB_STORE.args("$tdb", "$tpath", _DB_RETRIEVE.args("$db", "$path")) +
         " else " + _DB_ADD.args("$tdb",

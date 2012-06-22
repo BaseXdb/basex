@@ -60,7 +60,7 @@ class RESTQuery extends RESTCode {
   protected void query(final String in, final HTTPContext http, final String path)
       throws HTTPException, IOException {
 
-    final Session session = http.session();
+    final LocalSession session = http.session();
     if(item != null) {
       // create main memory instance of the document specified as context node
       final boolean mm = session.execute(

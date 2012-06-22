@@ -72,7 +72,7 @@ abstract class RESTCode {
    * @throws IOException I/O exception
    */
   protected static boolean exists(final HTTPContext http) throws IOException {
-    final Query q = http.session().query(_DB_EXISTS.args("$d", "$p"));
+    final LocalQuery q = http.session().query(_DB_EXISTS.args("$d", "$p"));
     q.bind("d", http.db());
     q.bind("p", http.dbpath());
     return q.execute().equals(Text.TRUE);
@@ -85,7 +85,7 @@ abstract class RESTCode {
    * @throws IOException I/O exception
    */
   protected static boolean isRaw(final HTTPContext http) throws IOException {
-    final Query q = http.session().query(_DB_IS_RAW.args("$d", "$p"));
+    final LocalQuery q = http.session().query(_DB_IS_RAW.args("$d", "$p"));
     q.bind("d", http.db());
     q.bind("p", http.dbpath());
     return q.execute().equals(Text.TRUE);
@@ -98,7 +98,7 @@ abstract class RESTCode {
    * @throws IOException I/O exception
    */
   protected static String contentType(final HTTPContext http) throws IOException {
-    final Query q = http.session().query(_DB_CONTENT_TYPE.args("$d", "$p"));
+    final LocalQuery q = http.session().query(_DB_CONTENT_TYPE.args("$d", "$p"));
     q.bind("d", http.db());
     q.bind("p", http.dbpath());
     return q.execute();

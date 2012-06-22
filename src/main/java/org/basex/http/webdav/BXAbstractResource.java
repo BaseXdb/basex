@@ -76,7 +76,7 @@ public abstract class BXAbstractResource extends BXResource implements
    * @throws IOException I/O exception
    */
   protected void del() throws IOException {
-    final Session session = http.session();
+    final LocalSession session = http.session();
     session.execute(new Open(db));
     session.execute(new Delete(path));
 
@@ -91,7 +91,7 @@ public abstract class BXAbstractResource extends BXResource implements
    * @throws IOException I/O exception
    */
   protected void rename(final String n) throws IOException {
-    final Session session = http.session();
+    final LocalSession session = http.session();
     session.execute(new Open(db));
     session.execute(new Rename(path, n));
 

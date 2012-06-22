@@ -96,8 +96,8 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
       public List<BXResource> get() throws IOException {
         final List<BXResource> ch = new ArrayList<BXResource>();
         final HashSet<String> paths = new HashSet<String>();
-        final Session session = http.session();
-        final Query q = session.query(
+        final LocalSession session = http.session();
+        final LocalQuery q = session.query(
             "for $a in " + _DB_LIST_DETAILS.args("$d", "$p") +
             "return ($a/@raw/data()," +
                     "$a/@content-type/data()," +
@@ -135,7 +135,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
     return new BXCode<BXResource>(this) {
       @Override
       public BXResource get() throws IOException {
-        final Session session = http.session();
+        final LocalSession session = http.session();
         session.execute(new Open(db));
         final String dbp = path.isEmpty() ? newName : path + SEP + newName;
         // delete old resource if it already exists
@@ -231,7 +231,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
    * @throws IOException I/O exception
    */
   private void add(final String tdb, final String tpath) throws IOException {
-    final Query q = http.session().query(
+    final LocalQuery q = http.session().query(
         "for $d in " + _DB_LIST.args("$db", "$path") +
         "let $t := $tpath ||'/'|| substring($d, string-length($path) + 1) " +
         "return if (" + _DB_IS_RAW.args("$db", "$d") + ") then " +

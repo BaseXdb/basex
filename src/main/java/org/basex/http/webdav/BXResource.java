@@ -113,7 +113,7 @@ public abstract class BXResource implements Resource {
     if(!pathExists(db, dummy, http)) return;
 
     // path contains dummy document
-    final Session session = http.session();
+    final LocalSession session = http.session();
     session.execute(new Open(db));
     session.execute(new Delete(dummy));
   }
@@ -127,7 +127,7 @@ public abstract class BXResource implements Resource {
     // check if path is a folder and is empty
     if(p.matches("[^/]") || pathExists(db, p, http)) return;
 
-    final Session session = http.session();
+    final LocalSession session = http.session();
     session.execute(new Open(db));
     session.store(p + SEP + DUMMY, new ArrayInput(Token.EMPTY));
   }
@@ -140,7 +140,7 @@ public abstract class BXResource implements Resource {
    * @throws IOException I/O exception
    */
   static boolean dbExists(final String db, final HTTPContext http) throws IOException {
-    final Query q = http.session().query(_DB_LIST.args() + "[. = $db]");
+    final LocalQuery q = http.session().query(_DB_LIST.args() + "[. = $db]");
     q.bind("db", db);
     try {
       if(q.more()) return true;
@@ -195,7 +195,7 @@ public abstract class BXResource implements Resource {
   static BXFile file(final String db, final String path, final HTTPContext http)
       throws IOException {
 
-    final Query q = http.session().query(
+    final LocalQuery q = http.session().query(
         "let $a := " + _DB_LIST_DETAILS.args("$d", "$p") +
         "return (" +
             "$a/@raw/data()," +
@@ -252,7 +252,7 @@ public abstract class BXResource implements Resource {
   static boolean pathExists(final String db, final String path, final HTTPContext http)
       throws IOException {
 
-    final Query q = http.session().query(COUNT.args(_DB_LIST.args("$d", "$p")));
+    final LocalQuery q = http.session().query(COUNT.args(_DB_LIST.args("$d", "$p")));
     q.bind("d", db);
     q.bind("p", path);
     return !q.execute().equals("0");
@@ -269,7 +269,7 @@ public abstract class BXResource implements Resource {
   private static boolean exists(final String db, final String path,
       final HTTPContext http) throws IOException {
 
-    final Query q = http.session().query(_DB_EXISTS.args("$d", "$p"));
+    final LocalQuery q = http.session().query(_DB_EXISTS.args("$d", "$p"));
     q.bind("d", db);
     q.bind("p", path);
     return q.execute().equals(Text.TRUE);
@@ -286,7 +286,7 @@ public abstract class BXResource implements Resource {
       throws IOException {
 
     final String s = DATA.args(_DB_INFO.args("$p") + "/descendant::" + TIME + "[1]");
-    final Query q = http.session().query(s);
+    final LocalQuery q = http.session().query(s);
     q.bind("p", db);
     try {
       // retrieve and parse timestamp

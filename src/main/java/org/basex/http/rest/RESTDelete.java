@@ -22,7 +22,7 @@ public class RESTDelete extends RESTCode {
     // open addressed database
     open(http);
 
-    final Session session = http.session();
+    final LocalSession session = http.session();
     if(http.depth() == 0) {
       HTTPErr.NO_PATH.thrw();
     } else if(http.depth() == 1) {

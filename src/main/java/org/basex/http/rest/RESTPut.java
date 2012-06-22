@@ -22,7 +22,7 @@ public class RESTPut extends RESTCode {
     parseOptions(http);
 
     // create new database or update resource
-    final Session session = http.session();
+    final LocalSession session = http.session();
     if(http.depth() == 0) HTTPErr.NO_PATH.thrw();
 
     boolean xml = true;

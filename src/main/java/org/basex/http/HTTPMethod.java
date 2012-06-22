@@ -1,6 +1,5 @@
 package org.basex.http;
 
-
 /**
  * This enumeration contains the supported HTTP methods.
  *
