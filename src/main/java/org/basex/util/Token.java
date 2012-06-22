@@ -1292,7 +1292,7 @@ public final class Token {
    * @return resulting character
    */
   public static int norm(final int ch) {
-    return ch < 0x80 || ch >= 0x200 ? ch : ch()[ch];
+    return ch < 0x80 || ch >= 0x400 ? ch : ch()[ch];
   }
 
   /**
@@ -1302,7 +1302,7 @@ public final class Token {
   private static synchronized char[] ch() {
     if(norm == null) {
       // will be only initialized if needed
-      norm = new char[0x200];
+      norm = new char[0x400];
       for(int n = 0; n < norm.length; ++n) norm[n] = (char) n;
       for(final char[] aNC : NC) norm[aNC[0]] = aNC[1];
     }
@@ -1362,6 +1362,15 @@ public final class Token {
     { '\u0176', 'Y' }, { '\u0177', 'y' }, { '\u0178', 'Y' }, { '\u0179', 'Z' },
     { '\u017A', 'z' }, { '\u017B', 'Z' }, { '\u017C', 'z' }, { '\u017D', 'Z' },
     { '\u017E', 'z' }, { '\u01FA', 'A' }, { '\u01FB', 'a' }, { '\u01FC', 'A' },
-    { '\u01FD', 'a' }, { '\u01FE', 'O' }, { '\u01FF', 'o' }
+    { '\u01FD', 'a' }, { '\u01FE', 'O' }, { '\u01FF', 'o' },
+    // Greek characters
+    {'\u0390', '\u03B9'}, {'\u03B0', '\u03C5'}, {'\u03D3', '\u03A5'},
+    {'\u03D4', '\u03A5'}, {'\u0386', '\u0391'}, {'\u0388', '\u0395'},
+    {'\u0389', '\u0397'}, {'\u038A', '\u0399'}, {'\u03AA', '\u0399'},
+    {'\u03CA', '\u03B9'}, {'\u03AB', '\u03A5'}, {'\u03CB', '\u03C5'},
+    {'\u038C', '\u039F'}, {'\u03AC', '\u03B1'}, {'\u03CC', '\u03BF'},
+    {'\u03AD', '\u03B5'}, {'\u03CD', '\u03C5'}, {'\u038E', '\u03A5'},
+    {'\u03AE', '\u03B7'}, {'\u03CE', '\u03C9'}, {'\u038F', '\u03A9'},
+    {'\u03AF', '\u03B9'}
   };
 }
