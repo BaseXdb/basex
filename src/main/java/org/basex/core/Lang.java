@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.jar.*;
 
 import org.basex.io.*;
+import org.basex.io.in.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -43,25 +44,26 @@ public final class Lang {
     if(is == null) {
       Util.errln(path + " not found.");
     } else {
-      BufferedReader br = null;
       try {
-        br = new BufferedReader(new InputStreamReader(is, Token.UTF8));
-        for(String line; (line = br.readLine()) != null;) {
-          final int i = line.indexOf('=');
-          if(i == -1 || line.startsWith("#")) continue;
-          final String key = line.substring(0, i).trim();
-          String val = line.substring(i + 1).trim();
-          if(val.contains("\\n")) val = val.replaceAll("\\\\n", Prop.NL);
-          if(Prop.langkeys) val = '[' + key + ": " + val + ']';
-          if(TEXTS.put(key, val) != null) {
-            Util.errln("%." + SUFFIX + ": '%' is declared twice", lang, key);
+        final NewlineInput nli = new NewlineInput(is);
+        try {
+          for(String line; (line = nli.readLine()) != null;) {
+            final int i = line.indexOf('=');
+            if(i == -1 || line.startsWith("#")) continue;
+            final String key = line.substring(0, i).trim();
+            String val = line.substring(i + 1).trim();
+            if(val.contains("\\n")) val = val.replaceAll("\\\\n", Prop.NL);
+            if(Prop.langkeys) val = '[' + key + ": " + val + ']';
+            if(TEXTS.put(key, val) != null) {
+              Util.errln("%." + SUFFIX + ": '%' is declared twice", lang, key);
+            }
+            CHECK.put(key, true);
           }
-          CHECK.put(key, true);
+        } finally {
+          nli.close();
         }
       } catch(final IOException ex) {
         Util.errln(ex);
-      } finally {
-        if(br != null) try { br.close(); } catch(final IOException ex) { }
       }
     }
   }

@@ -105,24 +105,25 @@ public final class MimeTypes {
 
   /** Reads in the mime-types. */
   static {
-    NewlineInput nli = null;
     try {
-      final String file = "/mime.txt";
+      final String file = "/mime.properties";
       final InputStream is = MimeTypes.class.getResourceAsStream(file);
       if(is == null) {
         Util.errln(file + " not found.");
       } else {
-        nli = new NewlineInput(is);
-        for(String line; (line = nli.readLine()) != null;) {
-          final int i = line.indexOf('\t');
-          if(i == -1 || line.startsWith("#")) continue;
-          TYPES.put(line.substring(0, i), line.substring(i + 1));
+        final NewlineInput nli = new NewlineInput(is);
+        try {
+          for(String line; (line = nli.readLine()) != null;) {
+            final int i = line.indexOf('=');
+            if(i == -1 || line.startsWith("#")) continue;
+            TYPES.put(line.substring(0, i), line.substring(i + 1));
+          }
+        } finally {
+          nli.close();
         }
       }
     } catch(final IOException ex) {
       Util.errln(ex);
-    } finally {
-      if(nli != null) try { nli.close(); } catch(final IOException ex) { }
     }
   }
 }

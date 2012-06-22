@@ -297,7 +297,6 @@ public final class FNSql extends StandardFunc {
       }
       if(paramType == null) BXSQ_TYPE.thrw(info);
       final byte[] v = next.string();
-      isNull |= v.length == 0;
       setParam(++i, stmt, paramType, isNull ? null : string(v), isNull);
     }
   }
