@@ -67,8 +67,8 @@ public class GreekStemmer extends InternalStemmer {
     // "long list"
     l = rule22(s, l);
 
-    final TokenBuilder tb = new TokenBuilder(ln << 1);
-    for(int i = 0; i < ln; i++) tb.add(s[i]);
+    final TokenBuilder tb = new TokenBuilder(l << 1);
+    for(int i = 0; i < l; i++) tb.add(s[i]);
     return tb.finish();
   }
 
