@@ -486,6 +486,8 @@ public interface QueryText {
   byte[] VLDT = token("validate");
   /** XQuery token. */
   byte[] XQRY = token(XQUERY);
+  /** RestXQ token. */
+  byte[] RESTXQ = token("restxq");
   /** EXErr token. */
   byte[] EXPERR = token("experr");
 

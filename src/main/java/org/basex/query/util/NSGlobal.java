@@ -39,6 +39,8 @@ public final class NSGlobal {
     NS.add(HTTP, HTTPURI);
     NS.add(PKG, PKGURI);
     NS.add(ZIP, ZIPURI);
+    // EXQuery namespaces
+    NS.add(RESTXQ, RESTXQURI);
     // BaseX namespaces
     NS.add(BXERR, BXERRORS);
     NS.add(BASEX, BASEXURI);
