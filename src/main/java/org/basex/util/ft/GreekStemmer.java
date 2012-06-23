@@ -252,7 +252,7 @@ public class GreekStemmer extends InternalStemmer {
         e(s, len, "\u03b5\u03c9\u03c3") ||
         e(s, len, "\u03b5\u03c9\u03bd"))) {
       len -= 3;
-      if(contains(EXC4, s, len)) len++; // add back -\u03b5
+      if(c(EXC4, s, len)) len++; // add back -\u03b5
     }
     return len;
   }
@@ -319,7 +319,7 @@ public class GreekStemmer extends InternalStemmer {
     }
 
     if(rem) {
-      if(ev(s, len) || contains(EXC6, s, len)) len += 2; // add back -\u03b9\u03ba
+      if(ev(s, len) || c(EXC6, s, len)) len += 2; // add back -\u03b9\u03ba
     }
     return len;
   }
@@ -352,7 +352,7 @@ public class GreekStemmer extends InternalStemmer {
         e(s, len, "\u03b7\u03ba\u03b1\u03bc\u03b5"))) len -= 5;
     if(len > 3 && e(s, len, "\u03b1\u03bc\u03b5")) {
       len -= 3;
-      if(contains(EXC7, s, len)) len += 2; // add back -\u03b1\u03bc
+      if(c(EXC7, s, len)) len += 2; // add back -\u03b1\u03bc
     }
 
     return len;
@@ -446,7 +446,7 @@ public class GreekStemmer extends InternalStemmer {
       rem = true;
     }
 
-    if(rem && contains(EXC8A, s, len)) {
+    if(rem && c(EXC8A, s, len)) {
       // add -\u03b1\u03b3\u03b1\u03bd (we rem > 4 chars so its safe)
       len += 4;
       s[len - 4] = '\u03b1';
@@ -457,7 +457,7 @@ public class GreekStemmer extends InternalStemmer {
 
     if(len > 3 && e(s, len, "\u03b1\u03bd\u03b5")) {
       len -= 3;
-      if(ey(s, len) || contains(EXC8B, s, len)) {
+      if(ey(s, len) || c(EXC8B, s, len)) {
         len += 2; // add back -\u03b1\u03bd
       }
     }
@@ -489,7 +489,7 @@ public class GreekStemmer extends InternalStemmer {
 
     if(len > 3 && e(s, len, "\u03b5\u03c4\u03b5")) {
       len -= 3;
-      if(contains(EXC9, s, len) || ey(s, len) ||
+      if(c(EXC9, s, len) || ey(s, len) ||
         e(s, len, "\u03bf\u03b4") ||
         e(s, len, "\u03b1\u03b9\u03c1") ||
         e(s, len, "\u03c6\u03bf\u03c1") ||
@@ -604,12 +604,12 @@ public class GreekStemmer extends InternalStemmer {
     int len = l;
     if(len > 5 && e(s, len, "\u03b9\u03b5\u03c3\u03c4\u03b5")) {
       len -= 5;
-      if(contains(EXC12A, s, len)) len += 4; // add back -\u03b9\u03b5\u03c3\u03c4
+      if(c(EXC12A, s, len)) len += 4; // add back -\u03b9\u03b5\u03c3\u03c4
     }
 
     if(len > 4 && e(s, len, "\u03b5\u03c3\u03c4\u03b5")) {
       len -= 4;
-      if(contains(EXC12B, s, len)) len += 3; // add back -\u03b5\u03c3\u03c4
+      if(c(EXC12B, s, len)) len += 3; // add back -\u03b5\u03c3\u03c4
     }
 
     return len;
@@ -649,7 +649,7 @@ public class GreekStemmer extends InternalStemmer {
       rem = true;
     }
 
-    if(rem && (contains(EXC13, s, len) ||
+    if(rem && (c(EXC13, s, len) ||
         e(s, len, "\u03c3\u03ba\u03c9\u03bb") ||
         e(s, len, "\u03c3\u03ba\u03bf\u03c5\u03bb") ||
         e(s, len, "\u03bd\u03b1\u03c1\u03b8") ||
@@ -697,7 +697,7 @@ public class GreekStemmer extends InternalStemmer {
       rem = true;
     }
 
-    if(rem && (contains(EXC14, s, len) || ev(s, len) ||
+    if(rem && (c(EXC14, s, len) || ev(s, len) ||
       e(s, len, "\u03c0\u03bf\u03b4\u03b1\u03c1") ||
       e(s, len, "\u03b2\u03bb\u03b5\u03c0") ||
       e(s, len, "\u03c0\u03b1\u03bd\u03c4\u03b1\u03c7") ||
@@ -764,7 +764,7 @@ public class GreekStemmer extends InternalStemmer {
     }
 
     if(rem) {
-      final boolean cond1 = contains(EXC15A, s, len) ||
+      final boolean cond1 = c(EXC15A, s, len) ||
         e(s, len, "\u03bf\u03c6") ||
         e(s, len, "\u03c0\u03b5\u03bb") ||
         e(s, len, "\u03c7\u03bf\u03c1\u03c4") ||
@@ -776,7 +776,7 @@ public class GreekStemmer extends InternalStemmer {
         e(s, len, "\u03bb\u03bf\u03c7") ||
         e(s, len, "\u03c3\u03bc\u03b7\u03bd");
 
-      final boolean cond2 = contains(EXC15B, s, len) ||
+      final boolean cond2 = c(EXC15B, s, len) ||
         e(s, len, "\u03ba\u03bf\u03bb\u03bb");
 
       if(cond1 && !cond2) len += 2; // add back -\u03b1\u03b3
@@ -811,7 +811,7 @@ public class GreekStemmer extends InternalStemmer {
       rem = true;
     }
 
-    if(rem && contains(EXC16, s, len)) len += 2; // add back -\u03b7\u03c3
+    if(rem && c(EXC16, s, len)) len += 2; // add back -\u03b7\u03c3
 
     return len;
   }
@@ -834,7 +834,7 @@ public class GreekStemmer extends InternalStemmer {
     int len = l;
     if(len > 4 && e(s, len, "\u03b7\u03c3\u03c4\u03b5")) {
       len -= 4;
-      if(contains(EXC17, s, len)) len += 3; // add back the -\u03b7\u03c3\u03c4
+      if(c(EXC17, s, len)) len += 3; // add back the -\u03b7\u03c3\u03c4
     }
 
     return len;
@@ -867,7 +867,7 @@ public class GreekStemmer extends InternalStemmer {
       rem = true;
     }
 
-    if(rem && contains(EXC18, s, len)) {
+    if(rem && c(EXC18, s, len)) {
       len += 3;
       s[len - 3] = '\u03bf';
       s[len - 2] = '\u03c5';
@@ -903,7 +903,7 @@ public class GreekStemmer extends InternalStemmer {
       rem = true;
     }
 
-    if(rem && contains(EXC19, s, len)) {
+    if(rem && c(EXC19, s, len)) {
       len += 3;
       s[len - 3] = '\u03bf';
       s[len - 2] = '\u03c5';
@@ -1116,7 +1116,7 @@ public class GreekStemmer extends InternalStemmer {
    * @param l length of characters
    * @return result of check
    */
-  private boolean contains(final String[] strings, final char[] s, final int l) {
+  private boolean c(final String[] strings, final char[] s, final int l) {
     for(final String e : strings) {
       final int el = e.length();
       if(l != el) continue;

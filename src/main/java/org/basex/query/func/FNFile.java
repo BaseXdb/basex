@@ -253,7 +253,7 @@ public final class FNFile extends StandardFunc {
    * @return result
    * @throws QueryException query exception
    */
-  private Item createDirectory(final File path) throws QueryException {
+  private synchronized Item createDirectory(final File path) throws QueryException {
     // resolve symbolic links
     File f;
     try {
@@ -282,7 +282,9 @@ public final class FNFile extends StandardFunc {
    * @return result
    * @throws QueryException query exception
    */
-  private Item delete(final File path, final QueryContext ctx) throws QueryException {
+  private synchronized Item delete(final File path, final QueryContext ctx)
+      throws QueryException {
+
     if(!path.exists()) FILE_WHICH.thrw(info, path.getAbsolutePath());
     if(optionalBool(1, ctx)) {
       deleteRec(path);
@@ -297,7 +299,7 @@ public final class FNFile extends StandardFunc {
    * @param path path to be deleted
    * @throws QueryException query exception
    */
-  private void deleteRec(final File path) throws QueryException {
+  private synchronized void deleteRec(final File path) throws QueryException {
     final File[] ch = path.listFiles();
     if(ch != null) for(final File f : ch) deleteRec(f);
     if(!path.delete()) FILE_DEL.thrw(info, path);
@@ -352,8 +354,8 @@ public final class FNFile extends StandardFunc {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private Item write(final File path, final boolean append, final QueryContext ctx)
-      throws QueryException, IOException {
+  private synchronized Item write(final File path, final boolean append,
+      final QueryContext ctx) throws QueryException, IOException {
 
     check(path);
     final Iter ir = expr[1].iter(ctx);
@@ -382,8 +384,8 @@ public final class FNFile extends StandardFunc {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private Item writeText(final File path, final boolean append, final QueryContext ctx)
-      throws QueryException, IOException {
+  private synchronized Item writeText(final File path, final boolean append,
+      final QueryContext ctx) throws QueryException, IOException {
 
     check(path);
     final byte[] s = checkStr(expr[1], ctx);
@@ -408,7 +410,7 @@ public final class FNFile extends StandardFunc {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private Item writeTextLines(final File path, final boolean append,
+  private synchronized Item writeTextLines(final File path, final boolean append,
       final QueryContext ctx) throws QueryException, IOException {
 
     check(path);
@@ -440,8 +442,8 @@ public final class FNFile extends StandardFunc {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private Item writeBinary(final File path, final QueryContext ctx, final boolean append)
-      throws QueryException, IOException {
+  private synchronized Item writeBinary(final File path, final QueryContext ctx,
+      final boolean append) throws QueryException, IOException {
 
     check(path);
     final Iter ir = expr[1].iter(ctx);
@@ -483,8 +485,8 @@ public final class FNFile extends StandardFunc {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private Item copy(final File src, final QueryContext ctx, final boolean copy)
-      throws QueryException, IOException {
+  private synchronized Item copy(final File src, final QueryContext ctx,
+      final boolean copy) throws QueryException, IOException {
 
     File trg = file(1, ctx).getAbsoluteFile();
     if(!src.exists()) FILE_WHICH.thrw(info, src.getAbsolutePath());
@@ -516,7 +518,9 @@ public final class FNFile extends StandardFunc {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private void copy(final File src, final File trg) throws QueryException, IOException {
+  private synchronized void copy(final File src, final File trg)
+      throws QueryException, IOException {
+
     if(src.isDirectory()) {
       if(!trg.mkdir()) FILE_CREATE.thrw(info, trg);
       final File[] files = src.listFiles();

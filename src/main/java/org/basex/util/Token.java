@@ -1301,7 +1301,7 @@ public final class Token {
    */
   private static synchronized char[] ch() {
     if(norm == null) {
-      // will be only initialized if needed
+      // will only be initialized if needed
       norm = new char[0x400];
       for(int n = 0; n < norm.length; ++n) norm[n] = (char) n;
       for(final char[] aNC : NC) norm[aNC[0]] = aNC[1];
