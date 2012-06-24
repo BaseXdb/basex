@@ -33,7 +33,7 @@ public final class Delete extends ACreate {
     // delete all documents in reverse order (faster)
     final IntList docs = data.resources.docs(target);
     for(int d = docs.size() - 1; d >= 0; d--) data.delete(docs.get(d));
-    if(!docs.isEmpty()) context.update();
+    context.update();
 
     // delete binaries
     final TokenList bins = data.resources.binaries(target);

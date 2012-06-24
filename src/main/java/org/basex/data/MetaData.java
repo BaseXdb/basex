@@ -257,6 +257,7 @@ public final class MetaData {
    * @return binary directory
    */
   public IOFile binary(final String pth) {
+    if(path == null) return null;
     final IOFile dir = binaries();
     final IOFile file = new IOFile(dir, pth);
     return file.path().startsWith(dir.path()) ? file : null;

@@ -34,6 +34,7 @@ public final class PathSummary implements Index {
    */
   public PathSummary(final Data d) {
     data = d;
+    init();
   }
 
   /**
@@ -43,7 +44,7 @@ public final class PathSummary implements Index {
    * @throws IOException I/O exception
    */
   public PathSummary(final Data d, final DataInput in) throws IOException {
-    if(in.readBool()) root = new PathNode(in, null);
+    root = in.readBool() ? new PathNode(in, null) : new PathNode();
     data = d;
   }
 
@@ -66,15 +67,20 @@ public final class PathSummary implements Index {
   }
 
   @Override
-  public void close() {
-    root = null;
+  public void init() {
+    root = new PathNode();
+    stack.clear();
+    stack.add(root);
   }
+
+  @Override
+  public void close() { }
 
   // Build Index ==============================================================
 
   /**
    * Adds an entry.
-   * @param n name reference
+   * @param n name reference (0 for nodes other than element and attributes)
    * @param k node kind
    * @param l current level
    */
@@ -84,7 +90,7 @@ public final class PathSummary implements Index {
 
   /**
    * Adds an entry, including its value.
-   * @param n name reference
+   * @param n name reference (0 for nodes other than element and attributes)
    * @param k node kind
    * @param l current level
    * @param v value
@@ -93,11 +99,7 @@ public final class PathSummary implements Index {
   public void index(final int n, final byte k, final int l, final byte[] v,
       final MetaData md) {
 
-    if(root == null) {
-      root = new PathNode(n, k, null);
-      stack.clear();
-      stack.add(root);
-    } else if(l == 0) {
+    if(l == 0) {
       if(v != null) root.stats.add(v, md);
       root.stats.count++;
     } else {

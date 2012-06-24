@@ -52,16 +52,13 @@ public final class Resources implements Index {
 
   /**
    * Returns the {@code pre} values of all document nodes.
-   * A single dummy node is returned if the database is empty.
    * @return document nodes
    */
   public synchronized IntList docs() {
     return docs.docs();
   }
 
-  /**
-   * Initializes the index.
-   */
+  @Override
   public synchronized void init() {
     docs.init();
   }

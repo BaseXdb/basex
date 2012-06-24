@@ -102,6 +102,9 @@ public final class FTIndex implements Index {
   }
 
   @Override
+  public synchronized void init() { }
+
+  @Override
   public synchronized int count(final IndexToken it) {
     final byte[] tok = it.get();
     if(tok.length > data.meta.maxlen) return Integer.MAX_VALUE;

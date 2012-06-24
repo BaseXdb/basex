@@ -80,7 +80,8 @@ final class FolderIterator {
     if(y > height) return false;
 
     final Data data = view.gui.context.data();
-    if(data == null) return false;
+    if(data == null || pre >= data.meta.size) return false;
+
     final int kind = data.kind(pre);
     return mode == 2 || (kind == Data.ELEM || kind == Data.DOC) &&
       view.opened[pre] ? moreData(data) : moreCS();

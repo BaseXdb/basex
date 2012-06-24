@@ -65,6 +65,9 @@ public class DiskValues implements Index {
   }
 
   @Override
+  public synchronized void init() { }
+
+  @Override
   public synchronized byte[] info() {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(LI_STRUCTURE + SORTED_LIST + NL);

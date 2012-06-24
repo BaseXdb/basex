@@ -49,9 +49,7 @@ public final class Names extends TokenSet implements Index {
     for(int s = 1; s < size; ++s) stats[s] = new Stats(in);
   }
 
-  /**
-   * Initializes the statistics.
-   */
+  @Override
   public void init() {
     for(int s = 1; s < size; ++s) stats[s] = new Stats();
   }

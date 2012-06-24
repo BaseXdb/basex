@@ -17,7 +17,6 @@ import org.basex.util.*;
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
- * @author Andreas Weiler
  */
 public final class PathNode {
   /** Tag/attribute name id. */
@@ -29,7 +28,14 @@ public final class PathNode {
   /** Children. */
   public PathNode[] ch;
   /** Node kind. */
-  public Stats stats;
+  public final Stats stats;
+
+  /**
+   * Empty constructor.
+   */
+  PathNode() {
+    this(0, Data.DOC, null, 0);
+  }
 
   /**
    * Default constructor.
@@ -38,12 +44,23 @@ public final class PathNode {
    * @param p parent node
    */
   PathNode(final int n, final byte k, final PathNode p) {
+    this(n, k, p, 1);
+  }
+
+  /**
+   * Default constructor.
+   * @param n node name
+   * @param k node kind
+   * @param p parent node
+   * @param c counter
+   */
+  PathNode(final int n, final byte k, final PathNode p, final int c) {
     ch = new PathNode[0];
     name = (short) n;
     kind = k;
     par = p;
     stats = new Stats();
-    stats.count = 1;
+    stats.count = c;
   }
 
   /**
@@ -171,7 +188,7 @@ public final class PathNode {
   }
 
   /**
-   * Prints a path summary node.
+   * Returns a string representation of a path summary node.
    * @param data data reference
    * @param l level
    * @return string representation

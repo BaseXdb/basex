@@ -36,6 +36,9 @@ public class MemValues extends TokenSet implements Index {
   }
 
   @Override
+  public synchronized void init() { }
+
+  @Override
   public IndexIterator iter(final IndexToken tok) {
     final byte k = tok.type() == IndexType.TEXT ? Data.TEXT : Data.ATTR;
     final int i = id(tok.get());

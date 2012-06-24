@@ -348,7 +348,7 @@ final class TableHeader extends BaseXPanel {
    */
   void filter(final int col) {
     // activate table filter
-    if(inputCol != col) {
+    if(inputCol != col && tdata.cols.length != 0) {
       if(box != null) box.stop();
       box = new TableInput(this, tdata.cols[col].filter);
       inputCol = col;

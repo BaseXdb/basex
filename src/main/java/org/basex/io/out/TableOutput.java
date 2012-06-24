@@ -17,9 +17,9 @@ public final class TableOutput extends OutputStream {
   /** Buffer. */
   private final byte[] buffer = new byte[IO.BLOCKSIZE];
   /** Index entries. */
-  private final IntList firstPres = new IntList();
+  private final IntList fpres = new IntList();
   /** Index entries. */
-  private final IntList blocks = new IntList();
+  private final IntList pages = new IntList();
 
   /** The underlying output stream. */
   private final OutputStream os;
@@ -30,8 +30,6 @@ public final class TableOutput extends OutputStream {
 
   /** Position inside buffer. */
   private int pos;
-  /** Block count. */
-  private int bcount;
   /** First pre value of current block. */
   private int fpre;
 
@@ -58,26 +56,27 @@ public final class TableOutput extends OutputStream {
   public void flush() throws IOException {
     if(pos == 0) return;
     os.write(buffer);
-    firstPres.add(fpre);
-    blocks.add(bcount++);
+    fpres.add(fpre);
+    pages.add(pages.size());
     fpre += pos >>> IO.NODEPOWER;
     pos = 0;
   }
 
   @Override
   public void close() throws IOException {
+    final boolean empty = fpre + pos == 0;
+    if(empty) pos++;
     flush();
     os.close();
 
-    DataOutput dt = null;
+    final DataOutput out = new DataOutput(meta.dbfile(file + 'i'));
     try {
-      dt = new DataOutput(meta.dbfile(file + 'i'));
-      dt.writeNum(bcount);
-      dt.writeNum(bcount);
-      dt.writeNums(firstPres.toArray());
-      dt.writeNums(blocks.toArray());
+      out.writeNum(pages.size());
+      out.writeNum(empty ? 0 : pages.size());
+      out.writeNums(fpres.toArray());
+      out.writeNums(pages.toArray());
     } finally {
-      if(dt != null) try { dt.close(); } catch(final IOException ex) { }
+      out.close();
     }
   }
 }

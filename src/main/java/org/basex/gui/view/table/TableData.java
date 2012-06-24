@@ -168,6 +168,7 @@ final class TableData {
 
     rows = new IntList();
     for(int p : n) {
+      if(p >= data.meta.size) break;
       final int s = p + data.size(p, data.kind(p));
       // find first root tag
       do {

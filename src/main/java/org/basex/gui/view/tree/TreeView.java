@@ -164,6 +164,7 @@ public final class TreeView extends View implements TreeConstants {
     if(roots.length == 0) return;
 
     for(int i = 0; !showAtts && i < roots.length; ++i) {
+      if(roots[i] >= data.meta.size) break;
       if(data.kind(roots[i]) == Data.ATTR) {
         drawMessage(g, NO_ATTS);
         return;
@@ -265,11 +266,9 @@ public final class TreeView extends View implements TreeConstants {
           drawBigRectSquares(tg, lv, x, ww, 4);
         }
       }
-      if(SHOW_CONN_MI) {
-        final TreeRect rr = tr.getTreeRectPerIndex(rn, 0, 0);
-        highlightDescendants(tg, rn, 0, rr, roots[rn], getRectCenter(rr),
-            Draw.CONNECTION);
-      }
+
+      final TreeRect rr = tr.getTreeRectPerIndex(rn, 0, 0);
+      highlightDescendants(tg, rn, 0, rr, roots[rn], getRectCenter(rr), Draw.CONNECTION);
     }
   }
 
@@ -370,9 +369,8 @@ public final class TreeView extends View implements TreeConstants {
       case RECTANGLE:
         borderColor = getColorPerLevel(lv, false);
         fillColor = getColorPerLevel(lv, true);
-        txt &= DRAW_NODE_TEXT;
-        border = BORDER_RECTANGLES;
-        fill = FILL_RECTANGLES;
+        border = true;
+        fill = true;
         break;
       case HIGHLIGHT:
         borderColor = color4;
@@ -424,7 +422,7 @@ public final class TreeView extends View implements TreeConstants {
       g.setColor(fillColor);
       g.fillRect(xx + 1, y + 1, ww - 1, h - 1);
     }
-    if(txt && (fill || !FILL_RECTANGLES)) {
+    if(txt && fill) {
       g.setColor(textColor);
       drawRectangleText(g, rn, lv, r, pre);
     }
@@ -776,7 +774,7 @@ public final class TreeView extends View implements TreeConstants {
 
           final TreeRect dr = tr.getTreeRectPerIndex(rn, lvd, j + start);
 
-          if(SHOW_DESCENDANTS_CONN && levelDistance >= MIN_NODE_DIST_CONN)
+          if(levelDistance >= MIN_NODE_DIST_CONN)
             drawDescendantsConn(g, lvd, dr, px, t);
 
           highlightDescendants(g, rn, lvd, dr, dp, getRectCenter(dr),

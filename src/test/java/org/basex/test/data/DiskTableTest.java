@@ -49,18 +49,15 @@ public final class DiskTableTest extends SandboxTest {
 
   /**
    * Loads the JUnitTest database.
+   * @throws Exception exception
    */
   @Before
-  public void setUp() {
-    try {
-      final Parser parser = Parser.xmlParser(IO.get(TESTFILE), context.prop);
-      data = new DiskBuilder(NAME, parser, context).build();
-      size = data.meta.size;
-      data.close();
-      tda = new TableDiskAccess(data.meta, true);
-    } catch(final Exception ex) {
-      Util.stack(ex);
-    }
+  public void setUp() throws Exception {
+    final Parser parser = Parser.xmlParser(IO.get(TESTFILE), context.prop);
+    data = new DiskBuilder(NAME, parser, context).build();
+    size = data.meta.size;
+    data.close();
+    tda = new TableDiskAccess(data.meta, true);
 
     final int bc = size * (1 << IO.NODEPOWER);
     storage = new byte[bc];
@@ -73,15 +70,12 @@ public final class DiskTableTest extends SandboxTest {
 
   /**
    * Drops the JUnitTest database.
+   * @throws Exception exception
    */
   @After
-  public void tearDown() {
-    try {
-      if(tda != null) tda.close();
-      DropDB.drop(NAME, context);
-    } catch(final Exception ex) {
-      Util.stack(ex);
-    }
+  public void tearDown() throws Exception {
+    if(tda != null) tda.close();
+    DropDB.drop(NAME, context);
   }
 
   /**
@@ -156,7 +150,7 @@ public final class DiskTableTest extends SandboxTest {
    */
   private int tdaBlocks() {
     try {
-      final Field f = tda.getClass().getDeclaredField("blocks");
+      final Field f = tda.getClass().getDeclaredField("used");
       f.setAccessible(true);
       return f.getInt(tda);
     } catch(final Exception ex) {

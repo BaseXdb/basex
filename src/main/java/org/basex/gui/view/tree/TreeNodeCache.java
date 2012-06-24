@@ -23,64 +23,28 @@ final class TreeNodeCache implements TreeConstants {
    * @param atts show attributes
    */
   TreeNodeCache(final Data data, final boolean atts) {
-      final ArrayList<IntList> alil = new ArrayList<IntList>();
+    final ArrayList<IntList> alil = new ArrayList<IntList>();
 
-      if(USE_CHILDITERATOR) {
-        IntList parList = new IntList(1);
-        parList.add(0);
-        alil.add(parList);
-        int l = 0;
-        while(true) {
-          parList = getNextNodeLine(parList, data);
-          if(parList.isEmpty()) break;
-          alil.add(parList);
-          ++l;
-        }
-        maxLevel = l + 1;
-      } else {
-        final int ts = data.meta.size;
-        final IntList roots = data.resources.docs();
-        alil.add(new IntList());
-        for(int i = 0, is = roots.size(); i < is; ++i) {
-          final int root = roots.get(i);
-          alil.get(0).add(root);
-          final int sh = i + 1 == roots.size() ? ts : roots.get(i + 1);
-          for(int p = root + 1; p < sh; ++p) {
-            final int k = data.kind(p);
-            if(!atts && k == Data.ATTR || ONLY_ELEMENT_NODES
-                & k != Data.ELEM) continue;
-            int lv = 0;
-            final int par = data.parent(p, k);
-            while(par != alil.get(lv).get(alil.get(lv).size() - 1))
-              ++lv;
-            for(int j = alil.size(); j <= lv + 1; ++j)
-              alil.add(new IntList());
-            alil.get(lv + 1).add(p);
-          }
-        }
-        maxLevel = alil.size();
-      }
-      nodes = alil.toArray(new IntList[alil.size()]);
-  }
-
-  /**
-   * Saves node line in parentList.
-   * @param par array with nodes of the line before
-   * @param data the data reference
-   * @return IntList filled with nodes of the current line
-   */
-  private static IntList getNextNodeLine(final IntList par, final Data data) {
-    final int l = par.size();
-    final IntList line = new IntList();
-    for(int i = 0; i < l; ++i) {
-      final int p = par.get(i);
-      final ChildIterator iter = new ChildIterator(data, p);
-      while(iter.more()) {
-        final int pre = iter.next();
-        if(data.kind(pre) == Data.ELEM || !ONLY_ELEMENT_NODES) line.add(pre);
+    final int ts = data.meta.size;
+    final IntList roots = data.resources.docs();
+    alil.add(new IntList());
+    for(int i = 0, rs = roots.size(); i < rs; ++i) {
+      final int root = roots.get(i);
+      alil.get(0).add(root);
+      final int sh = i + 1 == roots.size() ? ts : roots.get(i + 1);
+      for(int p = root + 1; p < sh; ++p) {
+        final int k = data.kind(p);
+        if(!atts && k == Data.ATTR) continue;
+        final int par = data.parent(p, k);
+        int lv = -1;
+        final int is = alil.size();
+        while(++lv < is && par != alil.get(lv).peek());
+        for(int j = is; j <= lv + 1; ++j) alil.add(new IntList());
+        alil.get(lv + 1).add(p);
       }
     }
-    return line;
+    maxLevel = alil.size();
+    nodes = alil.toArray(new IntList[alil.size()]);
   }
 
   /**

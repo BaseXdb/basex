@@ -75,7 +75,6 @@ final class Docs {
 
   /**
    * Returns the {@code pre} values of all document nodes.
-   * A single dummy node is returned if the database is empty.
    * @return document nodes
    */
   synchronized IntList docs() {

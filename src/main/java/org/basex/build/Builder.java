@@ -71,14 +71,6 @@ public abstract class Builder extends Progress {
   final void parse() throws IOException {
     // add document node and parse document
     parser.parse(this);
-
-    // no nodes inserted: add default document node
-    if(meta.size == 0) {
-      startDoc(token(name));
-      endDoc();
-      setSize(0, meta.size);
-    }
-    // lastid should reflect the fact that the default document was added
     meta.lastid = meta.size - 1;
   }
 

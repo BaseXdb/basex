@@ -86,8 +86,7 @@ public final class Array {
    * @param off move offset
    * @param l length
    */
-  public static void move(final Object ar, final int pos, final int off,
-      final int l) {
+  public static void move(final Object ar, final int pos, final int off, final int l) {
     System.arraycopy(ar, pos, ar, pos + off, l);
   }
 

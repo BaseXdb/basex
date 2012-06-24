@@ -112,6 +112,8 @@ public final class TableView extends View implements Runnable {
 
   @Override
   public void refreshUpdate() {
+    tdata.rootRows = null;
+    tdata.init(gui.context.data());
     refreshContext(false, true);
   }
 

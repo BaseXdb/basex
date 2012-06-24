@@ -114,7 +114,7 @@ public abstract class Data {
    * @return result of check
    */
   public final boolean isEmpty() {
-    return meta.size == 1 && kind(0) == DOC;
+    return meta.size == 0;
   }
 
   /**
@@ -612,10 +612,7 @@ public abstract class Data {
     // size of the subtree to delete
     int k = kind(pre);
     int s = size(pre, k);
-    // indicates if database is empty
-    final boolean empty = pre == 0 && s == meta.size;
-    // update document index: delete specified entry
-    if(!empty) resources.delete(pre, s);
+    resources.delete(pre, s);
 
     if(meta.updindex) {
       // delete child records from indexes
@@ -647,12 +644,7 @@ public abstract class Data {
 
     // preserve empty root node
     int p = pre;
-    if(empty) {
-      ++p;
-      --s;
-    } else if(kind(p) == DOC) {
-      --meta.ndocs;
-    }
+    if(kind(p) == DOC) --meta.ndocs;
 
     if(meta.updindex) {
       // delete node and descendants from ID -> PRE map:
@@ -665,13 +657,6 @@ public abstract class Data {
 
     // NSNodes have to be checked for pre value shifts after delete
     nspaces.update(pre, s, false, null);
-
-    // restore empty document node
-    if(empty) {
-      doc(pre, 1, EMPTY);
-      table.set(0, buffer());
-      if(meta.updindex) idmap.insert(0, id(0), 1);
-    }
   }
 
   /**
@@ -700,7 +685,6 @@ public abstract class Data {
     resources.insert(ipre, data);
 
     // indicates if database only contains a dummy node
-    final boolean dummy = isEmpty() && data.kind(0) == DOC;
     final int dsize = data.meta.size;
 
     final int buf = Math.min(dsize, IO.BLOCKSIZE >> IO.NODEPOWER);
@@ -866,9 +850,6 @@ public abstract class Data {
       idmap.insert(ipre, id(ipre), dsize);
       indexEnd();
     }
-
-    // delete old empty root node
-    if(dummy) delete(0);
   }
 
   /**

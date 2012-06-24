@@ -5,6 +5,7 @@ import java.util.*;
 
 import org.basex.data.*;
 import org.basex.io.*;
+import org.basex.util.list.*;
 
 /**
  * This class allows main memory access to the database table representation.
@@ -14,9 +15,9 @@ import org.basex.io.*;
  */
 public final class TableMemAccess extends TableAccess {
   /** Long buffer array. */
-  private long[] buf1 = new long[16];
+  private long[] buf1 = new long[ElementList.CAP];
   /** Long buffer array. */
-  private long[] buf2 = new long[16];
+  private long[] buf2 = new long[ElementList.CAP];
 
   /**
    * Stores the table in long arrays.
@@ -39,26 +40,22 @@ public final class TableMemAccess extends TableAccess {
 
   @Override
   public int read1(final int p, final int o) {
-    return (int) ((o < 8 ? buf1 : buf2)[p] >>
-      ((o < 8 ? 7 : 15) - o << 3) & 0xFF);
+    return (int) ((o < 8 ? buf1 : buf2)[p] >> ((o < 8 ? 7 : 15) - o << 3) & 0xFF);
   }
 
   @Override
   public int read2(final int p, final int o) {
-    return (int) ((o < 8 ? buf1 : buf2)[p] >>
-      ((o < 8 ? 6 : 14) - o << 3) & 0xFFFF);
+    return (int) ((o < 8 ? buf1 : buf2)[p] >> ((o < 8 ? 6 : 14) - o << 3) & 0xFFFF);
   }
 
   @Override
   public int read4(final int p, final int o) {
-    return (int) ((o < 8 ? buf1 : buf2)[p] >>
-      ((o < 8 ? 4 : 12) - o << 3));
+    return (int) ((o < 8 ? buf1 : buf2)[p] >> ((o < 8 ? 4 : 12) - o << 3));
   }
 
   @Override
   public long read5(final int p, final int o) {
-    return (o < 8 ? buf1 : buf2)[p] >>
-      ((o < 8 ? 3 : 11) - o << 3) & 0xFFFFFFFFFFL;
+    return (o < 8 ? buf1 : buf2)[p] >> ((o < 8 ? 3 : 11) - o << 3) & 0xFFFFFFFFFFL;
   }
 
   @Override

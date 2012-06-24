@@ -26,14 +26,15 @@ public final class InfoStorage extends AQuery {
    * @param arg optional arguments
    */
   public InfoStorage(final String... arg) {
-    super(Perm.READ, true, arg);
+    super(Perm.READ, true, arg.length > 0 ? arg[0] : null,
+      arg.length >  1 ? arg[1] : null);
   }
 
   @Override
   protected boolean run() throws IOException {
     // get arguments
-    final String start = args.length > 0 ? args[0] : null;
-    final String end = args.length > 1 ? args[1] : null;
+    final String start = args[0];
+    final String end = args[1];
 
     // evaluate input as number range or xquery
     if(start != null && toInt(start) == Integer.MIN_VALUE) {
@@ -139,8 +140,7 @@ public final class InfoStorage extends AQuery {
   @Override
   public void build(final CmdBuilder cb) {
     cb.init(Cmd.INFO + " " + CmdInfo.STORAGE);
-    if(args.length > 0 && args[0] != null && toInt(args[0]) ==
-      Integer.MIN_VALUE) {
+    if(args[0] != null && toInt(args[0]) == Integer.MIN_VALUE) {
       cb.xquery(0);
     } else {
       cb.arg(0).arg(1);

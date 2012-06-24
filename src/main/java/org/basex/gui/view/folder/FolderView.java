@@ -130,6 +130,7 @@ public final class FolderView extends View {
   @Override
   public void refreshUpdate() {
     if(opened == null) return;
+
     final Data data = gui.context.data();
     if(opened.length < data.meta.size)
       opened = Arrays.copyOf(opened, data.meta.size);

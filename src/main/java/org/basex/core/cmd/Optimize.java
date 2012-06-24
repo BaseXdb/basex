@@ -73,7 +73,7 @@ public final class Optimize extends ACreate {
     // initialize structural indexes
     final MetaData md = data.meta;
     if(!md.uptodate) {
-      data.paths.close();
+      data.paths.init();
       data.resources.init();
       data.tagindex.init();
       data.atnindex.init();

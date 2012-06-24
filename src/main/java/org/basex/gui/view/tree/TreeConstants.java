@@ -9,21 +9,6 @@ import java.awt.*;
  * @author Wolfgang Miller
  */
 interface TreeConstants {
-  /** Use ChildIterator to cache nodes. */
-  boolean USE_CHILDITERATOR = false;
-  /** Draw only element nodes. */
-  boolean ONLY_ELEMENT_NODES = false;
-  /** Show descendant connection. */
-  boolean SHOW_DESCENDANTS_CONN = true;
-  /** Draw rectangle border. */
-  boolean BORDER_RECTANGLES = true;
-  /** Fill rectangles. */
-  boolean FILL_RECTANGLES = true;
-  /** Draw node text. */
-  boolean DRAW_NODE_TEXT = true;
-  /** Show connections in main image. **/
-  boolean SHOW_CONN_MI = true;
-
   /** Border padding value. */
   int BORDER_PADDING = 2;
   /** Margin to top. */
@@ -59,7 +44,7 @@ interface TreeConstants {
     /** New initialization. */ INIT,
     /** New context. */        CONTEXT,
     /** New window-size. */    RESIZE,
-    /** Void. */ VOID
+    /** Void. */               VOID
   }
 
   /** Draw kinds. */

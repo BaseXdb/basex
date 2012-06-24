@@ -11,6 +11,11 @@ import org.basex.index.query.*;
  */
 public interface Index {
   /**
+   * Initializes the index.
+   */
+  void init();
+
+  /**
    * Returns information on the index structure.
    * @return info
    */
