@@ -22,7 +22,7 @@ public final class BitArray {
   /** Bit storage. */
   private long[] words;
   /** Number of used bits. */
-  private int length;
+  private int size;
   /** All set? If bit is set, array must not be actually true'd. */
   private boolean all;
 
@@ -45,12 +45,12 @@ public final class BitArray {
    * @param l number of used bits
    */
   public BitArray(final long[] a, final int l) {
-    setWords(a, l);
+    init(a, l);
   }
 
   /** Initialize the bit array with an empty array. */
   public void init() {
-    setWords(new long[1], 0);
+    init(new long[1], 0);
   }
 
   /**
@@ -58,7 +58,7 @@ public final class BitArray {
    * @param n initial number of bits (> 0)
    */
   void init(final int n) {
-    setWords(new long[(Math.max(0, n - 1) >>> WORD_POWER) + 1], n);
+    init(new long[(Math.max(0, n - 1) >>> WORD_POWER) + 1], n);
   }
 
   /**
@@ -66,9 +66,9 @@ public final class BitArray {
    * @param a array with bits
    * @param l number of used bits
    */
-  public void setWords(final long[] a, final int l) {
+  public void init(final long[] a, final int l) {
     words = a;
-    length = l;
+    size = l;
     all = false;
   }
 
@@ -78,7 +78,7 @@ public final class BitArray {
    * @return array of longs
    */
   public long[] toArray() {
-    if (all) {
+    if(all) {
       final long[] result = new long[words.length];
       Arrays.fill(result, WORD_MASK);
       return result;
@@ -99,12 +99,12 @@ public final class BitArray {
    * @return <code>true</code> if the i<sup>th</sup> bit is set
    */
   public boolean get(final int i) {
-    if(i >= length) return false;
+    if(i >= size) return false;
     if(all) return true;
     // calculate the index of the word in the array: i div 2^6 = i >> 6
-    final int wordIndex = i >>> WORD_POWER;
+    final int wi = i >>> WORD_POWER;
     // check if the ith bit is 1
-    return (words[wordIndex] & 1L << i) != 0;
+    return (words[wi] & 1L << i) != 0;
   }
 
   /**
@@ -113,18 +113,18 @@ public final class BitArray {
    */
   public void set(final int i) {
     // calculate the index of the word in the array: i div 2^6 = i >> 6
-    final int oldIndex = length >>> WORD_POWER;
-    if(all && i >= length) {
-      for(int j = 0; j < oldIndex; j++)
+    final int oi = size >>> WORD_POWER;
+    if(all && i >= size) {
+      for(int j = 0; j < oi; j++)
         words[j] = WORD_MASK;
-      words[oldIndex] = Long.MAX_VALUE >> length % WORD_SIZE - 1;
-      all = !(i > length);
+      words[oi] = Long.MAX_VALUE >> size % WORD_SIZE - 1;
+      all = !(i > size);
     }
     // calculate the index of the word in the array: i div 2^6 = i >> 6
-    final int wordIndex = i >>> WORD_POWER;
-    if(wordIndex >= words.length) expandTo(wordIndex + 1);
-    words[wordIndex] |= 1L << i;
-    if(i >= length) length = i + 1;
+    final int wi = i >>> WORD_POWER;
+    if(wi >= words.length) resize(wi + 1);
+    words[wi] |= 1L << i;
+    if(i >= size) size = i + 1;
   }
 
   /**
@@ -139,7 +139,7 @@ public final class BitArray {
    * @return Whether all bits are set.
    */
   public boolean getAll() {
-    return all || nextClearBit(0) == length;
+    return all || nextFree(0) == size;
   }
 
   /**
@@ -147,14 +147,14 @@ public final class BitArray {
    * @param i index of the bit
    */
   public void clear(final int i) {
-    if (all) {
+    if(all) {
       all = false;
       Arrays.fill(words, WORD_MASK);
     }
     // calculate the index of the word in the array: i div 2^6 = i >> 6
-    final int wordIndex = i >>> WORD_POWER;
-    if(wordIndex >= words.length) expandTo(wordIndex + 1);
-    words[wordIndex] &= ~(1L << i);
+    final int wi = i >>> WORD_POWER;
+    if(wi >= words.length) resize(wi + 1);
+    words[wi] &= ~(1L << i);
     // it is not necessary to set the last used bit
   }
 
@@ -163,34 +163,34 @@ public final class BitArray {
    * @param i index from which to start the search (inclusive)
    * @return index of the next clear bit after the i<sup>th</sup> bit
    */
-  public int nextClearBit(final int i) {
-    if (all) return length;
+  public int nextFree(final int i) {
+    if(all) return size;
     // calculate the index of the word in the array: i div 2^6 = i >> 6
-    int wordIndex = i >>> WORD_POWER;
+    int wi = i >>> WORD_POWER;
     // invert the word and skip the first i bits:
-    long word = ~words[wordIndex] & WORD_MASK << i;
+    long word = ~words[wi] & WORD_MASK << i;
 
     if(word != 0) {
-      return (wordIndex << WORD_POWER) + numberOfTrailingZeros(word);
+      return (wi << WORD_POWER) + numberOfTrailingZeros(word);
     }
 
-    while(++wordIndex < words.length) {
-      if((word = ~words[wordIndex]) != 0) {
-        return (wordIndex << WORD_POWER) + numberOfTrailingZeros(word);
+    while(++wi < words.length) {
+      if((word = ~words[wi]) != 0) {
+        return (wi << WORD_POWER) + numberOfTrailingZeros(word);
       }
     }
 
-    // wordIndex * 2^6:
-    return wordIndex << WORD_POWER;
+    // wi * 2^6:
+    return wi << WORD_POWER;
   }
 
   /**
    * Expand the {@link #words} array to the desired size.
    * @param s new size
    */
-  private void expandTo(final int s) {
-    final long[] newWords = new long[Math.max(words.length << 1, s)];
-    System.arraycopy(words, 0, newWords, 0, words.length);
-    words = newWords;
+  private void resize(final int s) {
+    final long[] tmp = new long[Math.max(words.length << 1, s)];
+    System.arraycopy(words, 0, tmp, 0, words.length);
+    words = tmp;
   }
 }

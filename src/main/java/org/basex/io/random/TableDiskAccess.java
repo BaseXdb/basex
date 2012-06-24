@@ -350,14 +350,14 @@ public final class TableDiskAccess extends TableAccess {
     // number of records to be inserted
     final int nr = nnew >>> IO.NODEPOWER;
 
-    // go to the block and find the offset within the block where the new
-    // records will be inserted
-    final int split;
+    int split = 0;
     if(pre == 0) {
+      // empty database: insert new data into first block
       readIndex(0);
-      used++;
-      split = 0;
+      pagemap.set(0);
+      ++used;
     } else {
+      // find the offset within the block where the new records will be inserted
       split = cursor(pre - 1) + IO.NODESIZE;
     }
 
@@ -446,7 +446,7 @@ public final class TableDiskAccess extends TableAccess {
       pages[index] = (int) bm.current().pos;
     }
 
-    // increment first pre-values of blocks after the last modified block
+    // increment all fpre values after the last modified block
     for(int i = index + 1; i < used; ++i) fpres[i] += nr;
 
     meta.size += nr;
@@ -537,7 +537,7 @@ public final class TableDiskAccess extends TableAccess {
    * Moves the cursor to a free block (either new or existing empty one).
    */
   private void freeBlock() {
-    final int b = pagemap.nextClearBit(0);
+    final int b = pagemap.nextFree(0);
     pagemap.set(b);
     readBlock(b);
     ++used;

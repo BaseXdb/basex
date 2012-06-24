@@ -158,6 +158,23 @@ public final class AddDeleteTest extends SandboxTest {
   }
 
   /**
+   * Adds/deletes with target.
+   * @throws BaseXException exception
+   */
+  @Test
+  public void createDeleteAdd() throws BaseXException {
+    new CreateDB(NAME, "<a/>").execute(context);
+    new Delete("/").execute(context);
+    assertEquals(0, docs());
+    final StringBuilder sb = new StringBuilder();
+    for(int i = 0; i < 256; i++) sb.append("<a" + i + "/>");
+    new Add("x", "<x>" + sb + "</x>").execute(context);
+    assertEquals(1, docs());
+    assertEquals("1", new XQuery("count(//x)").execute(context));
+    assertEquals("0", new XQuery("count(//a)").execute(context));
+  }
+
+  /**
    * Adds a non-existent file.
    * @throws BaseXException expected.
    */

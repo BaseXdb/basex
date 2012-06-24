@@ -24,14 +24,14 @@ public final class BitArrayTest {
   /** Test method for {@link BitArray#toArray()}. */
   @Test
   public void getTrimmedWords() {
-    a.setWords(new long[] {-1L, 0L}, 64);
+    a.init(new long[] {-1L, 0L}, 64);
     assertEquals("Array not trimmed correctly", 1, a.toArray().length);
   }
 
   /** Test method for {@link BitArray#get(int)}. */
   @Test
   public void getInt() {
-    a.setWords(new long[] {-1L, 0L}, 65);
+    a.init(new long[] {-1L, 0L}, 65);
     assertTrue("Bit 63 is 0", a.get(63));
     assertFalse("Bit 64 is 1", a.get(64));
   }
@@ -49,22 +49,22 @@ public final class BitArrayTest {
   /** Test method for {@link BitArray#clear(int)}. */
   @Test
   public void clearInt() {
-    a.setWords(new long[] {-1L, 0L}, 64);
+    a.init(new long[] {-1L, 0L}, 64);
     a.clear(63);
     assertFalse("Bit 63 is 1", a.get(63));
   }
 
-  /** Test method for {@link BitArray#nextClearBit(int)}. */
+  /** Test method for {@link BitArray#nextFree(int)}. */
   @Test
   public void nextClearBitInt() {
-    a.setWords(new long[] {-1L, 0L}, 64);
-    assertEquals("Incorrect next clear bit", 64, a.nextClearBit(0));
+    a.init(new long[] {-1L, 0L}, 64);
+    assertEquals("Incorrect next clear bit", 64, a.nextFree(0));
   }
 
   /** Test method for {@link BitArray#setAll}. */
   @Test
   public void setAll() {
-    a.setWords(new long[] {0L}, 32);
+    a.init(new long[] {0L}, 32);
     a.setAll();
     assertTrue("First 32 should be true", a.get(0) && a.get(1) && a.get(31));
     assertFalse("Bit 32+ should be false", a.get(32) || a.get(33) || a.get(63));
