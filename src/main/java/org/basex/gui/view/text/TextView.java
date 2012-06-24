@@ -155,7 +155,7 @@ public final class TextView extends View implements ActionListener {
    * @param r result
    */
   public void setText(final ArrayOutput out, final Command c, final Result r) {
-    setText(out);
+    if(r == null) setText(out);
     // cache command or node set
     cmd = null;
     ns = null;

@@ -416,22 +416,21 @@ public final class GUI extends AGUI {
         }
       } else {
         // get query result
-        final Result result = cmd.result();
+        Result result = cmd.result();
         final Nodes nodes = result instanceof Nodes &&
             result.size() != 0 ? (Nodes) result : null;
 
-        final Data ndata = context.data();
-        Nodes marked = context.marked;
-
-        if(ndata != data) {
+        if(context.data() != data) {
           // database reference has changed - notify views
           notify.init();
         } else if(cmd.updated()) {
-          // data has been updated
+          // update visualizations
           notify.update();
-          //if(ao.size() != 0) text.setText(ao, c);
+          // adopt updated nodes as result set
+          if(result == null) result = context.current();
         } else if(result != null) {
           final Nodes nd = context.current();
+          Nodes marked = context.marked;
           // check if result has changed
           final boolean flt = gprop.is(GUIProp.FILTERRT);
           if(flt || nd != null && !nd.sameAs(current)) {
@@ -457,9 +456,10 @@ public final class GUI extends AGUI {
           // show number of hits
           if(result != null) setResults(result.size());
 
-          // assign textual output if no node result was created
+          // show hidden text view if a non-empty result with no nodes was created
           if(!text.visible() && nodes == null && ao.size() != 0)
             GUICommands.C_SHOWTEXT.execute(this);
+          // assign textual output if no node result was created
           text.setText(ao, cmd, result);
         }
       }
