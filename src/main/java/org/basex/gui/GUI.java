@@ -416,9 +416,9 @@ public final class GUI extends AGUI {
         }
       } else {
         // get query result
-        Result result = cmd.result();
-        final Nodes nodes = result instanceof Nodes &&
-            result.size() != 0 ? (Nodes) result : null;
+        final Result result = cmd.result();
+        Nodes nodes = result instanceof Nodes && result.size() != 0 ?
+          (Nodes) result : null;
 
         if(context.data() != data) {
           // database reference has changed - notify views
@@ -427,7 +427,7 @@ public final class GUI extends AGUI {
           // update visualizations
           notify.update();
           // adopt updated nodes as result set
-          if(result == null) result = context.current();
+          if(nodes == null) nodes = context.current();
         } else if(result != null) {
           final Nodes nd = context.current();
           Nodes marked = context.marked;
@@ -456,11 +456,13 @@ public final class GUI extends AGUI {
           // show number of hits
           if(result != null) setResults(result.size());
 
-          // show hidden text view if a non-empty result with no nodes was created
-          if(!text.visible() && nodes == null && ao.size() != 0)
-            GUICommands.C_SHOWTEXT.execute(this);
-          // assign textual output if no node result was created
-          text.setText(ao, cmd, result);
+          if(nodes == null) {
+            // make text view visible
+            if(!text.visible() && ao.size() != 0) GUICommands.C_SHOWTEXT.execute(this);
+            // assign textual output if no node result was created
+            text.setText(ao);
+          }
+          text.cacheText(ao, cmd, result);
         }
       }
     } catch(final Exception ex) {
