@@ -665,7 +665,7 @@ public enum Function {
   /** XQuery function. */
   _SQL_PREPARE(FNSql.class, "prepare(id,statement)", ITR, ITR, STR),
   /** XQuery function. */
-  _SQL_EXECUTE(FNSql.class, "execute(id[,item])", ELM_ZM, 1, ITR, ITEM_ZO),
+  _SQL_EXECUTE(FNSql.class, "execute(id,arg)", ELM_ZM, ITR, ITEM),
   /** XQuery function. */
   _SQL_CLOSE(FNSql.class, "close(id)", EMP, ITR),
   /** XQuery function. */
