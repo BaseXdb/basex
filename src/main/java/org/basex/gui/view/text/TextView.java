@@ -149,13 +149,12 @@ public final class TextView extends View implements ActionListener {
   }
 
   /**
-   * Sets the output text.
+   * Caches the output.
    * @param out cached output
    * @param c command
    * @param r result
    */
-  public void setText(final ArrayOutput out, final Command c, final Result r) {
-    if(r == null) setText(out);
+  public void cacheText(final ArrayOutput out, final Command c, final Result r) {
     // cache command or node set
     cmd = null;
     ns = null;
@@ -172,7 +171,7 @@ public final class TextView extends View implements ActionListener {
    * Sets the output text.
    * @param out cached output
    */
-  private void setText(final ArrayOutput out) {
+  public void setText(final ArrayOutput out) {
     final byte[] buf = out.buffer();
     final int size = (int) out.size();
     final byte[] chop = token(DOTS);
