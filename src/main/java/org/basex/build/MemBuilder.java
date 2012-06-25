@@ -77,7 +77,7 @@ public final class MemBuilder extends Builder {
     meta = data.meta;
     tags = data.tagindex;
     atts = data.atnindex;
-    path.finish(data);
+    path.data(data);
   }
 
   @Override

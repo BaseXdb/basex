@@ -102,7 +102,7 @@ public final class DiskData extends Data {
     tagindex = nm;
     atnindex = at;
     paths = ps;
-    paths.finish(this);
+    paths.data(this);
     nspaces = n;
     if(meta.updindex) idmap = new IdPreMap(meta.lastid);
     init();

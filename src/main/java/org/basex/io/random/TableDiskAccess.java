@@ -25,6 +25,8 @@ public final class TableDiskAccess extends TableAccess {
   private final Buffers bm = new Buffers();
   /** File storing all blocks. */
   private final RandomAccessFile file;
+  /** Bitmap storing free (=0) and occupied (=1) pages. */
+  private final BitArray freePages;
   /** File lock. */
   private FileLock fl;
 
@@ -32,8 +34,8 @@ public final class TableDiskAccess extends TableAccess {
   private int[] fpres;
   /** Page index (length: {@link #blocks}). */
   private int[] pages;
-  /** Bitmap storing free (=0) and occupied (=1) pages. */
-  private final BitArray pagemap;
+  /** Page index. */
+  private int page = -1;
 
   /** Pre value of the first entry in the current block. */
   private int fpre = -1;
@@ -44,8 +46,6 @@ public final class TableDiskAccess extends TableAccess {
   private int blocks;
   /** Number of used blocks. */
   private int used;
-  /** Index of the current block number in the {@link #pages} array. */
-  private int index = -1;
 
   /**
    * Constructor.
@@ -67,11 +67,11 @@ public final class TableDiskAccess extends TableAccess {
     // check if the page map has been stored
     if(psize == 0) {
       // init the map with empty pages
-      pagemap = new BitArray(blocks);
-      for(final int p : pages) pagemap.set(p);
+      freePages = new BitArray(blocks);
+      for(final int p : pages) freePages.set(p);
       dirty = true;
     } else {
-      pagemap = new BitArray(in.readLongs(psize), blocks);
+      freePages = new BitArray(in.readLongs(psize), blocks);
     }
     in.close();
 
@@ -92,9 +92,8 @@ public final class TableDiskAccess extends TableAccess {
     final IOFile table = MetaData.file(ctx.mprop.dbpath(db), DATATBL);
     if(!table.exists()) return false;
 
-    final RandomAccessFile file;
     try {
-      file = new RandomAccessFile(table.file(), "rw");
+      final RandomAccessFile file = new RandomAccessFile(table.file(), "rw");
       try {
         return file.getChannel().tryLock() == null;
       } finally {
@@ -124,7 +123,7 @@ public final class TableDiskAccess extends TableAccess {
     out.writeNum(blocks);
     for(int a = 0; a < blocks; a++) out.writeNum(pages[a]);
 
-    out.writeLongs(pagemap.toArray());
+    out.writeLongs(freePages.toArray());
     out.close();
     dirty = false;
   }
@@ -288,13 +287,13 @@ public final class TableDiskAccess extends TableAccess {
       // if whole block was deleted, remove it from the index
       if(npre == fpre) {
         // mark the block as empty
-        pagemap.clear(pages[index]);
+        freePages.clear(pages[page]);
 
-        Array.move(fpres, index + 1, -1, used - index - 1);
-        Array.move(pages, index + 1, -1, used - index - 1);
+        Array.move(fpres, page + 1, -1, used - page - 1);
+        Array.move(pages, page + 1, -1, used - page - 1);
 
         --used;
-        readIndex(index);
+        readPage(page);
       }
       return;
     }
@@ -308,20 +307,20 @@ public final class TableDiskAccess extends TableAccess {
         ++unused;
         // mark the blocks as empty; range clear cannot be used because the
         // blocks may not be consecutive
-        pagemap.clear(pages[index]);
+        freePages.clear(pages[page]);
       }
-      setIndex(index + 1);
+      setPage(page + 1);
       from = 0;
     }
 
     // if the last block is empty, clear the corresponding bit
-    readBlock(pages[index]);
+    readBlock(pages[page]);
     final Buffer bf = bm.current();
     if(npre == last) {
-      pagemap.clear((int) bf.pos);
+      freePages.clear((int) bf.pos);
       ++unused;
-      if(index < used - 1) readIndex(index + 1);
-      else ++index;
+      if(page < used - 1) readPage(page + 1);
+      else ++page;
     } else {
       // delete entries at beginning of current (last) block
       copy(bf.data, last - fpre, bf.data, 0, npre - last);
@@ -329,14 +328,14 @@ public final class TableDiskAccess extends TableAccess {
 
     // now remove them from the index
     if(unused > 0) {
-      Array.move(fpres, index, -unused, used - index);
-      Array.move(pages, index, -unused, used - index);
+      Array.move(fpres, page, -unused, used - page);
+      Array.move(pages, page, -unused, used - page);
       used -= unused;
-      index -= unused;
+      page -= unused;
     }
 
     // update index entry for this block
-    fpres[index] = pre;
+    fpres[page] = pre;
     fpre = pre;
     updatePre(nr);
   }
@@ -351,14 +350,18 @@ public final class TableDiskAccess extends TableAccess {
     final int nr = nnew >>> IO.NODEPOWER;
 
     int split = 0;
-    if(pre == 0) {
+    if(used == 0) {
       // empty database: insert new data into first block
-      readIndex(0);
-      pagemap.set(0);
+      readPage(0);
+      freePages.set(0);
       ++used;
-    } else {
+    } else if(pre > 0) {
       // find the offset within the block where the new records will be inserted
       split = cursor(pre - 1) + IO.NODESIZE;
+    } else {
+      // all insert operations will add data after first node.
+      // i.e., there is no "insert before first document" statement
+      Util.notexpected("Insertion at beginning of populated table.");
     }
 
     // number of bytes occupied by old records in the current block
@@ -374,7 +377,7 @@ public final class TableDiskAccess extends TableAccess {
       bf.dirty = true;
 
       // increment first pre-values of blocks after the last modified block
-      for(int i = index + 1; i < used; ++i) fpres[i] += nr;
+      for(int i = page + 1; i < used; ++i) fpres[i] += nr;
       // update cached variables (fpre is not changed)
       npre += nr;
       meta.size += nr;
@@ -402,19 +405,19 @@ public final class TableDiskAccess extends TableAccess {
 
     if(remain > 0) {
       // check if the last entries can fit in the block after the current one
-      if(index + 1 < used) {
-        final int o = occSpace(index + 1) << IO.NODEPOWER;
+      if(page + 1 < used) {
+        final int o = occSpace(page + 1) << IO.NODEPOWER;
         if(remain <= IO.BLOCKSIZE - o) {
           // copy the last records
-          readIndex(index + 1);
+          readPage(page + 1);
           bf = bm.current();
           System.arraycopy(bf.data, 0, bf.data, remain, o);
           System.arraycopy(all, all.length - remain, bf.data, 0, remain);
           bf.dirty = true;
           // reduce the pre value, since it will be later incremented with nr
-          fpres[index] -= remain >>> IO.NODEPOWER;
+          fpres[page] -= remain >>> IO.NODEPOWER;
           // go back to the previous block
-          readIndex(index - 1);
+          readPage(page - 1);
         } else {
           // there is not enough space in the block - allocate a new one
           ++needed;
@@ -435,26 +438,26 @@ public final class TableDiskAccess extends TableAccess {
     }
 
     // make place for the blocks where the new entries will be written
-    Array.move(fpres, index + 1, needed, used - index - 1);
-    Array.move(pages, index + 1, needed, used - index - 1);
+    Array.move(fpres, page + 1, needed, used - page - 1);
+    Array.move(pages, page + 1, needed, used - page - 1);
 
     // write the all remaining entries
     while(needed-- > 0) {
       freeBlock();
       nrem += write(all, nrem);
-      fpres[index] = fpres[index - 1] + IO.ENTRIES;
-      pages[index] = (int) bm.current().pos;
+      fpres[page] = fpres[page - 1] + IO.ENTRIES;
+      pages[page] = (int) bm.current().pos;
     }
 
     // increment all fpre values after the last modified block
-    for(int i = index + 1; i < used; ++i) fpres[i] += nr;
+    for(int i = page + 1; i < used; ++i) fpres[i] += nr;
 
     meta.size += nr;
 
     // update cached variables
-    fpre = fpres[index];
-    npre = index + 1 < used && fpres[index + 1] < meta.size ?
-        fpres[index + 1] : meta.size;
+    fpre = fpres[page];
+    npre = page + 1 < used && fpres[page + 1] < meta.size ?
+        fpres[page + 1] : meta.size;
   }
 
   // PRIVATE METHODS ==========================================================
@@ -472,7 +475,7 @@ public final class TableDiskAccess extends TableAccess {
       final int last = used - 1;
       int l = 0;
       int h = last;
-      int m = index;
+      int m = page;
       while(l <= h) {
         if(pre < fp) h = m - 1;
         else if(pre >= np) l = m + 1;
@@ -487,28 +490,28 @@ public final class TableDiskAccess extends TableAccess {
           "\n- #used blocks: " + used +
           "\n- #total locks: " + blocks +
           "\n- access: " + m + " (" + l + " > " + h + ']');
-      readIndex(m);
+      readPage(m);
     }
     return pre - fpre << IO.NODEPOWER;
   }
 
   /**
-   * Update the index pointers.
-   * @param i new index
+   * Updates the page pointers.
+   * @param p page index
    */
-  private void setIndex(final int i) {
-    index = i;
-    fpre = fpres[i];
-    npre = i + 1 >= used ? meta.size : fpres[i + 1];
+  private void setPage(final int p) {
+    page = p;
+    fpre = fpres[p];
+    npre = p + 1 >= used ? meta.size : fpres[p + 1];
   }
 
   /**
    * Updates the index pointers and fetches the requested block.
-   * @param i index of the block to fetch
+   * @param p index of the block to fetch
    */
-  private void readIndex(final int i) {
-    setIndex(i);
-    readBlock(pages[i]);
+  private void readPage(final int p) {
+    setPage(p);
+    readBlock(pages[p]);
   }
 
   /**
@@ -537,11 +540,11 @@ public final class TableDiskAccess extends TableAccess {
    * Moves the cursor to a free block (either new or existing empty one).
    */
   private void freeBlock() {
-    final int b = pagemap.nextFree(0);
-    pagemap.set(b);
+    final int b = freePages.nextFree(0);
+    freePages.set(b);
     readBlock(b);
     ++used;
-    ++index;
+    ++page;
   }
 
   /**
@@ -561,9 +564,9 @@ public final class TableDiskAccess extends TableAccess {
    */
   private void updatePre(final int nr) {
     // update index entries for all following blocks and reduce counter
-    for(int i = index + 1; i < used; ++i) fpres[i] -= nr;
+    for(int i = page + 1; i < used; ++i) fpres[i] -= nr;
     meta.size -= nr;
-    npre = index + 1 < used && fpres[index + 1] < meta.size ? fpres[index + 1] :
+    npre = page + 1 < used && fpres[page + 1] < meta.size ? fpres[page + 1] :
       meta.size;
   }
 

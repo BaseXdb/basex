@@ -45,8 +45,7 @@ public final class MemData extends Data {
   }
 
   /**
-   * Light-weight constructor, adopting data structures from the
-   * specified database.
+   * Light-weight constructor, adopting data structures from the specified database.
    * @param data data reference
    */
   public MemData(final Data data) {

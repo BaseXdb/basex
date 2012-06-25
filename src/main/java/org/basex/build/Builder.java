@@ -25,7 +25,7 @@ import org.basex.util.list.*;
  */
 public abstract class Builder extends Progress {
   /** Tree structure. */
-  final PathSummary path = new PathSummary(null);
+  final PathSummary path = new PathSummary();
   /** Namespace index. */
   final Namespaces ns = new Namespaces();
   /** Parser instance. */

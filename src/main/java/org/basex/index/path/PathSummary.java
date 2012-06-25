@@ -29,12 +29,20 @@ public final class PathSummary implements Index {
   private PathNode root;
 
   /**
+   * Constructor.
+   * The {@link Data} reference can be set via {@link #data(Data)}.
+   */
+  public PathSummary() {
+    init();
+  }
+
+  /**
    * Constructor, specifying a data reference.
    * @param d data reference
    */
   public PathSummary(final Data d) {
+    this();
     data = d;
-    init();
   }
 
   /**
@@ -62,7 +70,7 @@ public final class PathSummary implements Index {
    * Sets the data reference.
    * @param d reference
    */
-  public void finish(final Data d) {
+  public void data(final Data d) {
     data = d;
   }
 
