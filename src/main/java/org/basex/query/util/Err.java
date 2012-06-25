@@ -129,6 +129,8 @@ public enum Err {
   BXSQ_ERROR(BXSQ, 1, "An SQL exception occurred: '%'"),
   /** BXSQ0002. */
   BXSQ_CONN(BXSQ, 2, "No opened connection with id %"),
+  /** BXSQ0002. */
+  BXSQ_STATE(BXSQ, 2, "No prepared statement with id %"),
   /** BXSQ0003. */
   BXSQ_PARAMS(BXSQ, 3, "Number of parameters differs from number of placeholders"),
   /** BXSQ0004. */

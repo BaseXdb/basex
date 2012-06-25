@@ -88,8 +88,9 @@ public final class FNSql extends StandardFunc {
   public Iter iter(final QueryContext ctx) throws QueryException {
     checkCreate(ctx);
     switch(sig) {
-      case _SQL_EXECUTE: return execute(ctx);
-      default:         return super.iter(ctx);
+      case _SQL_EXECUTE:          return execute(ctx);
+      case _SQL_EXECUTE_PREPARED: return executePrepared(ctx);
+      default:                    return super.iter(ctx);
     }
   }
 
@@ -201,29 +202,15 @@ public final class FNSql extends StandardFunc {
    * @return result
    * @throws QueryException query exception
    */
-  private Iter execute(final QueryContext ctx) throws QueryException {
+  private NodeSeqBuilder execute(final QueryContext ctx) throws QueryException {
     final int id = (int) checkItr(expr[0].item(ctx, info));
     final Object obj = ctx.jdbc().get(id);
-    if(obj == null) throw BXSQ_CONN.thrw(info, id);
-    // Execute query or prepared statement
-    return obj instanceof Connection ? executeQuery((Connection) obj, ctx)
-        : executePrepStmt((PreparedStatement) obj, ctx);
-  }
-
-  /**
-   * Executes a query or an update statement on a relational database.
-   * @param conn connection
-   * @param ctx query context
-   * @return result
-   * @throws QueryException query exception
-   */
-  private NodeSeqBuilder executeQuery(final Connection conn, final QueryContext ctx)
-      throws QueryException {
+    if(!(obj instanceof Connection)) BXSQ_CONN.thrw(info, id);
 
     final String query = string(checkStr(ctx.iter(expr[1]).next(), ctx));
     Statement stmt = null;
     try {
-      stmt = conn.createStatement();
+      stmt = ((Connection) obj).createStatement();
       final boolean result = stmt.execute(query);
       return result ? buildResult(stmt.getResultSet()) : new NodeSeqBuilder();
     } catch(final SQLException ex) {
@@ -234,24 +221,31 @@ public final class FNSql extends StandardFunc {
   }
 
   /**
-   * Executes a prepared statement.
-   * @param stmt prepared statement
+   * Executes a query, update or prepared statement.
    * @param ctx query context
    * @return result
    * @throws QueryException query exception
    */
-  private NodeSeqBuilder executePrepStmt(final PreparedStatement stmt,
-      final QueryContext ctx) throws QueryException {
+  private NodeSeqBuilder executePrepared(final QueryContext ctx) throws QueryException {
+    final int id = (int) checkItr(expr[0].item(ctx, info));
+    final Object obj = ctx.jdbc().get(id);
+    if(!(obj instanceof PreparedStatement)) BXSQ_STATE.thrw(info, id);
+
     // Get parameters for prepared statement
-    final ANode params = (ANode) checkType(expr[1].item(ctx, info), NodeType.ELM);
-    if(!params.qname().eq(E_PARAMS)) ELMOPTION.thrw(info, params.qname());
+    long c = 0;
+    ANode params = null;
+    if(expr.length > 1) {
+      params = (ANode) checkType(expr[1].item(ctx, info), NodeType.ELM);
+      if(!params.qname().eq(E_PARAMS)) ELMOPTION.thrw(info, params.qname());
+      c = countParams(params);
+    }
+
     try {
-      final int placeCount = stmt.getParameterMetaData().getParameterCount();
+      final PreparedStatement stmt = (PreparedStatement) obj;
       // Check if number of parameters equals number of place holders
-      if(placeCount != countParams(params)) BXSQ_PARAMS.thrw(info);
-      else setParameters(params.children(), stmt);
-      final boolean result = stmt.execute();
-      return result ? buildResult(stmt.getResultSet()) : new NodeSeqBuilder();
+      if(c != stmt.getParameterMetaData().getParameterCount()) BXSQ_PARAMS.thrw(info);
+      if(params != null) setParameters(params.children(), stmt);
+      return stmt.execute() ? buildResult(stmt.getResultSet()) : new NodeSeqBuilder();
     } catch(final SQLException ex) {
       throw BXSQ_ERROR.thrw(info, ex);
     }
@@ -265,8 +259,7 @@ public final class FNSql extends StandardFunc {
   private static long countParams(final ANode params) {
     final AxisIter ch = params.children();
     long c = ch.size();
-    if(c == -1) do
-      ++c;
+    if(c == -1) do ++c;
     while(ch.next() != null);
     return c;
   }
@@ -277,8 +270,9 @@ public final class FNSql extends StandardFunc {
    * @param stmt prepared statement
    * @throws QueryException query exception
    */
-  private void setParameters(final AxisMoreIter params,
-      final PreparedStatement stmt) throws QueryException {
+  private void setParameters(final AxisMoreIter params, final PreparedStatement stmt)
+      throws QueryException {
+
     int i = 0;
     for(ANode next; (next = params.next()) != null;) {
       // Check name
