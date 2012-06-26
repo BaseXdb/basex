@@ -65,8 +65,11 @@ public final class Transform extends Arr {
   public Value value(final QueryContext ctx) throws QueryException {
     final int s = ctx.vars.size();
     final int o = (int) ctx.output.size();
+    final ContextModifier tmp = ctx.updates.mod;
+    final TransformModifier pu = new TransformModifier();
+    ctx.updates.mod = pu;
+
     try {
-      final TransformModifier pu = new TransformModifier();
       for(final Let fo : copies) {
         final Iter ir = ctx.iter(fo.expr);
         final Item i = ir.next();
@@ -80,17 +83,13 @@ public final class Transform extends Arr {
         ctx.vars.add(fo.var.bind(new DBNode(md), ctx).copy());
         pu.addData(md);
       }
-
-      final ContextModifier tmp = ctx.updates.mod;
-      ctx.updates.mod = pu;
       ctx.value(expr[0]);
       ctx.updates.apply();
-      ctx.updates.mod = tmp;
-
       return ctx.value(expr[1]);
     } finally {
       ctx.vars.size(s);
       ctx.output.size(o);
+      ctx.updates.mod = tmp;
     }
   }
 
