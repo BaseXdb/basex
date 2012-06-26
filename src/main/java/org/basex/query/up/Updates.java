@@ -1,8 +1,5 @@
 package org.basex.query.up;
 
-import static org.basex.query.util.Err.*;
-import static org.basex.util.Token.*;
-
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
@@ -109,11 +106,12 @@ import org.basex.util.hash.*;
 public final class Updates {
   /** Current context modifier. */
   public ContextModifier mod;
+  /** Set which contains all file paths which are targeted during a snapshot. */
+  public final TokenSet putPaths = new TokenSet();
+
   /** Mapping between fragment IDs and the temporary data instances created
    * to apply updates on the corresponding fragments. */
   private final IntMap<MemData> fragmentIDs = new IntMap<MemData>();
-  /** Set which contains all URIs which are targeted during a snapshot. */
-  private final TokenSet putUris = new TokenSet();
 
   /**
    * Adds an update primitive to the current context modifier.
@@ -125,14 +123,6 @@ public final class Updates {
       throws QueryException {
 
     if(mod == null) mod = new DatabaseModifier();
-
-    // check for duplicate Put target URIs
-    if(up instanceof Put) {
-      final Put put = (Put) up;
-      if(putUris.add(token(put.path(0))) < 0)
-        UPURIDUP.thrw(put.info, put.path(0));
-    }
-
     mod.add(up, ctx);
   }
 

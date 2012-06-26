@@ -206,7 +206,7 @@ public class QueryParser extends InputParser {
     }
     ctx.funcs.check();
 
-    // check if any updating expressions have been found
+    // check updating expressions if any updating expressions have been found
     if(ctx.updates != null) {
       ctx.funcs.checkUp();
       ctx.vars.checkUp();
