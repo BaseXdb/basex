@@ -10,6 +10,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Variable Reference expression.
@@ -99,6 +100,11 @@ public final class VarRef extends ParseExpr {
   @Override
   public Expr remove(final Var v) {
     return var.is(v) ? new Context(info) : this;
+  }
+
+  @Override
+  public boolean databases(final StringList db) {
+    return true;
   }
 
   @Override

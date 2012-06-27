@@ -10,6 +10,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Some/Every satisfier clause.
@@ -114,6 +115,12 @@ public final class Quantifier extends ParseExpr {
     for(final ForLet f : fl) f.remove(v);
     sat = sat.remove(v);
     return this;
+  }
+
+  @Override
+  public boolean databases(final StringList db) {
+    for(final ForLet f : fl) if(!f.databases(db)) return false;
+    return sat.databases(db);
   }
 
   @Override

@@ -3,6 +3,7 @@ package org.basex.core;
 import static org.basex.core.Text.*;
 
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This class is implemented by all kinds of processes.
@@ -108,6 +109,18 @@ public abstract class Progress {
       timeout.interrupt();
       timeout = null;
     }
+  }
+
+  /**
+   * Adds the names of the databases that will be touched by the process.
+   * An empty string indicates that the currently opened database will be
+   * touched.
+   * @param db databases
+   * @return {@code false} if databases cannot be statically determined
+   */
+  @SuppressWarnings("unused")
+  protected boolean databases(final StringList db) {
+    return false;
   }
 
   /**

@@ -213,7 +213,6 @@ public final class FTLexer extends FTIterator implements IndexToken {
     for(final Entry<Language, Stemmer> l : langs.entrySet()) {
       sl.add(l.getKey() + " (" + l.getValue() + ')');
     }
-    sl.sort(true, true);
-    return sl;
+    return sl.sort(true, true);
   }
 }

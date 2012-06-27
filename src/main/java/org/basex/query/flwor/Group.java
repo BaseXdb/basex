@@ -9,6 +9,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Implementation of the group by clause.
@@ -82,7 +83,6 @@ public final class Group extends ParseExpr {
 
   @Override
   public boolean removable(final Var v) {
-    // don't allow removal if variable is used
     for(final GroupSpec g : groupby) if(g.count(v) != 0) return false;
     for(final Var g : nongroup[0]) if(g.count(v) != 0) return false;
     return true;
@@ -91,6 +91,13 @@ public final class Group extends ParseExpr {
   @Override
   public Expr remove(final Var v) {
     return this;
+  }
+
+  @Override
+  public boolean databases(final StringList db) {
+    for(final GroupSpec g : groupby) if(!g.databases(db)) return false;
+    for(final Var g : nongroup[0]) if(!g.databases(db)) return false;
+    return true;
   }
 
   @Override

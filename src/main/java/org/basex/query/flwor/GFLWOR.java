@@ -15,6 +15,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * GFLWOR clause.
@@ -384,6 +385,14 @@ public class GFLWOR extends ParseExpr {
     if(order != null) order = order.remove(v);
     ret = ret.remove(v);
     return this;
+  }
+
+  @Override
+  public boolean databases(final StringList db) {
+    for(final ForLet f : fl) if(!f.databases(db)) return false;
+    return (where == null || where.databases(db)) &&
+           (order == null || order.databases(db)) &&
+           (group == null || group.databases(db)) && ret.databases(db);
   }
 
   @Override

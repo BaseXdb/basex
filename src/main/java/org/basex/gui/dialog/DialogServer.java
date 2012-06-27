@@ -416,8 +416,7 @@ public final class DialogServer extends BaseXDialog {
       final String name = s.name();
       if(name.endsWith(".log")) sl.add(name);
     }
-    sl.sort(false, false);
-    for(final String s : sl) logc.addItem(s);
+    for(final String s : sl.sort(false, false)) logc.addItem(s);
     action(refreshLog);
   }
 

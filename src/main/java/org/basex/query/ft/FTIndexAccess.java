@@ -10,6 +10,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * FTContains expression with index access.
@@ -75,6 +76,12 @@ public final class FTIndexAccess extends Simple {
   public Expr remove(final Var v) {
     ftexpr.remove(v);
     return this;
+  }
+
+  @Override
+  public boolean databases(final StringList db) {
+    db.add(ictx.data.meta.name);
+    return ftexpr.databases(db);
   }
 
   @Override

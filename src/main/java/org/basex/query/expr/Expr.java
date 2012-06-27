@@ -12,6 +12,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Abstract class for representing XQuery expressions.
@@ -199,6 +200,18 @@ public abstract class Expr extends ExprInfo {
    * @return new expression
    */
   public abstract Expr remove(final Var v);
+
+  /**
+   * Adds the names of the databases that will be touched by the query.
+   * The {@code abstract} modifier can be replaced as soon as the function is
+   * implemented by all expressions.
+   * @param db set
+   * @return {@code false} if databases cannot be statically determined
+   */
+  @SuppressWarnings("unused")
+  public boolean databases(final StringList db) {
+    return false;
+  }
 
   /**
    * <p>This method is overwritten by {@link CmpG}, {@link CmpV} and {@link FNSimple}.

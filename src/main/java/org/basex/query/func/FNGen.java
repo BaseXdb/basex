@@ -21,6 +21,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Generating functions.
@@ -172,7 +173,7 @@ public final class FNGen extends StandardFunc {
     if(it == null) return null;
     final byte[] in = checkEStr(it);
     if(!Uri.uri(in).isValid()) INVDOC.thrw(info, in);
-    return ctx.resource.doc(string(in), info);
+    return ctx.resource.doc(new QueryInput(string(in)), info);
   }
 
   /**
@@ -322,18 +323,30 @@ public final class FNGen extends StandardFunc {
   @Override
   public boolean uses(final Use u) {
     return
-      u == Use.CNS && sig == Function.PARSE_XML ||
-      u == Use.UPD && sig == Function.PUT ||
-      u == Use.X30 && (sig == Function.DATA && expr.length == 0 ||
+      u == Use.CNS && sig == PARSE_XML ||
+      u == Use.UPD && sig == PUT ||
+      u == Use.X30 && (sig == DATA && expr.length == 0 ||
         oneOf(sig, UNPARSED_TEXT, UNPARSED_TEXT_LINES, UNPARSED_TEXT_AVAILABLE,
-            Function.PARSE_XML, URI_COLLECTION, SERIALIZE)) ||
-      u == Use.CTX && (
-        sig == Function.DATA && expr.length == 0 || sig == Function.PUT) || super.uses(u);
+            PARSE_XML, URI_COLLECTION, SERIALIZE)) ||
+      u == Use.CTX && (sig == DATA && expr.length == 0 || sig == PUT) ||
+        super.uses(u);
+  }
+
+  @Override
+  public boolean databases(final StringList db) {
+    if(oneOf(sig, DOC, COLLECTION)) {
+      // [JE] XQuery: check how to handle default collection()
+      if(expr.length == 0 || !(expr[0] instanceof Str)) return false;
+      final QueryInput qi = new QueryInput(string(((Str) expr[0]).string()));
+      db.add(qi.db);
+      return true;
+    }
+    return super.databases(db);
   }
 
   @Override
   public boolean iterable() {
     // collections will never yield duplicates
-    return sig == Function.COLLECTION || super.iterable();
+    return sig == COLLECTION || super.iterable();
   }
 }

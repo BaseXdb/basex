@@ -7,6 +7,7 @@ import org.basex.query.up.primitives.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * ***** Implementation of the W3C XQUERY UPDATE FACILITY 1.0 *****
@@ -163,6 +164,16 @@ public final class Updates {
     final int pre = preSteps(anc, trgID);
 
     return new DBNode(data, pre);
+  }
+
+  /**
+   * Returns names of the databases that will be updated.
+   * @return databases
+   */
+  public StringList databases() {
+    final StringList db = new StringList();
+    if(mod != null) mod.databases(db);
+    return db;
   }
 
   /**

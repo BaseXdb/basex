@@ -9,6 +9,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
+import org.basex.util.list.*;
 
 /**
  * FTDistance expression.
@@ -99,6 +100,12 @@ public final class FTDistance extends FTFilter {
   public FTExpr remove(final Var v) {
     for(int d = 0; d != dist.length; ++d) dist[d] = dist[d].remove(v);
     return super.remove(v);
+  }
+
+  @Override
+  public boolean databases(final StringList db) {
+    for(final Expr d : dist) if(!d.databases(db)) return false;
+    return super.databases(db);
   }
 
   @Override

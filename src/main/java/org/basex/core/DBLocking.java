@@ -7,6 +7,8 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.*;
 import java.util.concurrent.locks.*;
 
+import org.basex.util.list.*;
+
 /**
  * Manage read and write locks on arbitrary objects. Maximum of {@link MainProp#PARALLEL}
  * concurrent transactions are allowed, further will be queued.
@@ -54,9 +56,7 @@ public final class DBLocking implements ILocking {
   }
 
   @Override
-  public <T extends Object & Comparable<? super T>> void acquire(
-      final Progress pr, final Comparable<? extends T>[] objects) {
-
+  public void acquire(final Progress pr, final StringList db) {
     final Thread thread = Thread.currentThread();
     if (locked.containsKey(thread))
       throw new IllegalMonitorStateException("Thread already holds one or more locks.");
@@ -87,15 +87,14 @@ public final class DBLocking implements ILocking {
       }
     }
 
-    // Sort to prevent deadlocks
-    final Comparable<? extends T>[] sortedObjects = objects.clone();
-    Arrays.sort(sortedObjects);
+    // Sort entries and remove duplicates to prevent deadlocks
+    final String[] objects = db.sort(true, true).unique().toArray();
 
     // Store for unlocking later
-    locked.put(thread, sortedObjects);
+    locked.put(thread, objects);
 
     // Finally lock objects
-    for(final Object object : sortedObjects) {
+    for(final String object : objects) {
       ReentrantReadWriteLock lock = locks.get(object);
       if(null == lock) {
         lock = new ReentrantReadWriteLock();

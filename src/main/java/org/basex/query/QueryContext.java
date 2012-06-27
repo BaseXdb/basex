@@ -65,9 +65,10 @@ public final class QueryContext extends Progress {
   public final HashMap<String, String> dbOptions = new HashMap<String, String>();
   /** Global options (will be set after query execution). */
   public final HashMap<String, Object> globalOpt = new HashMap<String, Object>();
+  /** Names of the databases that may be touched by this query.
+   * Set to {@code null} if the affected databases are unknown. */
+  public StringList db;
 
-  /** Root expression of the query. */
-  public Expr root;
   /** Current context value. */
   public Value value;
   /** Current context position. */
@@ -126,6 +127,8 @@ public final class QueryContext extends Progress {
   JDBCConnections jdbc;
   /** Opened connections to relational databases. */
   ClientSessions sessions;
+  /** Root expression of the query. */
+  Expr root;
 
   /** String container for query background information. */
   private final TokenBuilder info = new TokenBuilder();
@@ -159,7 +162,7 @@ public final class QueryContext extends Progress {
    * @throws QueryException query exception
    */
   public void parse(final String qu) throws QueryException {
-    root = new QueryParser(qu, this).parse(null);
+    root = new QueryParser(qu, this).parse();
   }
 
   /**
@@ -179,9 +182,6 @@ public final class QueryContext extends Progress {
   public void compile() throws QueryException {
     // dump compilation info
     if(inf) compInfo(NL + COMPILING_C);
-
-    // static compilation
-    //analyze();
 
     // temporarily set database values (size check added for better performance)
     if(!dbOptions.isEmpty()) {
@@ -273,6 +273,8 @@ public final class QueryContext extends Progress {
    */
   public Value update() throws QueryException {
     if(updating) {
+      // refresh list of touched databases
+      db = updates.databases();
       updates.apply();
       if(updates.size() != 0 && context.data() != null) context.update();
       if(output.size() != 0) return output.value();

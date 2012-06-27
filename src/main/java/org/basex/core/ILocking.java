@@ -1,5 +1,7 @@
 package org.basex.core;
 
+import org.basex.util.list.*;
+
 /**
  * Lock interface; will get obsolete in a later version.
  *
@@ -13,11 +15,9 @@ public interface ILocking {
    *
    * Store and return the {@code token} for unlocking these objects again.
    * @param pr progress
-   * @param objects Objects to put read locks on
-   * @param <T> Allow all Object arrays with mutual comparable objects
+   * @param db names of databases to put read locks on
    */
-  <T extends Object & Comparable<? super T>> void acquire(
-      final Progress pr, final Comparable<? extends T>[] objects);
+  void acquire(final Progress pr, final StringList db);
 
   /**
    * Unlock all objects a transaction locked.

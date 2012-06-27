@@ -6,6 +6,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Project specific try/catch expression.
@@ -119,6 +120,12 @@ public final class Try extends Single {
   public Expr remove(final Var v) {
     for(final Catch c : ctch) c.remove(v);
     return super.remove(v);
+  }
+
+  @Override
+  public boolean databases(final StringList db) {
+    for(final Catch c : ctch) if(!c.databases(db)) return false;
+    return super.databases(db);
   }
 
   @Override

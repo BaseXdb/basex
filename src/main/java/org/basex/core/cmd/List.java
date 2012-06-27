@@ -185,8 +185,7 @@ public final class List extends Command {
         db.add(name);
       }
     }
-    db.sort(false, true);
-    return db;
+    return db.sort(false, true);
   }
 
   /**

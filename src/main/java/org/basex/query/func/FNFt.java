@@ -269,4 +269,14 @@ public final class FNFt extends StandardFunc {
     // skip evaluation at compile time
     return u == Use.CTX && oneOf(sig, _FT_SEARCH, _FT_TOKENS) || super.uses(u);
   }
+
+  @Override
+  public boolean databases(final StringList db) {
+    if(sig == _FT_SEARCH) {
+      if(!(expr[0] instanceof Str)) return false;
+      db.add(string(((Str) expr[0]).string()));
+      return true;
+    }
+    return super.databases(db);
+  }
 }

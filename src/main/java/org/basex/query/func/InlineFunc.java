@@ -11,6 +11,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Inline function.
@@ -70,6 +71,11 @@ public final class InlineFunc extends UserFunc {
   @Override
   public Expr remove(final Var v) {
     throw Util.notexpected(v);
+  }
+
+  @Override
+  public boolean databases(final StringList db) {
+    return false;
   }
 
   @Override

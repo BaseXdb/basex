@@ -18,6 +18,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Path expression.
@@ -388,6 +389,15 @@ public abstract class Path extends ParseExpr {
     if(root != null) root = root.remove(v);
     if(root instanceof Context) root = null;
     return this;
+  }
+
+  @Override
+  public boolean databases(final StringList db) {
+    for(final Expr s : steps) if(!s.databases(db)) return false;
+    if(root != null) return root.databases(db);
+    // [JE] XQuery: should only be added if placed outside a predicate
+    db.add("");
+    return true;
   }
 
   @Override

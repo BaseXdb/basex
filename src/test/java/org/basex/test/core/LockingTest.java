@@ -6,6 +6,7 @@ import java.lang.reflect.Array;
 import java.util.concurrent.*;
 import org.basex.core.*;
 import org.basex.test.*;
+import org.basex.util.list.*;
 import org.junit.*;
 
 /**
@@ -22,7 +23,7 @@ public final class LockingTest extends SandboxTest {
   /** Locking instance used for testing. */
   DBLocking locks = new DBLocking(mprop);
   /** Objects used for locking. */
-  private final Integer[] objects = new Integer[1];
+  private final String[] objects = new String[1];
 
   /**
    * Test preparations: create objects for locking.
@@ -30,7 +31,7 @@ public final class LockingTest extends SandboxTest {
   @Before
   public void before() {
     for(int i = 0; i < objects.length; i++) {
-      objects[i] = new Integer(i);
+      objects[i] = Integer.toString(i);
     }
   }
 
@@ -41,8 +42,8 @@ public final class LockingTest extends SandboxTest {
   @Test
   public void writeWriteTest() throws InterruptedException {
     final CountDownLatch sync = new CountDownLatch(1), test = new CountDownLatch(1);
-    final LockTester<Integer> th1 = new LockTester<Integer>(null, true, objects, sync);
-    final LockTester<Integer> th2 = new LockTester<Integer>(sync, true, objects, test);
+    final LockTester th1 = new LockTester(null, true, objects, sync);
+    final LockTester th2 = new LockTester(sync, true, objects, test);
 
     th1.start();
     th2.start();
@@ -61,8 +62,8 @@ public final class LockingTest extends SandboxTest {
   @Test
   public void writeReadTest() throws InterruptedException {
     final CountDownLatch sync = new CountDownLatch(1), test = new CountDownLatch(1);
-    final LockTester<Integer> th1 = new LockTester<Integer>(null, true, objects, sync);
-    final LockTester<Integer> th2 = new LockTester<Integer>(sync, false, objects, test);
+    final LockTester th1 = new LockTester(null, true, objects, sync);
+    final LockTester th2 = new LockTester(sync, false, objects, test);
 
     th1.start();
     th2.start();
@@ -81,8 +82,8 @@ public final class LockingTest extends SandboxTest {
   @Test
   public void readWriteTest() throws InterruptedException {
     final CountDownLatch sync = new CountDownLatch(1), test = new CountDownLatch(1);
-    final LockTester<Integer> th1 = new LockTester<Integer>(null, false, objects, sync);
-    final LockTester<Integer> th2 = new LockTester<Integer>(sync, true, objects, test);
+    final LockTester th1 = new LockTester(null, false, objects, sync);
+    final LockTester th2 = new LockTester(sync, true, objects, test);
 
     th1.start();
     th2.start();
@@ -103,16 +104,16 @@ public final class LockingTest extends SandboxTest {
     final CountDownLatch sync = new CountDownLatch(1), test1 = new CountDownLatch(1),
         test2 = new CountDownLatch(1);
 
-    final Integer[] obj1 = new Integer[] { 1, 2, 3};
-    final Integer[] obj2 = new Integer[] { obj1[2], obj1[0] }; // 3, 1
-    final Integer[] obj0 = new Integer[] { obj1[1] };          // 2
+    final String[] obj1 = new String[] { "1", "2", "3" };
+    final String[] obj2 = new String[] { obj1[2], obj1[0] }; // 3, 1
+    final String[] obj0 = new String[] { obj1[1] };          // 2
 
     // Block 2
-    final LockTester<Integer> thread0 = new LockTester<Integer>(null, true, obj0, sync);
+    final LockTester thread0 = new LockTester(null, true, obj0, sync);
     // Fetches 1, pauses on 2 (which is hold by thread0), later on fetch 3
-    final LockTester<Integer> thread1 = new LockTester<Integer>(sync, true, obj1, test1);
+    final LockTester thread1 = new LockTester(sync, true, obj1, test1);
     // Fetches 3, then 2 (will pause) - later on fetch 1 (deadlock when not rearranged)
-    final LockTester<Integer> thread2 = new LockTester<Integer>(sync, true, obj2, test2);
+    final LockTester thread2 = new LockTester(sync, true, obj2, test2);
 
     thread0.start();
     thread1.start();
@@ -149,8 +150,8 @@ public final class LockingTest extends SandboxTest {
   @Test
   public void readReadTest() throws InterruptedException {
     final CountDownLatch sync = new CountDownLatch(1), test = new CountDownLatch(1);
-    final LockTester<Integer> th1 = new LockTester<Integer>(null, false, objects, sync);
-    final LockTester<Integer> th2 = new LockTester<Integer>(sync, false, objects, test);
+    final LockTester th1 = new LockTester(null, false, objects, sync);
+    final LockTester th2 = new LockTester(sync, false, objects, test);
 
     th1.start();
     th2.start();
@@ -169,14 +170,12 @@ public final class LockingTest extends SandboxTest {
     final CountDownLatch latch =
         new CountDownLatch(Math.max(mprop.num(MainProp.PARALLEL), 1));
     // Container for (maximum number allowed transactions) + 1 testers
-    @SuppressWarnings("unchecked")
-    // Generic array construction not allowed
-    final LockTester<Integer>[] testers = (LockTester<Integer>[]) Array.newInstance(
+    final LockTester[] testers = (LockTester[]) Array.newInstance(
         LockTester.class, (int) (latch.getCount() + 1));
 
     // Start maximum number of allowed transactions
     for(int i = 0; i < testers.length - 1; i++) {
-      testers[i] = new LockTester<Integer>(null, false, objects, latch);
+      testers[i] = new LockTester(null, false, objects, latch);
       testers[i].start();
     }
     assertTrue("Couldn't start maximum allowed number of parallel transactions!",
@@ -184,7 +183,7 @@ public final class LockingTest extends SandboxTest {
 
     // Start one more transaction
     final CountDownLatch latch2 = new CountDownLatch(1);
-    testers[testers.length - 1] = new LockTester<Integer>(null, false, objects, latch2);
+    testers[testers.length - 1] = new LockTester(null, false, objects, latch2);
     testers[testers.length - 1].start();
     assertFalse("Shouldn't be able to start another parallel transaction yet!",
         latch2.await(WAIT, TimeUnit.MILLISECONDS));
@@ -202,9 +201,8 @@ public final class LockingTest extends SandboxTest {
 
   /**
    * Default implementation for setting locks and latches.
-   * @param <T> Object Array to put locks on
    */
-  private class LockTester<T extends Object & Comparable<? super T>> extends Thread {
+  private class LockTester extends Thread {
     /** Latch to await before locking. */
     private final CountDownLatch await;
     /** Latch to count down after locking. */
@@ -212,7 +210,7 @@ public final class LockingTest extends SandboxTest {
     /** Shall we fetch write locks? */
     private final boolean write;
     /** Array of objects to put locks onto. */
-    private final Comparable<? extends T>[] objectsArray;
+    private final String[] objectsArray;
     /** Flag indicating to release locks after being notified. */
     private volatile boolean requestRelease;
 
@@ -223,8 +221,8 @@ public final class LockingTest extends SandboxTest {
      * @param o Object array to put locks on
      * @param c Latch to count down after receiving locks
      */
-    LockTester(final CountDownLatch a, final boolean w,
-        final Comparable<? extends T>[] o, final CountDownLatch c) {
+    LockTester(final CountDownLatch a, final boolean w, final String[] o,
+        final CountDownLatch c) {
       await = a;
       write = w;
       objectsArray = o;
@@ -244,7 +242,7 @@ public final class LockingTest extends SandboxTest {
 
       // Fetch lock if objects are set
       final Command cmd = new Cmd(write);
-      if(null != objectsArray) locks.acquire(cmd, objectsArray);
+      if(null != objectsArray) locks.acquire(cmd, new StringList().add(objectsArray));
 
       // We hold the lock, count down
       if(null != countDown) countDown.countDown();

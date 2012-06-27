@@ -13,6 +13,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This index class retrieves texts and attribute values from the index.
@@ -127,6 +128,11 @@ public final class ValueAccess extends IndexAccess {
   public Expr remove(final Var v) {
     expr = expr.remove(v);
     return this;
+  }
+
+  @Override
+  public boolean databases(final StringList db) {
+    return expr.databases(db);
   }
 
   @Override

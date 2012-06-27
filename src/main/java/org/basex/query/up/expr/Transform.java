@@ -14,6 +14,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Transform expression.
@@ -115,6 +116,12 @@ public final class Transform extends Arr {
   public Expr remove(final Var v) {
     for(final Let c : copies) c.remove(v);
     return super.remove(v);
+  }
+
+  @Override
+  public boolean databases(final StringList db) {
+    for(final Let c : copies) if(!c.databases(db)) return false;
+    return super.databases(db);
   }
 
   @Override

@@ -9,6 +9,7 @@ import org.basex.index.resource.*;
 import org.basex.io.random.*;
 import org.basex.query.util.pkg.*;
 import org.basex.server.*;
+import org.basex.util.list.*;
 
 /**
  * This class serves as a central database context.
@@ -89,7 +90,7 @@ public final class Context {
     locks = ctx.locks;
     users = ctx.users;
     repo = ctx.repo;
-    databases = ctx.databases();
+    databases = ctx.databases;
     listener = cl;
   }
 
@@ -106,6 +107,7 @@ public final class Context {
     users = new Users(true);
     repo = new Repo(this);
     user = users.get(ADMIN);
+    databases = databases();
     listener = null;
   }
 
@@ -255,7 +257,19 @@ public final class Context {
   public void register(final Progress pr) {
     // administrators will not be affected by the timeout
     if(!user.has(Perm.ADMIN)) pr.startTimeout(mprop.num(MainProp.TIMEOUT));
-    locks.acquire(pr, new String[] { "".intern() });
+
+    // get touched databases
+    StringList sl = new StringList();
+    if(!pr.databases(sl)) {
+      // databases cannot be determined... pass on all existing databases
+      sl = databases.listDBs();
+    } else {
+      // replace empty string with currently opened database and return array
+      for(int d = 0; d < sl.size(); d++) {
+        if(data != null && sl.get(d).isEmpty()) sl.set(d, data.meta.name);
+      }
+    }
+    locks.acquire(pr, sl);
   }
 
   /**

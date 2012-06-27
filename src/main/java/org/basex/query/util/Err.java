@@ -928,7 +928,7 @@ public enum Err {
   /** XUST0002. */
   UPEXPECTT(XUST, 2, "Updating expression expected in modify clause."),
   /** XUST0002. */
-  UPEXPECTF(XUST, 2, "Updating expression expected in function declaration."),
+  UPEXPECTF(XUST, 2, "Function body must be an updating expression."),
   /** XUST0003. */
   DUPLREVAL(XUST, 3, "Duplicate 'revalidation' declaration."),
   /** XUST0026. */

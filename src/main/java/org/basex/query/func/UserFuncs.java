@@ -148,9 +148,10 @@ public final class UserFuncs extends ExprInfo {
     for(int i = 0; i < funcs.length; ++i) {
       for(final UserFuncCall c : calls[i]) c.init(funcs[i]);
     }
+
     for(final UserFunc f : funcs) {
       if(!f.declared || f.expr == null) {
-        // function has not been declare yet
+        // function has not been declared yet
         for(final UserFunc uf : funcs) {
           // check if another function with same name exists
           if(f != uf && f.name.eq(uf.name)) FUNCTYPE.thrw(f.info, uf.name.string());

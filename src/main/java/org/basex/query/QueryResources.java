@@ -106,14 +106,12 @@ public final class QueryResources {
   /**
    * Evaluates {@code fn:doc()}: opens an existing database document, or creates a new
    * database and node.
-   * @param input document path
+   * @param qi query input
    * @param info input info
    * @return document
    * @throws QueryException query exception
    */
-  public DBNode doc(final String input, final InputInfo info) throws QueryException {
-    final QueryInput qi = new QueryInput(input);
-
+  public DBNode doc(final QueryInput qi, final InputInfo info) throws QueryException {
     // check currently opened databases
     for(int d = 0; d < datas; ++d) {
       final Data dt = data[d];

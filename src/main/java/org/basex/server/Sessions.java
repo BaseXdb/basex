@@ -26,8 +26,7 @@ public final class Sessions extends CopyOnWriteArrayList<ClientListener> {
     for(final ClientListener sp : this) {
       sl.add(sp.context().user.name + ' ' + sp);
     }
-    sl.sort(true, true);
-    for(final String sp : sl) tb.add(NL).add(LI).add(sp);
+    for(final String sp : sl.sort(true, true)) tb.add(NL).add(LI).add(sp);
     return tb.toString();
   }
 }

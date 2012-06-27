@@ -3,6 +3,7 @@ package org.basex.core;
 import java.util.*;
 
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Management of executing read/write processes.
@@ -37,9 +38,7 @@ final class ProcessLocking implements ILocking {
   }
 
   @Override
-  public <T extends Object & Comparable<? super T>> void acquire(
-      final Progress pr, final Comparable<? extends T>[] objects) {
-
+  public void acquire(final Progress pr, final StringList db) {
     final Object o = new Object();
 
     synchronized(mutex) {

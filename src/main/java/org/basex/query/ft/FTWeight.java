@@ -8,6 +8,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * FTOptions expression.
@@ -101,6 +102,11 @@ public final class FTWeight extends FTExpr {
   public FTExpr remove(final Var v) {
     weight = weight.remove(v);
     return super.remove(v);
+  }
+
+  @Override
+  public boolean databases(final StringList db) {
+    return weight.databases(db) && super.databases(db);
   }
 
   @Override
