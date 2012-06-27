@@ -16,9 +16,13 @@ import java.util.concurrent.locks.*;
  *
  * Locks can only be released by the same thread which acquired it.
  *
+ * This locking can be activated by setting {@link MainProp#DBLOCKING} to {@code true}.
+ * It will get the default implementation in future versions.
+ *
+ * @author BaseX Team 2005-12, BSD License
  * @author Jens Erat
  */
-public final class Locking {
+public final class DBLocking implements ILocking {
   /** Stores one lock for each object ever used for locking. */
   private final Map<Object, ReentrantReadWriteLock> locks =
       new HashMap<Object, ReentrantReadWriteLock>();
@@ -26,7 +30,7 @@ public final class Locking {
    * Currently running transactions.
    *
    * Used as monitor for atomizing access to
-   * {@link Locking#transactions} and {@link Locking#queue}
+   * {@link DBLocking#transactions} and {@link DBLocking#queue}
    */
   private final AtomicInteger transactions = new AtomicInteger(0);
   /**
@@ -45,20 +49,14 @@ public final class Locking {
    * Initialize new Locking instance.
    * @param mp Main properties, used to read parallel transactions limit.
    */
-  public Locking(final MainProp mp) {
+  public DBLocking(final MainProp mp) {
     mprop = mp;
   }
 
-  /**
-   * Puts read locks on an array of objects.
-   *
-   * Store and return the {@code token} for unlocking these objects again.
-   * @param writeLock Acquire exclusive write lock?
-   * @param objects Objects to put read locks on
-   * @param <T> Allow all Object arrays with mutual comparable objects
-   */
+  @Override
   public <T extends Object & Comparable<? super T>> void acquire(
-      final boolean writeLock, final Comparable<? extends T>[] objects) {
+      final Progress pr, final Comparable<? extends T>[] objects) {
+
     final Thread thread = Thread.currentThread();
     if (locked.containsKey(thread))
       throw new IllegalMonitorStateException("Thread already holds one or more locks.");
@@ -74,7 +72,7 @@ public final class Locking {
       while(result) {
         try {
           queue.wait();
-        } catch(InterruptedException e) {
+        } catch(final InterruptedException e) {
           Thread.currentThread().interrupt();
         }
         synchronized(transactions) {
@@ -97,27 +95,24 @@ public final class Locking {
     locked.put(thread, sortedObjects);
 
     // Finally lock objects
-    for(Object object : sortedObjects) {
+    for(final Object object : sortedObjects) {
       ReentrantReadWriteLock lock = locks.get(object);
       if(null == lock) {
         lock = new ReentrantReadWriteLock();
         locks.put(object, lock);
       }
-      (writeLock ? lock.writeLock() : lock.readLock()).lock();
+      (pr.updating ? lock.writeLock() : lock.readLock()).lock();
     }
   }
 
-  /**
-   * Unlock all objects a transaction locked.
-   * @throws IllegalMonitorStateException when no locks are set or already unlocked
-   */
-  public void release() {
+  @Override
+  public void release(final Progress pr) {
     final Object[] objects = locked.remove(Thread.currentThread());
     if(null == objects)
       throw new IllegalMonitorStateException("No locks held by current thread");
 
     // Unlock all locks, no matter if read or write lock
-    for(Object object : objects) {
+    for(final Object object : objects) {
       final ReentrantReadWriteLock lock = locks.get(object);
       if (lock.isWriteLockedByCurrentThread())
         lock.writeLock().unlock();
@@ -145,10 +140,10 @@ public final class Locking {
     sb.append(ind + "Transactions running: " + transactions.get() + nl);
     sb.append(ind + "Transaction queue: " + queue + nl);
     sb.append(ind + "Held locks by object:" + nl);
-    for (Object object : locks.keySet())
+    for (final Object object : locks.keySet())
       sb.append(ind + ind + object + " -> " + locks.get(object) + nl);
     sb.append(ind + "Held locks by transaction:" + nl);
-    for (Thread thread : locked.keySet())
+    for (final Thread thread : locked.keySet())
       sb.append(ind + ind + thread + " -> " + locked.get(thread) + nl);
     return sb.toString();
   }
