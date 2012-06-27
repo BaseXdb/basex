@@ -208,10 +208,7 @@ public abstract class Expr extends ExprInfo {
    * @param db set
    * @return {@code false} if databases cannot be statically determined
    */
-  @SuppressWarnings("unused")
-  public boolean databases(final StringList db) {
-    return false;
-  }
+  public abstract boolean databases(final StringList db);
 
   /**
    * <p>This method is overwritten by {@link CmpG}, {@link CmpV} and {@link FNSimple}.
