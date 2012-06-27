@@ -5,6 +5,7 @@ import java.io.*;
 import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.*;
+import org.basex.util.list.*;
 
 /**
  * Evaluates the 'show events' command and lists all existing events.
@@ -24,6 +25,11 @@ public final class ShowEvents extends Command {
   @Override
   protected boolean run() throws IOException {
     out.println(context.events.info());
+    return true;
+  }
+
+  @Override
+  protected boolean databases(final StringList db) {
     return true;
   }
 

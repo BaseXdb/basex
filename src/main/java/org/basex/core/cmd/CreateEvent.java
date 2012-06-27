@@ -5,6 +5,7 @@ import static org.basex.core.Text.*;
 import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.*;
+import org.basex.util.list.*;
 
 /**
  * Evaluates the 'create event' command and creates a new event.
@@ -27,6 +28,11 @@ public final class CreateEvent extends Command {
     final String name = args[0];
     return context.events.create(name) ?
         info(EVENT_CREATED_X, name) : error(EVENT_EXISTS_X, name);
+  }
+
+  @Override
+  protected boolean databases(final StringList db) {
+    return true;
   }
 
   @Override

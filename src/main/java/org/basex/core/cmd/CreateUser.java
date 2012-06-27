@@ -5,6 +5,7 @@ import static org.basex.core.Text.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.*;
 import org.basex.data.*;
+import org.basex.util.list.*;
 
 /**
  * Evaluates the 'create user' command and creates a new user.
@@ -30,6 +31,11 @@ public final class CreateUser extends AUser {
     return !isMD5(pass) ? error(PW_NOT_VALID) :
       context.users.create(user, pass) ? info(USER_CREATED_X, user) :
         error(USER_EXISTS_X, user);
+  }
+
+  @Override
+  protected boolean databases(final StringList db) {
+    return true;
   }
 
   @Override

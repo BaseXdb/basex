@@ -41,6 +41,11 @@ public final class DropBackup extends Command {
     return info(BACKUP_DROPPED_X, name + '*' + IO.ZIPSUFFIX);
   }
 
+  @Override
+  protected boolean databases(final StringList db) {
+    return databases(db, 0);
+  }
+
   /**
    * Drops one or more backups of the specified database.
    * @param db database

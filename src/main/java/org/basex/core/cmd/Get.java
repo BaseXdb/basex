@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.util.list.*;
 
 /**
  * Evaluates the 'get' command and return the value of a database property.
@@ -29,6 +30,11 @@ public final class Get extends AGet {
     if(type == null && !context.client()) type = mprop.get(key);
     if(type == null) return error(prop.unknown(key));
     out.println(key + COLS + type);
+    return true;
+  }
+
+  @Override
+  protected boolean databases(final StringList db) {
     return true;
   }
 }

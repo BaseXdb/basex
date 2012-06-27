@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
+import org.basex.util.list.*;
 
 /**
  * Evaluates the 'close' command and closes the current database.
@@ -27,6 +28,12 @@ public final class Close extends Command {
     close(data, context);
     context.closeDB();
     return info(DB_CLOSED_X, data.meta.name);
+  }
+
+  @Override
+  protected boolean databases(final StringList db) {
+    db.add("");
+    return true;
   }
 
   /**

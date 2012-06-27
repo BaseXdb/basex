@@ -10,6 +10,7 @@ import org.basex.core.parse.Commands.*;
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Evaluates the 'info index' command and returns information on the indexes
@@ -54,6 +55,12 @@ public final class InfoIndex extends AInfo {
     tb.add(info(CmdIndexInfo.FULLTEXT, data));
     tb.add(info(CmdIndexInfo.PATH, data));
     out.print(tb.finish());
+    return true;
+  }
+
+  @Override
+  protected boolean databases(final StringList db) {
+    db.add("");
     return true;
   }
 

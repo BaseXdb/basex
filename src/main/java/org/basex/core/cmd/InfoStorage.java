@@ -65,6 +65,12 @@ public final class InfoStorage extends AQuery {
     return true;
   }
 
+  @Override
+  protected boolean databases(final StringList db) {
+    db.add("");
+    return true;
+  }
+
   /**
    * Prints the specified range of the table.
    * @param data data reference

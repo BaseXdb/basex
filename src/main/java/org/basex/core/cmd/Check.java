@@ -2,6 +2,7 @@ package org.basex.core.cmd;
 
 import org.basex.core.*;
 import org.basex.io.*;
+import org.basex.util.list.*;
 
 /**
  * Evaluates the 'check' command: opens an existing database or
@@ -37,5 +38,11 @@ public final class Check extends ACreate {
     final boolean ok = cmd.run(context);
     final String msg = cmd.info().trim();
     return ok ? info(msg) : error(msg);
+  }
+
+  @Override
+  protected boolean databases(final StringList db) {
+    db.add("").add(new QueryInput(args[0]).io.dbname());
+    return true;
   }
 }

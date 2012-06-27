@@ -32,6 +32,12 @@ public final class Find extends AQuery {
     return updating(ctx, find(args[0], ctx, false));
   }
 
+  @Override
+  protected boolean databases(final StringList db) {
+    db.add("");
+    return true;
+  }
+
   /**
    * Creates an XQuery representation for the specified query.
    * @param query query

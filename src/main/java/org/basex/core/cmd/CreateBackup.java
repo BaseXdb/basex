@@ -75,6 +75,11 @@ public final class CreateBackup extends Command {
   }
 
   @Override
+  protected boolean databases(final StringList db) {
+    return databases(db, 0);
+  }
+
+  @Override
   protected String tit() {
     return BACKUP;
   }

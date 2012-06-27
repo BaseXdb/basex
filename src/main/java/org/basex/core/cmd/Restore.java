@@ -55,6 +55,12 @@ public final class Restore extends Command {
         info(DB_RESTORED_X, file.name(), perf) : error(DB_NOT_RESTORED_X, db);
   }
 
+  @Override
+  protected boolean databases(final StringList db) {
+    db.add(args[0]);
+    return true;
+  }
+
   /**
    * Restores the specified database.
    * @param file file

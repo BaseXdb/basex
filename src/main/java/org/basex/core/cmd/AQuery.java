@@ -173,7 +173,7 @@ abstract class AQuery extends Command {
   }
 
   @Override
-  public boolean databases(final StringList db) {
+  protected boolean databases(final StringList db) {
     return qp != null && qp.databases(db);
   }
 

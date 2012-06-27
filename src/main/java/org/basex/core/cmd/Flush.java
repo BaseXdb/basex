@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
+import org.basex.util.list.*;
 
 /**
  * Evaluates the 'flush' command and flushes the database buffers.
@@ -28,5 +29,11 @@ public final class Flush extends Command {
       prop.set(Prop.AUTOFLUSH, false);
     }
     return info(DB_FLUSHED_X, data.meta.name, perf);
+  }
+
+  @Override
+  protected boolean databases(final StringList db) {
+    db.add("");
+    return true;
   }
 }

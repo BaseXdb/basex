@@ -265,6 +265,21 @@ public abstract class Command extends Progress {
   }
 
   /**
+   * Adds the names of the database addressed by the argument index.
+   * Skipped if the argument uses glob syntax.
+   * @param db databases
+   * @param a argument index
+   * @return {@code false} if database cannot be determined due to glob syntax
+   */
+  protected final boolean databases(final StringList db, final int a) {
+    // return true if the addressed database argument does not exists
+    if(args.length <= a || args[a] == null) return true;
+    final boolean noglob = !args[a].matches(".*[\\?\\*,].*");
+    if(noglob) db.add(args[a]);
+    return noglob;
+  }
+
+  /**
    * Returns the specified command option.
    * @param s string to be found
    * @param typ options enumeration
@@ -319,15 +334,6 @@ public abstract class Command extends Progress {
 
     // set updating flag
     updating = updating(ctx);
-
-    /* [JE] get touched databases
-    final String[] db = databases(ctx);
-    if(db != null) {
-      System.out.println("Touched Databases:");
-      for(final String d : databases(ctx)) {
-        System.out.println("- " + d);
-      }
-    }*/
 
     try {
       // register process

@@ -90,6 +90,11 @@ public final class DropDB extends ACreate {
   }
 
   @Override
+  protected boolean databases(final StringList db) {
+    return databases(db, 0);
+  }
+
+  @Override
   public void build(final CmdBuilder cb) {
     cb.init(Cmd.DROP + " " + CmdDrop.DB).args();
   }
