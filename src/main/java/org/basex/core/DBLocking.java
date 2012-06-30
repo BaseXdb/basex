@@ -26,8 +26,8 @@ import org.basex.util.list.*;
  */
 public final class DBLocking implements ILocking {
   /** Stores one lock for each object ever used for locking. */
-  private final Map<Object, ReentrantReadWriteLock> locks =
-      new HashMap<Object, ReentrantReadWriteLock>();
+  private final Map<String, ReentrantReadWriteLock> locks =
+      new HashMap<String, ReentrantReadWriteLock>();
   /**
    * Currently running transactions.
    *
