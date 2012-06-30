@@ -119,11 +119,8 @@ public abstract class IdPreMapBulkTestBase {
       return idlist.indexOf(id);
     }
 
-    /**
-     * Size of the map.
-     * @return number of stored records
-     */
-    int size() {
+    @Override
+    public int size() {
       return idlist.size();
     }
 
