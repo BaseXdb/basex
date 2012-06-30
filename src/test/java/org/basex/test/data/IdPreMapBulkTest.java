@@ -14,9 +14,9 @@ public final class IdPreMapBulkTest extends IdPreMapBulkTestBase {
   /** Random number generator. */
   private static final Random RANDOM = new Random();
   /** Maximal number of bulk inserted/deleted records. */
-  private static final int BULK = 20;
+  private static final int BULK = 50;
   /** Number of times to repeat each test. */
-  private static final int ITER = 20;
+  private static final int ITER = 200;
 
   /** Set-up method. */
   @Before
@@ -105,7 +105,7 @@ public final class IdPreMapBulkTest extends IdPreMapBulkTestBase {
           id += c;
         } else {
           c = -Math.min(n - pre, RANDOM.nextInt(BULK) + 1);
-          delete(pre, c);
+          if(c != 0) delete(pre, c);
         }
         check();
         n += c;
