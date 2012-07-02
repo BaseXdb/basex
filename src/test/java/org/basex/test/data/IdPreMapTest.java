@@ -44,6 +44,25 @@ public final class IdPreMapTest {
     deletedpres = new IntList(ITERATIONS);
   }
 
+  /** Insert correctness: insert values at at the end. */
+  @Test
+  public void appendCorrectness() {
+    final int n = BASEID + ITERATIONS;
+    for(int id = BASEID + 1; id <= n; ++id) {
+      insert(id, id);
+      check();
+    }
+  }
+
+  /** Insert correctness: insert values at at the end. */
+  @Test
+  public void deleteFromEndCorrectness() {
+    for(int id = BASEID; id >= 0; --id) {
+      delete(id);
+      check();
+    }
+  }
+
   /** Insert correctness: insert values at random positions. */
   @Test
   public void insertCorrectness() {
@@ -80,7 +99,7 @@ public final class IdPreMapTest {
   public void insertDeleteCorrectness() {
     for(int i = 0, cnt = BASEID + 1, id = BASEID + 1; i < ITERATIONS; ++i) {
       // can't delete if all records have been deleted:
-      if(RANDOM.nextBoolean() || id == 0) insert(RANDOM.nextInt(cnt++), id++);
+      if(RANDOM.nextBoolean() || cnt == 0) insert(RANDOM.nextInt(++cnt), id++);
       else delete(RANDOM.nextInt(cnt--));
       check();
     }
@@ -247,11 +266,8 @@ public final class IdPreMapTest {
       return ids.indexOf(id);
     }
 
-    /**
-     * Size of the map.
-     * @return number of stored records
-     */
-    int size() {
+    @Override
+    public int size() {
       return ids.size();
     }
 

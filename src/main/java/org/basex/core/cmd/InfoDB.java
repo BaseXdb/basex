@@ -12,6 +12,7 @@ import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.*;
 import org.basex.data.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Evaluates the 'info database' command and returns information on the
@@ -35,6 +36,12 @@ public final class InfoDB extends AInfo {
   protected boolean run() throws IOException {
     final boolean create = context.user.has(Perm.CREATE);
     out.print(db(context.data().meta, false, true, create));
+    return true;
+  }
+
+  @Override
+  protected boolean databases(final StringList db) {
+    db.add("");
     return true;
   }
 

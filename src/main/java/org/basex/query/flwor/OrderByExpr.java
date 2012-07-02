@@ -8,6 +8,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Single order specifier.
@@ -75,6 +76,11 @@ public final class OrderByExpr extends OrderBy {
   public OrderByExpr remove(final Var v) {
     expr = expr.remove(v);
     return this;
+  }
+
+  @Override
+  public boolean databases(final StringList db) {
+    return expr.databases(db);
   }
 
   @Override

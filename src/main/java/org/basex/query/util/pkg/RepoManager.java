@@ -137,9 +137,7 @@ public final class RepoManager {
         sl.add(dir.name() + '.' + s.replaceAll("\\..*", "").replace('/', '.'));
       }
     }
-
-    sl.sort(false, true);
-    return sl;
+    return sl.sort(false, true);
   }
 
   /**

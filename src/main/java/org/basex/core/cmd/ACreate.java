@@ -11,6 +11,7 @@ import org.basex.index.ft.*;
 import org.basex.index.value.*;
 import org.basex.io.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Abstract class for database creation commands.
@@ -45,6 +46,13 @@ public abstract class ACreate extends Command {
   public boolean newData(final Context ctx) {
     if(newData) new Close().run(ctx);
     return newData;
+  }
+
+  @Override
+  protected boolean databases(final StringList db) {
+    // default implementation for commands accessing (exclusively) the opened database
+    db.add("");
+    return true;
   }
 
   @Override

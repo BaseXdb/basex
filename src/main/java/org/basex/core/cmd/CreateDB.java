@@ -15,6 +15,7 @@ import org.basex.index.value.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Evaluates the 'create db' command and creates a new database.
@@ -121,6 +122,12 @@ public final class CreateDB extends ACreate {
       abort();
       return error(Util.info(NOT_PARSED_X, parser.src));
     }
+  }
+
+  @Override
+  protected boolean databases(final StringList db) {
+    db.add("").add(args[0]);
+    return true;
   }
 
   /**

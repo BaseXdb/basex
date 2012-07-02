@@ -52,6 +52,11 @@ public final class IOUrl extends IO {
   }
 
   @Override
+  public String dir() {
+    return path.endsWith("/") ? path : path.substring(0, path.lastIndexOf('/') + 1);
+  }
+
+  @Override
   public IO merge(final String f) {
     final IO io = IO.get(f);
     if(!(io instanceof IOFile) || f.contains(":") || f.startsWith("/")) return io;

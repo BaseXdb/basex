@@ -17,6 +17,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Abstract value.
@@ -123,6 +124,13 @@ public abstract class Value extends Expr implements Iterable<Item> {
   @Override
   public final Expr remove(final Var v) {
     return this;
+  }
+
+  @Override
+  public boolean databases(final StringList db) {
+    final Data data = data();
+    if(data != null) db.add(data.meta.name);
+    return true;
   }
 
   @Override

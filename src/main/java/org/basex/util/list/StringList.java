@@ -60,6 +60,17 @@ public class StringList extends ElementList implements Iterable<String> {
   }
 
   /**
+   * Sets an element at the specified index position.
+   * @param i index
+   * @param e element to be set
+   */
+  public final void set(final int i, final String e) {
+    if(i >= list.length) list = Arrays.copyOf(list, newSize(i + 1));
+    list[i] = e;
+    size = Math.max(size, i + 1);
+  }
+
+  /**
    * Checks if the specified element is found in the list.
    * @param e element to be found
    * @return result of check
@@ -89,9 +100,10 @@ public class StringList extends ElementList implements Iterable<String> {
    * Sorts the elements.
    * @param cs respect case sensitivity
    * @param asc ascending/descending flag
+   * @return self reference
    */
-  public final void sort(final boolean cs, final boolean asc) {
-    sort(cs, asc, 0);
+  public final StringList sort(final boolean cs, final boolean asc) {
+    return sort(cs, asc, 0);
   }
 
   /**
@@ -99,10 +111,12 @@ public class StringList extends ElementList implements Iterable<String> {
    * @param cs respect case sensitivity
    * @param asc ascending/descending flag
    * @param pos position where sorting starts
+   * @return self reference
    */
-  public final void sort(final boolean cs, final boolean asc, final int pos) {
+  public final StringList sort(final boolean cs, final boolean asc, final int pos) {
     final Comparator<String> comp = cs ? null : String.CASE_INSENSITIVE_ORDER;
     Arrays.sort(list, pos, size, asc ? comp : Collections.reverseOrder(comp));
+    return this;
   }
 
   @Override

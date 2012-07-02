@@ -9,6 +9,7 @@ import org.basex.core.parse.Commands.*;
 import org.basex.data.*;
 import org.basex.server.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Evaluates the 'drop user' command and drops a user.
@@ -26,9 +27,9 @@ public final class DropUser extends AUser {
   }
 
   /**
-   * Constructor, specifying a database.
+   * Constructor for dropping local database users.
    * @param name name of user
-   * @param db database
+   * @param db database (may be {@code null})
    */
   public DropUser(final String name, final String db) {
     super(name, db);
@@ -73,6 +74,11 @@ public final class DropUser extends AUser {
     data.finishUpdate();
     Close.close(data, context);
     return true;
+  }
+
+  @Override
+  protected boolean databases(final StringList db) {
+    return databases(db, 1);
   }
 
   @Override

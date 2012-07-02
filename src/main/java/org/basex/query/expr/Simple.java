@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Simple expression without arguments.
@@ -47,6 +48,11 @@ public abstract class Simple extends ParseExpr {
   @Override
   public Expr remove(final Var v) {
     return this;
+  }
+
+  @Override
+  public boolean databases(final StringList db) {
+    return true;
   }
 
   @Override

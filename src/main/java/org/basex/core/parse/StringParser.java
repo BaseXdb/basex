@@ -260,7 +260,7 @@ final class StringParser extends CmdParser {
     if(parser.more() && !parser.curr(';')) {
       final QueryParser p = new QueryParser(parser.input, new QueryContext(ctx));
       p.ip = parser.ip;
-      p.parse(null);
+      p.parse();
       sb.append(parser.input.substring(parser.ip, p.ip));
       parser.ip = p.ip;
     }

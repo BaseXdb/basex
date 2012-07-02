@@ -6,6 +6,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Stable order specifier.
@@ -49,6 +50,11 @@ public final class OrderByStable extends OrderBy {
 
   @Override
   public boolean removable(final Var v) {
+    return true;
+  }
+
+  @Override
+  public boolean databases(final StringList db) {
     return true;
   }
 

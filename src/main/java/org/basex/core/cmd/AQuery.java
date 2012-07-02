@@ -15,6 +15,7 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Abstract class for database queries.
@@ -168,7 +169,12 @@ abstract class AQuery extends Command {
 
   @Override
   public boolean updating(final Context ctx) {
-    return super.updating(ctx) || args[0] != null && updating(ctx, args[0]);
+    return args[0] != null && updating(ctx, args[0]);
+  }
+
+  @Override
+  protected boolean databases(final StringList db) {
+    return qp != null && qp.databases(db);
   }
 
   @Override

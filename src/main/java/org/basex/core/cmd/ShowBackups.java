@@ -46,6 +46,11 @@ public final class ShowBackups extends Command {
   }
 
   @Override
+  protected boolean databases(final StringList db) {
+    return true;
+  }
+
+  @Override
   public void build(final CmdBuilder cb) {
     cb.init(Cmd.SHOW + " " + CmdShow.BACKUPS);
   }

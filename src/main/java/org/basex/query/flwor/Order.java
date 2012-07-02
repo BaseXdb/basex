@@ -12,6 +12,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Order by expression.
@@ -105,6 +106,12 @@ public final class Order extends ParseExpr {
   public Order remove(final Var v) {
     for(int o = 0; o < ob.length; ++o) ob[o] = ob[o].remove(v);
     return this;
+  }
+
+  @Override
+  public boolean databases(final StringList db) {
+    for(final OrderBy o : ob) if(!o.databases(db)) return false;
+    return true;
   }
 
   @Override

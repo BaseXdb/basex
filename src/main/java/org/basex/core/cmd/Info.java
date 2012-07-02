@@ -6,6 +6,7 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Evaluates the 'info' command and returns general database information.
@@ -24,6 +25,11 @@ public final class Info extends AInfo {
   @Override
   protected boolean run() throws IOException {
     out.print(info(context));
+    return true;
+  }
+
+  @Override
+  protected boolean databases(final StringList db) {
     return true;
   }
 

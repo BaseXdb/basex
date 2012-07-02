@@ -11,6 +11,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * If expression.
@@ -115,13 +116,18 @@ public final class If extends Arr {
 
   @Override
   public boolean removable(final Var v) {
-    return cond.removable(v) || super.removable(v);
+    return cond.removable(v) && super.removable(v);
   }
 
   @Override
   public Expr remove(final Var v) {
     cond = cond.remove(v);
     return super.remove(v);
+  }
+
+  @Override
+  public boolean databases(final StringList db) {
+    return cond.databases(db) && super.databases(db);
   }
 
   @Override

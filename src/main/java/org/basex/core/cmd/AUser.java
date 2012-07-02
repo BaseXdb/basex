@@ -48,7 +48,7 @@ abstract class AUser extends Command {
 
   /**
    * Runs the command for all users and databases.
-   * @param off offset for users and optional databases
+   * @param off offset for users and optional databases ({@code off + 1})
    * @param opt indicates if user/database argument is optional
    * @return success flag
    */

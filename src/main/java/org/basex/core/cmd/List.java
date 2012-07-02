@@ -54,6 +54,11 @@ public final class List extends Command {
     return args[0] == null || args[0].isEmpty() ? list() : listDB();
   }
 
+  @Override
+  protected boolean databases(final StringList db) {
+    return false;
+  }
+
   /**
    * Lists all databases.
    * @return success flag
@@ -185,8 +190,7 @@ public final class List extends Command {
         db.add(name);
       }
     }
-    db.sort(false, true);
-    return db;
+    return db.sort(false, true);
   }
 
   /**

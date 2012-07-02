@@ -9,6 +9,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Switch expression.
@@ -118,6 +119,12 @@ public final class Switch extends ParseExpr {
     for(final SwitchCase sc : cases) sc.remove(v);
     cond = cond.remove(v);
     return this;
+  }
+
+  @Override
+  public boolean databases(final StringList db) {
+    for(final SwitchCase sc : cases) if(!sc.databases(db)) return false;
+    return cond.databases(db);
   }
 
   /**

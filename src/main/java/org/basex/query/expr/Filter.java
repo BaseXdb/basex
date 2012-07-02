@@ -10,6 +10,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Filter expression.
@@ -173,6 +174,11 @@ public class Filter extends Preds {
   public final Expr remove(final Var v) {
     root = root.remove(v);
     return super.remove(v);
+  }
+
+  @Override
+  public boolean databases(final StringList db) {
+    return root.databases(db) && super.databases(db);
   }
 
   @Override

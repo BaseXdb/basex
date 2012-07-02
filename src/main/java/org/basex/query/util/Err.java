@@ -129,6 +129,8 @@ public enum Err {
   BXSQ_ERROR(BXSQ, 1, "An SQL exception occurred: '%'"),
   /** BXSQ0002. */
   BXSQ_CONN(BXSQ, 2, "No opened connection with id %"),
+  /** BXSQ0002. */
+  BXSQ_STATE(BXSQ, 2, "No prepared statement with id %"),
   /** BXSQ0003. */
   BXSQ_PARAMS(BXSQ, 3, "Number of parameters differs from number of placeholders"),
   /** BXSQ0004. */
@@ -926,7 +928,7 @@ public enum Err {
   /** XUST0002. */
   UPEXPECTT(XUST, 2, "Updating expression expected in modify clause."),
   /** XUST0002. */
-  UPEXPECTF(XUST, 2, "Updating expression expected in function declaration."),
+  UPEXPECTF(XUST, 2, "Function body must be an updating expression."),
   /** XUST0003. */
   DUPLREVAL(XUST, 3, "Duplicate 'revalidation' declaration."),
   /** XUST0026. */

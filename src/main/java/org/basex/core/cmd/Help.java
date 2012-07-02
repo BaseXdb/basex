@@ -6,6 +6,7 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.core.parse.Commands.*;
+import org.basex.util.list.*;
 
 /**
  * Evaluates the 'help' command and returns help on the database commands.
@@ -33,6 +34,11 @@ public final class Help extends Command {
       out.println(TRY_SPECIFIC_X);
       for(final Cmd c : Cmd.values()) out.print(c.help(false));
     }
+    return true;
+  }
+
+  @Override
+  protected boolean databases(final StringList db) {
     return true;
   }
 }

@@ -682,7 +682,7 @@ public enum AtomType implements Type {
   /** Parent type. */
   public final Type par;
   /** Type id . */
-  private final int id;
+  private final byte id;
 
   /** Number flag. */
   private final boolean num;
@@ -719,7 +719,7 @@ public enum AtomType implements Type {
     str = s;
     dur = d;
     dat = t;
-    id = i;
+    id = (byte) i;
   }
 
   @Override
@@ -797,7 +797,7 @@ public enum AtomType implements Type {
   }
 
   @Override
-  public int id() {
+  public byte id() {
     return id;
   }
 

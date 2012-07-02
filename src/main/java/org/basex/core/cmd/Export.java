@@ -49,6 +49,12 @@ public final class Export extends Command {
     }
   }
 
+  @Override
+  protected boolean databases(final StringList db) {
+    db.add("");
+    return true;
+  }
+
   /**
    * Exports the current database to the specified path.
    * Files and directories in {@code path} will be possibly overwritten.

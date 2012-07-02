@@ -53,6 +53,12 @@ public final class OptimizeAll extends ACreate {
   }
 
   @Override
+  protected boolean databases(final StringList db) {
+    db.add("");
+    return true;
+  }
+
+  @Override
   public double prog() {
     return (double) pre / size;
   }

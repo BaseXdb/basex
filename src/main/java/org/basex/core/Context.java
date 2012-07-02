@@ -9,6 +9,7 @@ import org.basex.index.resource.*;
 import org.basex.io.random.*;
 import org.basex.query.util.pkg.*;
 import org.basex.server.*;
+import org.basex.util.list.*;
 
 /**
  * This class serves as a central database context.
@@ -54,7 +55,7 @@ public final class Context {
   /** Node context. */
   private Nodes current;
   /** Process locking. */
-  private final Lock lock;
+  private final ILocking locks;
   /** Data reference. */
   private Data data;
   /** Databases list. */
@@ -86,10 +87,10 @@ public final class Context {
     datas = ctx.datas;
     events = ctx.events;
     sessions = ctx.sessions;
-    lock = ctx.lock;
+    locks = ctx.locks;
     users = ctx.users;
     repo = ctx.repo;
-    databases = ctx.databases();
+    databases = ctx.databases;
     listener = cl;
   }
 
@@ -102,10 +103,11 @@ public final class Context {
     datas = new Datas();
     events = new Events();
     sessions = new Sessions();
-    lock = new Lock(this);
+    locks = mp.is(MainProp.DBLOCKING) ? new DBLocking(mp) : new ProcessLocking(this);
     users = new Users(true);
     repo = new Repo(this);
     user = users.get(ADMIN);
+    databases = databases();
     listener = null;
   }
 
@@ -255,7 +257,19 @@ public final class Context {
   public void register(final Progress pr) {
     // administrators will not be affected by the timeout
     if(!user.has(Perm.ADMIN)) pr.startTimeout(mprop.num(MainProp.TIMEOUT));
-    lock.lock(pr);
+
+    // get touched databases
+    StringList sl = new StringList();
+    if(!pr.databases(sl)) {
+      // databases cannot be determined... pass on all existing databases
+      sl = databases.listDBs();
+    } else {
+      // replace empty string with currently opened database and return array
+      for(int d = 0; d < sl.size(); d++) {
+        if(data != null && sl.get(d).isEmpty()) sl.set(d, data.meta.name);
+      }
+    }
+    locks.acquire(pr, sl);
   }
 
   /**
@@ -263,7 +277,7 @@ public final class Context {
    * @param pr process
    */
   public void unregister(final Progress pr) {
-    lock.unlock(pr);
+    locks.release(pr);
     pr.stopTimeout();
   }
 

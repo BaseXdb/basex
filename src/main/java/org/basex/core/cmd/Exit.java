@@ -1,6 +1,7 @@
 package org.basex.core.cmd;
 
 import org.basex.core.*;
+import org.basex.util.list.*;
 
 /**
  * Evaluates the 'exit' command and quits the console.
@@ -17,5 +18,11 @@ public final class Exit extends Command {
   @Override
   protected boolean run() {
     return new Close().run(context);
+  }
+
+  @Override
+  protected boolean databases(final StringList db) {
+    db.add("");
+    return true;
   }
 }

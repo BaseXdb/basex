@@ -162,6 +162,15 @@ public class QueryParser extends InputParser {
   }
 
   /**
+   * Parses the query.
+   * @return resulting root expression
+   * @throws QueryException query exception
+   */
+  public final Expr parse() throws QueryException {
+    return parse(null);
+  }
+
+  /**
    * Parses the specified query or module.
    * If the specified uri is {@code null}, the query is parsed as main module.
    * @param uri module uri.
@@ -204,9 +213,11 @@ public class QueryParser extends InputParser {
     if(ctx.sc.decFormats.get(empty) == null) {
       ctx.sc.decFormats.add(empty, new DecFormatter());
     }
+
+    // check function calls
     ctx.funcs.check();
 
-    // check if any updating expressions have been found
+    // check placement of updating expressions if any updating expressions have been found
     if(ctx.updates != null) {
       ctx.funcs.checkUp();
       ctx.vars.checkUp();

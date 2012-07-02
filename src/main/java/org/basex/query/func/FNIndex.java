@@ -1,6 +1,6 @@
 package org.basex.query.func;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.func.Function.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
@@ -19,6 +19,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Index functions.
@@ -29,17 +30,17 @@ import org.basex.util.*;
  */
 public final class FNIndex extends StandardFunc {
   /** Name: name. */
-  static final QNm Q_NAME = new QNm(NAM);
+  static final QNm Q_NAME = new QNm(QueryText.NAM);
   /** Name: count. */
-  static final QNm Q_COUNT = new QNm(COUNT);
+  static final QNm Q_COUNT = new QNm(QueryText.COUNT);
   /** Name: type. */
-  static final QNm Q_TYPE = new QNm(TYP);
+  static final QNm Q_TYPE = new QNm(QueryText.TYP);
   /** Name: value. */
   static final QNm Q_ENTRY = new QNm("entry");
   /** Name: min. */
-  static final QNm Q_MIN = new QNm(MIN);
+  static final QNm Q_MIN = new QNm(QueryText.MIN);
   /** Name: max. */
-  static final QNm Q_MAX = new QNm(MAX);
+  static final QNm Q_MAX = new QNm(QueryText.MAX);
   /** Name: elements. */
   static final QNm Q_ELM = new QNm(NodeType.ELM.string());
   /** Name: attributes. */
@@ -85,7 +86,8 @@ public final class FNIndex extends StandardFunc {
   private Item facets(final QueryContext ctx) throws QueryException {
     final Data data = data(0, ctx);
     final boolean flat = expr.length == 2 && eq(checkStr(expr[1], ctx), FLAT);
-    return new FDoc(EMPTY).add(flat ? flat(data) : tree(data, data.paths.root().get(0)));
+    return new FDoc(Token.EMPTY).add(flat ? flat(data) :
+      tree(data, data.paths.root().get(0)));
   }
 
   /**
@@ -97,7 +99,7 @@ public final class FNIndex extends StandardFunc {
    */
   private Iter values(final QueryContext ctx, final IndexType it) throws QueryException {
     final Data data = data(0, ctx);
-    final byte[] entry = expr.length < 2 ? EMPTY : checkStr(expr[1], ctx);
+    final byte[] entry = expr.length < 2 ? Token.EMPTY : checkStr(expr[1], ctx);
     if(data.inMemory()) BXDB_MEM.thrw(info, data.meta.name);
 
     final IndexEntries et = expr.length < 3 ? new IndexEntries(entry, it) :
@@ -144,7 +146,7 @@ public final class FNIndex extends StandardFunc {
   private Iter names(final QueryContext ctx, final IndexType it) throws QueryException {
     final Data data = data(0, ctx);
     return entries(it == IndexType.TAG ? data.tagindex : data.atnindex,
-      new IndexEntries(EMPTY, it));
+      new IndexEntries(Token.EMPTY, it));
   }
 
   /**
@@ -238,7 +240,14 @@ public final class FNIndex extends StandardFunc {
   @Override
   public boolean uses(final Use u) {
     // skip pre-evaluation, because cached results may get very large
-    return u == Use.CTX && (sig == Function._INDEX_TEXTS ||
-        sig == Function._INDEX_ATTRIBUTES) || super.uses(u);
+    return u == Use.CTX && (sig == _INDEX_TEXTS || sig == _INDEX_ATTRIBUTES) ||
+        super.uses(u);
+  }
+
+  @Override
+  public boolean databases(final StringList db) {
+    if(!(expr[0] instanceof Str)) return false;
+    db.add(string(((Str) expr[0]).string()));
+    return true;
   }
 }

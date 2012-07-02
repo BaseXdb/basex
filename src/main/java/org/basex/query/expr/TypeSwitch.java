@@ -8,6 +8,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Typeswitch expression.
@@ -46,13 +47,13 @@ public final class TypeSwitch extends ParseExpr {
     ts = ts.compile(ctx);
     // static condition: return branch in question
     if(ts.isValue()) {
-      for(final TypeCase c : cases) {
-        if(c.var.type == null || c.var.type.instance(ts.value(ctx)))
-          return optPre(c.compile(ctx, (Value) ts).expr, ctx);
+      for(final TypeCase tc : cases) {
+        if(tc.var.type == null || tc.var.type.instance(ts.value(ctx)))
+          return optPre(tc.compile(ctx, (Value) ts).expr, ctx);
       }
     }
     // compile branches
-    for(final TypeCase c : cases) c.compile(ctx);
+    for(final TypeCase tc : cases) tc.compile(ctx);
 
     // return result if all branches are equal (e.g., empty)
     boolean eq = true;
@@ -71,8 +72,8 @@ public final class TypeSwitch extends ParseExpr {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Value seq = ctx.value(ts);
-    for(final TypeCase c : cases) {
-      final Iter iter = c.iter(ctx, seq);
+    for(final TypeCase tc : cases) {
+      final Iter iter = tc.iter(ctx, seq);
       if(iter != null) return iter;
     }
     // will never happen
@@ -81,35 +82,41 @@ public final class TypeSwitch extends ParseExpr {
 
   @Override
   public boolean isVacuous() {
-    for(final TypeCase c : cases) if(!c.expr.isVacuous()) return false;
+    for(final TypeCase tc : cases) if(!tc.expr.isVacuous()) return false;
     return true;
   }
 
   @Override
   public boolean uses(final Use u) {
     if(u == Use.VAR) return true;
-    for(final TypeCase c : cases) if(c.uses(u)) return true;
+    for(final TypeCase tc : cases) if(tc.uses(u)) return true;
     return ts.uses(u);
   }
 
   @Override
   public int count(final Var v) {
     int c = ts.count(v);
-    for(final TypeCase t : cases) c += t.count(v);
+    for(final TypeCase tc : cases) c += tc.count(v);
     return c;
   }
 
   @Override
   public boolean removable(final Var v) {
-    for(final TypeCase c : cases) if(!c.removable(v)) return false;
+    for(final TypeCase tc : cases) if(!tc.removable(v)) return false;
     return ts.removable(v);
   }
 
   @Override
   public Expr remove(final Var v) {
-    for(final TypeCase c : cases) c.remove(v);
+    for(final TypeCase tc : cases) tc.remove(v);
     ts = ts.remove(v);
     return this;
+  }
+
+  @Override
+  public boolean databases(final StringList db) {
+    for(final TypeCase tc : cases) if(!tc.databases(db)) return false;
+    return ts.databases(db);
   }
 
   @Override

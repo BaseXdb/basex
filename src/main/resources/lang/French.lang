@@ -11,6 +11,7 @@ add_resources        = Add Resources
 adjust_nodes         = Ajuster les nœuds au texte
 admin_static_%       = L'utilisateur Admin ne peut être modifié.
 all                  = All
+already_executed     = The query has already been executed.
 alter_pw             = Modifier mot de passe
 and_others           = et d'autres
 are_you_sure         = Confirmer?

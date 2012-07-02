@@ -12,6 +12,7 @@ add_resources        = Add Resources
 adjust_nodes         = Зангилаанаас текстрүү өөрчлөх
 admin_static_%       = Админ хэрэглэгч өөрчлөгдөж чадахгүй байна.
 all                  = Бүгд
+already_executed     = The query has already been executed.
 alter_pw             = Нууц үг өөрчлөх
 and_others           = Болон бусад
 are_you_sure         = Та итгэлтэй байна уу?

@@ -6,6 +6,7 @@ import java.util.*;
 
 import org.basex.core.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Evaluates the 'set' command and modifies database properties.
@@ -42,5 +43,10 @@ public final class Set extends AGet {
       Util.debug(ex);
       return error(INVALID_VALUE_X_X, key, val);
     }
+  }
+
+  @Override
+  protected boolean databases(final StringList db) {
+    return true;
   }
 }

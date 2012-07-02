@@ -80,6 +80,12 @@ public final class Copy extends Command {
   }
 
   @Override
+  protected boolean databases(final StringList db) {
+    db.add(args);
+    return true;
+  }
+
+  @Override
   protected String tit() {
     return COPY;
   }

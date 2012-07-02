@@ -5,6 +5,7 @@ import java.io.*;
 import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.*;
+import org.basex.util.list.*;
 
 /**
  * Evaluates the 'show sessions' command and shows server sessions.
@@ -23,6 +24,11 @@ public final class ShowSessions extends Command {
   @Override
   protected boolean run() throws IOException {
     out.println(context.sessions.info());
+    return true;
+  }
+
+  @Override
+  protected boolean databases(final StringList db) {
     return true;
   }
 

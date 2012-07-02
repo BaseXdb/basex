@@ -288,14 +288,14 @@ public abstract class Item extends Value {
    * @return type string
    */
   public byte[] xdmInfo() {
-    return new byte[] { (byte) typeId() };
+    return new byte[] { typeId() };
   }
 
   /**
    * Returns a type id.
    * @return type string
    */
-  public int typeId() {
+  public byte typeId() {
     return type.id();
   }
 

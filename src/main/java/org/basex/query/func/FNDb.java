@@ -727,6 +727,16 @@ public final class FNDb extends StandardFunc {
   }
 
   @Override
+  public boolean databases(final StringList db) {
+    if(!oneOf(_DB_SYSTEM, _DB_NODE_ID, _DB_NODE_PRE, _DB_EVENT, _DB_OUTPUT)) {
+      if(!(expr[0] instanceof Str)) return false;
+      db.add(string(((Str) expr[0]).string()));
+      return true;
+    }
+    return super.databases(db);
+  }
+
+  @Override
   public boolean iterable() {
     // index functions will always yield ordered and duplicate-free results
     return oneOf(sig, _DB_OPEN, _DB_TEXT, _DB_ATTRIBUTE, _DB_FULLTEXT) ||

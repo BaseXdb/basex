@@ -9,6 +9,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Root node.
@@ -61,6 +62,13 @@ public final class Root extends Simple {
   @Override
   public boolean uses(final Use u) {
     return u == Use.CTX;
+  }
+
+  @Override
+  public boolean databases(final StringList db) {
+    // [JE] XQuery: should only be added if placed outside a predicate
+    db.add("");
+    return true;
   }
 
   @Override

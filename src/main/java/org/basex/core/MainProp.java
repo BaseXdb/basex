@@ -62,6 +62,10 @@ public final class MainProp extends AProp {
   /** Defines the number of parallel readers. */
   public static final Object[] PARALLEL = { "PARALLEL", 8 };
 
+  /** Defines the locking algorithm (process vs. database locking);
+   *  will be removed as soon as database locking is stable. */
+  public static final Object[] DBLOCKING = { "DBLOCKING", false };
+
   /**
    * Constructor, reading properties from disk.
    */

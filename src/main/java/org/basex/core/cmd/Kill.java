@@ -3,6 +3,7 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 
 import org.basex.server.*;
+import org.basex.util.list.*;
 
 /**
  * Evaluates the 'kill' command and stops user sessions.
@@ -46,6 +47,11 @@ public final class Kill extends AUser {
       }
     }
     return ok && info(SESSIONS_KILLED_X, count);
+  }
+
+  @Override
+  protected boolean databases(final StringList db) {
+    return true;
   }
 
   @Override

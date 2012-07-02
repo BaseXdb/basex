@@ -5,6 +5,7 @@ import java.util.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.*;
+import org.basex.util.list.*;
 
 /**
  * Base class for the different context modifiers. A context modifier aggregates
@@ -42,6 +43,17 @@ public abstract class ContextModifier {
       pendingUpdates.put(data, dbp);
     }
     dbp.add(p);
+  }
+
+  /**
+   * Returns all updated databases to the specified list.
+   * @param db databases
+   */
+  void databases(final StringList db) {
+    for(final DatabaseUpdates du : pendingUpdates.values()) {
+      db.add(du.data().meta.name);
+    }
+    db.sort(false, true).unique();
   }
 
   /**

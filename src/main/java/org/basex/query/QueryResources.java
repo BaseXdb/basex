@@ -65,7 +65,7 @@ public final class QueryResources {
     // create default collection: use initial node set if it contains all
     // documents of the database. otherwise, create new node set
     addCollection(nodes.root ? ctx.value :
-        DBNodeSeq.get(d.resources.docs(), d, true, true), d.meta.name);
+      DBNodeSeq.get(d.resources.docs(), d, true, true), d.meta.name);
 
     addData(d);
   }
@@ -75,7 +75,7 @@ public final class QueryResources {
    */
   void close() {
     for(int d = ctx.nodes != null ? 1 : 0; d < datas; ++d) {
-      Close.close(data[d], ctx.context);
+     Close.close(data[d], ctx.context);
     }
     datas = 0;
   }
@@ -106,14 +106,12 @@ public final class QueryResources {
   /**
    * Evaluates {@code fn:doc()}: opens an existing database document, or creates a new
    * database and node.
-   * @param input document path
+   * @param qi query input
    * @param info input info
    * @return document
    * @throws QueryException query exception
    */
-  public DBNode doc(final String input, final InputInfo info) throws QueryException {
-    final QueryInput qi = new QueryInput(input);
-
+  public DBNode doc(final QueryInput qi, final InputInfo info) throws QueryException {
     // check currently opened databases
     for(int d = 0; d < datas; ++d) {
       final Data dt = data[d];

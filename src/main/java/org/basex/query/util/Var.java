@@ -11,6 +11,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Variable expression.
@@ -215,6 +216,11 @@ public final class Var extends ParseExpr {
   @Override
   public Var remove(final Var v) {
     return this;
+  }
+
+  @Override
+  public boolean databases(final StringList db) {
+    return true;
   }
 
   @Override

@@ -23,8 +23,6 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public class DiskValues implements Index {
-  /** Number of index entries. */
-  protected int size;
   /** ID references. */
   protected final DataAccess idxr;
   /** ID lists. */
@@ -37,6 +35,9 @@ public class DiskValues implements Index {
   protected final IndexCache cache = new IndexCache();
   /** Cached texts. Increases used memory, but speeds up repeated queries. */
   protected final IntMap<byte[]> ctext = new IntMap<byte[]>();
+
+  /** Number of current index entries. */
+  protected volatile int size;
 
   /**
    * Constructor, initializing the index structure.

@@ -11,6 +11,7 @@ add_resources        = Add Resources
 adjust_nodes         = Sesuaikan simpul dengan teks
 admin_static_%       = Pengguna Admin tidak dapat diubah.
 all                  = All
+already_executed     = The query has already been executed.
 alter_pw             = Ubah kata sandi
 and_others           = dan lainnya
 are_you_sure         = Apakah anda yakin?

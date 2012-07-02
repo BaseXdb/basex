@@ -87,11 +87,11 @@ public final class Add extends ACreate {
     // get name from io reference
     else name = io.name();
 
-    parser = new DirParser(io, prop, data.meta.path);
-    parser.target(target);
-
     // ensure that the final name is not empty
     if(name.isEmpty()) return error(NAME_INVALID_X, name);
+
+    parser = new DirParser(io, prop, data.meta.path);
+    parser.target(target);
 
     // create disk instances for large documents
     // (does not work for input streams and directories)

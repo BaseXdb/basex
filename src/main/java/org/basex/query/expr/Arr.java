@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Abstract array expression.
@@ -59,6 +60,12 @@ public abstract class Arr extends ParseExpr {
   public Expr remove(final Var v) {
     for(int e = 0; e != expr.length; ++e) expr[e] = expr[e].remove(v);
     return this;
+  }
+
+  @Override
+  public boolean databases(final StringList db) {
+    for(final Expr e : expr) if(!e.databases(db)) return false;
+    return true;
   }
 
   @Override

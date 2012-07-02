@@ -125,6 +125,14 @@ final class DatabaseUpdates {
   }
 
   /**
+   * Returns the data instance.
+   * @return data data instance
+   */
+  Data data() {
+    return data;
+  }
+
+  /**
    * Applies all updates for this specific database.
    * @throws QueryException query exception
    */

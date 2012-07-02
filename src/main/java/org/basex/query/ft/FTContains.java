@@ -12,6 +12,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
+import org.basex.util.list.*;
 
 /**
  * FTContains expression.
@@ -126,6 +127,11 @@ public class FTContains extends ParseExpr {
     expr = expr.remove(v);
     ftexpr = ftexpr.remove(v);
     return this;
+  }
+
+  @Override
+  public boolean databases(final StringList db) {
+    return expr.databases(db) && ftexpr.databases(db);
   }
 
   @Override

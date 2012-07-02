@@ -10,6 +10,7 @@ import org.basex.core.parse.Commands.*;
 import org.basex.query.*;
 import org.basex.query.util.pkg.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Evaluates the 'repo delete' command.
@@ -40,6 +41,11 @@ public final class RepoDelete extends Command {
       Util.debug(ex);
       return error(ex.getMessage());
     }
+  }
+
+  @Override
+  protected boolean databases(final StringList db) {
+    return true;
   }
 
   @Override

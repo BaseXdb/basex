@@ -3,16 +3,20 @@ package org.basex.core;
 import java.util.*;
 
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Management of executing read/write processes.
  * Supports multiple readers, limited by {@link MainProp#PARALLEL},
  * and a single writer (readers/writer lock).
  *
+ * This locking is activated by default. It will be replace by {@link DBLocking}
+ * in future versions.
+ *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-final class Lock {
+final class ProcessLocking implements ILocking {
   /** Queue for all waiting processes. */
   private final LinkedList<Object> queue = new LinkedList<Object>();
   /** Mutex object. */
@@ -29,15 +33,12 @@ final class Lock {
    * Default constructor.
    * @param c context
    */
-  Lock(final Context c) {
+  ProcessLocking(final Context c) {
     ctx = c;
   }
 
-  /**
-   * Modifications before executing a process.
-   * @param pr process
-   */
-  void lock(final Progress pr) {
+  @Override
+  public void acquire(final Progress pr, final StringList db) {
     final Object o = new Object();
 
     synchronized(mutex) {
@@ -76,11 +77,8 @@ final class Lock {
     }
   }
 
-  /**
-   * Modifications after executing a command.
-   * @param pr process
-   */
-  void unlock(final Progress pr) {
+  @Override
+  public void release(final Progress pr) {
     synchronized(mutex) {
       if(pr.updating) {
         writer = false;

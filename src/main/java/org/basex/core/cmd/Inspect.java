@@ -5,6 +5,7 @@ import java.io.*;
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Evaluates the 'inspect' command: checks if the currently opened database has
@@ -26,6 +27,12 @@ public final class Inspect extends Command {
     final Data data = context.data();
     out.print(inspect(data));
     return info("'%' inspected in %.", data.meta.name, perf);
+  }
+
+  @Override
+  protected boolean databases(final StringList db) {
+    db.add("");
+    return true;
   }
 
   /**

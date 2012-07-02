@@ -7,6 +7,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
+import org.basex.util.list.*;
 
 /**
  * FTWindow expression.
@@ -96,6 +97,11 @@ public final class FTWindow extends FTFilter {
   public FTExpr remove(final Var v) {
     win = win.remove(v);
     return super.remove(v);
+  }
+
+  @Override
+  public boolean databases(final StringList db) {
+    return win.databases(db) && super.databases(db);
   }
 
   @Override

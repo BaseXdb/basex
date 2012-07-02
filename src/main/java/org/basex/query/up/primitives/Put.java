@@ -4,16 +4,14 @@ import static org.basex.core.Text.*;
 import static org.basex.query.util.Err.*;
 
 import java.io.*;
-import java.util.*;
 
 import org.basex.data.*;
-import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Update primitive for the fn:put() function.
@@ -22,8 +20,8 @@ import org.basex.util.*;
  * @author Lukas Kircher
  */
 public final class Put extends UpdatePrimitive {
-  /** Put location. The same node can be stored in multiple locations. */
-  private final ArrayList<Uri> uri = new ArrayList<Uri>(1);
+  /** Target paths. The same node can be stored in multiple locations. */
+  private final StringList paths = new StringList(1);
 
   /**
    * Constructor.
@@ -32,62 +30,45 @@ public final class Put extends UpdatePrimitive {
    * @param d data
    * @param u uri
    */
-  public Put(final InputInfo i, final int p, final Data d, final Uri u) {
+  public Put(final InputInfo i, final int p, final Data d, final String u) {
     super(PrimitiveType.PUT, p, d, i);
-    uri.add(u);
+    paths.add(u);
   }
 
   @Override
   public void apply() throws QueryException {
-    for(final Uri u : uri) {
-      PrintOutput po = null;
+    for(final String u : paths) {
       final DBNode node = new DBNode(data, pre);
       try {
-        po = new PrintOutput(path(u));
-        final SerializerProp pr = new SerializerProp();
-        // try to reproduce non-chopped documents correctly
-        pr.set(SerializerProp.S_INDENT, node.data.meta.chop ? YES : NO);
-        final Serializer ser = Serializer.get(po, pr);
-        ser.serialize(node);
-        ser.close();
+        final PrintOutput po = new PrintOutput(u);
+        try {
+          final SerializerProp pr = new SerializerProp();
+          // try to reproduce non-chopped documents correctly
+          pr.set(SerializerProp.S_INDENT, node.data.meta.chop ? YES : NO);
+          final Serializer ser = Serializer.get(po, pr);
+          ser.serialize(node);
+          ser.close();
+        } finally {
+          po.close();
+        }
       } catch(final IOException ex) {
-        UPPUTERR.thrw(info, path(u));
-      } finally {
-        if(po != null) try { po.close(); } catch(final IOException ex) { }
+        UPPUTERR.thrw(info, u);
       }
     }
   }
 
-  /**
-   * Returns uri as string.
-   * @param u uri
-   * @return string uri
-   */
-  private String path(final Uri u) {
-    return new IOFile(u.toJava()).path();
-  }
-
-  /**
-   * Returns uri as string.
-   * @param p uri position
-   * @return string uri
-   */
-  public String path(final int p) {
-    return path(uri.get(p));
-  }
-
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
-    for(final Uri u : ((Put) p).uri) uri.add(u);
+    for(final String u : ((Put) p).paths) paths.add(u);
   }
 
   @Override
   public int size() {
-    return uri.size();
+    return paths.size();
   }
 
   @Override
   public String toString() {
-    return Util.name(this) + '[' + targetNode() + ", " + uri.get(0) + ']';
+    return Util.name(this) + '[' + targetNode() + ", " + paths.get(0) + ']';
   }
 }

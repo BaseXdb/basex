@@ -7,6 +7,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This class defines is an abstract class for full-text expressions.
@@ -82,6 +83,12 @@ public abstract class FTExpr extends ParseExpr {
   public FTExpr remove(final Var v) {
     for(int e = 0; e != expr.length; ++e) expr[e] = expr[e].remove(v);
     return this;
+  }
+
+  @Override
+  public boolean databases(final StringList db) {
+    for(final Expr e : expr) if(!e.databases(db)) return false;
+    return true;
   }
 
   @Override

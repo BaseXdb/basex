@@ -6,6 +6,7 @@ import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.*;
 import org.basex.data.*;
+import org.basex.util.list.*;
 
 /**
  * Evaluates the 'alter database' command and renames a database.
@@ -47,6 +48,12 @@ public final class AlterDB extends ACreate {
     // try to alter database
     return alter(src, trg, context) && (!closed || new Open(trg).run(context)) ?
         info(DB_RENAMED_X, src, trg) : error(DB_NOT_RENAMED_X, src);
+  }
+
+  @Override
+  protected boolean databases(final StringList db) {
+    db.add(args);
+    return true;
   }
 
   /**

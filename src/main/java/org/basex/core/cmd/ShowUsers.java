@@ -9,6 +9,7 @@ import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.*;
 import org.basex.data.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Evaluates the 'show users' command and shows existing users.
@@ -52,6 +53,11 @@ public final class ShowUsers extends Command {
         return msg.isEmpty() ? error(DB_NOT_OPENED_X, name) : error(msg);
       }
     }
+    return true;
+  }
+
+  @Override
+  protected boolean databases(final StringList db) {
     return true;
   }
 

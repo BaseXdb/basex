@@ -176,7 +176,6 @@ public final class Databases {
         sl.add(f.path());
       }
     }
-    sl.sort(false, false);
-    return sl;
+    return sl.sort(false, false);
   }
 }

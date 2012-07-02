@@ -9,6 +9,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Context item.
@@ -50,8 +51,20 @@ public final class Context extends Simple {
   }
 
   @Override
+  public boolean uses(final Use u) {
+    return u == Use.CTX;
+  }
+
+  @Override
   public boolean removable(final Var v) {
     return false;
+  }
+
+  @Override
+  public boolean databases(final StringList db) {
+    // [JE] XQuery: should only be added if placed outside a predicate
+    db.add("");
+    return true;
   }
 
   @Override
@@ -60,11 +73,6 @@ public final class Context extends Simple {
     if(!ctx.leaf) return this;
     ctx.compInfo(OPTTEXT);
     return Path.get(info, null, AxisStep.get(info, Axis.CHILD, Test.TXT));
-  }
-
-  @Override
-  public boolean uses(final Use u) {
-    return u == Use.CTX;
   }
 
   @Override

@@ -10,6 +10,7 @@ import org.basex.core.parse.*;
 import org.basex.data.*;
 import org.basex.io.out.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 import org.xml.sax.*;
 
 /**
@@ -41,7 +42,7 @@ public abstract class Command extends Progress {
   private final TokenBuilder info = new TokenBuilder();
   /** Permission required to execute this command. */
   private final Perm perm;
-  /** Indicates if command requires opened database. */
+  /** Indicates if the command requires an opened database. */
   private final boolean data;
 
   /**
@@ -144,6 +145,27 @@ public abstract class Command extends Progress {
   }
 
   /**
+   * Returns the names of the databases that will be touched by the command.
+   * {@code null} is returned if the touched databases cannot be statically determined.
+   * @param ctx database context
+   * @return databases
+   * @see #databases(StringList)
+   */
+  String[] databases(final Context ctx) {
+    // get touched databases
+    final StringList sl = new StringList();
+    if(!databases(sl)) return null;
+
+    // replace empty string with currently opened database and return array
+    final Data dt = ctx.data();
+    final String[] tmp = new String[sl.size()];
+    for(int d = 0; d < tmp.length; d++) {
+      tmp[d] = dt != null && sl.get(d).isEmpty() ? dt.meta.name : sl.get(d);
+    }
+    return tmp;
+  }
+
+  /**
    * Checks if the command has updated any data.
    * If this method is called before command execution, it always returns {@code true}.
    * @return result of check
@@ -243,6 +265,21 @@ public abstract class Command extends Progress {
   }
 
   /**
+   * Adds the names of the database addressed by the argument index.
+   * Skipped if the argument uses glob syntax.
+   * @param db databases
+   * @param a argument index
+   * @return {@code false} if database cannot be determined due to glob syntax
+   */
+  protected final boolean databases(final StringList db, final int a) {
+    // return true if the addressed database argument does not exists
+    if(args.length <= a || args[a] == null) return true;
+    final boolean noglob = !args[a].matches(".*[\\?\\*,].*");
+    if(noglob) db.add(args[a]);
+    return noglob;
+  }
+
+  /**
    * Returns the specified command option.
    * @param s string to be found
    * @param typ options enumeration
@@ -289,11 +326,11 @@ public abstract class Command extends Progress {
    */
   private boolean exec(final Context ctx, final OutputStream os) {
     // check if data reference is available
-    final Data d = ctx.data();
-    if(d == null && data) return error(NO_DB_OPENED);
+    final Data dt = ctx.data();
+    if(dt == null && data) return error(NO_DB_OPENED);
 
     // check permissions
-    if(!ctx.perm(perm, d != null ? d.meta : null)) return error(PERM_REQUIRED_X, perm);
+    if(!ctx.perm(perm, dt != null ? dt.meta : null)) return error(PERM_REQUIRED_X, perm);
 
     // set updating flag
     updating = updating(ctx);
