@@ -351,7 +351,7 @@ public final class TableDiskAccess extends TableAccess {
 
     int split = 0;
     if(used == 0) {
-      // empty database: insert new data into first block
+      // special case: insert new data into first block if database is empty
       readPage(0);
       freePages.set(0);
       ++used;

@@ -30,7 +30,7 @@ public final class PathSummary implements Index {
 
   /**
    * Constructor.
-   * The {@link Data} reference can be set via {@link #data(Data)}.
+   * The {@link Data} reference must be set in a second step via {@link #data(Data)}.
    */
   public PathSummary() {
     init();

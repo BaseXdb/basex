@@ -53,6 +53,11 @@ public final class OptimizeAll extends ACreate {
   }
 
   @Override
+  public boolean newData(final Context ctx) {
+    return true;
+  }
+
+  @Override
   protected boolean databases(final StringList db) {
     db.add("");
     return true;

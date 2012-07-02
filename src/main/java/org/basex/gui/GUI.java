@@ -385,6 +385,9 @@ public final class GUI extends AGUI {
         editor.reset();
       }
 
+      // reset visualizations if data reference will be changed
+      if(cmd.newData(context)) notify.init();
+
       // evaluate command
       String inf = null;
       try {
