@@ -11,6 +11,7 @@ add_resources        = Neue Ressourcen
 adjust_nodes         = Knoten an Text anpassen
 admin_static_%       = Admin-Benutzer kann nicht modifiziert werden.
 all                  = All
+already_executed     = Die Anfrage wurde schon ausgeführt.
 alter_pw             = Passwort ändern
 and_others           = und andere
 are_you_sure         = Sind Sie sicher?

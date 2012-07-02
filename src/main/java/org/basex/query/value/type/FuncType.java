@@ -189,7 +189,7 @@ public class FuncType implements Type {
   }
 
   @Override
-  public int id() {
+  public byte id() {
     return 7;
   }
 

@@ -471,9 +471,9 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public int typeId() {
+  public byte typeId() {
     // check if a document has a single element as child
-    int t = type.id();
+    byte t = type.id();
     if(type == NodeType.DOC) {
       final AxisMoreIter ai = children();
       if(ai.more() && ai.next().type == NodeType.ELM && !ai.more()) t = NodeType.DEL.id();

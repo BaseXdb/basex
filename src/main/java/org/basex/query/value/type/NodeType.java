@@ -140,7 +140,7 @@ public enum NodeType implements Type {
   /** Parent type. */
   private final Type par;
   /** Type id . */
-  private final int id;
+  private final byte id;
   /** Sequence type. */
   private SeqType seq;
 
@@ -153,7 +153,7 @@ public enum NodeType implements Type {
   NodeType(final String nm, final Type pr, final int i) {
     string = Token.token(nm);
     par = pr;
-    id = i;
+    id = (byte) i;
   }
 
   @Override
@@ -226,7 +226,7 @@ public enum NodeType implements Type {
   }
 
   @Override
-  public int id() {
+  public byte id() {
     return id;
   }
 

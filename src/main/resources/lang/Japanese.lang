@@ -11,6 +11,7 @@ add_resources        = Add Resources
 adjust_nodes         = ノードをテキストに調整
 admin_static_%       = Admin ユーザーは編集できません。
 all                  = All
+already_executed     = The query has already been executed.
 alter_pw             = パスワードの変更
 and_others           = その他の貢献者
 are_you_sure         = よろしいですか？

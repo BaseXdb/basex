@@ -65,7 +65,7 @@ public final class QueryResources {
     // create default collection: use initial node set if it contains all
     // documents of the database. otherwise, create new node set
     addCollection(nodes.root ? ctx.value :
-        DBNodeSeq.get(d.resources.docs(), d, true, true), d.meta.name);
+      DBNodeSeq.get(d.resources.docs(), d, true, true), d.meta.name);
 
     addData(d);
   }
@@ -75,7 +75,7 @@ public final class QueryResources {
    */
   void close() {
     for(int d = ctx.nodes != null ? 1 : 0; d < datas; ++d) {
-      Close.close(data[d], ctx.context);
+     Close.close(data[d], ctx.context);
     }
     datas = 0;
   }

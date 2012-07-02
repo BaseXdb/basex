@@ -23,7 +23,7 @@ public abstract class Query {
   /** Cached results. */
   protected TokenList cache;
   /** Cached result types. */
-  protected IntList types;
+  protected ByteList types;
   /** Cache pointer. */
   protected int pos;
 
@@ -102,7 +102,7 @@ public abstract class Query {
    * @return item type
    */
   public final Type type() {
-    final int id = types.get(pos - 1);
+    final byte id = types.get(pos - 1);
     for(final AtomType t : AtomType.values()) if(t.id() == id) return t;
     for(final NodeType t : NodeType.values()) if(t.id() == id) return t;
     return null;
@@ -115,7 +115,7 @@ public abstract class Query {
    */
   protected void cache(final InputStream is) throws IOException {
     cache = new TokenList();
-    types = new IntList();
+    types = new ByteList();
     final ByteList bl = new ByteList();
     for(int t; (t = is.read()) > 0;) {
       final DecodingInput di = new DecodingInput(is);

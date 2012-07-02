@@ -162,6 +162,8 @@ public interface Text {
   String TIMEOUT_EXCEEDED = lang("timeout_exceeded");
   /** Connection error. */
   String CONNECTION_ERROR = lang("connection_error");
+  /** Query has already been executed. */
+  String ALREADY_EXECUTED = lang("already_executed");
   /** Access denied. */
   String ACCESS_DENIED = lang("access_denied");
   /** User name. */

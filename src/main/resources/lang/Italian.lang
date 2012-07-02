@@ -11,6 +11,7 @@ add_resources        = Aggiungi risorse
 adjust_nodes         = Adegua i nodi al testo
 admin_static_%       = L'utente amministratore non può essere modificato.
 all                  = All
+already_executed     = The query has already been executed.
 alter_pw             = Modifica parola chiave
 and_others           = ed altri
 are_you_sure         = Sei sicuro?

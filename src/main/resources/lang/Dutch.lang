@@ -11,6 +11,7 @@ add_resources        = Add Resources
 adjust_nodes         = Pas nodes aan tekst aan
 admin_static_%       = Admin gebruiker kan niet gewijzigd worden.
 all                  = All
+already_executed     = The query has already been executed.
 alter_pw             = Verander wachtwoord
 and_others           = en anderen
 are_you_sure         = Weet je het zeker?

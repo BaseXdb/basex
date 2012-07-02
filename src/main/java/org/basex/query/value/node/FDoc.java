@@ -105,7 +105,7 @@ public final class FDoc extends FNode {
   }
 
   @Override
-  public int typeId() {
+  public byte typeId() {
     // check if a document has a single element as child
     return children.size() == 1 && children.get(0).type == NodeType.ELM ?
       NodeType.DEL.id() : type.id();

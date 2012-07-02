@@ -32,6 +32,8 @@ final class QueryListener extends Progress {
   private String info = "";
   /** Serialization options. */
   private SerializerProp options;
+  /** Closed flag. */
+  private boolean closed;
 
   /**
    * Constructor.
@@ -51,6 +53,7 @@ final class QueryListener extends Progress {
    * @throws IOException query exception
    */
   void bind(final String n, final Object v, final String t) throws IOException {
+    check();
     try {
       qp.bind(n, v, t);
     } catch(final QueryException ex) {
@@ -65,6 +68,7 @@ final class QueryListener extends Progress {
    * @throws IOException query exception
    */
   void context(final Object v, final String t) throws IOException {
+    check();
     try {
       qp.context(v, t);
     } catch(final QueryException ex) {
@@ -111,6 +115,7 @@ final class QueryListener extends Progress {
   void execute(final boolean iter, final OutputStream out, final boolean enc,
       final boolean full) throws IOException {
 
+    check();
     try {
       // parses the query
       init();
@@ -166,20 +171,30 @@ final class QueryListener extends Progress {
     } finally {
       // close processor and stop monitoring
       qp.close();
+      closed = true;
     }
   }
 
   /**
-   * Parses the query and retrieves the serialization options.
+   * Initializes the query.
    * @throws IOException I/O Exception
    */
   private void init() throws IOException {
     if(options != null) return;
     try {
+      check();
       qp.parse();
     } catch(final QueryException ex) {
       throw new BaseXException(ex);
     }
     options = qp.ctx.serParams(false);
+  }
+
+  /**
+   * Checks if the query has not been closed yet.
+   * @throws IOException I/O Exception
+   */
+  private void check() throws IOException {
+    if(closed) throw new BaseXException(ALREADY_EXECUTED);
   }
 }
