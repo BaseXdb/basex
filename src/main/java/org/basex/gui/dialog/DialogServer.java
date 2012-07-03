@@ -26,7 +26,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Andreas Weiler
  */
-public final class DialogServer extends BaseXDialog implements KeyListener {
+public final class DialogServer extends BaseXDialog {
   /** Password textfield. */
   private final BaseXPassword admpass;
 
@@ -48,6 +48,10 @@ public final class DialogServer extends BaseXDialog implements KeyListener {
   final BaseXButton disconnect;
   /** Refresh button. */
   final BaseXButton refreshSess;
+  /** Connect button. */
+  final BaseXButton connect;
+  /** Start button. */
+  final BaseXButton start;
   /** Indicates which tab is activated. */
   int tab;
 
@@ -57,10 +61,6 @@ public final class DialogServer extends BaseXDialog implements KeyListener {
   private final BaseXButton refreshLog;
   /** Stop button. */
   private final BaseXButton stop;
-  /** Start button. */
-  private final BaseXButton start;
-  /** Connect button. */
-  private final BaseXButton connect;
   /** Deletes log file. */
   private final BaseXButton delete;
   /** Deletes all log files. */
@@ -238,13 +238,27 @@ public final class DialogServer extends BaseXDialog implements KeyListener {
       }
     });
 
-    //key listeners for the enter key pressing
-    //when enter key is pressed the connect button will be clicked
-    admuser.addKeyListener(this);
-    admpass.addKeyListener(this);
-    host.addKeyListener(this);
-    portc.addKeyListener(this);
-    
+    // start server: when enter key is pressed, the server will be started
+    final KeyAdapter startListener = new KeyAdapter() {
+      @Override
+      public void keyPressed(final KeyEvent key) {
+        if(key.getKeyCode() == KeyEvent.VK_ENTER) action(start);
+      }
+    };
+    ports.addKeyListener(startListener);
+
+    // admin login: when enter key is pressed the connect button will be clicked
+    final KeyAdapter connListener = new KeyAdapter() {
+      @Override
+      public void keyPressed(final KeyEvent key) {
+        if(key.getKeyCode() == KeyEvent.VK_ENTER) action(connect);
+      }
+    };
+    admuser.addKeyListener(connListener);
+    admpass.addKeyListener(connListener);
+    host.addKeyListener(connListener);
+    portc.addKeyListener(connListener);
+
     refreshLog();
     action(null);
     setResizable(true);
@@ -443,24 +457,5 @@ public final class DialogServer extends BaseXDialog implements KeyListener {
   @Override
   public void close() {
     if(ok) super.close();
-  }
-
-  @Override
-  public void keyPressed(KeyEvent key) {
-    //when enter key is pressed the connect button will be clicked
-    if (key.getKeyCode() == KeyEvent.VK_ENTER) {
-      connect.doClick();
-    }
-  }
-
-  @Override
-  public void keyReleased(KeyEvent arg0) {
-    // TODO Auto-generated method stub
-    
-  }
-
-  @Override
-  public void keyTyped(KeyEvent arg0) {
-    // TODO Auto-generated method stub
   }
 }
