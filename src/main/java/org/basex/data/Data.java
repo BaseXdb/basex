@@ -109,23 +109,6 @@ public abstract class Data {
   public abstract void close();
 
   /**
-   * Checks if the database contains no documents.
-   * Empty databases can be recognized by a single document node.
-   * @return result of check
-   */
-  public final boolean isEmpty() {
-    return meta.size == 0;
-  }
-
-  /**
-   * Checks if the database contains a single document.
-   * @return result of check
-   */
-  public final boolean single() {
-    return meta.size == size(0, DOC);
-  }
-
-  /**
    * Closes the specified index.
    * @param type index to be closed
    */

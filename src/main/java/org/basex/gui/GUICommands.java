@@ -96,15 +96,7 @@ public enum GUICommands implements GUICommand {
           if(!BaseXDialog.confirm(gui, Util.info(msg, file))) return;
         }
       }
-
       DialogProgress.execute(gui, new Export(root.path()));
-    }
-
-    @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      final Data data = gui.context.data();
-      b.setEnabled(data != null && (!data.isEmpty() ||
-          !data.inMemory() && data.meta.binaries().exists()));
     }
   },
 

@@ -65,7 +65,8 @@ final class Docs {
   }
 
   /**
-   * Initializes the document index.
+   * Initializes the document index. Currently, will only be called if the database is
+   * optimized, and the resource index will be rebuilt.
    */
   synchronized void init() {
     docList = null;
@@ -206,7 +207,7 @@ final class Docs {
   synchronized IntList docs(final String path) {
     // invalid path, or no documents: return empty list
     final String pth = MetaData.normPath(path);
-    if(pth == null || data.isEmpty()) return new IntList(0);
+    if(pth == null) return new IntList(0);
 
     // empty path: return all documents
     final IntList docs = docs();
@@ -245,7 +246,7 @@ final class Docs {
   synchronized int doc(final String path, final boolean sort) {
     // invalid or empty path, or no documents: return -1
     final String pth = MetaData.normPath(path);
-    if(pth == null || pth.isEmpty() || data.isEmpty()) return -1;
+    if(pth == null || pth.isEmpty()) return -1;
 
     // normalize paths
     final byte[] exct = normalize(token(pth));
@@ -268,12 +269,10 @@ final class Docs {
 
   /**
    * Determines whether the given path is the path to a document directory.
-   * @param path given path (must be normalized, means one leading but
-   * no trailing slash.
+   * @param path given path (will be normalized by adding a trailing slash)
    * @return path to a directory or not
    */
   synchronized boolean isDir(final byte[] path) {
-    if(path == null || data.isEmpty()) return false;
     final byte[] pa = concat(path, SLASH);
     for(final byte[] b : paths()) if(startsWith(b, pa)) return true;
     return false;
@@ -290,19 +289,19 @@ final class Docs {
       final TokenBoolMap tbm) {
 
     final String pth = MetaData.normPath(string(path));
-    if(pth != null && !data.isEmpty()) {
-      // normalize path to one leading + one trailing slash!
-      byte[] tp = concat(SLASH, token(pth));
-      // if the given path is the root, don't add a trailing slash
-      if(!pth.isEmpty()) tp = concat(tp, SLASH);
-      for(final byte[] to : paths()) {
-        if(startsWith(to, tp)) {
-          final byte[] toAdd = substring(to, tp.length, to.length);
-          final int i = indexOf(toAdd, SLASH);
-          // no more slashes means this must be a leaf
-          if(!dir && i == -1) tbm.add(toAdd, false);
-          else if(dir && i >= 0) tbm.add(substring(toAdd, 0, i), false);
-        }
+    if(pth == null) return;
+
+    // normalize path to one leading + one trailing slash!
+    byte[] tp = concat(SLASH, token(pth));
+    // if the given path is the root, don't add a trailing slash
+    if(!pth.isEmpty()) tp = concat(tp, SLASH);
+    for(final byte[] to : paths()) {
+      if(startsWith(to, tp)) {
+        final byte[] toAdd = substring(to, tp.length, to.length);
+        final int i = indexOf(toAdd, SLASH);
+        // no more slashes means this must be a leaf
+        if(!dir && i == -1) tbm.add(toAdd, false);
+        else if(dir && i >= 0) tbm.add(substring(toAdd, 0, i), false);
       }
     }
   }

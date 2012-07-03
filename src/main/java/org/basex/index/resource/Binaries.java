@@ -69,9 +69,8 @@ final class Binaries {
 
   /**
    * Determines whether the given path is the path to a directory.
-   * @param path given path (must be normalized, means one leading but
-   * no trailing slash.
-   * @return path to a directory or not
+   * @param path given path
+   * @return result of check
    */
   synchronized boolean isDir(final String path) {
     if(data.inMemory()) return false;

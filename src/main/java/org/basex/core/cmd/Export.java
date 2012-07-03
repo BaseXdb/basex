@@ -92,27 +92,25 @@ public final class Export extends Command {
     }
 
     // XML documents
-    if(!data.isEmpty()) {
-      for(int i = 0, is = il.size(); i < is; i++) {
-        final int pre = il.get(i);
-        // create file path
-        final IO f = root.merge(Token.string(data.text(pre, true)));
-        if(e != null) {
-          e.checkStop();
-          e.progFile = f;
-          e.progPos++;
-        }
-        // create dir if necessary
-        final IOFile dir = new IOFile(f.dir());
-        if(!dir.exists()) dir.md();
-
-        // serialize file
-        final PrintOutput po = new PrintOutput(unique(exported, f.path()));
-        final Serializer ser = Serializer.get(po, sp);
-        ser.serialize(new DBNode(data, pre));
-        ser.close();
-        po.close();
+    for(int i = 0, is = il.size(); i < is; i++) {
+      final int pre = il.get(i);
+      // create file path
+      final IO f = root.merge(Token.string(data.text(pre, true)));
+      if(e != null) {
+        e.checkStop();
+        e.progFile = f;
+        e.progPos++;
       }
+      // create dir if necessary
+      final IOFile dir = new IOFile(f.dir());
+      if(!dir.exists()) dir.md();
+
+      // serialize file
+      final PrintOutput po = new PrintOutput(unique(exported, f.path()));
+      final Serializer ser = Serializer.get(po, sp);
+      ser.serialize(new DBNode(data, pre));
+      ser.close();
+      po.close();
     }
 
     // export raw files
