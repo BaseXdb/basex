@@ -171,6 +171,7 @@ public abstract class ParseExpr extends Expr {
   public void checkAllUp(final Expr... expr) throws QueryException {
     int s = 0;
     for(final Expr e : expr) {
+      e.checkUp();
       if(e.isVacuous()) continue;
       final boolean u = e.uses(Use.UPD);
       if(u && s == 2 || !u && s == 1) UPNOT.thrw(info, description());

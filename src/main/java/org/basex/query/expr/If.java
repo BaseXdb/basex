@@ -37,7 +37,7 @@ public final class If extends Arr {
 
   @Override
   public void checkUp() throws QueryException {
-    checkNoneUp(cond);
+    checkNoUp(cond);
     checkAllUp(expr);
   }
 
