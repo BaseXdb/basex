@@ -44,6 +44,8 @@ public final class StaticContext {
   public boolean nsInherit = true;
   /** Default collation. */
   public Uri collation = Uri.uri(URLCOLL, false);
+  /** XQuery version flag. */
+  public boolean xquery3;
 
   /** Static Base URI. */
   private Uri baseURI = Uri.EMPTY;

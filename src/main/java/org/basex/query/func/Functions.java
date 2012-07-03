@@ -69,7 +69,7 @@ public final class Functions extends TokenSet {
     if(!eq(fl.uri(), name.uri())) return null;
 
     final StandardFunc f = fl.get(ii, args);
-    if(!ctx.xquery3 && f.uses(Use.X30)) FEATURE30.thrw(ii);
+    if(!ctx.sc.xquery3 && f.uses(Use.X30)) FEATURE30.thrw(ii);
     // check number of arguments
     if(args.length < fl.min || args.length > fl.max) XPARGS.thrw(ii, fl);
     return f;

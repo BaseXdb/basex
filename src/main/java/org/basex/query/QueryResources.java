@@ -58,9 +58,7 @@ public final class QueryResources {
     if(!ctx.context.perm(Perm.READ, d.meta)) BASX_PERM.thrw(null, Perm.READ);
 
     // assign initial context value
-    // (if database only contains an empty root node, assign empty sequence)
-    ctx.value = d.isEmpty() ? Empty.SEQ :
-      DBNodeSeq.get(new IntList(nodes.pres), d, nodes.root, nodes.root);
+    ctx.value = DBNodeSeq.get(new IntList(nodes.pres), d, nodes.root, nodes.root);
 
     // create default collection: use initial node set if it contains all
     // documents of the database. otherwise, create new node set
@@ -116,7 +114,7 @@ public final class QueryResources {
     for(int d = 0; d < datas; ++d) {
       final Data dt = data[d];
       // database has a single document, input paths are matching
-      if(dt.single() && IO.get(dt.meta.original).eq(qi.io))
+      if(dt.resources.docs().size() == 1 && IO.get(dt.meta.original).eq(qi.io))
         return new DBNode(dt, 0, Data.DOC);
 
       // database instance has same name as input path
@@ -288,12 +286,11 @@ public final class QueryResources {
   private DBNode doc(final Data dt, final QueryInput qi, final InputInfo info)
       throws QueryException {
 
-    // database contains a single document and no database path is specified
-    if(dt.single() && qi.path.isEmpty()) return new DBNode(dt, 0, Data.DOC);
-
-    // check if the database contains exactly one relevant document
+    // get all document nodes of the specified database
     final IntList docs = dt.resources.docs(qi.path);
+    // specified document was not found...
     if(docs.isEmpty()) WHICHRES.thrw(info, qi.original);
+    // ensure that a single document was filtered
     if(docs.size() != 1) BXDB_SINGLE.thrw(info, qi.original);
     return new DBNode(dt, docs.get(0), Data.DOC);
   }

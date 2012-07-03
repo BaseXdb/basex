@@ -54,8 +54,6 @@ public final class QueryContext extends Progress {
   public final QueryResources resource = new QueryResources(this);
   /** Database context. */
   public final Context context;
-  /** XQuery version flag. */
-  public boolean xquery3;
 
   /** Cached stop word files. */
   public HashMap<String, IO> stop;
@@ -148,12 +146,12 @@ public final class QueryContext extends Progress {
   public QueryContext(final Context ctx) {
     context = ctx;
     nodes = ctx.current();
-    xquery3 = ctx.prop.is(Prop.XQUERY3);
     inf = ctx.prop.is(Prop.QUERYINFO) || Prop.debug;
     final String path = ctx.prop.get(Prop.QUERYPATH);
     if(!path.isEmpty()) sc.baseURI(path);
     maxCalls = ctx.prop.num(Prop.TAILCALLS);
     modules = new ModuleLoader(ctx);
+    sc.xquery3 = ctx.prop.is(Prop.XQUERY3);
   }
 
   /**

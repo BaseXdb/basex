@@ -37,8 +37,8 @@ final class InvDocTest extends Test {
    * @return document test
    */
   static Test get(final QueryContext ctx, final Data data) {
-    // use simple test if database contains only one node
-    if(data.single()) return Test.DOC;
+    // use simple test if database contains only one document
+    if(data.resources.docs().size() == 1) return Test.DOC;
 
     // adopt nodes from existing sequence
     if(ctx.value instanceof DBNodeSeq) {

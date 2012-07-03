@@ -212,7 +212,7 @@ public final class FNPat extends StandardFunc {
   private Pattern pattern(final Expr pattern, final Expr mod, final QueryContext ctx)
       throws QueryException {
     return RegExParser.parse(checkStr(pattern, ctx),
-        mod != null ? checkStr(mod, ctx) : null, ctx.xquery3, info);
+        mod != null ? checkStr(mod, ctx) : null, ctx.sc.xquery3, info);
   }
 
   @Override
