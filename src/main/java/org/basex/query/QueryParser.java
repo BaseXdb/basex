@@ -775,6 +775,7 @@ public class QueryParser extends InputParser {
     final StaticContext sc = ctx.sc;
     ctx.sc = new StaticContext();
     ctx.sc.baseURI(io.path());
+    ctx.sc.xquery3 = sc.xquery3;
     new QueryParser(qu, ctx).parse(uri);
     ctx.sc = sc;
   }
