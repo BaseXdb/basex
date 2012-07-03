@@ -753,6 +753,8 @@ public interface Text {
   String METHOD = lang("method");
   /** "Parameters". */
   String PARAMETERS = lang("parameters");
+  /** "Path". */
+  String PATH = lang("path");
 
   /** Info on whitespace chopping. */
   String WS_CHOPPING = lang("ws_chopping");

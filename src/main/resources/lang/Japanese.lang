@@ -240,6 +240,7 @@ parse_dtds           = DTDとエントリーを解析する
 parsing              = パース中
 password             = パスワード
 paste                = 貼り付け
+path                 = パス
 path_added_%_%       = パス '%' が  % に追加されました。
 path_index           = パスサマリー
 perm_required_%      = % パーミッションが必要です。

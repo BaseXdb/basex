@@ -240,6 +240,7 @@ parse_dtds           = Parse DTDs en entities
 parsing              = Parsing
 password             = Wachtwoord
 paste                = Plak
+path                 = Pad
 path_added_%_%       = Pad '%' toegevoegd in %.
 path_index           = Path summary
 perm_required_%      = % toegang geweigerd.

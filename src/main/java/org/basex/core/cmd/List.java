@@ -106,8 +106,7 @@ public final class List extends Command {
         table.contents.add(tl);
       }
     }
-    table.sort();
-    out.println(table.finish());
+    out.println(table.sort().finish());
     return true;
   }
 
@@ -159,8 +158,7 @@ public final class List extends Command {
       final String msg = ex.getMessage();
       return msg.isEmpty() ? error(DB_NOT_OPENED_X, db) : error(msg);
     }
-    table.sort();
-    out.println(table.finish());
+    out.println(table.sort().finish());
     return true;
   }
 

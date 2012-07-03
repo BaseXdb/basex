@@ -240,6 +240,7 @@ parse_dtds           = Uraikan DTD dan entitas
 parsing              = Menguarikan
 password             = Kata kunci
 paste                = Tempel
+path                 = Jejak
 path_added_%_%       = Jejak "%" ditambahkan di %.
 path_index           = Ringkasan jejak
 perm_required_%      = % izin dibutuhkan.

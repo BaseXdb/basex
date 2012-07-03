@@ -240,6 +240,7 @@ parse_dtds           = Parsen von DTDs und Entities
 parsing              = Parsing
 password             = Passwort
 paste                = Einfügen
+path                 = Pfad
 path_added_%_%       = Pfad '%' hinzugefügt (%).
 path_index           = Pfadindex
 perm_required_%      = %-Recht benötigt.

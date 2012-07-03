@@ -40,8 +40,7 @@ public final class ShowBackups extends Command {
       tl.add(f.length());
       table.contents.add(tl);
     }
-    table.sort();
-    out.println(table.finish());
+    out.println(table.sort().finish());
     return true;
   }
 

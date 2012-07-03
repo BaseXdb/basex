@@ -39,8 +39,8 @@ public final class DialogPackages extends BaseXDialog {
   private final BaseXLabel version;
   /** Type label. */
   private final BaseXLabel type;
-  /** Directory label. */
-  private final BaseXLabel directory;
+  /** Path label. */
+  private final BaseXLabel path;
 
   /** Refresh list of databases. */
   private boolean refresh;
@@ -61,7 +61,7 @@ public final class DialogPackages extends BaseXDialog {
     name = new BaseXLabel(" ");
     version = new BaseXLabel(" ");
     type = new BaseXLabel(" ");
-    directory = new BaseXLabel(" ");
+    path = new BaseXLabel(" ");
 
     final BaseXBack table = new BaseXBack(new TableLayout(4, 2, 16, 0)).border(5);
     table.add(new BaseXLabel(NAME + COL, false, true));
@@ -70,8 +70,8 @@ public final class DialogPackages extends BaseXDialog {
     table.add(version);
     table.add(new BaseXLabel(TYPE + COL, false, true));
     table.add(type);
-    table.add(new BaseXLabel(DIRECTORY + COL, false, true));
-    table.add(directory);
+    table.add(new BaseXLabel(PATH + COL, false, true));
+    table.add(path);
 
     // database buttons
     install = new BaseXButton(INSTALL + DOTS, this);
@@ -106,8 +106,8 @@ public final class DialogPackages extends BaseXDialog {
     final ArrayList<Command> cmds = new ArrayList<Command>();
 
     if(cmp == install) {
-      final String path = gui.gprop.get(GUIProp.PKGPATH);
-      final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR, path, gui);
+      final String pp = gui.gprop.get(GUIProp.PKGPATH);
+      final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR, pp, gui);
       fc.addFilter(XML_ARCHIVES, IO.XARSUFFIX);
       fc.addFilter(JAVA_ARCHIVES, IO.JARSUFFIX);
       fc.addFilter(XQUERY_FILES, IO.XQSUFFIXES);
@@ -130,15 +130,15 @@ public final class DialogPackages extends BaseXDialog {
         name.setText(Token.string(Package.name(key)));
         version.setText(Token.string(Package.version(key)));
         type.setText(PkgText.EXPATH);
-        directory.setText(Token.string(pkg.get(key)));
+        path.setText(Token.string(pkg.get(key)));
       } else {
         final IOFile file = RepoManager.file(key, ctx.repo);
-        final String path = Token.string(key);
-        title.setText(key.length == 0 ? DOTS : path);
+        final String pp = Token.string(key);
+        title.setText(key.length == 0 ? DOTS : pp);
         name.setText(file != null ? file.name() : "-");
         version.setText("-");
         type.setText(PkgText.INTERNAL);
-        directory.setText(path.replace('.', '/'));
+        path.setText(pp.replace('.', '/'));
       }
       // enable or disable buttons
       delete.setEnabled(pkgs.size() > 0);

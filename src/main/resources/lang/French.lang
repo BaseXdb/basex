@@ -240,6 +240,7 @@ parse_dtds           = Analyser les DTD et les entités
 parsing              = Analyse
 password             = Mot de passe
 paste                = Coller
+path                 = Chemin
 path_added_%_%       = Chemin '%' ajouté en %.
 path_index           = Index des chemins
 perm_required_%      = Permission % requise.

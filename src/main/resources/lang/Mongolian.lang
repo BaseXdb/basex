@@ -241,6 +241,7 @@ parse_dtds           = DTD-үүд болон объектуудыг Parsing хи
 parsing              = Parsing хийх
 password             = Нууц үг
 paste                = Хуулж тавих
+path                 = зам
 path_added_%_%       = "%"зам нь % нэмэгдсэн.
 path_index           = Замын байршил
 perm_required_%      = % хэрэглэгчийн эрх шаардагдаж байна.

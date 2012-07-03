@@ -189,8 +189,6 @@ public final class Users {
       }
       table.contents.add(tl);
     }
-    table.sort();
-    table.toTop(token(ADMIN));
-    return table.finish();
+    return table.sort().toTop(token(ADMIN)).finish();
   }
 }

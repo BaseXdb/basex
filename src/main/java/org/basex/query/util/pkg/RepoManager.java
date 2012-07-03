@@ -88,35 +88,49 @@ public final class RepoManager {
     t.header.add(NAME);
     t.header.add(VERSINFO);
     t.header.add(TYPE);
-    t.header.add(DIRECTORY);
+    t.header.add(PATH);
 
     final TokenMap pkg = repo.pkgDict();
     // traverse EXPath packages
     for(final byte[] p : pkg) {
-      if(p == null) continue;
-      final TokenList tl = new TokenList();
-      tl.add(Package.name(p));
-      tl.add(Package.version(p));
-      tl.add(EXPATH);
-      tl.add(pkg.get(p));
-      t.contents.add(tl);
+      if(p != null) t.contents.add(entry(string(Package.name(p)),
+          string(Package.version(p)), EXPATH, string(pkg.get(p))));
     }
 
     // traverse all directories, ignore root entries with dashes
-    for(final IOFile dir : repo.path().children()) {
-      if(dir.name().indexOf('-') != -1) continue;
-      for(final String s : dir.descendants()) {
-        final TokenList tl = new TokenList();
-        tl.add(dir.name() + '.' + s.replaceAll("\\..*", "").replace('/', '.'));
-        tl.add("-");
-        tl.add(INTERNAL);
-        tl.add(dir.name() + '/' + s);
-        t.contents.add(tl);
+    for(final IOFile ch : repo.path().children()) {
+      final String n = ch.name();
+      if(!ch.isDir()) {
+        t.contents.add(entry(n.replaceAll("\\..*", "").
+            replace('/', '.'), "-", INTERNAL, n));
+      } else if(n.indexOf('-') == -1) {
+        for(final String s : ch.descendants()) {
+          t.contents.add(entry(n + '.' + s.replaceAll("\\..*", "").replace('/', '.'),
+              "-", INTERNAL, n + '/' + s));
+        }
       }
     }
+    return t.sort();
+  }
 
-    t.sort();
-    return t;
+
+  /**
+   * Adds a single table entry.
+   * @param name package name
+   * @param version package version
+   * @param type package type
+   * @param path package path
+   * @return new entry
+   */
+  private TokenList entry(final String name, final String version,
+      final String type, final String path) {
+
+    final TokenList tl = new TokenList();
+    tl.add(name);
+    tl.add(version);
+    tl.add(type);
+    tl.add(path);
+    return tl;
   }
 
   /**
@@ -131,10 +145,14 @@ public final class RepoManager {
     }
 
     // traverse all directories, ignore root entries with dashes
-    for(final IOFile dir : repo.path().children()) {
-      if(dir.name().indexOf('-') != -1) continue;
-      for(final String s : dir.descendants()) {
-        sl.add(dir.name() + '.' + s.replaceAll("\\..*", "").replace('/', '.'));
+    for(final IOFile ch : repo.path().children()) {
+      final String n = ch.name();
+      if(!ch.isDir()) {
+        sl.add(n.replaceAll("\\..*", "").replace('/', '.'));
+      } else if(n.indexOf('-') == -1) {
+        for(final String s : ch.descendants()) {
+          sl.add(n + '.' + s.replaceAll("\\..*", "").replace('/', '.'));
+        }
       }
     }
     return sl.sort(false, true);

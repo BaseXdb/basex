@@ -70,14 +70,16 @@ public final class Table {
 
   /**
    * Sorts the table by the first column.
+   * @return self reference
    */
-  public void sort() {
+  public Table sort() {
     Collections.sort(contents, new Comparator<TokenList>() {
       @Override
       public int compare(final TokenList tl1, final TokenList tl2) {
         return diff(lc(tl1.get(0)), lc(tl2.get(0)));
       }
     });
+    return this;
   }
 
   /**
@@ -109,14 +111,16 @@ public final class Table {
   /**
    * Moves the specified string to top.
    * @param top entry to be moved to the top
+   * @return self reference
    */
-  public void toTop(final byte[] top) {
+  public Table toTop(final byte[] top) {
     for(int i = 0; i < contents.size(); ++i) {
       if(eq(top, contents.get(i).get(0))) {
         contents.add(0, contents.remove(i));
-        return;
+        break;
       }
     }
+    return this;
   }
 
   /**
