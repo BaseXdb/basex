@@ -55,7 +55,7 @@ public final class DialogPackages extends BaseXDialog {
 
     // create package chooser
     packages = new BaseXList(new String[] {}, this, false);
-    packages.setSize(270, 160);
+    packages.setSize(270, 220);
 
     title = new BaseXLabel(" ").large().border(0, 5, 5, 0);
     name = new BaseXLabel(" ");
@@ -83,7 +83,6 @@ public final class DialogPackages extends BaseXDialog {
     p.add(newButtons(install, delete), BorderLayout.SOUTH);
     BaseXLayout.setWidth(p, 430);
 
-    //BaseXLayout.setWidth(details, 450);
     set(packages, BorderLayout.CENTER);
     set(p, BorderLayout.EAST);
 
