@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.io.*;
 
 import javax.swing.event.*;
@@ -25,7 +26,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Andreas Weiler
  */
-public final class DialogServer extends BaseXDialog {
+public final class DialogServer extends BaseXDialog implements KeyListener {
   /** Password textfield. */
   private final BaseXPassword admpass;
 
@@ -236,6 +237,14 @@ public final class DialogServer extends BaseXDialog {
         if(o == sess) action(refreshSess);
       }
     });
+
+    //key listeners for the enter key pressing
+    //when enter key is pressed the connect button will be clicked
+    admuser.addKeyListener(this);
+    admpass.addKeyListener(this);
+    host.addKeyListener(this);
+    portc.addKeyListener(this);
+    
     refreshLog();
     action(null);
     setResizable(true);
@@ -303,6 +312,7 @@ public final class DialogServer extends BaseXDialog {
                 host.getText() + COL + portc.getText());
         msg = Util.info(S_CONNECTED, host.getText(), portc.getText());
         refreshSess();
+        disconnect.requestFocusInWindow();
       } else if(cmp == disconnect) {
         cs.execute(new Exit());
         connected = false;
@@ -433,5 +443,24 @@ public final class DialogServer extends BaseXDialog {
   @Override
   public void close() {
     if(ok) super.close();
+  }
+
+  @Override
+  public void keyPressed(KeyEvent key) {
+    //when enter key is pressed the connect button will be clicked
+    if (key.getKeyCode() == KeyEvent.VK_ENTER) {
+      connect.doClick();
+    }
+  }
+
+  @Override
+  public void keyReleased(KeyEvent arg0) {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  public void keyTyped(KeyEvent arg0) {
+    // TODO Auto-generated method stub
   }
 }
