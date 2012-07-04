@@ -20,16 +20,20 @@ import org.basex.util.*;
 public final class GroupSpec extends Single {
   /** Grouping variable. */
   public final Var grp;
+  /** Contains assignment. */
+  public final boolean assign;
 
   /**
    * Constructor.
    * @param ii input info
    * @param gv grouping variable
    * @param e grouping expression
+   * @param a this grouping spec rule contains an assignment
    */
-  public GroupSpec(final InputInfo ii, final Var gv, final Expr e) {
+  public GroupSpec(final InputInfo ii, final Var gv, final Expr e, final boolean a) {
     super(ii, e);
     grp = gv;
+    assign = a;
   }
 
   @Override
