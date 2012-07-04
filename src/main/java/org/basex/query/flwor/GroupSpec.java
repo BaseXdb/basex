@@ -20,6 +20,8 @@ import org.basex.util.*;
 public final class GroupSpec extends Single {
   /** Grouping variable. */
   public final Var grp;
+  /** This contains an assignment. */
+  public final boolean assign;
 
   /**
    * Constructor.
@@ -27,9 +29,10 @@ public final class GroupSpec extends Single {
    * @param gv grouping variable
    * @param e grouping expression
    */
-  public GroupSpec(final InputInfo ii, final Var gv, final Expr e) {
+  public GroupSpec(final InputInfo ii, final Var gv, final Expr e, final boolean a) {
     super(ii, e);
     grp = gv;
+    assign = a;
   }
 
   @Override
