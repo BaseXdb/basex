@@ -43,8 +43,23 @@ public final class MainProp extends AProp {
   public static final Object[] EVENTPORT = { "EVENTPORT", 1985 };
   /** Server: port, used for starting the HTTP server. */
   public static final Object[] HTTPPORT = { "HTTPPORT", 8984 };
-  /** Server: port, used for stopping the HTTP server. */
+  /** Server: port, used for stopping the server. */
   public static final Object[] STOPPORT = { "STOPPORT", 8985 };
+  /** Server: port, used for starting the HTTPS server. */
+  public static final Object[] HTTPSPORT = { "HTTPSPORT", 8989 };
+
+  /** Server: password for the SSL certificate. */
+  public static final Object[] SSLPASSWORD = { "SSLPASSWORD", "" };
+  /** Server: path to the keystore. */
+  public static final Object[] KEYSTORE = { "KEYSTORE",
+    Prop.HOME + (USERHOME ? Prop.NAME + "SSL" : "ssl") + "/keystore" };
+  /** Server: password for keystore. */
+  public static final Object[] KEYPASSWORD = { "KEYSTOREPASSWORD", "" };
+  /** Server: path to the truststore. */
+  public static final Object[] TRUSTSTORE = { "TRUSTSTORE",
+    Prop.HOME + (USERHOME ? Prop.NAME + "SSL" : "ssl") + "/keystore" };
+  /** Server: password for truststore. */
+  public static final Object[] TRUSTSTOREPASSWORD = { "TRUSTSTOREPASSWORD", "" };
 
   /** Server: proxy host. */
   public static final Object[] PROXYHOST = { "PROXYHOST", "" };
