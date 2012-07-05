@@ -48,6 +48,8 @@ public class Dur extends Item {
    */
   Dur(final Type t) {
     super(t);
+    mon = 0;
+    sc = BigDecimal.valueOf(0);
   }
 
   /**
