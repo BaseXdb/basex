@@ -1007,7 +1007,9 @@ public class QueryParser extends InputParser {
       // find all non-grouping variables that aren't shadowed
       final ArrayList<Var> ng = new ArrayList<Var>();
       final TokenSet set = new TokenSet();
-      for(final GroupSpec spec : grp) set.add(spec.grp.name.eqname());
+      for(final GroupSpec spec : grp) {
+        if(!spec.assign) set.add(spec.grp.name.eqname());
+      }
       for(int i = fl.length; --i >= 0;) {
         for(final Var v : fl[i].vars()) {
           final byte[] eqn = v.name.eqname();
@@ -1160,10 +1162,12 @@ public class QueryParser extends InputParser {
     final SeqType type = optAsType();
     final Var var = Var.create(ctx, ii, name, type, null);
 
+    final boolean assign;
     final Expr by;
     if(type != null || wsConsume(ASSIGN)) {
       if(type != null) wsCheck(ASSIGN);
       by = check(single(), NOVARDECL);
+      assign = true;
     } else {
       final Var v = checkVar(var.name, GVARNOTDEFINED);
       // the grouping variable has to be declared by the same FLWOR expression
@@ -1176,6 +1180,7 @@ public class QueryParser extends InputParser {
       }
       if(!dec) throw error(GVARNOTDEFINED, v);
       by = new VarRef(ii, v);
+      assign = false;
     }
 
     if(wsConsumeWs(COLLATION)) {
@@ -1186,7 +1191,7 @@ public class QueryParser extends InputParser {
     // add the new grouping var
     ctx.vars.add(var);
 
-    final GroupSpec grp = new GroupSpec(ii, var, by);
+    final GroupSpec grp = new GroupSpec(ii, var, by, assign);
     return group == null ? new GroupSpec[] { grp } : Array.add(group, grp);
   }
 
