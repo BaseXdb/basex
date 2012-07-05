@@ -116,11 +116,16 @@ public interface Text {
 
   /** HTTP information. */
   String HTTPINFO =
-    " [-dehlnpPRUWz] [stop]" + NL +
+    " [-aAbdehkKlnpPRsStTUWXz] [stop]" + NL +
     "  stop      Stop running server" + NL +
+    "  -a        Deactive SSL support" + NL +
+    "  -A        Set https port" + NL +
+    "  -b        Specify SSL password" + NL +
     "  -d        Activate debugging mode" + NL +
     "  -e<num>   Set event port" + NL +
     "  -h<num>   Set port of HTTP server" + NL +
+    "  -k<path>  Path to the keystore" + NL +
+    "  -K<pass>  Specify keystore password" + NL +
     "  -l        Start in local mode" + NL +
     "  -n<name>  Set host name of database server" + NL +
     "  -p<num>   Set port of database server" + NL +
@@ -128,6 +133,8 @@ public interface Text {
     "  -R        Deactivate REST service" + NL +
     "  -s        Specify port to stop HTTP server" + NL +
     "  -S        Start as service" + NL +
+    "  -t        Path to the truststore" + NL +
+    "  -T        Specify truststore password" + NL +
     "  -U<name>  Specify user name" + NL +
     "  -W        Deactivate WebDAV service" + NL +
     "  -X        Deactivate RESTXQ service" + NL +
