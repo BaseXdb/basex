@@ -3,6 +3,7 @@ package org.basex.query.value.item;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
+import java.math.*;
 import java.util.regex.*;
 
 import org.basex.query.*;
@@ -27,6 +28,7 @@ public final class YMDur extends Dur {
   public YMDur(final Dur it) {
     super(AtomType.YMD);
     mon = it.mon;
+    sc = BigDecimal.valueOf(0);
   }
 
   /**
@@ -75,6 +77,7 @@ public final class YMDur extends Dur {
 
     mon = y * 12 + m;
     if(!mt.group(1).isEmpty()) mon = -mon;
+    sc = BigDecimal.valueOf(0);
   }
 
   /**

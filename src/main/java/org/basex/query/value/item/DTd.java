@@ -64,8 +64,7 @@ public final class DTd extends Dur {
 
     this(it);
     if(Double.isNaN(f)) DATECALC.thrw(ii, description(), f);
-    if(m ? f == 1 / 0d || f == -1 / 0d : f == 0)
-      DATEZERO.thrw(ii, description());
+    if(m ? f == 1 / 0d || f == -1 / 0d : f == 0) DATEZERO.thrw(ii, description());
     sc = sc.multiply(BigDecimal.valueOf(m ? f : 1 / f));
     if(Math.abs(sc.doubleValue()) < 1E-13) sc = BigDecimal.valueOf(0);
   }
@@ -95,13 +94,11 @@ public final class DTd extends Dur {
 
     final String val = Token.string(v).trim();
     final Matcher mt = DUR.matcher(val);
-    if(!mt.matches() || val.endsWith("P") || val.endsWith("T"))
-      dateErr(v, XDTD, ii);
+    if(!mt.matches() || val.endsWith("P") || val.endsWith("T")) dateErr(v, XDTD, ii);
     final long d = mt.group(2) != null ? Token.toInt(mt.group(3)) : 0;
     final long h = mt.group(5) != null ? Token.toInt(mt.group(6)) : 0;
     final long n = mt.group(7) != null ? Token.toInt(mt.group(8)) : 0;
-    final double s = mt.group(9) != null ?
-        Token.toDouble(Token.token(mt.group(10))) : 0;
+    final double s = mt.group(9) != null ? Token.toDouble(Token.token(mt.group(10))) : 0;
 
     sc = BigDecimal.valueOf(d * DAYSECONDS + h * 3600 + n * 60);
     sc = sc.add(BigDecimal.valueOf(s));
