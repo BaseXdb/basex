@@ -185,7 +185,6 @@ public final class DiskBuilder extends Builder {
    * @return inline value or text position
    * @throws IOException I/O exception
    */
-  @SuppressWarnings("resource")
   private long textOff(final byte[] value, final boolean text) throws IOException {
     // inline integer values...
     final long v = Token.toSimpleInt(value);

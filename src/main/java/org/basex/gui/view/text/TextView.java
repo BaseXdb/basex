@@ -132,7 +132,6 @@ public final class TextView extends View implements ActionListener {
    * Serializes the specified nodes.
    * @param n nodes to display
    */
-  @SuppressWarnings("resource")
   private void setText(final Nodes n) {
     if(visible()) {
       try {

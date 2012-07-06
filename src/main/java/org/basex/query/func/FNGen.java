@@ -200,7 +200,6 @@ public final class FNGen extends StandardFunc {
    * @return content
    * @throws QueryException query exception
    */
-  @SuppressWarnings("resource")
   private Item unparsedText(final QueryContext ctx, final boolean check)
       throws QueryException {
 
@@ -256,7 +255,6 @@ public final class FNGen extends StandardFunc {
    * @param str text input
    * @return result
    */
-  @SuppressWarnings("resource")
   static Iter textIter(final byte[] str) {
     // not I/O exception expected, as input is a main-memory array
     try {

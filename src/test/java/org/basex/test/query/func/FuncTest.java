@@ -133,9 +133,9 @@ public final class FuncTest extends QueryTest {
       { "doc 2", "exists(doc('src/test/resources/dir/'))" },
 
       { "seconds-from-duration 1", bool(true),
-                      "fn:seconds-from-duration(xs:yearMonthDuration('P2000Y12M')) = 0"},
+         "fn:seconds-from-duration(xs:yearMonthDuration('P2000Y12M')) = 0"},
       { "seconds-from-duration 2", bool(true),
-                        "fn:seconds-from-duration(xs:dayTimeDuration('-PT256S')) = -16"},
+        "fn:seconds-from-duration(xs:dayTimeDuration('-PT256S')) = -16"},
     };
   }
 

@@ -245,7 +245,6 @@ public final class RepoManager {
    * @return {@code true} if existing package was replaced
    * @throws IOException I/O exception
    */
-  @SuppressWarnings("resource")
   private boolean installJAR(final byte[] cont) throws IOException {
     final Zip zip = new Zip(new IOContent(cont));
     final IOContent mf = new IOContent(zip.read(MANIFEST_MF));

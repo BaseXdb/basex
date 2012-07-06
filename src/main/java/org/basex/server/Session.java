@@ -32,7 +32,6 @@ public abstract class Session {
    * @return result, or {@code null} reference
    * @throws IOException I/O exception
    */
-  @SuppressWarnings("resource")
   public final String execute(final Command command) throws IOException {
     final ArrayOutput ao = out == null ? new ArrayOutput() : null;
     execute(command, ao != null ? ao : out);
@@ -46,7 +45,6 @@ public abstract class Session {
    * @return result, or {@code null} reference
    * @throws IOException I/O exception
    */
-  @SuppressWarnings("resource")
   public final String execute(final String command) throws IOException {
     final ArrayOutput ao = out == null ? new ArrayOutput() : null;
     execute(command, ao != null ? ao : out);

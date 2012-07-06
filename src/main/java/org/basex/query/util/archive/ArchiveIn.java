@@ -28,7 +28,6 @@ public abstract class ArchiveIn {
    * @return reader
    * @throws QueryException query exception
    */
-  @SuppressWarnings("resource")
   public static ArchiveIn get(final BufferInput bi, final InputInfo info)
       throws QueryException {
 
@@ -75,7 +74,6 @@ public abstract class ArchiveIn {
    * @return entry
    * @throws IOException I/O exception
    */
-  @SuppressWarnings("resource")
   public byte[] read() throws IOException {
     final ArrayOutput ao = new ArrayOutput();
     for(int c; (c = read(data)) != -1;) ao.write(data, 0, c);

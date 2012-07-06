@@ -153,7 +153,6 @@ public abstract class Parser extends Progress {
    * @return xml parser
    * @throws IOException I/O exception
    */
-  @SuppressWarnings("resource")
   public static Item item(final IO in, final Prop prop, final String type)
       throws IOException {
 

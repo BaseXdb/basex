@@ -111,7 +111,6 @@ public final class CSVParser extends SingleParser {
     encoding = props.get(ParserProp.ENCODING);
   }
 
-  @SuppressWarnings("resource")
   @Override
   public void parse() throws IOException {
     builder.startElem(CSV, atts);

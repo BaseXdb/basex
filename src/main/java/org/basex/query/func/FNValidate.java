@@ -214,7 +214,6 @@ public final class FNValidate extends StandardFunc {
    * @throws QueryException query exception
    * @throws IOException exception
    */
-  @SuppressWarnings("resource")
   private IO read(final int i, final QueryContext ctx, final SerializerProp sp)
       throws QueryException, IOException {
 

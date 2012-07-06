@@ -96,7 +96,6 @@ public class ClientSession extends Session {
    * be returned as strings.
    * @throws IOException I/O exception
    */
-  @SuppressWarnings("resource")
   public ClientSession(final String host, final int port, final String user,
       final String pass, final OutputStream output) throws IOException {
 
@@ -174,7 +173,6 @@ public class ClientSession extends Session {
    * @param notifier event notification
    * @throws IOException I/O exception
    */
-  @SuppressWarnings("resource")
   public void watch(final String name, final EventNotifier notifier)
       throws IOException {
 
@@ -217,7 +215,6 @@ public class ClientSession extends Session {
    * Starts the listener thread.
    * @param in input stream
    */
-  @SuppressWarnings("resource")
   private void listen(final InputStream in) {
     final BufferInput bi = new BufferInput(in);
     new Thread() {
@@ -241,7 +238,6 @@ public class ClientSession extends Session {
    * @param input input stream
    * @throws IOException I/O exception
    */
-  @SuppressWarnings("resource")
   private void send(final InputStream input) throws IOException {
     final EncodingOutput eo = new EncodingOutput(sout);
     for(int b; (b = input.read()) != -1;) eo.write(b);
@@ -294,7 +290,6 @@ public class ClientSession extends Session {
    * @param os output stream
    * @throws IOException I/O exception
    */
-  @SuppressWarnings("resource")
   protected static void receive(final BufferInput bi, final OutputStream os)
       throws IOException {
     final DecodingInput di = new DecodingInput(bi);
@@ -319,7 +314,6 @@ public class ClientSession extends Session {
    * @return string
    * @throws IOException I/O exception
    */
-  @SuppressWarnings("resource")
   protected String exec(final ServerCmd cmd, final String arg, final OutputStream os)
       throws IOException {
 

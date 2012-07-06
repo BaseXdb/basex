@@ -143,7 +143,6 @@ public final class HTTPResponse {
    * @return payload as byte array
    * @throws IOException I/O Exception
    */
-  @SuppressWarnings("resource")
   private static byte[] extractPayload(final InputStream io, final String c,
       final String ce) throws IOException {
 
@@ -320,7 +319,6 @@ public final class HTTPResponse {
    * @return payload part content
    * @throws IOException I/O Exception
    */
-  @SuppressWarnings("resource")
   private static byte[] extractPartPayload(final InputStream io, final byte[] sep,
       final byte[] end, final String ce) throws IOException {
 

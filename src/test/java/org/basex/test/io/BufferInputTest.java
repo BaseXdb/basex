@@ -108,7 +108,6 @@ public final class BufferInputTest {
    * @param input input string
    * @throws IOException I/O exception
    */
-  @SuppressWarnings("resource")
   private static void encoding(final String enc, final String input)
       throws IOException {
 
