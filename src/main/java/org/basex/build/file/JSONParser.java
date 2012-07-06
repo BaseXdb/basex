@@ -65,6 +65,7 @@ public final class JSONParser extends XMLParser {
    * @return parser
    * @throws IOException I/O exception
    */
+  @SuppressWarnings("resource")
   public static IO toXML(final IO io, final String options) throws IOException {
     // set parser properties
     final ParserProp props = new ParserProp(options);
