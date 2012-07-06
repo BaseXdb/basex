@@ -48,6 +48,7 @@ public class LocalQuery extends Query {
   }
 
   @Override
+  @SuppressWarnings("resource")
   public String execute() throws IOException {
     final OutputStream os = out == null ? new ArrayOutput() : out;
     ql.execute(false, os, false, false);

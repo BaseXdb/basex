@@ -48,13 +48,14 @@ public class PrintOutput extends OutputStream {
    * @param out output stream reference
    * @return print output
    */
+  @SuppressWarnings("resource")
   public static PrintOutput get(final OutputStream out) {
     return out instanceof PrintOutput ? (PrintOutput) out :
       new PrintOutput(
-        out instanceof ByteArrayOutputStream ||
-        out instanceof BufferedOutputStream ||
-        out instanceof BufferOutput ||
-        out instanceof ArrayOutput ? out : new BufferOutput(out));
+          out instanceof ByteArrayOutputStream ||
+          out instanceof BufferedOutputStream ||
+          out instanceof BufferOutput ||
+          out instanceof ArrayOutput ? out : new BufferOutput(out));
   }
 
   @Override

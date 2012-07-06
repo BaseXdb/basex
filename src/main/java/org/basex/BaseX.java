@@ -173,6 +173,7 @@ public class BaseX extends Main {
    * @param io input file
    * @throws IOException I/O exception
    */
+  @SuppressWarnings("resource")
   private void query(final IO io) throws IOException {
     final String query = Token.string(new TextInput(io).content());
     execute(new Set(Prop.QUERYPATH, io.path()), false);
@@ -184,6 +185,7 @@ public class BaseX extends Main {
    * @param io input file
    * @throws IOException I/O exception
    */
+  @SuppressWarnings("resource")
   private void script(final IO io) throws IOException {
     final byte[] cmd = new TextInput(io).content();
     if(Token.startsWith(cmd, '<')) {

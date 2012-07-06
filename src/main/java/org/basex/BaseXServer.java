@@ -395,6 +395,7 @@ public final class BaseXServer extends Main implements Runnable {
    * @author BaseX Team 2005-12, BSD License
    * @author Andreas Weiler
    */
+  @SuppressWarnings("resource")
   final class EventListener extends Thread {
     @Override
     public void run() {

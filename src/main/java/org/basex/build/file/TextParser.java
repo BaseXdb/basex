@@ -58,6 +58,7 @@ public final class TextParser extends SingleParser {
   }
 
   @Override
+  @SuppressWarnings("resource")
   public void parse() throws IOException {
     builder.startElem(TEXT, atts);
 

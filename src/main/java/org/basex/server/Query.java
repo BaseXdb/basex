@@ -113,6 +113,7 @@ public abstract class Query {
    * @param is input stream
    * @throws IOException I/O exception
    */
+  @SuppressWarnings("resource")
   protected void cache(final InputStream is) throws IOException {
     cache = new TokenList();
     types = new ByteList();
