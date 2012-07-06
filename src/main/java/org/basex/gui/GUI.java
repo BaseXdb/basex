@@ -351,6 +351,7 @@ public final class GUI extends AGUI {
    * @param edit call from editor panel
    * @return success flag
    */
+  @SuppressWarnings("resource")
   boolean exec(final Command cmd, final boolean edit) {
     // wait when command is still running
     final int thread = ++threadID;

@@ -26,6 +26,7 @@ public final class IOUrl extends IO {
   }
 
   @Override
+  @SuppressWarnings("resource")
   public byte[] read() throws IOException {
     return new BufferInput(this).content();
   }

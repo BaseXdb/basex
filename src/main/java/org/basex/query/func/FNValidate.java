@@ -214,13 +214,13 @@ public final class FNValidate extends StandardFunc {
    * @throws QueryException query exception
    * @throws IOException exception
    */
+  @SuppressWarnings("resource")
   private IO read(final int i, final QueryContext ctx, final SerializerProp sp)
       throws QueryException, IOException {
 
     final Item it = checkItem(expr[i], ctx);
     if(it.isEmpty()) STRNODTYPE.thrw(info, this, it);
     final Type ip = it.type;
-
     final ArrayOutput ao = new ArrayOutput();
     if(ip.isNode()) {
       // return node in string representation

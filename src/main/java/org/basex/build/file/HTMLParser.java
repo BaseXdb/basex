@@ -61,6 +61,7 @@ public final class HTMLParser extends XMLParser {
    * @return parser
    * @throws IOException I/O exception
    */
+  @SuppressWarnings("resource")
   private static IO toXML(final IO io, final String options) throws IOException {
     // reader could not be initialized; fall back to XML
     if(READER == null) return io;
