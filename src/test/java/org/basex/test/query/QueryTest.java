@@ -75,11 +75,19 @@ public abstract class QueryTest extends SandboxTest {
           } else {
             sb.append("error");
           }
+          final TokenBuilder types = new TokenBuilder();
+          if(val instanceof ValueBuilder) {
+            final ValueBuilder vb = (ValueBuilder) val;
+            for(final Item i : vb) types.add(i.type.toString()).add(" ");
+          } else {
+            types.add(Util.name(val));
+          }
           s = val.size() != 1 ? "#" + val.size() : "";
-          sb.append("\n[F" + s + "] '" + val + "' " + details() + '\n');
+          sb.append("\n[F" + s + "] '" + val + "', " + types +
+            details() + '\n');
           ++fail;
         }
-      } catch(final BaseXException ex) {
+      } catch(final Exception ex) {
         final String msg = ex.getMessage();
         if(correct || msg.contains("mailman")) {
           final String cp = correct && (!(cmp instanceof Nodes) ||
@@ -138,6 +146,15 @@ public abstract class QueryTest extends SandboxTest {
    */
   protected static ValueBuilder dbl(final double d) {
     return item(Dbl.get(d));
+  }
+
+  /**
+   * Creates an iterator for the specified decimal.
+   * @param d decimal value
+   * @return iterator
+   */
+  protected static ValueBuilder dec(final double d) {
+    return item(Dec.get(d));
   }
 
   /**
