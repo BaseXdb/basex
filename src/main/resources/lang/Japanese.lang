@@ -178,6 +178,7 @@ invalid_%            = % は不正です。
 invalid_value_%_%    = プロパティ '%' を '%' に変更する事が出来ませんでした。
 italics              = 斜体
 java_lf              = Javaのルック＆フィールを使用する
+jettyxml_not_found_% = The jetty.xml file could not be found at '%'.
 kill_self_%          = '%' 自身のセッションを切断する事は出来ません。
 language             = 言語
 license              = BSD ライセンス
