@@ -43,7 +43,6 @@ public class Filter extends Preds {
   public final Expr compile(final QueryContext ctx) throws QueryException {
     // invalidate current context value (will be overwritten by filter)
     final Value cv = ctx.value;
-    ctx.value = null;
     try {
       root = root.compile(ctx);
       // return empty root
@@ -53,6 +52,7 @@ public class Filter extends Preds {
         return ((AxisPath) root).copy().addPreds(preds).compile(ctx);
 
       // optimize filter expressions
+      ctx.value = null;
       final Expr e = super.compile(ctx);
       if(e != this) return e;
 
