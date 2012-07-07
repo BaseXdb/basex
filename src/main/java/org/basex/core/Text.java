@@ -116,12 +116,11 @@ public interface Text {
 
   /** HTTP information. */
   String HTTPINFO =
-    " [-dehjlnpPRUWz] [stop]" + NL +
+    " [-dehlnpPRUWz] [stop]" + NL +
     "  stop      Stop running server" + NL +
     "  -d        Activate debugging mode" + NL +
     "  -e<num>   Set event port" + NL +
     "  -h<num>   Set port of HTTP server" + NL +
-    "  -j<path>  Specify the path to a jetty.xml file" + NL +
     "  -l        Start in local mode" + NL +
     "  -n<name>  Set host name of database server" + NL +
     "  -p<num>   Set port of database server" + NL +
@@ -157,8 +156,6 @@ public interface Text {
   String SRV_RUNNING = lang("srv_running");
   /** Ports was specified twice. */
   String PORT_TWICE_X = lang("port_twice_%");
-  /** jetty.xml could not be found. */
-  String JETTY_XML_NOT_FOUND = lang("jettyxml_not_found_%");
   /** Unknown host. */
   String UNKNOWN_HOST_X = lang("unknown_host_x");
   /** Timeout exceeded. */
