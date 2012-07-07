@@ -178,6 +178,7 @@ invalid_%            = % ist ungültig.
 invalid_value_%_%    = Fehler beim Setzen von '%' auf '%'.
 italics              = Kursiv
 java_lf              = Verwende Java Look & Feel
+jettyxml_not_found_% = Die Konfigurationsdatei jetty.xml konnte nicht gefunden werden unter '%'.
 kill_self_%          = '%' kann sich nicht selbst beenden.
 language             = Sprache
 license              = BSD-Lizenz
