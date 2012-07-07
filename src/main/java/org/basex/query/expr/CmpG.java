@@ -13,6 +13,7 @@ import org.basex.query.path.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -146,10 +147,11 @@ public final class CmpG extends Cmp {
       e = compCount(op.op);
       if(e != this) ctx.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
     } else if(e1.isFunction(Function.POSITION)) {
-      if(e2 instanceof Range && op.op == OpV.EQ) {
+      if(e2 instanceof RangeSeq && op.op == OpV.EQ) {
         // position() CMP range
-        final long[] rng = ((Range) e2).range(ctx);
-        e = rng == null ? this : Pos.get(rng[0], rng[1], info);
+        final long p1 = ((RangeSeq) e2).itemAt(0).itr(info);
+        final long p2 = p1 + e2.size() - 1;
+        e = Pos.get(p1, p2, info);
       } else {
         // position() CMP number
         e = Pos.get(op.op, e2, e, info);

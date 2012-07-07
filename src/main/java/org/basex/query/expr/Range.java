@@ -25,6 +25,7 @@ public final class Range extends Arr {
    */
   public Range(final InputInfo ii, final Expr e1, final Expr e2) {
     super(ii, e1, e2);
+    type = SeqType.ITR_OM;
   }
 
   @Override
@@ -34,16 +35,9 @@ public final class Range extends Arr {
     Expr e = this;
     if(oneIsEmpty()) {
       e = Empty.SEQ;
-    } else {
-      final long[] v = range(ctx);
-      if(v != null) {
-        size = v[1] - v[0] + 1;
-        // use iterative evaluation at runtime instead of range sequence
-        // to avoid prevent intermediary result materialization
-        e = size < 1 ? Empty.SEQ : size == 1 ? Int.get(v[0]) : this;
-      }
+    } else if(allAreValues()) {
+      e = value(ctx);
     }
-    type = SeqType.ITR_OM;
     return optPre(e, ctx);
   }
 
@@ -57,17 +51,6 @@ public final class Range extends Arr {
     final long[] v = rng(ctx);
     return v == null || v[0] > v[1] ? Empty.SEQ :
       v[0] == v[1] ? Int.get(v[0]) : new RangeSeq(v[0], v[1] - v[0] + 1);
-  }
-
-  /**
-   * Returns the start and end value of the range operator, or {@code null}
-   * if the range could not be evaluated.
-   * @param ctx query context
-   * @return value array
-   * @throws QueryException query exception
-   */
-  long[] range(final QueryContext ctx) throws QueryException {
-    return allAreValues() ? rng(ctx) : null;
   }
 
   /**
