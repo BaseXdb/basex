@@ -202,7 +202,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
      * @param r resource
      */
     BXSAXContentHandler(final BXXMLResource r, final MemBuilder mb) {
-      super(mb, false);
+      super(mb, false, false);
       res = r;
     }
 
