@@ -24,13 +24,16 @@ public final class FNProfTest extends AdvancedQueryTest {
   @Test
   public void utilMem() {
     final PrintStream err = System.err;
-    System.setErr(NULL);
-    check(_PROF_MEM);
-    query(_PROF_MEM.args("()"));
-    query(COUNT.args(_PROF_MEM.args(" 1 to 100 ", false)), "100");
-    query(COUNT.args(_PROF_MEM.args(" 1 to 100 ", true)), "100");
-    query(COUNT.args(_PROF_MEM.args(" 1 to 100 ", true, "label")), "100");
-    System.setErr(err);
+    try {
+      System.setErr(NULL);
+      check(_PROF_MEM);
+      query(_PROF_MEM.args("()"));
+      query(COUNT.args(_PROF_MEM.args(" 1 to 100 ", false)), "100");
+      query(COUNT.args(_PROF_MEM.args(" 1 to 100 ", true)), "100");
+      query(COUNT.args(_PROF_MEM.args(" 1 to 100 ", true, "label")), "100");
+    } finally {
+      System.setErr(err);
+    }
   }
 
   /**
@@ -39,13 +42,16 @@ public final class FNProfTest extends AdvancedQueryTest {
   @Test
   public void utilTime() {
     final PrintStream err = System.err;
-    System.setErr(NULL);
-    check(_PROF_TIME);
-    query(_PROF_TIME.args("()"));
-    query(COUNT.args(_PROF_TIME.args(" 1 to 100 ", false)), "100");
-    query(COUNT.args(_PROF_TIME.args(" 1 to 100 ", true)), "100");
-    query(COUNT.args(_PROF_TIME.args(" 1 to 100 ", true, "label")), "100");
-    System.setErr(err);
+    try {
+      System.setErr(NULL);
+      check(_PROF_TIME);
+      query(_PROF_TIME.args("()"));
+      query(COUNT.args(_PROF_TIME.args(" 1 to 100 ", false)), "100");
+      query(COUNT.args(_PROF_TIME.args(" 1 to 100 ", true)), "100");
+      query(COUNT.args(_PROF_TIME.args(" 1 to 100 ", true, "label")), "100");
+    } finally {
+      System.setErr(err);
+    }
   }
 
   /**

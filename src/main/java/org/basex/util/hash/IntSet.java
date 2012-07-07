@@ -54,7 +54,7 @@ public class IntSet {
    * @param key key to be found
    * @return id or 0 if nothing was found
    */
-  final int id(final int key) {
+  public final int id(final int key) {
     final int p = key & bucket.length - 1;
     for(int id = bucket[p]; id != 0; id = next[id]) {
       if(key == keys[id]) return id;

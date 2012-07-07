@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.util.*;
 
 import org.basex.index.*;
+import org.basex.util.*;
 import org.junit.*;
 
 /**
@@ -81,8 +82,8 @@ public abstract class IdPreMapBulkTestBase {
       s.append(o[2]);
       s.append(");\n");
     }
-    System.err.println("Operations:\n" + s);
-    System.err.println(testedmap);
+    Util.errln("Operations:\n" + s);
+    Util.errln(testedmap);
   }
 
   /**

@@ -4,7 +4,6 @@ import static org.basex.util.Token.*;
 
 import java.util.*;
 import java.util.List;
-import java.util.Set;
 
 import org.basex.core.cmd.*;
 import org.basex.index.*;
@@ -594,7 +593,7 @@ public abstract class Data {
 
     // size of the subtree to delete
     int k = kind(pre);
-    int s = size(pre, k);
+    final int s = size(pre, k);
     resources.delete(pre, s);
 
     if(meta.updindex) {
@@ -626,7 +625,7 @@ public abstract class Data {
     }
 
     // preserve empty root node
-    int p = pre;
+    final int p = pre;
     if(kind(p) == DOC) --meta.ndocs;
 
     if(meta.updindex) {
@@ -637,9 +636,6 @@ public abstract class Data {
     // delete node from table structure and reduce document size
     table.delete(pre, s);
     updateDist(p, -s);
-
-    // NSNodes have to be checked for pre value shifts after delete
-    nspaces.update(pre, s, false, null);
   }
 
   /**
@@ -689,7 +685,7 @@ public abstract class Data {
     final IntList preStack = new IntList();
     int dpre = -1;
     final NSNode t = nspaces.current;
-    final Set<NSNode> newNodes = new HashSet<NSNode>();
+    final HashSet<NSNode> newNodes = new HashSet<NSNode>();
     final IntList flagPres = new IntList();
 
     while(++dpre != dsize) {
@@ -804,17 +800,20 @@ public abstract class Data {
           break;
       }
     }
-
+    // finalize and update namespace structure
     while(!preStack.isEmpty()) nspaces.close(preStack.pop());
     nspaces.setRoot(t);
+    if(ipar != -1) nspaces.insert(ipre, dsize, newNodes);
 
     if(bp != 0) insert(ipre + dpre - 1 - (dpre - 1) % buf);
     // reset buffer to old size
     buffer(1);
 
     // set ns flags
-    for(final int toFlag : flagPres.toArray())
-      table.write2(toFlag, 1, name(toFlag) | 1 << 15);
+    for(int f = 0; f < flagPres.size(); f++) {
+      final int fl = flagPres.get(f);
+      table.write2(fl, 1, name(fl) | 1 << 15);
+    }
 
     // increase size of ancestors
     int p = ipar;
@@ -824,9 +823,6 @@ public abstract class Data {
       p = parent(p, k);
     }
     updateDist(ipre + dsize, dsize);
-
-    // NSNodes have to be checked for pre value shifts after insert
-    nspaces.update(ipre, dsize, true, newNodes);
 
     if(meta.updindex) {
       // add the entries to the ID -> PRE mapping:

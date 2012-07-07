@@ -360,7 +360,8 @@ public class DataAccessTest {
     final RandomAccessFile f = new RandomAccessFile(file.file(), "r");
     try {
       f.seek(pos);
-      for(int i = 0; i < bytes.length; ++i) assertEquals(bytes[i], f.read());
+      for(final int b : bytes)
+        assertEquals(b, f.read());
     } finally {
       f.close();
     }
@@ -394,7 +395,8 @@ public class DataAccessTest {
    */
   private static void write(final RandomAccessFile out, final int[] bytes)
       throws IOException {
-    for(int i = 0; i < bytes.length; ++i) out.write(bytes[i]);
+    for(final int b : bytes)
+      out.write(b);
   }
 
   /**
