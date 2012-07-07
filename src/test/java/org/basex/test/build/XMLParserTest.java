@@ -8,15 +8,17 @@ import org.basex.test.*;
 import org.junit.*;
 
 /**
- * Tests for parsing XML documents with the internal parser.
+ * Tests for parsing XML documents.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class XMLParserTest extends SandboxTest {
-  /** Parse documents. */
+  /**
+   * Tests the internal parser (Option {@link Prop#INTPARSE}).
+   */
   @Test
-  public void parse() {
+  public void intParse() {
     context.prop.set(Prop.MAINMEM, true);
     context.prop.set(Prop.CHOP, false);
 
@@ -53,5 +55,23 @@ public final class XMLParserTest extends SandboxTest {
 
     // list all errors
     if(sb.length() != 0) fail(sb.toString());
+  }
+
+  /**
+   * Tests the namespace stripping option (Option {@link Prop#STRIPNS}).
+   * @throws Exception exceptions
+   */
+  @Test
+  public void parse() throws Exception {
+    context.prop.set(Prop.STRIPNS, true);
+    final String doc = "<e xmlns='A'><b:f xmlns:b='B'/></e>";
+    for(final boolean b : new boolean[] { false, true }) {
+      context.prop.set(Prop.INTPARSE, b);
+      new CreateDB(NAME, doc).execute(context);
+      String result = new XQuery(".").execute(context).replaceAll("[\\r\\n]+ *", "");
+      assertEquals("<e><f/></e>", result);
+      result = new XQuery("e/f").execute(context).replaceAll("[\\r\\n]+ *", "");
+      assertEquals("<f/>", result);
+    }
   }
 }

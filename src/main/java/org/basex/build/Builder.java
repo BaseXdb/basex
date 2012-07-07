@@ -263,8 +263,7 @@ public abstract class Builder extends Progress {
 
   /**
    * Adds an element node to the storage.
-   *
-   * @param nm tag name
+   * @param nm element name
    * @param att attributes
    * @throws IOException I/O exception
    */
@@ -289,10 +288,12 @@ public abstract class Builder extends Progress {
 
     // get and store attribute references
     for(int a = 0; a < as; ++a) {
-      n = atts.index(att.name(a), att.string(a), true);
-      u = ns.uri(att.name(a), false);
-      path.index(n, Data.ATTR, level + 1, att.string(a), meta);
-      addAttr(n, att.string(a), Math.min(IO.MAXATTS, a + 1), u);
+      final byte[] av = att.string(a);
+      final byte[] an = att.name(a);
+      n = atts.index(an, av, true);
+      u = ns.uri(an, false);
+      path.index(n, Data.ATTR, level + 1, av, meta);
+      addAttr(n, av, Math.min(IO.MAXATTS, a + 1), u);
     }
 
     // set leaf node information in index

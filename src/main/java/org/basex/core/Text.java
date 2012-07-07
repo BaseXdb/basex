@@ -1022,8 +1022,10 @@ public interface Text {
 
   /** Dialog title for database options. */
   String CREATE_DATABASE = lang("create_database");
-  /** Whitespaces information. */
+  /** Chop whitespaces. */
   String CHOP_WS = lang("chop_ws");
+  /** Strip namespaces. */
+  String STRIP_NS = lang("strip_ns");
   /** DTD information. */
   String PARSE_DTDS = lang("parse_dtds");
   /** Internal parser. */
@@ -1339,7 +1341,7 @@ public interface Text {
   /** Command info. */
   String H_SAVE = lang("h_save");
 
-  /** Whitespaces information. */
+  /** Information on chopping whitespaces. */
   String H_CHOP_WS = lang("h_chop_ws");
   /** Internal parser information. */
   String H_INT_PARSER = lang("h_int_parser");

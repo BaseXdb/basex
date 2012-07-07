@@ -20,6 +20,8 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
   /** Builder reference. */
   protected final Builder builder;
 
+  /** Strip namespaces. */
+  private final boolean stripNS;
   /** Temporary attribute array. */
   private final Atts atts = new Atts();
   /** DTD flag. */
@@ -40,10 +42,12 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
    * Constructor.
    * @param build builder reference
    * @param ch chopping flag
+   * @param sn strip namespaces
    */
-  public SAXHandler(final Builder build, final boolean ch) {
+  public SAXHandler(final Builder build, final boolean ch, final boolean sn) {
     builder = build;
     chop = ch;
+    stripNS = sn;
   }
 
   @Override
@@ -55,9 +59,12 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
       final int as = at.getLength();
       atts.reset();
       for(int a = 0; a < as; ++a) {
-        atts.add(token(at.getQName(a)), token(at.getValue(a)));
+        final byte[] an = token(at.getQName(a));
+        final byte[] av = token(at.getValue(a));
+        atts.add(stripNS ? local(an) : an, av);
       }
-      builder.startElem(token(qn), atts);
+      final byte[] en = token(qn);
+      builder.startElem(stripNS ? local(en) : en, atts);
       ++nodes;
     } catch(final IOException ex) {
       error(ex);
@@ -120,8 +127,10 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
       builder.text(token(chop ? s.trim() : s));
       sb.setLength(0);
     }
-    for(int i = 0; i < ns.size(); ++i) {
-      builder.startNS(ns.name(i), ns.string(i));
+    if(!stripNS) {
+      for(int i = 0; i < ns.size(); ++i) {
+        builder.startNS(ns.name(i), ns.string(i));
+      }
     }
     ns.reset();
   }

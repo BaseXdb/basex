@@ -34,7 +34,9 @@ final class DialogParsing extends BaseXBack {
   /** DTD mode. */
   private final BaseXCheckBox dtd;
   /** Whitespace chopping. */
-  private final BaseXCheckBox chop;
+  private final BaseXCheckBox chopWS;
+  /** Namespace stripping. */
+  private final BaseXCheckBox stripNS;
   /** Use XML Catalog. */
   private final BaseXCheckBox usecat;
   /** Catalog file. */
@@ -109,7 +111,8 @@ final class DialogParsing extends BaseXBack {
 
     intparse = new BaseXCheckBox(INT_PARSER, prop.is(Prop.INTPARSE), 0, d);
     dtd = new BaseXCheckBox(PARSE_DTDS, prop.is(Prop.DTD), 0, d);
-    chop = new BaseXCheckBox(CHOP_WS, prop.is(Prop.CHOP), 0, d);
+    chopWS = new BaseXCheckBox(CHOP_WS, prop.is(Prop.CHOP), 0, d);
+    stripNS = new BaseXCheckBox(STRIP_NS, prop.is(Prop.STRIPNS), 0, d);
     cfile = new BaseXTextField(prop.get(Prop.CATFILE), d);
     browsec = new BaseXButton(BROWSE_D, d);
     usecat = new BaseXCheckBox(USE_CATALOG_FILE, !prop.get(Prop.CATFILE).isEmpty(), 0, d);
@@ -148,7 +151,7 @@ final class DialogParsing extends BaseXBack {
     tencoding = DialogExport.encoding(d, enc);
     jencoding = DialogExport.encoding(d, enc);
 
-    xmlopts  = new BaseXBack(new TableLayout(8, 1));
+    xmlopts  = new BaseXBack(new TableLayout(9, 1));
     htmlopts = new BaseXBack(new TableLayout(2, 1));
     jsonopts = new BaseXBack(new TableLayout(2, 1));
     csvopts  = new BaseXBack(new TableLayout(2, 1));
@@ -166,7 +169,8 @@ final class DialogParsing extends BaseXBack {
     xmlopts.add(intparse);
     xmlopts.add(new BaseXLabel(H_INT_PARSER, true, false));
     xmlopts.add(dtd);
-    xmlopts.add(chop);
+    xmlopts.add(stripNS);
+    xmlopts.add(chopWS);
     xmlopts.add(new BaseXLabel(H_CHOP_WS, false, false).border(0, 0, 8, 0));
     xmlopts.add(new BaseXLabel());
 
@@ -308,7 +312,8 @@ final class DialogParsing extends BaseXBack {
 
     gui.set(Prop.PARSER, type);
     gui.set(Prop.PARSEROPT, props.toString());
-    gui.set(Prop.CHOP, chop.isSelected());
+    gui.set(Prop.CHOP, chopWS.isSelected());
+    gui.set(Prop.STRIPNS, stripNS.isSelected());
     gui.set(Prop.DTD, dtd.isSelected());
     gui.set(Prop.INTPARSE, intparse.isSelected());
     gui.set(Prop.CATFILE, usecat.isSelected() ? cfile.getText() : "");

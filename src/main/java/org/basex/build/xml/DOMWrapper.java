@@ -19,6 +19,8 @@ import org.w3c.dom.Text;
  * @author Christian Gruen
  */
 public final class DOMWrapper extends Parser {
+  /** Strip namespaces. */
+  private final boolean stripNS;
   /** Name of the document. */
   private final String filename;
   /** Root document. */
@@ -39,6 +41,7 @@ public final class DOMWrapper extends Parser {
     root = doc;
     filename = fn;
     chop = pr.is(Prop.CHOP);
+    stripNS = pr.is(Prop.STRIPNS);
   }
 
   @Override
@@ -59,16 +62,18 @@ public final class DOMWrapper extends Parser {
           final NamedNodeMap at = n.getAttributes();
           for(int a = 0, as = at.getLength(); a < as; ++a) {
             final Attr att = (Attr) at.item(a);
-            final byte[] k = token(att.getName()), v = token(att.getValue());
-            if(eq(k, XMLNS)) {
-              builder.startNS(EMPTY, v);
-            } else if(startsWith(k, XMLNSC)) {
-              builder.startNS(local(k), v);
+            final byte[] an = token(att.getName());
+            final byte[] av = token(att.getValue());
+            if(eq(an, XMLNS)) {
+              if(!stripNS) builder.startNS(EMPTY, av);
+            } else if(startsWith(an, XMLNSC)) {
+              if(!stripNS) builder.startNS(local(an), av);
             } else {
-              atts.add(k, v);
+              atts.add(stripNS ? local(an) : an, av);
             }
           }
-          builder.startElem(token(n.getNodeName()), atts);
+          final byte[] en = token(n.getNodeName());
+          builder.startElem(stripNS ? local(en) : en, atts);
         } else if(n instanceof Text) {
           final String s = n.getNodeValue();
           builder.text(token(chop ? s.trim() : s));

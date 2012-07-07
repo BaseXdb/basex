@@ -21,6 +21,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public class XMLParser extends SingleParser {
+  /** Strip namespaces. */
+  private final boolean stripNS;
   /** Scanner reference. */
   private final XMLScanner scanner;
   /** Names of opened elements. */
@@ -37,6 +39,7 @@ public class XMLParser extends SingleParser {
   public XMLParser(final IO source, final Prop pr) throws IOException {
     super(source, pr);
     scanner = new XMLScanner(source, pr);
+    stripNS = pr.is(Prop.STRIPNS);
   }
 
   @Override
@@ -97,33 +100,34 @@ public class XMLParser extends SingleParser {
     consume(Type.L_BR);
     atts.reset();
 
-    // get tag name
-    final byte[] tag = consumeToken(Type.TAGNAME);
+    // get element name
+    byte[] en = consumeToken(Type.TAGNAME);
+    if(stripNS) en = local(en);
     skipSpace();
 
     // parse optional attributes
     while(scanner.type != Type.R_BR && scanner.type != Type.CLOSE_R_BR) {
-      final byte[] attName = consumeToken(Type.ATTNAME);
+      final byte[] an = consumeToken(Type.ATTNAME);
       skipSpace();
       consume(Type.EQ);
       skipSpace();
       consume(Type.QUOTE);
-      byte[] attValue = EMPTY;
+      byte[] av = EMPTY;
       if(scanner.type == Type.ATTVALUE) {
-        attValue = scanner.token.finish();
+        av = scanner.token.finish();
         scanner.more();
       }
       consume(Type.QUOTE);
 
-      if(startsWith(attName, XMLNSC)) {
+      if(startsWith(an, XMLNSC)) {
         // open namespace...
-        builder.startNS(local(attName), attValue);
-      } else if(eq(attName, XMLNS)) {
+        if(!stripNS) builder.startNS(local(an), av);
+      } else if(eq(an, XMLNS)) {
         // open namespace...
-        builder.startNS(EMPTY, attValue);
+        if(!stripNS) builder.startNS(EMPTY, av);
       } else {
         // add attribute
-        atts.add(attName, attValue);
+        atts.add(stripNS ? local(an) : an, av);
       }
 
       if(scanner.type != Type.R_BR && scanner.type != Type.CLOSE_R_BR) {
@@ -133,14 +137,14 @@ public class XMLParser extends SingleParser {
 
     // send empty element to builder
     if(scanner.type == Type.CLOSE_R_BR) {
-      builder.emptyElem(tag, atts);
+      builder.emptyElem(en, atts);
       if(tags.isEmpty()) closed = true;
       return scanner.more();
     }
 
     // send start element
-    builder.startElem(tag, atts);
-    tags.add(tag);
+    builder.startElem(en, atts);
+    tags.add(en);
     return consume(Type.R_BR);
   }
 

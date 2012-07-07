@@ -69,7 +69,7 @@ public final class SAXWrapper extends SingleParser {
         r = f.newSAXParser().getXMLReader();
       }
 
-      saxh = new SAXHandler(builder, prop.is(Prop.CHOP));
+      saxh = new SAXHandler(builder, prop.is(Prop.CHOP), prop.is(Prop.STRIPNS));
       final String cat = prop.get(Prop.CATFILE);
       if(!cat.isEmpty()) CatalogWrapper.set(r, cat);
 

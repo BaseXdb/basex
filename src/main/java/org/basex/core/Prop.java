@@ -80,6 +80,8 @@ public final class Prop extends AProp {
   public static final Object[] ADDRAW = { "ADDRAW", false };
   /** Flag for skipping corrupt files. */
   public static final Object[] SKIPCORRUPT = { "SKIPCORRUPT", false };
+  /** Strips namespaces. */
+  public static final Object[] STRIPNS = { "STRIPNS", false };
   /** Define import parser. */
   public static final Object[] PARSER = { "PARSER", "xml" };
   /** Define parser options. */
