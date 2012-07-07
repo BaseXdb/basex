@@ -178,7 +178,6 @@ invalid_%            = % est invalide.
 invalid_value_%_%    = Impossible de donner à la propriété '%' la valeur '%'.
 italics              = Italique
 java_lf              = Utiliser apparence Java
-jettyxml_not_found_% = The jetty.xml file could not be found at '%'.
 kill_self_%          = '%' ne peut pas s'auto-interrompre.
 language             = Langue
 license              = License BSD

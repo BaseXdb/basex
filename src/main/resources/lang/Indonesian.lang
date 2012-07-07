@@ -178,7 +178,6 @@ invalid_%            = % tidak sah.
 invalid_value_%_%    = Tidak dapat mengatur '%' menjadi '%'.
 italics              = Miring
 java_lf              = Gunakan Java Look & Feel
-jettyxml_not_found_% = The jetty.xml file could not be found at '%'.
 kill_self_%          = '%' tidak dapat mematikan sendiri.
 language             = Bahasa
 license              = BSD License

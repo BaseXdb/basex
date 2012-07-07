@@ -178,7 +178,6 @@ invalid_%            = % is invalid.
 invalid_value_%_%    = Could not set '%' to '%'.
 italics              = Nghiên
 java_lf              = Xài cách nhìn & cảm giác Java
-jettyxml_not_found_% = The jetty.xml file could not be found at '%'.
 kill_self_%          = '%' cannot kill itself.
 language             = Ngôn ngữ
 license              = BSD giấy phép
