@@ -594,7 +594,7 @@ public abstract class Data {
 
     // size of the subtree to delete
     int k = kind(pre);
-    int s = size(pre, k);
+    final int s = size(pre, k);
     resources.delete(pre, s);
 
     if(meta.updindex) {
@@ -626,7 +626,7 @@ public abstract class Data {
     }
 
     // preserve empty root node
-    int p = pre;
+    final int p = pre;
     if(kind(p) == DOC) --meta.ndocs;
 
     if(meta.updindex) {
@@ -637,9 +637,6 @@ public abstract class Data {
     // delete node from table structure and reduce document size
     table.delete(pre, s);
     updateDist(p, -s);
-
-    // NSNodes have to be checked for pre value shifts after delete
-    nspaces.update(pre, s, false, null);
   }
 
   /**
@@ -689,8 +686,8 @@ public abstract class Data {
     final IntList preStack = new IntList();
     int dpre = -1;
     final NSNode t = nspaces.current;
-    final Set<NSNode> newNodes = new HashSet<NSNode>();
     final IntList flagPres = new IntList();
+    Set<NSNode> newNodes = null;
 
     while(++dpre != dsize) {
       if(dpre != 0 && dpre % buf == 0) insert(ipre + dpre - buf);
@@ -768,7 +765,9 @@ public abstract class Data {
                 // prior to inserting and two new nodes are inserted at
                 // location pre == 3 we have to make sure N and only N gets
                 // updated.
-                newNodes.add(nspaces.add(at.name(a), at.string(a), pre));
+                final NSNode ns = nspaces.add(at.name(a), at.string(a), pre);
+                if(newNodes == null) newNodes = new HashSet<NSNode>();
+                newNodes.add(ns);
                 ne = true;
               }
             }
@@ -807,6 +806,7 @@ public abstract class Data {
 
     while(!preStack.isEmpty()) nspaces.close(preStack.pop());
     nspaces.setRoot(t);
+    nspaces.insert(ipre, dsize, newNodes);
 
     if(bp != 0) insert(ipre + dpre - 1 - (dpre - 1) % buf);
     // reset buffer to old size
@@ -824,9 +824,6 @@ public abstract class Data {
       p = parent(p, k);
     }
     updateDist(ipre + dsize, dsize);
-
-    // NSNodes have to be checked for pre value shifts after insert
-    nspaces.update(ipre, dsize, true, newNodes);
 
     if(meta.updindex) {
       // add the entries to the ID -> PRE mapping:

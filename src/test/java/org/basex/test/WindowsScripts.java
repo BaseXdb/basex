@@ -6,6 +6,7 @@ import java.util.*;
 
 import org.basex.io.*;
 import org.basex.io.in.*;
+import org.basex.util.*;
 import org.junit.*;
 
 /**
@@ -27,7 +28,7 @@ public class WindowsScripts {
     }
 
     if(libs.isEmpty()) {
-      System.err.println("WindowsScripts: no library files found.");
+      Util.errln("WindowsScripts: no library files found.");
     } else {
       for(final IOFile f : new IOFile("etc").children()) {
         final String n = f.name();

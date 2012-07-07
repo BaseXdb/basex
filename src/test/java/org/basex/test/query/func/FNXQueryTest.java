@@ -53,12 +53,15 @@ public final class FNXQueryTest extends AdvancedQueryTest {
   @Test
   public void xqueryType() {
     final PrintStream err = System.err;
-    System.setErr(NULL);
-    check(_XQUERY_TYPE);
-    query(_XQUERY_TYPE.args("()"), "");
-    query(_XQUERY_TYPE.args("1"), "1");
-    query(_XQUERY_TYPE.args("(1, 2, 3)"), "1 2 3");
-    query(_XQUERY_TYPE.args("<x a='1' b='2' c='3'/>/@*/data()"), "1 2 3");
-    System.setErr(err);
+    try {
+      System.setErr(NULL);
+      check(_XQUERY_TYPE);
+      query(_XQUERY_TYPE.args("()"), "");
+      query(_XQUERY_TYPE.args("1"), "1");
+      query(_XQUERY_TYPE.args("(1, 2, 3)"), "1 2 3");
+      query(_XQUERY_TYPE.args("<x a='1' b='2' c='3'/>/@*/data()"), "1 2 3");
+    } finally {
+      System.setErr(err);
+    }
   }
 }
