@@ -178,6 +178,7 @@ invalid_%            = % is ongeldig.
 invalid_value_%_%    = Kon '%' niet de waarde '%' geven.
 italics              = Cursief
 java_lf              = Gebruik Java Look & Feel
+jettyxml_not_found_% = The jetty.xml file could not be found at '%'.
 kill_self_%          = '%' kan zichzelf niet stoppen.
 language             = Taal
 license              = BSD License
