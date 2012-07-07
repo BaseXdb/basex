@@ -123,6 +123,7 @@ public final class Pos extends Simple {
 
   @Override
   public String toString() {
+    if(min == max) return Long.toString(min);
     final StringBuilder sb = new StringBuilder("position() ");
     if(max == Long.MAX_VALUE) sb.append('>');
     sb.append("= ").append(min);

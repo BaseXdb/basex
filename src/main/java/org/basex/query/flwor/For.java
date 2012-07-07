@@ -147,22 +147,8 @@ public final class For extends ForLet {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(VAR, var, POS, pos, SCORE, score), expr);
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder(FOR + ' ' + var + ' ');
-    if(pos != null) sb.append(AT + ' ' + pos + ' ');
-    if(score != null) sb.append(SCORE + ' ' + score + ' ');
-    return sb.append(IN + ' ' + expr).toString();
-  }
-
-  @Override
   public boolean declares(final Var v) {
-    return var.is(v) || pos != null && pos.is(v)
-        || score != null && score.is(v);
+    return var.is(v) || pos != null && pos.is(v) || score != null && score.is(v);
   }
 
   @Override
@@ -173,5 +159,18 @@ public final class For extends ForLet {
     }
     if(score != null) return new Var[]{ var, score };
     return new Var[]{ var };
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(VAR, var, POS, pos, SCORE, score), expr);
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder(FOR + ' ' + var + ' ');
+    if(pos != null) sb.append(AT + ' ' + pos + ' ');
+    if(score != null) sb.append(SCORE + ' ' + score + ' ');
+    return sb.append(IN + ' ' + expr).toString();
   }
 }

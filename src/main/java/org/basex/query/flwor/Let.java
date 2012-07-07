@@ -120,6 +120,16 @@ public final class Let extends ForLet {
   }
 
   @Override
+  public boolean declares(final Var v) {
+    return var.is(v);
+  }
+
+  @Override
+  public Var[] vars() {
+    return new Var[]{ var };
+  }
+
+  @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(score ? SCORE : VAR, var), expr);
   }
@@ -130,15 +140,5 @@ public final class Let extends ForLet {
     if(score) sb.append(SCORE).append(' ');
     sb.append(var).append(' ').append(ASSIGN).append(' ').append(expr);
     return sb.toString();
-  }
-
-  @Override
-  public boolean declares(final Var v) {
-    return var.is(v);
-  }
-
-  @Override
-  public Var[] vars() {
-    return new Var[]{ var };
   }
 }

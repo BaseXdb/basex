@@ -90,16 +90,10 @@ public class GFLWOR extends ParseExpr {
     final int vs = ctx.vars.size();
     for(int f = 0; f < fl.length; ++f) {
       final ForLet flt = fl[f].compile(ctx);
-      // bind variable if it contains a value or occurs only once
-      if(flt.expr.isValue() || count(flt.var, f) == 1) flt.bind(ctx);
-
-      /* ...or if all inner clauses return only one item. This rewriting would
-       * disallow repeated evaluations of the same expression, but it prevents
-       * index-based rewritings (e.g. for XMark 9)
-      boolean one = true;
-      for(int g = f + 1; g < fl.length; g++) one &= fl[g].size() == 1;
-      if(flt.expr.value() || count(flt.var, f) == 1 && one) flt.bind(ctx);
-      */
+      // bind variable if it contains a value or will only be evaluated once
+      boolean let = true;
+      for(int g = f + 1; g < fl.length; g++) let &= flt instanceof Let;
+      if(flt.expr.isValue() || let && count(flt.var, f) == 1) flt.bind(ctx);
     }
 
     // optimize where clause
