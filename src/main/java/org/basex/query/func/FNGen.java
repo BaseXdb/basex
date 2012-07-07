@@ -338,6 +338,7 @@ public final class FNGen extends StandardFunc {
       // [JE] XQuery: check how to handle default collection()
       if(expr.length == 0 || !(expr[0] instanceof Str)) return false;
       final QueryInput qi = new QueryInput(string(((Str) expr[0]).string()));
+      if(qi.db == null) return false;
       db.add(qi.db);
       return true;
     }
