@@ -115,14 +115,16 @@ public class FNArchive extends StandardFunc {
     final ArchiveOut out = ArchiveOut.get(format, info);
     // check algorithm
     final byte[] alg = map.get(ALGORITHM);
+    int level = ZipEntry.DEFLATED;
     if(alg != null) {
       if(format.equals("zip") && !eq(alg, STORED, DEFLATE) ||
          format.equals("gzip") && !eq(alg, DEFLATE)) {
         ARCH_SUPP.thrw(info, ALGORITHM, alg);
       }
-      if(alg.equals(STORED)) out.level(ZipEntry.STORED);
-      else if(alg.equals(DEFLATE)) out.level(ZipEntry.DEFLATED);
+      if(alg.equals(STORED)) level = ZipEntry.STORED;
+      else if(alg.equals(DEFLATE)) level = ZipEntry.DEFLATED;
     }
+    out.level(level);
 
     try {
       int e = 0;
@@ -134,7 +136,7 @@ public class FNArchive extends StandardFunc {
         if(en == null || cn == null) break;
         if(out instanceof GZIPOut && c > 0)
           ARCH_ONE.thrw(info, format.toUpperCase(Locale.ENGLISH));
-        add(checkElmStr(en), cn, out);
+        add(checkElmStr(en), cn, out, level);
         e++;
         c++;
       }
@@ -287,7 +289,7 @@ public class FNArchive extends StandardFunc {
       for(final byte[] h : hm) {
         if(h == null) continue;
         final Item[] it = hm.get(h);
-        add(it[0], it[1], out);
+        add(it[0], it[1], out, ZipEntry.DEFLATED);
       }
     } catch(final IOException ex) {
       Util.debug(ex);
@@ -370,11 +372,12 @@ public class FNArchive extends StandardFunc {
    * @param entry entry descriptor
    * @param con contents
    * @param out output archive
+   * @param level default compression level
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private void add(final Item entry, final Item con, final ArchiveOut out)
-      throws QueryException, IOException {
+  private void add(final Item entry, final Item con, final ArchiveOut out,
+      final int level) throws QueryException, IOException {
 
     // create new zip entry
     final String name = string(entry.string(info));
@@ -383,17 +386,10 @@ public class FNArchive extends StandardFunc {
     String en = null;
 
     // compression level
+    byte[] lvl = null;
     if(entry instanceof ANode) {
       final ANode el = (ANode) entry;
-      final byte[] level = el.attribute(Q_LEVEL);
-      if(level != null) {
-        final int l = toInt(level);
-        try {
-          ze.setMethod(l);
-        } catch(final IllegalArgumentException ex) {
-          ARCH_LEVEL.thrw(info, level);
-        }
-      }
+      lvl = el.attribute(Q_LEVEL);
 
       // last modified
       final byte[] mod = el.attribute(Q_LAST_MOD);
@@ -422,6 +418,12 @@ public class FNArchive extends StandardFunc {
       val = ((Bin) con).binary(info);
     } else {
       STRB64TYPE.thrw(info, con.type);
+    }
+
+    try {
+      out.level(lvl == null ? level : toInt(lvl));
+    } catch(final IllegalArgumentException ex) {
+      ARCH_LEVEL.thrw(info, lvl);
     }
     out.write(ze, val);
   }
