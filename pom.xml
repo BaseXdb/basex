@@ -18,6 +18,11 @@
       <url>http://www.opensource.org/licenses/bsd-license.php</url>
     </license>
   </licenses>
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
+  </parent>
   <repositories>
     <repository>
       <id>basex</id>
@@ -145,6 +150,20 @@
           <source>1.6</source>
           <target>1.6</target>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>1.4</version>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -307,11 +326,18 @@
       </resource>
     </resources>
   </build>
-  <distributionManagement>
+<distributionManagement>
     <repository>
       <id>basex.mvn</id>
       <name>BaseX Maven Repository</name>
-      <url>ftp://basex.org/</url>
+      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
     </repository>
   </distributionManagement>
+  <url>https://github.com/BaseXdb/basex</url>
+  <scm>
+  	<url>BaseXdb@github.com:BaseXdbc/basex.git</url>
+  	<connection>scm:git:BaseXdb@github.com:BaseXdb/basex.git</connection>
+  	<developerConnection>scm:git:BaseXdb@github.com:BaseXdb/basex.git</developerConnection>
+  	<tag>BaseX</tag>
+  </scm>
 </project>
