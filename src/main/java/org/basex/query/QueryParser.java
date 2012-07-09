@@ -99,8 +99,6 @@ public class QueryParser extends InputParser {
   private boolean declBase;
   /** Declaration flag. */
   private boolean declItem;
-  /** Declaration flag. */
-  private boolean declVars;
 
   /** Cached QNames. */
   private final ArrayList<QNmCheck> names = new ArrayList<QNmCheck>();
@@ -1008,7 +1006,7 @@ public class QueryParser extends InputParser {
       final ArrayList<Var> ng = new ArrayList<Var>();
       final TokenSet set = new TokenSet();
       for(final GroupSpec spec : grp) {
-        if(!spec.assign) set.add(spec.grp.name.eqname());
+        if(!spec.assign) set.add(spec.var.name.eqname());
       }
       for(int i = fl.length; --i >= 0;) {
         for(final Var v : fl[i].vars()) {
@@ -3574,12 +3572,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException if the variable isn't defined
    */
   private Var checkVar(final QNm name, final Err err) throws QueryException {
-    Var v = ctx.vars.get(name);
-    // dynamically assign variables from function modules
-    if(v == null && !declVars) {
-      declVars = true;
-      v = ctx.vars.get(name);
-    }
+    final Var v = ctx.vars.get(name);
     if(v == null) error(err, '$' + string(name.string()));
     return v;
   }
