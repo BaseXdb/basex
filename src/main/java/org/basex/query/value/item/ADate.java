@@ -3,6 +3,7 @@ package org.basex.query.value.item;
 import static org.basex.query.util.Err.*;
 
 import java.math.*;
+import java.util.*;
 import java.util.regex.*;
 
 import javax.xml.datatype.*;
@@ -184,7 +185,11 @@ public abstract class ADate extends Item {
     final int h = xc.getHour() == UNDEF ? 0 : xc.getHour();
     final int m = xc.getMinute() == UNDEF ? 0 : xc.getMinute();
     final int s = xc.getSecond() == UNDEF ? 0 : xc.getSecond();
-    final int z = xc.getTimezone() == UNDEF ? 0 : xc.getTimezone();
+    int z = xc.getTimezone();
+    if(z == UNDEF) {
+      final long ms = System.currentTimeMillis();
+      z = Calendar.getInstance().getTimeZone().getOffset(ms) / 60000;
+    }
     BigDecimal bd = xc.getFractionalSecond();
     if(bd == null) bd = BigDecimal.valueOf(0);
     return bd.add(BigDecimal.valueOf(h * 3600 + m * 60 - z * 60 + s));

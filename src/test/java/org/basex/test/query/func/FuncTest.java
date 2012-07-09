@@ -136,6 +136,9 @@ public final class FuncTest extends QueryTest {
          "fn:seconds-from-duration(xs:yearMonthDuration('P2000Y12M')) = 0"},
       { "seconds-from-duration 2", bool(true),
         "fn:seconds-from-duration(xs:dayTimeDuration('-PT256S')) = -16"},
+
+      { "current-date()", bool(true),
+        "current-date() eq xs:date(substring(string(current-date()), 1, 10))"},
     };
   }
 
