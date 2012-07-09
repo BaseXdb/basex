@@ -9,23 +9,24 @@ import static org.basex.util.Token.*;
  * @author Christian Gruen
  */
 interface RestXqText {
-  /** Annotation "path". */
+  /** Token "path". */
   byte[] PATH = token("path");
-  /** Annotation "produces". */
+  /** Token "produces". */
   byte[] PRODUCES = token("produces");
-  /** Annotation "consumes". */
+  /** Token "consumes". */
   byte[] CONSUMES = token("consumes");
-  /** Annotation "query-param". */
+  /** Token "query-param". */
   byte[] QUERY_PARAM = token("query-param");
-  /** Annotation "form-param". */
+  /** Token "form-param". */
   byte[] FORM_PARAM = token("form-param");
-  /** Annotation "header-param". */
+  /** Token "header-param". */
   byte[] HEADER_PARAM = token("header-param");
-  /** Annotation "cookie-param". */
+  /** Token "cookie-param". */
   byte[] COOKIE_PARAM = token("cookie-param");
-  /** Annotation "session-id". */
+  /** Token "session-id". */
   byte[] SESSION_ID = token("session-id");
-
+  /** Token "request". */
+  byte[] REQUEST = token("request");
   /** Token "header". */
   byte[] HEADER = token("header");
   /** Token "response". */
@@ -67,8 +68,6 @@ interface RestXqText {
   String HEAD_METHOD = "HEAD method must only return 'rest:reponse' element.";
   /** Error message. */
   String METHOD_VALUE = "Method % does not allow values.";
-  /** Error message. */
-  String SESSION_VALUE = "Annotation % requires a value.";
   /** Error message. */
   String INPUT_CONV = "Input could not be converted: %";
 }
