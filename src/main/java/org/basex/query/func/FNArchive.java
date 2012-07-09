@@ -388,8 +388,11 @@ public class FNArchive extends StandardFunc {
       final byte[] level = el.attribute(Q_LEVEL);
       if(level != null) {
         final int l = toInt(level);
-        if(l < 0 || l > 9) ARCH_LEVEL.thrw(info, level);
-        ze.setMethod(l);
+        try {
+          ze.setMethod(l);
+        } catch(final IllegalArgumentException ex) {
+          ARCH_LEVEL.thrw(info, level);
+        }
       }
 
       // last modified
