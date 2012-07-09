@@ -326,7 +326,7 @@
       </resource>
     </resources>
   </build>
-<distributionManagement>
+  <distributionManagement>
     <repository>
       <id>basex.mvn</id>
       <name>BaseX Maven Repository</name>
