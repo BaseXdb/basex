@@ -54,8 +54,8 @@ public final class Group extends ParseExpr {
   public Expr compile(final QueryContext ctx) throws QueryException {
     for(final GroupSpec g : groupby) {
       g.compile(ctx);
-      if(g.grp.ret != null) g.grp.ret = SeqType.get(g.grp.ret.type, 1);
-      ctx.vars.add(g.grp);
+      if(g.var.ret != null) g.var.ret = SeqType.get(g.var.ret.type, 1);
+      ctx.vars.add(g.var);
     }
     for(final Var v : nongroup[1]) ctx.vars.add(v);
     return this;

@@ -19,7 +19,7 @@ import org.basex.util.*;
  */
 public final class GroupSpec extends Single {
   /** Grouping variable. */
-  public final Var grp;
+  public final Var var;
   /** This contains an assignment. */
   public final boolean assign;
 
@@ -32,7 +32,7 @@ public final class GroupSpec extends Single {
    */
   public GroupSpec(final InputInfo ii, final Var gv, final Expr e, final boolean a) {
     super(ii, e);
-    grp = gv;
+    var = gv;
     assign = a;
   }
 
@@ -50,11 +50,11 @@ public final class GroupSpec extends Single {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(), grp, expr);
+    addPlan(plan, planElem(), var, expr);
   }
 
   @Override
   public String toString() {
-    return grp + " " + ASSIGN + ' ' + expr;
+    return var + " " + ASSIGN + ' ' + expr;
   }
 }

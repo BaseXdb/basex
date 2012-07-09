@@ -136,7 +136,7 @@ final class GroupPartition {
     for(int i = 0; i < part.size(); ++i) {
       final GroupNode gn = part.get(i);
       for(int j = 0; j < gv.length; ++j)
-        ctx.vars.add(gv[j].grp.copy().bind(gn.vals[j], ctx));
+        ctx.vars.add(gv[j].var.copy().bind(gn.vals[j], ctx));
 
       if(items != null) {
         final ValueBuilder[] ii = items.get(i);
