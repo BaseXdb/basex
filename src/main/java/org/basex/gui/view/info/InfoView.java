@@ -160,7 +160,7 @@ public final class InfoView extends View {
     strings = sl;
     String total = time;
 
-    if(ok && cmd instanceof XQuery) {
+    if(ok && cmd instanceof XQuery && !il.isEmpty()) {
       text.reset();
       add(EVALUATING_C, eval);
       add(QUERY_C + ' ', qu);
