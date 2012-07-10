@@ -874,9 +874,17 @@ public class QueryParser extends InputParser {
     final UserFunc func = new UserFunc(info(), name, args, optAsType(), ann, true);
     if(func.updating) ctx.updating(true);
 
-    ctx.funcs.add(func, info());
-    if(!wsConsumeWs(EXTERNAL)) func.expr = enclosed(NOFUNBODY);
-    ctx.vars.reset(vl);
+    if(!wsConsumeWs(EXTERNAL)) {
+      ctx.funcs.add(func, info());
+      func.expr = enclosed(NOFUNBODY);
+      ctx.vars.reset(vl);
+    } else {
+      /* try to bind external function
+      if(ctx.modules.addImport(name.uri(), info(), this)) {
+        final TypedFunc f = Functions.get(name, args, false, ctx, info());
+        if(f != null) func.expr = f.fun;
+      }*/
+    }
   }
 
   /**

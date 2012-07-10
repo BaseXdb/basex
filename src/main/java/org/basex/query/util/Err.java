@@ -652,7 +652,9 @@ public enum Err {
   /** XPST0003. */
   FEATURE30(XPST, 17, "Feature not available in XQuery 1.0."),
   /** XPST0017. */
-  FUNCUNKNOWN(XPST, 17, "Unknown function '%(...)'."),
+  FUNCUNKNOWN(XPST, 17, "Unknown function: %(...)."),
+  /** XPST0017. */
+  EXTERNALFUNC(XPST, 17, "Unbound external function: %(...)."),
   /** XPST0017. */
   WHICHJAVA(XPST, 17, "Java function '%(...)' not found."),
   /** XPST0017. */
