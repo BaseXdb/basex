@@ -12,10 +12,10 @@ import org.basex.http.rest.*;
 import org.basex.http.restxq.*;
 import org.basex.http.webdav.*;
 import org.basex.util.*;
-import org.mortbay.jetty.*;
-import org.mortbay.jetty.handler.*;
-import org.mortbay.jetty.nio.*;
-import org.mortbay.servlet.*;
+import org.eclipse.jetty.server.*;
+import org.eclipse.jetty.server.handler.*;
+import org.eclipse.jetty.server.nio.*;
+import org.eclipse.jetty.servlet.*;
 
 /**
  * This is the main class for the starting the database HTTP services.
@@ -126,17 +126,15 @@ public final class BaseXHTTP {
     conn.setPort(hport);
     jetty.addConnector(conn);
 
-    final org.mortbay.jetty.servlet.Context jctx =
-        new org.mortbay.jetty.servlet.Context(jetty, "/",
-            org.mortbay.jetty.servlet.Context.SESSIONS);
+    final ServletContextHandler jctx =
+        new ServletContextHandler(jetty, "/",
+            ServletContextHandler.SESSIONS);
 
     if(rest) {
       jctx.addServlet(RESTServlet.class, "/rest/*");
-      jctx.addFilter(GzipFilter.class, "/rest/*", Handler.ALL);
     }
     if(restxq) {
       jctx.addServlet(RestXqServlet.class, "/restxq/*");
-      jctx.addFilter(GzipFilter.class, "/restxq/*", Handler.ALL);
     }
     if(webdav) {
       jctx.addServlet(WebDAVServlet.class, "/webdav/*");
