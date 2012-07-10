@@ -8,6 +8,8 @@
       <sourceFolder url="file://$MODULE_DIR$/src/main/resources" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/resources" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/target/generated-sources/test-annotations" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/target/generated-sources/annotations" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />
@@ -17,6 +19,7 @@
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache:lucene-stemmers:3.4.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.ccil.cowan.tagsoup:tagsoup:1.2" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: xml-resolver:xml-resolver:1.2" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: jline:jline:1.0" level="project" />
   </component>
   <component name="org.twodividedbyzero.idea.findbugs">
     <option name="_basePreferences">
