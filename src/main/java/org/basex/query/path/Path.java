@@ -163,7 +163,7 @@ public abstract class Path extends ParseExpr {
     // skip computation if value contains document nodes
     if(rt == null || rt.type != NodeType.DOC) return -1;
     final Data data = rt.data();
-    // skip computation if no database instance is available, is out-of-dated or
+    // skip computation if no database instance is available, is out-of-date or
     // if context does not contain all database nodes
     if(data == null || !data.meta.uptodate ||
         data.resources.docs().size() != rt.size()) return -1;
@@ -250,7 +250,7 @@ public abstract class Path extends ParseExpr {
    * @return path
    */
   Expr children(final QueryContext ctx, final Data data) {
-    // skip path check if no path index exists, or if it is out-of-dated
+    // skip path check if no path index exists, or if it is out-of-date
     if(!data.meta.uptodate || data.nspaces.globalNS() == null) return this;
 
     Path path = this;

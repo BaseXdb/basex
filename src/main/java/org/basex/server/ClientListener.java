@@ -498,7 +498,7 @@ public final class ClientListener extends Thread {
         } else if(sc == ServerCmd.CLOSE) {
           queries.remove(arg);
         } else if(sc == ServerCmd.NEXT) {
-          throw new Exception("Protocol for query iteration is out-of-dated.");
+          throw new Exception("Protocol for query iteration is out-of-date.");
         }
         // send 0 as end marker
         out.write(0);
