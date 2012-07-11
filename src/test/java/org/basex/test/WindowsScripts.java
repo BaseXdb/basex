@@ -7,6 +7,7 @@ import java.util.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 import org.junit.*;
 
 /**
@@ -32,7 +33,19 @@ public class WindowsScripts {
     } else {
       for(final IOFile f : new IOFile("etc").children()) {
         final String n = f.name();
-        if(n.endsWith(".bat")) libraries(n, libs);
+        final StringList missing = new StringList();
+        final StringList obsolete = new StringList();
+        if(n.endsWith(".bat")) libraries(n, libs, missing, obsolete);
+        if(!missing.isEmpty()) {
+          final StringBuilder sb = new StringBuilder();
+          for(final String l : missing) sb.append(';').append(l);
+          fail("Library not found in '" + n + "':\n" + sb.substring(1));
+        }
+        if(!obsolete.isEmpty()) {
+          final StringBuilder sb = new StringBuilder();
+          for(final String l : obsolete) sb.append(';').append(l);
+          fail("Library obsolete in '" + n + "':\n" + sb.substring(1));
+        }
       }
     }
   }
@@ -41,9 +54,13 @@ public class WindowsScripts {
    * Tests the library references in the Windows script.
    * @param name script name
    * @param libs libraries
+   * @param missing missing libraries
+   * @param obsolete obsolete libraries
    * @throws Exception exception
    */
-  private void libraries(final String name, final HashSet<String> libs) throws Exception {
+  private void libraries(final String name, final HashSet<String> libs,
+      final StringList missing, final StringList obsolete) throws Exception {
+
     final HashSet<String> sl = new HashSet<String>();
     final NewlineInput nli = new NewlineInput(IO.get("etc/" + name));
     try {
@@ -58,10 +75,10 @@ public class WindowsScripts {
 
     for(final String l : libs) {
       if(l.contains("basex")) continue;
-      assertTrue("Library not found in '" + name + "': " + l, sl.remove(l));
+      if(!sl.remove(l)) missing.add(l);
     }
-    final StringBuilder sb = new StringBuilder();
-    for(final String l : sl) sb.append("\n- ").append(l);
-    assertTrue("Libraries superfluous in '" + name + "':" + sb, sl.isEmpty());
+    for(final String l : sl) {
+      if(l.endsWith(".jar")) obsolete.add(l);
+    }
   }
 }
