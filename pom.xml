@@ -91,12 +91,12 @@
     <dependency>
 	  <groupId>org.eclipse.jetty</groupId>
 	  <artifactId>jetty-server</artifactId>
-	  <version>7.6.4.v20120524</version>
+	  <version>8.1.4.v20120524</version>
 	</dependency>
 	<dependency>
 	  <groupId>org.eclipse.jetty</groupId>
 	  <artifactId>jetty-servlet</artifactId>
-	  <version>7.6.4.v20120524</version>
+	  <version>8.1.4.v20120524</version>
 	</dependency>
     <dependency>
       <groupId>com.ettrema</groupId>
