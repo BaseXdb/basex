@@ -123,7 +123,6 @@ public final class BXServletRequest extends AbstractRequest {
   @Override
   public Map<String, String> getHeaders() {
     final Map<String, String> map = new HashMap<String, String>();
-    @SuppressWarnings("unchecked")
     final Enumeration<String> en = req.getHeaderNames();
     while(en.hasMoreElements()) {
       final String name = en.nextElement();
@@ -165,7 +164,6 @@ public final class BXServletRequest extends AbstractRequest {
             files.put(item.getFieldName(), new FileItemWrapper(item));
         }
       } else {
-        @SuppressWarnings("unchecked")
         final Enumeration<String> en = req.getParameterNames();
         while(en.hasMoreElements()) {
           final String nm = en.nextElement();
