@@ -123,7 +123,7 @@ public class DiskValues implements Index {
   }
 
   @Override
-  public EntryIterator entries(final IndexEntries entries) {
+  public synchronized EntryIterator entries(final IndexEntries entries) {
     final byte[] prefix = entries.get();
     final int i = get(prefix);
     return new EntryIterator() {
