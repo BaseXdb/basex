@@ -298,7 +298,7 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPDROP = {
-    "[" + CmdDrop.BACKUP + '|' + CmdDrop.DATABASE + '|' + '|' + CmdDrop.EVENT +
+    "[" + CmdDrop.BACKUP + '|' + CmdDrop.DATABASE + '|' + CmdDrop.EVENT + '|' +
       CmdDrop.INDEX + '|' + CmdDrop.USER + "] [...]",
     lang("c_drop1"),
     lang("c_drop2") + NL +
