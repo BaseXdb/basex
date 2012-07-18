@@ -1,6 +1,7 @@
 package org.basex.core;
 
 import java.util.*;
+import java.util.concurrent.locks.*;
 
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -23,6 +24,8 @@ final class ProcessLocking implements ILocking {
   private final Object mutex = new Object();
   /** Database context. */
   private final Context ctx;
+  /** Additional lock for memory barriers. */
+  private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
 
   /** Number of active readers. */
   private int readers;
@@ -74,6 +77,11 @@ final class ProcessLocking implements ILocking {
       }
       // start process, remove from queue
       queue.remove(0);
+      if (pr.updating) {
+        rwLock.writeLock().lock();
+      } else {
+        rwLock.readLock().lock();
+      }
     }
   }
 
@@ -82,8 +90,10 @@ final class ProcessLocking implements ILocking {
     synchronized(mutex) {
       if(pr.updating) {
         writer = false;
+        rwLock.writeLock().unlock();
       } else {
         --readers;
+        rwLock.readLock().unlock();
       }
       mutex.notifyAll();
     }
