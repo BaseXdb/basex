@@ -10,52 +10,54 @@ import org.basex.util.list.*;
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
- * @author Wolfgang Kronberg
  */
 public final class Compress {
-  /** A ByteList instance serving as a buffer. */
-  private final MyByteList bl = new MyByteList();
   /** Temporary value. */
   private int pc;
   /** Pack offset. */
   private int po;
-  /** Current unpack position. */
-  private int uc;
-  /** Unpack offset. */
-  private int uo;
 
   /**
-   * We create our own version of ByteList here 
-   * in order to access some protected fields from the Compress class
+   * We create our own version of ByteList here in order to access
+   * some protected fields from the Compress class.
    * @author kgb
    */
   private static final class MyByteList extends ByteList {
     /**
-     * Forwarding constructor.
+     * A simple forwarding constructor.
      */
     public MyByteList() {
       super();
     }
     /**
-     * @param newList the new value for ByteList.list, 
-     *   including setting ByteList.size to list.size.
+     * Exchanges the actual byte array backing this list instance.
+     * @param newList the new value for ByteList.list, including
+     *   setting ByteList.size to list.size.
      */
     public void setList(final byte[] newList) {
       list = newList;
+      size = newList.length;
     }
     /**
-     * @return ByteList.list.
+     * Direct access to the backing byte array.
+     * @return ByteList.list
      */
     public byte[] getList() {
       return list;
     }
     /**
-     * @param newSize the new value for ByteList.size.
+     * Sets the list size to a new value.
+     * @param newSize the new value for ByteList.size
      */
     public void setSize(final int newSize) {
       size = newSize;
     }
   }
+
+  /**
+   * A ByteList instance serving as a buffer.
+   */
+  private final MyByteList bl = new MyByteList();
 
   /**
    * Compresses the specified text.
@@ -120,6 +122,11 @@ public final class Compress {
     pc = cc;
   }
 
+  /** Current unpack position. */
+  private int uc;
+  /** UNpack offset. */
+  private int uo;
+
   /**
    * Decompresses the specified text.
    * @param txt text to be unpacked
@@ -127,7 +134,7 @@ public final class Compress {
    */
   public byte[] unpack(final byte[] txt) {
     // initialize decompression
-    final byte[] tmp = bl.getList();
+    final byte[] oldBlList = bl.getList();
     bl.setList(txt);
     uc = Num.length(txt, 0);
     uo = 0;
@@ -155,9 +162,14 @@ public final class Compress {
       }
       res[r] = (byte) (b >= 128 ? b : unpack[b]);
     }
-    // make sure that the external txt byte array does not remain in this class
-    bl.setList(tmp);
+
+    /*
+     * make sure that the external txt byte array does not remain in this class
+     */
+    bl.setList(oldBlList);
+
     return res;
+
   }
 
   /**
