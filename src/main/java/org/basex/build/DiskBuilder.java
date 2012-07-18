@@ -47,7 +47,7 @@ public final class DiskBuilder extends Builder {
   private int c;
 
   /** Text compressor. */
-  private static final ThreadLocal<Compress> comp = new ThreadLocal<Compress>() {
+  private static final ThreadLocal<Compress> COMP = new ThreadLocal<Compress>() {
     @Override
     protected Compress initialValue() {
       return new Compress();
