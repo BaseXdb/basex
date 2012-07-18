@@ -16,6 +16,8 @@ import org.basex.util.*;
 /**
  * This class stores the table on disk and reads it block-wise.
  *
+ * NOTE: this class is not thread-safe.
+ *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  * @author Tim Petrowsky
@@ -109,7 +111,7 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   @Override
-  public synchronized void flush() throws IOException {
+  public void flush() throws IOException {
     for(final Buffer b : bm.all()) if(b.dirty) writeBlock(b);
     if(!dirty) return;
 
@@ -129,7 +131,7 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   @Override
-  public synchronized void close() throws IOException {
+  public void close() throws IOException {
     flush();
     file.close();
   }
@@ -183,21 +185,21 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   @Override
-  public synchronized int read1(final int pre, final int off) {
+  public int read1(final int pre, final int off) {
     final int o = off + cursor(pre);
     final byte[] b = bm.current().data;
     return b[o] & 0xFF;
   }
 
   @Override
-  public synchronized int read2(final int pre, final int off) {
+  public int read2(final int pre, final int off) {
     final int o = off + cursor(pre);
     final byte[] b = bm.current().data;
     return ((b[o] & 0xFF) << 8) + (b[o + 1] & 0xFF);
   }
 
   @Override
-  public synchronized int read4(final int pre, final int off) {
+  public int read4(final int pre, final int off) {
     final int o = off + cursor(pre);
     final byte[] b = bm.current().data;
     return ((b[o] & 0xFF) << 24) + ((b[o + 1] & 0xFF) << 16) +
@@ -205,7 +207,7 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   @Override
-  public synchronized long read5(final int pre, final int off) {
+  public long read5(final int pre, final int off) {
     final int o = off + cursor(pre);
     final byte[] b = bm.current().data;
     return ((long) (b[o] & 0xFF) << 32) + ((long) (b[o + 1] & 0xFF) << 24) +
