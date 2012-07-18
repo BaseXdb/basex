@@ -18,38 +18,44 @@ public final class Compress {
   private int po;
 
   /**
-   * We create our own version of ByteList here in order to access some protected fields from the Compress class
+   * We create our own version of ByteList here in order to access
+   * some protected fields from the Compress class.
    * @author kgb
    */
   private static final class MyByteList extends ByteList {
     /**
-     * Forwarding constructor
+     * A simple forwarding constructor.
      */
     public MyByteList() {
       super();
     }
     /**
-     * @param newList the new value for ByteList.list, including setting ByteList.size to list.size
+     * Exchanges the actual byte array backing this list instance.
+     * @param newList the new value for ByteList.list, including
+     *   setting ByteList.size to list.size.
      */
-    public void setList(byte[] newList) {
+    public void setList(final byte[] newList) {
       list = newList;
+      size = newList.length;
     }
     /**
+     * Direct access to the backing byte array.
      * @return ByteList.list
      */
     public byte[] getList() {
       return list;
     }
     /**
+     * Sets the list size to a new value.
      * @param newSize the new value for ByteList.size
      */
-    public void setSize(int newSize) {
+    public void setSize(final int newSize) {
       size = newSize;
     }
   }
 
   /**
-   * a ByteList instance serving as a buffer
+   * A ByteList instance serving as a buffer.
    */
   private final MyByteList bl = new MyByteList();
 
@@ -128,6 +134,7 @@ public final class Compress {
    */
   public byte[] unpack(final byte[] txt) {
     // initialize decompression
+    final byte[] oldBlList = bl.getList();
     bl.setList(txt);
     uc = Num.length(txt, 0);
     uo = 0;
@@ -155,7 +162,14 @@ public final class Compress {
       }
       res[r] = (byte) (b >= 128 ? b : unpack[b]);
     }
+
+    /*
+     * make sure that the external txt byte array does not remain in this class
+     */
+    bl.setList(oldBlList);
+
     return res;
+
   }
 
   /**
