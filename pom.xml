@@ -3,8 +3,8 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.basex</groupId>
-  <artifactId>basex</artifactId>
-  <version>7.3.1-SNAPSHOT</version>
+  <artifactId>basex-kgb</artifactId>
+  <version>7.3.1.1</version>
   <name>BaseX</name>
   <properties>
     <compileSource>1.6</compileSource>
