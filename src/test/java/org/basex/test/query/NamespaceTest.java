@@ -719,6 +719,17 @@ public final class NamespaceTest extends AdvancedQueryTest {
   }
 
   /**
+   * Checks if a query uses the outer default namespace.
+   * @throws Exception exception
+   */
+  @Test
+  @Ignore
+  public void defaultNS() throws Exception {
+    create(1);
+    query("<h xmlns='U'>{ doc('d1')/x }</h>/*", "");
+  }
+
+  /**
    * Creates the database context.
    * @throws BaseXException database exception
    */
