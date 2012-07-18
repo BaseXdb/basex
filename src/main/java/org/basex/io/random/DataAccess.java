@@ -380,7 +380,7 @@ public final class DataAccess {
    * @param size size of new text entry
    * @return new offset to store text
    */
-  public long free(final long pos, final int size) {
+  public synchronized long free(final long pos, final int size) {
     // old text size (available space)
     int os = readNum(pos) + (int) (cursor() - pos);
 
