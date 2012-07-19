@@ -6,14 +6,58 @@ import org.basex.util.list.*;
  * This class compresses and decompresses tokens. It is inspired by the
  * Huffman coding, but was simplified to speed up processing.
  *
+ * NOTE: this class is not thread-safe.
+ *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class Compress extends ByteList {
+public final class Compress {
   /** Temporary value. */
   private int pc;
   /** Pack offset. */
   private int po;
+
+  /**
+   * We create our own version of ByteList here in order to access
+   * some protected fields from the Compress class.
+   * @author kgb
+   */
+  private static final class MyByteList extends ByteList {
+    /**
+     * A simple forwarding constructor.
+     */
+    public MyByteList() {
+      super();
+    }
+    /**
+     * Exchanges the actual byte array backing this list instance.
+     * @param newList the new value for ByteList.list, including
+     *   setting ByteList.size to list.size.
+     */
+    public void setList(final byte[] newList) {
+      list = newList;
+      size = newList.length;
+    }
+    /**
+     * Direct access to the backing byte array.
+     * @return ByteList.list
+     */
+    public byte[] getList() {
+      return list;
+    }
+    /**
+     * Sets the list size to a new value.
+     * @param newSize the new value for ByteList.size
+     */
+    public void setSize(final int newSize) {
+      size = newSize;
+    }
+  }
+
+  /**
+   * A ByteList instance serving as a buffer.
+   */
+  private final MyByteList bl = new MyByteList();
 
   /**
    * Compresses the specified text.
@@ -23,9 +67,9 @@ public final class Compress extends ByteList {
   public byte[] pack(final byte[] txt) {
     // initialize compression
     final int tl = txt.length;
-    reset();
-    Num.set(list, tl, 0);
-    size = Num.length(tl);
+    bl.reset();
+    Num.set(bl.getList(), tl, 0);
+    bl.setSize(Num.length(tl));
     pc = 0;
     po = 0;
 
@@ -54,8 +98,8 @@ public final class Compress extends ByteList {
         push(b << 4, 12);
       }
     }
-    if(po != 0) add(pc);
-    return size() < tl ? toArray() : txt;
+    if(po != 0) bl.add(pc);
+    return bl.size() < tl ? bl.toArray() : txt;
   }
 
   /**
@@ -69,7 +113,7 @@ public final class Compress extends ByteList {
       cc |= (bb & 1) << oo;
       bb >>= 1;
       if(++oo == 8) {
-        add(cc);
+        bl.add(cc);
         oo = 0;
         cc = 0;
       }
@@ -88,10 +132,10 @@ public final class Compress extends ByteList {
    * @param txt text to be unpacked
    * @return unpacked text
    */
-  public synchronized byte[] unpack(final byte[] txt) {
+  public byte[] unpack(final byte[] txt) {
     // initialize decompression
-    list = txt;
-    size = txt.length;
+    final byte[] oldBlList = bl.getList();
+    bl.setList(txt);
     uc = Num.length(txt, 0);
     uo = 0;
 
@@ -118,7 +162,14 @@ public final class Compress extends ByteList {
       }
       res[r] = (byte) (b >= 128 ? b : unpack[b]);
     }
+
+    /*
+     * make sure that the external txt byte array does not remain in this class
+     */
+    bl.setList(oldBlList);
+
     return res;
+
   }
 
   /**
@@ -128,6 +179,7 @@ public final class Compress extends ByteList {
    */
   private int pull(final int s) {
     int oo = uo, cc = uc, x = 0;
+    byte[] list = bl.getList();
     for(int i = 0; i < s; i++) {
       if((list[cc] & 1 << oo) != 0) x |= 1 << i;
       if(++oo == 8) {
@@ -145,7 +197,7 @@ public final class Compress extends ByteList {
    * @return result
    */
   private boolean pull() {
-    final boolean b = (list[uc] & 1 << uo) != 0;
+    final boolean b = (bl.getList()[uc] & 1 << uo) != 0;
     if(++uo == 8) {
       uo = 0;
       ++uc;

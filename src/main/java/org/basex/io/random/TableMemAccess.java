@@ -10,6 +10,8 @@ import org.basex.util.list.*;
 /**
  * This class allows main memory access to the database table representation.
  *
+ * NOTE: this class is not thread-safe.
+ *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */

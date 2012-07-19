@@ -45,13 +45,13 @@ public final class UpdatableDiskValues extends DiskValues {
   }
 
   @Override
-  public void flush() {
+  public synchronized void flush() {
     idxl.write4(0, size);
     super.flush();
   }
 
   @Override
-  public void index(final TokenObjMap<IntList> m) {
+  public synchronized void index(final TokenObjMap<IntList> m) {
     final int last = size - 1;
 
     // create a sorted list of all keys: allows faster binary search
@@ -122,7 +122,7 @@ public final class UpdatableDiskValues extends DiskValues {
   }
 
   @Override
-  public void delete(final TokenObjMap<IntList> m) {
+  public synchronized void delete(final TokenObjMap<IntList> m) {
     // create a sorted list of all keys: allows faster binary search
     final TokenList allkeys = new TokenList(m.keys()).sort(true);
 
@@ -195,7 +195,7 @@ public final class UpdatableDiskValues extends DiskValues {
   }
 
   @Override
-  public void replace(final byte[] o, final byte[] n, final int id) {
+  public synchronized void replace(final byte[] o, final byte[] n, final int id) {
     // delete the id from the old key
     final int p = get(o);
     if(p >= 0) {

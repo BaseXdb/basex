@@ -35,10 +35,16 @@ public final class DiskBuilder extends Builder {
 
   /** Database context. */
   final Context context;
-  /** Text compressor. */
-  private final Compress comp;
   /** Debug counter. */
   private int c;
+
+  /** Text compressor. */
+  private static final ThreadLocal<Compress> COMP = new ThreadLocal<Compress>() {
+    @Override
+    protected Compress initialValue() {
+      return new Compress();
+    }
+  };
 
   /**
    * Constructor.
@@ -48,7 +54,6 @@ public final class DiskBuilder extends Builder {
    */
   public DiskBuilder(final String nm, final Parser parse, final Context ctx) {
     super(nm, parse);
-    comp = new Compress();
     context = ctx;
   }
 
@@ -90,8 +95,8 @@ public final class DiskBuilder extends Builder {
     }
 
     // copy temporary values into database table
-    final TableAccess ta = new TableDiskAccess(md, true);
     final DataInput in = new DataInput(md.dbfile(DATATMP));
+    final TableAccess ta = new TableDiskAccess(md, true);
     for(; spos < ssize; ++spos) ta.write4(in.readNum(), 8, in.readNum());
     ta.close();
     in.close();
@@ -193,7 +198,7 @@ public final class DiskBuilder extends Builder {
     // store text
     final DataOutput store = text ? xout : vout;
     final long off = store.size();
-    final byte[] val = comp.pack(value);
+    final byte[] val = COMP.get().pack(value);
     store.writeToken(val);
     return val == value ? off : off | IO.OFFCOMP;
   }
