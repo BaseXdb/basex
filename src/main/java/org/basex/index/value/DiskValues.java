@@ -88,18 +88,14 @@ public class DiskValues implements Index {
   public synchronized int count(final IndexToken it) {
     if(it instanceof StringRange) return idRange((StringRange) it).size();
     if(it instanceof NumericRange) return idRange((NumericRange) it).size();
-
     final byte[] key = it.get();
-    if(key.length > data.meta.maxlen) return Integer.MAX_VALUE;
-
-    return entry(key).size;
+    return key.length <= data.meta.maxlen ? entry(key).size : Integer.MAX_VALUE;
   }
 
   @Override
   public synchronized IndexIterator iter(final IndexToken it) {
     if(it instanceof StringRange) return idRange((StringRange) it);
     if(it instanceof NumericRange) return idRange((NumericRange) it);
-
     final IndexEntry e = entry(it.get());
     return iter(e.size, e.pointer);
   }
@@ -123,7 +119,7 @@ public class DiskValues implements Index {
   }
 
   @Override
-  public EntryIterator entries(final IndexEntries entries) {
+  public synchronized EntryIterator entries(final IndexEntries entries) {
     final byte[] prefix = entries.get();
     final int i = get(prefix);
     return new EntryIterator() {

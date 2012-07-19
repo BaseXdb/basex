@@ -8,12 +8,19 @@ import org.basex.util.list.*;
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
+ * @author Wolfgang Kronberg
  */
-public final class Compress extends ByteList {
+public final class Compress {
+  /** A ByteList instance serving as a buffer. */
+  private final MyByteList bl = new MyByteList();
   /** Temporary value. */
   private int pc;
   /** Pack offset. */
   private int po;
+  /** Current unpack position. */
+  private int uc;
+  /** Unpack offset. */
+  private int uo;
 
   /**
    * Compresses the specified text.
@@ -23,9 +30,9 @@ public final class Compress extends ByteList {
   public byte[] pack(final byte[] txt) {
     // initialize compression
     final int tl = txt.length;
-    reset();
-    Num.set(list, tl, 0);
-    size = Num.length(tl);
+    bl.reset();
+    Num.set(bl.get(), tl, 0);
+    bl.size(Num.length(tl));
     pc = 0;
     po = 0;
 
@@ -54,8 +61,8 @@ public final class Compress extends ByteList {
         push(b << 4, 12);
       }
     }
-    if(po != 0) add(pc);
-    return size() < tl ? toArray() : txt;
+    if(po != 0) bl.add(pc);
+    return bl.size() < tl ? bl.toArray() : txt;
   }
 
   /**
@@ -69,7 +76,7 @@ public final class Compress extends ByteList {
       cc |= (bb & 1) << oo;
       bb >>= 1;
       if(++oo == 8) {
-        add(cc);
+        bl.add(cc);
         oo = 0;
         cc = 0;
       }
@@ -78,20 +85,15 @@ public final class Compress extends ByteList {
     pc = cc;
   }
 
-  /** Current unpack position. */
-  private int uc;
-  /** UNpack offset. */
-  private int uo;
-
   /**
    * Decompresses the specified text.
    * @param txt text to be unpacked
    * @return unpacked text
    */
-  public synchronized byte[] unpack(final byte[] txt) {
+  public byte[] unpack(final byte[] txt) {
     // initialize decompression
-    list = txt;
-    size = txt.length;
+    final byte[] tmp = bl.get();
+    bl.set(txt);
     uc = Num.length(txt, 0);
     uo = 0;
 
@@ -118,18 +120,21 @@ public final class Compress extends ByteList {
       }
       res[r] = (byte) (b >= 128 ? b : unpack[b]);
     }
+    // make sure that the external txt byte array does not remain in this class
+    bl.set(tmp);
     return res;
   }
 
   /**
-   * Pulls the specified number of bit and returns the result.
+   * Pulls the specified number of bits and returns the result.
    * @param s number of bytes
    * @return result
    */
   private int pull(final int s) {
     int oo = uo, cc = uc, x = 0;
+    final byte[] l = bl.get();
     for(int i = 0; i < s; i++) {
-      if((list[cc] & 1 << oo) != 0) x |= 1 << i;
+      if((l[cc] & 1 << oo) != 0) x |= 1 << i;
       if(++oo == 8) {
         oo = 0;
         ++cc;
@@ -145,11 +150,13 @@ public final class Compress extends ByteList {
    * @return result
    */
   private boolean pull() {
-    final boolean b = (list[uc] & 1 << uo) != 0;
-    if(++uo == 8) {
-      uo = 0;
+    int oo = uo;
+    final boolean b = (bl.get()[uc] & 1 << oo) != 0;
+    if(++oo == 8) {
+      oo = 0;
       ++uc;
     }
+    uo = oo;
     return b;
   }
 
@@ -191,6 +198,35 @@ public final class Compress extends ByteList {
       UNPACK2[p] = b2;
       PACK1[b1] = (byte) p;
       PACK2[b2] = (byte) p;
+    }
+  }
+
+  /** Local ByteList implementation to make protected fields accessible. */
+  static final class MyByteList extends ByteList {
+    /**
+     * Exchanges the actual byte array backing this list instance.
+     * @param newList the new value for ByteList.list, including
+     *   setting ByteList.size to list.size.
+     */
+    void set(final byte[] newList) {
+      list = newList;
+      size = newList.length;
+    }
+
+    /**
+     * Direct access to the backing byte array.
+     * @return ByteList.list
+     */
+    byte[] get() {
+      return list;
+    }
+
+    /**
+     * Sets the list size to a new value.
+     * @param newSize the new value for ByteList.size
+     */
+    void size(final int newSize) {
+      size = newSize;
     }
   }
 }
