@@ -120,11 +120,6 @@ public final class DiskData extends Data {
    * @throws IOException I/O exception
    */
   public void init() throws IOException {
-    /*
-     * [WK] hier spielt die Musik!
-     * TableDiskAccess und DataAccess komplett thread-unsafe deklarieren
-     * und nur DiskData syncen?
-     */
     table = new TableDiskAccess(meta, false);
     texts = new DataAccess(meta.dbfile(DATATXT));
     values = new DataAccess(meta.dbfile(DATAATV));

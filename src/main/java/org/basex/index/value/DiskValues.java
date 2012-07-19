@@ -308,7 +308,7 @@ public class DiskValues implements Index {
   /**
    * Flushes the buffered data.
    */
-  public void flush() {
+  public synchronized void flush() {
     idxl.flush();
     idxr.flush();
   }
@@ -325,14 +325,14 @@ public class DiskValues implements Index {
    * @param m a set of <key, id-list> pairs
    */
   @SuppressWarnings("unused")
-  public void index(final TokenObjMap<IntList> m) { }
+  public synchronized void index(final TokenObjMap<IntList> m) { }
 
   /**
    * Delete records from the index.
    * @param m a set of <key, id-list> pairs
    */
   @SuppressWarnings("unused")
-  public void delete(final TokenObjMap<IntList> m) { }
+  public synchronized void delete(final TokenObjMap<IntList> m) { }
 
   /**
    * Remove record from the index.
@@ -341,5 +341,5 @@ public class DiskValues implements Index {
    * @param id record id
    */
   @SuppressWarnings("unused")
-  public void replace(final byte[] o, final byte[] n, final int id) { }
+  public synchronized void replace(final byte[] o, final byte[] n, final int id) { }
 }
