@@ -92,6 +92,6 @@ public final class FNMath extends StandardFunc {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X30 || u == Use.NDT || super.uses(u);
+    return u == Use.X30 || super.uses(u);
   }
 }
