@@ -34,7 +34,9 @@ public class JapaneseTokenizer extends Tokenizer {
   /** The kind of POS(Verb). */
   private static final String DOUSHI = "\u52D5\u8A5E";
   /** The kind of POS(Conjunction). */
-  private static final String SETSUZOKUSHI = "\u63A5\u982D\u8A5E";
+  private static final String SETSUZOKUSHI = "\u63A5\u7D9A\u8A5E";
+  /** The kind of POS(Prefix). */
+  private static final String SETTOUSHI = "\u63A5\u982D\u8A5E";
   /** The kind of POS(Modal verbs). */
   private static final String JYODOUSHI = "\u52A9\u52D5\u8A5E";
   /** The kind of POS(Postpositional particle). */
@@ -44,7 +46,7 @@ public class JapaneseTokenizer extends Tokenizer {
   /** The kind of POS(Mark). */
   private static final String KIGOU = "\u8A18\u53F7";
   /** The kind of POS(Interjection). */
-  private static final String KANDOUSHI = "\u8A18\u53F7";
+  private static final String KANDOUSHI = "\u611F\u52D5\u8A5E";
   /** The kind of POS(Filler). */
   private static final String FILLER = "\u30D5\u30A3\u30E9\u30FC";
 
@@ -404,7 +406,11 @@ public class JapaneseTokenizer extends Tokenizer {
         tb.add(0x0020);
       } else if(c == 0xFF01) { // !
         tb.add(0x0021);
-      } else if(c == 0x201D) { // "
+      } else if(c == 0xFF02) { // " FULLWIDTH QUOTATION MARK
+        tb.add(0x0022);
+      } else if(c == 0x201C) { // " LEFT DOUBLE QUOTATION MARK
+        tb.add(0x0022);
+      } else if(c == 0x201D) { // " RIGHT DOUBLE QUOTATION MARK
         tb.add(0x0022);
       } else if(c == 0xFF03) { // #
         tb.add(0x0023);
@@ -414,7 +420,11 @@ public class JapaneseTokenizer extends Tokenizer {
         tb.add(0x0025);
       } else if(c == 0xFF06) { // &
         tb.add(0x0026);
-      } else if(c == 0x2019) { // '
+      } else if(c == 0xFF07) { // ' FULLWIDTH APOSTROPHE
+        tb.add(0x0027);
+      } else if(c == 0x2018) { // ' LEFT SINGLE QUOTATION MARK
+        tb.add(0x0027);
+      } else if(c == 0x2019) { // ' RIGHT SINGLE QUOTATION MARK
         tb.add(0x0027);
       } else if(c == 0xFF08) { // (
         tb.add(0x0028);
@@ -497,6 +507,8 @@ public class JapaneseTokenizer extends Tokenizer {
     static final int HINSHI_KANDOUSHI = 10;
     /** A part of speech in the context, FILLER(Filler). */
     static final int HINSHI_FILLER = 11;
+    /** A part of speech in the context, SETTOUSHI(Prefix). */
+    static final int HINSHI_SETTOUSHI = 12;
     /** A part of speech in the context, Others. */
     static final int HINSHI_SONOTA = 0;
 
@@ -564,6 +576,8 @@ public class JapaneseTokenizer extends Tokenizer {
           hinshi = HINSHI_DOUSHI;
         } else if(h.equals(SETSUZOKUSHI)) {
           hinshi = HINSHI_SETSUZOKUSHI;
+        } else if(h.equals(SETTOUSHI)) {
+          hinshi = HINSHI_SETTOUSHI;
         } else if(h.equals(JYODOUSHI)) {
           hinshi = HINSHI_JYODOUSHI;
         } else if(h.equals(JYOSHI)) {
