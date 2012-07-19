@@ -3,7 +3,6 @@ package org.basex.query.func;
 import static java.lang.StrictMath.*;
 import static org.basex.query.func.Function.*;
 
-import java.util.*;
 import java.util.zip.*;
 
 import org.basex.query.*;
@@ -57,8 +56,6 @@ public final class FNMath extends StandardFunc {
       case _MATH_SINH:   return Dbl.get(sinh(d));
       case _MATH_COSH:   return Dbl.get(cosh(d));
       case _MATH_TANH:   return Dbl.get(tanh(d));
-      case _MATH_RANDOM: return Dbl.get(random());
-      case _MATH_UUID:   return Str.get(UUID.randomUUID());
       case _MATH_CRC32:  return crc32(ctx);
       default:           return super.item(ctx, ii);
     }
@@ -95,7 +92,6 @@ public final class FNMath extends StandardFunc {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X30 || u == Use.NDT && oneOf(sig, _MATH_RANDOM, _MATH_UUID) ||
-        super.uses(u);
+    return u == Use.X30 || u == Use.NDT || super.uses(u);
   }
 }

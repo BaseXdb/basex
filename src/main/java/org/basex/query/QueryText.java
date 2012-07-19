@@ -480,6 +480,8 @@ public interface QueryText {
   byte[] SQL = token("sql");
   /** Cryptography token. */
   byte[] CRYPTO = token("crytpo");
+  /** Random token. */
+  byte[] RANDOM = token("random");
   /** Repository token. */
   byte[] REPO = token("repo");
   /** Validate token. */
@@ -577,6 +579,8 @@ public interface QueryText {
   byte[] XSLTURI = token(BXMODULES + "xslt");
   /** SQL module URI. */
   byte[] SQLURI = token(BXMODULES + "sql");
+  /** Random module URI. */
+  byte[] RANDOMURI = token(BXMODULES + "random");
   /** Repository module URI. */
   byte[] REPOURI = token(BXMODULES + "repo");
   /** Validate module URI. */
