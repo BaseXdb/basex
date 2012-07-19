@@ -45,7 +45,7 @@ public final class StringRangeTest extends QueryPlanTest {
    * Finishes the tests.
    * @throws BaseXException database exception
    */
-  @BeforeClass
+  @AfterClass
   public static void finish() throws BaseXException {
     new DropDB(NAME).execute(context);
   }
