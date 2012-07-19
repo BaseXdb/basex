@@ -24,6 +24,7 @@ public final class FNRandomTest extends AdvancedQueryTest {
     check(_RANDOM_INTEGER);
     check(_RANDOM_SEEDED_DOUBLE);
     check(_RANDOM_SEEDED_INTEGER);
+    check(_RANDOM_GAUSSIAN);
     check(_RANDOM_UUID);
   }
 
