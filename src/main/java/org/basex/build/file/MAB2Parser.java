@@ -53,7 +53,9 @@ public final class MAB2Parser extends SingleParser {
 
   /** Flat database creation. */
   private final boolean flat;
-  /** Input to be parsed. */
+  /** Input to be parsed.
+   * DataAccess is not thread-safe,
+   * which is no problem because parsers are also not thread-safe on the whole. */
   private final DataAccess input;
 
   /** Temporary read position. */
