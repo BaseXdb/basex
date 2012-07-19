@@ -17,9 +17,6 @@ import org.basex.io.*;
 public abstract class TableAccess {
   /** Meta data. */
   protected final MetaData meta;
-  /*
-   * [WK] passed as an argument from outside; do we need additional sync on this object?
-   */
   /** Dirty index flag. */
   protected boolean dirty;
 
