@@ -448,17 +448,17 @@ public enum Function {
 
   /* FNRandom functions. */
   /** XQuery function. */
-  _RANDOM_DOUBLE(FNRandom.class, "random-double()", DBL),
+  _RANDOM_DOUBLE(FNRandom.class, "double()", DBL),
   /** XQuery function. */
-  _RANDOM_INTEGER(FNRandom.class, "random-int([max])", ITR, 0, ITR),
+  _RANDOM_INTEGER(FNRandom.class, "integer([max])", ITR, 0, ITR),
   /** XQuery function. */
-  _RANDOM_SEEDED_DOUBLE(FNRandom.class, "seeded-random-double(seed,num)", ITEM_ZM, ITR,
+  _RANDOM_SEEDED_DOUBLE(FNRandom.class, "seeded-double(seed,num)", ITEM_ZM, ITR,
       ITR),
   /** XQuery function. */
-  _RANDOM_SEEDED_INTEGER(FNRandom.class, "seeded-random-int(seed,num[,max])", ITEM_ZM,
+  _RANDOM_SEEDED_INTEGER(FNRandom.class, "seeded-integer(seed,num[,max])", ITEM_ZM,
       2, ITR, ITR, ITR),
   /** XQuery function. */
-  _RANDOM_GAUSSIAN(FNRandom.class, "random-gaussian(num)", ITEM_ZM, ITR),
+  _RANDOM_GAUSSIAN(FNRandom.class, "gaussian(num)", ITEM_ZM, ITR),
   /** XQuery function. */
   _RANDOM_UUID(FNRandom.class, "uuid()", STR),
 
