@@ -1,9 +1,9 @@
 import module namespace bin = "http://basex.org/bin-tree" at "binary-tree.xqm";
 
 declare function local:randomize($seq) {
-	for $x in $seq
-	order by math:random()
-	return $x
+  for $x in $seq
+  order by random:double()
+  return $x
 };
 
 let $seq := local:randomize(1 to 1000)
