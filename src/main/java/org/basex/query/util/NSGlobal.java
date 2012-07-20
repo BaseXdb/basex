@@ -47,6 +47,7 @@ public final class NSGlobal {
     NS.add(ARCHIVE, ARCHIVEURI);
     NS.add(CLIENT, CLIENTURI);
     NS.add(CONVERT, CONVERTURI);
+    NS.add(DATETIME, DATETIMEURI);
     NS.add(DB, DBURI);
     NS.add(FT, FTURI);
     NS.add(HASH, HASHURI);

@@ -54,7 +54,7 @@ public final class StoreTest extends SandboxTest {
     for(int n = 0; n < NQUERIES; n++) {
       final String qu =
           "for $a in //text() " +
-          "let $d := random:random-double() " +
+          "let $d := random:double() " +
           "return replace node $a with $d";
       run(new XQuery(qu));
     }
@@ -74,7 +74,7 @@ public final class StoreTest extends SandboxTest {
       String qu = "for $a in //text() return delete node $a";
       run(new XQuery(qu));
       qu = "for $a in //text() " +
-          "let $d := random:random-int(" + Integer.MAX_VALUE + ") " +
+          "let $d := random:integer(" + Integer.MAX_VALUE + ") " +
           "return insert node $a into $d";
       run(new XQuery(qu));
     }

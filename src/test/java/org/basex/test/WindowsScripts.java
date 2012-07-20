@@ -37,7 +37,10 @@ public class WindowsScripts {
         final StringList obsolete = new StringList();
         if(n.endsWith(".bat")) libraries(n, libs, missing, obsolete);
         if(!missing.isEmpty()) {
-          final StringBuilder sb = new StringBuilder();
+          StringBuilder sb = new StringBuilder();
+          for(final String l : missing) sb.append(";%LIB%/").append(l);
+          Util.errln(sb);
+          sb = new StringBuilder();
           for(final String l : missing) sb.append(';').append(l);
           fail("Library not found in '" + n + "':\n" + sb.substring(1));
         }

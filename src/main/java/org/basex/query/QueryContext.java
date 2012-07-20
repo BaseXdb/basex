@@ -82,11 +82,11 @@ public final class QueryContext extends Progress {
   public FTLexer fttoken;
 
   /** Current Date. */
-  public Dat date;
+  public Item date;
   /** Current DateTime. */
-  public Dtm dtm;
+  public Item dtm;
   /** Current Time. */
-  public Tim time;
+  public Item time;
 
   /** Full-text position data (needed for highlighting of full-text results). */
   public FTPosData ftpos;

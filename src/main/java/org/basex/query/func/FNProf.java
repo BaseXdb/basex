@@ -39,8 +39,8 @@ public final class FNProf extends StandardFunc {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
-      case _PROF_SLEEP: return sleep(ctx);
-      default:          return super.item(ctx, ii);
+      case _PROF_SLEEP:       return sleep(ctx);
+      default:                return super.item(ctx, ii);
     }
   }
 

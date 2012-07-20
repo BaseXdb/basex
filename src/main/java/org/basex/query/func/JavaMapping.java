@@ -1,6 +1,5 @@
 package org.basex.query.func;
 
-import static javax.xml.datatype.DatatypeConstants.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
@@ -249,21 +248,22 @@ public abstract class JavaMapping extends Arr {
 
     if(o instanceof Duration) {
       final Duration d = (Duration) o;
-      return !d.isSet(YEARS) && !d.isSet(MONTHS) ? AtomType.DTD :
-        !d.isSet(HOURS) && !d.isSet(MINUTES) && !d.isSet(SECONDS) ?
-          AtomType.YMD : AtomType.DUR;
+      return !d.isSet(DatatypeConstants.YEARS) && !d.isSet(DatatypeConstants.MONTHS)
+          ? AtomType.DTD : !d.isSet(DatatypeConstants.HOURS) &&
+          !d.isSet(DatatypeConstants.MINUTES) && !d.isSet(DatatypeConstants.SECONDS)
+          ? AtomType.YMD : AtomType.DUR;
     }
 
     if(o instanceof XMLGregorianCalendar) {
       final QName type = ((XMLGregorianCalendar) o).getXMLSchemaType();
-      if(type == DATE) return AtomType.DAT;
-      if(type == DATETIME) return AtomType.DTM;
-      if(type == TIME) return AtomType.TIM;
-      if(type == GYEARMONTH) return AtomType.YMO;
-      if(type == GMONTHDAY) return AtomType.MDA;
-      if(type == GYEAR) return AtomType.YEA;
-      if(type == GMONTH) return AtomType.MON;
-      if(type == GDAY) return AtomType.DAY;
+      if(type == DatatypeConstants.DATE) return AtomType.DAT;
+      if(type == DatatypeConstants.DATETIME) return AtomType.DTM;
+      if(type == DatatypeConstants.TIME) return AtomType.TIM;
+      if(type == DatatypeConstants.GYEARMONTH) return AtomType.YMO;
+      if(type == DatatypeConstants.GMONTHDAY) return AtomType.MDA;
+      if(type == DatatypeConstants.GYEAR) return AtomType.YEA;
+      if(type == DatatypeConstants.GMONTH) return AtomType.MON;
+      if(type == DatatypeConstants.GDAY) return AtomType.DAY;
     }
     return null;
   }

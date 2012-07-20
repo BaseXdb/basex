@@ -81,21 +81,16 @@ public final class FNContext extends StandardFunc {
     return ctx.time;
   }
 
-
   /**
    * Initializes the static date and time context of a query.
    * @param ctx query context
    * @throws QueryException query exception
    */
   private void initDateTime(final QueryContext ctx) throws QueryException {
-    final java.util.Date d = Calendar.getInstance().getTime();
-    final String zon = new SimpleDateFormat("Z").format(d);
-    final String ymd = new SimpleDateFormat("yyyy-MM-dd").format(d);
-    final String hms = new SimpleDateFormat("HH:mm:ss.S").format(d);
-    final String zone = zon.substring(0, 3) + ':' + zon.substring(3);
-    ctx.date = new Dat(token(ymd + zone), info);
-    ctx.time = new Tim(token(hms + zone), info);
-    ctx.dtm = new Dtm(token(ymd + 'T' + hms + zone), info);
+    final Item[] items = FNDateTime.dateTime(info);
+    ctx.time = items[0];
+    ctx.date = items[1];
+    ctx.dtm = items[2];
   }
 
   /**
