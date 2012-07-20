@@ -802,13 +802,13 @@ public enum Function {
   /* FNDateTime functions. */
 
   /** XQuery function. */
-  _DATETIME_CURRENT_TIME(FNProf.class, "current-time()", TIM),
+  _DATETIME_CURRENT_TIME(FNDateTime.class, "current-time()", TIM),
   /** XQuery function. */
-  _DATETIME_CURRENT_DATE(FNProf.class, "current-date()", TIM),
+  _DATETIME_CURRENT_DATE(FNDateTime.class, "current-date()", DAT),
   /** XQuery function. */
-  _DATETIME_CURRENT_DATETIME(FNProf.class, "current-dateTime()", TIM),
+  _DATETIME_CURRENT_DATETIME(FNDateTime.class, "current-dateTime()", DTM),
   /** XQuery function. */
-  _DATETIME_TIMESTAMP(FNProf.class, "timestamp()", ITR),
+  _DATETIME_TIMESTAMP(FNDateTime.class, "timestamp()", ITR),
 
   /* FNHash functions. */
 
