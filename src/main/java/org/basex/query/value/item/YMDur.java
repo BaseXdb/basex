@@ -55,8 +55,7 @@ public final class YMDur extends Dur {
 
     this(it);
     if(Double.isNaN(f)) DATECALC.thrw(ii, description(), f);
-    if(m ? f == 1 / 0d || f == -1 / 0d : f == 0)
-      DATEZERO.thrw(ii, description());
+    if(m ? f == 1 / 0d || f == -1 / 0d : f == 0) DATEZERO.thrw(ii, description());
     mon = (int) StrictMath.round(m ? mon * f : mon / f);
   }
 

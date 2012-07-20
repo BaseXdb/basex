@@ -273,7 +273,7 @@ public enum Err {
   // W3 Functions
 
   /** FOAR0001. */
-  DIVZERO(FOAR, 1, "'%' was divided by zero."),
+  DIVZERO(FOAR, 1, "% cannot be divided by zero."),
   /** FOAR0002. */
   DIVFLOW(FOAR, 2, "Invalid division result: % / %."),
   /** FOAR0002. */
