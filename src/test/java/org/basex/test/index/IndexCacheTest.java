@@ -24,6 +24,20 @@ public final class IndexCacheTest {
     cache = new IndexCache();
   }
 
+  /** Test for method {@link IndexCache#get(byte[])}. */
+  @Test
+  public void testGetNotExisting() {
+    for(int i = 0; i < 4000; ++i) {
+      final byte[] key = token("keyAdd" + i);
+      final int size = i;
+      final long pointer = i + 5000L;
+
+      cache.add(key, size, pointer);
+      assertCacheEntry(key, size, pointer);
+    }
+    assertNull(cache.get(token("keyAdd" + 4000)));
+  }
+
   /** Test for method {@link IndexCache#add(byte[], int, long)}. */
   @Test
   public void testAdd() {
@@ -89,8 +103,7 @@ public final class IndexCacheTest {
    * @param size number of index hits
    * @param pointer pointer to id list
    */
-  private void assertCacheEntry(final byte[] key, final int size,
-      final long pointer) {
+  private void assertCacheEntry(final byte[] key, final int size, final long pointer) {
     final IndexEntry entry = cache.get(key);
     assertEquals(entry.size, size);
     assertEquals(entry.pointer, pointer);
