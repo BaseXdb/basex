@@ -9,8 +9,8 @@ import java.util.List;
 import org.basex.core.cmd.*;
 import org.basex.http.*;
 import org.basex.io.in.*;
-import org.basex.query.value.item.*;
 import org.basex.server.*;
+import org.basex.util.*;
 
 import com.bradmcevoy.http.*;
 import com.bradmcevoy.http.exceptions.*;
@@ -109,7 +109,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
         while(q.more()) {
           final boolean raw = Boolean.parseBoolean(q.next());
           final String ctype = q.next();
-          final long mod = Dtm.parse(q.next());
+          final long mod = DateTime.parse(q.next());
           final Long size = raw ? Long.valueOf(q.next()) : null;
           final String p = stripLeadingSlash(q.next());
           final int ix = p.indexOf(SEP);

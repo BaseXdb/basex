@@ -9,7 +9,6 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.http.*;
 import org.basex.io.in.*;
-import org.basex.query.value.item.*;
 import org.basex.server.*;
 import org.basex.util.*;
 
@@ -208,7 +207,7 @@ public abstract class BXResource implements Resource {
     try {
       final boolean raw = Boolean.parseBoolean(q.next());
       final String ctype = q.next();
-      final long mod = Dtm.parse(q.next());
+      final long mod = DateTime.parse(q.next());
       final Long size = raw ? Long.valueOf(q.next()) : null;
       final String pth = stripLeadingSlash(q.next());
       return new BXFile(db, pth, mod, raw, ctype, size, http);
@@ -290,7 +289,7 @@ public abstract class BXResource implements Resource {
     q.bind("p", db);
     try {
       // retrieve and parse timestamp
-      return Util.parseDate(q.execute(), InfoDB.DATE).getTime();
+      return DateTime.parse(q.execute(), DateTime.DATETIME).getTime();
     } catch(final Exception ex) {
       Util.errln(ex);
       return 0;

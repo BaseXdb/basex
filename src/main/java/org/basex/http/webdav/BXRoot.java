@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.basex.core.cmd.*;
 import org.basex.http.*;
-import org.basex.query.value.item.*;
 import org.basex.server.*;
 import org.basex.util.*;
 
@@ -73,7 +72,7 @@ public final class BXRoot extends BXFolder {
         try {
           while(q.more()) {
             final String name = q.next();
-            final long mod = Dtm.parse(q.next());
+            final long mod = DateTime.parse(q.next());
             dbs.add(new BXDatabase(name, mod, http));
           }
         } catch(final Exception ex) {
