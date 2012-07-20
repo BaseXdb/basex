@@ -23,6 +23,35 @@ import org.basex.util.*;
  * @author Tim Petrowsky
  */
 public final class TableDiskAccess extends TableAccess {
+
+  /**
+   * The TableCursor class encapsulates information about the current position
+   * in the TableDiskAccess data structure we are working with.
+   * @author kgb
+   *
+   */
+  private static final class TableCursor {
+    /** Default constructor. */
+    public TableCursor() {
+      // nothing to do here: all variables are directly initialized to correct values
+    }
+    /** Page index. */
+    public int page = -1;
+    /** Pre value of the first entry in the current block. */
+    public int fpre = -1;
+    /** First pre value of the next block. */
+    public int npre = -1;
+  }
+
+  /** each thread gets its own copy of the cursor varaible. */
+  private static final ThreadLocal<TableCursor> TABLE_CURSOR
+      = new ThreadLocal<TableCursor>(){
+    @Override
+    public TableCursor initialValue() {
+      return new TableCursor();
+    }
+  };
+
   /** Buffer manager. */
   private final Buffers bm = new Buffers();
   /** File storing all blocks. */
@@ -36,13 +65,6 @@ public final class TableDiskAccess extends TableAccess {
   private int[] fpres;
   /** Page index (length: {@link #blocks}). */
   private int[] pages;
-  /** Page index. */
-  private int page = -1;
-
-  /** Pre value of the first entry in the current block. */
-  private int fpre = -1;
-  /** First pre value of the next block. */
-  private int npre = -1;
 
   /** Total number of blocks. */
   private int blocks;
@@ -186,21 +208,24 @@ public final class TableDiskAccess extends TableAccess {
 
   @Override
   public int read1(final int pre, final int off) {
-    final int o = off + cursor(pre);
+    TableCursor cursor = TABLE_CURSOR.get();
+    final int o = off + cursor(cursor, pre);
     final byte[] b = bm.current().data;
     return b[o] & 0xFF;
   }
 
   @Override
   public int read2(final int pre, final int off) {
-    final int o = off + cursor(pre);
+    TableCursor cursor = TABLE_CURSOR.get();
+    final int o = off + cursor(cursor, pre);
     final byte[] b = bm.current().data;
     return ((b[o] & 0xFF) << 8) + (b[o + 1] & 0xFF);
   }
 
   @Override
   public int read4(final int pre, final int off) {
-    final int o = off + cursor(pre);
+    TableCursor cursor = TABLE_CURSOR.get();
+    final int o = off + cursor(cursor, pre);
     final byte[] b = bm.current().data;
     return ((b[o] & 0xFF) << 24) + ((b[o + 1] & 0xFF) << 16) +
       ((b[o + 2] & 0xFF) << 8) + (b[o + 3] & 0xFF);
@@ -208,7 +233,8 @@ public final class TableDiskAccess extends TableAccess {
 
   @Override
   public long read5(final int pre, final int off) {
-    final int o = off + cursor(pre);
+    TableCursor cursor = TABLE_CURSOR.get();
+    final int o = off + cursor(cursor, pre);
     final byte[] b = bm.current().data;
     return ((long) (b[o] & 0xFF) << 32) + ((long) (b[o + 1] & 0xFF) << 24) +
       ((b[o + 2] & 0xFF) << 16) + ((b[o + 3] & 0xFF) << 8) + (b[o + 4] & 0xFF);
@@ -216,7 +242,8 @@ public final class TableDiskAccess extends TableAccess {
 
   @Override
   public void write1(final int pre, final int off, final int v) {
-    final int o = off + cursor(pre);
+    TableCursor cursor = TABLE_CURSOR.get();
+    final int o = off + cursor(cursor, pre);
     final Buffer bf = bm.current();
     final byte[] b = bf.data;
     b[o] = (byte) v;
@@ -225,7 +252,8 @@ public final class TableDiskAccess extends TableAccess {
 
   @Override
   public void write2(final int pre, final int off, final int v) {
-    final int o = off + cursor(pre);
+    TableCursor cursor = TABLE_CURSOR.get();
+    final int o = off + cursor(cursor, pre);
     final Buffer bf = bm.current();
     final byte[] b = bf.data;
     b[o] = (byte) (v >>> 8);
@@ -235,7 +263,8 @@ public final class TableDiskAccess extends TableAccess {
 
   @Override
   public void write4(final int pre, final int off, final int v) {
-    final int o = off + cursor(pre);
+    TableCursor cursor = TABLE_CURSOR.get();
+    final int o = off + cursor(cursor, pre);
     final Buffer bf = bm.current();
     final byte[] b = bf.data;
     b[o]     = (byte) (v >>> 24);
@@ -247,7 +276,8 @@ public final class TableDiskAccess extends TableAccess {
 
   @Override
   public void write5(final int pre, final int off, final long v) {
-    final int o = off + cursor(pre);
+    TableCursor cursor = TABLE_CURSOR.get();
+    final int o = off + cursor(cursor, pre);
     final Buffer bf = bm.current();
     final byte[] b = bf.data;
     b[o]     = (byte) (v >>> 32);
@@ -260,8 +290,9 @@ public final class TableDiskAccess extends TableAccess {
 
   @Override
   protected void copy(final byte[] entries, final int pre, final int last) {
+    TableCursor cursor = TABLE_CURSOR.get();
     for(int o = 0, i = pre; i < last; ++i, o += IO.NODESIZE) {
-      final int off = cursor(i);
+      final int off = cursor(cursor, i);
       final Buffer bf = bm.current();
       System.arraycopy(entries, o, bf.data, off, IO.NODESIZE);
       bf.dirty = true;
@@ -272,30 +303,31 @@ public final class TableDiskAccess extends TableAccess {
   public void delete(final int pre, final int nr) {
     if(nr == 0) return;
     dirty = true;
+    TableCursor cursor = TABLE_CURSOR.get();
 
     // get first block
-    cursor(pre);
+    cursor(cursor, pre);
 
     // some useful variables to make code more readable
-    int from = pre - fpre;
+    int from = pre - cursor.fpre;
     final int last = pre + nr;
 
     // check if all entries are in current block: handle and return
-    if(last - 1 < npre) {
+    if(last - 1 < cursor.npre) {
       final Buffer bf = bm.current();
-      copy(bf.data, from + nr, bf.data, from, npre - last);
-      updatePre(nr);
+      copy(bf.data, from + nr, bf.data, from, cursor.npre - last);
+      updatePre(cursor, nr);
 
       // if whole block was deleted, remove it from the index
-      if(npre == fpre) {
+      if(cursor.npre == cursor.fpre) {
         // mark the block as empty
-        freePages.clear(pages[page]);
+        freePages.clear(pages[cursor.page]);
 
-        Array.move(fpres, page + 1, -1, used - page - 1);
-        Array.move(pages, page + 1, -1, used - page - 1);
+        Array.move(fpres, cursor.page + 1, -1, used - cursor.page - 1);
+        Array.move(pages, cursor.page + 1, -1, used - cursor.page - 1);
 
         --used;
-        readPage(page);
+        readPage(cursor, cursor.page);
       }
       return;
     }
@@ -304,42 +336,42 @@ public final class TableDiskAccess extends TableAccess {
 
     // first count them
     int unused = 0;
-    while(npre < last) {
+    while(cursor.npre < last) {
       if(from == 0) {
         ++unused;
         // mark the blocks as empty; range clear cannot be used because the
         // blocks may not be consecutive
-        freePages.clear(pages[page]);
+        freePages.clear(pages[cursor.page]);
       }
-      setPage(page + 1);
+      setPage(cursor, cursor.page + 1);
       from = 0;
     }
 
     // if the last block is empty, clear the corresponding bit
-    readBlock(pages[page]);
+    readBlock(pages[cursor.page]);
     final Buffer bf = bm.current();
-    if(npre == last) {
+    if(cursor.npre == last) {
       freePages.clear((int) bf.pos);
       ++unused;
-      if(page < used - 1) readPage(page + 1);
-      else ++page;
+      if(cursor.page < used - 1) readPage(cursor, cursor.page + 1);
+      else ++cursor.page;
     } else {
       // delete entries at beginning of current (last) block
-      copy(bf.data, last - fpre, bf.data, 0, npre - last);
+      copy(bf.data, last - cursor.fpre, bf.data, 0, cursor.npre - last);
     }
 
     // now remove them from the index
     if(unused > 0) {
-      Array.move(fpres, page, -unused, used - page);
-      Array.move(pages, page, -unused, used - page);
+      Array.move(fpres, cursor.page, -unused, used - cursor.page);
+      Array.move(pages, cursor.page, -unused, used - cursor.page);
       used -= unused;
-      page -= unused;
+      cursor.page -= unused;
     }
 
     // update index entry for this block
-    fpres[page] = pre;
-    fpre = pre;
-    updatePre(nr);
+    fpres[cursor.page] = pre;
+    cursor.fpre = pre;
+    updatePre(cursor, nr);
   }
 
   @Override
@@ -351,15 +383,16 @@ public final class TableDiskAccess extends TableAccess {
     // number of records to be inserted
     final int nr = nnew >>> IO.NODEPOWER;
 
+    TableCursor cursor = TABLE_CURSOR.get();
     int split = 0;
     if(used == 0) {
       // special case: insert new data into first block if database is empty
-      readPage(0);
+      readPage(cursor, 0);
       freePages.set(0);
       ++used;
     } else if(pre > 0) {
       // find the offset within the block where the new records will be inserted
-      split = cursor(pre - 1) + IO.NODESIZE;
+      split = cursor(cursor, pre - 1) + IO.NODESIZE;
     } else {
       // all insert operations will add data after first node.
       // i.e., there is no "insert before first document" statement
@@ -367,7 +400,7 @@ public final class TableDiskAccess extends TableAccess {
     }
 
     // number of bytes occupied by old records in the current block
-    final int nold = npre - fpre << IO.NODEPOWER;
+    final int nold = cursor.npre - cursor.fpre << IO.NODEPOWER;
     // number of bytes occupied by old records which will be moved at the end
     final int moved = nold - split;
 
@@ -379,9 +412,9 @@ public final class TableDiskAccess extends TableAccess {
       bf.dirty = true;
 
       // increment first pre-values of blocks after the last modified block
-      for(int i = page + 1; i < used; ++i) fpres[i] += nr;
+      for(int i = cursor.page + 1; i < used; ++i) fpres[i] += nr;
       // update cached variables (fpre is not changed)
-      npre += nr;
+      cursor.npre += nr;
       meta.size += nr;
       return;
     }
@@ -407,19 +440,19 @@ public final class TableDiskAccess extends TableAccess {
 
     if(remain > 0) {
       // check if the last entries can fit in the block after the current one
-      if(page + 1 < used) {
-        final int o = occSpace(page + 1) << IO.NODEPOWER;
+      if(cursor.page + 1 < used) {
+        final int o = occSpace(cursor.page + 1) << IO.NODEPOWER;
         if(remain <= IO.BLOCKSIZE - o) {
           // copy the last records
-          readPage(page + 1);
+          readPage(cursor, cursor.page + 1);
           bf = bm.current();
           System.arraycopy(bf.data, 0, bf.data, remain, o);
           System.arraycopy(all, all.length - remain, bf.data, 0, remain);
           bf.dirty = true;
           // reduce the pre value, since it will be later incremented with nr
-          fpres[page] -= remain >>> IO.NODEPOWER;
+          fpres[cursor.page] -= remain >>> IO.NODEPOWER;
           // go back to the previous block
-          readPage(page - 1);
+          readPage(cursor, cursor.page - 1);
         } else {
           // there is not enough space in the block - allocate a new one
           ++needed;
@@ -440,26 +473,26 @@ public final class TableDiskAccess extends TableAccess {
     }
 
     // make place for the blocks where the new entries will be written
-    Array.move(fpres, page + 1, needed, used - page - 1);
-    Array.move(pages, page + 1, needed, used - page - 1);
+    Array.move(fpres, cursor.page + 1, needed, used - cursor.page - 1);
+    Array.move(pages, cursor.page + 1, needed, used - cursor.page - 1);
 
     // write the all remaining entries
     while(needed-- > 0) {
-      freeBlock();
+      freeBlock(cursor);
       nrem += write(all, nrem);
-      fpres[page] = fpres[page - 1] + IO.ENTRIES;
-      pages[page] = (int) bm.current().pos;
+      fpres[cursor.page] = fpres[cursor.page - 1] + IO.ENTRIES;
+      pages[cursor.page] = (int) bm.current().pos;
     }
 
     // increment all fpre values after the last modified block
-    for(int i = page + 1; i < used; ++i) fpres[i] += nr;
+    for(int i = cursor.page + 1; i < used; ++i) fpres[i] += nr;
 
     meta.size += nr;
 
     // update cached variables
-    fpre = fpres[page];
-    npre = page + 1 < used && fpres[page + 1] < meta.size ?
-        fpres[page + 1] : meta.size;
+    cursor.fpre = fpres[cursor.page];
+    cursor.npre = cursor.page + 1 < used && fpres[cursor.page + 1] < meta.size ?
+        fpres[cursor.page + 1] : meta.size;
   }
 
   // PRIVATE METHODS ==========================================================
@@ -467,17 +500,18 @@ public final class TableDiskAccess extends TableAccess {
   /**
    * Searches for the block containing the entry for the specified pre value.
    * Reads the block and returns its offset inside the block.
+   * @param cursor the cursor on which this operation shall operate
    * @param pre pre of the entry to search for
    * @return offset of the entry in the block
    */
-  private int cursor(final int pre) {
-    int fp = fpre;
-    int np = npre;
+  private int cursor(final TableCursor cursor, final int pre) {
+    int fp = cursor.fpre;
+    int np = cursor.npre;
     if(pre < fp || pre >= np) {
       final int last = used - 1;
       int l = 0;
       int h = last;
-      int m = page;
+      int m = cursor.page;
       while(l <= h) {
         if(pre < fp) h = m - 1;
         else if(pre >= np) l = m + 1;
@@ -492,27 +526,29 @@ public final class TableDiskAccess extends TableAccess {
           "\n- #used blocks: " + used +
           "\n- #total locks: " + blocks +
           "\n- access: " + m + " (" + l + " > " + h + ']');
-      readPage(m);
+      readPage(cursor, m);
     }
-    return pre - fpre << IO.NODEPOWER;
+    return pre - cursor.fpre << IO.NODEPOWER;
   }
 
   /**
    * Updates the page pointers.
+   * @param cursor the cursor on which this operation shall operate
    * @param p page index
    */
-  private void setPage(final int p) {
-    page = p;
-    fpre = fpres[p];
-    npre = p + 1 >= used ? meta.size : fpres[p + 1];
+  private void setPage(final TableCursor cursor, final int p) {
+    cursor.page = p;
+    cursor.fpre = fpres[p];
+    cursor.npre = p + 1 >= used ? meta.size : fpres[p + 1];
   }
 
   /**
    * Updates the index pointers and fetches the requested block.
+   * @param cursor the cursor on which this operation shall operate
    * @param p index of the block to fetch
    */
-  private void readPage(final int p) {
-    setPage(p);
+  private void readPage(final TableCursor cursor, final int p) {
+    setPage(cursor, p);
     readBlock(pages[p]);
   }
 
@@ -540,13 +576,14 @@ public final class TableDiskAccess extends TableAccess {
 
   /**
    * Moves the cursor to a free block (either new or existing empty one).
+   * @param cursor the cursor on which this operation shall operate
    */
-  private void freeBlock() {
+  private void freeBlock(final TableCursor cursor) {
     final int b = freePages.nextFree(0);
     freePages.set(b);
     readBlock(b);
     ++used;
-    ++page;
+    ++cursor.page;
   }
 
   /**
@@ -562,14 +599,15 @@ public final class TableDiskAccess extends TableAccess {
 
   /**
    * Updates the firstPre index entries.
+   * @param cursor the cursor on which this operation shall operate
    * @param nr number of entries to move
    */
-  private void updatePre(final int nr) {
+  private void updatePre(final TableCursor cursor, final int nr) {
     // update index entries for all following blocks and reduce counter
-    for(int i = page + 1; i < used; ++i) fpres[i] -= nr;
+    for(int i = cursor.page + 1; i < used; ++i) fpres[i] -= nr;
     meta.size -= nr;
-    npre = page + 1 < used && fpres[page + 1] < meta.size ? fpres[page + 1] :
-      meta.size;
+    cursor.npre = cursor.page + 1 < used && fpres[cursor.page + 1] < meta.size ?
+      fpres[cursor.page + 1] : meta.size;
   }
 
   /**
