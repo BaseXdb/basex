@@ -55,7 +55,7 @@ public abstract class IndexBuilder extends Progress {
    * @return result of check
    * @throws IOException I/O exception
    */
-  protected final boolean memFull() throws IOException {
+  protected final boolean memFull() throws IOException { // [WK] Abschaffen!
     final boolean full = rt.totalMemory() - rt.freeMemory() >= maxMem;
     if(full) {
       if(cc >= 0) throw new BaseXException(OUT_OF_MEM + H_OUT_OF_MEM);
