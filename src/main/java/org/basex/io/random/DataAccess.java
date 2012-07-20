@@ -217,7 +217,7 @@ public final class DataAccess {
    * Sets the disk cursor.
    * @param p read position
    */
-  public void cursor(final long p) {
+  public synchronized void cursor(final long p) {
     off = (int) (p & IO.BLOCKSIZE - 1);
     final long b = p - off;
     if(!bm.cursor(b)) return;
@@ -418,7 +418,7 @@ public final class DataAccess {
    * @param bf buffer to write
    * @throws IOException I/O exception
    */
-  private void writeBlock(final Buffer bf) throws IOException {
+  private synchronized void writeBlock(final Buffer bf) throws IOException {
     file.seek(bf.pos);
     file.write(bf.data);
     bf.dirty = false;

@@ -52,8 +52,8 @@ public final class TableDiskAccess extends TableAccess {
     }
   };
 
-  /** Buffer manager. */
-  private final Buffers bm = new Buffers();
+  /** Buffer manager. */  // [WK] test why the one test fails
+  private final Buffers bm = new Buffers();  // [WK] inkonsistenzen mit TableCursor!
   /** File storing all blocks. */
   private final RandomAccessFile file;
   /** Bitmap storing free (=0) and occupied (=1) pages. */
@@ -566,8 +566,10 @@ public final class TableDiskAccess extends TableAccess {
       if(b >= blocks) {
         blocks = b + 1;
       } else {
-        file.seek(bf.pos * IO.BLOCKSIZE);
-        file.readFully(bf.data);
+        synchronized (file) {
+          file.seek(bf.pos * IO.BLOCKSIZE);
+          file.readFully(bf.data);
+        }
       }
     } catch(final IOException ex) {
       Util.stack(ex);
@@ -592,8 +594,10 @@ public final class TableDiskAccess extends TableAccess {
    * @throws IOException I/O exception
    */
   private void writeBlock(final Buffer bf) throws IOException {
-    file.seek(bf.pos * IO.BLOCKSIZE);
-    file.write(bf.data);
+    synchronized (file) {
+      file.seek(bf.pos * IO.BLOCKSIZE);
+      file.write(bf.data);
+    }
     bf.dirty = false;
   }
 
