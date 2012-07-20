@@ -56,6 +56,7 @@ public final class NSGlobal {
     NS.add(OUT, OUTURI);
     NS.add(PROC, PROCURI);
     NS.add(PROF, PROFURI);
+    NS.add(RANDOM, RANDOMURI);
     NS.add(REPO, REPOURI);
     NS.add(SQL, SQLURI);
     NS.add(VLDT, VALIDATEURI);

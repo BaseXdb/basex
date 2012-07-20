@@ -66,10 +66,10 @@ public final class FuncTest extends QueryTest {
       { "count 38", itr(2), "count(//desc/1)" },
       { "count 39", itr(4), "count(//desc/(1,2))" },
 
-      { "empty 1", bool(false), "empty(math:random())" },
+      { "empty 1", bool(false), "empty(random:random-double())" },
       { "empty 2", bool(false, false), "for $x in 1 to 2 return empty($x)" },
 
-      { "exists 1", bool(true), "exists(math:random())" },
+      { "exists 1", bool(true), "exists(random:random-double())" },
       { "exists 2", bool(true, true), "for $x in 1 to 2 return exists($x)" },
 
       { "contains 1", "contains(.)" },

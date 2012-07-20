@@ -444,11 +444,23 @@ public enum Function {
   /** XQuery function. */
   _MATH_TANH(FNMath.class, "tanh(number)", DBL_ZO, DBL_ZO),
   /** XQuery function. */
-  _MATH_RANDOM(FNMath.class, "random()", DBL),
-  /** XQuery function. */
   _MATH_CRC32(FNMath.class, "crc32(string)", HEX, STR),
+
+  /* FNRandom functions. */
   /** XQuery function. */
-  _MATH_UUID(FNMath.class, "uuid()", STR),
+  _RANDOM_DOUBLE(FNRandom.class, "double()", DBL),
+  /** XQuery function. */
+  _RANDOM_INTEGER(FNRandom.class, "integer([max])", ITR, 0, ITR),
+  /** XQuery function. */
+  _RANDOM_SEEDED_DOUBLE(FNRandom.class, "seeded-double(seed,num)", ITEM_ZM, ITR,
+      ITR),
+  /** XQuery function. */
+  _RANDOM_SEEDED_INTEGER(FNRandom.class, "seeded-integer(seed,num[,max])", ITEM_ZM,
+      2, ITR, ITR, ITR),
+  /** XQuery function. */
+  _RANDOM_GAUSSIAN(FNRandom.class, "gaussian(num)", ITEM_ZM, ITR),
+  /** XQuery function. */
+  _RANDOM_UUID(FNRandom.class, "uuid()", STR),
 
   /* FNArchive functions. */
 
@@ -870,6 +882,7 @@ public enum Function {
     URIS.put(FNOut.class,      OUTURI);
     URIS.put(FNProc.class,     PROCURI);
     URIS.put(FNProf.class,     PROFURI);
+    URIS.put(FNRandom.class,   RANDOMURI);
     URIS.put(FNSql.class,      SQLURI);
     URIS.put(FNValidate.class, VALIDATEURI);
     URIS.put(FNXslt.class,     XSLTURI);
