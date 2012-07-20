@@ -12,31 +12,22 @@ import org.junit.*;
  * @author Christian Gruen
  */
 public final class FNOutTest extends AdvancedQueryTest {
-  /**
-   * Test method for the out:nl() function.
-   */
+  /** Test method. */
   @Test
-  public void outNl() {
-    check(_OUT_NL);
+  public void nl() {
     // query() function removes all newlines..
     query(_OUT_NL.args(), "");
   }
 
-  /**
-   * Test method for the out:tab() function.
-   */
+  /** Test method. */
   @Test
-  public void outTab() {
-    check(_OUT_TAB);
+  public void tab() {
     query(_OUT_TAB.args(), "\t");
   }
 
-  /**
-   * Test method for the out:format() function.
-   */
+  /** Test method. */
   @Test
-  public void outFormat() {
-    check(_OUT_FORMAT);
+  public void format() {
     query(_OUT_FORMAT.args("x", "x"), "x");
     query(_OUT_FORMAT.args("%d", " 1"), "1");
     query(_OUT_FORMAT.args("%2d", " 1"), " 1");

@@ -13,29 +13,21 @@ import org.junit.*;
  * @author Christian Gruen
  */
 public final class FNXsltTest extends AdvancedQueryTest {
-  /**
-   * Test method for the xslt:processor() function.
-   */
+  /** Test method. */
   @Test
-  public void xsltProcessor() {
+  public void processor() {
     assertTrue(!query(_XSLT_PROCESSOR.args()).isEmpty());
   }
 
-  /**
-   * Test method for the xslt:version() function.
-   */
+  /** Test method. */
   @Test
-  public void xsltVersion() {
+  public void version() {
     assertTrue(!query(_XSLT_VERSION.args()).isEmpty());
   }
 
-  /**
-   * Test method for the xslt:transform() function.
-   */
+  /** Test method. */
   @Test
-  public void xsltTransform() {
-    check(_XSLT_TRANSFORM);
-
+  public void transform() {
     final String doc = "<a/>";
     String style = wrap("<xsl:template match='/'><X/></xsl:template>");
     query(_XSLT_TRANSFORM.args(doc, style), "<X/>");

@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import java.util.regex.*;
 
 import org.basex.io.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -18,7 +19,7 @@ public final class Databases {
   public static final Pattern FILES = Pattern.compile(".{3,5}" + IO.BASEXSUFFIX);
   /** Pattern to extract the database name from a backup file name. */
   public static final Pattern ZIPPATTERN =
-      Pattern.compile(IO.DATEPATTERN + IO.ZIPSUFFIX + '$');
+      Pattern.compile(DateTime.PATTERN + IO.ZIPSUFFIX + '$');
 
   /** Database path. */
   final IOFile dbpath;
@@ -172,9 +173,7 @@ public final class Databases {
     final StringList sl = new StringList();
     for(final IOFile f : ctx.mprop.dbpath().children()) {
       final String name = f.name();
-      if(name.matches(db + IO.DATEPATTERN + IO.ZIPSUFFIX)) {
-        sl.add(f.path());
-      }
+      if(name.matches(db + DateTime.PATTERN + IO.ZIPSUFFIX)) sl.add(f.path());
     }
     return sl.sort(false, false);
   }

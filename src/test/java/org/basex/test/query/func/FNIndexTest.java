@@ -35,13 +35,9 @@ public final class FNIndexTest extends AdvancedQueryTest {
     new DropDB(NAME).execute(context);
   }
 
-  /**
-   * Test method for the facets() function.
-   */
+  /** Test method. */
   @Test
-  public void indexFacets() {
-    check(_INDEX_FACETS);
-
+  public void facets() {
     final String tree = _INDEX_FACETS.args(NAME);
     query(tree + "//element[@name='head']/@count/data()", 1);
     query(tree + "//element[@name='title']/text/@type/data()", "category");
@@ -53,12 +49,9 @@ public final class FNIndexTest extends AdvancedQueryTest {
     query(flat + "//element[@name='li']/@count/data()", 2);
   }
 
-  /**
-   * Test method for the texts() function.
-   */
+  /** Test method. */
   @Test
-  public void indexTexts() {
-    check(_INDEX_TEXTS);
+  public void texts() {
     // complete search
     final String entries = _INDEX_TEXTS.args(NAME);
     query("count(" + entries + ')', 5);
@@ -77,12 +70,9 @@ public final class FNIndexTest extends AdvancedQueryTest {
     //      "return " + _INDEX_TEXTS.args("$a") + "/text()", "A");
   }
 
-  /**
-   * Test method for the attributes() function.
-   */
+  /** Test method. */
   @Test
-  public void indexAttributes() {
-    check(_INDEX_ATTRIBUTES);
+  public void attributes() {
     // complete search
     final String entries = _INDEX_ATTRIBUTES.args(NAME);
     query("count(" + entries + ')', 6);
@@ -97,25 +87,17 @@ public final class FNIndexTest extends AdvancedQueryTest {
     query(_INDEX_ATTRIBUTES.args(NAME, "#000099", "false()") + "/text()", "#000000");
   }
 
-  /**
-   * Test method for the element-names() function.
-   */
+  /** Test method. */
   @Test
-  public void indexElementNames() {
-    check(_INDEX_ELEMENT_NAMES);
-
+  public void elementNames() {
     final String entries = _INDEX_ELEMENT_NAMES.args(NAME);
     query("count(" + entries + ')', 9);
     query("exists(" + entries + "/self::entry)", "true");
   }
 
-  /**
-   * Test method for the attribute-names() function.
-   */
+  /** Test method. */
   @Test
-  public void indexAttributeNames() {
-    check(_INDEX_ATTRIBUTE_NAMES);
-
+  public void attributeNames() {
     final String entries = _INDEX_ATTRIBUTE_NAMES.args(NAME);
     query("count(" + entries + ')', 5);
     query("exists(" + entries + "/self::entry)", "true");

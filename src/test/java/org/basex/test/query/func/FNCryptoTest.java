@@ -1,7 +1,5 @@
 package org.basex.test.query.func;
 
-import static org.basex.query.func.Function.*;
-
 import org.basex.test.query.*;
 import org.junit.*;
 
@@ -12,23 +10,9 @@ import org.junit.*;
  * @author Lukas Kircher
  */
 public class FNCryptoTest extends AdvancedQueryTest {
-  /**
-   * Checks FNCrypto functions for correct argument handling.
-   */
+  /** Checks default/empty arguments. */
   @Test
-  public void checkFunctionArguments() {
-    check(_CRYPTO_ENCRYPT);
-    check(_CRYPTO_DECRYPT);
-    check(_CRYPTO_HMAC);
-    check(_CRYPTO_GENERATE_SIGNATURE);
-    check(_CRYPTO_VALIDATE_SIGNATURE);
-  }
-
-  /**
-   * Checks default / empty arguments.
-   */
-  @Test
-  public void checkDefaultArguments() {
+  public void check() {
     final String pl = "declare namespace c = 'http://expath.org/ns/crypto';";
     query(pl + "c:hmac('msg','key','','')");
     query(pl + "c:encrypt('msg','','keykeyke','')");

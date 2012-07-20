@@ -1,6 +1,5 @@
 package org.basex.query.func;
 
-import static org.basex.query.func.Function.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
@@ -39,8 +38,10 @@ public final class FNProf extends StandardFunc {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
-      case _PROF_SLEEP:       return sleep(ctx);
-      default:                return super.item(ctx, ii);
+      case _PROF_SLEEP:      return sleep(ctx);
+      case _PROF_CURRENT_MS: return Int.get(System.currentTimeMillis());
+      case _PROF_CURRENT_NS: return Int.get(System.nanoTime());
+      default:               return super.item(ctx, ii);
     }
   }
 
@@ -144,7 +145,6 @@ public final class FNProf extends StandardFunc {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.NDT && oneOf(sig, _PROF_SLEEP, _PROF_MEM, _PROF_TIME) ||
-        super.uses(u);
+    return u == Use.NDT || super.uses(u);
   }
 }

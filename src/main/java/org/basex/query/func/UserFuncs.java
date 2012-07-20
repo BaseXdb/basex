@@ -150,8 +150,7 @@ public final class UserFuncs extends ExprInfo {
     }
 
     for(final UserFunc f : funcs) {
-      if(f.expr == null) EXTERNALFUNC.thrw(f.info, f.name.string());
-      if(!f.declared) {
+      if(!f.declared || f.expr == null) {
         // function has not been declared yet
         for(final UserFunc uf : funcs) {
           // check if another function with same name exists

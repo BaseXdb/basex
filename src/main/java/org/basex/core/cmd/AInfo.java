@@ -28,7 +28,7 @@ abstract class AInfo extends Command {
    * @param key key
    * @param val value
    */
-  static void format(final TokenBuilder tb, final String key, final String val) {
+  static void info(final TokenBuilder tb, final String key, final String val) {
     tb.add(' ').add(key).add(COLS).add(val).add(NL);
   }
 }

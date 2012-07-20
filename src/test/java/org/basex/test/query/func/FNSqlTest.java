@@ -1,7 +1,5 @@
 package org.basex.test.query.func;
 
-import static org.basex.query.func.Function.*;
-
 import org.basex.test.query.*;
 import org.junit.*;
 
@@ -13,51 +11,43 @@ import org.junit.*;
  * @author Christian Gruen
  */
 public final class FNSqlTest extends AdvancedQueryTest {
-  /** Test method for the sql:init() function. */
+  /** Test method. */
   @Test
-  public void sqlInit() {
-    check(_SQL_INIT);
+  public void init() {
   }
 
-  /** Test method for the sql:connect() function. */
+  /** Test method. */
   @Test
-  public void sqlConnect() {
-    check(_SQL_CONNECT);
+  public void connect() {
   }
 
-  /** Test method for the sql:prepare() function. */
+  /** Test method. */
   @Test
-  public void sqlPrepare() {
-    check(_SQL_PREPARE);
+  public void prepare() {
   }
 
-  /** Test method for the sql:execute() function. */
+  /** Test method. */
   @Test
-  public void sqlExecute() {
-    check(_SQL_EXECUTE);
+  public void execute() {
   }
 
-  /** Test method for the sql:execute-prepared() function. */
+  /** Test method. */
   @Test
-  public void sqlExecutePrepared() {
-    check(_SQL_EXECUTE_PREPARED);
+  public void executePrepared() {
   }
 
-  /** Test method for the sql:close() function. */
+  /** Test method. */
   @Test
-  public void sqlClose() {
-    check(_SQL_CLOSE);
+  public void close() {
   }
 
-  /** Test method for the sql:commit() function. */
+  /** Test method. */
   @Test
-  public void sqlCommit() {
-    check(_SQL_COMMIT);
+  public void commit() {
   }
 
-  /** Test method for the sql:rollback() function. */
+  /** Test method. */
   @Test
-  public void sqlRollback() {
-    check(_SQL_ROLLBACK);
+  public void rollback() {
   }
 }

@@ -16,32 +16,23 @@ public final class FNGenTest extends AdvancedQueryTest {
   /** Text file. */
   private static final String TEXT = "src/test/resources/input.xml";
 
-  /**
-   * Test method for the unparsed-text() function.
-   */
+  /** Test method. */
   @Test
-  public void fnUnparsedText() {
-    check(UNPARSED_TEXT);
+  public void unparsedText() {
     contains(UNPARSED_TEXT.args(TEXT), "&lt;html");
     contains(UNPARSED_TEXT.args(TEXT, "US-ASCII"), "&lt;html");
     error(UNPARSED_TEXT.args(TEXT, "xyz"), Err.WHICHENC);
   }
 
-  /**
-   * Test method for the parse-xml() function.
-   */
+  /** Test method. */
   @Test
-  public void fnParseXML() {
-    check(PARSE_XML);
+  public void parseXML() {
     contains(PARSE_XML.args("\"<x>a</x>\"") + "//text()", "a");
   }
 
-  /**
-   * Test method for the serialize() function.
-   */
+  /** Test method. */
   @Test
-  public void fnSerialize() {
-    check(SERIALIZE);
+  public void serialize() {
     contains(SERIALIZE.args("<x/>"), "&lt;x/&gt;");
     contains(SERIALIZE.args("<x/>", serialParams("")), "&lt;x/&gt;");
     contains(SERIALIZE.args("<x>a</x>", serialParams("<method value='text'/>")), "a");

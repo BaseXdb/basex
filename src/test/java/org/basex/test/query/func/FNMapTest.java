@@ -15,24 +15,18 @@ import org.junit.*;
  * @author Christian Gruen
  */
 public final class FNMapTest extends AdvancedQueryTest {
-  /**
-   * Test method for the map:new() function.
-   */
+  /** Test method. */
   @Test
-  public void mapNew() {
-    check(_MAP_NEW);
+  public void newTest() {
     query(EXISTS.args(_MAP_NEW.args("()")), true);
     query(_MAP_SIZE.args(_MAP_NEW.args("()")), 0);
     query(COUNT.args(_MAP_NEW.args("()")), 1);
     query(_MAP_SIZE.args(_MAP_NEW.args(_MAP_NEW.args("()"))), 0);
   }
 
-  /**
-   * Test method for the map:entry() function.
-   */
+  /** Test method. */
   @Test
-  public void mapEntry() {
-    check(_MAP_ENTRY);
+  public void entry() {
     query(EXISTS.args(_MAP_ENTRY.args("A", "B")), true);
     query(EXISTS.args(_MAP_ENTRY.args(1, 2)), true);
     query(EXISTS.args(_MAP_NEW.args(_MAP_ENTRY.args(1, 2))), "true");
@@ -40,50 +34,35 @@ public final class FNMapTest extends AdvancedQueryTest {
     error(EXISTS.args(_MAP_ENTRY.args("(1,2)", 2)), Err.XPTYPE);
   }
 
-  /**
-   * Test method for the map:get() function.
-   */
+  /** Test method. */
   @Test
-  public void mapGet() {
-    check(_MAP_GET);
+  public void get() {
     query(_MAP_GET.args(_MAP_NEW.args("()"), 1), "");
     query(_MAP_GET.args(_MAP_ENTRY.args(1, 2), 1), 2);
   }
 
-  /**
-   * Test method for the map:contains() function.
-   */
+  /** Test method. */
   @Test
-  public void mapContains() {
-    check(_MAP_CONTAINS);
+  public void contains() {
     query(_MAP_CONTAINS.args(_MAP_NEW.args(), 1), false);
     query(_MAP_CONTAINS.args(_MAP_ENTRY.args(1, 2), 1), true);
   }
 
-  /**
-   * Test method for the map:remove() function.
-   */
+  /** Test method. */
   @Test
-  public void mapRemove() {
-    check(_MAP_REMOVE);
+  public void remove() {
     query(_MAP_SIZE.args(_MAP_REMOVE.args(_MAP_ENTRY.args(1, 2), 1)), 0);
   }
 
-  /**
-   * Test method for the map:size() function.
-   */
+  /** Test method. */
   @Test
-  public void mapSize() {
-    check(_MAP_SIZE);
+  public void size() {
     query(_MAP_SIZE.args(_MAP_ENTRY.args(1, 2)), 1);
   }
 
-  /**
-   * Test method for the map:keys() function.
-   */
+  /** Test method. */
   @Test
-  public void mapKeys() {
-    check(_MAP_KEYS);
+  public void keys() {
     query("for $i in " + _MAP_KEYS.args(
         _MAP_NEW.args(" for $i in 1 to 3 return " +
         _MAP_ENTRY.args("$i", "$i+1"))) + " order by $i return $i", "1 2 3");
@@ -93,13 +72,9 @@ public final class FNMapTest extends AdvancedQueryTest {
         _MAP_GET.args("$map", "$k"), "2 3 4");
   }
 
-  /**
-   * Test method for the map:collation() function.
-   */
+  /** Test method. */
   @Test
-  public void mapCollation() {
-    check(_MAP_COLLATION);
-    query(_MAP_COLLATION.args(_MAP_NEW.args()),
-        Token.string(QueryText.URLCOLL));
+  public void collation() {
+    query(_MAP_COLLATION.args(_MAP_NEW.args()), Token.string(QueryText.URLCOLL));
   }
 }

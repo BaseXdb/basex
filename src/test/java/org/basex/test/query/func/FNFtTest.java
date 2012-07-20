@@ -30,13 +30,11 @@ public final class FNFtTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the search() function.
+   * Test method.
    * @throws BaseXException database exception
    */
   @Test
-  public void ftSearch() throws BaseXException {
-    check(_FT_SEARCH);
-
+  public void search() throws BaseXException {
     // check index results
     query(_FT_SEARCH.args(" . ", "assignments"), "Assignments");
     query(_FT_SEARCH.args(" . ", " ('exercise','1')"), "Exercise 1Exercise 2");
@@ -71,12 +69,9 @@ public final class FNFtTest extends AdvancedQueryTest {
     error(_FT_SEARCH.args(" .", "x", " 1"), Err.ELMMAPTYPE);
   }
 
-  /**
-   * Test method for the count() function.
-   */
+  /** Test method. */
   @Test
-  public void ftCount() {
-    check(_FT_COUNT);
+  public void count() {
     query(_FT_COUNT.args("()"), "0");
     query(_FT_COUNT.args(" //*[text() contains text '1']"), "1");
     query(_FT_COUNT.args(" //li[text() contains text 'exercise']"), "2");
@@ -84,12 +79,9 @@ public final class FNFtTest extends AdvancedQueryTest {
         _FT_COUNT.args("$i[text() contains text 'exercise']"), "1 1");
   }
 
-  /**
-   * Test method for the mark() function.
-   */
+  /** Test method. */
   @Test
-  public void ftMark() {
-    check(_FT_MARK);
+  public void mark() {
     query(_FT_MARK.args(" //*[text() contains text '1']"),
       "<li>Exercise <mark>1</mark></li>");
     query(_FT_MARK.args(" //*[text() contains text '2'], 'b'"),
@@ -104,12 +96,9 @@ public final class FNFtTest extends AdvancedQueryTest {
         _FT_MARK.args("$a[. contains text 'a b'], 'b'"), "<b>a</b> <b>b</b>");
   }
 
-  /**
-   * Test method for the extract() function.
-   */
+  /** Test method. */
   @Test
-  public void ftExtract() {
-    check(_FT_EXTRACT);
+  public void extract() {
     query(_FT_EXTRACT.args(" //*[text() contains text '1']"),
       "<li>Exercise <mark>1</mark></li>");
     query(_FT_EXTRACT.args(" //*[text() contains text '2'], 'b', 20"),
@@ -120,23 +109,19 @@ public final class FNFtTest extends AdvancedQueryTest {
       "<li><b>Exercise</b>...</li>");
   }
 
-  /**
-   * Test method for the score() function.
-   */
+  /** Test method. */
   @Test
-  public void ftScore() {
-    check(_FT_SCORE);
+  public void score() {
     query(_FT_SCORE.args(_FT_SEARCH.args(" . ", "2")), "1");
     query(_FT_SCORE.args(_FT_SEARCH.args(" . ", "XML")), "1 0.5");
   }
 
   /**
-   * Test method for the tokens() function.
+   * Test method.
    * @throws BaseXException database exception
    */
   @Test
-  public void ftTokens() throws BaseXException {
-    check(_FT_TOKENS);
+  public void tokens() throws BaseXException {
     new CreateIndex(IndexType.FULLTEXT).execute(context);
 
     String entries = _FT_TOKENS.args(NAME);
@@ -150,12 +135,9 @@ public final class FNFtTest extends AdvancedQueryTest {
     query("count(" + entries + ')', 1);
   }
 
-  /**
-   * Test method for the tokenize() function.
-   */
+  /** Test method. */
   @Test
-  public void ftTokenize() {
-    check(_FT_TOKENIZE);
+  public void tokenize() {
     query(_FT_TOKENIZE.args("A bc"), "a bc");
     query("declare ft-option using stemming; " + _FT_TOKENIZE.args("Gifts"), "gift");
     query("count(" + _FT_TOKENIZE.args("") + ')', "0");

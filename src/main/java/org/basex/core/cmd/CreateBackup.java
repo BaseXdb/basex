@@ -1,8 +1,6 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
-import static org.basex.util.Util.*;
-
 import java.io.*;
 import java.util.*;
 
@@ -60,7 +58,8 @@ public final class CreateBackup extends Command {
    * @return success flag
    */
   private boolean backup(final String db) {
-    final String backup = db + '-' + formatDate(new Date(), IO.DATE) + IO.ZIPSUFFIX;
+    final String backup = db + '-' + DateTime.format(new Date(), DateTime.DATETIME) +
+        IO.ZIPSUFFIX;
     final IOFile zf = mprop.dbpath(backup);
     final Zip zip = progress(new Zip(zf));
 

@@ -19,24 +19,18 @@ public final class FNConvertTest extends AdvancedQueryTest {
   /** Null output stream. */
   static final PrintStream NULL = new PrintStream(new NullOutput());
 
-  /**
-   * Test method for the binary-to-string() function.
-   */
+  /** Test method. */
   @Test
-  public void convertBinaryToString() {
-    check(_CONVERT_BINARY_TO_STRING);
+  public void binaryToString() {
     query(_CONVERT_BINARY_TO_STRING.args("xs:base64Binary(xs:hexBinary('41'))"), "A");
     query(_CONVERT_BINARY_TO_STRING.args("xs:hexBinary('41')"), "A");
     query(_CONVERT_BINARY_TO_STRING.args("xs:hexBinary('41')", "CP1252"), "A");
     error(_CONVERT_BINARY_TO_STRING.args("xs:hexBinary('41')", "X"), Err.BXCO_ENCODING);
   }
 
-  /**
-   * Test method for the string-to-base64() function.
-   */
+  /** Test method. */
   @Test
-  public void convertStringToBase64() {
-    check(_CONVERT_STRING_TO_BASE64);
+  public void stringToBase64() {
     query(_CONVERT_STRING_TO_BASE64.args("a"), "YQ==");
     query(_CONVERT_STRING_TO_BASE64.args("a", "UTF-8"), "YQ==");
     query(_CONVERT_STRING_TO_BASE64.args("a", "US-ASCII"), "YQ==");
@@ -44,22 +38,16 @@ public final class FNConvertTest extends AdvancedQueryTest {
     error(_CONVERT_STRING_TO_BASE64.args("a", "X"), Err.BXCO_ENCODING);
   }
 
-  /**
-   * Test method for the bytes-to-base64() function.
-   */
+  /** Test method. */
   @Test
-  public void convertBytesToBase64() {
-    check(_CONVERT_BYTES_TO_BASE64);
+  public void bytesToBase64() {
     query(_CONVERT_BYTES_TO_BASE64.args("xs:byte(97)"), "YQ==");
     query(_CONVERT_BYTES_TO_BASE64.args("()"), "");
   }
 
-  /**
-   * Test method for the string-to-hex() function.
-   */
+  /** Test method. */
   @Test
-  public void convertStringToHex() {
-    check(_CONVERT_STRING_TO_HEX);
+  public void stringToHex() {
     query(_CONVERT_STRING_TO_HEX.args("a"), "61");
     query(_CONVERT_STRING_TO_HEX.args("a", "UTF-8"), "61");
     query(_CONVERT_STRING_TO_HEX.args("a", "US-ASCII"), "61");
@@ -67,22 +55,16 @@ public final class FNConvertTest extends AdvancedQueryTest {
     error(_CONVERT_STRING_TO_HEX.args("a", "X"), Err.BXCO_ENCODING);
   }
 
-  /**
-   * Test method for the bytes-to-hex() function.
-   */
+  /** Test method. */
   @Test
-  public void convertBytesToHex() {
-    check(_CONVERT_BYTES_TO_HEX);
+  public void bytesToHex() {
     query(_CONVERT_BYTES_TO_HEX.args("xs:byte(1)"), "01");
     query(_CONVERT_BYTES_TO_HEX.args(" for $i in 1 to 3 return xs:byte($i)"), "010203");
   }
 
-  /**
-   * Test method for the binary-to-bytes() function.
-   */
+  /** Test method. */
   @Test
-  public void convertToBytes() {
-    check(_CONVERT_BINARY_TO_BYTES);
+  public void binaryToBytes() {
     query(_CONVERT_BINARY_TO_BYTES.args("xs:base64Binary('QmFzZVggaXMgY29vbA==')"),
       "66 97 115 101 88 32 105 115 32 99 111 111 108");
     query(_CONVERT_BINARY_TO_BYTES.args("xs:base64Binary(xs:hexBinary('4261736558'))"),
@@ -93,12 +75,9 @@ public final class FNConvertTest extends AdvancedQueryTest {
     query(COUNT.args(_CONVERT_BINARY_TO_BYTES.args(123)), 3);
   }
 
-  /**
-   * Test method for the integer-to-base() function.
-   */
+  /** Test method. */
   @Test
-  public void convertToBase() {
-    check(_CONVERT_INTEGER_TO_BASE);
+  public void integerToBase() {
     query(_CONVERT_INTEGER_TO_BASE.args(4, 2), 100);
     query(_CONVERT_INTEGER_TO_BASE.args(65535, 2), "1111111111111111");
     query(_CONVERT_INTEGER_TO_BASE.args(65536, 2), "10000000000000000");
@@ -113,12 +92,9 @@ public final class FNConvertTest extends AdvancedQueryTest {
     error(_CONVERT_INTEGER_TO_BASE.args(1, 100), Err.INVBASE);
   }
 
-  /**
-   * Test method for the integer-from-base() function.
-   */
+  /** Test method. */
   @Test
-  public void convertFromBase() {
-    check(_CONVERT_INTEGER_FROM_BASE);
+  public void integerFromBase() {
     query(_CONVERT_INTEGER_FROM_BASE.args("100", 2), "4");
     query(_CONVERT_INTEGER_FROM_BASE.args("1111111111111111", 2), 65535);
     query(_CONVERT_INTEGER_FROM_BASE.args("10000000000000000", 2), 65536);

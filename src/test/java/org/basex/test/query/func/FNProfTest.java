@@ -18,15 +18,12 @@ public final class FNProfTest extends AdvancedQueryTest {
   /** Null output stream. */
   static final PrintStream NULL = new PrintStream(new NullOutput());
 
-  /**
-   * Test method for the prof:mem() function.
-   */
+  /** Test method. */
   @Test
-  public void utilMem() {
+  public void mem() {
     final PrintStream err = System.err;
     try {
       System.setErr(NULL);
-      check(_PROF_MEM);
       query(_PROF_MEM.args("()"));
       query(COUNT.args(_PROF_MEM.args(" 1 to 100 ", false)), "100");
       query(COUNT.args(_PROF_MEM.args(" 1 to 100 ", true)), "100");
@@ -36,15 +33,12 @@ public final class FNProfTest extends AdvancedQueryTest {
     }
   }
 
-  /**
-   * Test method for the prof:time() function.
-   */
+  /** Test method. */
   @Test
-  public void utilTime() {
+  public void time() {
     final PrintStream err = System.err;
     try {
       System.setErr(NULL);
-      check(_PROF_TIME);
       query(_PROF_TIME.args("()"));
       query(COUNT.args(_PROF_TIME.args(" 1 to 100 ", false)), "100");
       query(COUNT.args(_PROF_TIME.args(" 1 to 100 ", true)), "100");
@@ -54,15 +48,22 @@ public final class FNProfTest extends AdvancedQueryTest {
     }
   }
 
-  /**
-   * Test method for the prof:sleep() function.
-   */
+  /** Test method. */
   @Test
-  public void utilSleep() {
-    check(_PROF_SLEEP);
+  public void sleep() {
     query(_PROF_SLEEP.args(" 10"));
     query(_PROF_SLEEP.args(" 1"));
     query(_PROF_SLEEP.args(" 0"));
     query(_PROF_SLEEP.args(" -1"));
+  }
+
+  /** Test method. */
+  @Test
+  public void currentMs() {
+  }
+
+  /** Test method. */
+  @Test
+  public void currentNs() {
   }
 }

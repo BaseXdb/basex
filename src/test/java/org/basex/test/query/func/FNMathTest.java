@@ -12,12 +12,9 @@ import org.junit.*;
  * @author Christian Gruen
  */
 public final class FNMathTest extends AdvancedQueryTest {
-  /**
-   * Test method for the math:crc32() function.
-   */
+  /** Test method. */
   @Test
-  public void mathCRC32() {
-    check(_MATH_CRC32);
+  public void crc32() {
     query(_MATH_CRC32.args(""), "00000000");
     query(_MATH_CRC32.args("BaseX"), "4C06FC7F");
   }

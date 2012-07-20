@@ -74,12 +74,9 @@ public final class FNJsonTest extends AdvancedQueryTest {
     { "<json numbers=\"item\" type='array'><item>1</item></json>", "[1]" },
   };
 
-  /**
-   * Test method for the json:parse() function.
-   */
+  /** Test method. */
   @Test
-  public void jsonParse() {
-    check(_JSON_PARSE);
+  public void parse() {
     for(final String[] f : TOXML) {
       final String qu = _JSON_PARSE.args(f[0]);
       if(f.length == 1) {
@@ -92,12 +89,9 @@ public final class FNJsonTest extends AdvancedQueryTest {
     }
   }
 
-  /**
-   * Test method for the json:serialize() function.
-   */
+  /** Test method. */
   @Test
-  public void jsonSerialize() {
-    check(_JSON_SERIALIZE);
+  public void serialize() {
     for(final String[] f : TOJSON) {
       final String qu = _JSON_SERIALIZE.args(f[0]);
       if(f.length == 1) {

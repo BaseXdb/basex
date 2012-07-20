@@ -460,9 +460,8 @@ public enum AtomType implements Type {
     @Override
     public Item cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
-      return it.type == LNG ? new Dtm((Int) it, ii) : it.type == DAT ?
-          new Dtm((ADate) it) : str(it) ? new Dtm(it.string(ii), ii) :
-            error(it, ii);
+      return it.type.isNumber() ? new Dtm(it.itr(ii), ii) : it.type == DAT ?
+          new Dtm((ADate) it) : str(it) ? new Dtm(it.string(ii), ii) : error(it, ii);
     }
     @Override
     public Item cast(final Object o, final InputInfo ii) throws QueryException {

@@ -41,7 +41,7 @@ public final class Restore extends Command {
       if(!list.isEmpty()) file = new IOFile(list.get(0));
     } else {
       // db is already the name of a backup -> extract db name
-      db = Pattern.compile(IO.DATEPATTERN + '$').split(db)[0];
+      db = Pattern.compile(DateTime.PATTERN + '$').split(db)[0];
     }
     if(!file.exists()) return error(BACKUP_NOT_FOUND_X, db);
 

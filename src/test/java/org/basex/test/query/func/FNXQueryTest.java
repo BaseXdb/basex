@@ -19,12 +19,9 @@ public final class FNXQueryTest extends AdvancedQueryTest {
   /** Null output stream. */
   static final PrintStream NULL = new PrintStream(new NullOutput());
 
-  /**
-   * Test method for the xquery:eval() function.
-   */
+  /** Test method. */
   @Test
-  public void xqueryEval() {
-    check(_XQUERY_EVAL);
+  public void eval() {
     query(_XQUERY_EVAL.args("1"), 1);
     query(_XQUERY_EVAL.args("1 + 2"), 3);
     query(_XQUERY_EVAL.args("\"$a\"", " map { '$a' := 'b' }"), "b");
@@ -37,25 +34,19 @@ public final class FNXQueryTest extends AdvancedQueryTest {
     error("for $a in (1,2) return " + _XQUERY_EVAL.args("\"$a\""), Err.VARUNDEF);
   }
 
-  /**
-   * Test method for the xquery:invoke() function.
-   */
+  /** Test method. */
   @Test
-  public void xqueryInvoke() {
-    check(_XQUERY_INVOKE);
+  public void invoke() {
     query(_XQUERY_INVOKE.args("src/test/resources/input.xq"), "XML");
     error(_XQUERY_INVOKE.args("src/test/resources/xxx.xq"), Err.WHICHRES);
   }
 
-  /**
-   * Test method for the xquery:type() function.
-   */
+  /** Test method. */
   @Test
-  public void xqueryType() {
+  public void type() {
     final PrintStream err = System.err;
     try {
       System.setErr(NULL);
-      check(_XQUERY_TYPE);
       query(_XQUERY_TYPE.args("()"), "");
       query(_XQUERY_TYPE.args("1"), "1");
       query(_XQUERY_TYPE.args("(1, 2, 3)"), "1 2 3");

@@ -798,17 +798,10 @@ public enum Function {
   _PROF_TIME(FNProf.class, "time(expr[,cache[,label]])", ITEM_ZM, 1, ITEM_ZM, BLN, STR),
   /** XQuery function. */
   _PROF_SLEEP(FNProf.class, "sleep(ms)", EMP, ITR),
-
-  /* FNDateTime functions. */
-
   /** XQuery function. */
-  _DATETIME_CURRENT_TIME(FNDateTime.class, "current-time()", TIM),
+  _PROF_CURRENT_MS(FNProf.class, "current-ms()", ITR),
   /** XQuery function. */
-  _DATETIME_CURRENT_DATE(FNDateTime.class, "current-date()", DAT),
-  /** XQuery function. */
-  _DATETIME_CURRENT_DATETIME(FNDateTime.class, "current-dateTime()", DTM),
-  /** XQuery function. */
-  _DATETIME_TIMESTAMP(FNDateTime.class, "timestamp()", ITR),
+  _PROF_CURRENT_NS(FNProf.class, "current-ns()", ITR),
 
   /* FNHash functions. */
 
@@ -884,7 +877,6 @@ public enum Function {
     URIS.put(FNArchive.class,  ARCHIVEURI);
     URIS.put(FNClient.class,   CLIENTURI);
     URIS.put(FNConvert.class,  CONVERTURI);
-    URIS.put(FNDateTime.class, DATETIMEURI);
     URIS.put(FNDb.class,       DBURI);
     URIS.put(FNFt.class,       FTURI);
     URIS.put(FNHof.class,      HOFURI);

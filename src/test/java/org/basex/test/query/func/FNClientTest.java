@@ -40,71 +40,57 @@ public final class FNClientTest extends AdvancedQueryTest {
     server.stop();
   }
 
-  /**
-   * Test method for the connect() function.
-   */
+  /** Test method. */
   @Test
-  public void clientConnect() {
-    check(_CLIENT_CONNECT);
-    query(connect());
-    query(EXISTS.args(" " + connect()));
+  public void connect() {
+    query(conn());
+    query(EXISTS.args(" " + conn()));
     // BXCL0001: connection errors
     error(_CLIENT_CONNECT.args(Text.LOCALHOST, 9999, Text.ADMIN, ""), Err.BXCL_CONN);
     error(_CLIENT_CONNECT.args("xxx", 9999, Text.ADMIN, Text.ADMIN), Err.BXCL_CONN);
   }
 
-  /**
-   * Test method for the execute() function.
-   */
+  /** Test method. */
   @Test
-  public void clientExecute() {
-    check(_CLIENT_EXECUTE);
-    contains(_CLIENT_EXECUTE.args(connect(), new ShowUsers()), Text.USERHEAD[0]);
-    query("let $a := " + connect() + ", $b := " + connect() + " return (" +
+  public void execute() {
+    contains(_CLIENT_EXECUTE.args(conn(), new ShowUsers()), Text.USERHEAD[0]);
+    query("let $a := " + conn() + ", $b := " + conn() + " return (" +
         _CLIENT_EXECUTE.args("$a", new XQuery("1")) + "," +
         _CLIENT_EXECUTE.args("$b", new XQuery("2")) + ")", "1 2");
     // BXCL0004: connection errors
-    error(_CLIENT_EXECUTE.args(connect(), "x"), Err.BXCL_COMMAND);
+    error(_CLIENT_EXECUTE.args(conn(), "x"), Err.BXCL_COMMAND);
   }
 
-  /**
-   * Test method for the query() function.
-   */
+  /** Test method. */
   @Test
-  public void clientQuery() {
-    check(_CLIENT_QUERY);
-    contains(_CLIENT_EXECUTE.args(connect(), new ShowUsers()), Text.USERHEAD[0]);
-    query("let $a := " + connect() + ", $b := " + connect() + " return " +
+  public void query() {
+    contains(_CLIENT_EXECUTE.args(conn(), new ShowUsers()), Text.USERHEAD[0]);
+    query("let $a := " + conn() + ", $b := " + conn() + " return " +
         _CLIENT_QUERY.args("$a", "1") + "+" + _CLIENT_QUERY.args("$b", "2"), "3");
-    query(_CLIENT_QUERY.args(connect(), "\"$a*2\"", " map{ 'a':=1 }"), "2");
+    query(_CLIENT_QUERY.args(conn(), "\"$a*2\"", " map{ 'a':=1 }"), "2");
     // query errors
-    error(_CLIENT_QUERY.args(connect(), "x"), Err.XPNOCTX);
-    error(_CLIENT_QUERY.args(connect(), "\"$a\"", " map{ 'a':=(1,2) }"), Err.BXCL_ITEM);
+    error(_CLIENT_QUERY.args(conn(), "x"), Err.XPNOCTX);
+    error(_CLIENT_QUERY.args(conn(), "\"$a\"", " map{ 'a':=(1,2) }"), Err.BXCL_ITEM);
   }
 
-  /**
-   * Test method for the correct return of all XDM data types.
-   */
+  /** Test method for the correct return of all XDM data types. */
   @Test
-  public void clientQueryTypes() {
+  public void queryTypes() {
     final Object[][] types = XdmInfoTest.TYPES;
     for(final Object[] type : types) {
       if(type == null || type.length < 3) continue;
-      query(_CLIENT_QUERY.args(connect(), " " + "\"" + type[1] + "\""), type[2]);
+      query(_CLIENT_QUERY.args(conn(), " " + "\"" + type[1] + "\""), type[2]);
     }
   }
 
-  /**
-   * Test method for the close() function.
-   */
+  /** Test method. */
   @Test
-  public void clientClose() {
-    check(_CLIENT_CLOSE);
-    query(connect() + " ! " + _CLIENT_CLOSE.args(" ."));
+  public void close() {
+    query(conn() + " ! " + _CLIENT_CLOSE.args(" ."));
     // BXCL0002: session not available
     error(_CLIENT_CLOSE.args("xs:anyURI('unknown')"), Err.BXCL_NOTAVL);
     // BXCL0002: session has already been closed
-    error(connect() + " ! (" + _CLIENT_CLOSE.args(" .") + ", " +
+    error(conn() + " ! (" + _CLIENT_CLOSE.args(" .") + ", " +
         _CLIENT_CLOSE.args(" .") + ")", Err.BXCL_NOTAVL);
   }
 
@@ -112,7 +98,7 @@ public final class FNClientTest extends AdvancedQueryTest {
    * Returns a successful connect string.
    * @return connect string
    */
-  private static String connect() {
+  private static String conn() {
     return _CLIENT_CONNECT.args(Text.LOCALHOST, 9999, Text.ADMIN, Text.ADMIN);
   }
 }

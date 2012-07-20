@@ -22,12 +22,9 @@ public final class FNValidateTest extends AdvancedQueryTest {
   /** Test file. */
   private static final String DTD = DIR + "validate.dtd";
 
-  /**
-   * Test method for the validate:xsd() function.
-   */
+  /** Test method. */
   @Test
-  public void validateXSD() {
-    check(_VALIDATE_XSD);
+  public void xsd() {
     // specify arguments as file paths
     query(_VALIDATE_XSD.args(FILE, XSD), "");
     // specify arguments as document nodes
@@ -54,12 +51,9 @@ public final class FNValidateTest extends AdvancedQueryTest {
         "return validate:xsd($doc, $schema)", Err.BXVA_FAIL);
   }
 
-  /**
-   * Test method for the validate:dtd() function.
-   */
+  /** Test method. */
   @Test
-  public void validateDTD() {
-    check(_VALIDATE_DTD);
+  public void dtd() {
     // specify arguments as file paths
     query(_VALIDATE_DTD.args(FILE, DTD), "");
     // specify document as document nodes

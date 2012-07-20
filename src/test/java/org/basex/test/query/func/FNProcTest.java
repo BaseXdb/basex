@@ -13,22 +13,16 @@ import org.junit.*;
  * @author Christian Gruen
  */
 public final class FNProcTest extends AdvancedQueryTest {
-  /**
-   * Test method for the proc:system() function.
-   */
+  /** Test method. */
   @Test
-  public void procSystem() {
-    check(_PROC_SYSTEM);
+  public void system() {
     query(_PROC_SYSTEM.args("java", "-version"), "");
     error(_PROC_SYSTEM.args("java", "-version", "xx"), Err.BXPR_ENC);
   }
 
-  /**
-   * Test method for the proc:execute() function.
-   */
+  /** Test method. */
   @Test
-  public void procExecute() {
-    check(_PROC_EXECUTE);
+  public void execute() {
     query("count(" + _PROC_EXECUTE.args("java", "-version") + "/*)", "3");
   }
 }

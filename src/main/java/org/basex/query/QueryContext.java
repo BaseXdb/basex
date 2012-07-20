@@ -87,6 +87,8 @@ public final class QueryContext extends Progress {
   public Item dtm;
   /** Current Time. */
   public Item time;
+  /** Current timezone. */
+  public Item zone;
 
   /** Full-text position data (needed for highlighting of full-text results). */
   public FTPosData ftpos;

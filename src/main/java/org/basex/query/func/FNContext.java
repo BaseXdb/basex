@@ -2,7 +2,6 @@ package org.basex.query.func;
 
 import static org.basex.util.Token.*;
 
-import java.text.*;
 import java.util.*;
 
 import org.basex.query.*;
@@ -37,7 +36,7 @@ public final class FNContext extends StandardFunc {
       case CURRENT_TIME:
         return currTIM(ctx);
       case IMPLICIT_TIMEZONE:
-        return implZone();
+        return currZone(ctx);
       case DEFAULT_COLLATION:
         return ctx.sc.baseURI().resolve(ctx.sc.collation);
       case STATIC_BASE_URI:
@@ -60,7 +59,7 @@ public final class FNContext extends StandardFunc {
   }
 
   /**
-   * Returns the current DateTime.
+   * Returns the current dateTime.
    * @param ctx query context
    * @return current date
    * @throws QueryException query exception
@@ -71,9 +70,9 @@ public final class FNContext extends StandardFunc {
   }
 
   /**
-   * Returns the current DateTime.
+   * Returns the current time.
    * @param ctx query context
-   * @return current date
+   * @return current dateTime
    * @throws QueryException query exception
    */
   private Item currTIM(final QueryContext ctx) throws QueryException {
@@ -82,26 +81,30 @@ public final class FNContext extends StandardFunc {
   }
 
   /**
+   * Returns the current timezone.
+   * @param ctx query context
+   * @return current timezone
+   * @throws QueryException query exception
+   */
+  private Item currZone(final QueryContext ctx) throws QueryException {
+    if(ctx.zone == null) initDateTime(ctx);
+    return ctx.zone;
+  }
+
+  /**
    * Initializes the static date and time context of a query.
    * @param ctx query context
    * @throws QueryException query exception
    */
   private void initDateTime(final QueryContext ctx) throws QueryException {
-    final Item[] items = FNDateTime.dateTime(info);
-    ctx.time = items[0];
-    ctx.date = items[1];
-    ctx.dtm = items[2];
-  }
-
-  /**
-   * Returns the current DateTime.
-   * @return current date
-   */
-  private static Item implZone() {
-    final java.util.Date d = Calendar.getInstance().getTime();
-    final String zone = new SimpleDateFormat("Z").format(d);
-    final byte[] z = token(zone);
-    final int cshift = toInt(substring(z, 0, 3)) * 60 + toInt(substring(z, 3));
-    return new DTd(cshift);
+    final Date d = Calendar.getInstance().getTime();
+    final String zon = DateTime.format(d, DateTime.ZONE);
+    final String ymd = DateTime.format(d, DateTime.DATE);
+    final String hms = DateTime.format(d, DateTime.TIME);
+    final String zone = zon.substring(0, 3) + ':' + zon.substring(3);
+    ctx.time = new Tim(token(hms + zone), info);
+    ctx.date = new Dat(token(ymd + zone), info);
+    ctx.dtm = new Dtm(token(ymd + 'T' + hms + zone), info);
+    ctx.zone = new DTd(toInt(zon.substring(0, 3)) * 60 + toInt(zon.substring(3)));
   }
 }

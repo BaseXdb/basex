@@ -45,7 +45,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Finishes the code.
+   * Finishes the test.
    * @throws BaseXException database exception
    */
   @AfterClass
@@ -54,12 +54,11 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the open() function.
+   * Test method.
    * @throws BaseXException database exception
    */
   @Test
-  public void dbOpen() throws BaseXException {
-    check(_DB_OPEN);
+  public void open() throws BaseXException {
     query(COUNT.args(_DB_OPEN.args(NAME)), "1");
     query(COUNT.args(_DB_OPEN.args(NAME, "")), "1");
     query(COUNT.args(_DB_OPEN.args(NAME, "unknown")), "0");
@@ -74,33 +73,26 @@ public final class FNDbTest extends AdvancedQueryTest {
     error(_DB_OPEN.args(NAME), Err.BXDB_OPEN);
   }
 
-  /**
-   * Test method for the open-pre() function.
-   */
+  /** Test method. */
   @Test
-  public void dbOpenPre() {
-    check(_DB_OPEN_PRE);
+  public void openPre() {
     query(_DB_OPEN_PRE.args(NAME, 0) + "//title/text()", "XML");
     error(_DB_OPEN_PRE.args(NAME, -1), Err.BXDB_RANGE);
   }
 
-  /**
-   * Test method for the open-id() function.
-   */
+  /** Test method. */
   @Test
-  public void dbOpenId() {
-    check(_DB_OPEN_ID);
+  public void openId() {
     query(_DB_OPEN_ID.args(NAME, 0) + "//title/text()", "XML");
     error(_DB_OPEN_ID.args(NAME, -1), Err.BXDB_RANGE);
   }
 
   /**
-   * Test method for the text() function.
+   * Test method.
    * @throws BaseXException database exception
    */
   @Test
-  public void dbText() throws BaseXException {
-    check(_DB_TEXT);
+  public void text() throws BaseXException {
     // run function without and with index
     new DropIndex(Commands.CmdIndex.TEXT).execute(context);
     query(_DB_TEXT.args(NAME, "XML"), "XML");
@@ -110,12 +102,11 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the text-range() function.
+   * Test method.
    * @throws BaseXException database exception
    */
   @Test
-  public void dbTextRange() throws BaseXException {
-    check(_DB_TEXT_RANGE);
+  public void textRange() throws BaseXException {
     // run function without and with index
     new DropIndex(Commands.CmdIndex.TEXT).execute(context);
     query(_DB_TEXT_RANGE.args(NAME, "Exercise", "Fun"), "Exercise 1Exercise 2");
@@ -125,12 +116,11 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the attribute() function.
+   * Test method.
    * @throws BaseXException database exception
    */
   @Test
-  public void dbAttribute() throws BaseXException {
-    check(_DB_ATTRIBUTE);
+  public void attribute() throws BaseXException {
     // run function without and with index
     new DropIndex(Commands.CmdIndex.ATTRIBUTE).execute(context);
     query(DATA.args(_DB_ATTRIBUTE.args(NAME, "0")), "0");
@@ -142,12 +132,11 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the attribute-range() function.
+   * Test method.
    * @throws BaseXException database exception
    */
   @Test
-  public void dbAttributeRange() throws BaseXException {
-    check(_DB_ATTRIBUTE_RANGE);
+  public void attributeRange() throws BaseXException {
     // run function without and with index
     new CreateIndex(Commands.CmdIndex.ATTRIBUTE).execute(context);
     query(_DB_ATTRIBUTE_RANGE.args(NAME, "0", "9") + "/data()", "0 1");
@@ -157,12 +146,11 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the fulltext() function.
+   * Test method.
    * @throws BaseXException database exception
    */
   @Test
-  public void dbFulltext() throws BaseXException {
-    check(_DB_FULLTEXT);
+  public void fulltext() throws BaseXException {
     // run function without and with index
     new DropIndex(Commands.CmdIndex.FULLTEXT).execute(context);
     error(_DB_FULLTEXT.args(NAME, "assignments"), Err.BXDB_INDEX);
@@ -172,12 +160,11 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the list() function.
+   * Test method.
    * @throws BaseXException database exception
    */
   @Test
-  public void dbList() throws BaseXException {
-    check(_DB_LIST);
+  public void list() throws BaseXException {
     // add documents
     new Add("test/docs", FLDR).execute(context);
     contains(_DB_LIST.args(NAME), "test/");
@@ -189,12 +176,9 @@ public final class FNDbTest extends AdvancedQueryTest {
     new DropDB(NAME + 2).execute(context);
   }
 
-  /**
-   * Test method for the list-details() function.
-   */
+  /** Test method. */
   @Test
-  public void dbListDetails() {
-    check(_DB_LIST_DETAILS);
+  public void listDetails() {
     query(_DB_ADD.args(NAME, "\"<a/>\"", "xml"));
     query(_DB_STORE.args(NAME, "raw", "bla"));
 
@@ -217,60 +201,42 @@ public final class FNDbTest extends AdvancedQueryTest {
     error(_DB_LIST_DETAILS.args("mostProbablyNotAvailable"), Err.BXDB_OPEN);
   }
 
-  /**
-   * Test method for the system() function.
-   */
+  /** Test method. */
   @Test
-  public void dbSystem() {
-    check(_DB_SYSTEM);
+  public void system() {
     contains(_DB_SYSTEM.args(), Prop.VERSION);
   }
 
-  /**
-   * Test method for the info() function.
-   */
+  /** Test method. */
   @Test
-  public void dbInfo() {
-    check(_DB_INFO);
+  public void info() {
     query("count(" + _DB_INFO.args(NAME) + "//" +
         SIZE.replaceAll(" |-", "").toLowerCase(Locale.ENGLISH) + ')', 1);
   }
 
-  /**
-   * Test method for node-id() function.
-   */
+  /** Test method. */
   @Test
-  public void dbNodeID() {
-    check(_DB_NODE_ID);
+  public void nodeID() {
     query(_DB_NODE_ID.args(" /html"), "1");
     query(_DB_NODE_ID.args(" / | /html"), "0 1");
   }
 
-  /**
-   * Test method for node-pre() function.
-   */
+  /** Test method. */
   @Test
-  public void dbNodePre() {
-    check(_DB_NODE_PRE);
+  public void nodePre() {
     query(_DB_NODE_PRE.args(" /html"), "1");
     query(_DB_NODE_PRE.args(" / | /html"), "0 1");
   }
 
-  /**
-   * Test method for event() function.
-   */
+  /** Test method. */
   @Test
-  public void dbEvent() {
-    check(_DB_EVENT);
+  public void event() {
     error(_DB_EVENT.args("X", "Y"), Err.BXDB_EVENT);
   }
 
-  /**
-   * Test method for output() function.
-   */
+  /** Test method. */
   @Test
-  public void dbOutput() {
-    check(_DB_OUTPUT);
+  public void output() {
     query(_DB_OUTPUT.args("x"), "x");
     query(_DB_OUTPUT.args("('x','y')"), "x y");
     query(_DB_OUTPUT.args("<a/>"), "<a/>");
@@ -278,12 +244,9 @@ public final class FNDbTest extends AdvancedQueryTest {
     error(_DB_OUTPUT.args(" count#1"), Err.FIVALUE);
   }
 
-  /**
-   * Test method for the add() function.
-   */
+  /** Test method. */
   @Test
-  public void dbAdd() {
-    check(_DB_ADD);
+  public void add() {
     query(_DB_ADD.args(NAME, "\"<root/>\"", "t1.xml"));
     query(COUNT.args(COLLECTION.args(NAME + "/t1.xml") + "/root"), "1");
 
@@ -312,34 +275,29 @@ public final class FNDbTest extends AdvancedQueryTest {
         COLLECTION.args('"' + NAME + "/doc\" || $i")), 3);
   }
 
-  /**
-   * Test method for the add() function with document with namespaces.
-   */
+  /** Test method. */
   @Test
-  public void dbAddWithNS() {
+  public void addWithNS() {
     query(_DB_ADD.args(NAME, " document { <x xmlns:a='a' a:y='' /> }", "x"));
   }
 
   /**
-   * Test method for the delete() function.
+   * Test method.
    * @throws BaseXException database exception
    */
   @Test
-  public void dbDelete() throws BaseXException {
-    check(_DB_DELETE);
+  public void delete() throws BaseXException {
     new Add("test/docs", FLDR).execute(context);
     query(_DB_DELETE.args(NAME, "test"));
     query(COUNT.args(COLLECTION.args(NAME + "/test")), 0);
   }
 
   /**
-   * Test method for the rename() function.
+   * Test method.
    * @throws BaseXException database exception
    */
   @Test
-  public void dbRename() throws BaseXException {
-    check(_DB_RENAME);
-
+  public void rename() throws BaseXException {
     new Add("test/docs", FLDR).execute(context);
     query(COUNT.args(COLLECTION.args(NAME + "/test")), NFLDR);
 
@@ -356,13 +314,11 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the replace() function.
+   * Test method.
    * @throws BaseXException database exception
    */
   @Test
-  public void dbReplace() throws BaseXException {
-    check(_DB_REPLACE);
-
+  public void replace() throws BaseXException {
     new Add("test", FILE).execute(context);
 
     query(_DB_REPLACE.args(NAME, FILE, "\"<R1/>\""));
@@ -379,23 +335,17 @@ public final class FNDbTest extends AdvancedQueryTest {
     query(COUNT.args(COLLECTION.args(NAME + '/' + FILE) + "/html"), 1);
   }
 
-  /**
-   * Test method for the optimize() function.
-   */
+  /** Test method. */
   @Test
-  public void dbOptimize() {
-    check(_DB_OPTIMIZE);
+  public void optimize() {
     query(_DB_OPTIMIZE.args(NAME));
     query(_DB_OPTIMIZE.args(NAME));
     query(_DB_OPTIMIZE.args(NAME, "true()"));
   }
 
-  /**
-   * Test method for the retrieve() function.
-   */
+  /** Test method. */
   @Test
-  public void dbRetrieve() {
-    check(_DB_RETRIEVE);
+  public void retrieve() {
     error(_DB_RETRIEVE.args(NAME, "raw"), Err.WHICHRES);
     query(_DB_STORE.args(NAME, "raw", "xs:hexBinary('41')"));
     query("xs:hexBinary(" + _DB_RETRIEVE.args(NAME, "raw") + ')', "41");
@@ -403,12 +353,9 @@ public final class FNDbTest extends AdvancedQueryTest {
     error(_DB_RETRIEVE.args(NAME, "raw"), Err.WHICHRES);
   }
 
-  /**
-   * Test method for the store() function.
-   */
+  /** Test method. */
   @Test
-  public void dbStore() {
-    check(_DB_STORE);
+  public void store() {
     query(_DB_STORE.args(NAME, "raw1", "xs:hexBinary('41')"));
     query(_DB_STORE.args(NAME, "raw2", "b"));
     query("xs:hexBinary(" + _DB_RETRIEVE.args(NAME, "raw2") + ')', "62");
@@ -416,22 +363,16 @@ public final class FNDbTest extends AdvancedQueryTest {
     query("xs:hexBinary(" + _DB_RETRIEVE.args(NAME, "raw3") + ')', "313233");
   }
 
-  /**
-   * Test method for the flush() function.
-   */
+  /** Test method. */
   @Test
-  public void dbFlush() {
-    check(_DB_FLUSH);
+  public void flush() {
     query(_DB_FLUSH.args(NAME));
     error(_DB_FLUSH.args(NAME + 'x'), Err.BXDB_OPEN);
   }
 
-  /**
-   * Test method for the is-raw() function.
-   */
+  /** Test method. */
   @Test
-  public void dbIsRaw() {
-    check(_DB_IS_RAW);
+  public void isRaw() {
     query(_DB_ADD.args(NAME, "\"<a/>\"", "xml"));
     query(_DB_STORE.args(NAME, "raw", "bla"));
     query(_DB_IS_RAW.args(NAME, "xml"), "false");
@@ -440,12 +381,11 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the exists() function.
+   * Test method.
    * @throws BaseXException database exception
    */
   @Test
-  public void dbExists() throws BaseXException {
-    check(_DB_EXISTS);
+  public void exists() throws BaseXException {
     query(_DB_ADD.args(NAME, "\"<a/>\"", "x/xml"));
     query(_DB_STORE.args(NAME, "x/raw", "bla"));
     // checks if the specified resources exist (false expected for directories)
@@ -460,12 +400,9 @@ public final class FNDbTest extends AdvancedQueryTest {
     query(_DB_EXISTS.args(NAME), "false");
   }
 
-  /**
-   * Test method for the is-xml() function.
-   */
+  /** Test method. */
   @Test
-  public void dbIsXML() {
-    check(_DB_IS_XML);
+  public void isXML() {
     query(_DB_ADD.args(NAME, "\"<a/>\"", "xml"));
     query(_DB_STORE.args(NAME, "raw", "bla"));
     query(_DB_IS_XML.args(NAME, "xml"), "true");
@@ -473,12 +410,9 @@ public final class FNDbTest extends AdvancedQueryTest {
     query(_DB_IS_XML.args(NAME, "xxx"), "false");
   }
 
-  /**
-   * Test method for the content-type() function.
-   */
+  /** Test method. */
   @Test
-  public void dbContentType() {
-    check(_DB_CONTENT_TYPE);
+  public void contentType() {
     query(_DB_ADD.args(NAME, "\"<a/>\"", "xml"));
     query(_DB_STORE.args(NAME, "raw", "bla"));
     query(_DB_CONTENT_TYPE.args(NAME, "xml"), MimeTypes.APP_XML);

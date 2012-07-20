@@ -13,34 +13,30 @@ import org.junit.*;
  * @author Christian Gruen
  */
 public final class FNHashTest extends AdvancedQueryTest {
-  /** Test method for the md5() function. */
+  /** Test method. */
   @Test
-  public void utilMd5() {
-    check(_HASH_MD5);
+  public void md5() {
     query(_HASH_MD5.args(""), "1B2M2Y8AsgTpgAmY7PhCfg==");
     query(_HASH_MD5.args("BaseX"), "DWUYXJ4pYxHAoiABeeR5og==");
   }
 
-  /** Test method for the sha1() function. */
+  /** Test method. */
   @Test
-  public void utilSha1() {
-    check(_HASH_SHA1);
+  public void sha1() {
     query(_HASH_SHA1.args(""), "2jmj7l5rSw0yVb/vlWAYkK/YBwk=");
     query(_HASH_SHA1.args("BaseX"), "OtWVjw8n1a/9yilXVg8SHQWXpO0=");
   }
 
-  /** Test method for the sha256() function. */
+  /** Test method. */
   @Test
-  public void utilSha256() {
-    check(_HASH_SHA256);
+  public void sha256() {
     query(_HASH_SHA256.args(""), "47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=");
     query(_HASH_SHA256.args("BaseX"), "FdVwdj3rddcou2lkM5KHO4NczMlKLx6IGQnaR2YoIaM=");
   }
 
-  /** Test method for the hash() function. */
+  /** Test method. */
   @Test
-  public void utilHash() {
-    check(_HASH_HASH);
+  public void hash() {
     query(_HASH_HASH.args("", "MD5"), "1B2M2Y8AsgTpgAmY7PhCfg==");
     query(_HASH_HASH.args("", "md5"), "1B2M2Y8AsgTpgAmY7PhCfg==");
     query(_HASH_HASH.args("", "SHA"), "2jmj7l5rSw0yVb/vlWAYkK/YBwk=");

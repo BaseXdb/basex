@@ -18,12 +18,9 @@ public final class FNArchiveTest extends AdvancedQueryTest {
   /** Test GZIP file. */
   private static final String GZIP = "src/test/resources/xml.gz";
 
-  /**
-   * Test method for the create() function.
-   */
+  /** Test method. */
   @Test
-  public void archiveCreate() {
-    check(_ARCHIVE_CREATE);
+  public void create() {
     // simple zip files
     query(COUNT.args(_ARCHIVE_CREATE.args("X", "")), "1");
     // simple zip files
@@ -85,12 +82,9 @@ public final class FNArchiveTest extends AdvancedQueryTest {
         Err.ARCH_ONE);
   }
 
-  /**
-   * Test method for the entries() function.
-   */
+  /** Test method. */
   @Test
-  public void archiveEntries() {
-    check(_ARCHIVE_ENTRIES);
+  public void entries() {
     // read entries
     query(COUNT.args(_ARCHIVE_ENTRIES.args(_FILE_READ_BINARY.args(ZIP))), "5");
     // simple zip files
@@ -101,12 +95,9 @@ public final class FNArchiveTest extends AdvancedQueryTest {
         "[not(@size)][not(@last-modified)][not(@compressed-size)][not(text())]"), "1");
   }
 
-  /**
-   * Test method for the options() function.
-   */
+  /** Test method. */
   @Test
-  public void archiveOptions() {
-    check(_ARCHIVE_OPTIONS);
+  public void options() {
     // read entries
     query(_ARCHIVE_OPTIONS.args(_FILE_READ_BINARY.args(ZIP)) + "//@value/data()",
         "zip deflate");
@@ -114,12 +105,9 @@ public final class FNArchiveTest extends AdvancedQueryTest {
         "gzip deflate");
   }
 
-  /**
-   * Test method for the extract-texts() function.
-   */
+  /** Test method. */
   @Test
-  public void archiveExtractTexts() {
-    check(_ARCHIVE_EXTRACT_TEXT);
+  public void extractText() {
     // extract all entries
     query(COUNT.args(_ARCHIVE_EXTRACT_TEXT.args(_FILE_READ_BINARY.args(ZIP))), "5");
     // extract all entries
@@ -139,12 +127,9 @@ public final class FNArchiveTest extends AdvancedQueryTest {
           "return $c//title/text()", "XML");
   }
 
-  /**
-   * Test method for the extract-binaries() function.
-   */
+  /** Test method. */
   @Test
-  public void archiveExtractBinary() {
-    check(_ARCHIVE_EXTRACT_BINARY);
+  public void extractBinary() {
     // extract all entries
     query(COUNT.args(_ARCHIVE_EXTRACT_BINARY.args(_FILE_READ_BINARY.args(ZIP))), "5");
     // extract all entries
@@ -166,12 +151,9 @@ public final class FNArchiveTest extends AdvancedQueryTest {
           "return $d//title/text()", "XML");
   }
 
-  /**
-   * Test method for the update() function.
-   */
+  /** Test method. */
   @Test
-  public void archiveUpdate() {
-    check(_ARCHIVE_UPDATE);
+  public void update() {
     // add a new entry
     query(_FILE_READ_BINARY.args(ZIP) + " ! " +
         _ARCHIVE_UPDATE.args(" .", "X", "X") + " ! " +
@@ -193,12 +175,9 @@ public final class FNArchiveTest extends AdvancedQueryTest {
         _ARCHIVE_UPDATE.args(" .", "X", "Y"), Err.ARCH_MODIFY);
   }
 
-  /**
-   * Test method for the delete() function.
-   */
+  /** Test method. */
   @Test
-  public void archiveDelete() {
-    check(_ARCHIVE_DELETE);
+  public void delete() {
     // delete single entry
     query("let $a := " + _FILE_READ_BINARY.args(ZIP) +
           "let $b := " + _ARCHIVE_DELETE.args("$a", "infos/stopWords") +

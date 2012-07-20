@@ -5,7 +5,6 @@ import static org.junit.Assert.*;
 
 import java.util.*;
 
-import org.basex.query.func.*;
 import org.basex.test.query.*;
 import org.junit.*;
 
@@ -16,55 +15,34 @@ import org.junit.*;
  * @author Dirk Kirsten
  */
 public final class FNRandomTest extends AdvancedQueryTest {
-  /**
-   * Checks {@link FNRandom} functions for correct argument handling.
-   */
+  /** Test method. */
   @Test
-  public void checkFunctionArguments() {
-    check(_RANDOM_DOUBLE);
-    check(_RANDOM_INTEGER);
-    check(_RANDOM_SEEDED_DOUBLE);
-    check(_RANDOM_SEEDED_INTEGER);
-    check(_RANDOM_GAUSSIAN);
-    check(_RANDOM_UUID);
-  }
-
-  /**
-   * Test method for the random:double() function.
-   */
-  @Test
-  public void randomDouble() {
+  public void doubleTest() {
     final Double i1 = Double.valueOf(query(_RANDOM_DOUBLE.args()));
     final Double i2 = Double.valueOf(query(_RANDOM_DOUBLE.args()));
     assertTrue(!i1.equals(i2) && i1 >= 0.0 && i1 < 1.0);
   }
 
-  /**
-   * Test method for the random:seeded-double() function.
-   */
+  /** Test method. */
   @Test
-  public void randomSeededDouble() {
+  public void seededDouble() {
     int num = 5;
     Random r = new Random();
     Integer seed = r.nextInt();
     query(_RANDOM_SEEDED_DOUBLE.args(seed, num));
   }
 
-  /**
-   * Test method for the random:integer() function.
-   */
+  /** Test method. */
   @Test
-  public void randomInt() {
+  public void integer() {
     final Integer i1 = Integer.valueOf(query(_RANDOM_INTEGER.args()));
     final Integer i2 = Integer.valueOf(query(_RANDOM_INTEGER.args(5)));
     assertTrue(!i1.equals(i2) && i2 >= 0 && i2 < 5);
   }
 
-  /**
-   * Test method for the random:seeded-integer() function.
-   */
+  /** Test method. */
   @Test
-  public void randomSeededInt() {
+  public void seededInteger() {
     int num = 5;
     Random r = new Random();
     Integer seed = r.nextInt();
@@ -72,20 +50,16 @@ public final class FNRandomTest extends AdvancedQueryTest {
     query(_RANDOM_SEEDED_INTEGER.args(seed, num, 1000000));
   }
 
-  /**
-   * Test method for the random:gaussian() function.
-   */
+  /** Test method. */
   @Test
-  public void randomGaussian() {
+  public void gaussian() {
     int num = 50;
     query(_RANDOM_GAUSSIAN.args(num));
   }
 
-  /**
-   * Test method for the random:uuid() function.
-   */
+  /** Test method. */
   @Test
-  public void randomUuid() {
+  public void uuid() {
     final String s1 = query(_RANDOM_UUID.args());
     final String s2 = query(_RANDOM_UUID.args());
     assertTrue(!s1.equals(s2));

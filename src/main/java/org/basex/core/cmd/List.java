@@ -23,7 +23,8 @@ import org.basex.util.list.*;
  */
 public final class List extends Command {
   /** Pattern to extract the database name from a backup file name. */
-  private static final Pattern PA = Pattern.compile(IO.DATEPATTERN + IO.ZIPSUFFIX + '$');
+  private static final Pattern PA =
+      Pattern.compile(DateTime.PATTERN + IO.ZIPSUFFIX + '$');
 
   /**
    * Default constructor.

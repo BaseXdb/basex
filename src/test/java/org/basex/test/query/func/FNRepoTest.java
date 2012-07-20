@@ -26,9 +26,7 @@ public class FNRepoTest extends AdvancedQueryTest {
   /** Pkg3 directory. */
   private static final String PKG3ID = PKG3 + "-10.0";
 
-  /**
-   * Prepare test.
-   */
+  /** Prepares a test. */
   @Before
   public void setupTest() {
     context = new Context();
@@ -36,12 +34,9 @@ public class FNRepoTest extends AdvancedQueryTest {
     new IOFile(REPO, PKG3ID).delete();
   }
 
-  /**
-   * Test method for pkg:install().
-   */
+  /** Test method. */
   @Test
   public void install() {
-    check(_REPO_INSTALL);
     query(_REPO_INSTALL.args(REPO + "pkg3.xar"));
     final String dir = normalize(PKG3ID);
     assertTrue(dir(dir));
@@ -52,12 +47,9 @@ public class FNRepoTest extends AdvancedQueryTest {
     query(_REPO_DELETE.args(PKG3));
   }
 
-  /**
-   * Test method for pkg:delete().
-   */
+  /** Test method. */
   @Test
   public void delete() {
-    check(_REPO_DELETE);
     // install
     query(_REPO_INSTALL.args(REPO + "pkg3.xar"));
     // delete by package name
@@ -73,12 +65,9 @@ public class FNRepoTest extends AdvancedQueryTest {
     assertTrue(!dir(dir));
   }
 
-  /**
-   * Test method for pkg:list().
-   */
+  /** Test method. */
   @Test
   public void list() {
-    check(_REPO_LIST);
     // install pkg3
     query(_REPO_INSTALL.args(REPO + "pkg3.xar"));
     // install pkg4

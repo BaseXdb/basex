@@ -3,7 +3,6 @@ package org.basex.server;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.text.*;
 import java.util.*;
 
 import org.basex.core.*;
@@ -17,11 +16,6 @@ import org.basex.util.*;
  * @author Andreas Weiler
  */
 public final class Log {
-  /** Date format. */
-  private static final DateFormat DATE = new SimpleDateFormat("yyyy-MM-dd");
-  /** Time format. */
-  private static final DateFormat TIME = new SimpleDateFormat("HH:mm:ss.SSS");
-
   /** Quiet flag. */
   private final boolean quiet;
   /** Logging directory. */
@@ -61,13 +55,13 @@ public final class Log {
 
     // check if current log file is still up-to-date
     final Date now = new Date();
-    if(!start.equals(DATE.format(now))) {
+    if(!start.equals(DateTime.format(now, DateTime.DATE))) {
       close();
       create(now);
     }
 
     // construct log text
-    final TokenBuilder tb = new TokenBuilder(TIME.format(now));
+    final TokenBuilder tb = new TokenBuilder(DateTime.format(now, DateTime.TIME));
     for(final Object s : str) {
       tb.add('\t');
       tb.add(chop(token(s.toString().replaceAll("[\\r\\n ]+", " ")), 1000));
@@ -89,7 +83,7 @@ public final class Log {
    */
   private void create(final Date d) {
     dir.md();
-    synchronized(DATE) { start = DATE.format(d); }
+    start = DateTime.format(d, DateTime.DATE);
     try {
       fos = new FileOutputStream(new IOFile(dir, start + ".log").file(), true);
     } catch(final IOException ex) {

@@ -654,8 +654,6 @@ public enum Err {
   /** XPST0017. */
   FUNCUNKNOWN(XPST, 17, "Unknown function: %(...)."),
   /** XPST0017. */
-  EXTERNALFUNC(XPST, 17, "Unbound external function: %(...)."),
-  /** XPST0017. */
   WHICHJAVA(XPST, 17, "Java function '%(...)' not found."),
   /** XPST0017. */
   JAVAAMB(XPST, 17, "Signature is ambiguous: '%(...)'."),

@@ -1,7 +1,6 @@
 package org.basex.io;
 
 import java.io.*;
-import java.text.*;
 import java.util.*;
 
 import org.basex.data.*;
@@ -39,10 +38,6 @@ public abstract class IO {
   public static final String XARSUFFIX = ".xar";
   /** File prefix. */
   public static final String FILEPREF = "file:";
-  /** Date format which is appended to backups. */
-  public static final SimpleDateFormat DATE = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
-  /** Date pattern. */
-  public static final String DATEPATTERN = "-\\d{4}-\\d{2}-\\d{2}-\\d{2}-\\d{2}-\\d{2}";
 
   /** XQuery suffixes. */
   public static final String[] XQSUFFIXES =

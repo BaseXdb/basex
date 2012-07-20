@@ -4,7 +4,6 @@ import static org.basex.query.func.Function.*;
 import static org.basex.data.DataText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-import static org.basex.util.Util.*;
 
 import java.io.*;
 import java.util.*;
@@ -323,7 +322,7 @@ public final class FNDb extends StandardFunc {
           di = new DataInput(meta.dbfile(DATAINF));
           meta.read(di);
           res.add(Q_RESOURCES, token(meta.ndocs));
-          final String tstamp = formatDate(new Date(meta.dbtime()), Dtm.FORMAT);
+          final String tstamp = DateTime.format(new Date(meta.dbtime()), DateTime.FULL);
           res.add(Q_MDATE, token(tstamp));
           if(ctx.context.perm(Perm.CREATE, meta)) res.add(Q_PATH, token(meta.original));
           res.add(token(name));
@@ -424,7 +423,7 @@ public final class FNDb extends StandardFunc {
   static FNode resource(final byte[] path, final boolean raw, final long size,
       final byte[] ctype, final long mdate) {
 
-    final String tstamp = formatDate(new Date(mdate), Dtm.FORMAT);
+    final String tstamp = DateTime.format(new Date(mdate), DateTime.FULL);
     final FElem res = new FElem(Q_RESOURCE).add(path).
         add(Q_RAW, token(raw)).add(Q_CTYPE, ctype).add(Q_MDATE, token(tstamp));
     return raw ? res.add(Q_SIZE, token(size)) : res;
