@@ -192,7 +192,7 @@ public class GFLWOR extends ParseExpr {
       /* move clauses upwards that contain a single value.
          non-deterministic expressions or fragment constructors creating
          unique nodes are ignored. example:
-         for $a in 1 to 2 let $b := math:random() return $b
+         for $a in 1 to 2 let $b := random:double() return $b
        */
       if(in.size() != 1 || in.uses(Use.NDT) || in.uses(Use.CNS)) continue;
 

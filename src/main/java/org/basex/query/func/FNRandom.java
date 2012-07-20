@@ -29,19 +29,19 @@ public final class FNRandom extends StandardFunc {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
-      case _RANDOM_DOUBLE: return Dbl.get(randomDouble());
+      case _RANDOM_DOUBLE:  return Dbl.get(randomDouble());
       case _RANDOM_INTEGER: return Int.get(randomInt(ctx));
-      case _RANDOM_UUID:   return Str.get(UUID.randomUUID());
-      default:           return super.item(ctx, ii);
+      case _RANDOM_UUID:    return Str.get(UUID.randomUUID());
+      default:              return super.item(ctx, ii);
     }
   }
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(sig) {
-      case _RANDOM_SEEDED_DOUBLE: return randomSeededDouble(ctx);
+      case _RANDOM_SEEDED_DOUBLE:  return randomSeededDouble(ctx);
       case _RANDOM_SEEDED_INTEGER: return randomSeededInt(ctx);
-      case _RANDOM_GAUSSIAN: return randomGaussian(ctx);
-      default:              return super.iter(ctx);
+      case _RANDOM_GAUSSIAN:       return randomGaussian(ctx);
+      default:                     return super.iter(ctx);
     }
   }
 
@@ -53,13 +53,8 @@ public final class FNRandom extends StandardFunc {
    * @throws QueryException query exception
    */
   private int randomInt(final QueryContext ctx) throws QueryException {
-    Random r = new Random();
-    if (expr.length == 1) {
-      int max = (int) checkItr(expr[0], ctx);
-      return r.nextInt(max);
-    }
-
-    return r.nextInt();
+    final Random r = new Random();
+    return expr.length == 1 ? r.nextInt((int) checkItr(expr[0], ctx)) : r.nextInt();
   }
 
   /**
@@ -82,7 +77,7 @@ public final class FNRandom extends StandardFunc {
       public Item next() throws QueryException {
         if (expr.length == 3) {
           // max defined
-          int max = (int) checkItr(expr[2], ctx);
+          final int max = (int) checkItr(expr[2], ctx);
           return ++count <= num ? Int.get(r.nextInt(max)) : null;
         }
         // no max given
@@ -96,8 +91,7 @@ public final class FNRandom extends StandardFunc {
    * @return random double
    */
   private double randomDouble() {
-    Random r = new Random();
-    return r.nextDouble();
+    return new Random().nextDouble();
   }
 
   /**
@@ -123,7 +117,7 @@ public final class FNRandom extends StandardFunc {
 
   /**
    * Returns a sequence of random doubles with exactly $num items
-   * using a gaussian (i.e. normal) distribution with a mean of 0.0
+   * using a Gaussian (i.e. normal) distribution with a mean of 0.0
    * and a derivation of 1.0
    * @param ctx query context
    * @return random double
@@ -144,6 +138,6 @@ public final class FNRandom extends StandardFunc {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X30 || u == Use.NDT || super.uses(u);
+    return u == Use.NDT || super.uses(u);
   }
 }

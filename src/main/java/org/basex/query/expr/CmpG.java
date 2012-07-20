@@ -301,7 +301,7 @@ public final class CmpG extends Cmp {
          expression depends on context, or if it is non-deterministic. examples:
          //*[text() = 1]
          //*[text() = .]
-         //*[text() = (if(math:random() < .5) then 'X' else 'Y')]
+         //*[text() = (if(random:double() < .5) then 'X' else 'Y')]
        */
       if(!t.type.isString() && !t.type.isNode() || arg.uses(Use.CTX) || arg.uses(Use.NDT))
         return false;

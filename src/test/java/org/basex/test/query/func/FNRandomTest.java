@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 
 import java.util.*;
 
+import org.basex.query.func.*;
 import org.basex.test.query.*;
 import org.junit.*;
 
@@ -16,7 +17,7 @@ import org.junit.*;
  */
 public final class FNRandomTest extends AdvancedQueryTest {
   /**
-   * Checks FNRAndom functions for correct argument handling.
+   * Checks {@link FNRandom} functions for correct argument handling.
    */
   @Test
   public void checkFunctionArguments() {
@@ -29,7 +30,7 @@ public final class FNRandomTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the random:random-double() function.
+   * Test method for the random:double() function.
    */
   @Test
   public void randomDouble() {
@@ -39,7 +40,7 @@ public final class FNRandomTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the random:seeded-random-double() function.
+   * Test method for the random:seeded-double() function.
    */
   @Test
   public void randomSeededDouble() {
@@ -50,7 +51,7 @@ public final class FNRandomTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the random:random-int() function.
+   * Test method for the random:integer() function.
    */
   @Test
   public void randomInt() {
@@ -60,7 +61,7 @@ public final class FNRandomTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the random:seeded-random-int() function.
+   * Test method for the random:seeded-integer() function.
    */
   @Test
   public void randomSeededInt() {
@@ -72,7 +73,7 @@ public final class FNRandomTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the random:random-gaussian() function.
+   * Test method for the random:gaussian() function.
    */
   @Test
   public void randomGaussian() {

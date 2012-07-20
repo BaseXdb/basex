@@ -99,7 +99,7 @@ public class Filter extends Preds {
     }
 
     // only choose deterministic and context-independent offsets; e.g., skip:
-    // (1 to 10)[xs:int(math:random() * 10)]  or  (1 to 10)[.]
+    // (1 to 10)[random:integer(10)]  or  (1 to 10)[.]
     boolean off = false;
     if(preds.length == 1) {
       final Expr p = preds[0];
