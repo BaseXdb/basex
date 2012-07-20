@@ -40,7 +40,18 @@ public final class Util {
     tb.add(NL).add("OS: ").add(System.getProperty("os.name"));
     tb.add(", ").add(System.getProperty("os.arch"));
     tb.add(NL).add("Stack Trace: ");
-    for(final String e : toArray(ex)) tb.add(NL).add(e);
+
+    Throwable t = ex;
+    while (true) {
+      for(final String e : toArray(t)) tb.add(NL).add(e);
+      t = t.getCause();  // we can be sure that this never recurses
+      if (t != null) {
+        tb.add(NL).add("Caused by:");
+      } else {
+        break;
+      }
+    }
+
     return tb.toString();
   }
 
