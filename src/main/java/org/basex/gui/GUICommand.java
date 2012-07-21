@@ -22,7 +22,7 @@ public interface GUICommand {
     @Override
     public String help() { return null; }
     @Override
-    public String key() { return null; }};
+    public String key() { return null; } };
 
   /**
    * Executes the command.

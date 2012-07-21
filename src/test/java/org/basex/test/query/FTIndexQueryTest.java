@@ -95,7 +95,7 @@ public final class FTIndexQueryTest extends SandboxTest {
       assertEquals("Query failed:\n" + q + '\n',
           new XQuery(q).execute(context), new XQuery(q).execute(CTX_IX));
       // [DP]: assert that index was really used
-    } catch (final BaseXException e) {
+    } catch(final BaseXException e) {
       fail("Query failed:\n" + q + "\nMessage: " + e.getMessage());
     }
   }

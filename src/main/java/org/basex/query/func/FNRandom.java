@@ -75,7 +75,7 @@ public final class FNRandom extends StandardFunc {
 
       @Override
       public Item next() throws QueryException {
-        if (expr.length == 3) {
+        if(expr.length == 3) {
           // max defined
           final int max = (int) checkItr(expr[2], ctx);
           return ++count <= num ? Int.get(r.nextInt(max)) : null;

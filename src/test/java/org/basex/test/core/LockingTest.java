@@ -137,16 +137,16 @@ public final class LockingTest extends SandboxTest {
         ^ test2.await(WAIT, TimeUnit.MILLISECONDS));
 
     boolean first = false;
-    if (test1.await(0, TimeUnit.MILLISECONDS)) {
+    if(test1.await(0, TimeUnit.MILLISECONDS)) {
       thread1.release();
       first = true;
     }
-    if (test2.await(0, TimeUnit.MILLISECONDS)) thread2.release();
+    if(test2.await(0, TimeUnit.MILLISECONDS)) thread2.release();
     assertTrue("Both threads should be finished now.",
         test1.await(WAIT, TimeUnit.MILLISECONDS)
         && test2.await(WAIT, TimeUnit.MILLISECONDS));
 
-    if (first) thread2.release();
+    if(first) thread2.release();
     else thread1.release();
   }
 

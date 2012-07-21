@@ -282,7 +282,7 @@ public final class TreeView extends View implements TreeConstants {
     final int mw = wwidth >> 1;
     final int mh = wheight >> 1;
     String message = "";
-    switch(t){
+    switch(t) {
       case NOT_ENOUGH_SPACE: message = NO_SPACE;
       break;
       case NO_ATTS: message = "Enable attributes in Tree Options.";

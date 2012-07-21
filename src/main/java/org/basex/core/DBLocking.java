@@ -58,7 +58,7 @@ public final class DBLocking implements ILocking {
   @Override
   public void acquire(final Progress pr, final StringList db) {
     final Thread thread = Thread.currentThread();
-    if (locked.containsKey(thread))
+    if(locked.containsKey(thread))
       throw new IllegalMonitorStateException("Thread already holds one or more locks.");
 
     // Wait in queue if necessary
@@ -113,7 +113,7 @@ public final class DBLocking implements ILocking {
     // Unlock all locks, no matter if read or write lock
     for(final Object object : objects) {
       final ReentrantReadWriteLock lock = locks.get(object);
-      if (lock.isWriteLockedByCurrentThread())
+      if(lock.isWriteLockedByCurrentThread())
         lock.writeLock().unlock();
       else
         lock.readLock().unlock();
@@ -139,10 +139,10 @@ public final class DBLocking implements ILocking {
     sb.append(ind + "Transactions running: " + transactions.get() + nl);
     sb.append(ind + "Transaction queue: " + queue + nl);
     sb.append(ind + "Held locks by object:" + nl);
-    for (final Object object : locks.keySet())
+    for(final Object object : locks.keySet())
       sb.append(ind + ind + object + " -> " + locks.get(object) + nl);
     sb.append(ind + "Held locks by transaction:" + nl);
-    for (final Thread thread : locked.keySet())
+    for(final Thread thread : locked.keySet())
       sb.append(ind + ind + thread + " -> " + locked.get(thread) + nl);
     return sb.toString();
   }

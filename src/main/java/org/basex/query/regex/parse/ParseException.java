@@ -96,13 +96,13 @@ public class ParseException extends Exception {
     final StringBuilder expected = new StringBuilder();
     int maxSize = 0;
     for(final int[] exp : exps) {
-      if (maxSize < exp.length) {
+      if(maxSize < exp.length) {
         maxSize = exp.length;
       }
       for(final int e : exp) {
         expected.append(img[e]).append(' ');
       }
-      if (exp[exp.length - 1] != 0) {
+      if(exp[exp.length - 1] != 0) {
         expected.append("...");
       }
       expected.append(eol).append("    ");
@@ -110,8 +110,8 @@ public class ParseException extends Exception {
     String retval = "Encountered \"";
     Token tok = curr.next;
     for (int i = 0; i < maxSize; i++) {
-      if (i != 0) retval += " ";
-      if (tok.kind == 0) {
+      if(i != 0) retval += " ";
+      if(tok.kind == 0) {
         retval += img[0];
         break;
       }
@@ -176,7 +176,7 @@ public class ParseException extends Exception {
               retval.append("\\\\");
               continue;
            default:
-              if ((ch = str.charAt(i)) < 0x20 || ch > 0x7e) {
+              if((ch = str.charAt(i)) < 0x20 || ch > 0x7e) {
                  final String s = "0000" + Integer.toString(ch, 16);
                  retval.append("\\u" + s.substring(s.length() - 4, s.length()));
               } else {

@@ -80,7 +80,7 @@ class DialogAdd extends BaseXBack {
       };
       DialogProgress.execute(dialog, run, new Add(trg, src));
 
-    } else if (comp == optimize) {
+    } else if(comp == optimize) {
       DialogProgress.execute(dialog, new Optimize());
 
     } else {

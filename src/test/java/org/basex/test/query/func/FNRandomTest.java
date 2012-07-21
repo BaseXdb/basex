@@ -26,9 +26,9 @@ public final class FNRandomTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void seededDouble() {
-    int num = 5;
-    Random r = new Random();
-    Integer seed = r.nextInt();
+    final int num = 5;
+    final Random r = new Random();
+    final Integer seed = r.nextInt();
     query(_RANDOM_SEEDED_DOUBLE.args(seed, num));
   }
 
@@ -43,9 +43,9 @@ public final class FNRandomTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void seededInteger() {
-    int num = 5;
-    Random r = new Random();
-    Integer seed = r.nextInt();
+    final int num = 5;
+    final Random r = new Random();
+    final Integer seed = r.nextInt();
     query(_RANDOM_SEEDED_INTEGER.args(seed, num));
     query(_RANDOM_SEEDED_INTEGER.args(seed, num, 1000000));
   }
@@ -53,7 +53,7 @@ public final class FNRandomTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void gaussian() {
-    int num = 50;
+    final int num = 50;
     query(_RANDOM_GAUSSIAN.args(num));
   }
 

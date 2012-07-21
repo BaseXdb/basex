@@ -40,7 +40,7 @@ public final class MinHeap<K, V> {
 
     // let the inserted value bubble up to its position
     int curr = size++, par = (curr - 1) / 2;
-    while (curr > 0 && compare(curr, par) < 0) {
+    while(curr > 0 && compare(curr, par) < 0) {
       swap(curr, par);
       curr = par;
       par = (curr - 1) / 2;
@@ -57,8 +57,8 @@ public final class MinHeap<K, V> {
     int pos = 0, sm;
     while(pos < size / 2) {
       sm = 2 * pos + 1;
-      if (sm < size - 1 && compare(sm + 1, sm) < 0) sm++;
-      if (compare(pos, sm) <= 0) break;
+      if(sm < size - 1 && compare(sm + 1, sm) < 0) sm++;
+      if(compare(pos, sm) <= 0) break;
       swap(pos, sm);
       pos = sm;
     }

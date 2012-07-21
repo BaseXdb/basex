@@ -165,7 +165,7 @@ public final class FTBitapSearchTest {
             fail("Test " + i + ", result " + j + ": expected " +
                 TESTS[i].expected[j] + ", got " + pos);
         }
-        if (s.hasNext())
+        if(s.hasNext())
           fail("Test " + i + ": expected " + TESTS[i].expected.length +
               " hits, got more!");
       }

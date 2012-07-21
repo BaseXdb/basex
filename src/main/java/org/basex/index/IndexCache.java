@@ -18,8 +18,6 @@ public final class IndexCache {
   private final ReferenceQueue<IndexEntry> queue = new ReferenceQueue<IndexEntry>();
   /** Read-write lock. */
   private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock(true);
-  private final ReentrantReadWriteLock.ReadLock readLock = rwl.readLock();
-  private final ReentrantReadWriteLock.WriteLock writeLock = rwl.writeLock();
   /** Hash table buckets. */
   private BucketEntry[] buckets = new BucketEntry[ElementList.CAP];
   /** Number of entries in the cache. */
@@ -32,7 +30,7 @@ public final class IndexCache {
    */
   public IndexEntry get(final byte[] key) {
     final int hash = hash(key);
-    readLock.lock();
+    rwl.readLock().lock();
 
     try {
       final int i = indexFor(hash, buckets.length);
@@ -43,7 +41,7 @@ public final class IndexCache {
         e = e.next;
       }
     } finally {
-      readLock.unlock();
+      rwl.readLock().unlock();
     }
 
     return null;
@@ -59,7 +57,7 @@ public final class IndexCache {
    */
   public IndexEntry add(final byte[] key, final int s, final long p) {
     final int hash = hash(key);
-    writeLock.lock();
+    rwl.writeLock().lock();
 
     try {
       purge();
@@ -85,7 +83,7 @@ public final class IndexCache {
       add(i, hash, entry);
       return entry;
     } finally {
-      writeLock.unlock();
+      rwl.writeLock().unlock();
     }
   }
 
@@ -95,7 +93,7 @@ public final class IndexCache {
    */
   public void delete(final byte[] key) {
     final int hash = hash(key);
-    writeLock.lock();
+    rwl.writeLock().lock();
 
     try {
       purge();
@@ -117,7 +115,7 @@ public final class IndexCache {
         e = next;
       }
     } finally {
-      writeLock.unlock();
+      rwl.writeLock().unlock();
     }
   }
 
@@ -158,12 +156,12 @@ public final class IndexCache {
   /**
    * Update an existing index entry.
    * @param entry index entry to update
-   * @param size new size
-   * @param pointer new pointer
+   * @param sz new size
+   * @param poi new pointer
    */
-  private void update(final IndexEntry entry, final int size, final long pointer) {
-    entry.size = size;
-    entry.pointer = pointer;
+  private void update(final IndexEntry entry, final int sz, final long poi) {
+    entry.size = sz;
+    entry.pointer = poi;
   }
 
   /**

@@ -124,7 +124,7 @@ public final class FNConvert extends StandardFunc {
       tb.add(DIGITS[(int) (n % base)]);
       n /= base;
     }
-    while (n != 0) {
+    while(n != 0) {
       tb.add(DIGITS[(int) (n % base)]);
       n /= base;
     }

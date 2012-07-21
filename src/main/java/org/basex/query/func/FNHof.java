@@ -137,7 +137,7 @@ public final class FNHof extends StandardFunc {
 
     final Iter iter = expr[0].iter(ctx);
     final MinHeap<Item, Item> heap = new MinHeap<Item, Item>((int) k,
-        new Comparator<Item>(){
+        new Comparator<Item>() {
       @Override
       public int compare(final Item it1, final Item it2) {
         try {
@@ -198,7 +198,7 @@ public final class FNHof extends StandardFunc {
   private Comparator<Item> getComp(final int pos, final QueryContext ctx)
       throws QueryException {
     final FItem lt = withArity(pos, 2, ctx);
-    return new Comparator<Item>(){
+    return new Comparator<Item>() {
       @Override
       public int compare(final Item a, final Item b) {
         try {
