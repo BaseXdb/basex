@@ -233,7 +233,7 @@ public final class FTIndex implements Index {
     final long l = inX.length() + inY.length() + inZ.length();
     tb.add(LI_SIZE + Performance.format(l, true) + NL);
 
-    final IndexStats stats = new IndexStats(data);
+    final IndexStats stats = new IndexStats(data.meta.prop.num(Prop.MAXSTAT));
     addOccs(stats);
     stats.print(tb);
     return tb.finish();

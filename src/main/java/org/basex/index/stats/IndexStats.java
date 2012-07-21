@@ -2,8 +2,6 @@ package org.basex.index.stats;
 
 import static org.basex.core.Text.*;
 
-import org.basex.core.*;
-import org.basex.data.*;
 import org.basex.util.*;
 
 /**
@@ -30,10 +28,10 @@ public final class IndexStats {
 
   /**
    * Default constructor.
-   * @param d data reference
+   * @param maxstat maximum number of index occurrences to print
    */
-  public IndexStats(final Data d) {
-    max = d.meta.prop.num(Prop.MAXSTAT);
+  public IndexStats(final int maxstat) {
+    max = maxstat;
     occMin = new int[max];
     occMax = new int[max];
     txtMin = new byte[max][];

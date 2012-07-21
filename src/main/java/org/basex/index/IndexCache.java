@@ -3,6 +3,7 @@ package org.basex.index;
 import static org.basex.util.Token.*;
 
 import java.lang.ref.*;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.basex.util.list.*;
 
@@ -15,8 +16,12 @@ import org.basex.util.list.*;
 public final class IndexCache {
   /** Queue used to collect unused keys. */
   private final ReferenceQueue<IndexEntry> queue = new ReferenceQueue<IndexEntry>();
+  /** Read-write lock. */
+  private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock(true);
+  private final ReentrantReadWriteLock.ReadLock readLock = rwl.readLock();
+  private final ReentrantReadWriteLock.WriteLock writeLock = rwl.writeLock();
   /** Hash table buckets. */
-  private BucketEntry[] bucket = new BucketEntry[ElementList.CAP];
+  private BucketEntry[] buckets = new BucketEntry[ElementList.CAP];
   /** Number of entries in the cache. */
   private int size;
 
@@ -26,24 +31,21 @@ public final class IndexCache {
    * @return cached entry or {@code null} if the entry is stale
    */
   public IndexEntry get(final byte[] key) {
-    purge();
-
     final int hash = hash(key);
-    final int i = indexFor(hash, bucket.length);
+    readLock.lock();
 
-    BucketEntry e = bucket[i];
-    BucketEntry prev = e;
-    while(e != null) {
-      final BucketEntry next = e.next;
-      final IndexEntry entry = e.get();
-      if(entry == null) {
-        delete(i, e, prev, next);
-      } else if(e.hash == hash && eq(entry.key, key)) {
-        return entry;
+    try {
+      final int i = indexFor(hash, buckets.length);
+      BucketEntry e = buckets[i];
+      while(e != null) {
+        final IndexEntry entry = e.get();
+        if(entry != null && e.hash == hash && eq(entry.key, key)) return entry;
+        e = e.next;
       }
-      prev = e;
-      e = next;
+    } finally {
+      readLock.unlock();
     }
+
     return null;
   }
 
@@ -56,32 +58,35 @@ public final class IndexCache {
    * @return cache entry
    */
   public IndexEntry add(final byte[] key, final int s, final long p) {
-    purge();
-
     final int hash = hash(key);
-    final int i = indexFor(hash, bucket.length);
+    writeLock.lock();
 
-    BucketEntry e = bucket[i];
-    BucketEntry prev = e;
-    while(e != null) {
-      final BucketEntry next = e.next;
-      final IndexEntry ce = e.get();
-      if(ce == null) {
-        delete(i, e, prev, next);
-      } else if(e.hash == hash && eq(ce.key, key)) {
-        ce.size = s;
-        ce.pointer = p;
-        return ce;
+    try {
+      purge();
+
+      final int i = indexFor(hash, buckets.length);
+
+      BucketEntry current = buckets[i];
+      BucketEntry prev = current;
+      while(current != null) {
+        final BucketEntry next = current.next;
+        final IndexEntry entry = current.get();
+        if(entry == null) {
+          delete(i, current, prev, next);
+        } else if(current.hash == hash && eq(entry.key, key)) {
+          update(entry, s, p);
+          return entry;
+        }
+        prev = current;
+        current = next;
       }
-      prev = e;
-      e = next;
-    }
 
-    e = bucket[i];
-    final IndexEntry ce = new IndexEntry(key, s, p);
-    bucket[i] = new BucketEntry(hash, e, ce, queue);
-    if(++size == bucket.length) rehash();
-    return ce;
+      final IndexEntry entry = new IndexEntry(key, s, p);
+      add(i, hash, entry);
+      return entry;
+    } finally {
+      writeLock.unlock();
+    }
   }
 
   /**
@@ -89,79 +94,92 @@ public final class IndexCache {
    * @param key key
    */
   public void delete(final byte[] key) {
-    purge();
-
     final int hash = hash(key);
-    final int i = indexFor(hash, bucket.length);
+    writeLock.lock();
 
-    BucketEntry e = bucket[i];
-    BucketEntry prev = e;
-    while(e != null) {
-      final BucketEntry next = e.next;
-      final IndexEntry entry = e.get();
-      if(entry == null) {
-        delete(i, e, prev, next);
-      } else if(e.hash == hash && eq(entry.key, key)) {
-        delete(i, e, prev, next);
-        return;
+    try {
+      purge();
+
+      final int i = indexFor(hash, buckets.length);
+
+      BucketEntry e = buckets[i];
+      BucketEntry prev = e;
+      while(e != null) {
+        final BucketEntry next = e.next;
+        final IndexEntry entry = e.get();
+        if(entry == null) {
+          delete(i, e, prev, next);
+        } else if(e.hash == hash && eq(entry.key, key)) {
+          delete(i, e, prev, next);
+          break;
+        }
+        prev = e;
+        e = next;
       }
-      prev = e;
-      e = next;
+    } finally {
+      writeLock.unlock();
     }
   }
 
   /**
-   * Deletes a cached entry from the bucket with the specified index.
+   * Purges stale entries from the cache.
+   * [DP] add a minimal load, after which the buckets array should be shrunk
+   */
+  private void purge() {
+    for(Object x; (x = queue.poll()) != null;) {
+      final BucketEntry e = (BucketEntry) x;
+      final int i = indexFor(e.hash, buckets.length);
+
+      BucketEntry prev = buckets[i];
+      BucketEntry p = prev;
+      while(p != null) {
+        final BucketEntry next = p.next;
+        if(p == e) {
+          delete(i, e, prev, next);
+          break;
+        }
+        prev = p;
+        p = next;
+      }
+    }
+  }
+
+  /**
+   * Add a new index entry to the bucket with the specified index.
    * @param i bucket index
+   * @param hash hash of the new index key
+   * @param entry index entry
+   */
+  private void add(final int i, final int hash, final IndexEntry entry) {
+    buckets[i] = new BucketEntry(hash, buckets[i], entry, queue);
+    if(++size == buckets.length) rehash();
+  }
+
+  /**
+   * Update an existing index entry.
+   * @param entry index entry to update
+   * @param size new size
+   * @param pointer new pointer
+   */
+  private void update(final IndexEntry entry, final int size, final long pointer) {
+    entry.size = size;
+    entry.pointer = pointer;
+  }
+
+  /**
+   * Deletes a cached entry from the buckets with the specified index.
+   * [DP] add a minimal load, after which the buckets array should be shrunk
+   * @param i buckets index
    * @param e cached entry to delete
    * @param p previous cache entry
    * @param n next cache entry
    */
   private void delete(final int i, final BucketEntry e, final BucketEntry p,
       final BucketEntry n) {
-    if(p == e) bucket[i] = n;
+    if(p == e) buckets[i] = n;
     else p.next = n;
     e.next = null;
     --size;
-  }
-
-  /**
-   * Purges stale entries from the cache.
-   * [DP] add a minimal load, after which the bucket array should be shrunk
-   */
-  private void purge() {
-    for(Object x; (x = queue.poll()) != null;) {
-      // {@link java.lang.ref.ReferenceQueue} is not thread-safe.
-      synchronized(queue) {
-        final BucketEntry e = (BucketEntry) x;
-        final int i = indexFor(e.hash, bucket.length);
-
-        BucketEntry prev = bucket[i];
-        BucketEntry p = prev;
-        while(p != null) {
-          final BucketEntry next = p.next;
-          if(p == e) {
-            if(prev == e) bucket[i] = next;
-            else prev.next = next;
-            e.next = null;
-            --size;
-            break;
-          }
-          prev = p;
-          p = next;
-        }
-      }
-    }
-  }
-
-  /**
-   * Returns bucket index for a hash code.
-   * @param h hash code
-   * @param n number of available buckets
-   * @return index of a bucket
-   */
-  private static int indexFor(final int h, final int n) {
-    return h & n - 1;
   }
 
   /**
@@ -169,13 +187,14 @@ public final class IndexCache {
    */
   private void rehash() {
     purge();
+
     final int s = size << 1;
     final BucketEntry[] tmp = new BucketEntry[s];
 
-    final int l = bucket.length;
+    final int l = buckets.length;
     for(int i = 0; i < l; ++i) {
-      BucketEntry e = bucket[i];
-      bucket[i] = null;
+      BucketEntry e = buckets[i];
+      buckets[i] = null;
       while(e != null) {
         final BucketEntry next = e.next;
         final int p = indexFor(e.hash, tmp.length);
@@ -184,24 +203,34 @@ public final class IndexCache {
         e = next;
       }
     }
-    bucket = tmp;
+    buckets = tmp;
   }
 
   /**
-   * Cache bucket entry. Used to implement a linked list of cache entries for
-   * each bucket. It also stores the hash of the current entry for better
+   * Returns buckets index for a hash code.
+   * @param h hash code
+   * @param n number of available buckets
+   * @return index of a buckets
+   */
+  private static int indexFor(final int h, final int n) {
+    return h & n - 1;
+  }
+
+  /**
+   * Cache buckets entry. Used to implement a linked list of cache entries for
+   * each buckets. It also stores the hash of the current entry for better
    * performance.
    */
   private static class BucketEntry extends SoftReference<IndexEntry> {
     /** Hash code of the stored cache entry key. */
     final int hash;
-    /** Next bucket entry or {@code null} if the last one for this bucket. */
+    /** Next buckets entry or {@code null} if the last one for this buckets. */
     BucketEntry next;
 
     /**
      * Constructor.
      * @param h hash code of the cache entry key
-     * @param n next bucket entry or {@code null} if the last one
+     * @param n next buckets entry or {@code null} if the last one
      * @param v stored cache entry
      * @param rq reference queue
      */
