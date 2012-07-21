@@ -6,7 +6,7 @@
 VERSION 7.3 (June 18, 2012) --------------------------------------------
 
   - Many new internal XQuery Modules have been added, and existing
-    ones have been revised to ensure long-term stability of your future 
+    ones have been revised to ensure long-term stability of your future
     XQuery applications: http://docs.basex.org/wiki/Module_Library
   - A new powerful Command API is provided to specify BaseX commands
     and scripts as XML: http://docs.basex.org/wiki/Commands#Basics
@@ -16,7 +16,7 @@ VERSION 7.3 (June 18, 2012) --------------------------------------------
     process items of sequences: http://docs.basex.org/wiki/XQuery_3.0
   - BaseX as Web Application can now start its own server instance:
     http://docs.basex.org/wiki/Web_Application
-  - All command-line options will now be executed in the given order: 
+  - All command-line options will now be executed in the given order:
     http://docs.basex.org/wiki/Startup_Options
   - Charles Foster's latest XQJ Driver supports XQuery 3.0 and the
     Update and Full Text extensions: http://xqj.net/basex/
@@ -167,7 +167,7 @@ VERSION 7.0.1 (October 23, 2011) ---------------------------------------
   - Start scripts have been improved
 
   XQUERY
-  - much faster execution of count() when applied to opened databases
+  - much faster execution of cnt() when applied to opened databases
 
   SERVER
   - Flag -c connects to an existing database server
@@ -183,10 +183,10 @@ VERSION 7.0 (October 14, 2010) TEI EDITION -----------------------------
   API
   - Native and tightly integrated REST implementation replaces JAXRX
   - WebDAV provides a file system like access to BaseX databases
-  
+
   XQUERY
   - Parsing and serializing JSON documents
-  - SQL module builds a JDBC bridge to access relational databases 
+  - SQL module builds a JDBC bridge to access relational databases
   - EXPath Cryptographic Module for encryption and XML Signatures
   - Full text engine tokenizes Japanese texts (thx to Toshio Hirai!)
   - db:retrieve() and db:store() handle raw data
@@ -196,19 +196,19 @@ VERSION 7.0 (October 14, 2010) TEI EDITION -----------------------------
   - db:is-raw(), db:is-xml() check existence and type of a resource
   - db:list(), db:open() uses two separate arguments to specify
     database and resource path
-  - further modifications: db:add(), 
-  
+  - further modifications: db:add(),
+
   SERVER
   - BaseX HTTP Server activates the REST and WebDAV services
   - ITER command returns all results in one go and the client
     handles the iterative execution
-  
+
   COMMANDS
   - FLUSH command to write all database buffers to disk
   - STORE command to store raw data in a database
   - RETRIEVE command to get raw data from the database
   - modified ADD command
-  
+
   OPTIONS
   - SERVERHOST: to specify a server
   - KEEPALIVE: optional timeout to close inactive client sessions
@@ -255,14 +255,14 @@ VERSION 6.7 (June 30, 2011) --------------------------------------------
         http://docs.basex.org/wiki/Events
   [ADD] Persistent document index added to speed up
         access to large collections
-  
+
   XQuery:
   [ADD] New database and full-text functions:
         http://docs.basex.org/wiki/Database_Functions
         http://docs.basex.org/wiki/Full-Text_Functions
   [ADD] Event function added to fire events
   [MOD] Index optimizations, better cost estimations
-  
+
   Commands:
   [ADD] Glob syntax introduced to database commands:
         http://docs.basex.org/wiki/Commands
@@ -310,7 +310,7 @@ VERSION 6.6.1 (March 30, 2011) XML PRAGUE RELEASE ----------------------
   [FIX] trace function returned wrong original results
   [FIX] variables in catch clauses were discarded
   [FIX] HOF optimizations and fixes
-   
+
   GUI:
   [FIX] language option (for Japanese, German, etc. interface) fixed
 
