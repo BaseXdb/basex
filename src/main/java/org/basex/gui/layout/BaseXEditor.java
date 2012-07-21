@@ -320,17 +320,20 @@ public class BaseXEditor extends BaseXPanel {
 
     if(SwingUtilities.isMiddleMouseButton(e)) copy();
 
+    final boolean marking = e.isShiftDown();
+    final boolean nomark = !text.marked();
     if(SwingUtilities.isLeftMouseButton(e)) {
       final int c = e.getClickCount();
       if(c == 1) {
         // selection mode
-        rend.select(scroll.pos(), e.getPoint(), false);
+        if(marking && nomark) text.startMark();
+        rend.select(scroll.pos(), e.getPoint(), marking);
       } else if(c == 2) {
         text.selectWord();
       } else {
         text.selectLine();
       }
-    } else if(!text.marked()) {
+    } else if(nomark) {
       rend.select(scroll.pos(), e.getPoint(), false);
     }
   }
