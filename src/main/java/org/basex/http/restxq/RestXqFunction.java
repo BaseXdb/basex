@@ -198,7 +198,7 @@ final class RestXqFunction {
     IOContent body = null;
 
     if(requestBody != null) {
-      body = cache(http, body);
+      body = cache(http, null);
       try {
         // bind request body in the correct format
         body.name(http.method + IO.XMLSUFFIX);
