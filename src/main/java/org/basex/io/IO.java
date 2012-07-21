@@ -4,7 +4,6 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.data.*;
-import org.basex.util.*;
 import org.xml.sax.*;
 
 /**
@@ -115,7 +114,7 @@ public abstract class IO {
    * @return IO reference
    */
   public static IO get(final String source) {
-    if(source == null) return new IOContent(Token.EMPTY);
+    if(source == null) return new IOContent("");
     final String s = source.trim();
     return s.indexOf('<') == 0 ? new IOContent(s) :
            IOUrl.isFileURL(s)  ? new IOFile(IOUrl.file(s)) :

@@ -12,7 +12,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-abstract class Num extends Item {
+public abstract class Num extends Item {
   /**
    * Constructor.
    * @param t type

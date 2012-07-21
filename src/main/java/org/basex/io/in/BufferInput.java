@@ -193,7 +193,6 @@ public class BufferInput extends InputStream {
       final ByteList bl = new ByteList();
       for(int ch; (ch = next()) != -1;) bl.add(ch);
       return bl.toArray();
-
     } finally {
       close();
     }

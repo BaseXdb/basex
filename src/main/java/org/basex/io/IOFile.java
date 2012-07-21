@@ -208,13 +208,15 @@ public final class IOFile extends IO {
    * @throws IOException I/O exception
    */
   public void write(final InputStream in) throws IOException {
-    BufferOutput out = null;
     try {
-      out = new BufferOutput(path);
-      for(int i; (i = in.read()) != -1;) out.write(i);
+      final BufferOutput out = new BufferOutput(path);
+      try {
+        for(int i; (i = in.read()) != -1;) out.write(i);
+      } finally {
+        out.close();
+      }
     } finally {
-      try { in.close(); } catch(final IOException ex) { }
-      if(out != null) out.close();
+      in.close();
     }
   }
 
@@ -254,19 +256,19 @@ public final class IOFile extends IO {
     final int bsize = (int) Math.max(1, Math.min(length(), 1 << 22));
     final byte[] buf = new byte[bsize];
 
-    FileInputStream fis = null;
-    FileOutputStream fos = null;
+    // create parent directory of target file
+    new IOFile(trg.dir()).md();
+    final FileInputStream fis = new FileInputStream(file);
     try {
-      // create parent directory of target file
-      new IOFile(trg.dir()).md();
-      fis = new FileInputStream(file);
-      fos = new FileOutputStream(trg.file);
-      // copy file buffer by buffer
-      for(int i; (i = fis.read(buf)) != -1;) fos.write(buf, 0, i);
+      final FileOutputStream fos = new FileOutputStream(trg.file);
+      try {
+        // copy file buffer by buffer
+        for(int i; (i = fis.read(buf)) != -1;) fos.write(buf, 0, i);
+      } finally {
+        fos.close();
+      }
     } finally {
-      // close file references
-      if(fis != null) try { fis.close(); } catch(final IOException ex) { }
-      if(fos != null) try { fos.close(); } catch(final IOException ex) { }
+      fis.close();
     }
   }
 

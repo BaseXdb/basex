@@ -36,13 +36,12 @@ public final class Zip extends Progress {
    */
   private int size() throws IOException {
     int c = 0;
-    ZipInputStream in = null;
+    final ZipInputStream in = new ZipInputStream(archive.inputStream());
     try {
-      in = new ZipInputStream(archive.inputStream());
       while(in.getNextEntry() != null) c++;
       return c;
     } finally {
-      if(in != null) try { in.close(); } catch(final IOException e) { }
+      in.close();
     }
   }
 
@@ -59,7 +58,7 @@ public final class Zip extends Progress {
       if(cont == null) throw new FileNotFoundException(path);
       return cont;
     } finally {
-      try { in.close(); } catch(final IOException e) { }
+      in.close();
     }
   }
 
@@ -81,17 +80,16 @@ public final class Zip extends Progress {
           trg.md();
         } else {
           new IOFile(trg.dir()).md();
-          OutputStream out = null;
+          final OutputStream out = new FileOutputStream(trg.path());
           try {
-            out = new FileOutputStream(trg.path());
             for(int c; (c = in.read(data)) != -1;) out.write(data, 0, c);
           } finally {
-            if(out != null) try { out.close(); } catch(final IOException e) { }
+            out.close();
           }
         }
       }
     } finally {
-      try { in.close(); } catch(final IOException e) { }
+      in.close();
     }
   }
 
@@ -105,13 +103,12 @@ public final class Zip extends Progress {
     if(!(archive instanceof IOFile)) throw new FileNotFoundException(archive.path());
 
     final byte[] data = new byte[IO.BLOCKSIZE];
-    ZipOutputStream out = null;
+    final ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(
+        new FileOutputStream(archive.path())));
     curr = 0;
 
     try {
       // create output stream for zipping; use fast compression
-      out = new ZipOutputStream(new BufferedOutputStream(
-          new FileOutputStream(archive.path())));
       out.setLevel(1);
       out.putNextEntry(new ZipEntry(source.name() + '/'));
       out.closeEntry();
@@ -123,18 +120,17 @@ public final class Zip extends Progress {
         curr++;
         if(pattern != null && !pattern.matcher(io).matches()) continue;
 
-        FileInputStream in = null;
+        final FileInputStream in = new FileInputStream(new File(source.file(), io));
         try {
-          in = new FileInputStream(new File(source.file(), io));
           out.putNextEntry(new ZipEntry(source.name() + '/' + io));
           for(int c; (c = in.read(data)) != -1;) out.write(data, 0, c);
           out.closeEntry();
         } finally {
-          if(in != null) try { in.close(); } catch(final IOException e) { }
+          in.close();
         }
       }
     } finally {
-      if(out != null) try { out.close(); } catch(final IOException e) { }
+      out.close();
     }
   }
 
