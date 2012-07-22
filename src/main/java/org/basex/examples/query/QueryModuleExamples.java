@@ -5,7 +5,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -54,9 +53,9 @@ public class QueryModuleExamples extends QueryModule {
   public Value value(final Value value) {
     ValueBuilder vb = new ValueBuilder();
     for(final Item item : value) {
-      if(item.type == AtomType.STR) {
+      if(item instanceof AStr) {
         vb.add(item);
-      } else if(item.type.isNode()) {
+      } else if(item instanceof ANode) {
         ANode node = (ANode) item;
         vb.add(node.qname());
       }
