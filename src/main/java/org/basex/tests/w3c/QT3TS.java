@@ -311,7 +311,7 @@ public final class QT3TS {
     }
 
     final long time = perf.time() / 1000000;
-    if(verbose) Util.outln(name + ": " + time + " ms");
+    if(verbose && time > 100) Util.outln(name + ": " + time + " ms");
 
     // revert to XQuery as default
     ctx.prop.set(Prop.XQUERY3, true);
