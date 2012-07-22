@@ -169,10 +169,12 @@ public final class CmpG extends Cmp {
       if(e == this) e = CmpSR.get(this);
       if(e != this) ctx.compInfo(OPTWRITE, this);
     }
+    if(e != this) return e;
 
     // check if both arguments will always yield one result
     atomic = e1.type().zeroOrOne() && e2.type().zeroOrOne();
-    return e;
+    if(atomic) ctx.compInfo(OPTATOMIC, this);
+    return this;
   }
 
   @Override
@@ -252,14 +254,12 @@ public final class CmpG extends Cmp {
    * @throws QueryException query exception
    */
   private boolean eval(final Item a, final Item b) throws QueryException {
-    if(!(a instanceof FItem || b instanceof FItem)) {
-      final Type ta = a.type, tb = b.type;
-      if(ta == tb || ta.isUntyped() || tb.isUntyped() ||
-          a instanceof ANum && b instanceof ANum ||
-          a instanceof AStr && b instanceof AStr)
-        return op.op.eval(info, a, b);
-    }
-    throw XPTYPECMP.thrw(info, a.type, b.type);
+    final Type ta = a.type, tb = b.type;
+    if(!(a instanceof FItem || b instanceof FItem) &&
+        (ta == tb || ta.isUntyped() || tb.isUntyped() ||
+        a instanceof ANum && b instanceof ANum ||
+        a instanceof AStr && b instanceof AStr)) return op.op.eval(info, a, b);
+    throw XPTYPECMP.thrw(info, ta, tb);
   }
 
   @Override

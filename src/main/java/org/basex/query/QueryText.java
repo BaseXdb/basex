@@ -671,6 +671,8 @@ public interface QueryText {
   /** Optimization info. */
   String OPTDESC = "simplifying descendant-or-self step(s)";
   /** Optimization info. */
+  String OPTATOMIC = "atomic evaluation of %";
+  /** Optimization info. */
   String OPTMERGE = "merging axis paths";
   /** Optimization info. */
   String OPTPRE = "pre-evaluating %";

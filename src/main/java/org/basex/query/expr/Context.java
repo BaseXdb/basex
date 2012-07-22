@@ -8,6 +8,7 @@ import org.basex.query.path.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -24,12 +25,14 @@ public final class Context extends Simple {
    */
   public Context(final InputInfo ii) {
     super(ii);
+    type = SeqType.ITEM;
+    size = 1;
   }
 
   @Override
   public Context compile(final QueryContext ctx) {
     if(ctx.value != null) {
-      type = ctx.value.type.seqType();
+      type = ctx.value.type();
       size = ctx.value.size();
     }
     return this;

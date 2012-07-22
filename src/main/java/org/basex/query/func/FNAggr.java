@@ -122,57 +122,45 @@ public final class FNAggr extends StandardFunc {
     // strings
     if(rs instanceof AStr) {
       for(Item it; (it = iter.next()) != null;) {
-        if(!(it instanceof AStr)) FUNCMP.thrw(info, description(), rs.type, it.type);
+        if(!(it instanceof AStr)) FUNCMP.thrw(info, this, rs.type, it.type);
         if(cmp.eval(info, rs, it)) rs = it;
       }
       return rs;
     }
-
-    // dates
-    if(rs instanceof ADate) {
+    // dates, durations and booleans
+    if(rs instanceof ADate || rs instanceof Dur || rs.type == AtomType.BLN) {
       for(Item it; (it = iter.next()) != null;) {
-        if(!(it instanceof ADate)) FUNCMP.thrw(info, description(), rs.type, it.type);
+        if(rs.type != it.type) FUNCMP.thrw(info, this, rs.type, it.type);
         if(cmp.eval(info, rs, it)) rs = it;
       }
       return rs;
     }
-
-    // durations or numbers
-    Type t = rs.type.isUntyped() ? DBL : rs.type;
-    if(rs.type != t) rs = t.cast(rs, ctx, info);
-
+    // numbers
+    if(rs.type.isUntyped()) rs = DBL.cast(rs, ctx, info);
     for(Item it; (it = iter.next()) != null;) {
-      t = type(rs, it);
-      if(!(it instanceof Dur) && Double.isNaN(it.dbl(info)) || cmp.eval(info, rs, it))
-        rs = it;
+      final Type t = numType(rs, it);
+      if(cmp.eval(info, rs, it) || Double.isNaN(it.dbl(info))) rs = it;
       if(rs.type != t) rs = t.cast(rs, ctx, info);
     }
     return rs;
   }
 
   /**
-   * Returns the type with the highest precedence.
+   * Returns the numeric type with the highest precedence.
    * @param r result item
    * @param i new item
    * @return result
    * @throws QueryException query exception
    */
-  private Type type(final Item r, final Item i) throws QueryException {
-    final boolean nr = r instanceof ANum;
+  private Type numType(final Item r, final Item i) throws QueryException {
     final Type tr = r.type, ti = i.type;
-    if(ti.isUntyped()) {
-      if(nr) return DBL;
-      FUNCMP.thrw(info, this, tr, ti);
-    } else {
-      if(nr && i instanceof AStr) FUNCMP.thrw(info, this, tr, ti);
-    }
+    if(ti.isUntyped()) return DBL;
+    if(!(i instanceof ANum)) FUNCMP.thrw(info, this, tr, ti);
 
     if(tr == ti) return tr;
     if(tr == DBL || ti == DBL) return DBL;
     if(tr == FLT || ti == FLT) return FLT;
     if(tr == DEC || ti == DEC) return DEC;
-    final boolean ni = i instanceof ANum;
-    if(tr == BLN || nr ^ ni) FUNCMP.thrw(info, this, tr, ti);
-    return nr || ni ? ITR : tr;
+    return ITR;
   }
 }
