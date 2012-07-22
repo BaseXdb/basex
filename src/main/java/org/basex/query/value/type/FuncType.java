@@ -50,24 +50,24 @@ public class FuncType implements Type {
   }
 
   @Override
-  public final SeqType seqType() {
-    if(seq == null) seq = new SeqType(this);
-    return seq;
-  }
-
-  @Override
-  public final boolean isString() {
-    return false;
-  }
-
-  @Override
   public final boolean isUntyped() {
     return false;
   }
 
   @Override
-  public final boolean isFunction() {
-    return true;
+  public final boolean isNumberOrUntyped() {
+    return false;
+  }
+
+  @Override
+  public final boolean isStringOrUntyped() {
+    return false;
+  }
+
+  @Override
+  public final SeqType seqType() {
+    if(seq == null) seq = new SeqType(this);
+    return seq;
   }
 
   @Override
@@ -79,7 +79,7 @@ public class FuncType implements Type {
   public FItem cast(final Item it, final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
-    if(!it.type.isFunction()) throw Err.cast(ii, this, it);
+    if(!(it instanceof FItem)) throw Err.cast(ii, this, it);
     final FItem f = (FItem) it;
     return this == ANY_FUN ? f : f.coerceTo(this, ctx, ii);
   }
@@ -171,21 +171,6 @@ public class FuncType implements Type {
           vars[v].type = args[v];
     }
     return vars;
-  }
-
-  @Override
-  public boolean isDuration() {
-    return false;
-  }
-
-  @Override
-  public boolean isDate() {
-    return false;
-  }
-
-  @Override
-  public boolean isMap() {
-    return false;
   }
 
   @Override

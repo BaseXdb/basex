@@ -12,6 +12,7 @@ import org.basex.query.path.*;
 import org.basex.query.path.Test.Mode;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.item.ANum;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -61,15 +62,11 @@ public final class CmpR extends Single {
    * Tries to convert the specified expression into a range expression.
    * @param ex expression to be converted
    * @return new or original expression
-   * @throws QueryException query exception
    */
-  static Expr get(final CmpG ex) throws QueryException {
-    if(!ex.expr[1].isItem()) return ex;
-    final Item it = (Item) ex.expr[1];
-    if(!it.type.isNumber()) return ex;
-
+  static Expr get(final CmpG ex) {
+    if(!(ex.expr[1] instanceof ANum)) return ex;
+    final double d = ((ANum) ex.expr[1]).dbl();
     final Expr e = ex.expr[0];
-    final double d = it.dbl(ex.info);
     switch(ex.op.op) {
       case GE: return new CmpR(e, d, true, Double.POSITIVE_INFINITY, true, ex.info);
       case GT: return new CmpR(e, d, false, Double.POSITIVE_INFINITY, true, ex.info);

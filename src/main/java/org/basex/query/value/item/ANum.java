@@ -12,36 +12,60 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public abstract class Num extends Item {
+public abstract class ANum extends Item {
   /**
    * Constructor.
    * @param t type
    */
-  Num(final Type t) {
+  ANum(final Type t) {
     super(t);
   }
 
   /* Removing "throws QueryException" */
 
   @Override
-  public abstract byte[] string(final InputInfo ii);
+  public final byte[] string(final InputInfo ii) {
+    return string();
+  }
 
   @Override
-  public abstract double dbl(InputInfo ii);
+  public final double dbl(final InputInfo ii) {
+    return dbl();
+  }
 
   @Override
-  public abstract long itr(InputInfo ii);
+  public final long itr(final InputInfo ii) {
+    return itr();
+  }
+
+  @Override
+  public final float flt(final InputInfo ii) {
+    return flt();
+  }
+
+  /**
+   * Returns a string representation of the value.
+   * @return string value
+   */
+  public abstract byte[] string();
 
   /**
    * Returns an integer (long) representation of the value.
    * @return long value
    */
-  public final long itr() {
-    return itr(null);
-  }
+  public abstract long itr();
 
-  @Override
-  public abstract float flt(InputInfo ii);
+  /**
+   * Returns an double representation of the value.
+   * @return double value
+   */
+  public abstract double dbl();
+
+  /**
+   * Returns an float representation of the value.
+   * @return float value
+   */
+  public abstract float flt();
 
   @Override
   public final int hash(final InputInfo ii) {

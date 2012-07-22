@@ -69,7 +69,7 @@ public abstract class StandardFunc extends Arr {
    */
   public static final Item atom(final Item it, final InputInfo ii) throws QueryException {
     final Type ip = it.type;
-    return ip.isNode() ? ip == NodeType.PI || ip == NodeType.COM ?
+    return it instanceof ANode ? ip == NodeType.PI || ip == NodeType.COM ?
         Str.get(it.string(ii)) : new Atm(it.string(ii)) : it;
   }
 
@@ -110,8 +110,8 @@ public abstract class StandardFunc extends Arr {
   Data data(final int i, final QueryContext ctx) throws QueryException {
     final Item it = checkNoEmpty(expr[i].item(ctx, info));
     final Type ip = it.type;
-    if(ip.isNode()) return checkDBNode(it).data;
-    if(ip.isString())  {
+    if(it instanceof ANode) return checkDBNode(it).data;
+    if(it instanceof AStr)  {
       final String name = string(it.string(info));
       if(!MetaData.validName(name, false)) INVDB.thrw(info, name);
       return ctx.resource.data(name, info);
@@ -150,7 +150,7 @@ public abstract class StandardFunc extends Arr {
       final Map map = checkMap(expr[i].item(ctx, info));
       for(final Item it : map.keys()) {
         byte[] key;
-        if(it.type.isString()) {
+        if(it instanceof Str) {
           key = it.string(null);
         } else {
           final QNm qnm = (QNm) checkType(it, AtomType.QNM);

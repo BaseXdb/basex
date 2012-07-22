@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.item.ANum;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -51,8 +52,8 @@ public final class OrderByExpr extends OrderBy {
   Item key(final QueryContext ctx, final int i) throws QueryException {
     Item it = expr.item(ctx, info);
     if(it != null) {
-      if(it.type.isNode()) it = Str.get(it.string(info));
-      else if(it.type.isNumber() && Double.isNaN(it.dbl(info))) it = null;
+      if(it instanceof ANode) it = Str.get(it.string(info));
+      else if(it instanceof ANum && Double.isNaN(it.dbl(info))) it = null;
     }
     return it;
   }

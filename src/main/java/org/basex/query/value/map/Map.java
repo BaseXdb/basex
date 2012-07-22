@@ -220,12 +220,11 @@ public final class Map extends FItem {
   public TokenMap tokenJavaMap(final InputInfo ii) throws QueryException {
     final TokenMap tm = new TokenMap();
     final ValueIter vi = keys().iter();
-    for(Item k; (k = vi.next()) != null;) {
-      final Type kt = k.type;
-      if(!kt.isString()) FUNCMP.thrw(ii, description(), AtomType.STR, kt);
-      final Value v = get(k, ii);
+    for(Item it; (it = vi.next()) != null;) {
+      if(!(it instanceof AStr)) FUNCMP.thrw(ii, description(), AtomType.STR, it.type);
+      final Value v = get(it, ii);
       if(!v.isItem()) FUNCMP.thrw(ii, description(), AtomType.ITEM, v);
-      final byte[] key = k.string(null);
+      final byte[] key = it.string(null);
       byte[] val = ((Item) v).string(ii);
       final byte[] o = tm.get(key);
       if(o != null) val = new TokenBuilder(o).add(',').add(val).finish();

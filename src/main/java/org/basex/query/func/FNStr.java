@@ -290,8 +290,7 @@ public final class FNStr extends StandardFunc {
         NORMUNI.thrw(info, n);
       }
     }
-    return ascii(str) ? Str.get(str) :
-      Str.get(Normalizer.normalize(string(str), form));
+    return ascii(str) ? Str.get(str) : Str.get(Normalizer.normalize(string(str), form));
   }
 
   /**

@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
 import org.basex.util.*;
@@ -45,8 +46,8 @@ public final class ItemSeq extends Seq {
 
   @Override
   public Item ebv(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    if(!item[0].type.isNode()) CONDTYPE.thrw(ii, this);
-    return item[0];
+    if(item[0] instanceof ANode) return item[0];
+    throw CONDTYPE.thrw(ii, this);
   }
 
   @Override

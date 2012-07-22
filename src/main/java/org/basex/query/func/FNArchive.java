@@ -411,7 +411,7 @@ public class FNArchive extends StandardFunc {
 
     // data to be compressed
     byte[] val = null;
-    if(con.type.isString()) {
+    if(con instanceof AStr) {
       val = con.string(info);
       if(en != null && en != Token.UTF8) val = encode(val, en);
     } else if(con.type == AtomType.B64) {
@@ -450,7 +450,7 @@ public class FNArchive extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item checkElmStr(final Item it) throws QueryException {
-    if(it.type.isString() || TEST.eq(it)) return it;
+    if(it instanceof AStr || TEST.eq(it)) return it;
     throw ELMSTRTYPE.thrw(info, Q_ENTRY.string(), it.type);
   }
 }

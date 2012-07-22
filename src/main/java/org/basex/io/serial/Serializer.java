@@ -81,7 +81,7 @@ public abstract class Serializer {
    */
   public final void serialize(final Item item) throws IOException {
     openResult();
-    if(item.type.isNode()) {
+    if(item instanceof ANode) {
       serialize((ANode) item);
     } else {
       finishElement();

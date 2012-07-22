@@ -242,7 +242,7 @@ public final class FNFunc extends StandardFunc {
   private FItem withArity(final int p, final int a, final QueryContext ctx)
       throws QueryException {
     final Item f = checkItem(expr[p], ctx);
-    if(!f.type.isFunction() || ((FItem) f).arity() != a)
+    if(!(f instanceof FItem) || ((FItem) f).arity() != a)
       Err.type(this, FuncType.arity(a), f);
 
     return (FItem) f;

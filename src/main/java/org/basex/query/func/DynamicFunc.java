@@ -82,7 +82,7 @@ public final class DynamicFunc extends Arr {
   private FItem getFun(final QueryContext ctx) throws QueryException {
     final int ar = expr.length - 1;
     final Item it = checkItem(expr[ar], ctx);
-    if(!it.type.isFunction()) throw Err.type(this, FuncType.arity(ar), it);
+    if(!(it instanceof FItem)) throw Err.type(this, FuncType.arity(ar), it);
     final FItem fit = (FItem) it;
     if(fit.arity() != ar) throw INVARITY.thrw(info, fit, ar);
     return fit;

@@ -1,6 +1,7 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 
 import org.basex.index.*;
 import org.basex.index.query.*;
@@ -61,12 +62,9 @@ public final class CmpSR extends Single {
    * @throws QueryException query exception
    */
   static Expr get(final CmpG ex) throws QueryException {
-    if(!ex.expr[1].isItem()) return ex;
-    final Item it = (Item) ex.expr[1];
-    if(!it.type.isString()) return ex;
-
+    if(!(ex.expr[1] instanceof AStr)) return ex;
+    final byte[] d = ((AStr) ex.expr[1]).string(ex.info);
     final Expr e = ex.expr[0];
-    final byte[] d = it.string(ex.info);
     switch(ex.op.op) {
       case GE: return new CmpSR(e, d, true, null, true, ex.info);
       case GT: return new CmpSR(e, d, false, null, true, ex.info);
@@ -81,22 +79,29 @@ public final class CmpSR extends Single {
     // atomic evaluation of arguments (faster)
     if(atomic) {
       final Item it = expr.item(ctx, info);
-      if(it == null) return Bln.FALSE;
-      final byte[] s = it.string(info);
-      final int mn = min == null ? 1 : Token.diff(s, min);
-      final int mx = max == null ? -1 : Token.diff(s, max);
-      return Bln.get((mni ? mn >= 0 : mn > 0) && (mxi ? mx <= 0 : mx < 0));
+      return Bln.get(it != null && eval(it));
     }
 
     // iterative evaluation
     final Iter ir = ctx.iter(expr);
     for(Item it; (it = ir.next()) != null;) {
-      final byte[] s = it.string(info);
-      final int mn = min == null ? 1 : Token.diff(s, min);
-      final int mx = max == null ? -1 : Token.diff(s, max);
-      if((mni ? mn >= 0 : mn > 0) && (mxi ? mx <= 0 : mx < 0)) return Bln.TRUE;
+      if(eval(it)) return Bln.TRUE;
     }
     return Bln.FALSE;
+  }
+
+  /**
+   * Evaluates the range for the specified item.
+   * @param it item to be evaluated
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  private boolean eval(final Item it) throws QueryException {
+    if(!it.type.isStringOrUntyped()) XPTYPECMP.thrw(info, it.type, AtomType.STR);
+    final byte[] s = it.string(info);
+    final int mn = min == null ? 1 : Token.diff(s, min);
+    final int mx = max == null ? -1 : Token.diff(s, max);
+    return (mni ? mn >= 0 : mn > 0) && (mxi ? mx <= 0 : mx < 0);
   }
 
   /**

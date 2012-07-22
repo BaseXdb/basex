@@ -167,33 +167,18 @@ public enum NodeType implements Type {
   }
 
   @Override
-  public boolean isString() {
-    return false;
-  }
-
-  @Override
   public boolean isUntyped() {
     return true;
   }
 
   @Override
-  public boolean isDuration() {
-    return false;
+  public boolean isNumberOrUntyped() {
+    return true;
   }
 
   @Override
-  public boolean isDate() {
-    return false;
-  }
-
-  @Override
-  public final boolean isFunction() {
-    return false;
-  }
-
-  @Override
-  public final boolean isMap() {
-    return false;
+  public boolean isStringOrUntyped() {
+    return true;
   }
 
   @Override

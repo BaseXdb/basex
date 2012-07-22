@@ -16,7 +16,11 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class Dec extends Num {
+public final class Dec extends ANum {
+  /** Maximum unsigned long values. */
+  public static final BigDecimal MAXULNG = new BigDecimal(Long.MAX_VALUE).multiply(
+      BigDecimal.valueOf(2)).add(BigDecimal.ONE);
+
   /** Zero value. */
   private static final Dec ZERO = new Dec(BigDecimal.ZERO);
   /** Decimal value. */
@@ -69,7 +73,7 @@ public final class Dec extends Num {
   }
 
   @Override
-  public byte[] string(final InputInfo ii) {
+  public byte[] string() {
     return chopNumber(token(val.toPlainString()));
   }
 
@@ -79,17 +83,17 @@ public final class Dec extends Num {
   }
 
   @Override
-  public long itr(final InputInfo ii) {
+  public long itr() {
     return val.longValue();
   }
 
   @Override
-  public float flt(final InputInfo ii) {
+  public float flt() {
     return val.floatValue();
   }
 
   @Override
-  public double dbl(final InputInfo ii) {
+  public double dbl() {
     return val.doubleValue();
   }
 
@@ -123,7 +127,8 @@ public final class Dec extends Num {
    * @return double value
    * @throws QueryException query exception
    */
-  static BigDecimal parse(final double val, final InputInfo ii) throws QueryException {
+  public static BigDecimal parse(final double val, final InputInfo ii)
+      throws QueryException {
     if(Double.isNaN(val) || val == 1 / 0d || val == -1 / 0d)
       Err.value(ii, AtomType.DEC, val);
     return BigDecimal.valueOf(val);
@@ -136,7 +141,8 @@ public final class Dec extends Num {
    * @return double value
    * @throws QueryException query exception
    */
-  static BigDecimal parse(final byte[] val, final InputInfo ii) throws QueryException {
+  public static BigDecimal parse(final byte[] val, final InputInfo ii)
+      throws QueryException {
     if(contains(val, 'e') || contains(val, 'E')) FUNCAST.thrw(ii, AtomType.DEC, val);
 
     try {

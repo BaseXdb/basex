@@ -276,16 +276,15 @@ public final class SeqType {
     // the empty sequence has every type
     if(size == 0) return true;
 
-    final MapType mt = type.isMap() ? (MapType) type : null;
+    final MapType mt = type instanceof MapType ? (MapType) type : null;
     for(long i = 0; i < size; i++) {
       final Item it = val.itemAt(i);
 
       // maps don't have type information attached to them, you have to look...
-      final Type ip = it.type;
       if(mt == null) {
-        if(!(ip.instanceOf(type) && checkKind(it))) return false;
+        if(!(it.type.instanceOf(type) && checkKind(it))) return false;
       } else {
-        if(!(ip.isMap() && ((Map) it).hasType(mt))) return false;
+        if(!(it instanceof Map && ((Map) it).hasType(mt))) return false;
       }
       if(i == 0 && val.homogenous()) break;
     }
@@ -365,7 +364,7 @@ public final class SeqType {
   private boolean instance(final Item it, final InputInfo ii) throws QueryException {
     final Type ip = it.type;
     final boolean ins = ip.instanceOf(type);
-    if(!ins && !ip.isUntyped() && !ip.isFunction() &&
+    if(!ins && !ip.isUntyped() && !(it instanceof FItem) &&
         // implicit type promotions:
         // xs:float -> xs:double
         (ip != AtomType.FLT || type != AtomType.DBL) &&

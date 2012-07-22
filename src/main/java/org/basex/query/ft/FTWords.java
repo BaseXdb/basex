@@ -433,7 +433,7 @@ public final class FTWords extends FTExpr {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    final boolean str = query instanceof Item && ((Item) query).type.isString();
+    final boolean str = query instanceof AStr;
     if(!str) sb.append("{ ");
     sb.append(query);
     if(!str) sb.append(" }");

@@ -13,7 +13,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public class Int extends Num {
+public class Int extends ANum {
   /** Constant values. */
   private static final Int[] NUMS;
   /** Integer value. */
@@ -48,7 +48,7 @@ public class Int extends Num {
    * @param d date time
    */
   public Int(final ADate d) {
-    this(d.xc.toGregorianCalendar().getTimeInMillis(), AtomType.LNG);
+    this(d.xc.toGregorianCalendar().getTimeInMillis(), AtomType.ITR);
   }
 
   /**
@@ -71,7 +71,7 @@ public class Int extends Num {
   }
 
   @Override
-  public final byte[] string(final InputInfo ii) {
+  public final byte[] string() {
     return val == 0 ? Token.ZERO : Token.token(val);
   }
 
@@ -81,17 +81,17 @@ public class Int extends Num {
   }
 
   @Override
-  public final long itr(final InputInfo ii) {
+  public final long itr() {
     return val;
   }
 
   @Override
-  public final float flt(final InputInfo ii) {
+  public final float flt() {
     return val;
   }
 
   @Override
-  public final double dbl(final InputInfo ii) {
+  public final double dbl() {
     return val;
   }
 

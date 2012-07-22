@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.expr.CmpV.OpV;
 import org.basex.query.value.item.*;
+import org.basex.query.value.item.ANum;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -55,24 +56,19 @@ public final class Pos extends Simple {
    * @param o original expression
    * @param ii input info
    * @return resulting expression, or {@code null}
-   * @throws QueryException query exception
    */
-  public static Expr get(final OpV cmp, final Expr a, final Expr o, final InputInfo ii)
-      throws QueryException {
-
-    if(a.isItem()) {
-      final Item it = (Item) a;
-      if(it.type.isNumber()) {
-        final long p = it.itr(ii);
-        final boolean ex = p == it.dbl(ii);
-        switch(cmp) {
-          case EQ: return ex ? get(p, p, ii) : Bln.FALSE;
-          case GE: return get(ex ? p : p + 1, Long.MAX_VALUE, ii);
-          case GT: return get(p + 1, Long.MAX_VALUE, ii);
-          case LE: return get(1, p, ii);
-          case LT: return get(1, ex ? p - 1 : p, ii);
-          default:
-        }
+  public static Expr get(final OpV cmp, final Expr a, final Expr o, final InputInfo ii) {
+    if(a instanceof ANum) {
+      final ANum it = (ANum) a;
+      final long p = it.itr();
+      final boolean ex = p == it.dbl();
+      switch(cmp) {
+        case EQ: return ex ? get(p, p, ii) : Bln.FALSE;
+        case GE: return get(ex ? p : p + 1, Long.MAX_VALUE, ii);
+        case GT: return get(p + 1, Long.MAX_VALUE, ii);
+        case LE: return get(1, p, ii);
+        case LT: return get(1, ex ? p - 1 : p, ii);
+        default:
       }
     }
     return o;

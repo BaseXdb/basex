@@ -32,7 +32,7 @@ public final class FNNum extends StandardFunc {
     if(it == null) return null;
 
     final Type ip = it.type;
-    if(!ip.isUntyped() && !ip.isNumber()) Err.number(this, it);
+    if(!ip.isNumberOrUntyped()) Err.number(this, it);
     final double d = it.dbl(info);
     switch(sig) {
       case ABS:                return abs(it, info);

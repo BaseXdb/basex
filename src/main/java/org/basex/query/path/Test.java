@@ -90,7 +90,7 @@ public abstract class Test {
    * @return result of check
    */
   public boolean eq(final Item item) {
-    return item.type.isNode() && eq((ANode) item);
+    return item instanceof ANode && eq((ANode) item);
   }
 
   /**

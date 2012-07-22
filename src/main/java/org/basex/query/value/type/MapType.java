@@ -34,15 +34,13 @@ public final class MapType extends FuncType {
   }
 
   @Override
-  public boolean isMap() {
-    return true;
-  }
-
-  @Override
-  public FItem cast(final Item it, final QueryContext ctx, final InputInfo ii)
+  public Map cast(final Item it, final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    if(!it.type.isMap() || !((Map) it).hasType(this)) Err.cast(ii, this, it);
-    return (Map) it;
+    if(it instanceof Map) {
+      final Map m = (Map) it;
+      if(m.hasType(this)) return m;
+    }
+    throw Err.cast(ii, this, it);
   }
 
   /**

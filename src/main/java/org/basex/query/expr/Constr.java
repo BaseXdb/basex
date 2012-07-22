@@ -80,10 +80,9 @@ public final class Constr {
    * @throws QueryException query exception
    */
   private boolean add(final Item it) throws QueryException {
-    final Type ip = it.type;
-    if(ip.isFunction()) CONSFUNC.thrw(info, it);
+    if(it instanceof FItem) CONSFUNC.thrw(info, it);
 
-    if(!ip.isNode()) {
+    if(!(it instanceof ANode)) {
       // type: atomic value
       if(more) text.add(' ');
       text.add(it.string(info));
@@ -93,6 +92,7 @@ public final class Constr {
       // type: nodes
       ANode node = (ANode) it;
 
+      final Type ip = it.type;
       if(ip == NodeType.TXT) {
         // type: text node
         text.add(node.string());

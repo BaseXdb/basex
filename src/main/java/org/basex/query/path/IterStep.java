@@ -36,7 +36,7 @@ final class IterStep extends AxisStep {
       public ANode next() throws QueryException {
         if(ai == null) {
           final Value v = checkCtx(ctx);
-          if(!v.type.isNode()) NODESPATH.thrw(info, IterStep.this, v.type);
+          if(!(v instanceof ANode)) NODESPATH.thrw(info, IterStep.this, v.type);
           ai = axis.iter((ANode) v);
         }
 

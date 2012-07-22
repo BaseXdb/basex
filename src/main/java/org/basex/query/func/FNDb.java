@@ -701,11 +701,11 @@ public final class FNDb extends StandardFunc {
   private Item output(final QueryContext ctx) throws QueryException {
     final Iter ir = ctx.iter(expr[0]);
     for(Item it; (it = ir.next()) != null;) {
-      if(it.type.isNode()) {
+      if(it instanceof ANode) {
         final MemData md = new MemData(ctx.context.prop);
         new DataBuilder(md).build((ANode) it);
         it = new DBNode(md);
-      } else if(it.type.isFunction()) {
+      } else if(it instanceof FItem) {
         FIVALUE.thrw(info, it);
       }
       ctx.output.add(it);

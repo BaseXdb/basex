@@ -7,7 +7,6 @@ import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -16,7 +15,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class StrStream extends Item {
+public final class StrStream extends AStr {
   /** Input reference. */
   private final IO input;
   /** Encoding (optional). */
@@ -33,7 +32,6 @@ public final class StrStream extends Item {
    * @param err error message to be thrown
    */
   public StrStream(final IO io, final String enc, final Err err) {
-    super(AtomType.STR);
     input = io;
     encoding = enc;
     error = err;
@@ -49,21 +47,6 @@ public final class StrStream extends Item {
       }
     }
     return val;
-  }
-
-  @Override
-  public boolean bool(final InputInfo ii) throws QueryException {
-    return string(ii).length != 0;
-  }
-
-  @Override
-  public boolean eq(final InputInfo ii, final Item it) throws QueryException {
-    return Token.eq(string(ii), it.string(ii));
-  }
-
-  @Override
-  public int diff(final InputInfo ii, final Item it) throws QueryException {
-    return Token.diff(string(ii), it.string(ii));
   }
 
   @Override

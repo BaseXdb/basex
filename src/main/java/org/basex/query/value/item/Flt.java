@@ -15,7 +15,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class Flt extends Num {
+public final class Flt extends ANum {
   /** Invalid value. */
   public static final Flt NAN = new Flt(Float.NaN);
   /** Zero value. */
@@ -42,7 +42,7 @@ public final class Flt extends Num {
   }
 
   @Override
-  public byte[] string(final InputInfo ii) {
+  public byte[] string() {
     return Token.token(val);
   }
 
@@ -52,17 +52,17 @@ public final class Flt extends Num {
   }
 
   @Override
-  public long itr(final InputInfo ii) {
+  public long itr() {
     return (long) val;
   }
 
   @Override
-  public float flt(final InputInfo ii) {
+  public float flt() {
     return val;
   }
 
   @Override
-  public double dbl(final InputInfo ii) {
+  public double dbl() {
     return val;
   }
 

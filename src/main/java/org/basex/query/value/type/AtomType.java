@@ -12,6 +12,7 @@ import javax.xml.namespace.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.item.ANum;
 import org.basex.util.*;
 
 /**
@@ -22,19 +23,19 @@ import org.basex.util.*;
  */
 public enum AtomType implements Type {
   /** Item type. */
-  ITEM("item", null, EMPTY, false, false, false, false, false, 32),
+  ITEM("item", null, EMPTY, false, false, false, 32),
 
   /** Any simple type. */
-  UTY("untyped", null, XSURI, false, false, false, false, false, 33),
+  UTY("untyped", null, XSURI, false, false, false, 33),
 
   /** Any simple type. */
-  ATY("anyType", null, XSURI, false, false, false, false, false, 34),
+  ATY("anyType", null, XSURI, false, false, false, 34),
 
   /** Any simple type. */
-  AST("anySimpleType", null, XSURI, false, false, false, false, false, 35),
+  AST("anySimpleType", null, XSURI, false, false, false, 35),
 
   /** Any atomic type. */
-  AAT("anyAtomicType", ITEM, XSURI, false, false, false, false, false, 36) {
+  AAT("anyAtomicType", ITEM, XSURI, false, false, false, 36) {
     @Override
     public Atm cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -47,7 +48,7 @@ public enum AtomType implements Type {
   },
 
   /** Untyped Atomic type. */
-  ATM("untypedAtomic", AAT, XSURI, false, true, true, false, false, 37) {
+  ATM("untypedAtomic", AAT, XSURI, false, true, false, 37) {
     @Override
     public Atm cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -60,7 +61,7 @@ public enum AtomType implements Type {
   },
 
   /** String type. */
-  STR("string", AAT, XSURI, false, false, true, false, false, 38) {
+  STR("string", AAT, XSURI, false, false, true, 38) {
     @Override
     public Str cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -73,7 +74,7 @@ public enum AtomType implements Type {
   },
 
   /** Normalized String type. */
-  NST("normalizedString", STR, XSURI, false, false, true, false, false, 39) {
+  NST("normalizedString", STR, XSURI, false, false, true, 39) {
     @Override
     public Str cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -86,7 +87,7 @@ public enum AtomType implements Type {
   },
 
   /** Token type. */
-  TOK("token", NST, XSURI, false, false, true, false, false, 40) {
+  TOK("token", NST, XSURI, false, false, true, 40) {
     @Override
     public Str cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -99,7 +100,7 @@ public enum AtomType implements Type {
   },
 
   /** Language type. */
-  LAN("language", TOK, XSURI, false, false, true, false, false, 41) {
+  LAN("language", TOK, XSURI, false, false, true, 41) {
     @Override
     public Str cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -114,7 +115,7 @@ public enum AtomType implements Type {
   },
 
   /** NMTOKEN type. */
-  NMT("NMTOKEN", TOK, XSURI, false, false, true, false, false, 42) {
+  NMT("NMTOKEN", TOK, XSURI, false, false, true, 42) {
     @Override
     public Str cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -129,7 +130,7 @@ public enum AtomType implements Type {
   },
 
   /** Name type. */
-  NAM("Name", TOK, XSURI, false, false, true, false, false, 43) {
+  NAM("Name", TOK, XSURI, false, false, true, 43) {
     @Override
     public Str cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -144,7 +145,7 @@ public enum AtomType implements Type {
   },
 
   /** NCName type. */
-  NCN("NCName", NAM, XSURI, false, false, true, false, false, 44) {
+  NCN("NCName", NAM, XSURI, false, false, true, 44) {
     @Override
     public Str cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -157,7 +158,7 @@ public enum AtomType implements Type {
   },
 
   /** ID type. */
-  ID("ID", NCN, XSURI, false, false, true, false, false, 45) {
+  ID("ID", NCN, XSURI, false, false, true, 45) {
     @Override
     public Str cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -170,7 +171,7 @@ public enum AtomType implements Type {
   },
 
   /** IDREF type. */
-  IDR("IDREF", NCN, XSURI, false, false, true, false, false, 46) {
+  IDR("IDREF", NCN, XSURI, false, false, true, 46) {
     @Override
     public Str cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -183,7 +184,7 @@ public enum AtomType implements Type {
   },
 
   /** Entity type. */
-  ENT("ENTITY", NCN, XSURI, false, false, true, false, false, 47) {
+  ENT("ENTITY", NCN, XSURI, false, false, true, 47) {
     @Override
     public Str cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -196,7 +197,7 @@ public enum AtomType implements Type {
   },
 
   /** Float type. */
-  FLT("float", AAT, XSURI, true, false, false, false, false, 48) {
+  FLT("float", AAT, XSURI, true, false, false, 48) {
     @Override
     public Flt cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -209,7 +210,7 @@ public enum AtomType implements Type {
   },
 
   /** Double type. */
-  DBL("double", AAT, XSURI, true, false, false, false, false, 49) {
+  DBL("double", AAT, XSURI, true, false, false, 49) {
     @Override
     public Dbl cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -222,7 +223,7 @@ public enum AtomType implements Type {
   },
 
   /** Decimal type. */
-  DEC("decimal", AAT, XSURI, true, false, false, false, false, 50) {
+  DEC("decimal", AAT, XSURI, true, false, false, 50) {
     @Override
     public Dec cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -235,14 +236,14 @@ public enum AtomType implements Type {
   },
 
   /** Precision decimal type. */
-  PDC("precisionDecimal", null, EMPTY, false, false, false, false, false, 51),
+  PDC("precisionDecimal", null, EMPTY, false, false, false, 51),
 
   /** Integer type. */
-  ITR("integer", DEC, XSURI, true, false, false, false, false, 52) {
+  ITR("integer", DEC, XSURI, true, false, false, 52) {
     @Override
     public Int cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
-      return cast(it, ii);
+      return it.type == AtomType.DTM ? new Int((ADate) it) : cast(it, ii);
     }
     @Override
     public Int cast(final Object o, final InputInfo ii) throws QueryException {
@@ -251,7 +252,7 @@ public enum AtomType implements Type {
   },
 
   /** Non-positive integer type. */
-  NPI("nonPositiveInteger", ITR, XSURI, true, false, false, false, false, 53) {
+  NPI("nonPositiveInteger", ITR, XSURI, true, false, false, 53) {
     @Override
     public Int cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -264,7 +265,7 @@ public enum AtomType implements Type {
   },
 
   /** Negative integer type. */
-  NIN("negativeInteger", NPI, XSURI, true, false, false, false, false, 54) {
+  NIN("negativeInteger", NPI, XSURI, true, false, false, 54) {
     @Override
     public Int cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -277,11 +278,11 @@ public enum AtomType implements Type {
   },
 
   /** Long type. */
-  LNG("long", ITR, XSURI, true, false, false, false, false, 55) {
+  LNG("long", ITR, XSURI, true, false, false, 55) {
     @Override
     public Int cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
-      return it.type.isDate() ? new Int((ADate) it) : cast(it, ii);
+      return cast(it, ii);
     }
     @Override
     public Int cast(final Object o, final InputInfo ii) throws QueryException {
@@ -290,7 +291,7 @@ public enum AtomType implements Type {
   },
 
   /** Int type. */
-  INT("int", LNG, XSURI, true, false, false, false, false, 56) {
+  INT("int", LNG, XSURI, true, false, false, 56) {
     @Override
     public Int cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -303,7 +304,7 @@ public enum AtomType implements Type {
   },
 
   /** Short type. */
-  SHR("short", INT, XSURI, true, false, false, false, false, 57) {
+  SHR("short", INT, XSURI, true, false, false, 57) {
     @Override
     public Int cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -316,7 +317,7 @@ public enum AtomType implements Type {
   },
 
   /** Byte type. */
-  BYT("byte", SHR, XSURI, true, false, false, false, false, 58) {
+  BYT("byte", SHR, XSURI, true, false, false, 58) {
     @Override
     public Int cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -329,7 +330,7 @@ public enum AtomType implements Type {
   },
 
   /** Non-negative integer type. */
-  NNI("nonNegativeInteger", ITR, XSURI, true, false, false, false, false, 59) {
+  NNI("nonNegativeInteger", ITR, XSURI, true, false, false, 59) {
     @Override
     public Int cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -342,27 +343,25 @@ public enum AtomType implements Type {
   },
 
   /** Unsigned long type. */
-  ULN("unsignedLong", NNI, XSURI, true, false, false, false, false, 60) {
-    /** Maximum value. */
-    final BigDecimal max = new BigDecimal(Long.MAX_VALUE).multiply(
-        BigDecimal.valueOf(2)).add(BigDecimal.ONE);
-
+  ULN("unsignedLong", NNI, XSURI, true, false, false, 60) {
     @Override
     public Dec cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
-      final BigDecimal v = checkNum(it, ii).dec(ii);
-      if(v.signum() < 0 || v.compareTo(max) > 0 || it.type.isString() &&
-          contains(it.string(ii), '.')) FUNCAST.thrw(ii, this, it);
-      return new Dec(v, this);
+      return cast(it, ii);
     }
     @Override
-    public Dec cast(final Object o, final InputInfo ii) {
-      return new Dec(token(o.toString()));
+    public Dec cast(final Object o, final InputInfo ii) throws QueryException {
+      final Item it = o instanceof Item ? (Item) o : Str.get(o.toString());
+      final BigDecimal v = checkNum(it, ii).dec(ii);
+      final BigDecimal i = v.setScale(0, BigDecimal.ROUND_DOWN);
+      if(v.signum() < 0 || v.compareTo(Dec.MAXULNG) > 0 ||
+        it.type.isStringOrUntyped() && !v.equals(i)) FUNCAST.thrw(ii, this, it);
+      return new Dec(i, this);
     }
   },
 
   /** Short type. */
-  UIN("unsignedInt", ULN, XSURI, true, false, false, false, false, 61) {
+  UIN("unsignedInt", ULN, XSURI, true, false, false, 61) {
     @Override
     public Int cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -375,7 +374,7 @@ public enum AtomType implements Type {
   },
 
   /** Unsigned Short type. */
-  USH("unsignedShort", UIN, XSURI, true, false, false, false, false, 62) {
+  USH("unsignedShort", UIN, XSURI, true, false, false, 62) {
     @Override
     public Int cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -388,7 +387,7 @@ public enum AtomType implements Type {
   },
 
   /** Unsigned byte type. */
-  UBY("unsignedByte", USH, XSURI, true, false, false, false, false, 63) {
+  UBY("unsignedByte", USH, XSURI, true, false, false, 63) {
     @Override
     public Int cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -401,7 +400,7 @@ public enum AtomType implements Type {
   },
 
   /** Positive integer type. */
-  PIN("positiveInteger", NNI, XSURI, true, false, false, false, false, 64) {
+  PIN("positiveInteger", NNI, XSURI, true, false, false, 64) {
     @Override
     public Int cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -414,11 +413,11 @@ public enum AtomType implements Type {
   },
 
   /** Duration type. */
-  DUR("duration", AAT, XSURI, false, false, false, true, false, 65) {
+  DUR("duration", AAT, XSURI, false, false, false, 65) {
     @Override
     public Item cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
-      return it.type.isDuration() ? new Dur((Dur) it) : str(it) ?
+      return it instanceof Dur ? new Dur((Dur) it) : str(it) ?
           new Dur(it.string(ii), ii) : error(it, ii);
     }
     @Override
@@ -428,11 +427,11 @@ public enum AtomType implements Type {
   },
 
   /** Year month duration type. */
-  YMD("yearMonthDuration", DUR, XSURI, false, false, false, true, false, 66) {
+  YMD("yearMonthDuration", DUR, XSURI, false, false, false, 66) {
     @Override
     public Item cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
-      return it.type.isDuration() ? new YMDur((Dur) it) : str(it) ?
+      return it instanceof Dur ? new YMDur((Dur) it) : str(it) ?
           new YMDur(it.string(ii), ii) : error(it, ii);
     }
     @Override
@@ -442,11 +441,11 @@ public enum AtomType implements Type {
   },
 
   /** Day time duration type. */
-  DTD("dayTimeDuration", DUR, XSURI, false, false, false, true, false, 67) {
+  DTD("dayTimeDuration", DUR, XSURI, false, false, false, 67) {
     @Override
     public Item cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
-      return it.type.isDuration() ? new DTd((Dur) it) : str(it) ?
+      return it instanceof Dur ? new DTd((Dur) it) : str(it) ?
           new DTd(it.string(ii), ii) : error(it, ii);
     }
     @Override
@@ -456,11 +455,11 @@ public enum AtomType implements Type {
   },
 
   /** DateTime type. */
-  DTM("dateTime", AAT, XSURI, false, false, false, false, true, 68) {
+  DTM("dateTime", AAT, XSURI, false, false, false, 68) {
     @Override
     public Item cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
-      return it.type.isNumber() ? new Dtm(it.itr(ii), ii) : it.type == DAT ?
+      return it.type == AtomType.ITR ? new Dtm(it.itr(ii), ii) : it.type == DAT ?
           new Dtm((ADate) it) : str(it) ? new Dtm(it.string(ii), ii) : error(it, ii);
     }
     @Override
@@ -470,10 +469,10 @@ public enum AtomType implements Type {
   },
 
   /** DateTimeStamp type. */
-  DTS("dateTimeStamp", null, EMPTY, false, false, false, false, true, 69),
+  DTS("dateTimeStamp", null, EMPTY, false, false, false, 69),
 
   /** Date type. */
-  DAT("date", AAT, XSURI, false, false, false, false, true, 70) {
+  DAT("date", AAT, XSURI, false, false, false, 70) {
     @Override
     public Item cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -487,7 +486,7 @@ public enum AtomType implements Type {
   },
 
   /** Time type. */
-  TIM("time", AAT, XSURI, false, false, false, false, true, 71) {
+  TIM("time", AAT, XSURI, false, false, false, 71) {
     @Override
     public Item cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -501,7 +500,7 @@ public enum AtomType implements Type {
   },
 
   /** Year month type. */
-  YMO("gYearMonth", AAT, XSURI, false, false, false, false, true, 72) {
+  YMO("gYearMonth", AAT, XSURI, false, false, false, 72) {
     @Override
     public Item cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -516,7 +515,7 @@ public enum AtomType implements Type {
   },
 
   /** Year type. */
-  YEA("gYear", AAT, XSURI, false, false, false, false, true, 73) {
+  YEA("gYear", AAT, XSURI, false, false, false, 73) {
     @Override
     public Item cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -531,7 +530,7 @@ public enum AtomType implements Type {
   },
 
   /** Month day type. */
-  MDA("gMonthDay", AAT, XSURI, false, false, false, false, true, 74) {
+  MDA("gMonthDay", AAT, XSURI, false, false, false, 74) {
     @Override
     public Item cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -546,7 +545,7 @@ public enum AtomType implements Type {
   },
 
   /** Day type. */
-  DAY("gDay", AAT, XSURI, false, false, false, false, true, 75) {
+  DAY("gDay", AAT, XSURI, false, false, false, 75) {
     @Override
     public Item cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -561,7 +560,7 @@ public enum AtomType implements Type {
   },
 
   /** Month type. */
-  MON("gMonth", AAT, XSURI, false, false, false, false, true, 76) {
+  MON("gMonth", AAT, XSURI, false, false, false, 76) {
     @Override
     public Item cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -576,11 +575,11 @@ public enum AtomType implements Type {
   },
 
   /** Boolean type. */
-  BLN("boolean", AAT, XSURI, false, false, false, false, false, 77) {
+  BLN("boolean", AAT, XSURI, false, false, false, 77) {
     @Override
     public Item cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
-      return it.type.isNumber() ? Bln.get(it.bool(ii)) : str(it) ?
+      return it instanceof ANum ? Bln.get(it.bool(ii)) : str(it) ?
           Bln.get(Bln.parse(it.string(ii), ii)) : error(it, ii);
     }
     @Override
@@ -591,10 +590,10 @@ public enum AtomType implements Type {
   },
 
   /** Implementation specific: binary type. */
-  BIN("binary", AAT, BASEXURI, false, false, false, false, false, 78),
+  BIN("binary", AAT, BASEXURI, false, false, false, 78),
 
   /** Base64 binary type. */
-  B64("base64Binary", BIN, XSURI, false, false, false, false, false, 79) {
+  B64("base64Binary", BIN, XSURI, false, false, false, 79) {
     @Override
     public Item cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -608,7 +607,7 @@ public enum AtomType implements Type {
   },
 
   /** Hex binary type. */
-  HEX("hexBinary", BIN, XSURI, false, false, false, false, false, 80) {
+  HEX("hexBinary", BIN, XSURI, false, false, false, 80) {
     @Override
     public Item cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -622,12 +621,12 @@ public enum AtomType implements Type {
   },
 
   /** Any URI type. */
-  URI("anyURI", AAT, XSURI, false, false, true, false, false, 81) {
+  URI("anyURI", AAT, XSURI, false, false, true, 81) {
     @Override
     public Item cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
 
-      if(!it.type.isString()) error(it, ii);
+      if(!it.type.isStringOrUntyped()) error(it, ii);
       final Uri u = Uri.uri(it.string(ii));
       if(!u.isValid()) FUNCAST.thrw(ii, this, it);
       return u;
@@ -639,7 +638,7 @@ public enum AtomType implements Type {
   },
 
   /** QName Type. */
-  QNM("QName", AAT, XSURI, false, false, false, false, false, 82) {
+  QNM("QName", AAT, XSURI, false, false, false, 82) {
     @Override
     public Item cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -659,10 +658,10 @@ public enum AtomType implements Type {
   },
 
   /** NOTATION Type. */
-  NOT("NOTATION", AAT, XSURI, false, false, false, false, false, 83),
+  NOT("NOTATION", AAT, XSURI, false, false, false, 83),
 
   /** Java type. */
-  JAVA("java", null, EMPTY, true, true, true, false, false, 86) {
+  JAVA("java", null, EMPTY, true, true, true, 86) {
     @Override
     public Item cast(final Item it, final QueryContext ctx, final InputInfo ii) {
       return new Jav(it);
@@ -689,10 +688,6 @@ public enum AtomType implements Type {
   private final boolean unt;
   /** String flag. */
   private final boolean str;
-  /** Duration flag. */
-  private final boolean dur;
-  /** Date flag. */
-  private final boolean dat;
 
   /** Sequence type (lazy). */
   private SeqType seq;
@@ -705,19 +700,15 @@ public enum AtomType implements Type {
    * @param n number flag
    * @param u untyped flag
    * @param s string flag
-   * @param d duration flag
-   * @param t date flag
    * @param i type id
    */
   AtomType(final String nm, final Type pr, final byte[] ur, final boolean n,
-      final boolean u, final boolean s, final boolean d, final boolean t, final int i) {
+      final boolean u, final boolean s, final int i) {
     name = new QNm(nm, ur);
     par = pr;
     num = n;
     unt = u;
     str = s;
-    dur = d;
-    dat = t;
     id = (byte) i;
   }
 
@@ -727,33 +718,18 @@ public enum AtomType implements Type {
   }
 
   @Override
-  public boolean isString() {
-    return str;
-  }
-
-  @Override
   public boolean isUntyped() {
     return unt;
   }
 
   @Override
-  public boolean isDuration() {
-    return dur;
+  public boolean isNumberOrUntyped() {
+    return num || unt;
   }
 
   @Override
-  public boolean isDate() {
-    return dat;
-  }
-
-  @Override
-  public boolean isFunction() {
-    return false;
-  }
-
-  @Override
-  public boolean isMap() {
-    return false;
+  public boolean isStringOrUntyped() {
+    return str || unt;
   }
 
   @Override
@@ -811,7 +787,7 @@ public enum AtomType implements Type {
   }
 
   /**
-   * Throws an exception if the specified item can't be converted to a number.
+   * Throws an exception if the specified item cannot be converted to a number.
    * @param it item
    * @param ii input info
    * @return item argument
@@ -819,8 +795,8 @@ public enum AtomType implements Type {
    */
   Item checkNum(final Item it, final InputInfo ii) throws QueryException {
     final Type ip = it.type;
-    return ip == URI || !ip.isString() && !ip.isNumber() &&
-        !ip.isUntyped() && ip != BLN ? error(it, ii) : it;
+    return it instanceof ANum || ip.isStringOrUntyped() && ip != URI || ip == BLN ?
+      it : error(it, ii);
   }
 
   /**
@@ -862,7 +838,7 @@ public enum AtomType implements Type {
    */
   static boolean str(final Item it) {
     final Type ip = it.type;
-    return (ip.isString() || ip.isUntyped()) && ip != URI;
+    return ip.isStringOrUntyped() && ip != URI;
   }
 
   /**

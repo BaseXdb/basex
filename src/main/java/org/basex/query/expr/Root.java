@@ -50,7 +50,7 @@ public final class Root extends Simple {
    * @return root node
    */
   public static ANode root(final Value v) {
-    if(!v.type.isNode()) return null;
+    if(!(v instanceof ANode)) return null;
     ANode n = (ANode) v;
     while(true) {
       final ANode p = n.parent();

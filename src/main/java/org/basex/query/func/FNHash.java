@@ -48,7 +48,7 @@ public final class FNHash extends StandardFunc {
   }
 
   /**
-   * Creates the hash of the given xs:string, using the algorithm {@code algo}.
+   * Creates the hash of a string, using the given algorithm.
    * @param algo hashing algorithm
    * @param ctx query context
    * @return xs:hexBinary instance containing the hash
@@ -57,7 +57,7 @@ public final class FNHash extends StandardFunc {
   private B64 hash(final String algo, final QueryContext ctx) throws QueryException {
     final Item it = checkItem(expr[0], ctx);
     final byte[] val;
-    if(it.type.isString()) {
+    if(it instanceof AStr) {
       val = it.string(info);
     } else if(it instanceof B64) {
       val = ((B64) it).binary(info);

@@ -58,13 +58,12 @@ public abstract class ANode extends Item {
 
   @Override
   public final boolean eq(final InputInfo ii, final Item it) throws QueryException {
-    return !it.type.isUntyped() ? it.eq(ii, this) : Token.eq(string(), it.string(ii));
+    return it.type.isUntyped() ? Token.eq(string(), it.string(ii)) : it.eq(ii, this);
   }
 
   @Override
   public final int diff(final InputInfo ii, final Item it) throws QueryException {
-    return !it.type.isUntyped() ? -it.diff(ii, this) :
-      Token.diff(string(), it.string(ii));
+    return it.type.isUntyped() ? Token.diff(string(), it.string(ii)) : -it.diff(ii, this);
   }
 
   @Override

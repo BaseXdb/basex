@@ -12,6 +12,7 @@ import org.basex.query.iter.*;
 import org.basex.query.path.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.item.ANum;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -161,6 +162,7 @@ public final class CmpG extends Cmp {
         op == OpG.NE && e2 == Bln.TRUE)) {
       // (A = false()) -> not(A)
       e = Function.NOT.get(info, e1);
+      ctx.compInfo(OPTWRITE, this);
     } else {
       // rewrite path CMP number
       e = CmpR.get(this);
@@ -250,14 +252,14 @@ public final class CmpG extends Cmp {
    * @throws QueryException query exception
    */
   private boolean eval(final Item a, final Item b) throws QueryException {
-    final Type ta = a.type;
-    final Type tb = b.type;
-    if(ta != tb && (!ta.isUntyped() && !tb.isUntyped() && !(ta.isString() &&
-        tb.isString()) && !(ta.isNumber() && tb.isNumber()) &&
-        !ta.isFunction() && !tb.isFunction() ||
-        ta == AtomType.QNM || tb == AtomType.QNM))
-      XPTYPECMP.thrw(info, ta, tb);
-    return op.op.eval(info, a, b);
+    if(!(a instanceof FItem || b instanceof FItem)) {
+      final Type ta = a.type, tb = b.type;
+      if(ta == tb || ta.isUntyped() || tb.isUntyped() ||
+          a instanceof ANum && b instanceof ANum ||
+          a instanceof AStr && b instanceof AStr)
+        return op.op.eval(info, a, b);
+    }
+    throw XPTYPECMP.thrw(info, a.type, b.type);
   }
 
   @Override
@@ -297,13 +299,13 @@ public final class CmpG extends Cmp {
     final Expr arg = expr[1];
     if(!arg.isValue()) {
       final SeqType t = arg.type();
-      /* index access is not possible if returned type is no string or node, if
+      /* index access is not possible if returned type is no string or not untyped, if
          expression depends on context, or if it is non-deterministic. examples:
          //*[text() = 1]
          //*[text() = .]
          //*[text() = (if(random:double() < .5) then 'X' else 'Y')]
        */
-      if(!t.type.isString() && !t.type.isNode() || arg.uses(Use.CTX) || arg.uses(Use.NDT))
+      if(!t.type.isStringOrUntyped() || arg.uses(Use.CTX) || arg.uses(Use.NDT))
         return false;
 
       ic.addCosts(ic.data.meta.size / 10);
@@ -316,8 +318,7 @@ public final class CmpG extends Cmp {
     Item it;
     ic.costs(0);
     while((it = ir.next()) != null) {
-      final SeqType t = it.type();
-      if(!(t.type.isString() || t.type.isNode())) return false;
+      if(!it.type.isStringOrUntyped()) return false;
 
       final int is = ic.data.count(new StringToken(ind, it.string(info)));
       // add only expressions that yield results

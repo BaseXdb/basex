@@ -40,7 +40,7 @@ public final class Arith extends Arr {
     final SeqType s1 = expr[1].type();
     final Type t0 = s0.type;
     final Type t1 = s1.type;
-    if((t0.isNumber() || t0.isUntyped()) && (t1.isNumber() || t1.isUntyped())) {
+    if(t0.isNumberOrUntyped() && t1.isNumberOrUntyped()) {
       final Occ occ = s0.one() && s1.one() ? Occ.ONE : Occ.ZERO_ONE;
       type = SeqType.get(Calc.type(t0, t1), occ);
     } else if(s0.one() && s1.one()) {

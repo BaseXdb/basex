@@ -2,7 +2,6 @@ package org.basex.query.value.item;
 
 import static org.basex.data.DataText.*;
 
-import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -15,7 +14,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public class Str extends Item {
+public class Str extends AStr {
   /** Zero-length string. */
   public static final Str ZERO = new Str(Token.EMPTY);
   /** String data. */
@@ -34,7 +33,7 @@ public class Str extends Item {
    * @param v value
    * @param t data type
    */
-  public Str(final byte[] v, final Type t) {
+  public Str(final byte[] v, final AtomType t) {
     super(t);
     val = v;
   }
@@ -68,21 +67,6 @@ public class Str extends Item {
    */
   public final byte[] string() {
     return val;
-  }
-
-  @Override
-  public final boolean bool(final InputInfo ii) {
-    return string().length != 0;
-  }
-
-  @Override
-  public boolean eq(final InputInfo ii, final Item it) throws QueryException {
-    return Token.eq(val, it.string(ii));
-  }
-
-  @Override
-  public int diff(final InputInfo ii, final Item it) throws QueryException {
-    return Token.diff(val, it.string(ii));
   }
 
   @Override

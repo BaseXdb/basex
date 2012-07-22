@@ -81,7 +81,7 @@ public final class MixedPath extends Path {
 
         // loop through all input items
         for(Item it; (it = res.next()) != null;) {
-          if(path && !it.type.isNode()) NODESPATH.thrw(info, this, it.type);
+          if(path && !(it instanceof ANode)) NODESPATH.thrw(info, this, it.type);
           ctx.value = it;
 
           // loop through all resulting items
@@ -89,9 +89,9 @@ public final class MixedPath extends Path {
           for(Item i; (i = ir.next()) != null;) {
             if(path) {
               // set node flag
-              if(vb.size() == 0) nodes = i.type.isNode();
+              if(vb.size() == 0) nodes = i instanceof ANode;
               // check if both nodes and atomic values occur in last result
-              else if(last && nodes != i.type.isNode()) EVALNODESVALS.thrw(info);
+              else if(last && nodes != i instanceof ANode) EVALNODESVALS.thrw(info);
             }
             vb.add(i);
           }

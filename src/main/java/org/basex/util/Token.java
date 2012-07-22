@@ -424,7 +424,7 @@ public final class Token {
 
   /**
    * Creates a byte array representation from the specified double value;
-   * inspired by Xavier Franc's Qizx.
+   * inspired by Xavier Franc's Qizx/open processor.
    * @param dbl double value to be converted
    * @return byte array
    */
@@ -433,8 +433,7 @@ public final class Token {
     if(b != null) return b;
 
     final double a = Math.abs(dbl);
-    return chopNumber(token(a >= 1e-6 && a < 1e6 ?
-        DD.format(dbl) : SD.format(dbl)));
+    return chopNumber(token(a >= 1e-6 && a < 1e6 ? DD.format(dbl) : SD.format(dbl)));
   }
 
   /**

@@ -187,10 +187,9 @@ public final class FNDate extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item checkDur(final Item it) throws QueryException {
-    final Type ip = it.type;
-    if(ip.isUntyped()) return new Dur(it.string(info), info);
-    if(!ip.isDuration()) Err.type(this, AtomType.DUR, it);
-    return it;
+    if(it instanceof Dur) return it;
+    if(it.type.isUntyped()) return new Dur(it.string(info), info);
+    throw Err.type(this, AtomType.DUR, it);
   }
 
   /**
@@ -251,10 +250,8 @@ public final class FNDate extends StandardFunc {
   private Item dattim(final Item date, final Item tm) throws QueryException {
     if(tm == null) return null;
 
-    final Item d = date.type.isUntyped() ?
-        new Dat(date.string(info), info) : date;
-    final Item t = tm.type.isUntyped() ?
-        new Tim(tm.string(info), info) : tm;
+    final Item d = date.type.isUntyped() ? new Dat(date.string(info), info) : date;
+    final Item t = tm.type.isUntyped() ? new Tim(tm.string(info), info) : tm;
 
     final Dtm dtm = new Dtm((Dat) checkType(d, AtomType.DAT));
     final Tim tim = (Tim) checkType(t, AtomType.TIM);

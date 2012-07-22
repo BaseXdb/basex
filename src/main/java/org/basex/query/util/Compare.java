@@ -90,24 +90,23 @@ public final class Compare {
       if(it1 == null || it2 == null) return it1 == null && it2 == null;
 
       // check functions
-      Type t1 = it1.type, t2 = it2.type;
-      if(t1.isFunction() || t2.isFunction()) {
+      if(it1 instanceof FItem || it2 instanceof FItem) {
         // maps are functions but have a defined deep-equality
-        if(t1.isMap() && t2.isMap()) {
-          final Map map1 = (Map) it1, map2 = (Map) it2;
-          if(!map1.deep(info, map2)) return false;
+        if(it1 instanceof Map && it2 instanceof Map) {
+          if(!((Map) it1).deep(info, (Map) it2)) return false;
           continue;
         }
-        FICMP.thrw(info, t1.isFunction() ? it1 : it2);
+        FICMP.thrw(info, it1 instanceof FItem ? it1 : it2);
       }
 
       // check atomic values
-      if(!t1.isNode() && !t2.isNode()) {
+      if(!(it1 instanceof ANode || it2 instanceof ANode)) {
         if(!it1.equiv(info, it2)) return false;
         continue;
       }
 
       // node types must be equal
+      Type t1 = it1.type, t2 = it2.type;
       if(t1 != t2) return false;
 
       ANode s1 = (ANode) it1, s2 = (ANode) it2;

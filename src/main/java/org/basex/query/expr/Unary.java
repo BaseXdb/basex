@@ -47,7 +47,7 @@ public final class Unary extends Single {
     if(it == null) return null;
     final Type ip = it.type;
 
-    if(!ip.isUntyped() && !ip.isNumber()) Err.number(this, it);
+    if(!ip.isNumberOrUntyped()) Err.number(this, it);
     final double d = it.dbl(info);
     if(ip.isUntyped()) return Dbl.get(minus ? -d : d);
 

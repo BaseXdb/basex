@@ -96,7 +96,7 @@ public final class FNGen extends StandardFunc {
       public Item next() throws QueryException {
         final Item it = ir.next();
         if(it == null) return null;
-        if(it.type.isFunction()) FIATOM.thrw(info, FNGen.this);
+        if(it instanceof FItem) FIATOM.thrw(info, FNGen.this);
         return atom(it, info);
       }
     };

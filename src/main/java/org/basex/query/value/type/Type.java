@@ -74,34 +74,17 @@ public interface Type {
   boolean isUntyped();
 
   /**
-   * Checks if the type refers to an {@code xs:string} or one of its sub-types.
+   * Checks if the type refers to a number or an untyped item.
    * @return result of check
    */
-  boolean isString();
+  boolean isNumberOrUntyped();
 
   /**
-   * Checks if the type refers to a {@code xs:duration} or one of its sub-types.
+   * Checks if the type refers to a number or a string.
+   * Returns if this item is untyped or a string.
    * @return result of check
    */
-  boolean isDuration();
-
-  /**
-   * Checks if the type refers to a {@code date} or one of its sub-types.
-   * @return result of check
-   */
-  boolean isDate();
-
-  /**
-   * Checks if the type refers to a function item.
-   * @return result of check
-   */
-  boolean isFunction();
-
-  /**
-   * Checks if the type refers to a map.
-   * @return result of check
-   */
-  boolean isMap();
+  boolean isStringOrUntyped();
 
   /**
    * Returns the string representation of this type.

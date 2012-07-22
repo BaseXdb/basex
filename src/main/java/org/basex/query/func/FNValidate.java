@@ -221,12 +221,12 @@ public final class FNValidate extends StandardFunc {
     if(it.isEmpty()) STRNODTYPE.thrw(info, this, it);
     final Type ip = it.type;
     final ArrayOutput ao = new ArrayOutput();
-    if(ip.isNode()) {
+    if(it instanceof ANode) {
       // return node in string representation
       Serializer.get(ao, sp).serialize((ANode) it);
       return new IOContent(ao.toArray());
     }
-    if(ip.isString()) {
+    if(it instanceof AStr) {
       final String path = string(it.string(info));
       IO io = IO.get(path);
       if(!io.exists()) WHICHRES.thrw(info, path);

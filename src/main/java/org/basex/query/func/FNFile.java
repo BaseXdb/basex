@@ -421,8 +421,7 @@ public final class FNFile extends StandardFunc {
     final PrintOutput out = PrintOutput.get(new FileOutputStream(path, append));
     try {
       for(Item it; (it = ir.next()) != null;) {
-        final Type ip = it.type;
-        if(!ip.isString() && !ip.isUntyped()) Err.type(this, AtomType.STR, it);
+        if(!it.type.isStringOrUntyped()) Err.type(this, AtomType.STR, it);
         final byte[] s = it.string(info);
         out.write(cs == null ? s : Token.string(s).getBytes(cs));
         out.write(cs == null ? NL : Prop.NL.getBytes(cs));

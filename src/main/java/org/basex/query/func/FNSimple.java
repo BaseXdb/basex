@@ -171,7 +171,7 @@ public final class FNSimple extends StandardFunc {
       if(!e.type().mayBeNumber()) ex = e;
     } else if(sig == Function.EXISTS) {
       // if(exists(node*)) -> if(node*)
-      if(e.type().type.isNode() || e.size() > 0) ex = e;
+      if(e.type().type.isNode()) ex = e;
     }
     if(ex != this) ctx.compInfo(QueryText.OPTWRITE, this);
     return ex;

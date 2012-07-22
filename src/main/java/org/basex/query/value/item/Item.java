@@ -133,9 +133,9 @@ public abstract class Item extends Value {
     final Type t1 = type;
     final Type t2 = it.type;
     return t1 == t2 ||
-      t1.isNumber() && t2.isNumber() ||
-      (t1.isUntyped() || t1.isString()) && (t2.isUntyped() || t2.isString()) ||
-      t1.isDuration() && t2.isDuration();
+      this instanceof ANum && it instanceof ANum ||
+      t1.isStringOrUntyped() && t2.isStringOrUntyped() ||
+      this instanceof Dur && it instanceof Dur;
   }
 
   /**
@@ -156,7 +156,7 @@ public abstract class Item extends Value {
    */
   public final boolean equiv(final InputInfo ii, final Item it) throws QueryException {
     // check if both values are NaN, or if values are equal..
-    return (this == Dbl.NAN || this == Flt.NAN) && it.type.isNumber() &&
+    return (this == Dbl.NAN || this == Flt.NAN) && it instanceof ANum &&
         Double.isNaN(it.dbl(ii)) || comparable(it) && eq(ii, it);
   }
 

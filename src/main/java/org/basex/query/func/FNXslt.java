@@ -17,7 +17,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.type.Type;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
@@ -127,10 +126,9 @@ public final class FNXslt extends StandardFunc {
       throws QueryException, IOException  {
 
     final Item it = checkNoEmpty(e.item(ctx, info));
-    final Type ip = it.type;
-    if(ip.isNode()) return new IOContent(it.serialize().toArray());
-    if(ip.isString()) return IO.get(string(it.string(info)));
-    throw STRNODTYPE.thrw(info, this, ip);
+    if(it instanceof ANode) return new IOContent(it.serialize().toArray());
+    if(it instanceof AStr) return IO.get(string(it.string(info)));
+    throw STRNODTYPE.thrw(info, this, it.type);
   }
 
   @Override

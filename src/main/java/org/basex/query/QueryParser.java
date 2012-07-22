@@ -2737,7 +2737,7 @@ public class QueryParser extends InputParser {
     }
 
     // map
-    if(t.isMap()) {
+    if(t instanceof MapType) {
       final Type key = itemType().type;
       if(!key.instanceOf(AtomType.AAT)) error(MAPTAAT, key);
       wsCheck(COMMA);

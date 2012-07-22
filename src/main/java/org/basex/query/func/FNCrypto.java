@@ -5,6 +5,7 @@ import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.crypto.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -47,9 +48,8 @@ public class FNCrypto extends StandardFunc {
         if(expr.length > 6) {
           arg6 = checkItem(expr[6], ctx);
 
-          if(arg6.type.isString()) arg6Str = true;
-          else if(arg6.type.isNode());
-          else Err.type(this, AtomType.STR, arg6);
+          if(arg6 instanceof AStr) arg6Str = true;
+          else if(!(arg6 instanceof ANode)) Err.type(this, AtomType.STR, arg6);
         }
         return new DigitalSignature(ii).generateSignature(
             checkNode(expr[0].item(ctx, ii)), checkStr(expr[1], ctx),

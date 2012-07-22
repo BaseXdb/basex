@@ -5,7 +5,6 @@ import org.basex.query.expr.CmpV.OpV;
 import org.basex.query.func.*;
 import org.basex.query.path.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -62,8 +61,7 @@ public abstract class Cmp extends Arr {
     final Expr a = expr[1];
     if(!a.isItem()) return this;
     final Item it = (Item) a;
-    final Type ip = it.type;
-    if(!ip.isNumber() && !ip.isUntyped()) return this;
+    if(!it.type.isNumberOrUntyped()) return this;
 
     final double v = it.dbl(info);
     // TRUE: c > (v<0), c != (v<0), c >= (v<=0), c != not-int(v)

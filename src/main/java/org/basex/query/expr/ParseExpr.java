@@ -11,6 +11,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.item.ANum;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -82,7 +83,8 @@ public abstract class ParseExpr extends Expr {
     } else {
       final Iter ir = iter(ctx);
       it = ir.next();
-      if(it != null && !it.type.isNode() && ir.next() != null) CONDTYPE.thrw(info, this);
+      if(!(it == null || it instanceof ANode || ir.next() == null))
+        CONDTYPE.thrw(info, this);
     }
     return it == null ? Bln.FALSE : it;
   }
@@ -92,8 +94,7 @@ public abstract class ParseExpr extends Expr {
       throws QueryException {
 
     final Item it = ebv(ctx, info);
-    return (it.type.isNumber() ? it.dbl(info) == ctx.pos :
-      it.bool(info)) ? it : null;
+    return (it instanceof ANum ? it.dbl(info) == ctx.pos : it.bool(info)) ? it : null;
   }
 
   @Override
@@ -192,8 +193,8 @@ public abstract class ParseExpr extends Expr {
 
     final Item it = checkNoEmpty(e.item(ctx, info), AtomType.BLN);
     final Type ip = it.type;
-    if(!ip.isUntyped() && ip != AtomType.BLN) Err.type(this, AtomType.BLN, it);
-    return it.bool(info);
+    if(ip == AtomType.BLN || ip.isUntyped()) return it.bool(info);
+    throw Err.type(this, AtomType.BLN, it);
   }
 
   /**
@@ -208,9 +209,8 @@ public abstract class ParseExpr extends Expr {
       throws QueryException {
 
     final Item it = checkNoEmpty(e.item(ctx, info), AtomType.DBL);
-    final Type ip = it.type;
-    if(!ip.isUntyped() && !ip.isNumber()) number(this, it);
-    return it.dbl(info);
+    if(it.type.isNumberOrUntyped()) return it.dbl(info);
+    throw number(this, it);
   }
 
   /**
@@ -234,9 +234,8 @@ public abstract class ParseExpr extends Expr {
    */
   public final long checkItr(final Item it) throws QueryException {
     final Type ip = it.type;
-    if(!ip.isUntyped() && !ip.instanceOf(AtomType.ITR))
-      Err.type(this, AtomType.ITR, it);
-    return it.itr(info);
+    if(ip.instanceOf(AtomType.ITR) || ip.isUntyped()) return it.itr(info);
+    throw Err.type(this, AtomType.ITR, it);
   }
 
   /**
@@ -247,8 +246,8 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   public final ANode checkNode(final Item it) throws QueryException {
-    if(!it.type.isNode()) Err.type(this, NodeType.NOD, it);
-    return (ANode) it;
+    if(it instanceof ANode) return (ANode) it;
+    throw Err.type(this, NodeType.NOD, it);
   }
 
   /**
@@ -259,8 +258,8 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   public final DBNode checkDBNode(final Item it) throws QueryException {
-    if(!(it instanceof DBNode)) BXDB_NODB.thrw(info, this);
-    return (DBNode) it;
+    if(it instanceof DBNode) return (DBNode) it;
+    throw BXDB_NODB.thrw(info, this);
   }
 
   /**
@@ -292,8 +291,8 @@ public abstract class ParseExpr extends Expr {
 
     final Item it = checkItem(e, ctx);
     final Type ip = it.type;
-    if(!ip.isString() && !ip.isUntyped()) Err.type(this, AtomType.STR, it);
-    return it.string(info);
+    if(ip.isStringOrUntyped()) return it.string(info);
+    throw Err.type(this, AtomType.STR, it);
   }
 
   /**
@@ -306,8 +305,8 @@ public abstract class ParseExpr extends Expr {
   public final byte[] checkEStr(final Item it) throws QueryException {
     if(it == null) return EMPTY;
     final Type ip = it.type;
-    if(!ip.isString() && !ip.isUntyped()) Err.type(this, AtomType.STR, it);
-    return it.string(info);
+    if(ip.isStringOrUntyped()) return it.string(info);
+    throw Err.type(this, AtomType.STR, it);
   }
 
   /**
@@ -318,8 +317,8 @@ public abstract class ParseExpr extends Expr {
    */
   public final Value checkCtx(final QueryContext ctx) throws QueryException {
     final Value v = ctx.value;
-    if(v == null) XPNOCTX.thrw(info, this);
-    return v;
+    if(v != null) return v;
+    throw XPNOCTX.thrw(info, this);
   }
 
   /**
@@ -345,8 +344,8 @@ public abstract class ParseExpr extends Expr {
       throws QueryException {
 
     final Item it = checkItem(e, ctx);
-    if(!(it instanceof Bin)) BINARYTYPE.thrw(info, it.type);
-    return (Bin) it;
+    if(it instanceof Bin) return (Bin) it;
+    throw BINARYTYPE.thrw(info, it.type);
   }
 
   /**
@@ -358,8 +357,8 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   public final Item checkType(final Item it, final Type t) throws QueryException {
-    if(!checkNoEmpty(it).type.instanceOf(t)) Err.type(this, t, it);
-    return it;
+    if(checkNoEmpty(it).type.instanceOf(t)) return it;
+    throw Err.type(this, t, it);
   }
 
   /**
@@ -369,8 +368,8 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   public final Item checkNoEmpty(final Item it) throws QueryException {
-    if(it == null) XPEMPTY.thrw(info, description());
-    return it;
+    if(it != null) return it;
+    throw XPEMPTY.thrw(info, description());
   }
 
   /**
@@ -381,8 +380,8 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   private Item checkNoEmpty(final Item it, final Type t) throws QueryException {
-    if(it == null) XPEMPTYPE.thrw(info, description(), t);
-    return it;
+    if(it != null) return it;
+    throw XPEMPTYPE.thrw(info, description(), t);
   }
 
   /**

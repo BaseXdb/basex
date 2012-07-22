@@ -137,14 +137,9 @@ public final class QNm extends Item {
   }
 
   @Override
-  public boolean bool(final InputInfo ii) throws QueryException {
-    throw CONDTYPE.thrw(ii, type, this);
-  }
-
-  @Override
-  public boolean eq(final InputInfo ii, final Item it) {
-    // at this stage, item will always be of the same type
-    return eq((QNm) it);
+  public boolean eq(final InputInfo ii, final Item it) throws QueryException {
+    if(it instanceof QNm) return eq((QNm) it);
+    throw XPTYPECMP.thrw(ii, it.type, type);
   }
 
   /**

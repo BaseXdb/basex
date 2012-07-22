@@ -72,11 +72,10 @@ public final class FNFormat extends StandardFunc {
     // evaluate arguments
     Item it = expr[0].item(ctx, info);
     if(it == null) it = Dbl.NAN;
-    else if(!it.type.isUntyped() && !it.type.isNumber()) number(this, it);
+    else if(!it.type.isNumberOrUntyped()) number(this, it);
 
     final String pic = string(checkStr(expr[1], ctx));
-    final QNm frm = new QNm(expr.length == 3 ?
-        checkStr(expr[2], ctx) : EMPTY, ctx);
+    final QNm frm = new QNm(expr.length == 3 ? checkStr(expr[2], ctx) : EMPTY, ctx);
 
     final DecFormatter df = ctx.sc.decFormats.get(frm.eqname());
     if(df == null) throw FORMNUM.thrw(info, frm);
