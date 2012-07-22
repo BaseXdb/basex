@@ -4,6 +4,7 @@ import static javax.servlet.http.HttpServletResponse.*;
 import static org.basex.http.HTTPText.*;
 
 import java.io.*;
+import java.util.*;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -53,8 +54,13 @@ public abstract class BaseXServlet extends HttpServlet {
       http.status(SC_INTERNAL_SERVER_ERROR, Util.info(UNEXPECTED, ex));
     } finally {
       if(Boolean.parseBoolean(System.getProperty(HTTPText.DBVERBOSE))) {
-        Util.out("_ REQUEST ___________________________________" + Prop.NL + req);
-        Util.out("_ RESPONSE __________________________________" + Prop.NL + res);
+        Util.outln("_ REQUEST _________________________________" + Prop.NL + req);
+        final Enumeration<String> en = req.getHeaderNames();
+        while(en.hasMoreElements()) {
+          final String key = en.nextElement();
+          Util.outln(Text.LI + key + Text.COLS + req.getHeader(key));
+        }
+        Util.out("_ RESPONSE ________________________________" + Prop.NL + res);
       }
       http.close();
     }

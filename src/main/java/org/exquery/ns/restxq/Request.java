@@ -47,4 +47,14 @@ public final class Request extends QueryModule {
       final String value) {
     request.getSession().setAttribute(key, value);
   }
+
+  /**
+   * Returns the path of the request.
+   * @param request servlet request
+   * @return path
+   */
+  @Requires(Permission.NONE)
+  public String path(final HttpServletRequest request) {
+    return request.getPathInfo();
+  }
 }
