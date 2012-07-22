@@ -48,7 +48,6 @@ public class BaseXEditor extends BaseXPanel {
     setFocusable(true);
     setFocusTraversalKeysEnabled(!edit);
 
-    BaseXLayout.addInteraction(this, win);
     addMouseMotionListener(this);
     addMouseWheelListener(this);
     addComponentListener(this);
