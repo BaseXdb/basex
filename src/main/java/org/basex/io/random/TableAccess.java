@@ -9,8 +9,6 @@ import org.basex.io.*;
  * This abstract class defines the methods for accessing the
  * database table representation.
  *
- * NOTE: this thread and its descendants are not thread-safe
- *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
