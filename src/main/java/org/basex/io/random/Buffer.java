@@ -11,7 +11,7 @@ import org.basex.io.*;
 final class Buffer {
   /** Buffer data. */
   final byte[] data = new byte[IO.BLOCKSIZE];
-  /** Disk offset, or block position. */
+  /** File position of the first byte of this buffer. */
   long pos = -1;
   /** Dirty flag. */
   boolean dirty;
