@@ -65,10 +65,10 @@ public final class ValueBuilder extends IndexBuilder {
       if((pre & 0x0FFF) == 0) {
         check();
         // check if main memory is exhausted
-        if(memFull()) {
+        if(memFull()) {  // [WK] dangerous dependency!
           write(f + csize++, false);
           index = new IndexTree();
-          Performance.gc(2);
+          Performance.mandatoryGC(2);
         }
       }
       // skip too long values

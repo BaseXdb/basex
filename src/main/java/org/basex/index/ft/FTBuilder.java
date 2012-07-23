@@ -81,9 +81,9 @@ public final class FTBuilder extends IndexBuilder {
         // skip too long and stopword tokens
         if(tok.length <= data.meta.maxlen && (sw.isEmpty() || !sw.contains(tok))) {
           // check if main memory is exhausted
-          if((ntok++ & 0xFFF) == 0 && memFull()) {
+          if((ntok++ & 0xFFF) == 0 && memFull()) {  // [WK] dangerous dependency!
             writeIndex(csize++);
-            Performance.gc(2);
+            Performance.mandatoryGC(2);
           }
           index(tok);
         }

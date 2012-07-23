@@ -52,10 +52,12 @@ public abstract class IndexBuilder extends Progress {
 
   /**
    * Checks if enough memory is left to continue index building.
+   * NOTE: this method is inherently unreliable. Its return value should
+   *   never be used for important control flow decisions.
    * @return result of check
    * @throws IOException I/O exception
    */
-  protected final boolean memFull() throws IOException { // [WK] Abschaffen!
+  protected final boolean memFull() throws IOException {
     final boolean full = rt.totalMemory() - rt.freeMemory() >= maxMem;
     if(full) {
       if(cc >= 0) throw new BaseXException(OUT_OF_MEM + H_OUT_OF_MEM);
