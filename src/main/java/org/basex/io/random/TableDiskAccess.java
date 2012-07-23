@@ -75,14 +75,13 @@ public final class TableDiskAccess extends TableAccess {
      * @param blockNumber the part of the file we are interested in,
      *    starting at file position blockNumber * IO.BLOCKSIZE
      * @param write must be set to true if we intend to change the buffer
-     * @return the buffer containing data of the selected area
      */
-    public Buffer acquireBuffer(final Selector selector, final long blockNumber,
+    public void acquireBuffer(final Selector selector, final long blockNumber,
         final boolean write) {
       if (buffer != null) {
         bm.freeBuffer();
       }
-      return bm.acquireBuffer(selector, blockNumber, write);
+      buffer = bm.acquireBuffer(selector, blockNumber, write);
     }
 
     /**
@@ -649,7 +648,7 @@ public final class TableDiskAccess extends TableAccess {
       }
       readPage(cursor, m, write);
     } else {
-      readBlock(cursor, cursor.page, write);
+      readBlock(cursor, pages[cursor.page], write);
     }
     return pre - cursor.fpre << IO.NODEPOWER;
   }

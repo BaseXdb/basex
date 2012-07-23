@@ -120,8 +120,9 @@ final class Buffers {
       bf.pos = blockNumber;
       final long len = file.length();
       final long pos = blockNumber * IO.BLOCKSIZE;
+      file.seek(pos);
       if(pos < len)
-        file.readFully(bf.data, 0, (int) Math.min(len - bf.pos, IO.BLOCKSIZE));
+        file.readFully(bf.data, 0, (int) Math.min(len - pos, IO.BLOCKSIZE));
     } catch(final IOException ex) {
       Util.stack(ex);
     }
