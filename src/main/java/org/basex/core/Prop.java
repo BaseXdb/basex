@@ -40,6 +40,11 @@ public final class Prop extends AProp {
   public static final String DBPREFIX = "org.basex.";
   /** System property for specifying database home directory. */
   public static final String PATH = DBPREFIX + "path";
+  /**
+   * System property for suppressing unwanted System.gc() calls.
+   * Possible values include: true, false, and optional.
+   */
+  public static final String SUPPRESS_GC = DBPREFIX + "suppressgc";
   /** User's home directory. */
   public static final String USERHOME = System.getProperty("user.home") + File.separator;
   /** Directory for storing the property files, database directory, etc. */

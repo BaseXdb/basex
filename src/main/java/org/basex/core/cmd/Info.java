@@ -43,7 +43,7 @@ public final class Info extends AInfo {
     tb.add(GENERAL_INFO + NL);
     format(tb, VERSINFO, Prop.VERSION);
     if(context.user.has(Perm.CREATE)) {
-      Performance.gc(3);
+      Performance.mandatoryGC(3);
       format(tb, USED_MEM, Performance.getMemory());
     }
     if(context.user.has(Perm.ADMIN)) {

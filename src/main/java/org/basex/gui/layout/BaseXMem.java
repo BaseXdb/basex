@@ -69,7 +69,7 @@ public final class BaseXMem extends BaseXPanel {
 
   @Override
   public void mousePressed(final MouseEvent e) {
-    Performance.gc(3);
+    Performance.mandatoryGC(3);
     repaint();
 
     final Runtime rt = Runtime.getRuntime();
