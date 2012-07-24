@@ -4,7 +4,7 @@
 #
 # (C) BaseX Team 2005-12, BSD License
 
-require 'BaseXClient.rb'
+require './BaseXClient.rb'
 
 begin
 
