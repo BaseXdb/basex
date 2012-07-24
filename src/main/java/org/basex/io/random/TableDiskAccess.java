@@ -621,7 +621,9 @@ public final class TableDiskAccess extends TableAccess {
    * @return offset of the entry in the block
    */
   private int cursor(final TableCursor cursor, final int pre, final boolean write) {
-    setCurrentPage(cursor);
+    if (cursor.page >= 0) {
+      setCurrentPage(cursor);
+    }
     int fp = cursor.fpre;
     int np = cursor.npre;
     if(pre < fp || pre >= np) {
