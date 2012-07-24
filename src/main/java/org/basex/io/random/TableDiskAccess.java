@@ -621,6 +621,7 @@ public final class TableDiskAccess extends TableAccess {
    * @return offset of the entry in the block
    */
   private int cursor(final TableCursor cursor, final int pre, final boolean write) {
+    setCurrentPage(cursor);
     int fp = cursor.fpre;
     int np = cursor.npre;
     if(pre < fp || pre >= np) {
@@ -660,8 +661,16 @@ public final class TableDiskAccess extends TableAccess {
    */
   private void setPage(final TableCursor cursor, final int p) {
     cursor.page = p;
-    cursor.fpre = fpres[p];
-    cursor.npre = p + 1 >= used ? meta.size : fpres[p + 1];
+    setCurrentPage(cursor);
+  }
+
+  /**
+   * Updates cursor.fpre and cursor.npre.
+   * @param cursor the cursor on which this operation shall operate
+   */
+  private void setCurrentPage(final TableCursor cursor) {
+    cursor.fpre = fpres[cursor.page];
+    cursor.npre = cursor.page + 1 >= used ? meta.size : fpres[cursor.page + 1];
   }
 
   /**
