@@ -232,8 +232,13 @@ public final class DiskData extends Data {
 
   @Override
   public byte[] text(final int pre, final boolean text) {
-    final long o = textOff(pre);
-    return num(o) ? token((int) o) : txt(o, text);
+    try {
+      final long o = textOff(pre);
+      return num(o) ? token((int) o) : txt(o, text);
+    } catch (RuntimeException e) {
+      throw new RuntimeException("Error extracting text for pre " + pre +
+          " from " + ((text ? texts : values).fileName), e);
+    }
   }
 
   @Override

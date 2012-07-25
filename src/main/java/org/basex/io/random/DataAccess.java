@@ -16,6 +16,8 @@ public final class DataAccess {
   private final Buffers bm = new Buffers();
   /** Reference to the data input stream. */
   private final RandomAccessFile file;
+  /** The path of the file (for debugging purposes). */
+  public final String fileName;
   /** File length. */
   private long len;
   /** Changed flag. */
@@ -29,6 +31,7 @@ public final class DataAccess {
    * @throws IOException I/O Exception
    */
   public DataAccess(final IOFile f) throws IOException {
+    fileName = f.file().getAbsolutePath();
     file = new RandomAccessFile(f.file(), "rw");
     len = file.length();
     cursor(0);

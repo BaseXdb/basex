@@ -96,7 +96,7 @@ final class Buffers {
 
     /*
      * We need to try again whether a matching buffer is available,
-     * because we ned to strictly avoid mapping the same file area to
+     * because we need to strictly avoid mapping the same file area to
      * more than one buffer at the same time
      */
     do {

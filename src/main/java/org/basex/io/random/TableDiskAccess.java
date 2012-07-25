@@ -595,19 +595,20 @@ public final class TableDiskAccess extends TableAccess {
         pages[cursor.page] = (int) cursor.buffer.pos;
       }
 
+      // increment all fpre values after the last modified block
+      for(int i = cursor.page + 1; i < used; ++i) fpres[i] += nr;
+
+      meta.size += nr;
+
+      // update cached variables
+      cursor.fpre = fpres[cursor.page];
+      cursor.npre = cursor.page + 1 < used && fpres[cursor.page + 1] < meta.size ?
+        fpres[cursor.page + 1] : meta.size;
+
     } finally {
       cursor.freeBuffer();
     }
 
-    // increment all fpre values after the last modified block
-    for(int i = cursor.page + 1; i < used; ++i) fpres[i] += nr;
-
-    meta.size += nr;
-
-    // update cached variables
-    cursor.fpre = fpres[cursor.page];
-    cursor.npre = cursor.page + 1 < used && fpres[cursor.page + 1] < meta.size ?
-        fpres[cursor.page + 1] : meta.size;
   }
 
   // PRIVATE METHODS ==========================================================
@@ -643,7 +644,10 @@ public final class TableDiskAccess extends TableAccess {
         synchronized (blocksLock) {
         Util.notexpected(
           "Data Access out of bounds:" +
+          "\n- file: " + meta.dbfile(DATATBL).file().getAbsolutePath() +
           "\n- pre value: " + pre +
+          "\n- fp value: " + fp +
+          "\n- meta.size: " + meta.size +
           "\n- #used blocks: " + used +
           "\n- #total locks: " + blocks +
           "\n- access: " + m + " (" + l + " > " + h + ']');
@@ -672,7 +676,8 @@ public final class TableDiskAccess extends TableAccess {
    */
   private void setCurrentPage(final TableCursor cursor) {
     cursor.fpre = fpres[cursor.page];
-    cursor.npre = cursor.page + 1 >= used ? meta.size : fpres[cursor.page + 1];
+    cursor.npre = cursor.page + 1 < used && fpres[cursor.page + 1] < meta.size ?
+      fpres[cursor.page + 1] : meta.size;
   }
 
   /**
