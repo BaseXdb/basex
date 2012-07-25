@@ -3,7 +3,7 @@ package org.basex.index;
 import static org.basex.util.Token.*;
 
 import java.lang.ref.*;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.*;
 
 import org.basex.util.list.*;
 
@@ -18,7 +18,9 @@ public final class IndexCache {
   private final ReferenceQueue<IndexEntry> queue = new ReferenceQueue<IndexEntry>();
   /** Read-write lock. */
   private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock(true);
+  /** Read-write lock, read part. */
   private final ReentrantReadWriteLock.ReadLock readLock = rwl.readLock();
+  /** Read-write lock, write part. */
   private final ReentrantReadWriteLock.WriteLock writeLock = rwl.writeLock();
   /** Hash table buckets. */
   private BucketEntry[] buckets = new BucketEntry[ElementList.CAP];
@@ -158,11 +160,11 @@ public final class IndexCache {
   /**
    * Update an existing index entry.
    * @param entry index entry to update
-   * @param size new size
+   * @param newSize new size
    * @param pointer new pointer
    */
-  private void update(final IndexEntry entry, final int size, final long pointer) {
-    entry.size = size;
+  private void update(final IndexEntry entry, final int newSize, final long pointer) {
+    entry.size = newSize;
     entry.pointer = pointer;
   }
 
