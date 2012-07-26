@@ -2,7 +2,7 @@ package org.basex.index.value;
 
 import static org.basex.core.Text.*;
 
-import org.basex.core.Prop;
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
