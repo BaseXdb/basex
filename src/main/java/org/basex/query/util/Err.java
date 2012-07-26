@@ -27,6 +27,8 @@ public enum Err {
   BASX_PERM(BASX, 1, "% permission required."),
   /** BASX0002. */
   BASX_OPTIONS(BASX, 2, "Unknown database option '%'."),
+  /** BASX0002. */
+  BASX_VALUE(BASX, 2, "Invalid value for database option: %."),
   /** BASX0003. */
   BASX_RESTXQ(BASX, 3, "%"),
 
@@ -661,13 +663,13 @@ public enum Err {
   INITJAVA(XPST, 17, "Class cannot be initialized: %."),
 
   /** XPST0051. */
-  TYPEUNKNOWN(XPST, 51, "Unknown type %."),
+  TYPEUNKNOWN(XPST, 51, "Unknown type '%'."),
   /** XPST0080. */
-  CASTUNKNOWN(XPST, 80, "Invalid cast type %."),
+  CASTUNKNOWN(XPST, 80, "Invalid cast type '%'."),
   /** XPST0081. */
-  NOURI(XPST, 81, "No namespace declared for %."),
+  NOURI(XPST, 81, "No namespace declared for '%'."),
   /** XPST0081. */
-  NSMISS(XPST, 81, "QName % has no namespace."),
+  NSMISS(XPST, 81, "QName '%' has no namespace."),
 
   /** XPTY0004. */
   XPSEQ(XPTY, 4, "Single item expected, % found."),
