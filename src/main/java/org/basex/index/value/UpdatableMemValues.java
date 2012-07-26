@@ -2,6 +2,7 @@ package org.basex.index.value;
 
 import static org.basex.core.Text.*;
 
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
@@ -50,7 +51,7 @@ public final class UpdatableMemValues extends MemValues {
   @Override
   public byte[] info() {
     final TokenBuilder tb = new TokenBuilder(LI_STRUCTURE).add(SORTED_LIST).add(NL);
-    final IndexStats stats = new IndexStats(data);
+    final IndexStats stats = new IndexStats(data.meta.prop.num(Prop.MAXSTAT));
     for(int m = 1; m < size; ++m) {
       final int oc = len[m];
       if(stats.adding(oc)) stats.add(key(m));
