@@ -154,13 +154,7 @@ public final class Var extends ParseExpr {
   public Value value(final QueryContext ctx) throws QueryException {
     if(value == null) {
       if(expr == null) VAREMPTY.thrw(info, this);
-      final Value v = ctx.value;
-      ctx.value = null;
-      try {
-        value = cast(ctx.value(expr.compile(ctx)), ctx);
-      } finally {
-        ctx.value = v;
-      }
+      value = cast(ctx.value(expr.compile(ctx)), ctx);
     }
     return value;
   }
