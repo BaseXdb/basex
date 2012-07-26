@@ -45,6 +45,12 @@ public final class Prop extends AProp {
    * Possible values include: true, false, and optional.
    */
   public static final String SUPPRESS_GC = DBPREFIX + "suppressgc";
+  /**
+   * System property for suppressing BaseX own OutOfMemory error.
+   * Set this property to 'true' to suppress all OutOfMemory errors
+   * which are thrown by BaseX although VM memory is not exhausted.
+   */
+  public static final String SUPPRESS_OUT_OF_MEMORY = DBPREFIX + "suppressoom";
   /** User's home directory. */
   public static final String USERHOME = System.getProperty("user.home") + File.separator;
   /** Directory for storing the property files, database directory, etc. */

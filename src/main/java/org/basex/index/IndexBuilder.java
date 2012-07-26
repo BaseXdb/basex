@@ -16,6 +16,16 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class IndexBuilder extends Progress {
+
+  /** if true, BaseX will not create OutOfMemory error on its own. */
+  public static final boolean SUPPRESS_OUT_OF_MEMORY;
+
+  static {
+    String s = System.getProperty(Prop.SUPPRESS_OUT_OF_MEMORY);
+    SUPPRESS_OUT_OF_MEMORY = s != null && s.toLowerCase().equals("true");
+  }
+
+
   /** Data reference. */
   protected final Data data;
   /** Total parsing value. */
@@ -60,7 +70,7 @@ public abstract class IndexBuilder extends Progress {
   protected final boolean memFull() throws IOException {
     final boolean full = rt.totalMemory() - rt.freeMemory() >= maxMem;
     if(full) {
-      if(cc >= 0) throw new BaseXException(OUT_OF_MEM + H_OUT_OF_MEM);
+      if(cc >= 0 && !SUPPRESS_OUT_OF_MEMORY) throw new BaseXException(OUT_OF_MEM + H_OUT_OF_MEM);
       if(Prop.debug) Util.err("!");
       merge = true;
       cc = 30;
