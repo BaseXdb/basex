@@ -543,7 +543,7 @@ public enum Function {
   /** XQuery function. */
   _DB_OUTPUT(FNDb.class, "output(expression)", EMP, ITEM_ZM),
   /** XQuery function. */
-  _DB_ADD(FNDb.class, "add(database,nodes[,name[,path]])", EMP, 2, STR, DOC_ZM, STR, STR),
+  _DB_ADD(FNDb.class, "add(database,input[,path])", EMP, 2, STR, DOC_ZM, STR),
   /** XQuery function. */
   _DB_DELETE(FNDb.class, "delete(database,path)", EMP, STR, STR),
   /** XQuery function. */
@@ -555,7 +555,7 @@ public enum Function {
   /** XQuery function. */
   _DB_RETRIEVE(FNDb.class, "retrieve(database,path)", B64, STR, STR),
   /** XQuery function. */
-  _DB_STORE(FNDb.class, "store(database,path,value)", EMP, STR, STR, ITEM),
+  _DB_STORE(FNDb.class, "store(database,path,input)", EMP, STR, STR, ITEM),
   /** XQuery function. */
   _DB_IS_XML(FNDb.class, "is-xml(database,path)", BLN, STR, STR),
   /** XQuery function. */
