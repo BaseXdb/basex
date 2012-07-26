@@ -4,6 +4,7 @@ import static org.basex.http.restxq.RestXqText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.util.Map.*;
 
 import org.basex.http.*;
 import org.basex.io.*;
@@ -69,6 +70,13 @@ final class RestXqResponse {
 
     // bind variables
     function.bind(http);
+
+    // temporarily set database values (size check added for better performance)
+    if(!qc.dbOptions.isEmpty()) {
+      for(final Entry<String, String> e : qc.dbOptions.entrySet()) {
+        qc.context.prop.set(e.getKey(), e.getValue());
+      }
+    }
 
     // compile and evaluate function
     try {
