@@ -70,7 +70,8 @@ public abstract class IndexBuilder extends Progress {
   protected final boolean memFull() throws IOException {
     final boolean full = rt.totalMemory() - rt.freeMemory() >= maxMem;
     if(full) {
-      if(cc >= 0 && !SUPPRESS_OUT_OF_MEMORY) throw new BaseXException(OUT_OF_MEM + H_OUT_OF_MEM);
+      if(cc >= 0 && !SUPPRESS_OUT_OF_MEMORY)
+        throw new BaseXException(OUT_OF_MEM + H_OUT_OF_MEM);
       if(Prop.debug) Util.err("!");
       merge = true;
       cc = 30;
