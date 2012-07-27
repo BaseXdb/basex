@@ -81,9 +81,12 @@ public final class FNFtTest extends AdvancedQueryTest {
         _FT_COUNT.args("$i[text() contains text 'exercise']"), "1 1");
   }
 
-  /** Test method. */
+  /**
+   * Test method.
+   * @throws IOException query exception
+   */
   @Test
-  public void mark() {
+  public void mark() throws IOException {
     query(_FT_MARK.args(" //*[text() contains text '1']"),
       "<li>Exercise <mark>1</mark></li>");
     query(_FT_MARK.args(" //*[text() contains text '2'], 'b'"),
@@ -96,14 +99,18 @@ public final class FNFtTest extends AdvancedQueryTest {
         _FT_MARK.args("$a[. contains text 'ab'], 'b'"), "<b>ab</b>");
     query("copy $a := text { 'a b' } modify () return " +
         _FT_MARK.args("$a[. contains text 'a b'], 'b'"), "<b>a</b> <b>b</b>");
+
+    new CreateDB(NAME, "<a:a xmlns:a='A'>C</a:a>").execute(context);
+    query(_FT_MARK.args(" /descendant::*[text() contains text 'C']", 'b'),
+        "<a:a xmlns:a=\"A\"><b>C</b></a:a>");
+    new DropDB(NAME).execute(context);
+    query("copy $c := <A xmlns='A'>A</A> modify () return <X>{ " +
+        _FT_MARK.args(" $c[text() contains text 'A']") + " }</X>/*");
   }
 
-  /**
-   * Test method.
-   * @throws IOException query exception
-   */
+  /** Test method. */
   @Test
-  public void extract() throws IOException {
+  public void extract() {
     query(_FT_EXTRACT.args(" //*[text() contains text '1']"),
       "<li>Exercise <mark>1</mark></li>");
     query(_FT_EXTRACT.args(" //*[text() contains text '2'], 'b', 20"),
@@ -112,11 +119,6 @@ public final class FNFtTest extends AdvancedQueryTest {
       "<li>...<_o_>2</_o_></li>");
     contains(_FT_EXTRACT.args(" //*[text() contains text 'Exercise'], 'b', 1"),
       "<li><b>Exercise</b>...</li>");
-
-    new CreateDB(NAME, "<a:a xmlns:a='A'>C</a:a>").execute(context);
-    query(_FT_EXTRACT.args(" /descendant::*[text() contains text 'C']", 'b'),
-        "<a:a xmlns:a=\"A\"><b>C</b></a:a>");
-    new DropDB(NAME).execute(context);
   }
 
   /** Test method. */

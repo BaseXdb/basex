@@ -61,7 +61,7 @@ public final class DataBuilder {
   public void build(final ANodeList nl) {
     int pre = 1;
     final int ns = nl.size();
-    for(int n = 0; n < ns; n++) pre = addNode(nl.get(n), pre, 0);
+    for(int n = 0; n < ns; n++) pre = addNode(nl.get(n), pre, 0, null);
   }
 
   /**
@@ -71,12 +71,13 @@ public final class DataBuilder {
    * @param pre node position
    * @param par node parent
    * @return pre value of next node
+   * @param ndPar parent of node to be added
    */
-  private int addNode(final ANode nd, final int pre, final int par) {
+  private int addNode(final ANode nd, final int pre, final int par, final ANode ndPar) {
     switch(nd.nodeType()) {
       case DOC: return addDoc(nd, pre);
       case ELM: return addElem(nd, pre, par);
-      case TXT: return pre + addText(nd, pre, par);
+      case TXT: return pre + addText(nd, pre, par, ndPar);
       case ATT: return pre + addAttr(nd, pre, par);
       case COM: return pre + addComm(nd, pre, par);
       // will always be processing instruction
@@ -96,7 +97,7 @@ public final class DataBuilder {
     data.insert(ms);
     int p = pre + 1;
     final AxisIter ai = nd.children();
-    for(ANode ch; (ch = ai.next()) != null;) p = addNode(ch, p, pre);
+    for(ANode ch; (ch = ai.next()) != null;) p = addNode(ch, p, pre, null);
     return p;
   }
 
@@ -129,20 +130,27 @@ public final class DataBuilder {
    * @param nd node to be added
    * @param pre pre reference
    * @param par parent reference
+   * @param ndPar parent node
    * @return number of added nodes
    */
-  private int addText(final ANode nd, final int pre, final int par) {
+  private int addText(final ANode nd, final int pre, final int par, final ANode ndPar) {
     // check full-text mode
     final int dist = pre - par;
     final TokenList tl = ftbuilder != null ? ftbuilder.build(nd) : null;
     if(tl == null) return addText(nd.string(), dist);
+
+    // adopt namespace from parent
+    int u = 0;
+    ANode p = ndPar;
+    while(p != null && p.qname().hasPrefix()) p = p.parent();
+    if(p != null) u = data.nspaces.uri(p.name(), true);
 
     for(int i = 0; i < tl.size(); i++) {
       byte[] text = tl.get(i);
       final boolean elem = text == null;
       if(elem) {
         // open element
-        data.elem(dist + i, marker, 1, 2, 0, false);
+        data.elem(dist + i, marker, 1, 2, u, false);
         data.insert(data.meta.size);
         text = tl.get(++i);
       }
@@ -224,11 +232,11 @@ public final class DataBuilder {
 
     // add attributes
     AxisIter ai = nd.attributes();
-    for(ANode ch; (ch = ai.next()) != null;) p = addNode(ch, p, pre);
+    for(ANode ch; (ch = ai.next()) != null;) p = addNode(ch, p, pre, nd);
 
     // add children
     ai = nd.children();
-    for(ANode ch; (ch = ai.next()) != null;) p = addNode(ch, p, pre);
+    for(ANode ch; (ch = ai.next()) != null;) p = addNode(ch, p, pre, nd);
     data.nspaces.close(ms);
 
     // update size if additional nodes have been added by the descendants
