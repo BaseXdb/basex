@@ -20,6 +20,8 @@ public final class Log {
   private final boolean quiet;
   /** Logging directory. */
   private final IOFile dir;
+  /** Log message cut-off. */
+  private final int maxlen;
 
   /** Start date of log. */
   private String start;
@@ -33,6 +35,7 @@ public final class Log {
    */
   public Log(final Context ctx, final boolean q) {
     dir = ctx.mprop.dbpath(".logs");
+    maxlen = ctx.mprop.num(MainProp.LOGMSGMAXLEN);
     quiet = q;
     if(!q) create(new Date());
   }
@@ -64,7 +67,7 @@ public final class Log {
     final TokenBuilder tb = new TokenBuilder(DateTime.format(now, DateTime.TIME));
     for(final Object s : str) {
       tb.add('\t');
-      tb.add(chop(token(s.toString().replaceAll("[\\r\\n ]+", " ")), 1000));
+      tb.add(chop(token(s.toString().replaceAll("[\\r\\n ]+", " ")), maxlen));
     }
     tb.add(Prop.NL);
 
