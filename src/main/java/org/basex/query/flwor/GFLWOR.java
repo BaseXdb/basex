@@ -92,7 +92,7 @@ public class GFLWOR extends ParseExpr {
       final ForLet flt = fl[f].compile(ctx);
       // bind variable if it contains a value or will only be evaluated once
       boolean let = true;
-      for(int g = f + 1; g < fl.length; g++) let &= flt instanceof Let;
+      for(int g = f + 1; g < fl.length; g++) let &= fl[g] instanceof Let;
       if(flt.expr.isValue() || let && count(flt.var, f) == 1) flt.bind(ctx);
     }
 

@@ -207,7 +207,7 @@ public class QueryParser extends InputParser {
     if(ctx.sc.nsElem != null) ctx.sc.ns.add(EMPTY, ctx.sc.nsElem, null);
 
     // set default decimal format
-    final byte[] empty = new QNm(EMPTY).eqname();
+    final byte[] empty = new QNm(EMPTY).id();
     if(ctx.sc.decFormats.get(empty) == null) {
       ctx.sc.decFormats.add(empty, new DecFormatter());
     }
@@ -622,7 +622,7 @@ public class QueryParser extends InputParser {
     final QNm name = def ? new QNm() : eQName(QNAMEINV, null);
 
     // check if format has already been declared
-    if(ctx.sc.decFormats.get(name.eqname()) != null) error(DECDUPL);
+    if(ctx.sc.decFormats.get(name.id()) != null) error(DECDUPL);
 
     // create new format
     final HashMap<String, String> map = new HashMap<String, String>();
@@ -643,7 +643,7 @@ public class QueryParser extends InputParser {
     } while(n != map.size());
 
     // completes the format declaration
-    ctx.sc.decFormats.add(name.eqname(), new DecFormatter(info(), map));
+    ctx.sc.decFormats.add(name.id(), new DecFormatter(info(), map));
     return true;
   }
 
@@ -1014,11 +1014,11 @@ public class QueryParser extends InputParser {
       final ArrayList<Var> ng = new ArrayList<Var>();
       final TokenSet set = new TokenSet();
       for(final GroupSpec spec : grp) {
-        if(!spec.assign) set.add(spec.var.name.eqname());
+        if(!spec.assign) set.add(spec.var.name.id());
       }
       for(int i = fl.length; --i >= 0;) {
         for(final Var v : fl[i].vars()) {
-          final byte[] eqn = v.name.eqname();
+          final byte[] eqn = v.name.id();
           if(!set.contains(eqn)) {
             ng.add(v);
             set.add(eqn);
@@ -1595,7 +1595,9 @@ public class QueryParser extends InputParser {
    */
   private Expr extension() throws QueryException {
     final Pragma[] pragmas = pragma();
-    return pragmas == null ? null : new Extension(info(), pragmas, enclosed(NOPRAGMA));
+    if(pragmas == null) return null;
+    final Expr expr = enclosed(NOPRAGMA);
+    return pragmas.length == 0 ? expr : new Extension(info(), pragmas, expr);
   }
 
   /**
@@ -1617,7 +1619,15 @@ public class QueryParser extends InputParser {
         tok.add(consume());
         c = curr();
       }
-      el.add(new Pragma(name, tok.trim().finish()));
+
+      final byte[] v = tok.trim().finish();
+      if(eq(name.prefix(), DB)) {
+        // project-specific declaration
+        final String key = string(uc(name.local()));
+        final Object obj = ctx.context.prop.get(key);
+        if(obj == null) error(BASX_OPTIONS, key);
+        el.add(new DBPragma(name, v));
+      }
       ip += 2;
     } while(wsConsumeWs(PRAGMA));
     return el.toArray(new Pragma[el.size()]);

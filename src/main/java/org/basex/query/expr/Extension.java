@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -36,14 +37,22 @@ public final class Extension extends Single {
   @Override
   public Expr compile(final QueryContext ctx) throws QueryException {
     expr.compile(ctx);
-    // ignore pragma
-    return optPre(expr, ctx);
+    return this;
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    // currently, will never be called, as compilation step returns argument
-    return ctx.iter(expr);
+  public ValueIter iter(final QueryContext ctx) throws QueryException {
+    return value(ctx).iter(ctx);
+  }
+
+  @Override
+  public Value value(final QueryContext ctx) throws QueryException {
+    try {
+      for(final Pragma g : pragmas) g.init(ctx, info);
+      return ctx.value(expr);
+    } finally {
+      for(final Pragma g : pragmas) g.finish(ctx);
+    }
   }
 
   @Override

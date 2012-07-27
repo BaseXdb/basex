@@ -502,6 +502,16 @@ public abstract class SessionTest extends SandboxTest {
     query.close();
   }
 
+  /** Runs a query with a bound context item.
+   * @throws IOException I/O exception */
+  @Test
+  public void queryContextVar() throws IOException {
+    final Query query = session.query("declare variable $a := .; $a");
+    query.context("<a/>", "element()");
+    assertEqual("<a/>", query.next());
+    query.close();
+  }
+
   /** Runs a query, omitting more().
    * @throws IOException I/O exception */
   @Test

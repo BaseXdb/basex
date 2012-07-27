@@ -82,6 +82,7 @@ public abstract class BaseXTest extends MainTest {
     final String in = "<X/>";
     INPUT.write(token(in));
     equals(in, "-i" + INPUT, "-q.");
+    equals(in, "-i" + in, "-q.");
   }
 
   /**

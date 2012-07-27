@@ -43,7 +43,7 @@ public final class Functions extends TokenSet {
     for(final Function def : Function.values()) {
       final String dsc = def.desc;
       final byte[] ln = token(dsc.substring(0, dsc.indexOf(PAR1)));
-      final int i = add(new QNm(ln, def.uri()).eqname());
+      final int i = add(new QNm(ln, def.uri()).id());
       if(i < 0) Util.notexpected("Function defined twice:" + def);
       funcs[i] = def;
     }
@@ -61,7 +61,7 @@ public final class Functions extends TokenSet {
   public StandardFunc get(final QNm name, final Expr[] args, final QueryContext ctx,
       final InputInfo ii) throws QueryException {
 
-    final int id = id(name.eqname());
+    final int id = id(name.id());
     if(id == 0) return null;
 
     // create function
