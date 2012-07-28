@@ -504,8 +504,12 @@ public final class FNFile extends StandardFunc {
 
     // ignore operations on same source and target path
     if(!src.equals(trg)) {
-      if(copy) copy(src, trg);
-      else if(!src.renameTo(trg)) FILE_MOVE.thrw(info, src, trg);
+      if(copy) {
+        copy(src, trg);
+      } else {
+        if(trg.exists() && !trg.delete()) FILE_DEL.thrw(info, src, trg);
+        if(!src.renameTo(trg)) FILE_MOVE.thrw(info, src, trg);
+      }
     }
     return null;
   }
