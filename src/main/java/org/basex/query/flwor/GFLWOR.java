@@ -390,6 +390,11 @@ public class GFLWOR extends ParseExpr {
   }
 
   @Override
+  public boolean isVacuous() {
+    return ret.isVacuous();
+  }
+
+  @Override
   public final void plan(final FElem plan) {
     final FElem el = planElem();
     addPlan(plan, el, fl);
