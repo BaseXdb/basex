@@ -17,6 +17,8 @@ import org.xml.sax.*;
 public abstract class IO {
   /** Database file suffix. */
   public static final String BASEXSUFFIX = ".basex";
+  /** Command script suffix. */
+  public static final String BASEXMLSUFFIX = ".basexml";
   /** XQuery file suffix. */
   public static final String XQSUFFIX = ".xq";
   /** XQuery module suffix. */

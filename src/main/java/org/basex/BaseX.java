@@ -254,8 +254,8 @@ public class BaseX extends Main {
           arg.usage();
         }
       } else {
-        c = 'q';
         v = arg.string();
+        c = v.endsWith(IO.BASEXMLSUFFIX) ? 'c' : 'q';
       }
       if(v != null) {
         ops.add(c);
