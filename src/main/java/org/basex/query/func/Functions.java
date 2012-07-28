@@ -188,7 +188,7 @@ public final class Functions extends TokenSet {
     final Levenshtein ls = new Levenshtein();
     for(int k = 1; k < size; ++k) {
       final int i = indexOf(keys[k], '}');
-      final byte[] u = substring(keys[k], 1, i);
+      final byte[] u = substring(keys[k], 2, i);
       final byte[] l = substring(keys[k], i + 1);
       if(eq(ln, l)) {
         final byte[] ur = name.uri();
