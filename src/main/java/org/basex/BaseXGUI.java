@@ -82,7 +82,7 @@ public final class BaseXGUI {
         boolean xml = false;
         for(final String file : files) {
           final IOFile io = new IOFile(file);
-          boolean xq = false;
+          boolean xq = file.endsWith(IO.BASEXMLSUFFIX);
           for(final String suf : IO.XQSUFFIXES) xq |= file.endsWith(suf);
           if(xq) {
             gui.editor.open(io);
