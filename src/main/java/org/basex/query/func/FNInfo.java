@@ -101,7 +101,6 @@ public final class FNInfo extends StandardFunc {
    * @param ctx query context
    */
   static void dump(final byte[] value, final byte[] label, final QueryContext ctx) {
-    Util.stack(12);
     final TokenBuilder tb = new TokenBuilder();
     if(label != null) tb.add(label);
     tb.add(value);
