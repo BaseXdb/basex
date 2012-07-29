@@ -135,21 +135,24 @@ public final class FNSeq extends StandardFunc {
   public Expr comp(final QueryContext ctx) throws QueryException {
     // static typing:
     // index-of will create integers, insert-before might add new types
-    if(sig == Function.INDEX_OF ||
-       sig == Function.INSERT_BEFORE) return this;
+    if(sig == Function.INDEX_OF || sig == Function.INSERT_BEFORE) return this;
+
+    // pre-evaluate distinct values
+    final SeqType st = expr[0].type();
+    final Type t = st.type;
+    if(sig == Function.DISTINCT_VALUES) {
+      type = t.isNode() ? SeqType.get(AtomType.ATM, st.occ) : st;
+      return cmpDist(ctx);
+    }
 
     // all other types will return existing types
-    final Type t = expr[0].type().type;
     Occ o = Occ.ZERO_MORE;
     // at most one returned item
-    if(sig == Function.SUBSEQUENCE && expr[0].type().one()) o = Occ.ZERO_ONE;
+    if(sig == Function.SUBSEQUENCE && st.one()) o = Occ.ZERO_ONE;
 
     // head will return at most one item
     else if(sig == Function.HEAD) o = Occ.ZERO_ONE;
     type = SeqType.get(t, o);
-
-    // pre-evaluate distinct values
-    if(sig == Function.DISTINCT_VALUES) return cmpDist(ctx);
 
     return this;
   }
