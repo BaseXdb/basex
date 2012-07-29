@@ -45,10 +45,9 @@ public final class FNFile extends StandardFunc {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     checkCreate(ctx);
-    final File path = file(0, ctx);
     switch(sig) {
-      case _FILE_LIST:            return list(path, ctx);
-      case _FILE_READ_TEXT_LINES: return readTextLines(path, ctx);
+      case _FILE_LIST:            return list(file(0, ctx), ctx);
+      case _FILE_READ_TEXT_LINES: return readTextLines(file(0, ctx), ctx);
       default:                    return super.iter(ctx);
     }
   }
@@ -56,36 +55,35 @@ public final class FNFile extends StandardFunc {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     checkCreate(ctx);
-    final File path = file(0, ctx);
     try {
       switch(sig) {
-        case _FILE_APPEND:            return write(path, true, ctx);
-        case _FILE_APPEND_BINARY:     return writeBinary(path, ctx, true);
-        case _FILE_APPEND_TEXT:       return writeText(path, true, ctx);
-        case _FILE_APPEND_TEXT_LINES: return writeTextLines(path, true, ctx);
-        case _FILE_COPY:              return copy(path, ctx, true);
-        case _FILE_CREATE_DIR:        return createDirectory(path);
-        case _FILE_DELETE:            return delete(path, ctx);
-        case _FILE_MOVE:              return copy(path, ctx, false);
-        case _FILE_READ_BINARY:       return readBinary(path);
-        case _FILE_READ_TEXT:         return readText(path, ctx);
-        case _FILE_WRITE:             return write(path, false, ctx);
-        case _FILE_WRITE_BINARY:      return writeBinary(path, ctx, false);
-        case _FILE_WRITE_TEXT:        return writeText(path, false, ctx);
-        case _FILE_WRITE_TEXT_LINES:  return writeTextLines(path, false, ctx);
+        case _FILE_APPEND:            return write(file(0, ctx), true, ctx);
+        case _FILE_APPEND_BINARY:     return writeBinary(file(0, ctx), ctx, true);
+        case _FILE_APPEND_TEXT:       return writeText(file(0, ctx), true, ctx);
+        case _FILE_APPEND_TEXT_LINES: return writeTextLines(file(0, ctx), true, ctx);
+        case _FILE_COPY:              return copy(file(0, ctx), ctx, true);
+        case _FILE_CREATE_DIR:        return createDirectory(file(0, ctx));
+        case _FILE_DELETE:            return delete(file(0, ctx), ctx);
+        case _FILE_MOVE:              return copy(file(0, ctx), ctx, false);
+        case _FILE_READ_BINARY:       return readBinary(file(0, ctx));
+        case _FILE_READ_TEXT:         return readText(file(0, ctx), ctx);
+        case _FILE_WRITE:             return write(file(0, ctx), false, ctx);
+        case _FILE_WRITE_BINARY:      return writeBinary(file(0, ctx), ctx, false);
+        case _FILE_WRITE_TEXT:        return writeText(file(0, ctx), false, ctx);
+        case _FILE_WRITE_TEXT_LINES:  return writeTextLines(file(0, ctx), false, ctx);
         case _FILE_PATH_SEPARATOR:    return Str.get(File.pathSeparator);
         case _FILE_DIR_SEPARATOR:     return Str.get(File.separator);
         case _FILE_LINE_SEPARATOR:    return Str.get(NL);
-        case _FILE_EXISTS:            return Bln.get(path.exists());
-        case _FILE_IS_DIR:            return Bln.get(path.isDirectory());
-        case _FILE_IS_FILE:           return Bln.get(path.isFile());
-        case _FILE_LAST_MODIFIED:     return lastModified(path);
-        case _FILE_SIZE:              return size(path);
-        case _FILE_BASE_NAME:         return baseName(path, ctx);
-        case _FILE_DIR_NAME:          return dirName(path);
-        case _FILE_PATH_TO_NATIVE:    return pathToNative(path);
-        case _FILE_RESOLVE_PATH:      return Str.get(path.getAbsolutePath());
-        case _FILE_PATH_TO_URI:       return pathToUri(path);
+        case _FILE_EXISTS:            return Bln.get(file(0, ctx).exists());
+        case _FILE_IS_DIR:            return Bln.get(file(0, ctx).isDirectory());
+        case _FILE_IS_FILE:           return Bln.get(file(0, ctx).isFile());
+        case _FILE_LAST_MODIFIED:     return lastModified(file(0, ctx));
+        case _FILE_SIZE:              return size(file(0, ctx));
+        case _FILE_BASE_NAME:         return baseName(file(0, ctx), ctx);
+        case _FILE_DIR_NAME:          return dirName(file(0, ctx));
+        case _FILE_PATH_TO_NATIVE:    return pathToNative(file(0, ctx));
+        case _FILE_RESOLVE_PATH:      return Str.get(file(0, ctx).getAbsolutePath());
+        case _FILE_PATH_TO_URI:       return pathToUri(file(0, ctx));
         default:                      return super.item(ctx, ii);
       }
     } catch(final IOException ex) {
