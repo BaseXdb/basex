@@ -176,7 +176,7 @@ public final class FNFile extends StandardFunc {
     // get canonical representation to resolve symbolic links
     final File dir;
     try {
-      dir = new File(path.getCanonicalPath().replaceAll("[\\\\/]$", ""));
+      dir = new File(path.getCanonicalPath());
     } catch(final IOException ex) {
       throw FILE_PATH.thrw(info, path);
     }
@@ -190,7 +190,9 @@ public final class FNFile extends StandardFunc {
         Prop.WIN ? Pattern.CASE_INSENSITIVE : 0);
 
     final StringList list = new StringList();
-    list(dir.getPath().length() + 1, dir, list, rec, pat);
+    final String p = dir.getPath();
+    final int l = p.length() + (p.endsWith(File.separator) ? 0 : 1);
+    list(l, dir, list, rec, pat);
 
     return new Iter() {
       int c;
