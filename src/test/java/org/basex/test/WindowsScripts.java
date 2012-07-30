@@ -33,18 +33,13 @@ public class WindowsScripts {
 
     for(final IOFile f : new IOFile("etc").children()) {
       final String n = f.name();
-      final StringList missing = new StringList();
-      final StringList obsolete = new StringList();
-      if(n.endsWith(".bat")) libraries(n, libs, missing, obsolete);
-      if(!missing.isEmpty()) {
-        final StringBuilder sb = new StringBuilder();
-        for(final String l : missing) sb.append(";%LIB%").append(l);
-        fail("Library not found in '" + n + "':\n" + sb.substring(1));
-      }
-      if(!obsolete.isEmpty()) {
-        final StringBuilder sb = new StringBuilder();
-        for(final String l : obsolete) sb.append(";%LIB%").append(l);
-        fail("Library obsolete in '" + n + "':\n" + sb.substring(1));
+      if(n.endsWith(".bat") && !libraries(n, libs)) {
+        final TokenBuilder tb = new TokenBuilder("set CP=%CP%");
+        for(final IOFile l : new IOFile("lib").children()) {
+          if(!l.name().contains("basex")) tb.add(";%LIB%/").add(l.name());
+        }
+        Util.errln(tb.toString());
+        fail(n + ": see STDERR output");
       }
     }
   }
@@ -53,12 +48,11 @@ public class WindowsScripts {
    * Tests the library references in the Windows script.
    * @param name script name
    * @param libs libraries
-   * @param missing missing libraries
-   * @param obsolete obsolete libraries
+   * @return result of check
    * @throws Exception exception
    */
-  private void libraries(final String name, final HashSet<String> libs,
-      final StringList missing, final StringList obsolete) throws Exception {
+  private boolean libraries(final String name, final HashSet<String> libs)
+      throws Exception {
 
     final HashSet<String> sl = new HashSet<String>();
     final NewlineInput nli = new NewlineInput(IO.get("etc/" + name));
@@ -72,12 +66,16 @@ public class WindowsScripts {
       nli.close();
     }
 
+    final StringList mis = new StringList();
     for(final String l : libs) {
-      if(l.contains("basex")) continue;
-      if(!sl.remove(l)) missing.add(l);
+      if(!l.contains("basex") && !sl.remove(l)) mis.add(l);
     }
+    final StringList obs = new StringList();
     for(final String l : sl) {
-      if(l.endsWith(".jar")) obsolete.add(l);
+      if(l.endsWith(".jar")) obs.add(l);
     }
+    if(!mis.isEmpty()) Util.errln("Missing: " + Arrays.toString(mis.toArray()));
+    if(!obs.isEmpty()) Util.errln("Obsolete: " + Arrays.toString(obs.toArray()));
+    return mis.isEmpty() && obs.isEmpty();
   }
 }
