@@ -220,7 +220,7 @@ public final class FNFile extends StandardFunc {
     // parse directories
     if(rec) {
       for(final File f : ch) {
-        if(!mayBeLink(f) && f.isDirectory()) list(root, f, list, rec, pat);
+        if(f.isDirectory() && !mayBeLink(f)) list(root, f, list, rec, pat);
       }
     }
     // parse files. ignore directories if a pattern is specified

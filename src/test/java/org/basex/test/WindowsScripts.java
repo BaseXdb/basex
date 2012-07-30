@@ -38,12 +38,12 @@ public class WindowsScripts {
       if(n.endsWith(".bat")) libraries(n, libs, missing, obsolete);
       if(!missing.isEmpty()) {
         final StringBuilder sb = new StringBuilder();
-        for(final String l : missing) sb.append(';').append(l);
+        for(final String l : missing) sb.append(";%LIB%").append(l);
         fail("Library not found in '" + n + "':\n" + sb.substring(1));
       }
       if(!obsolete.isEmpty()) {
         final StringBuilder sb = new StringBuilder();
-        for(final String l : obsolete) sb.append(';').append(l);
+        for(final String l : obsolete) sb.append(";%LIB%").append(l);
         fail("Library obsolete in '" + n + "':\n" + sb.substring(1));
       }
     }
