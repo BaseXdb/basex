@@ -182,7 +182,7 @@ public final class FNSeq extends StandardFunc {
       // check if distinct values are available
       if(pn.stats.type != StatsType.CATEGORY) return this;
       // if yes, add them to the item set
-      for(final byte[] c : pn.stats.cats) is.index(info, new Atm(c));
+      for(final byte[] c : pn.stats.cats) is.add(new Atm(c), info);
     }
     // return resulting sequence
     final ValueBuilder vb = new ValueBuilder(is.size());
@@ -268,7 +268,7 @@ public final class FNSeq extends StandardFunc {
           if(i == null) return null;
           ctx.checkStop();
           i = atom(i, info);
-          if(map.index(info, i)) return i;
+          if(map.add(i, info) >= 0) return i;
         }
       }
     };

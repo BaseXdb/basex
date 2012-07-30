@@ -12,9 +12,9 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class ItemSet implements Iterable<Item> {
+public class ItemSet implements Iterable<Item> {
   /** Initial hash capacity. */
-  private static final int CAP = 1 << 3;
+  protected static final int CAP = 1 << 3;
   /** Hash values. */
   private int[] hash = new int[CAP];
   /** Pointers to the next token. */
@@ -27,32 +27,48 @@ public final class ItemSet implements Iterable<Item> {
   int size = 1;
 
   /**
-   * Indexes the specified item.
+   * Indexes the specified key and returns the offset of the added key.
+   * If the key already exists, a negative offset is returned.
+   * @param key key
    * @param ii input info
-   * @param i item
-   * @return true if value is new
+   * @return offset of added key, negative offset otherwise
    * @throws QueryException query exception
    */
-  public boolean index(final InputInfo ii, final Item i) throws QueryException {
+  public int add(final Item key, final InputInfo ii) throws QueryException {
     if(size == next.length) rehash();
 
-    final int h = i.hash(ii);
+    final int h = key.hash(ii);
     final int p = h & bucket.length - 1;
     for(int id = bucket[p]; id != 0; id = next[id]) {
-      if(keys[id].equiv(ii, i)) return false;
+      if(keys[id].equiv(ii, key)) return -id;
     }
-
     next[size] = bucket[p];
     hash[size] = h;
-    keys[size] = i;
-    bucket[p] = size++;
-    return true;
+    keys[size] = key;
+    bucket[p] = size;
+    return size++;
+  }
+
+  /**
+   * Returns the id of the specified key or -1 if key was not found.
+   * @param key key to be found
+   * @return id or 0 if nothing was found
+   * @param ii input info
+   * @throws QueryException query exception
+   */
+  public final int id(final Item key, final InputInfo ii) throws QueryException {
+    final int h = key.hash(ii);
+    final int p = h & bucket.length - 1;
+    for(int id = bucket[p]; id != 0; id = next[id]) {
+      if(keys[id].equiv(ii, key)) return id;
+    }
+    return 0;
   }
 
   /**
    * Resizes the hash table.
    */
-  private void rehash() {
+  protected void rehash() {
     final int s = size << 1;
     final int[] b = new int[s];
 
