@@ -25,8 +25,6 @@ public enum HTTPErr {
   NOT_FOUND_X(SC_NOT_FOUND, "%"),
   /** Error: 404, "No path specified.". */
   NO_PATH(SC_NOT_FOUND, "No path specified."),
-  /** Error: 404, "Path does not exist.". */
-  UNKNOWN_PATH(SC_NOT_FOUND, "Path does not exist."),
   /** Error: 404, "No XQuery function found to process the request.". */
   NO_XQUERY(SC_NOT_FOUND, "No XQuery function found to process the request."),
 

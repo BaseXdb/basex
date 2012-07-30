@@ -31,8 +31,7 @@ final class RESTRetrieve extends RESTQuery {
    * @param vars external variables
    * @param it context item
    */
-  RESTRetrieve(final String in, final Map<String, String[]> vars,
-      final byte[] it) {
+  RESTRetrieve(final String in, final Map<String, String[]> vars, final byte[] it) {
     super(in, vars, it);
   }
 
@@ -57,8 +56,6 @@ final class RESTRetrieve extends RESTQuery {
     } else if(!exists(http)) {
       // list database resources
       final Table table = new Table(session.execute(new List(http.path())));
-      if(table.contents.isEmpty()) HTTPErr.UNKNOWN_PATH.thrw();
-
       final String serial = http.serialization;
       final SerializerProp sprop = new SerializerProp(serial);
       final Serializer ser = Serializer.get(http.res.getOutputStream(), sprop);
