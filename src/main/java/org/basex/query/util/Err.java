@@ -253,7 +253,7 @@ public enum Err {
   HASH_ALG(HASH, 1, "Algorithm not supported: '%'."),
 
   /** HC0001. */
-  HC_ERROR(HC, 1, "An HTTP error occurred: %."),
+  HC_ERROR(HC, 1, "%."),
   /** HC0003. */
   HC_ATTR(HC, 3, "No attribute beside 'src' and 'media-type' allowed."),
   /** HC0004. */

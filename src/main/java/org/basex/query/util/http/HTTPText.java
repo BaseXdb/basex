@@ -73,13 +73,13 @@ public interface HTTPText {
   byte[] HEXBIN = token("http:hexBinary");
 
   /** http:multipart element. */
-  QNm HTTP_MULTIPART = new QNm("http:multipart", HTTPURI);
+  QNm Q_HTTP_MULTIPART = new QNm("http:multipart", HTTPURI);
   /** http:body element. */
-  QNm HTTP_BODY = new QNm("http:body", HTTPURI);
+  QNm Q_HTTP_BODY = new QNm("http:body", HTTPURI);
   /** http:response element. */
-  QNm HTTP_RESPONSE = new QNm("http:response", HTTPURI);
+  QNm Q_HTTP_RESPONSE = new QNm("http:response", HTTPURI);
   /** http:header element. */
-  QNm HTTP_HEADER = new QNm("http:header", HTTPURI);
+  QNm Q_HTTP_HEADER = new QNm("http:header", HTTPURI);
 
   /** Header attribute: name. */
   QNm Q_NAME = new QNm("name");

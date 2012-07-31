@@ -80,15 +80,15 @@ public final class HTTPClient {
           setContentType(conn, r);
           setRequestContent(conn.getOutputStream(), r);
         }
-        return new HTTPResponse(info, prop).getResponse(
-            conn, r.attrs.get(STATUS_ONLY), r.attrs.get(OVERRIDE_MEDIA_TYPE));
+        return new HTTPResponse(info, prop).getResponse(conn, r.attrs.get(STATUS_ONLY),
+            r.attrs.get(OVERRIDE_MEDIA_TYPE));
       } finally {
         conn.disconnect();
       }
     } catch(final MalformedURLException ex) {
-      throw HC_ERROR.thrw(info, "Invalid URL");
+      throw HC_ERROR.thrw(info, "Invalid URL: " + ex.getMessage());
     } catch(final ProtocolException ex) {
-      throw HC_ERROR.thrw(info, "Invalid HTTP method");
+      throw HC_ERROR.thrw(info, "Invalid HTTP method: " + ex.getMessage());
     } catch(final IOException ex) {
       Util.debug(ex);
       throw HC_ERROR.thrw(info, ex);
@@ -108,7 +108,7 @@ public final class HTTPClient {
 
     final URL url = new URL(dest);
     if(!eqic(url.getProtocol(), "HTTP", "HTTPS"))
-      HC_ERROR.thrw(info, "Invalid URL");
+      HC_ERROR.thrw(info, "Invalid URL: " + url);
     return (HttpURLConnection) url.openConnection();
   }
 

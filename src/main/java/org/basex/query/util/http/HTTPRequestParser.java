@@ -56,7 +56,7 @@ public final class HTTPRequestParser {
     if(payload != null) {
       final QNm pl = payload.qname();
       // single part request
-      if(pl.eq(HTTP_BODY)) {
+      if(pl.eq(Q_HTTP_BODY)) {
         Item it = null;
         if(bodies != null) {
           // $bodies must contain exactly one item
@@ -68,7 +68,7 @@ public final class HTTPRequestParser {
         parseBody(payload, it, r.payloadAttrs, r.bodyContent);
         r.isMultipart = false;
         // multipart request
-      } else if(pl.eq(HTTP_MULTIPART)) {
+      } else if(pl.eq(Q_HTTP_MULTIPART)) {
         int i = 0;
         final AxisMoreIter ch = payload.children();
         while(ch.next() != null)
@@ -112,7 +112,7 @@ public final class HTTPRequestParser {
       if(n == null) break;
       final QNm nm = n.qname();
       if(nm == null) continue;
-      if(!nm.eq(HTTP_HEADER)) break;
+      if(!nm.eq(Q_HTTP_HEADER)) break;
 
       final AxisIter hdrAttrs = n.attributes();
       byte[] name = null;

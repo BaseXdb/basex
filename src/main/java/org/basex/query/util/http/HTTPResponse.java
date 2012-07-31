@@ -59,28 +59,33 @@ public final class HTTPResponse {
 
     final ANodeList attrs = extractAttrs(conn);
     final ANodeList hdrs = extractHdrs(conn);
-    final String cType = mediaTypeOvr == null ?
-        extractContentType(conn.getContentType()) : string(mediaTypeOvr);
+    final String type = conn.getContentType();
+    final String cType = mediaTypeOvr == null ? extractContentType(type) :
+      string(mediaTypeOvr);
     final ValueBuilder payloads = new ValueBuilder();
-    final FNode body;
     final boolean s = status != null && Bln.parse(status, info);
 
     // multipart response
+    final FNode body;
+    InputStream is = conn.getErrorStream();
+    if(is == null) is = conn.getInputStream();
     if(cType.startsWith(MULTIPART)) {
-      final byte[] boundary = extractBoundary(conn.getContentType());
+      final byte[] boundary = extractBoundary(type);
       final ANodeList a = new ANodeList(
           new FAttr(Q_MEDIA_TYPE, token(cType)), new FAttr(Q_BOUNDARY, boundary));
-      body = new FElem(HTTP_MULTIPART, extractParts(conn.getInputStream(), s,
+      body = new FElem(Q_HTTP_MULTIPART, extractParts(is, s,
           payloads, concat(token("--"), boundary)), a, new Atts(HTTP, HTTPURI));
       // single part response
     } else {
       body = createBody(cType);
-      if(!s) payloads.add(interpretPayload(extractPayload(conn.getInputStream(),
-          cType, extractCharset(conn.getContentType())), cType));
+      if(!s) {
+        final byte[] payload = extractPayload(is, cType, extractCharset(type));
+        payloads.add(interpretPayload(payload, cType));
+      }
     }
 
     // construct <http:response/>
-    final FElem responseEl = new FElem(HTTP_RESPONSE, hdrs, attrs,
+    final FElem responseEl = new FElem(Q_HTTP_RESPONSE, hdrs, attrs,
         new Atts(HTTP, HTTPURI));
     responseEl.add(body);
 
@@ -114,7 +119,7 @@ public final class HTTPResponse {
     final ANodeList h = new ANodeList();
     for(final String headerName : conn.getHeaderFields().keySet()) {
       if(headerName != null) {
-        final FElem hdr = new FElem(HTTP_HEADER, new Atts(HTTP, HTTPURI));
+        final FElem hdr = new FElem(Q_HTTP_HEADER, new Atts(HTTP, HTTPURI));
         hdr.add(Q_NAME, token(headerName));
         hdr.add(Q_VALUE, token(conn.getHeaderField(headerName)));
         h.add(hdr);
@@ -129,9 +134,8 @@ public final class HTTPResponse {
    * @return body
    */
   private static FElem createBody(final String mediaType) {
-    final FElem b = new FElem(HTTP_BODY, new Atts(HTTP, HTTPURI));
-    b.add(Q_MEDIA_TYPE, token(mediaType));
-    return b;
+    return new FElem(Q_HTTP_BODY, new Atts(HTTP, HTTPURI)).add(
+        Q_MEDIA_TYPE, token(mediaType));
   }
 
   /**
@@ -261,7 +265,7 @@ public final class HTTPResponse {
             final byte[] value = trim(substring(nextHdr, pos + 1,
                 nextHdr.length));
             // construct attributes
-            final FElem hdr = new FElem(HTTP_HEADER);
+            final FElem hdr = new FElem(Q_HTTP_HEADER);
             hdr.add(Q_NAME, name);
             hdr.add(Q_VALUE, value);
             root.add(hdr);
