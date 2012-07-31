@@ -14,7 +14,7 @@ BXCORE="$( cd -P "$BX/../basex" && pwd )"
 CP="$BX/target/classes$(printf ":%s" "$BX/BaseX.jar" "$BX/lib/"*.jar "$BXCORE/target/classes" "$BXCORE/lib/"*.jar)"
 
 # Options for virtual machine
-VM=-Xmx512m
+VM=
 
 general_args=( )
 vm_args=( )
