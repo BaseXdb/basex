@@ -54,7 +54,7 @@ public class HTTPClientTest extends HTTPTest {
   private static final String CRLF = "\r\n";
 
   /** Local database context. */
-  protected static Context lcontext;
+  protected static Context ctx;
 
   /**
    * Start server.
@@ -63,7 +63,7 @@ public class HTTPClientTest extends HTTPTest {
   @BeforeClass
   public static void start() throws Exception {
     init(RESTURL, true);
-    lcontext = new Context();
+    ctx = new Context();
   }
 
   /**
@@ -75,7 +75,7 @@ public class HTTPClientTest extends HTTPTest {
     final QueryProcessor qp = new QueryProcessor("http:send-request("
         + "<http:request method='put' status-only='true'>"
         + "<http:body media-type='text/xml'>" + BOOKS + "</http:body>"
-        + "</http:request>, '" + RESTURL + "')", lcontext);
+        + "</http:request>, '" + RESTURL + "')", ctx);
     checkResponse(qp.execute(), HttpURLConnection.HTTP_CREATED, 1);
     qp.close();
   }
@@ -94,7 +94,7 @@ public class HTTPClientTest extends HTTPTest {
         + "<text>1</text>"
         + "<parameter name='wrap' value='yes'/>"
         + "</query>" + "</http:body>"
-        + "</http:request>, '" + RESTURL + "')", lcontext);
+        + "</http:request>, '" + RESTURL + "')", ctx);
     checkResponse(qp.execute(), HttpURLConnection.HTTP_OK, 2);
     qp.close();
 
@@ -106,7 +106,7 @@ public class HTTPClientTest extends HTTPTest {
         + "<query xmlns='" + URL + "/rest'>"
         + "<text>1</text>"
         + "<parameter name='wrap' value='yes'/>"
-        + "</query>)", lcontext);
+        + "</query>)", ctx);
     checkResponse(qp.execute(), HttpURLConnection.HTTP_OK, 2);
     qp.close();
   }
@@ -119,7 +119,7 @@ public class HTTPClientTest extends HTTPTest {
   public void postGet() throws Exception {
     // GET1 - just send a GET request
     QueryProcessor qp = new QueryProcessor("http:send-request("
-        + "<http:request method='get' href='" + ROOT + "'/>)", lcontext);
+        + "<http:request method='get' href='" + ROOT + "'/>)", ctx);
     Result r = qp.execute();
     checkResponse(r, HttpURLConnection.HTTP_OK, 2);
 
@@ -129,7 +129,7 @@ public class HTTPClientTest extends HTTPTest {
     // GET2 - with override-media-type='text/plain'
     qp = new QueryProcessor("http:send-request("
         + "<http:request method='get' override-media-type='text/plain'/>, '"
-        + ROOT + "')", lcontext);
+        + ROOT + "')", ctx);
     r = qp.execute();
     checkResponse(r, HttpURLConnection.HTTP_OK, 2);
 
@@ -139,7 +139,7 @@ public class HTTPClientTest extends HTTPTest {
     // Get3 - with status-only='true'
     qp = new QueryProcessor("http:send-request("
         + "<http:request method='get' status-only='true'/>, '" + ROOT + "')",
-        lcontext);
+        ctx);
     checkResponse(qp.execute(), HttpURLConnection.HTTP_OK, 1);
     qp.close();
   }
@@ -154,14 +154,14 @@ public class HTTPClientTest extends HTTPTest {
     QueryProcessor qp = new QueryProcessor("http:send-request("
         + "<http:request method='put'>"
         + "<http:body media-type='text/xml'><ToBeDeleted/></http:body>"
-        + "</http:request>, '" + RESTURL + "')", lcontext);
+        + "</http:request>, '" + RESTURL + "')", ctx);
     qp.execute();
     qp.close();
 
     // DELETE
     qp = new QueryProcessor("http:send-request("
         + "<http:request method='delete' status-only='true'/>, '"
-        + RESTURL + "')", lcontext);
+        + RESTURL + "')", ctx);
     checkResponse(qp.execute(), HttpURLConnection.HTTP_OK, 1);
     qp.close();
   }
@@ -173,7 +173,7 @@ public class HTTPClientTest extends HTTPTest {
   @Test
   public void sendEmptyReq() {
     try {
-      new XQuery("http:send-request(<http:request/>)").execute(lcontext);
+      new XQuery("http:send-request(<http:request/>)").execute(ctx);
     } catch(final BaseXException ex) {
       assertTrue(indexOf(token(ex.getMessage()),
           token(ErrType.HC.toString())) != -1);
@@ -187,11 +187,23 @@ public class HTTPClientTest extends HTTPTest {
   public void sendReqNoParams() {
     final Command c = new XQuery("http:send-request(())");
     try {
-      c.execute(lcontext);
+      c.execute(ctx);
     } catch(final BaseXException ex) {
       assertTrue(indexOf(token(ex.getMessage()),
           token(ErrType.HC.toString())) != -1);
     }
+  }
+
+  /**
+   * Tests an erroneous query.
+   * @throws QueryException query exception
+   */
+  @Test
+  public void error() throws QueryException {
+    final QueryProcessor qp = new QueryProcessor("http:send-request(" +
+        "<http:request method='get'/>, '" + RESTURL + "unknown')[1]/@status/data()", ctx);
+    assertEquals("404", qp.execute().toString());
+    qp.close();
   }
 
   /**
@@ -209,7 +221,7 @@ public class HTTPClientTest extends HTTPTest {
         + "<http:header name='hdr2' value='hdr2val'/>"
         + "<http:body media-type='text/xml'>" + "Test body content"
         + "</http:body>" + "</http:request>";
-    final DBNode dbNode = new DBNode(new IOContent(req), lcontext.prop);
+    final DBNode dbNode = new DBNode(new IOContent(req), ctx.prop);
     final HTTPRequestParser rp = new HTTPRequestParser(null);
     final HTTPRequest r = rp.parse(dbNode.children().next(), null);
 
@@ -242,7 +254,7 @@ public class HTTPClientTest extends HTTPTest {
         + "Part3" + "</http:body>" + "</part>" + "</http:multipart>"
         + "</http:request>";
 
-    final DBNode dbNode1 = new DBNode(new IOContent(multiReq), lcontext.prop);
+    final DBNode dbNode1 = new DBNode(new IOContent(multiReq), ctx.prop);
     final HTTPRequestParser rp = new HTTPRequestParser(null);
     final HTTPRequest r = rp.parse(dbNode1.children().next(), null);
 
@@ -292,7 +304,7 @@ public class HTTPClientTest extends HTTPTest {
         + "<http:body media-type='text/plain'/>" + "</part>"
         + "</http:multipart>" + "</http:request>";
 
-    final DBNode dbNode1 = new DBNode(new IOContent(multiReq), lcontext.prop);
+    final DBNode dbNode1 = new DBNode(new IOContent(multiReq), ctx.prop);
     final ValueBuilder bodies = new ValueBuilder();
     bodies.add(Str.get("Part1"));
     bodies.add(Str.get("Part2"));
@@ -396,7 +408,7 @@ public class HTTPClientTest extends HTTPTest {
 
     final Iterator<byte[]> i = falseReqs.iterator();
     while(i.hasNext()) {
-      final DBNode dbNode = new DBNode(new IOContent(i.next()), lcontext.prop);
+      final DBNode dbNode = new DBNode(new IOContent(i.next()), ctx.prop);
       try {
         final HTTPRequestParser rp = new HTTPRequestParser(null);
         rp.parse(dbNode.children().next(), null);
@@ -445,7 +457,7 @@ public class HTTPClientTest extends HTTPTest {
 
     final FakeHttpConnection fakeConn = new FakeHttpConnection(new URL(
         "http://www.test.com"));
-    final HTTPClient hc = new HTTPClient(null, lcontext.prop);
+    final HTTPClient hc = new HTTPClient(null, ctx.prop);
     hc.setRequestContent(fakeConn.getOutputStream(), req);
     final String expResult = "--boundary42" + CRLF
         + "Content-Type: text/plain; charset=us-ascii" + CRLF + CRLF
@@ -480,7 +492,7 @@ public class HTTPClientTest extends HTTPTest {
     req1.bodyContent.add(e1);
     // String item child
     req1.bodyContent.add(Str.get("<b>b</b>"));
-    HTTPClient hc = new HTTPClient(null, lcontext.prop);
+    HTTPClient hc = new HTTPClient(null, ctx.prop);
     hc.setRequestContent(fakeConn1.getOutputStream(), req1);
     assertEquals("<a>a</a>&lt;b&gt;b&lt;/b&gt;", fakeConn1.out.toString());
 
@@ -494,7 +506,7 @@ public class HTTPClientTest extends HTTPTest {
     req2.bodyContent.add(e2);
     // String item child
     req2.bodyContent.add(Str.get("<b>b</b>"));
-    hc = new HTTPClient(null, lcontext.prop);
+    hc = new HTTPClient(null, ctx.prop);
     hc.setRequestContent(fakeConn2.getOutputStream(), req2);
     assertEquals("a<b>b</b>", fakeConn2.out.toString());
 
@@ -509,7 +521,7 @@ public class HTTPClientTest extends HTTPTest {
     req3.bodyContent.add(e3);
     // String item child
     req3.bodyContent.add(Str.get("<b>b</b>"));
-    hc = new HTTPClient(null, lcontext.prop);
+    hc = new HTTPClient(null, ctx.prop);
     hc.setRequestContent(fakeConn3.getOutputStream(), req3);
     assertEquals("a<b>b</b>", fakeConn3.out.toString());
   }
@@ -527,7 +539,7 @@ public class HTTPClientTest extends HTTPTest {
     req1.bodyContent.add(new B64(token("dGVzdA==")));
     final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL(
         "http://www.test.com"));
-    HTTPClient hc = new HTTPClient(null, lcontext.prop);
+    HTTPClient hc = new HTTPClient(null, ctx.prop);
     hc.setRequestContent(fakeConn1.getOutputStream(), req1);
     assertEquals(fakeConn1.out.toString(), "dGVzdA==");
 
@@ -538,7 +550,7 @@ public class HTTPClientTest extends HTTPTest {
     req2.bodyContent.add(e3);
     final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL(
         "http://www.test.com"));
-    hc = new HTTPClient(null, lcontext.prop);
+    hc = new HTTPClient(null, ctx.prop);
     hc.setRequestContent(fakeConn2.getOutputStream(), req2);
     assertEquals(fakeConn2.out.toString(), "dGVzdA==");
   }
@@ -556,7 +568,7 @@ public class HTTPClientTest extends HTTPTest {
     req1.bodyContent.add(new Hex(token("74657374")));
     final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL(
         "http://www.test.com"));
-    HTTPClient hc = new HTTPClient(null, lcontext.prop);
+    HTTPClient hc = new HTTPClient(null, ctx.prop);
     hc.setRequestContent(fakeConn1.getOutputStream(), req1);
     assertEquals(fakeConn1.out.toString(), "74657374");
 
@@ -568,7 +580,7 @@ public class HTTPClientTest extends HTTPTest {
     req2.bodyContent.add(e3);
     final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL(
         "http://www.test.com"));
-    hc = new HTTPClient(null, lcontext.prop);
+    hc = new HTTPClient(null, ctx.prop);
     hc.setRequestContent(fakeConn2.getOutputStream(), req2);
     assertEquals(fakeConn2.out.toString(), "74657374");
   }
@@ -592,7 +604,7 @@ public class HTTPClientTest extends HTTPTest {
     // HTTP connection
     final FakeHttpConnection fakeConn = new FakeHttpConnection(new URL(
         "http://www.test.com"));
-    final HTTPClient hc = new HTTPClient(null, lcontext.prop);
+    final HTTPClient hc = new HTTPClient(null, ctx.prop);
     hc.setRequestContent(fakeConn.getOutputStream(), req);
 
     // Delete file
@@ -619,7 +631,7 @@ public class HTTPClientTest extends HTTPTest {
     conn.contentType = "text/plain; charset=CP1251";
     // set content encoded in CP1251
     conn.content = Charset.forName("CP1251").encode(test).array();
-    final Iter i = new HTTPResponse(null, lcontext.prop).getResponse(
+    final Iter i = new HTTPResponse(null, ctx.prop).getResponse(
         conn, Bln.FALSE.string(), null);
     // compare results
     assertEquals(test, string(i.get(1).string(null)));
@@ -664,7 +676,7 @@ public class HTTPClientTest extends HTTPTest {
         + "--boundary42" + CRLF + "Content-Type: text/x-whatever" + CRLF + CRLF
         + ".... fanciest formatted version of same  "
         + "message  goes  here" + CRLF + "..."  + CRLF + "--boundary42--");
-    final Iter i = new HTTPResponse(null, lcontext.prop).getResponse(
+    final Iter i = new HTTPResponse(null, ctx.prop).getResponse(
         conn, Bln.FALSE.string(), null);
 
     // Construct expected result
@@ -690,7 +702,7 @@ public class HTTPClientTest extends HTTPTest {
         + "<http:body media-type='text/x-whatever'/>" + "</part>"
         + "</http:multipart>" + "</http:response> ";
 
-    final DBNode dbNode = new DBNode(new IOContent(reqItem), lcontext.prop);
+    final DBNode dbNode = new DBNode(new IOContent(reqItem), ctx.prop);
     resultIter.add(dbNode.children().next());
     resultIter.add(Str.get("...plain text version of message "
         + "goes here....\n\n"));
@@ -754,7 +766,7 @@ public class HTTPClientTest extends HTTPTest {
         +  CRLF + "--simple boundary--" + CRLF
         + "This is the epilogue.  It is also to be ignored.");
     // Get response as sequence of XQuery items
-    final Iter i = new HTTPResponse(null, lcontext.prop).getResponse(
+    final Iter i = new HTTPResponse(null, ctx.prop).getResponse(
         conn, Bln.FALSE.string(), null);
 
     // Construct expected result
@@ -778,7 +790,7 @@ public class HTTPClientTest extends HTTPTest {
         + "<http:body media-type='text/plain; charset=us-ascii'/>"
         + "</part>" + "</http:multipart>" + "</http:response>";
 
-    final DBNode dbNode = new DBNode(new IOContent(reqItem), lcontext.prop);
+    final DBNode dbNode = new DBNode(new IOContent(reqItem), ctx.prop);
     resultIter.add(dbNode.children().next());
     resultIter.add(Str.get("This is implicitly typed plain ASCII text.\n"
         + "It does NOT end with a linebreak.\n"));
@@ -796,8 +808,8 @@ public class HTTPClientTest extends HTTPTest {
    * @param itemsCount expected number of items
    * @throws QueryException query exception
    */
-  static void checkResponse(final Result r, final int expStatus,
-      final int itemsCount) throws QueryException {
+  static void checkResponse(final Result r, final int expStatus, final int itemsCount)
+      throws QueryException {
 
     assertTrue(r instanceof Iter);
     final Iter res = (Iter) r;
