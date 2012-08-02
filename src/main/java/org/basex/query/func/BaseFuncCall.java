@@ -29,38 +29,50 @@ public final class BaseFuncCall extends UserFuncCall {
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     Expr fun = func;
     Var[] args = args(ctx);
-    do {
-      // cache arguments, evaluate function and reset variable scope
-      final VarStack cs = addArgs(ctx, args);
-      ctx.tailCalls = 0;
-      try {
-        return fun.item(ctx, ii);
-      } catch(final Continuation c) {
-        fun = c.getFunc();
-        args = c.getArgs();
-      } finally {
-        ctx.vars.reset(cs);
-      }
-    } while(true);
+
+    final int calls = ctx.tailCalls;
+    try {
+      do {
+        // cache arguments, evaluate function and reset variable scope
+        final VarStack cs = addArgs(ctx, args);
+        ctx.tailCalls = 0;
+        try {
+          return fun.item(ctx, ii);
+        } catch(final Continuation c) {
+          fun = c.getFunc();
+          args = c.getArgs();
+        } finally {
+          ctx.vars.reset(cs);
+        }
+      } while(true);
+    } finally {
+      ctx.tailCalls = calls;
+    }
   }
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
     Expr fun = func;
     Var[] args = args(ctx);
-    do {
-      // cache arguments, evaluate function and reset variable scope
-      final VarStack cs = addArgs(ctx, args);
-      ctx.tailCalls = 0;
-      try {
-        return ctx.value(fun);
-      } catch(final Continuation c) {
-        fun = c.getFunc();
-        args = c.getArgs();
-      } finally {
-        ctx.vars.reset(cs);
-      }
-    } while(true);
+
+    final int calls = ctx.tailCalls;
+    try {
+      do {
+        // cache arguments, evaluate function and reset variable scope
+        final VarStack cs = addArgs(ctx, args);
+        ctx.tailCalls = 0;
+        try {
+          return ctx.value(fun);
+        } catch(final Continuation c) {
+          fun = c.getFunc();
+          args = c.getArgs();
+        } finally {
+          ctx.vars.reset(cs);
+        }
+      } while(true);
+    } finally {
+      ctx.tailCalls = calls;
+    }
   }
 
   @Override
