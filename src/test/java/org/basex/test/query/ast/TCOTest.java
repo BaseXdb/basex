@@ -1,5 +1,6 @@
 package org.basex.test.query.ast;
 
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.util.*;
 import org.junit.*;
@@ -73,8 +74,36 @@ public class TCOTest extends QueryPlanTest {
         null,
 
         "exists(//" + Util.name(UserFunc.class) + "/" +
-        Util.name(TailFuncCall.class) + ")",
+            Util.name(TailFuncCall.class) + ")",
         "exists(//" + Util.name(BaseFuncCall.class) + ")"
+    );
+  }
+
+  /** Checks if a function only containing a tail call is properly optimized. */
+  @Test
+  public void selfRecursive() {
+    check("declare function local:f($i) { if($i eq 12345) then $i else local:f($i+1) };" +
+        "local:f(0)",
+
+        "12345",
+
+        "exists(//" + Util.name(If.class) + "/" +
+            Util.name(TailFuncCall.class) + ")"
+    );
+  }
+
+  /** Checks if a function only containing a tail call is properly optimized. */
+  @Test
+  public void mixedSelfRecursive() {
+    check("declare function local:inc($i) { $i + 1 };" +
+        "declare function local:f($i) { if($i eq 12345) then $i " +
+        "else local:f(local:inc($i)) };" +
+        "local:f(0)",
+
+        "12345",
+
+        "exists(//" + Util.name(If.class) + "/" +
+            Util.name(TailFuncCall.class) + ")"
     );
   }
 }
