@@ -27,8 +27,10 @@ public class WindowsScripts {
     for(final String s : new String[] { "lib" }) {
       final int l = libs.size();
       for(final IOFile f : new IOFile(s).children()) libs.add(f.name());
-      if(l == libs.size())
+      if(l == libs.size()) {
         Util.errln(Util.name(this) + ": test skipped (no library files found)");
+        return;
+      }
     }
 
     for(final IOFile f : new IOFile("etc").children()) {
