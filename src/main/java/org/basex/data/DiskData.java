@@ -31,8 +31,9 @@ import org.basex.util.list.*;
  * @author Tim Petrowsky
  */
 public final class DiskData extends Data {
+
   /** Text compressor. */
-  private static final ThreadLocal<Compress> COMP = new ThreadLocal<Compress>() {
+  private static final ThreadLocal<Compress> comp = new ThreadLocal<Compress>() {
     @Override
     protected Compress initialValue() {
       return new Compress();
@@ -265,7 +266,7 @@ public final class DiskData extends Data {
    */
   private byte[] txt(final long o, final boolean text) {
     final byte[] txt = (text ? texts : values).readToken(o & IO.OFFCOMP - 1);
-    return cpr(o) ? COMP.get().unpack(txt) : txt;
+    return cpr(o) ? comp.get().unpack(txt) : txt;
   }
 
   /**
@@ -319,7 +320,7 @@ public final class DiskData extends Data {
     // flag for inlining numeric value
     final boolean vn = v != Integer.MIN_VALUE;
     // text to be stored (null if value will be inlined)
-    final byte[] vl = vn ? null : COMP.get().pack(value);
+    final byte[] vl = vn ? null : comp.get().pack(value);
 
     // old entry (offset or value)
     final long old = textOff(pre);
@@ -390,7 +391,7 @@ public final class DiskData extends Data {
 
     // store text
     final long off = store.length();
-    final byte[] val = COMP.get().pack(value);
+    final byte[] val = comp.get().pack(value);
     store.writeToken(off, val);
     return val == value ? off : off | IO.OFFCOMP;
   }

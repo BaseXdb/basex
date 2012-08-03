@@ -46,6 +46,14 @@ public final class DiskBuilder extends Builder {
   /** Debug counter. */
   private int c;
 
+  /** Text compressor. */
+  private static final ThreadLocal<Compress> comp = new ThreadLocal<Compress>() {
+    @Override
+    protected Compress initialValue() {
+      return new Compress();
+    }
+  };
+
   /**
    * Constructor.
    * @param nm name of database
