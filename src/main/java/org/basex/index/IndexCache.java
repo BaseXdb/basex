@@ -3,7 +3,7 @@ package org.basex.index;
 import static org.basex.util.Token.*;
 
 import java.lang.ref.*;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.*;
 
 import org.basex.util.list.*;
 
@@ -18,6 +18,10 @@ public final class IndexCache {
   private final ReferenceQueue<IndexEntry> queue = new ReferenceQueue<IndexEntry>();
   /** Read-write lock. */
   private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock(true);
+  /** Read-write lock, read part. */
+  private final ReentrantReadWriteLock.ReadLock readLock = rwl.readLock();
+  /** Read-write lock, write part. */
+  private final ReentrantReadWriteLock.WriteLock writeLock = rwl.writeLock();
   /** Hash table buckets. */
   private BucketEntry[] buckets = new BucketEntry[ElementList.CAP];
   /** Number of entries in the cache. */
@@ -30,7 +34,7 @@ public final class IndexCache {
    */
   public IndexEntry get(final byte[] key) {
     final int hash = hash(key);
-    rwl.readLock().lock();
+    readLock.lock();
 
     try {
       final int i = indexFor(hash, buckets.length);
@@ -41,7 +45,7 @@ public final class IndexCache {
         e = e.next;
       }
     } finally {
-      rwl.readLock().unlock();
+      readLock.unlock();
     }
 
     return null;
@@ -57,7 +61,7 @@ public final class IndexCache {
    */
   public IndexEntry add(final byte[] key, final int s, final long p) {
     final int hash = hash(key);
-    rwl.writeLock().lock();
+    writeLock.lock();
 
     try {
       purge();
@@ -83,7 +87,7 @@ public final class IndexCache {
       add(i, hash, entry);
       return entry;
     } finally {
-      rwl.writeLock().unlock();
+      writeLock.unlock();
     }
   }
 
@@ -93,7 +97,7 @@ public final class IndexCache {
    */
   public void delete(final byte[] key) {
     final int hash = hash(key);
-    rwl.writeLock().lock();
+    writeLock.lock();
 
     try {
       purge();
@@ -115,7 +119,7 @@ public final class IndexCache {
         e = next;
       }
     } finally {
-      rwl.writeLock().unlock();
+      writeLock.unlock();
     }
   }
 
@@ -156,12 +160,12 @@ public final class IndexCache {
   /**
    * Update an existing index entry.
    * @param entry index entry to update
-   * @param sz new size
-   * @param poi new pointer
+   * @param newSize new size
+   * @param pointer new pointer
    */
-  private void update(final IndexEntry entry, final int sz, final long poi) {
-    entry.size = sz;
-    entry.pointer = poi;
+  private void update(final IndexEntry entry, final int newSize, final long pointer) {
+    entry.size = newSize;
+    entry.pointer = pointer;
   }
 
   /**

@@ -66,7 +66,7 @@ public final class FNOut extends StandardFunc {
    * @param ctx query context
    */
   static void dump(final long min, final byte[] msg, final QueryContext ctx) {
-    Performance.gc(2);
+    Performance.mandatoryGC(2);
     final long max = Performance.memory();
     final long mb = Math.max(0, max - min);
     FNInfo.dump(token(Performance.format(mb)), msg, ctx);

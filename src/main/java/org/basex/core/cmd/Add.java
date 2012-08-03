@@ -99,8 +99,8 @@ public final class Add extends ACreate {
     boolean large = false;
     final Runtime rt = Runtime.getRuntime();
     if(fl > rt.freeMemory() / 3) {
-      Performance.gc(2);
-      large = fl > rt.freeMemory() / 3;
+      Performance.mandatoryGC(2);
+      large = fl > rt.freeMemory() / 3;  // [WK] dangerous dependency!
     }
     // in main memory mode, never write to disk
     if(prop.is(Prop.MAINMEM)) large = false;

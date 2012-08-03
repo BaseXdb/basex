@@ -64,7 +64,7 @@ public final class FNProf extends StandardFunc {
    */
   private Iter mem(final QueryContext ctx) throws QueryException {
     // measure initial memory consumption
-    Performance.gc(3);
+    Performance.mandatoryGC(3);
     final long min = Performance.memory();
 
     // optional message
@@ -95,7 +95,7 @@ public final class FNProf extends StandardFunc {
    * @param ctx query context
    */
   static void dump(final long min, final byte[] msg, final QueryContext ctx) {
-    Performance.gc(2);
+    Performance.mandatoryGC(2);
     final long max = Performance.memory();
     final long mb = Math.max(0, max - min);
     FNInfo.dump(token(Performance.format(mb)), msg, ctx);

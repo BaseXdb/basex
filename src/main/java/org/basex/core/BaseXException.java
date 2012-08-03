@@ -18,6 +18,9 @@ public final class BaseXException extends IOException {
    */
   public BaseXException(final String s, final Object... e) {
     super(Util.info(s, e));
+    if (e.length > 0 && e[0] != null && e[0] instanceof Throwable) {
+      initCause((Throwable) e[0]);
+    }
   }
 
   /**
@@ -26,6 +29,9 @@ public final class BaseXException extends IOException {
    */
   public BaseXException(final Exception ex) {
     super(Util.message(ex));
+    if (ex != null && ex.getCause() != null) {
+      initCause(ex.getCause());
+    }
     setStackTrace(ex.getStackTrace());
   }
 

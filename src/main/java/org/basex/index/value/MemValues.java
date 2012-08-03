@@ -5,7 +5,7 @@ import static org.basex.util.Token.*;
 
 import java.util.*;
 
-import org.basex.core.Prop;
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;

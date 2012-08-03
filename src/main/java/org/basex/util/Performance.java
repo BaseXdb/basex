@@ -1,5 +1,7 @@
 package org.basex.util;
 
+import org.basex.core.*;
+
 /**
  * This class contains methods for performance measurements.
  *
@@ -9,6 +11,20 @@ package org.basex.util;
 public final class Performance {
   /** Performance timer, using nano seconds. */
   private long time = System.nanoTime();
+
+  /**
+   * If suppressOptionalGCs == true, Performance.gc() has no effect,
+   * and Performance.mandatoryGC() will use n==1. */
+  public static final boolean SUPPRESS_OPTIONAL_GCS;
+
+  /** If suppressAllGCs == true, Performance.mandatoryGC() has no effect. */
+  public static final boolean SUPPRESS_ALL_GCS;
+
+  static {
+    String s = System.getProperty(Prop.SUPPRESS_GC);
+    SUPPRESS_OPTIONAL_GCS = s != null && !s.toLowerCase().equals("false");
+    SUPPRESS_ALL_GCS = s != null && s.toLowerCase().equals("true");
+  }
 
   /**
    * Returns the measured execution time in nanoseconds.
@@ -107,11 +123,38 @@ public final class Performance {
   /**
    * Performs some garbage collection.
    * GC behavior in Java is a pretty complex task. Still, garbage collection
-   * can be forced by calling it several times.
+   * can be forced by calling it several times. Execution of this method
+   * can be prohibited:
+   * @see Performance#SUPPRESS_OPTIONAL_GCS
+   * @see Performance#SUPPRESS_ALL_GCS
    * @param n number of times to execute garbage collection
    */
   public static void gc(final int n) {
+    if (SUPPRESS_OPTIONAL_GCS) {
+      return;
+    }
     for(int i = 0; i < n; ++i) System.gc();
+  }
+
+  /**
+   * In rare cases, we want to call System.gc()
+   * not just because of performance considerations,
+   * but because correct execution of an algorithm depends on it. In such cases,
+   * mandatoryGC() should be used instead of gc(). Execution of this method
+   * can be altered or altogether prohibited:
+   * @see Performance#SUPPRESS_OPTIONAL_GCS
+   * @see Performance#SUPPRESS_ALL_GCS
+   * @param n number of times to execute garbage collection
+   */
+  public static void mandatoryGC(final int n) {
+    if (SUPPRESS_ALL_GCS) {
+      return;
+    }
+    if (SUPPRESS_OPTIONAL_GCS) {
+      System.gc();  // perform gc() only once
+    } else {
+      gc(n);
+    }
   }
 
   /**

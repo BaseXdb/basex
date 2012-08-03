@@ -3,6 +3,7 @@ package org.basex.io.random;
 import java.io.*;
 
 import org.basex.io.*;
+import org.basex.io.random.Buffers.Selector;
 import org.basex.util.*;
 
 /**
@@ -13,15 +14,34 @@ import org.basex.util.*;
  */
 public final class DataAccess {
   /** Buffer manager. */
-  private final Buffers bm = new Buffers();
+  private final Buffers bm;
   /** Reference to the data input stream. */
   private final RandomAccessFile file;
+  /** The path of the file (for debugging purposes). */
+  public final String fileName;
   /** File length. */
   private long len;
   /** Changed flag. */
   private boolean changed;
   /** Offset. */
   private int off;
+  /** block number of current buffer. */
+  private long block;
+
+  /**
+   * Private selector instance for Buffers usage.
+   */
+  private final Selector selector = new Selector() {
+    private int idx;
+    @Override
+    public void setSelectedBufferIndex(final int index) {
+      idx = index;
+    }
+    @Override
+    public int getSelectedBufferIndex() {
+      return idx;
+    }
+  };
 
   /**
    * Constructor, initializing the file reader.
@@ -29,8 +49,10 @@ public final class DataAccess {
    * @throws IOException I/O Exception
    */
   public DataAccess(final IOFile f) throws IOException {
+    fileName = f.file().getAbsolutePath();
     file = new RandomAccessFile(f.file(), "rw");
     len = file.length();
+    bm = new Buffers(file);
     cursor(0);
   }
 
@@ -39,7 +61,7 @@ public final class DataAccess {
    */
   public synchronized void flush() {
     try {
-      for(final Buffer b : bm.all()) if(b.dirty) writeBlock(b);
+      bm.flush();
       if(changed) {
         file.setLength(len);
         changed = false;
@@ -65,8 +87,8 @@ public final class DataAccess {
    * Returns the current file position.
    * @return position in the file
    */
-  public long cursor() {
-    return buffer(false).pos + off;
+  public synchronized long cursor() {
+    return IO.BLOCKSIZE * block + off;
   }
 
   /**
@@ -82,7 +104,7 @@ public final class DataAccess {
    * Returns the file length.
    * @return file length
    */
-  public long length() {
+  public synchronized long length() {
     return len;
   }
 
@@ -90,7 +112,7 @@ public final class DataAccess {
    * Checks if more bytes can be read.
    * @return result of check
    */
-  public boolean more() {
+  public synchronized boolean more() {
     return cursor() < len;
   }
 
@@ -199,15 +221,27 @@ public final class DataAccess {
     int ll = IO.BLOCKSIZE - off;
     final byte[] b = new byte[l];
 
-    System.arraycopy(buffer(false).data, off, b, 0, Math.min(l, ll));
+    try {
+      System.arraycopy(buffer(false).data, off, b, 0, Math.min(l, ll));
+    } finally {
+      bm.freeBuffer();
+    }
     if(l > ll) {
       l -= ll;
       while(l > IO.BLOCKSIZE) {
-        System.arraycopy(buffer(true).data, 0, b, ll, IO.BLOCKSIZE);
+        try {
+          System.arraycopy(buffer(true).data, 0, b, ll, IO.BLOCKSIZE);
+        } finally {
+          bm.freeBuffer();
+        }
         ll += IO.BLOCKSIZE;
         l -= IO.BLOCKSIZE;
       }
-      System.arraycopy(buffer(true).data, 0, b, ll, l);
+      try {
+        System.arraycopy(buffer(true).data, 0, b, ll, l);
+      } finally {
+        bm.freeBuffer();
+      }
     }
     off += l;
     return b;
@@ -217,21 +251,9 @@ public final class DataAccess {
    * Sets the disk cursor.
    * @param p read position
    */
-  public void cursor(final long p) {
+  public synchronized void cursor(final long p) {
     off = (int) (p & IO.BLOCKSIZE - 1);
-    final long b = p - off;
-    if(!bm.cursor(b)) return;
-
-    final Buffer bf = bm.current();
-    try {
-      if(bf.dirty) writeBlock(bf);
-      bf.pos = b;
-      file.seek(bf.pos);
-      if(bf.pos < file.length())
-        file.readFully(bf.data, 0, (int) Math.min(len - bf.pos, IO.BLOCKSIZE));
-    } catch(final IOException ex) {
-      Util.stack(ex);
-    }
+    block = (p - off) / IO.BLOCKSIZE;
   }
 
   /**
@@ -257,7 +279,7 @@ public final class DataAccess {
    * @param p position in the file
    * @param v value to be written
    */
-  public void write5(final long p, final long v) {
+  public synchronized void write5(final long p, final long v) {
     cursor(p);
     write((byte) (v >>> 32));
     write((byte) (v >>> 24));
@@ -271,7 +293,7 @@ public final class DataAccess {
    * @param p write position
    * @param v byte array to be appended
    */
-  public void write4(final long p, final int v) {
+  public synchronized void write4(final long p, final int v) {
     cursor(p);
     write4(v);
   }
@@ -280,7 +302,7 @@ public final class DataAccess {
    * Writes an integer value to the current position.
    * @param v value to be written
    */
-  public void write4(final int v) {
+  public synchronized void write4(final int v) {
     write(v >>> 24);
     write(v >>> 16);
     write(v >>>  8);
@@ -292,7 +314,7 @@ public final class DataAccess {
    * @param p write position
    * @param v value to be written
    */
-  public void writeNum(final long p, final int v) {
+  public synchronized void writeNum(final long p, final int v) {
     cursor(p);
     writeNum(v);
   }
@@ -302,7 +324,7 @@ public final class DataAccess {
    * @param p write position
    * @param v integer values
    */
-  public void writeNums(final long p, final int[] v) {
+  public synchronized void writeNums(final long p, final int[] v) {
     cursor(p);
     writeNum(v.length);
     for(final int n : v) writeNum(n);
@@ -313,7 +335,7 @@ public final class DataAccess {
    * @param v integer values
    * @return the position in the file where the values have been written
    */
-  public long appendNums(final int[] v) {
+  public synchronized long appendNums(final int[] v) {
     final long end = len;
     writeNums(end, v);
     return end;
@@ -324,7 +346,7 @@ public final class DataAccess {
    * @param p write position
    * @param v byte array to be appended
    */
-  public void writeToken(final long p, final byte[] v) {
+  public synchronized void writeToken(final long p, final byte[] v) {
     cursor(p);
     writeToken(v, 0, v.length);
   }
@@ -335,7 +357,9 @@ public final class DataAccess {
    * @param offset offset in the buffer where the token starts
    * @param length token length
    */
-  public void writeToken(final byte[] buf, final int offset, final int length) {
+  public synchronized void writeToken(final byte[] buf,
+      final int offset, final int length) {
+
     writeNum(length);
 
     final int last = offset + length;
@@ -343,15 +367,19 @@ public final class DataAccess {
 
     while(o < last) {
       final Buffer bf = buffer(off == IO.BLOCKSIZE);
-      final int l = Math.min(last - o, IO.BLOCKSIZE - off);
-      System.arraycopy(buf, o, bf.data, off, l);
-      bf.dirty = true;
-      off += l;
-      o += l;
+      try {
+        final int l = Math.min(last - o, IO.BLOCKSIZE - off);
+        System.arraycopy(buf, o, bf.data, off, l);
+        bf.dirty = true;
+        off += l;
+        o += l;
+      } finally {
+        bm.freeBuffer();
+      }
     }
 
     // adjust file size if needed
-    final long nl = bm.current().pos + off;
+    final long nl = IO.BLOCKSIZE * block + off;
     if(nl > len) length(nl);
   }
 
@@ -380,7 +408,7 @@ public final class DataAccess {
    * @param size size of new text entry
    * @return new offset to store text
    */
-  public long free(final long pos, final int size) {
+  public synchronized long free(final long pos, final int size) {
     // old text size (available space)
     int os = readNum(pos) + (int) (cursor() - pos);
 
@@ -414,23 +442,16 @@ public final class DataAccess {
   // PRIVATE METHODS ==========================================================
 
   /**
-   * Writes the specified block to disk.
-   * @param bf buffer to write
-   * @throws IOException I/O exception
-   */
-  private void writeBlock(final Buffer bf) throws IOException {
-    file.seek(bf.pos);
-    file.write(bf.data);
-    bf.dirty = false;
-  }
-
-  /**
    * Reads the next byte.
    * @return next byte
    */
   private int read() {
     final Buffer bf = buffer(off == IO.BLOCKSIZE);
-    return bf.data[off++] & 0xFF;
+    try {
+      return bf.data[off++] & 0xFF;
+    } finally {
+      bm.freeBuffer();
+    }
   }
 
   /**
@@ -439,21 +460,27 @@ public final class DataAccess {
    */
   private void write(final int b) {
     final Buffer bf = buffer(off == IO.BLOCKSIZE);
-    bf.dirty = true;
-    bf.data[off++] = (byte) b;
-    final long nl = bf.pos + off;
-    if(nl > len) length(nl);
+    try {
+      bf.dirty = true;
+      bf.data[off++] = (byte) b;
+      final long nl = IO.BLOCKSIZE * bf.pos + off;
+      if(nl > len) length(nl);
+    } finally {
+      bm.freeBuffer();
+    }
   }
 
   /**
    * Returns the current or next buffer.
+   * NOTE: this acquires a buffer from bm, which must be freed afterwards.
    * @param next next block
    * @return buffer
    */
   private Buffer buffer(final boolean next) {
     if(next) {
-      cursor(bm.current().pos + IO.BLOCKSIZE);
+      cursor((block + 1) * IO.BLOCKSIZE);
     }
-    return bm.current();
+    // we always acquire exclusive access (may be optimized later)
+    return bm.acquireBuffer(selector, block, true);
   }
 }
