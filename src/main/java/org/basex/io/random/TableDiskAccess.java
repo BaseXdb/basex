@@ -99,7 +99,7 @@ public final class TableDiskAccess extends TableAccess {
 
   /** each thread gets its own copy of the cursor varaible. */
   private final ThreadLocal<TableCursor> tableCursor
-      = new ThreadLocal<TableCursor>(){
+      = new ThreadLocal<TableCursor>() {
     @Override
     public TableCursor initialValue() {
       return new TableCursor(bm);
