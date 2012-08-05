@@ -28,72 +28,72 @@ public final class MetaData {
   public final Prop prop;
 
   /** Database name. */
-  public String name;
+  public volatile String name;
   /** Database users. */
-  public Users users;
+  public volatile Users users;
 
   /** Encoding of original document. */
-  public String encoding = UTF8;
+  public volatile String encoding = UTF8;
   /** Path to original document. */
-  public String original = "";
+  public volatile String original = "";
   /** Size of original document. */
-  public long filesize;
+  public volatile long filesize;
   /** Number of stored documents. */
-  public int ndocs;
+  public volatile int ndocs;
   /** Timestamp of original document. */
-  public long time;
+  public volatile long time;
 
   /** Flag for whitespace chopping. */
-  public boolean chop;
+  public volatile boolean chop;
   /** Flag for activated automatic index update. */
-  public boolean updindex;
+  public volatile boolean updindex;
   /** Indicates if a text index exists. */
-  public boolean textindex;
+  public volatile boolean textindex;
   /** Indicates if a attribute index exists. */
-  public boolean attrindex;
+  public volatile boolean attrindex;
   /** Indicates if a full-text index exists. */
-  public boolean ftxtindex;
+  public volatile boolean ftxtindex;
   /** Indicates if text index is to be recreated. */
-  public boolean createtext;
+  public volatile boolean createtext;
   /** Indicates if attribute index is to be recreated. */
-  public boolean createattr;
+  public volatile boolean createattr;
   /** Indicates if full-text index is to be recreated. */
-  public boolean createftxt;
+  public volatile boolean createftxt;
 
   /** Flag for full-text stemming. */
-  public boolean stemming;
+  public volatile boolean stemming;
   /** Flag for full-text case sensitivity. */
-  public boolean casesens;
+  public volatile boolean casesens;
   /** Flag for full-text diacritics removal. */
-  public boolean diacritics;
+  public volatile boolean diacritics;
 
   /** Maximum number of categories. */
-  public int maxcats;
+  public volatile int maxcats;
   /** Maximum token length. */
-  public int maxlen;
+  public volatile int maxlen;
 
   /** Language of full-text search index. */
-  public Language language;
+  public volatile Language language;
 
   /** Flag for out-of-date index structures.
    *  Will be removed as soon as all indexes support updates. */
-  public boolean uptodate = true;
+  public volatile boolean uptodate = true;
   /** Flag to indicate possible corruption. */
-  public boolean corrupt;
+  public volatile boolean corrupt;
   /** Dirty flag. */
-  public boolean dirty;
+  public volatile boolean dirty;
 
   /** Table size. */
-  public int size;
+  public volatile int size;
   /** Last (highest) id assigned to a node. */
-  public int lastid = -1;
+  public volatile int lastid = -1;
 
   /** Flag for out-of-date indexes. */
-  private boolean oldindex;
+  private volatile boolean oldindex;
   /** Flag for out-of-date wildcard index (legacy, deprecated). */
-  public boolean wcindex;
+  public volatile boolean wcindex;
   /** Scoring mode (legacy, deprecated). */
-  public int scoring;
+  public volatile int scoring;
 
   /**
    * Constructor, specifying the database properties.
@@ -427,4 +427,5 @@ public final class MetaData {
     out.writeToken(token(k));
     out.writeToken(token(v));
   }
+
 }
