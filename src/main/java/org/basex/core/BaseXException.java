@@ -13,7 +13,7 @@ import org.basex.util.*;
 public final class BaseXException extends IOException {
   /**
    * Constructs an exception with the specified message and extension.
-   * @param message message
+   * @param message message with optional placeholders
    * @param ext optional message extension
    */
   public BaseXException(final String message, final Object... ext) {
@@ -46,12 +46,12 @@ public final class BaseXException extends IOException {
   }
 
   /**
-   * Creates the error message from the specified info and extension array.
-   * @param info info message
+   * Creates the error message from the specified text and extension array.
+   * @param text text message with optional placeholders
    * @param ext info extensions
    * @return argument
    */
-  public static String message(final String info, final Object[] ext) {
+  public static String message(final String text, final Object[] ext) {
     final int es = ext.length;
     for(int e = 0; e < es; ++e) {
       if(ext[e] instanceof byte[]) {
@@ -62,6 +62,6 @@ public final class BaseXException extends IOException {
         ext[e] = ext[e].toString();
       }
     }
-    return Util.info(info, ext);
+    return Util.info(text, ext);
   }
 }
