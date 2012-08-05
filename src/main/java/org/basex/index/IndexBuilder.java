@@ -20,6 +20,8 @@ public abstract class IndexBuilder extends Progress {
   protected final Data data;
   /** Total parsing value. */
   protected final int size;
+  /** Number of explicit garbage collections. */
+  protected final int gc;
   /** Current parsing value. */
   protected int pre;
   /** Merge flag. */
@@ -58,7 +60,7 @@ public abstract class IndexBuilder extends Progress {
   protected final boolean memFull() throws IOException {
     final boolean full = rt.totalMemory() - rt.freeMemory() >= maxMem;
     if(full) {
-      if(cc >= 0) throw new BaseXException(OUT_OF_MEM + H_OUT_OF_MEM);
+      if(cc >= 0 && gc > 0) throw new BaseXException(OUT_OF_MEM + H_OUT_OF_MEM);
       if(Prop.debug) Util.err("!");
       merge = true;
       cc = 30;
@@ -75,8 +77,8 @@ public abstract class IndexBuilder extends Progress {
   protected IndexBuilder(final Data d) {
     data = d;
     size = data.meta.size;
-    if(rt.totalMemory() - rt.freeMemory() >= rt.maxMemory() >> 1)
-      Performance.gc(2);
+    gc = d.meta.prop.num(Prop.GC);
+    if(rt.totalMemory() - rt.freeMemory() >= rt.maxMemory() >> 1) Performance.gc(gc);
   }
 
   @Override

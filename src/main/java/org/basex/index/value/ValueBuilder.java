@@ -68,7 +68,7 @@ public final class ValueBuilder extends IndexBuilder {
         if(memFull()) {
           write(f + csize++, false);
           index = new IndexTree();
-          Performance.gc(2);
+          Performance.gc(gc);
         }
       }
       // skip too long values
@@ -79,7 +79,7 @@ public final class ValueBuilder extends IndexBuilder {
     if(merge) {
       write(f + csize++, false);
       index = null;
-      Performance.gc(1);
+      Performance.gc(gc);
       merge();
     } else {
       write(f, true);

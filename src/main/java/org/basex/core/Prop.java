@@ -107,6 +107,8 @@ public final class Prop extends AProp {
   public static final Object[] MAXCATS = { "MAXCATS", 100 };
   /** Flag for automatic index update. */
   public static final Object[] UPDINDEX = { "UPDINDEX", false };
+  /** Number of explicit garbage collections when building expensive data structures. */
+  public static final Object[] GC = { "GC", 2 };
 
   /** Writes original files back after updates. */
   public static final Object[] WRITEBACK = { "WRITEBACK", false };
