@@ -13,11 +13,12 @@ import org.basex.util.*;
 public final class BaseXException extends IOException {
   /**
    * Constructs an exception with the specified message and extension.
-   * @param s message
-   * @param e message extension
+   * @param message message
+   * @param ext optional message extension
    */
-  public BaseXException(final String s, final Object... e) {
-    super(Util.info(s, e));
+  public BaseXException(final String message, final Object... ext) {
+    super(Util.info(message, ext));
+    init(ext);
   }
 
   /**
@@ -26,7 +27,22 @@ public final class BaseXException extends IOException {
    */
   public BaseXException(final Exception ex) {
     super(Util.message(ex));
-    setStackTrace(ex.getStackTrace());
+    init(ex);
+  }
+
+  /**
+   * Initializes the cause to the first throwable argument.
+   * @param ext message extension
+   */
+  public void init(final Object... ext) {
+    for(final Object o : ext) {
+      if(o instanceof Throwable) {
+        final Throwable t = (Throwable) o;
+        setStackTrace(t.getStackTrace());
+        initCause(t);
+        break;
+      }
+    }
   }
 
   /**
