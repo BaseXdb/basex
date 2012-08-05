@@ -16,6 +16,8 @@ import org.basex.util.*;
 /**
  * This class stores the table on disk and reads it block-wise.
  *
+ * NOTE: this class is not thread-safe.
+ *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  * @author Tim Petrowsky

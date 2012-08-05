@@ -6,6 +6,8 @@ import org.basex.util.list.*;
  * This class compresses and decompresses tokens. It is inspired by the
  * Huffman coding, but was simplified to speed up processing.
  *
+ * NOTE: this class is not thread-safe.
+ *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  * @author Wolfgang Kronberg
