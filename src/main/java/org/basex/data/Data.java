@@ -59,6 +59,9 @@ import org.basex.util.list.*;
  * performed on the arguments (e.g.: if the string value of a text node is
  * requested, the specified pre value must point to a text node).
  *
+ * NOTE: the class is not thread-safe. It is imperative that all read/write accesses
+ * are synchronized over a single context's read/write lock.
+ *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
