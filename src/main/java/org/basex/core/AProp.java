@@ -46,7 +46,7 @@ public abstract class AProp implements Iterable<String> {
    * The file is located in the project home directory.
    * @param prop property file extension
    */
-  protected void read(final String prop) {
+  protected synchronized void read(final String prop) {
     file = new IOFile(HOME + IO.BASEXSUFFIX + prop);
 
     final StringList read = new StringList();
@@ -196,7 +196,7 @@ public abstract class AProp implements Iterable<String> {
    * @param key key to be found
    * @return value
    */
-  public final Object get(final String key) {
+  public final synchronized Object get(final String key) {
     return props.get(key);
   }
 
@@ -205,7 +205,7 @@ public abstract class AProp implements Iterable<String> {
    * @param key key to be found
    * @return value
    */
-  public final String get(final Object[] key) {
+  public final synchronized String get(final Object[] key) {
     return get(key, String.class).toString();
   }
 
@@ -214,7 +214,7 @@ public abstract class AProp implements Iterable<String> {
    * @param key key to be found
    * @return value
    */
-  public final int num(final Object[] key) {
+  public final synchronized int num(final Object[] key) {
     return (Integer) get(key, Integer.class);
   }
 
@@ -223,7 +223,7 @@ public abstract class AProp implements Iterable<String> {
    * @param key key to be found
    * @return value
    */
-  public final boolean is(final Object[] key) {
+  public final synchronized boolean is(final Object[] key) {
     return (Boolean) get(key, Boolean.class);
   }
 
@@ -232,7 +232,7 @@ public abstract class AProp implements Iterable<String> {
    * @param key key to be found
    * @return value
    */
-  public final String[] strings(final Object[] key) {
+  public final synchronized String[] strings(final Object[] key) {
     return (String[]) get(key, String[].class);
   }
 
@@ -241,7 +241,7 @@ public abstract class AProp implements Iterable<String> {
    * @param key key to be found
    * @return value
    */
-  public final int[] nums(final Object[] key) {
+  public final synchronized int[] nums(final Object[] key) {
     return (int[]) get(key, int[].class);
   }
 
@@ -250,7 +250,7 @@ public abstract class AProp implements Iterable<String> {
    * @param key key to be found
    * @param val value to be written
    */
-  public final void set(final Object[] key, final String val) {
+  public final synchronized void set(final Object[] key, final String val) {
     setObject(key[0].toString(), val);
   }
 
@@ -259,7 +259,7 @@ public abstract class AProp implements Iterable<String> {
    * @param key key to be found
    * @param val value to be written
    */
-  public final void set(final Object[] key, final int val) {
+  public final synchronized void set(final Object[] key, final int val) {
     setObject(key[0].toString(), val);
   }
 
@@ -268,7 +268,7 @@ public abstract class AProp implements Iterable<String> {
    * @param key key to be found
    * @param val value to be written
    */
-  public final void set(final Object[] key, final boolean val) {
+  public final synchronized void set(final Object[] key, final boolean val) {
     setObject(key[0].toString(), val);
   }
 
@@ -277,7 +277,7 @@ public abstract class AProp implements Iterable<String> {
    * @param key key to be found
    * @param val value to be written
    */
-  public final void set(final Object[] key, final String[] val) {
+  public final synchronized void set(final Object[] key, final String[] val) {
     setObject(key[0].toString(), val);
   }
 
@@ -286,7 +286,7 @@ public abstract class AProp implements Iterable<String> {
    * @param key key to be found
    * @param val value to be written
    */
-  public final void set(final Object[] key, final int[] val) {
+  public final synchronized void set(final Object[] key, final int[] val) {
     setObject(key[0].toString(), val);
   }
 
@@ -295,7 +295,7 @@ public abstract class AProp implements Iterable<String> {
    * @param key key to be found
    * @param val value to be written
    */
-  public final void setObject(final String key, final Object val) {
+  public final synchronized void setObject(final String key, final Object val) {
     props.put(key, val);
     finish();
   }
@@ -306,7 +306,7 @@ public abstract class AProp implements Iterable<String> {
    * @param val value
    * @return final value, or {@code null} if the key has not been found
    */
-  public final String set(final String key, final String val) {
+  public final synchronized String set(final String key, final String val) {
     final Object type = get(key);
     if(type == null) return null;
 
@@ -331,7 +331,7 @@ public abstract class AProp implements Iterable<String> {
    * @param s property string
    * @throws IOException io exception
    */
-  protected final void parse(final String s) throws IOException {
+  protected final synchronized void parse(final String s) throws IOException {
     for(final String ser : s.trim().split(",")) {
       if(ser.isEmpty()) continue;
       final String[] sprop = ser.split("=", 2);
@@ -352,7 +352,7 @@ public abstract class AProp implements Iterable<String> {
    * @param key key
    * @return error string
    */
-  public final String unknown(final String key) {
+  public final synchronized String unknown(final String key) {
     final String sim = similar(key);
     return Util.info(sim != null ? Text.UNKNOWN_OPT_SIMILAR_X_X :
       Text.UNKNOWN_OPTION_X, key, sim);
@@ -363,7 +363,7 @@ public abstract class AProp implements Iterable<String> {
    * @param key key
    * @return new value
    */
-  public final boolean invert(final Object[] key) {
+  public final synchronized boolean invert(final Object[] key) {
     final boolean val = !is(key);
     set(key, val);
     return val;
@@ -375,7 +375,7 @@ public abstract class AProp implements Iterable<String> {
    * @param val new value
    * @return result of check
    */
-  public final boolean sameAs(final Object[] key, final Object val) {
+  public final synchronized boolean sameAs(final Object[] key, final Object val) {
     return props.get(key[0].toString()).equals(val);
   }
 
@@ -384,7 +384,7 @@ public abstract class AProp implements Iterable<String> {
    * @param key key to be found
    * @return similar key
    */
-  public final String similar(final String key) {
+  public final synchronized String similar(final String key) {
     final byte[] name = token(key);
     final Levenshtein ls = new Levenshtein();
     for(final String prop : props.keySet()) {
@@ -416,12 +416,12 @@ public abstract class AProp implements Iterable<String> {
   }
 
   @Override
-  public final Iterator<String> iterator() {
+  public final synchronized Iterator<String> iterator() {
     return props.keySet().iterator();
   }
 
   @Override
-  public final String toString() {
+  public final synchronized String toString() {
     final TokenBuilder tb = new TokenBuilder();
     for(final Entry<String, Object> e : props.entrySet()) {
       if(!tb.isEmpty()) tb.add(',');
