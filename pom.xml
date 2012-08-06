@@ -11,6 +11,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.lib.directory>lib</project.lib.directory>
+    <jettyVersion>8.1.4.v20120524</jettyVersion>
   </properties>
   <licenses>
     <license>
@@ -91,12 +92,17 @@
     <dependency>
 	  <groupId>org.eclipse.jetty</groupId>
 	  <artifactId>jetty-server</artifactId>
-	  <version>8.1.4.v20120524</version>
+	  <version>${jettyVersion}</version>
 	</dependency>
 	<dependency>
 	  <groupId>org.eclipse.jetty</groupId>
 	  <artifactId>jetty-servlet</artifactId>
-	  <version>8.1.4.v20120524</version>
+	  <version>${jettyVersion}</version>
+	</dependency>
+	<dependency>
+	  <groupId>org.eclipse.jetty</groupId>
+	  <artifactId>jetty-servlets</artifactId>
+	  <version>${jettyVersion}</version>
 	</dependency>
     <dependency>
       <groupId>com.ettrema</groupId>
@@ -184,6 +190,7 @@
       <plugin>
         <groupId>org.mortbay.jetty</groupId>
         <artifactId>jetty-maven-plugin</artifactId>
+        <version>${jettyVersion}</version>
         <configuration>
           <connectors>
             <connector implementation="org.eclipse.jetty.server.nio.SelectChannelConnector">
