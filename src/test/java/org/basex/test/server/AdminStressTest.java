@@ -56,6 +56,7 @@ public final class AdminStressTest extends SandboxTest {
     start.countDown(); // start all clients
     stop.await();
 
+    Performance.sleep(50);
     final ClientSession cs = createClient();
     for(int i = 0; i < NUM; ++i) cs.execute("drop event " + NAME + i);
     cs.close();
