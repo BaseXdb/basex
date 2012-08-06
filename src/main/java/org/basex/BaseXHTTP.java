@@ -11,6 +11,7 @@ import org.basex.http.*;
 import org.basex.http.rest.*;
 import org.basex.http.restxq.*;
 import org.basex.http.webdav.*;
+import org.basex.server.*;
 import org.basex.util.*;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.*;
@@ -118,7 +119,10 @@ public final class BaseXHTTP {
     } else {
       // local or client mode
       Util.outln(CONSOLE + HTTP + ' ' + SRV_STARTED, SERVERMODE);
+      context.log = new Log(context, quiet);
+      System.out.println(context);
     }
+    context.log.write(HTTP + ' ' + SRV_STARTED);
 
     jetty = new Server();
     final Connector conn = new SelectChannelConnector();
@@ -126,9 +130,8 @@ public final class BaseXHTTP {
     conn.setPort(hport);
     jetty.addConnector(conn);
 
-    final ServletContextHandler jctx =
-        new ServletContextHandler(jetty, "/",
-            ServletContextHandler.SESSIONS);
+    final ServletContextHandler jctx = new ServletContextHandler(jetty, "/",
+        ServletContextHandler.SESSIONS);
 
     if(rest) {
       jctx.addServlet(RESTServlet.class, "/rest/*");
@@ -156,6 +159,8 @@ public final class BaseXHTTP {
       @Override
       public void run() {
         Util.outln(HTTP + ' ' + SRV_STOPPED);
+        final Log l = context.log;
+        if(l != null) l.write(HTTP + ' ' + SRV_STOPPED);
         context.close();
       }
     });

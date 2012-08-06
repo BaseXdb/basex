@@ -37,6 +37,8 @@ public final class HTTPContext {
   public final HttpServletResponse res;
   /** Request method. */
   public final HTTPMethod method;
+  /** Performance. */
+  private final Performance perf = new Performance();
 
   /** Serialization parameters. */
   public String serialization = "";
@@ -65,10 +67,17 @@ public final class HTTPContext {
 
     req = rq;
     res = rs;
-    method = HTTPMethod.get(rq.getMethod());
+    final String m = rq.getMethod();
+    method = HTTPMethod.get(m);
+
+    final StringBuilder uri = new StringBuilder(req.getRequestURL());
+    final String qs = req.getQueryString();
+    if(qs != null) uri.append('?').append(qs);
+    log(false, m, uri);
 
     // set UTF8 as default encoding (can be overwritten)
     res.setCharacterEncoding(UTF8);
+
     segments = toSegments(req.getPathInfo());
     path = join(0);
 
@@ -206,6 +215,7 @@ public final class HTTPContext {
    * @throws IOException I/O exception
    */
   public void status(final int code, final String message) throws IOException {
+    log(true, code, message);
     if(session != null) session.close();
     res.resetBuffer();
     res.setStatus(code);
@@ -250,6 +260,19 @@ public final class HTTPContext {
    */
   public Context context() {
     return context;
+  }
+
+  /**
+   * Writes a log message.
+   * @param str strings to be written
+   * @param time add performance info
+   */
+  public void log(final boolean time, final Object... str) {
+    final Object[] obj = new Object[str.length + (time ? 2 : 1)];
+    obj[0] = remote();
+    System.arraycopy(str, 0, obj, 1, str.length);
+    if(time) obj[obj.length - 1] = perf.toString();
+    context.log.write(obj);
   }
 
   // STATIC METHODS =====================================================================
@@ -344,5 +367,14 @@ public final class HTTPContext {
       tb.add(segments[p]);
     }
     return tb.toString();
+  }
+
+  /**
+   * Returns a string with the remote user address.
+   * @return user address
+   */
+  private String remote() {
+    return new StringBuilder().append('[').append(req.getRemoteAddr()).append(':').
+        append(req.getRemotePort()).append(']').toString();
   }
 }
