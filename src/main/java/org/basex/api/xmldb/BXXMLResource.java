@@ -15,6 +15,7 @@ import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
+import org.basex.query.*;
 import org.basex.query.value.node.*;
 import org.w3c.dom.*;
 import org.xml.sax.*;
@@ -210,8 +211,8 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
     public void endDocument() throws SAXException {
       try {
         res.content = new DBNode(((MemBuilder) builder).data).serialize().toArray();
-      } catch(final IOException ex) {
-        error(ex);
+      } catch(final QueryException ex) {
+        error(new BaseXException(ex));
       }
     }
   }
