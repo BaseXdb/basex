@@ -99,11 +99,6 @@
 	  <artifactId>jetty-servlet</artifactId>
 	  <version>${jettyVersion}</version>
 	</dependency>
-	<dependency>
-	  <groupId>org.eclipse.jetty</groupId>
-	  <artifactId>jetty-servlets</artifactId>
-	  <version>${jettyVersion}</version>
-	</dependency>
     <dependency>
       <groupId>com.ettrema</groupId>
       <artifactId>milton-api</artifactId>
