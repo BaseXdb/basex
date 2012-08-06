@@ -41,6 +41,8 @@ public final class Context {
 
   /** User reference. */
   public User user;
+  /** Log. */
+  public Log log;
 
   // GUI references
   /** Marked nodes. */

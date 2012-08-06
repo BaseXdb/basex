@@ -16,13 +16,10 @@ import org.basex.util.*;
  * @author Andreas Weiler
  */
 public final class Log {
-  /** Quiet flag. */
-  private final boolean quiet;
   /** Logging directory. */
-  private final IOFile dir;
+  private IOFile dir;
   /** Log message cut-off. */
-  private final int maxlen;
-
+  private int maxlen;
   /** Start date of log. */
   private String start;
   /** Output stream. */
@@ -34,10 +31,10 @@ public final class Log {
    * @param q quiet flag (no logging)
    */
   public Log(final Context ctx, final boolean q) {
+    if(q) return;
     dir = ctx.mprop.dbpath(".logs");
     maxlen = ctx.mprop.num(MainProp.LOGMSGMAXLEN);
-    quiet = q;
-    if(!q) create(new Date());
+    create(new Date());
   }
 
   /**
@@ -46,7 +43,7 @@ public final class Log {
    */
   public synchronized void error(final Throwable th) {
     Util.stack(th);
-    if(!quiet) write(Util.bug(th));
+    write(Util.bug(th));
   }
 
   /**
@@ -54,7 +51,7 @@ public final class Log {
    * @param str strings to be written
    */
   public synchronized void write(final Object... str) {
-    if(quiet) return;
+    if(fos == null) return;
 
     // check if current log file is still up-to-date
     final Date now = new Date();

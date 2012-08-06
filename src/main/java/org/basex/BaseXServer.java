@@ -29,8 +29,6 @@ public final class BaseXServer extends Main implements Runnable {
   ServerSocket esocket;
   /** Stop file. */
   IOFile stop;
-  /** Log. */
-  Log log;
 
   /** EventsListener. */
   private EventListener events;
@@ -106,12 +104,11 @@ public final class BaseXServer extends Main implements Runnable {
       return;
     }
 
+    context.log = new Log(context, quiet);
+
     try {
       // execute command-line arguments
       for(final String c : commands) execute(c);
-
-      log = new Log(context, quiet);
-      log.write(SRV_STARTED);
 
       socket = new ServerSocket();
       socket.setReuseAddress(true);
@@ -122,11 +119,11 @@ public final class BaseXServer extends Main implements Runnable {
       stop = stopFile(port);
 
       // show info when server is aborted
+      context.log.write(SRV_STARTED);
       Runtime.getRuntime().addShutdownHook(new Thread() {
         @Override
         public void run() {
-          log.write(SRV_STOPPED);
-          log = null;
+          context.log.write(SRV_STOPPED);
           Util.outln(SRV_STOPPED);
         }
       });
@@ -141,7 +138,7 @@ public final class BaseXServer extends Main implements Runnable {
         quit();
       }
     } catch(final IOException ex) {
-      if(log != null) log.error(ex);
+      context.log.error(ex);
       throw ex;
     }
   }
@@ -153,7 +150,7 @@ public final class BaseXServer extends Main implements Runnable {
       try {
         final Socket s = socket.accept();
         if(stop.exists()) {
-          if(!stop.delete()) log.write(Util.info(FILE_NOT_DELETED_X, stop));
+          if(!stop.delete()) context.log.write(Util.info(FILE_NOT_DELETED_X, stop));
           quit();
         } else {
           // drop inactive connections
@@ -164,7 +161,7 @@ public final class BaseXServer extends Main implements Runnable {
               if(ms - cs.last > ka) cs.quit();
             }
           }
-          final ClientListener cl = new ClientListener(s, context, log, this);
+          final ClientListener cl = new ClientListener(s, context, context.log, this);
           // start authentication timeout
           final long to = context.mprop.num(MainProp.KEEPALIVE) * 1000L;
           if(to > 0) {
@@ -182,7 +179,7 @@ public final class BaseXServer extends Main implements Runnable {
         break;
       } catch(final Throwable ex) {
         // socket may have been unexpectedly closed
-        if(log != null) log.error(ex);
+        context.log.error(ex);
         break;
       }
     }
@@ -218,7 +215,7 @@ public final class BaseXServer extends Main implements Runnable {
       esocket.close();
       socket.close();
     } catch(final IOException ex) {
-      if(log != null) log.error(ex);
+      context.log.error(ex);
     }
     console = false;
   }
