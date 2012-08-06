@@ -1,6 +1,7 @@
 package org.basex.query.value;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 
 import java.io.*;
 import java.util.*;
@@ -169,14 +170,20 @@ public abstract class Value extends Expr implements Iterable<Item> {
    * Serializes the value, using the standard XML serializer,
    * and returns the cached result.
    * @return serialized value
-   * @throws IOException I/O exception
+   * @throws QueryException query exception
    */
-  public final ArrayOutput serialize() throws IOException {
+  public final ArrayOutput serialize() throws QueryException {
     final ArrayOutput ao = new ArrayOutput();
-    final Serializer ser = Serializer.get(ao);
-    final ValueIter vi = iter();
-    for(Item it; (it = vi.next()) != null;) ser.serialize(it);
-    ser.close();
+    try {
+      final Serializer ser = Serializer.get(ao);
+      final ValueIter vi = iter();
+      for(Item it; (it = vi.next()) != null;) ser.serialize(it);
+      ser.close();
+    } catch(final SerializerException ex) {
+      throw ex.getCause(null);
+    } catch(final IOException ex) {
+      SERANY.thrw(null, ex);
+    }
     return ao;
   }
 

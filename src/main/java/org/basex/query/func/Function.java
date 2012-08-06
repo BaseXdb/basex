@@ -802,6 +802,8 @@ public enum Function {
   _PROF_CURRENT_MS(FNProf.class, "current-ms()", ITR),
   /** XQuery function. */
   _PROF_CURRENT_NS(FNProf.class, "current-ns()", ITR),
+  /** XQuery function. */
+  _PROF_DUMP(FNProf.class, "dump(expr[,label])", EMP, 1, ITEM_ZM, STR),
 
   /* FNHash functions. */
 

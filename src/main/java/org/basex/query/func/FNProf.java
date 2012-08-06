@@ -41,6 +41,7 @@ public final class FNProf extends StandardFunc {
       case _PROF_SLEEP:      return sleep(ctx);
       case _PROF_CURRENT_MS: return Int.get(System.currentTimeMillis());
       case _PROF_CURRENT_NS: return Int.get(System.nanoTime());
+      case _PROF_DUMP:       return dump(ctx);
       default:               return super.item(ctx, ii);
     }
   }
@@ -81,11 +82,26 @@ public final class FNProf extends StandardFunc {
       final Iter ir = expr[0].iter(ctx);
       @Override
       public Item next() throws QueryException {
-        final Item i = ir.next();
-        if(i == null) dump(min, msg, ctx);
-        return i;
+        final Item it = ir.next();
+        if(it == null) dump(min, msg, ctx);
+        return it;
       }
     };
+  }
+
+  /**
+   * Dumps the items of a sequence.
+   * @param ctx query context
+   * @return memory consumption
+   * @throws QueryException query exception
+   */
+  private Item dump(final QueryContext ctx) throws QueryException {
+    final Iter ir = expr[0].iter(ctx);
+    final byte[] s = expr.length > 1 ? checkStr(expr[1], ctx) : null;
+    for(Item it; (it = ir.next()) != null;) {
+      FNInfo.dump(it.serialize().toArray(), s, ctx);
+    }
+    return null;
   }
 
   /**
@@ -125,9 +141,9 @@ public final class FNProf extends StandardFunc {
       final Iter ir = expr[0].iter(ctx);
       @Override
       public Item next() throws QueryException {
-        final Item i = ir.next();
-        if(i == null) FNInfo.dump(token(p.getTime()), msg, ctx);
-        return i;
+        final Item it = ir.next();
+        if(it == null) FNInfo.dump(token(p.getTime()), msg, ctx);
+        return it;
       }
     };
   }

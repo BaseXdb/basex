@@ -80,13 +80,13 @@ public final class JSONParser extends XMLParser {
       final XMLConverter conv = jsonml ?
           new JsonMLConverter(null) : new JSONConverter(null);
       node = conv.parse(content);
+
+      // create XML input container from serialized node
+      final IOContent xml = new IOContent(node.serialize().toArray());
+      xml.name(io.name());
+      return xml;
     } catch(final QueryException ex) {
       throw new BaseXException(ex.getLocalizedMessage());
     }
-
-    // create XML input container from serialized node
-    final IOContent xml = new IOContent(node.serialize().toArray());
-    xml.name(io.name());
-    return xml;
   }
 }

@@ -120,11 +120,8 @@ public final class FNXslt extends StandardFunc {
    * @param ctx query context
    * @return item
    * @throws QueryException query exception
-   * @throws IOException I/O exception
    */
-  private IO read(final Expr e, final QueryContext ctx)
-      throws QueryException, IOException  {
-
+  private IO read(final Expr e, final QueryContext ctx) throws QueryException {
     final Item it = checkNoEmpty(e.item(ctx, info));
     if(it instanceof ANode) return new IOContent(it.serialize().toArray());
     if(it instanceof AStr) return IO.get(string(it.string(info)));

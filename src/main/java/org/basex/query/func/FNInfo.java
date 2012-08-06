@@ -32,52 +32,18 @@ public final class FNInfo extends StandardFunc {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(sig) {
-      case ERROR:
-        final int al = expr.length;
-        if(al == 0) FUNERR1.thrw(info);
-
-        QNm name = FUNERR1.qname();
-        String msg = FUNERR1.desc;
-
-        final Item it = expr[0].item(ctx, info);
-        if(it == null) {
-          if(al == 1) XPEMPTY.thrw(info, description());
-        } else {
-          name = (QNm) checkType(it, AtomType.QNM);
-        }
-        if(al > 1) msg = Token.string(checkEStr(expr[1], ctx));
-        final Value val = al > 2 ? ctx.value(expr[2]) : null;
-        throw new QueryException(info, name, msg).value(val);
-      case TRACE:
-        return new Iter() {
-          final Iter ir = expr[0].iter(ctx);
-          final byte[] s = checkStr(expr[1], ctx);
-          @Override
-          public Item next() throws QueryException {
-            final Item i = ir.next();
-            if(i != null) dump(Token.token(i.toString()), s, ctx);
-            return i;
-          }
-        };
-      case AVAILABLE_ENVIRONMENT_VARIABLES:
-        final ValueBuilder vb = new ValueBuilder();
-        for(final Object k : System.getenv().keySet().toArray()) {
-          vb.add(Str.get(k));
-        }
-        return vb;
-      default:
-        return super.iter(ctx);
+      case ERROR: return error(ctx);
+      case TRACE: return trace(ctx);
+      case AVAILABLE_ENVIRONMENT_VARIABLES: return avlEnvVars();
+      default: return super.iter(ctx);
     }
   }
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
-      case ENVIRONMENT_VARIABLE:
-        final String e = System.getenv(Token.string(checkEStr(expr[0], ctx)));
-        return e != null ? Str.get(e) : null;
-      default:
-        return super.item(ctx, ii);
+      case ENVIRONMENT_VARIABLE: return envVar(ctx);
+      default: return super.item(ctx, ii);
     }
   }
 
@@ -92,6 +58,70 @@ public final class FNInfo extends StandardFunc {
     return u == Use.X30 &&
         oneOf(sig, ENVIRONMENT_VARIABLE, AVAILABLE_ENVIRONMENT_VARIABLES) ||
       u == Use.NDT && oneOf(sig, ERROR, TRACE) || super.uses(u);
+  }
+
+  /**
+   * Performs the error function.
+   * @param ctx query context
+   * @return dummy iterator
+   * @throws QueryException query exception
+   */
+  private Iter error(final QueryContext ctx) throws QueryException {
+    final int al = expr.length;
+    if(al == 0) FUNERR1.thrw(info);
+
+    QNm name = FUNERR1.qname();
+    String msg = FUNERR1.desc;
+
+    final Item it = expr[0].item(ctx, info);
+    if(it == null) {
+      if(al == 1) XPEMPTY.thrw(info, description());
+    } else {
+      name = (QNm) checkType(it, AtomType.QNM);
+    }
+    if(al > 1) msg = Token.string(checkEStr(expr[1], ctx));
+    final Value val = al > 2 ? ctx.value(expr[2]) : null;
+    throw new QueryException(info, name, msg).value(val);
+  }
+
+  /**
+   * Performs the trace function.
+   * @param ctx query context
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  private Iter trace(final QueryContext ctx) throws QueryException {
+    return new Iter() {
+      final Iter ir = expr[0].iter(ctx);
+      final byte[] s = checkStr(expr[1], ctx);
+      @Override
+      public Item next() throws QueryException {
+        final Item it = ir.next();
+        if(it != null) dump(it.serialize().toArray(), s, ctx);
+        return it;
+      }
+    };
+  }
+
+  /**
+   * Returns all environment variables.
+   * @return iterator
+   */
+  private Iter avlEnvVars() {
+    final ValueBuilder vb = new ValueBuilder();
+    for(final Object k : System.getenv().keySet().toArray()) vb.add(Str.get(k));
+    return vb;
+  }
+
+  /**
+   * Returns a environment variable.
+   * @param ctx query context
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  private Item envVar(final QueryContext ctx) throws QueryException {
+    final String e = System.getenv(Token.string(checkEStr(expr[0], ctx)));
+    return e != null ? Str.get(e) : null;
   }
 
   /**

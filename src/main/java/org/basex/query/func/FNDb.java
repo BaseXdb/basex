@@ -17,7 +17,6 @@ import org.basex.index.resource.*;
 import org.basex.io.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -675,15 +674,7 @@ public final class FNDb extends StandardFunc {
    */
   private Item event(final QueryContext ctx) throws QueryException {
     final byte[] name = checkStr(expr[0], ctx);
-    final ArrayOutput ao;
-    try {
-      ao = ctx.value(expr[1]).serialize();
-    } catch(final SerializerException ex) {
-      throw ex.getCause(info);
-    } catch(final IOException ex) {
-      throw SERANY.thrw(info, ex);
-    }
-
+    final ArrayOutput ao = ctx.value(expr[1]).serialize();
     // throw exception if event is unknown
     if(!ctx.context.events.notify(ctx.context, name, ao.toArray())) {
       BXDB_EVENT.thrw(info, name);

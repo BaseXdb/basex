@@ -59,6 +59,18 @@ public final class FNProfTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test
+  public void dump() {
+    final PrintStream err = System.err;
+    try {
+      System.setErr(NULL);
+      query(_PROF_DUMP.args("a"), "");
+    } finally {
+      System.setErr(err);
+    }
+  }
+
+  /** Test method. */
+  @Test
   public void currentMs() {
   }
 
