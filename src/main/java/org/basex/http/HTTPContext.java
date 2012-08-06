@@ -326,7 +326,11 @@ public final class HTTPContext {
     }
     context = new Context(map);
 
-    if(SERVER.equals(System.getProperty(DBMODE))) new BaseXServer(context);
+    if(SERVER.equals(System.getProperty(DBMODE))) {
+      new BaseXServer(context);
+    } else {
+      context.log = new Log(context, false);
+    }
   }
 
   /**
