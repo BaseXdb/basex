@@ -120,7 +120,6 @@ public final class BaseXHTTP {
       // local or client mode
       Util.outln(CONSOLE + HTTP + ' ' + SRV_STARTED, SERVERMODE);
       context.log = new Log(context, quiet);
-      System.out.println(context);
     }
     context.log.write(HTTP + ' ' + SRV_STARTED);
 
