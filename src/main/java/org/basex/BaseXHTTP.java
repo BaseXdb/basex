@@ -43,8 +43,6 @@ public final class BaseXHTTP {
   private boolean stopped;
   /** HTTP server. */
   private Server jetty;
-  /** Quiet flag. */
-  private boolean quiet;
 
   /**
    * Main method, launching the HTTP services.
@@ -113,13 +111,12 @@ public final class BaseXHTTP {
 
     if(server) {
       // default mode: start database server
-      if(quiet) new BaseXServer(context, "-z");
-      else new BaseXServer(context);
+      new BaseXServer(context);
       Util.outln(HTTP + ' ' + SRV_STARTED);
     } else {
       // local or client mode
       Util.outln(CONSOLE + HTTP + ' ' + SRV_STARTED, SERVERMODE);
-      context.log = new Log(context, quiet);
+      context.log = new Log(context);
     }
     context.log.write(HTTP + ' ' + SRV_STARTED);
 
@@ -238,7 +235,7 @@ public final class BaseXHTTP {
             restxq = false;
             break;
           case 'z': // suppress logging
-            quiet = true;
+            context.mprop.set(MainProp.LOG, false);
             break;
           default:
             arg.usage();

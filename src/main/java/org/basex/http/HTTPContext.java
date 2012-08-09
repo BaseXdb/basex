@@ -329,7 +329,7 @@ public final class HTTPContext {
     if(SERVER.equals(System.getProperty(DBMODE))) {
       new BaseXServer(context);
     } else {
-      context.log = new Log(context, false);
+      context.log = new Log(context);
     }
   }
 
