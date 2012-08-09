@@ -39,8 +39,6 @@ public final class BaseXServer extends Main implements Runnable {
   /** Initial commands. */
   private StringList commands;
 
-  /** Quiet mode (no logging). */
-  private boolean quiet;
   /** Start as daemon. */
   private boolean service;
   /** Stopped flag. */
@@ -104,7 +102,7 @@ public final class BaseXServer extends Main implements Runnable {
       return;
     }
 
-    context.log = new Log(context, quiet);
+    context.log = new Log(context);
 
     try {
       // execute command-line arguments
@@ -257,7 +255,7 @@ public final class BaseXServer extends Main implements Runnable {
             service = !daemon;
             break;
           case 'z': // suppress logging
-            quiet = true;
+            context.mprop.set(MainProp.LOG, false);
             break;
           default:
             arg.usage();

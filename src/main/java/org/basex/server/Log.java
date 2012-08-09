@@ -13,13 +13,11 @@ import org.basex.util.*;
  * This class writes logging information to disk.
  *
  * @author BaseX Team 2005-12, BSD License
- * @author Andreas Weiler
+ * @author Christian Gruen
  */
 public final class Log {
-  /** Logging directory. */
-  private IOFile dir;
-  /** Log message cut-off. */
-  private int maxlen;
+  /** Main properties. */
+  private final MainProp mprop;
   /** Start date of log. */
   private String start;
   /** Output stream. */
@@ -28,13 +26,9 @@ public final class Log {
   /**
    * Constructor.
    * @param ctx database context
-   * @param q quiet flag (no logging)
    */
-  public Log(final Context ctx, final boolean q) {
-    if(q) return;
-    dir = ctx.mprop.dbpath(".logs");
-    maxlen = ctx.mprop.num(MainProp.LOGMSGMAXLEN);
-    create(new Date());
+  public Log(final Context ctx) {
+    mprop = ctx.mprop;
   }
 
   /**
@@ -51,53 +45,34 @@ public final class Log {
    * @param str strings to be written
    */
   public synchronized void write(final Object... str) {
-    if(fos == null) return;
+    if(!mprop.is(MainProp.LOG)) return;
 
-    // check if current log file is still up-to-date
-    final Date now = new Date();
-    if(!start.equals(DateTime.format(now, DateTime.DATE))) {
-      close();
-      create(now);
-    }
-
-    // construct log text
-    final TokenBuilder tb = new TokenBuilder(DateTime.format(now, DateTime.TIME));
-    for(final Object s : str) {
-      tb.add('\t');
-      tb.add(chop(token(s.toString().replaceAll("[\\r\\n ]+", " ")), maxlen));
-    }
-    tb.add(Prop.NL);
-
-    // write text and flush log file
+    // initializes the output stream and returns the current date
+    final Date date = new Date();
     try {
+      // day has changed..
+      if(fos != null && !start.equals(DateTime.format(date, DateTime.DATE))) {
+        fos.close();
+        fos = null;
+      }
+      // create new log file
+      if(fos == null) {
+        final IOFile dir = mprop.dbpath(".logs");
+        dir.md();
+        start = DateTime.format(date, DateTime.DATE);
+        fos = new FileOutputStream(new IOFile(dir, start + ".log").file(), true);
+      }
+
+      // construct log text
+      final int ml = mprop.num(MainProp.LOGMSGMAXLEN);
+      final TokenBuilder tb = new TokenBuilder(DateTime.format(date, DateTime.TIME));
+      for(final Object s : str) {
+        tb.add('\t').add(chop(token(s.toString().replaceAll("[\\r\\n ]+", " ")), ml));
+      }
+      tb.add(Prop.NL);
+
       fos.write(tb.finish());
       fos.flush();
-    } catch(final Exception ex) {
-      Util.debug(ex);
-    }
-  }
-
-  /**
-   * Creates a log file.
-   * @param d date, used for file name
-   */
-  private void create(final Date d) {
-    dir.md();
-    start = DateTime.format(d, DateTime.DATE);
-    try {
-      fos = new FileOutputStream(new IOFile(dir, start + ".log").file(), true);
-    } catch(final IOException ex) {
-      Util.stack(ex);
-    }
-  }
-
-  /**
-   * Closes the log file.
-   */
-  private void close() {
-    try {
-      fos.close();
-      fos = null;
     } catch(final IOException ex) {
       Util.stack(ex);
     }

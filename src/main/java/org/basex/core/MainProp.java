@@ -61,6 +61,8 @@ public final class MainProp extends AProp {
   public static final Object[] DEBUG = { "DEBUG", false };
   /** Defines the number of parallel readers. */
   public static final Object[] PARALLEL = { "PARALLEL", 8 };
+  /** Logging flag. */
+  public static final Object[] LOG = { "LOG", true };
   /** Log message cut-off. */
   public static final Object[] LOGMSGMAXLEN = { "LOGMSGMAXLEN", 1000 };
 
