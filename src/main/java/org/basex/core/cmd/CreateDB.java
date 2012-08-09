@@ -93,6 +93,8 @@ public final class CreateDB extends ACreate {
 
         // create disk-based instance
         progress(new DiskBuilder(name, parser, context)).build().close();
+        context.databases().add(name);
+
         // second step: open database and create index structures
         final Open open = new Open(name);
         if(!open.run(context)) return error(open.info());
@@ -104,8 +106,9 @@ public final class CreateDB extends ACreate {
         } finally {
           data.finishUpdate();
         }
-        context.databases().add(name);
       }
+      if(prop.is(Prop.CREATEONLY)) new Close().run(context);
+
       return info(parser.info() + DB_CREATED_X_X, name, perf);
     } catch(final ProgressException ex) {
       throw ex;
