@@ -99,7 +99,7 @@ public final class Add extends ACreate {
     boolean large = false;
     final Runtime rt = Runtime.getRuntime();
     if(fl > rt.freeMemory() / 3) {
-      Performance.gc(prop.num(Prop.GC));
+      Performance.gc(prop.is(Prop.SINGLEGC) ? 1 : 2);
       large = fl > rt.freeMemory() / 3;
     }
     // in main memory mode, never write to disk

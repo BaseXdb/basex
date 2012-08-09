@@ -83,7 +83,7 @@ public final class FTBuilder extends IndexBuilder {
           // check if main memory is exhausted
           if((ntok++ & 0xFFF) == 0 && memFull()) {
             writeIndex(csize++);
-            Performance.gc(gc);
+            Performance.gc(singlegc ? 1 : 2);
           }
           index(tok);
         }
