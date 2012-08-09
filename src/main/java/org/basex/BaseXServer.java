@@ -109,10 +109,8 @@ public final class BaseXServer extends Main implements Runnable {
       for(final String c : commands) execute(c);
 
       socket = new ServerSocket();
-      socket.setReuseAddress(true);
       socket.bind(new InetSocketAddress(addr, port));
       esocket = new ServerSocket();
-      esocket.setReuseAddress(true);
       esocket.bind(new InetSocketAddress(addr, eport));
       stop = stopFile(port);
 
