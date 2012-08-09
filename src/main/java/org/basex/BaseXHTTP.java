@@ -329,10 +329,8 @@ public final class BaseXHTTP {
      * @throws IOException I/O exception
      */
     StopServer(final int hport, final String host) throws IOException {
-      final InetAddress addr = host.isEmpty() ? null :
-        InetAddress.getByName(host);
+      final InetAddress addr = host.isEmpty() ? null : InetAddress.getByName(host);
       ss = new ServerSocket();
-      ss.setReuseAddress(true);
       ss.bind(new InetSocketAddress(addr, hport));
       stop = stopFile(hport);
       setDaemon(true);
