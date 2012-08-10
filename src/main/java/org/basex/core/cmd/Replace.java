@@ -7,6 +7,7 @@ import java.io.*;
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.*;
+import org.basex.util.list.*;
 
 /**
  * Evaluates the 'replace' command and replaces documents in a collection.
@@ -47,10 +48,7 @@ public final class Replace extends ACreate {
     if(path == null || path.isEmpty()) return error(NO_DIR_ALLOWED_X, args[0]);
 
     final Data data = context.data();
-    final int pre = data.resources.doc(path, false);
-    // check if path points to a single file
-    if(pre != -1 && data.resources.docs(path).size() != 1)
-      return error(NO_DIR_ALLOWED_X, path);
+    final IntList pre = data.resources.docs(path, true);
 
     if(!data.startUpdate()) return error(DB_PINNED_X, data.meta.name);
     try {
@@ -68,7 +66,9 @@ public final class Replace extends ACreate {
         add.lock = false;
         ok = add.run(context) || error(add.info());
         // delete old documents if addition was successful
-        if(ok && pre != -1) data.delete(pre);
+        if(ok) {
+          for(int p = pre.size() - 1; p >= 0; p--) data.delete(pre.get(p));
+        }
       }
       return ok && info(RES_REPLACED_X_X, 1, perf);
     } finally {

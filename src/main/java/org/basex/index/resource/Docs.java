@@ -200,11 +200,11 @@ final class Docs {
 
   /**
    * Returns the pre values of all document nodes matching the specified path.
-   * Exact || prefix match!
    * @param path input path
+   * @param exact exact (no prefix) matches
    * @return root nodes
    */
-  synchronized IntList docs(final String path) {
+  synchronized IntList docs(final String path, final boolean exact) {
     // invalid path, or no documents: return empty list
     final String pth = MetaData.normPath(path);
     if(pth == null) return new IntList(0);
@@ -230,7 +230,7 @@ final class Docs {
     final TokenList paths = paths();
     for(int p = 0; p < paths.size(); p++) {
       final byte[] b = paths.get(p);
-      if(eq(b, exct) || startsWith(b, pref)) il.add(docs.get(p));
+      if(eq(b, exct) || !exact && startsWith(b, pref)) il.add(docs.get(p));
     }
     return il.sort();
   }

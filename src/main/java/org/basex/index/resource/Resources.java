@@ -101,18 +101,26 @@ public final class Resources implements Index {
   }
 
   /**
-   * Returns the pre values of all document nodes matching the specified path.
-   * Exact || prefix match!
+   * Returns the pre values of all document nodes starting with the specified path.
    * @param path input path
    * @return root nodes
    */
   public synchronized IntList docs(final String path) {
-    return docs.docs(path);
+    return docs.docs(path, false);
   }
 
   /**
-   * Returns the pre value of the node that matches the specified path,
-   * or {@code -1}.
+   * Returns the pre values of all document nodes matching the specified path.
+   * @param path input path
+   * @param exact exact (no prefix) matches
+   * @return root nodes
+   */
+  public synchronized IntList docs(final String path, final boolean exact) {
+    return docs.docs(path, exact);
+  }
+
+  /**
+   * Returns the pre value of the node that matches the specified path, or {@code -1}.
    * @param path input path
    * @return pre value
    */

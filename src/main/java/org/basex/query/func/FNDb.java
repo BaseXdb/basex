@@ -505,13 +505,13 @@ public final class FNDb extends StandardFunc {
     final String path = path(1, ctx);
     final Item doc = checkItem(expr[2], ctx);
 
-    // collect all old documents
+    // remove old documents
     final Resources res = data.resources;
-    final int pre = res.doc(path);
-    if(pre != -1) {
-      if(res.docs(path).size() != 1) BXDB_SINGLE.thrw(info);
-      ctx.updates.add(new DeleteNode(pre, data, info), ctx);
+    final IntList pre = res.docs(path, true);
+    for(int p = 0; p < pre.size(); p++) {
+      ctx.updates.add(new DeleteNode(pre.get(p), data, info), ctx);
     }
+
     // delete binary resources
     final IOFile bin = data.inMemory() ? null : data.meta.binary(path);
     if(bin != null) {
