@@ -62,10 +62,14 @@ public final class BaseXGUI {
 
     // read properties
     final GUIProp gprop = new GUIProp();
+    // deactivate real-time execution and filtering
+    gprop.set(GUIProp.FILTERRT, false);
+    gprop.set(GUIProp.EXECRT, false);
     // cache results to pass them on to all visualizations
     context.prop.set(Prop.CACHEQUERY, true);
     // reduce number of results to save memory
     context.prop.set(Prop.MAXHITS, gprop.num(GUIProp.MAXHITS));
+
     // initialize fonts and colors
     GUIConstants.init(gprop);
 
