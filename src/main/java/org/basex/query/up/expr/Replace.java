@@ -58,7 +58,9 @@ public final class Replace extends Update {
     ANodeList list = c.children;
     if(value) {
       // replace value of node
-      final byte[] txt = list.size() < 1 ? EMPTY : list.get(0).string();
+      final byte[] txt = list.size() < 1 ? aList.size() < 1 ? EMPTY :
+        aList.get(0).string() : list.get(0).string();
+      // check validity of future comments or PIs
       if(tp == NodeType.COM) FComm.parse(txt, info);
       if(tp == NodeType.PI) FPI.parse(txt, info);
 

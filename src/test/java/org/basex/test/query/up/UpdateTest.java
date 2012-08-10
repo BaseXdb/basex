@@ -194,6 +194,29 @@ public final class UpdateTest extends AdvancedQueryTest {
       "<a><b/></a>");
   }
 
+
+  /**
+   * Text merging test for delete operation.
+   */
+  @Test
+  public void replaceValue() {
+    final String result = "<a b=\"a\"/>";
+    final String[] replacements = {
+        "'a'",
+        "attribute a { 'a' }",
+        "attribute b { 'a' }",
+        "text { 'a' }",
+        "comment { 'a' }",
+        "processing-instruction x { 'a' }",
+        "document { 'a' }",
+        "element x { 'a' }",
+    };
+    for(final String r : replacements) {
+      query("copy $c := <a b=''/> " +
+          "modify replace value of node $c/@b with " + r + " return $c", result);
+    }
+  }
+
   /**
    * Replace last node of a data instance. Checks if table limits are crossed.
    */
