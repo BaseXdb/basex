@@ -62,6 +62,8 @@ public final class FNConvert extends StandardFunc {
       case _CONVERT_BYTES_TO_BASE64:   return new B64(bytesToBinary(ctx));
       case _CONVERT_STRING_TO_HEX:     return new Hex(stringToBinary(ctx));
       case _CONVERT_BYTES_TO_HEX:      return new Hex(bytesToBinary(ctx));
+      case _CONVERT_DATETIME_TO_MS:    return dateTimeToMs(ctx);
+      case _CONVERT_MS_TO_DATETIME:    return msToDateTime(ctx);
       default:                         return super.item(ctx, ii);
     }
   }
@@ -174,6 +176,26 @@ public final class FNConvert extends StandardFunc {
     } catch(final IOException ex) {
       throw BXCO_STRING.thrw(info, ex);
     }
+  }
+
+  /**
+   * Converts the specified integer to a dateTime item.
+   * @param ctx query context
+   * @return resulting value
+   * @throws QueryException query exception
+   */
+  private Dtm msToDateTime(final QueryContext ctx) throws QueryException {
+    return new Dtm(checkItr(expr[0], ctx), info);
+  }
+
+  /**
+   * Converts the specified dateTime to milliseconds.
+   * @param ctx query context
+   * @return resulting value
+   * @throws QueryException query exception
+   */
+  private Int dateTimeToMs(final QueryContext ctx) throws QueryException {
+    return new Int((Dtm) checkType(checkItem(expr[0], ctx), AtomType.DTM));
   }
 
   /**
