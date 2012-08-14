@@ -39,6 +39,7 @@ public final class XQuery implements Iterable<XdmItem> {
           ((XdmValue) value).internal() : value);
       return this;
     } catch(final QueryException ex) {
+      Util.debug(ex);
       throw new XQueryException(ex);
     }
   }
@@ -56,6 +57,7 @@ public final class XQuery implements Iterable<XdmItem> {
           ((XdmValue) value).internal() : value);
       return this;
     } catch(final QueryException ex) {
+      Util.debug(ex);
       throw new XQueryException(ex);
     }
   }
@@ -73,6 +75,7 @@ public final class XQuery implements Iterable<XdmItem> {
       qp.namespace(prefix, uri);
       return this;
     } catch(final QueryException ex) {
+      Util.debug(ex);
       throw new XQueryException(ex);
     }
   }
@@ -89,6 +92,7 @@ public final class XQuery implements Iterable<XdmItem> {
     try {
       qp.ctx.resource.addCollection(name, sl.toArray());
     } catch(final QueryException ex) {
+      Util.debug(ex);
       throw new XQueryException(ex);
     }
   }
@@ -103,6 +107,7 @@ public final class XQuery implements Iterable<XdmItem> {
     try {
       qp.ctx.resource.addDoc(name, path);
     } catch(final QueryException ex) {
+      Util.debug(ex);
       throw new XQueryException(ex);
     }
   }
@@ -148,6 +153,7 @@ public final class XQuery implements Iterable<XdmItem> {
       if(ir == null) ir = qp.iter();
       return XdmItem.get(ir.next());
     } catch(final QueryException ex) {
+      Util.debug(ex);
       throw new XQueryException(ex);
     }
   }
@@ -161,6 +167,7 @@ public final class XQuery implements Iterable<XdmItem> {
     try {
       return XdmValue.get(qp.value().materialize(null));
     } catch(final QueryException ex) {
+      Util.debug(ex);
       throw new XQueryException(ex);
     }
   }
