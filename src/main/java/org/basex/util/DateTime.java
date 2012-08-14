@@ -26,6 +26,8 @@ public final class DateTime {
   /** Time zone. */
   public static final SimpleDateFormat ZONE = new SimpleDateFormat("Z");
 
+  static { FULL.setTimeZone(TimeZone.getTimeZone("UTC")); }
+
   /** Hidden constructor. */
   private DateTime() { }
 

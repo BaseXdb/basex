@@ -5,12 +5,12 @@ import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.iter.*;
 import org.basex.query.path.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -286,7 +286,7 @@ public final class SeqType {
       } else {
         if(!(it instanceof Map && ((Map) it).hasType(mt))) return false;
       }
-      if(i == 0 && val.homogenous()) break;
+      if(i == 0 && val.homogeneous()) break;
     }
     return true;
   }
@@ -315,6 +315,32 @@ public final class SeqType {
   }
 
   /**
+   * Treats the specified value as this sequence type.
+   * @param val value to promote
+   * @param ii input info
+   * @throws QueryException query exception
+   */
+  public void treat(final Value val, final InputInfo ii) throws QueryException {
+    final int size = (int) val.size();
+    if(!occ.check(size)) Err.treat(ii, this, val);
+
+    // empty sequence has all types
+    if(size == 0) return;
+    // check first item
+    Item n = val.itemAt(0);
+    boolean ins = n.type.instanceOf(type) && checkKind(n);
+
+    // check heterogeneous sequences
+    if(!val.homogeneous()) {
+      for(int i = 1; ins && i < size; i++) {
+        n = val.itemAt(i);
+        ins = n.type.instanceOf(type) && checkKind(n);
+      }
+    }
+    if(!ins) Err.treat(ii, this, val);
+  }
+
+  /**
    * Tries to promote the specified value to this sequence type.
    * @param val value to promote
    * @param ctx query context
@@ -325,33 +351,34 @@ public final class SeqType {
   public Value promote(final Value val, final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
-    final long size = val.size();
-    if(!occ.check(size)) Err.promote(ii, this, val);
+    final int size = (int) val.size();
+    if(!occ.check(size)) Err.treat(ii, this, val);
 
     // empty sequence has all types
     if(size == 0) return val;
+    // check first item
+    Item n = val.itemAt(0);
+    boolean in = instance(n, ii);
+    if(!in) n = type.cast(n, ctx, ii);
+    boolean ins = checkKind(n);
 
-    // take shortcut if it's a single item
-    final Item f = val.itemAt(0);
-    if(size == 1) {
-      final Item it = instance(f, ii) ? f : type.cast(f, ctx, ii);
-      if(!checkKind(it)) Err.promote(ii, this, val);
-      return it;
-    }
+    // return original sequence if no casting is necessary
+    if(in && ins && val.homogeneous()) return val;
 
-    // only cache if absolutely necessary
-    if(val.homogenous() && instance(f, ii) && checkKind(f)) return val;
-
+    // check heterogeneous sequences
+    Value v = n;
     // no way around it...
-    final ValueBuilder vb = new ValueBuilder((int) size);
-    for(long i = 0; i < size; i++) {
-      Item n = val.itemAt(i);
+    final Item[] items = new Item[size];
+    items[0] = n;
+    for(int i = 1; ins && i < size; i++) {
+      n = val.itemAt(i);
       if(!instance(n, ii)) n = type.cast(n, ctx, ii);
-      if(!checkKind(n)) Err.promote(ii, this, n);
-      vb.add(n);
+      ins = checkKind(n);
+      items[i] = n;
     }
-
-    return vb.value();
+    v = Seq.get(items, size);
+    if(!ins) Err.treat(ii, this, val);
+    return v;
   }
 
   /**
@@ -372,7 +399,7 @@ public final class SeqType {
         (ip != AtomType.URI || type != AtomType.STR) &&
         // xs:decimal -> xs:float/xs:double
         (type != AtomType.FLT && type != AtomType.DBL || !ip.instanceOf(AtomType.DEC)))
-      Err.promote(ii, this, it);
+      Err.treat(ii, this, it);
     return ins;
   }
 

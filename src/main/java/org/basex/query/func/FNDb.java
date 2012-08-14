@@ -321,8 +321,8 @@ public final class FNDb extends StandardFunc {
           di = new DataInput(meta.dbfile(DATAINF));
           meta.read(di);
           res.add(Q_RESOURCES, token(meta.ndocs));
-          final String tstamp = DateTime.format(new Date(meta.dbtime()), DateTime.FULL);
-          res.add(Q_MDATE, token(tstamp));
+          final String ts = DateTime.format(new Date(meta.dbtime()), DateTime.FULL);
+          res.add(Q_MDATE, token(ts));
           if(ctx.context.perm(Perm.CREATE, meta)) res.add(Q_PATH, token(meta.original));
           res.add(token(name));
         } catch(final IOException ex) {

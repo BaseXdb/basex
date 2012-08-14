@@ -279,7 +279,7 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public final boolean homogenous() {
+  public final boolean homogeneous() {
     return true;
   }
 

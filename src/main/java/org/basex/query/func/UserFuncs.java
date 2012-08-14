@@ -46,15 +46,16 @@ public final class UserFuncs extends ExprInfo {
    * @param name name of the function
    * @param args optional arguments
    * @param ii input info
+   * @param ctx query context
    * @return function instance
    * @throws QueryException query exception
    */
-  TypedFunc add(final QNm name, final Expr[] args, final InputInfo ii)
-      throws QueryException {
+  TypedFunc add(final QNm name, final Expr[] args, final InputInfo ii,
+      final QueryContext ctx) throws QueryException {
 
     // add function call for function that has not been declared yet
     final int al = args.length;
-    final UserFunc uf = new UserFunc(ii, name, new Var[al], null, null, false);
+    final UserFunc uf = new UserFunc(ii, name, new Var[al], null, null, false, ctx);
     final UserFuncCall call = add(ii, name, add(uf, ii), args);
     final FuncType type = FuncType.arity(al);
     return new TypedFunc(call, type);

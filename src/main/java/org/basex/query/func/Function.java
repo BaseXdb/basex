@@ -486,9 +486,10 @@ public enum Function {
   /* FNConvert functions. */
 
   /** XQuery function. */
-  _CONVERT_INTEGER_TO_BASE(FNConvert.class, "integer-to-base(num,base)", STR, ITR, ITR),
+  _CONVERT_INTEGER_TO_BASE(FNConvert.class, "integer-to-base(number,base)",
+      STR, ITR, ITR),
   /** XQuery function. */
-  _CONVERT_INTEGER_FROM_BASE(FNConvert.class, "integer-from-base(str,base)",
+  _CONVERT_INTEGER_FROM_BASE(FNConvert.class, "integer-from-base(string,base)",
       ITR, STR, ITR),
   /** XQuery function. */
   _CONVERT_BINARY_TO_BYTES(FNConvert.class, "binary-to-bytes(binary)", BYT_ZM, ITEM),
@@ -505,6 +506,10 @@ public enum Function {
   /** XQuery function. */
   _CONVERT_STRING_TO_HEX(FNConvert.class, "string-to-hex(string[,encoding])",
       HEX, 1, STR, STR),
+  /** XQuery function. */
+  _CONVERT_MS_TO_DATETIME(FNConvert.class, "ms-to-dateTime(number)", DTM, ITR),
+  /** XQuery function. */
+  _CONVERT_DATETIME_TO_MS(FNConvert.class, "dateTime-to-ms(date)", ITR, DTM),
 
   /* FNDb functions. */
 

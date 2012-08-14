@@ -61,8 +61,7 @@ public final class Treat extends Single {
       @Override
       public Item next() throws QueryException {
         if(i == null) return null;
-        if(!i.type.instanceOf(type.type))
-          NOTREAT.thrw(info, description(), i.type, type);
+        if(!i.type.instanceOf(type.type)) NOTREAT.thrw(info, description(), i.type, type);
         final Item ii = i;
         i = iter.next();
         return ii;

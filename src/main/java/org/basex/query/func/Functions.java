@@ -169,7 +169,7 @@ public final class Functions extends TokenSet {
     if(jf != null) return TypedFunc.java(jf);
 
     // add user-defined function that has not been declared yet
-    if(!dyn && FuncType.find(name) == null) return ctx.funcs.add(name, args, ii);
+    if(!dyn && FuncType.find(name) == null) return ctx.funcs.add(name, args, ii, ctx);
 
     // no function found
     return null;

@@ -193,13 +193,19 @@ public final class QNm extends Item {
   }
 
   /**
-   * Returns a unique representation of the QName. If the URI is not empty, the
-   * EQName notation is used.
+   * Returns a unique representation of the QName:
+   * <ul>
+   * <li> if a URI exists, the EQName notation is used.</li>
+   * <li> otherwise, if a prefix exists, the prefix and local name is returned.</li>
+   * <li> otherwise, the local name is returned.</li>
+   * </ul>
    * @return unique representation
    */
   public byte[] id() {
     final byte[] u = uri();
-    return u.length == 0 ? local() :
+    final byte[] p = prefix();
+    final byte[] l = local();
+    return u.length == 0 ? p.length == 0 ? l : name :
         new TokenBuilder().add('Q').add('{').add(u).add('}').add(local()).finish();
   }
 
@@ -220,6 +226,6 @@ public final class QNm extends Item {
 
   @Override
   public String toString() {
-    return Util.info("%", id());
+    return Token.string(id());
   }
 }

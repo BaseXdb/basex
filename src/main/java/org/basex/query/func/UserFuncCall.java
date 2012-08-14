@@ -27,7 +27,7 @@ public abstract class UserFuncCall extends Arr {
    * @param nm function name
    * @param arg arguments
    */
-  UserFuncCall(final InputInfo ii, final QNm nm, final Expr... arg) {
+  UserFuncCall(final InputInfo ii, final QNm nm, final Expr[] arg) {
     super(ii, arg);
     name = nm;
   }

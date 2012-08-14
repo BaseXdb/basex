@@ -66,8 +66,7 @@ public final class GDt extends ADate {
 
     if(t == AtomType.MDA) {
       final int m = xc.getMonth() - 1;
-      if(xc.getDay() > DAYS[m] + (m == 1 ? 1 : 0))
-        DATERANGE.thrw(ii, type, d);
+      if(xc.getDay() > DAYS[m] + (m == 1 ? 1 : 0)) TIMERANGE.thrw(ii, type, d);
     }
   }
 

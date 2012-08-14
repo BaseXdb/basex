@@ -98,7 +98,7 @@ public final class ItemSeq extends Seq {
   }
 
   @Override
-  public boolean homogenous() {
+  public boolean homogeneous() {
     return ret != null && ret != AtomType.ITEM;
   }
 }

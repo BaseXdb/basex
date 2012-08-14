@@ -21,9 +21,11 @@ public final class PartFunc extends UserFunc {
    * @param ii input info
    * @param fun typed function expression
    * @param arg arguments
+   * @param qc query context
    */
-  public PartFunc(final InputInfo ii, final TypedFunc fun, final Var[] arg) {
-    super(ii, new QNm(), nn(fun.type.type(arg)), fun.ret(), null);
+  public PartFunc(final InputInfo ii, final TypedFunc fun, final Var[] arg,
+      final QueryContext qc) {
+    super(ii, new QNm(), nn(fun.type.type(arg)), fun.ret(), null, qc);
     expr = fun.fun;
   }
 
@@ -32,10 +34,12 @@ public final class PartFunc extends UserFunc {
    * @param ii input info
    * @param func function expression
    * @param arg arguments
+   * @param ctx query context
    */
-  public PartFunc(final InputInfo ii, final Expr func, final Var[] arg) {
+  public PartFunc(final InputInfo ii, final Expr func, final Var[] arg,
+      final QueryContext ctx) {
     // [LW] XQuery/HOF: dynamic type propagation
-    super(ii, new QNm(), nn(arg), func.type(), null);
+    super(ii, new QNm(), nn(arg), func.type(), null, ctx);
     expr = func;
   }
 
@@ -43,7 +47,7 @@ public final class PartFunc extends UserFunc {
   public Expr compile(final QueryContext ctx) throws QueryException {
     compile(ctx, false);
     // defer creation of function item because of closure
-    return new InlineFunc(info, ret, args, expr, ann).compile(ctx);
+    return new InlineFunc(info, ret, args, expr, ann, ctx).compile(ctx);
   }
 
   @Override
@@ -75,7 +79,7 @@ public final class PartFunc extends UserFunc {
   }
 
   @Override
-  boolean tco() {
+  protected boolean tco() {
     return false;
   }
 }

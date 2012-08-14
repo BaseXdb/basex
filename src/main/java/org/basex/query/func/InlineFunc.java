@@ -27,10 +27,11 @@ public final class InlineFunc extends UserFunc {
    * @param v arguments
    * @param e function body
    * @param a annotations
+   * @param q query context
    */
-  public InlineFunc(final InputInfo ii, final SeqType r, final Var[] v,
-      final Expr e, final Ann a) {
-    super(ii, null, v, r, a);
+  public InlineFunc(final InputInfo ii, final SeqType r, final Var[] v, final Expr e,
+      final Ann a, final QueryContext q) {
+    super(ii, null, v, r, a, q);
     expr = e;
   }
 
@@ -100,7 +101,7 @@ public final class InlineFunc extends UserFunc {
   }
 
   @Override
-  boolean tco() {
+  protected boolean tco() {
     return false;
   }
 }

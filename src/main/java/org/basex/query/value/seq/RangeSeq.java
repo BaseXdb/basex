@@ -63,7 +63,7 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public boolean homogenous() {
+  public boolean homogeneous() {
     return true;
   }
 

@@ -24,8 +24,6 @@ public final class Var extends ParseExpr {
   public final QNm name;
   /** Annotations. */
   public final Ann ann;
-  /** Variable ID. */
-  private final int id;
 
   /** Expected return type. */
   public SeqType ret;
@@ -33,7 +31,13 @@ public final class Var extends ParseExpr {
   public boolean global;
   /** Declaration flag. */
   public boolean declared;
+  /** Cast flag (default: {@code true}). */
+  public boolean cast = true;
 
+  /** Static context. */
+  private final StaticContext sc;
+  /** Variable ID. */
+  private final int id;
   /** Bound value. */
   private Value value;
   /** Bound expression. */
@@ -46,14 +50,16 @@ public final class Var extends ParseExpr {
    * @param t data type
    * @param i variable ID
    * @param a annotations
+   * @param s static context
    */
   private Var(final InputInfo ii, final QNm n, final SeqType t, final int i,
-      final Ann a) {
+      final Ann a, final StaticContext s) {
     super(ii);
     name = n;
     type = t;
     id = i;
     ann = a == null ? new Ann() : a;
+    sc = s;
   }
 
   /**
@@ -67,20 +73,7 @@ public final class Var extends ParseExpr {
    */
   public static Var create(final QueryContext ctx, final InputInfo ii, final QNm n,
       final SeqType t, final Ann a) {
-    return new Var(ii, n, t, ctx.varIDs++, a);
-  }
-
-  /**
-   * Creates a new variable.
-   * @param ctx query context
-   * @param ii input info
-   * @param n variable name
-   * @param a annotations
-   * @return variable
-   */
-  public static Var create(final QueryContext ctx, final InputInfo ii, final QNm n,
-      final Ann a) {
-    return create(ctx, ii, n, (SeqType) null, a);
+    return new Var(ii, n, t, ctx.varIDs++, a, ctx.sc);
   }
 
   @Override
@@ -90,7 +83,15 @@ public final class Var extends ParseExpr {
 
   @Override
   public Var compile(final QueryContext ctx) throws QueryException {
-    if(expr != null) bind(expr.compile(ctx), ctx);
+    if(expr != null) {
+      final StaticContext s = ctx.sc;
+      ctx.sc = sc;
+      try {
+        bind(expr.compile(ctx), ctx);
+      } finally {
+        ctx.sc = s;
+      }
+    }
     return this;
   }
 
@@ -154,14 +155,19 @@ public final class Var extends ParseExpr {
   public Value value(final QueryContext ctx) throws QueryException {
     if(value == null) {
       if(expr == null) VAREMPTY.thrw(info, this);
-      value = cast(ctx.value(expr.compile(ctx)), ctx);
+      final StaticContext s = ctx.sc;
+      ctx.sc = sc;
+      try {
+        value = cast(ctx.value(expr.compile(ctx)), ctx);
+      } finally {
+        ctx.sc = s;
+      }
     }
     return value;
   }
 
   /**
-   * Checks whether the given variable is identical to this one, i.e. has the
-   * same ID.
+   * Checks whether the given variable is identical to this one, i.e. has the same ID.
    * @param v variable to check
    * @return {@code true}, if the IDs are equal, {@code false} otherwise
    */
@@ -177,17 +183,22 @@ public final class Var extends ParseExpr {
    * @throws QueryException query exception
    */
   private Value cast(final Value v, final QueryContext ctx) throws QueryException {
-    return type == null ? v : type.promote(v, ctx, info);
+    if(type != null) {
+      if(cast) return type.promote(v, ctx, info);
+      type.treat(v, info);
+    }
+    return v;
   }
 
   @Override
   public Var copy() {
-    final Var v = new Var(info, name, type, id, ann);
+    final Var v = new Var(info, name, type, id, ann, sc);
     v.global = global;
     v.value = value;
     v.expr = expr;
     v.type = type;
     v.ret = ret;
+    v.cast = cast;
     return v;
   }
 

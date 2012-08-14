@@ -33,6 +33,8 @@ public class UserFunc extends Single {
   /** Updating flag. */
   public final boolean updating;
 
+  /** Static context. */
+  protected final StaticContext sc;
   /** Cast flag. */
   private boolean cast;
   /** Compilation flag. */
@@ -45,10 +47,11 @@ public class UserFunc extends Single {
    * @param v arguments
    * @param r return type
    * @param a annotations
+   * @param qc query context
    */
-  public UserFunc(final InputInfo ii, final QNm n, final Var[] v, final SeqType r,
-      final Ann a) {
-    this(ii, n, v, r, a, true);
+  protected UserFunc(final InputInfo ii, final QNm n, final Var[] v, final SeqType r,
+      final Ann a, final QueryContext qc) {
+    this(ii, n, v, r, a, true, qc);
   }
 
   /**
@@ -59,9 +62,10 @@ public class UserFunc extends Single {
    * @param r return type
    * @param a annotations
    * @param d declaration flag
+   * @param qc query context
    */
   public UserFunc(final InputInfo ii, final QNm n, final Var[] v, final SeqType r,
-      final Ann a, final boolean d) {
+      final Ann a, final boolean d, final QueryContext qc) {
 
     super(ii, null);
     name = n;
@@ -71,6 +75,7 @@ public class UserFunc extends Single {
     ann = a == null ? new Ann() : a;
     declared = d;
     updating = ann.contains(Ann.Q_UPDATING);
+    sc = qc.sc;
   }
 
   @Override
@@ -99,10 +104,15 @@ public class UserFunc extends Single {
    * @param cache cache variables
    * @throws QueryException query exception
    */
-  void compile(final QueryContext ctx, final boolean cache) throws QueryException {
+  protected final void compile(final QueryContext ctx, final boolean cache)
+      throws QueryException {
+
     if(compiled) return;
     compiled = true;
 
+    final StaticContext s = ctx.sc;
+    ctx.sc = sc;
+    final Atts ns = ctx.sc.ns.reset();
     final int vs = ctx.vars.size();
     final VarStack vl = cache ? ctx.vars.cache(args.length) : null;
     try {
@@ -111,6 +121,8 @@ public class UserFunc extends Single {
     } finally {
       if(cache) ctx.vars.reset(vl);
       else ctx.vars.size(vs);
+      ctx.sc.ns.stack(ns);
+      ctx.sc = s;
     }
 
     // convert all function calls in tail position to proper tail calls
@@ -132,15 +144,18 @@ public class UserFunc extends Single {
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     // reset context and evaluate function
     final Value cv = ctx.value;
-    final Atts ns = ctx.sc.ns.reset();
     ctx.value = null;
+    final StaticContext s = ctx.sc;
+    ctx.sc = sc;
+    final Atts ns = ctx.sc.ns.reset();
     try {
       final Item it = expr.item(ctx, ii);
       // optionally promote return value to target type
       return cast ? ret.cast(it, false, ctx, info, this) : it;
     } finally {
-      ctx.value = cv;
       ctx.sc.ns.stack(ns);
+      ctx.sc = s;
+      ctx.value = cv;
     }
   }
 
@@ -148,15 +163,18 @@ public class UserFunc extends Single {
   public Value value(final QueryContext ctx) throws QueryException {
     // reset context and evaluate function
     final Value cv = ctx.value;
-    final Atts ns = ctx.sc.ns.reset();
     ctx.value = null;
+    final StaticContext s = ctx.sc;
+    ctx.sc = sc;
+    final Atts ns = ctx.sc.ns.reset();
     try {
       final Value v = ctx.value(expr);
       // optionally promote return value to target type
       return cast ? ret.promote(v, ctx, info) : v;
     } finally {
-      ctx.value = cv;
       ctx.sc.ns.stack(ns);
+      ctx.sc = s;
+      ctx.value = cv;
     }
   }
 
@@ -189,7 +207,7 @@ public class UserFunc extends Single {
    * Checks if this function is tail-call optimizable.
    * @return {@code true} if it is optimizable, {@code false} otherwise
    */
-  boolean tco() {
+  protected boolean tco() {
     return true;
   }
 }

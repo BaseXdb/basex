@@ -325,6 +325,8 @@ public enum Err {
   /** FODF1310. */
   PICNUM(FODF, 1310, "Invalid picture string: '%'."),
 
+  /** FODT0001. */
+  DATERANGE(FODT, 1, "%('%') out of range."),
   /** FODT0002. */
   DATEZERO(FODT, 2, "Invalid % calculation: infinity/zero."),
   /** FODT0003. */
@@ -340,9 +342,11 @@ public enum Err {
   /** FORG0001. */
   INVALIDZONE(FORG, 1, "Invalid timezone: %."),
   /** FORG0001. */
+  TIMERANGE(FORG, 1, "%('%') out of range."),
+  /** FORG0001. */
   FUNCAST(FORG, 1, "Invalid % cast: %."),
   /** FORG0001. */
-  DATERANGE(FORG, 1, "%('%') out of range."),
+  INVCAST(FORG, 1, "Invalid cast from % to %: %."),
   /** FORG0001. */
   DATEFORMAT(FORG, 1, "Wrong % format: '%' (try: '%')."),
   /** FORG0002. */
@@ -1140,7 +1144,7 @@ public enum Err {
    * @return query exception (indicates that an error is raised)
    * @throws QueryException query exception
    */
-  public static QueryException promote(final InputInfo ii, final SeqType t, final Value v)
+  public static QueryException treat(final InputInfo ii, final SeqType t, final Value v)
       throws QueryException {
     throw XPINVTREAT.thrw(ii, v.description(), t, v);
   }

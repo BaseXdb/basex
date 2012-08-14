@@ -115,7 +115,7 @@ public final class Empty extends Value {
   }
 
   @Override
-  public boolean homogenous() {
+  public boolean homogeneous() {
     return true;
   }
 }

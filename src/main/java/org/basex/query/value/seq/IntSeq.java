@@ -31,7 +31,7 @@ public final class IntSeq extends Seq {
   }
 
   @Override
-  public boolean homogenous() {
+  public boolean homogeneous() {
     return true;
   }
 

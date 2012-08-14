@@ -801,7 +801,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void varDecl(final Ann ann) throws QueryException {
-    final Var v = typedVar(ann);
+    final Var v = typedVar(false, ann);
     if(module != null && !eq(v.name.uri(), module.uri())) error(MODNS, v);
 
     // check if variable has already been declared
@@ -827,13 +827,26 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses a variable declaration with optional type.
+   * Parses a variable name, assigns the specified type and returns a variable instance.
+   * @param st sequence type
+   * @return variable
+   * @throws QueryException query exception
+   */
+  private Var typedVar(final SeqType st) throws QueryException {
+    return Var.create(ctx, info(), varName(), st, null);
+  }
+
+  /**
+   * Parses a variable name and an optional type and returns a variable instance.
+   * @param cast cast flag
    * @param ann annotations
    * @return parsed variable
    * @throws QueryException query exception
    */
-  private Var typedVar(final Ann ann) throws QueryException {
-    return Var.create(ctx, info(), varName(), optAsType(), ann);
+  private Var typedVar(final boolean cast, final Ann ann) throws QueryException {
+    final Var v = Var.create(ctx, info(), varName(), optAsType(), ann);
+    v.cast = cast;
+    return v;
   }
 
   /**
@@ -871,7 +884,7 @@ public class QueryParser extends InputParser {
     final Var[] args = paramList();
     wsCheck(PAR2);
 
-    final UserFunc func = new UserFunc(info(), name, args, optAsType(), ann, true);
+    final UserFunc func = new UserFunc(info(), name, args, optAsType(), ann, true, ctx);
     if(func.updating) ctx.updating(true);
 
     if(!wsConsumeWs(EXTERNAL)) {
@@ -910,9 +923,10 @@ public class QueryParser extends InputParser {
     while(true) {
       if(curr() != '$') {
         if(args.length == 0) break;
+        // enforce exception
         check('$');
       }
-      final Var var = typedVar(null);
+      final Var var = typedVar(true, null);
       ctx.vars.add(var);
       for(final Var v : args)
         if(v.name.eq(var.name)) error(FUNCDUPL, var);
@@ -1090,25 +1104,20 @@ public class QueryParser extends InputParser {
       do {
         if(comma && !fr) score = wsConsumeWs(SCORE);
 
-        final QNm name = varName();
-        final SeqType type = score ? SeqType.DBL : optAsType();
-        final Var var = Var.create(ctx, info(), name, type, null);
-
-        final Var ps = fr && wsConsumeWs(AT) ? Var.create(ctx, info(),
-            varName(), SeqType.ITR, null) : null;
-        final Var sc = fr && wsConsumeWs(SCORE) ? Var.create(ctx, info(),
-            varName(), SeqType.DBL, null) : null;
+        final Var var = score ? typedVar(SeqType.DBL) : typedVar(false, null);
+        final Var ps = fr && wsConsumeWs(AT) ? typedVar(SeqType.ITR) : null;
+        final Var sc = fr && wsConsumeWs(SCORE) ? typedVar(SeqType.DBL) : null;
 
         wsCheck(fr ? IN : ASSIGN);
         final Expr e = check(single(), NOVARDECL);
         ctx.vars.add(var);
 
         if(ps != null) {
-          if(name.eq(ps.name)) error(DUPLVAR, var);
+          if(var.name.eq(ps.name)) error(DUPLVAR, var);
           ctx.vars.add(ps);
         }
         if(sc != null) {
-          if(name.eq(sc.name)) error(DUPLVAR, var);
+          if(var.name.eq(sc.name)) error(DUPLVAR, var);
           if(ps != null && ps.name.eq(sc.name)) error(DUPLVAR, ps);
           ctx.vars.add(sc);
         }
@@ -1128,7 +1137,6 @@ public class QueryParser extends InputParser {
   /**
    * Parses the "OrderSpec" rule.
    * Parses the "OrderModifier" rule.
-   *
    * Empty order specs are ignored, {@code order} is then returned unchanged.
    * @param order order array
    * @return new order array
@@ -1164,14 +1172,11 @@ public class QueryParser extends InputParser {
       throws QueryException {
 
     final InputInfo ii = info();
-    final QNm name = varName();
-    final SeqType type = optAsType();
-    final Var var = Var.create(ctx, ii, name, type, null);
-
+    final Var var = typedVar(false, null);
     final boolean assign;
     final Expr by;
-    if(type != null || wsConsume(ASSIGN)) {
-      if(type != null) wsCheck(ASSIGN);
+    if(var.type != null || wsConsume(ASSIGN)) {
+      if(var.type != null) wsCheck(ASSIGN);
       by = check(single(), NOVARDECL);
       assign = true;
     } else {
@@ -1213,7 +1218,7 @@ public class QueryParser extends InputParser {
     final int s = ctx.vars.size();
     For[] fl = { };
     do {
-      final Var var = typedVar(null);
+      final Var var = typedVar(false, null);
       wsCheck(IN);
       final Expr e = check(single(), NOSOME);
       ctx.vars.add(var);
@@ -1891,7 +1896,7 @@ public class QueryParser extends InputParser {
         final Var[] part = new Var[args.length];
         final boolean pt = partial(args, part);
         e = new DynamicFunc(info(), e, args);
-        if(pt) e = new PartFunc(info(), e, part);
+        if(pt) e = new PartFunc(info(), e, part, ctx);
       }
     } while(e != old);
     return e;
@@ -2002,7 +2007,7 @@ public class QueryParser extends InputParser {
       final SeqType type = optAsType();
       final Expr body = enclosed(NOFUNBODY);
       ctx.vars.size(s);
-      return new InlineFunc(info(), type, args, body, ann);
+      return new InlineFunc(info(), type, args, body, ann, ctx);
     }
     // annotations not allowed here
     if(ann != null) error(NOANN);
@@ -2173,7 +2178,7 @@ public class QueryParser extends InputParser {
         final TypedFunc f = Functions.get(name, args, false, ctx, info());
         if(f != null) {
           alter = null;
-          return part ? new PartFunc(info(), f, vars) : f.fun;
+          return part ? new PartFunc(info(), f, vars, ctx) : f.fun;
         }
       }
     }
@@ -3377,7 +3382,7 @@ public class QueryParser extends InputParser {
 
     Let[] fl = { };
     do {
-      final Var v = Var.create(ctx, info(), varName(), null);
+      final Var v = typedVar(SeqType.NOD);
       wsCheck(ASSIGN);
       final Expr e = check(single(), INCOMPLETE);
       ctx.vars.add(v);

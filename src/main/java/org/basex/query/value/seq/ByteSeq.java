@@ -62,7 +62,7 @@ public final class ByteSeq extends Seq {
   }
 
   @Override
-  public boolean homogenous() {
+  public boolean homogeneous() {
     return true;
   }
 

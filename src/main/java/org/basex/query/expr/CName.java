@@ -130,6 +130,7 @@ public abstract class CName extends CFrag {
 
   @Override
   public final String toString() {
-    return toString(desc + " { " + name + " }");
+    return toString(desc + (name.type().eq(SeqType.QNM) ? " " + name :
+      " { " + name + " }"));
   }
 }

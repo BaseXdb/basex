@@ -87,10 +87,8 @@ public final class FuncItem extends FItem {
   private void bindVars(final QueryContext ctx, final Value[] args)
       throws QueryException {
 
-    for(int v = closure.size; --v >= 0;)
-      ctx.vars.add(closure.vars[v].copy());
-    for(int v = vars.length; --v >= 0;)
-      ctx.vars.add(vars[v].bind(args[v], ctx).copy());
+    for(int v = closure.size; --v >= 0;) ctx.vars.add(closure.vars[v].copy());
+    for(int v = vars.length; --v >= 0;) ctx.vars.add(vars[v].bind(args[v], ctx).copy());
   }
 
   @Override

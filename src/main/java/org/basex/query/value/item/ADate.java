@@ -108,7 +108,7 @@ public abstract class ADate extends Item {
 
     final int h = Token.toInt(mt.group(1));
     final int s = Token.toInt(mt.group(3));
-    if(s > 59) DATERANGE.thrw(ii, type, d);
+    if(s > 59) TIMERANGE.thrw(ii, type, d);
     final double ms = mt.group(4) != null ? Double.parseDouble(mt.group(4)) : 0;
     if(h == 24 && ms > 0) dateErr(d, e, ii);
     zone(mt, 6, d, ii);

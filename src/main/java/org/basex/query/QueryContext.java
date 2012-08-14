@@ -573,7 +573,7 @@ public final class QueryContext extends Progress {
     final Var gl = vars.globals().get(qnm);
     if(gl == null) {
       // assign new variable
-      vars.updateGlobal(Var.create(this, null, qnm, null).bind(val, this));
+      vars.updateGlobal(Var.create(this, null, qnm, null, null).bind(val, this));
     } else {
       // reset declaration state and bind new expression
       gl.declared = false;

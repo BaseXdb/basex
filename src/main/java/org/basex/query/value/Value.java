@@ -198,5 +198,5 @@ public abstract class Value extends Expr implements Iterable<Item> {
    * Checks if all items of this value share the same type.
    * @return result of check
    */
-  public abstract boolean homogenous();
+  public abstract boolean homogeneous();
 }
