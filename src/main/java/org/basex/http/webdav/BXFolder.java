@@ -6,7 +6,9 @@ import java.io.*;
 import java.util.*;
 import java.util.List;
 
+import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.core.cmd.Set;
 import org.basex.http.*;
 import org.basex.io.in.*;
 import org.basex.server.*;
@@ -196,7 +198,9 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
    * @throws IOException I/O exception
    */
   protected void addXML(final String n, final InputStream in) throws IOException {
-    http.session().add(path + SEP + n, in);
+    final LocalSession ls = http.session();
+    ls.execute(new Set(Prop.CHOP, false));
+    ls.add(path + SEP + n, in);
   }
 
   /**
@@ -231,11 +235,13 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
    * @throws IOException I/O exception
    */
   private void add(final String tdb, final String tpath) throws IOException {
+    System.out.println("ADD FOLDER");
     final LocalQuery q = http.session().query(
+        "declare option db:chop 'false'; " +
         "for $d in " + _DB_LIST.args("$db", "$path") +
-        "let $t := $tpath ||'/'|| substring($d, string-length($path) + 1) " +
-        "return if (" + _DB_IS_RAW.args("$db", "$d") + ") then " +
-        _DB_STORE.args("$tdb", "$t", _DB_RETRIEVE.args("$db", "$d")) +
+        "let $t := $tpath ||'/'|| substring($d, string-length($path) + 1) return " +
+        "if(" + _DB_IS_RAW.args("$db", "$d") + ") " +
+        " then " + _DB_STORE.args("$tdb", "$t", _DB_RETRIEVE.args("$db", "$d")) +
         " else " + _DB_ADD.args("$tdb", _DB_OPEN.args("$db", "$d"), "$t"));
     q.bind("db", db);
     q.bind("path", path);

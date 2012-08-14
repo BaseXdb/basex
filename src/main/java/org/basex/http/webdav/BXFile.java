@@ -112,12 +112,13 @@ public final class BXFile extends BXAbstractResource implements FileResource {
    * @throws IOException I/O exception
    */
   protected void add(final String tdb, final String tpath) throws IOException {
+    System.out.println("ADD FILE");
     final LocalSession session = http.session();
     final LocalQuery q = session.query(
-        "if(" + _DB_IS_RAW.args("$db", "$path") + ") then " +
-        _DB_STORE.args("$tdb", "$tpath", _DB_RETRIEVE.args("$db", "$path")) +
-        " else " + _DB_ADD.args("$tdb",
-        _DB_OPEN.args("$db", "$path"), "$tpath"));
+        "declare option db:chop 'false'; " +
+        "if(" + _DB_IS_RAW.args("$db", "$path") + ") " +
+        " then " + _DB_STORE.args("$tdb", "$tpath", _DB_RETRIEVE.args("$db", "$path")) +
+        " else " + _DB_ADD.args("$tdb", _DB_OPEN.args("$db", "$path"), "$tpath"));
     q.bind("db", db);
     q.bind("path", path);
     q.bind("tdb", tdb);
