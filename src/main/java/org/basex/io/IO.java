@@ -18,7 +18,7 @@ public abstract class IO {
   /** Database file suffix. */
   public static final String BASEXSUFFIX = ".basex";
   /** Command script suffix. */
-  public static final String BASEXMLSUFFIX = ".basexml";
+  public static final String BXSSUFFIX = ".bxs";
   /** XQuery file suffix. */
   public static final String XQSUFFIX = ".xq";
   /** XQuery module suffix. */
@@ -49,7 +49,7 @@ public abstract class IO {
   /** XML suffixes. */
   public static final String[] XMLSUFFIXES =
     { XMLSUFFIX, ".xsd", ".xsl", ".xslt", ".svg", ".rdf", ".rss", ".rng", ".sch",
-    BASEXMLSUFFIX };
+    BXSSUFFIX };
   /** HTML suffixes. */
   public static final String[] HTMLSUFFIXES =
     { ".xhtml", ".html", ".htm" };
