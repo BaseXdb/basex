@@ -358,7 +358,7 @@ public final class SeqType {
     if(size == 0) return val;
     // check first item
     Item n = val.itemAt(0);
-    boolean in = instance(n, ii);
+    final boolean in = instance(n, ii);
     if(!in) n = type.cast(n, ctx, ii);
     boolean ins = checkKind(n);
 

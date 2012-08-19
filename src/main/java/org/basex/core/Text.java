@@ -56,8 +56,8 @@ public interface Text {
   String LOCALMODE = "Standalone";
   /** Start information. */
   String LOCALINFO =
-    " [-bcdiLosuvVwxz] [query]" + NL +
-    "  [query]     Execute query file or expression" + NL +
+    " [-bcdiLosuvVwxz] [input]" + NL +
+    "  [input]     Execute input file or expression" + NL +
     "  -b<pars>    Bind external query variables" + NL +
     "  -c<input>   Execute commands from file or string" + NL +
     "  -d          Activate debugging mode" + NL +
@@ -75,8 +75,8 @@ public interface Text {
   String CLIENTMODE = "Client";
   /** Client start information. */
   String CLIENTINFO =
-    " [-bcdiLnopPsUvVwxz] [query]" + NL +
-    "  [query]     Execute query file or expression" + NL +
+    " [-bcdiLnopPsUvVwxz] [input]" + NL +
+    "  [input]     Execute input file or expression" + NL +
     "  -b<pars>    Bind external query variables" + NL +
     "  -c<input>   Execute commands from file or string" + NL +
     "  -d          Activate debugging mode" + NL +

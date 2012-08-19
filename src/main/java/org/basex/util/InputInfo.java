@@ -52,6 +52,19 @@ public final class InputInfo {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    if(!(obj instanceof InputInfo)) return false;
+    final InputInfo ii = (InputInfo) obj;
+    return (file != null ? file.equals(ii.file) : query.equals(ii.query)) &&
+        pos == ii.pos;
+  }
+
+  @Override
+  public int hashCode() {
+    return (file != null ? file.hashCode() : query.hashCode()) + pos;
+  }
+
+  @Override
   public String toString() {
     final int[] p = lineCol();
     return Util.info("InputInfo[Line %, Column %]", p[0], p[1]);
