@@ -12,7 +12,6 @@ import java.util.regex.*;
 import javax.servlet.http.*;
 
 import org.basex.build.*;
-import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
@@ -46,8 +45,8 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   final UserFunc function;
   /** Associated module. */
   final RestXqModule module;
-  /** Path segments. */
-  RestXqSegments segments;
+  /** Path. */
+  RestXqPath path;
 
   /** Query context. */
   private final QueryContext context;
@@ -113,9 +112,9 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       if(rexq) {
         if(eq(PATH, local)) {
           // annotation "path"
-          if(segments != null) error(ANN_TWICE, "%", name.string());
-          segments = new RestXqSegments(toString(value, name));
-          for(final String s : segments) {
+          if(path != null) error(ANN_TWICE, "%", name.string());
+          path = new RestXqPath(toString(value, name));
+          for(final String s : path) {
             if(s.trim().startsWith("{")) checkVariable(s, AtomType.AAT);
           }
         } else if(eq(CONSUMES, local)) {
@@ -170,7 +169,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     if(!mth.isEmpty()) methods = mth;
 
     if(found) {
-      if(segments == null) error(ANN_MISSING, PATH);
+      if(path == null) error(ANN_MISSING, PATH);
       for(final Var v : function.args) {
         if(!v.declared) error(VAR_UNDEFINED, v.name.string());
       }
@@ -197,16 +196,12 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    */
   void bind(final HTTPContext http) throws QueryException, IOException {
     // bind variables from segments
-    for(int s = 0; s < segments.size(); s++) {
-      final String seg = segments.get(s);
-      final Matcher m = TEMPLATE.matcher(seg);
+    for(int s = 0; s < path.size; s++) {
+      final Matcher m = TEMPLATE.matcher(path.segment[s]);
       if(!m.find()) continue;
       final QNm qnm = new QNm(token(m.group(1)), context);
       bind(qnm, new Atm(http.segment(s)));
     }
-
-    // bind request body from post/put method
-    final Prop prop = context.context.prop;
 
     // cache request body
     final String ct = http.contentType();
@@ -217,7 +212,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       try {
         // bind request body in the correct format
         body.name(http.method + IO.XMLSUFFIX);
-        bind(requestBody, Parser.item(body, prop, ct));
+        bind(requestBody, Parser.item(body, context.context.prop, ct));
       } catch(final IOException ex) {
         error(INPUT_CONV, ex);
       }
@@ -281,7 +276,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
 
   @Override
   public int compareTo(final RestXqFunction rxf) {
-    return segments.compareTo(rxf.segments);
+    return path.compareTo(rxf.path);
   }
 
   // PRIVATE METHODS ====================================================================
@@ -326,13 +321,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @return result of check
    */
   private boolean pathMatches(final HTTPContext http) {
-    // check if number of segments match
-    if(segments.size() != http.depth()) return false;
-    // check single segments
-    for(int s = 0; s < segments.size(); s++) {
-      if(!segments.get(s).equals(http.segment(s)) && !segments.isWC(s)) return false;
-    }
-    return true;
+    return path.matches(http);
   }
 
   /**

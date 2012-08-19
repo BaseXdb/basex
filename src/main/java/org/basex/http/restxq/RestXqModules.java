@@ -53,7 +53,7 @@ final class RestXqModules {
       first = list.get(0);
       // disallow more than one path with the same specifity
       if(first.compareTo(list.get(1)) == 0) {
-        first.error(PATH_CONFLICT, first.segments);
+        first.error(PATH_CONFLICT, first.path);
       }
     }
     // choose most specific function
