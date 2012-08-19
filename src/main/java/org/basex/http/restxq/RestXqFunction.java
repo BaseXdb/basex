@@ -33,7 +33,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-final class RestXqFunction {
+final class RestXqFunction implements Comparable<RestXqFunction> {
   /** Pattern for a single template. */
   private static final Pattern TEMPLATE =
       Pattern.compile("\\s*\\{\\s*\\$(.+?)\\s*\\}\\s*");
@@ -44,6 +44,10 @@ final class RestXqFunction {
   final SerializerProp output = new SerializerProp();
   /** Associated function. */
   final UserFunc function;
+  /** Associated module. */
+  final RestXqModule module;
+  /** Path segments. */
+  RestXqSegments segments;
 
   /** Query context. */
   private final QueryContext context;
@@ -59,8 +63,6 @@ final class RestXqFunction {
   private final ArrayList<RestXqParam> headerParams = new ArrayList<RestXqParam>();
   /** Query parameters. */
   private final ArrayList<RestXqParam> cookieParams = new ArrayList<RestXqParam>();
-  /** Path segments. */
-  private String[] segments;
   /** Post/Put variable. */
   private QNm requestBody;
   /** Reference to servlet request. */
@@ -74,10 +76,23 @@ final class RestXqFunction {
    * Constructor.
    * @param uf associated user function
    * @param qc query context
+   * @param m associated module
    */
-  RestXqFunction(final UserFunc uf, final QueryContext qc) {
+  RestXqFunction(final UserFunc uf, final QueryContext qc, final RestXqModule m) {
     function = uf;
     context = qc;
+    module = m;
+  }
+
+  /**
+   * Processes the HTTP request.
+   * @param http HTTP context
+   * Parses new modules and discards obsolete ones.
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   */
+  void process(final HTTPContext http) throws QueryException, IOException {
+    module.process(http, this);
   }
 
   /**
@@ -99,7 +114,7 @@ final class RestXqFunction {
         if(eq(PATH, local)) {
           // annotation "path"
           if(segments != null) error(ANN_TWICE, "%", name.string());
-          segments = HTTPContext.toSegments(toString(value, name));
+          segments = new RestXqSegments(toString(value, name));
           for(final String s : segments) {
             if(s.trim().startsWith("{")) checkVariable(s, AtomType.AAT);
           }
@@ -182,8 +197,8 @@ final class RestXqFunction {
    */
   void bind(final HTTPContext http) throws QueryException, IOException {
     // bind variables from segments
-    for(int s = 0; s < segments.length; s++) {
-      final String seg = segments[s];
+    for(int s = 0; s < segments.size(); s++) {
+      final String seg = segments.get(s);
       final Matcher m = TEMPLATE.matcher(seg);
       if(!m.find()) continue;
       final QNm qnm = new QNm(token(m.group(1)), context);
@@ -264,6 +279,11 @@ final class RestXqFunction {
     throw new QueryException(function.info, Err.BASX_RESTXQ, Util.info(msg, ext));
   }
 
+  @Override
+  public int compareTo(final RestXqFunction rxf) {
+    return segments.compareTo(rxf.segments);
+  }
+
   // PRIVATE METHODS ====================================================================
 
   /**
@@ -305,13 +325,12 @@ final class RestXqFunction {
    * @param http http context
    * @return result of check
    */
-  boolean pathMatches(final HTTPContext http) {
+  private boolean pathMatches(final HTTPContext http) {
     // check if number of segments match
-    if(segments.length != http.depth()) return false;
+    if(segments.size() != http.depth()) return false;
     // check single segments
-    for(int s = 0; s < segments.length; s++) {
-      final String seg = segments[s].trim();
-      if(!seg.equals(http.segment(s)) && !seg.startsWith("{")) return false;
+    for(int s = 0; s < segments.size(); s++) {
+      if(!segments.get(s).equals(http.segment(s)) && !segments.isWC(s)) return false;
     }
     return true;
   }

@@ -1,5 +1,7 @@
 package org.basex.http.restxq;
 
+import static org.basex.http.restxq.RestXqText.*;
+
 import java.util.*;
 
 import org.basex.core.*;
@@ -36,12 +38,26 @@ final class RestXqModules {
    * @throws QueryException query exception
    * @return instance
    */
-  RestXqModule find(final HTTPContext http) throws QueryException {
+  RestXqFunction find(final HTTPContext http) throws QueryException {
     analyze(http);
-    for(final RestXqModule mod : modules.values()) {
-      if(mod.find(http) != null) return mod;
+    // collect all functions
+    final ArrayList<RestXqFunction> list = new ArrayList<RestXqFunction>();
+    for(final RestXqModule mod : modules.values()) mod.add(http, list);
+    // no path matches
+    if(list.isEmpty()) return null;
+    // choose most appropriate function
+    RestXqFunction first = list.get(0);
+    if(list.size() > 1) {
+      // sort by specifity
+      Collections.sort(list);
+      first = list.get(0);
+      // disallow more than one path with the same specifity
+      if(first.compareTo(list.get(1)) == 0) {
+        first.error(PATH_CONFLICT, first.segments);
+      }
     }
-    return null;
+    // choose most specific function
+    return first;
   }
 
   /**

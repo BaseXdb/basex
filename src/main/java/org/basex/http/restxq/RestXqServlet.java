@@ -20,17 +20,11 @@ public final class RestXqServlet extends BaseXServlet {
     // authenticate user
     http.session();
 
-    // selects an XQuery module for the specified annotation
-    final RestXqModule module = RestXqModules.get().find(http);
-    // no module found: return 404
-    if(module == null) HTTPErr.NO_XQUERY.thrw();
-    // process module
-    module.process(http);
+    // selects an XQuery function for the specified annotation
+    final RestXqFunction func = RestXqModules.get().find(http);
+    // no function found: return 404
+    if(func == null) HTTPErr.NO_XQUERY.thrw();
+    // process function
+    func.process(http);
   }
 }
-
-/* [CG] RESTXQ: Open Issues
- * - resolve conflicting paths: what is "more specific"?
- * - add rest functions
- * - test nested modules
- */

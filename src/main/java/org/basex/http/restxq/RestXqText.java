@@ -70,4 +70,6 @@ interface RestXqText {
   String METHOD_VALUE = "Method % does not allow values.";
   /** Error message. */
   String INPUT_CONV = "Input could not be converted: %";
+  /** Error message. */
+  String PATH_CONFLICT = "Several functions assigned to path \"%\".";
 }

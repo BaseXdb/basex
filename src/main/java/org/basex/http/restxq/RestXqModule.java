@@ -46,7 +46,7 @@ final class RestXqModule {
     // loop through all functions
     final QueryContext qc = parse(http);
     for(final UserFunc uf : qc.funcs.funcs()) {
-      final RestXqFunction rxf = new RestXqFunction(uf, qc);
+      final RestXqFunction rxf = new RestXqFunction(uf, qc, this);
       if(rxf.analyze()) functions.add(rxf);
     }
     return !functions.isEmpty();
@@ -68,32 +68,35 @@ final class RestXqModule {
   }
 
   /**
-   * Returns a function that was made to process the specified path and method.
+   * Adds functions that match the current request.
    * @param http http context
-   * @return instance
+   * @param list list of functions
    */
-  RestXqFunction find(final HTTPContext http) {
+  void add(final HTTPContext http, final ArrayList<RestXqFunction> list) {
     for(final RestXqFunction rxf : functions) {
-      if(rxf.matches(http)) return rxf;
+      if(rxf.matches(http)) list.add(rxf);
     }
-    return null;
   }
 
   /**
    * Processes the HTTP request.
    * @param http HTTP context
-   * Parses new modules and discards obsolete ones.
+   * @param func function to be processed
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  void process(final HTTPContext http) throws QueryException, IOException {
+  void process(final HTTPContext http, final RestXqFunction func)
+      throws QueryException, IOException {
+
     // create new XQuery instance
     final QueryContext qc = parse(http);
     // loop through all functions
     for(final UserFunc uf : qc.funcs.funcs()) {
-      // find and evaluate relevant function
-      final RestXqFunction rxf = new RestXqFunction(uf, qc);
-      if(rxf.analyze() && rxf.matches(http)) {
+      // compare input info
+      if(func.function.info.equals(uf.info)) {
+        // find and evaluate relevant function
+        final RestXqFunction rxf = new RestXqFunction(uf, qc, this);
+        rxf.analyze();
         new RestXqResponse(rxf, qc, http).create();
         break;
       }
