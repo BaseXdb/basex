@@ -81,29 +81,32 @@ public final class ModuleLoader {
 
     // search module in repository: rewrite URI to file path
     final boolean java = startsWith(uri, JAVAPREF);
-    final String uriPath = uri2path(string(java ? substring(uri, JAVAPREF.length) : uri));
+    String uriPath = uri2path(string(java ? substring(uri, JAVAPREF.length) : uri));
     if(uriPath == null) return false;
 
-    // no file suffix specified: try different ones
-    final String path = context.mprop.get(MainProp.REPOPATH) + uriPath;
-    if(IO.suffix(path).isEmpty()) {
-      // no "java:" prefix: try different XQuery file suffixes
-      if(!java) {
+    final boolean suffix = IO.suffix(uriPath).isEmpty();
+    if(!java) {
+      // no "java:" prefix: first try to import module as XQuery
+      final String path = context.mprop.get(MainProp.REPOPATH) + uriPath;
+      if(suffix) {
+        // check if file has XQuery suffix
+        final IOFile f = new IOFile(path);
+        if(f.hasSuffix(IO.XQSUFFIXES)) return addModule(f, uri, qp);
+      } else {
+        // check for any file with XQuery suffix
         for(final String suf : IO.XQSUFFIXES) {
           if(addModule(new IOFile(path + suf), uri, qp)) return true;
         }
       }
-      // always check for Java module
-      addJar(new IOFile(path + IO.JARSUFFIX));
-    } else {
-      final IOFile file = new IOFile(path);
-      // no "java:" prefix: check if file has XQuery suffix
-      if(!java && file.hasSuffix(IO.XQSUFFIXES)) return addModule(file, uri, qp);
-      // always check for Java module
-      if(file.hasSuffix(IO.JARSUFFIX)) addJar(file);
     }
 
-    // Java class was successfully imported: create instance
+    // "java:" prefix, or no XQuery package found: try to load Java module
+    uriPath = capitalize(uriPath);
+    final String path = context.mprop.get(MainProp.REPOPATH) + uriPath;
+    final IOFile file = new IOFile(path + (suffix ? "" : IO.JARSUFFIX));
+    if(file.exists()) addURL(file);
+
+    // try to create Java class instance
     addJava(uriPath, uri, ii);
     return true;
   }
@@ -186,18 +189,18 @@ public final class ModuleLoader {
     }
   }
 
-  // PRIVATE METHODS ====================================================================
-
   /**
-   * Adds the specified file to the class loader if it exists.
-   * @param file file to be added
-   * @return {@code true} if file exists
+   * Capitalizes the last path segment.
+   * @param path input path
+   * @return capitalized path
    */
-  private boolean addJar(final IOFile file) {
-    if(!file.exists()) return false;
-    addURL(file);
-    return true;
+  public static String capitalize(final String path) {
+    final int i = path.lastIndexOf('/');
+    return i == -1 || i + 1 >= path.length() ? path : path.substring(0, i + 1) +
+      Character.toUpperCase(path.charAt(i + 1)) + path.substring(i + 2);
   }
+
+  // PRIVATE METHODS ====================================================================
 
   /**
    * Parses the specified file as module if it exists.

@@ -187,7 +187,7 @@ public abstract class JavaMapping extends Arr {
     String path = string(nm.uri());
     final String p = ModuleLoader.uri2path(path);
     if(p != null) path = p;
-    path = path.replace("/", ".").substring(1);
+    path = ModuleLoader.capitalize(path).replace("/", ".").substring(1);
 
     final Object jm  = ctx.modules.findImport(path);
     if(jm != null) {
