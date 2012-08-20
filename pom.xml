@@ -225,7 +225,7 @@
           </execution>
         </executions>
       </plugin>-->
-      <plugin>
+      <!--<plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <executions>
           <execution>
@@ -238,8 +238,10 @@
         </executions>
         <configuration>
           <descriptorRefs>
-            <descriptorRef>src</descriptorRef>
-            <!--<descriptorRef>jar-with-dependencies</descriptorRef>-->
+            <!- OpenSUSE, ...build sources
+            <descriptorRef>src</descriptorRef> ->
+            <!- JAR with all dependencies
+            <descriptorRef>jar-with-dependencies</descriptorRef> ->
           </descriptorRefs>
           <archive>
             <manifest>
@@ -248,7 +250,7 @@
             </manifest>
           </archive>
         </configuration>
-      </plugin>
+      </plugin>-->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
