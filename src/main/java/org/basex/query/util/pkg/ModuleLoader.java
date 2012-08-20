@@ -84,7 +84,7 @@ public final class ModuleLoader {
     String uriPath = uri2path(string(java ? substring(uri, JAVAPREF.length) : uri));
     if(uriPath == null) return false;
 
-    final boolean suffix = IO.suffix(uriPath).isEmpty();
+    final boolean suffix = !IO.suffix(uriPath).isEmpty();
     if(!java) {
       // no "java:" prefix: first try to import module as XQuery
       final String path = context.mprop.get(MainProp.REPOPATH) + uriPath;
