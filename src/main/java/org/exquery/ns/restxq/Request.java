@@ -1,7 +1,5 @@
 package org.exquery.ns.restxq;
 
-import java.util.Map.*;
-
 import javax.servlet.http.*;
 
 import org.basex.http.*;
@@ -55,6 +53,16 @@ public final class Request extends QueryModule {
   }
 
   /**
+   * Returns the path of the request.
+   * @return path
+   * @throws QueryException query exception
+   */
+  @Requires(Permission.NONE)
+  public String path() throws QueryException {
+    return request().getPathInfo();
+  }
+
+  /**
    * Returns the names of all query parameters.
    * @return parameter names
    * @throws QueryException query exception
@@ -62,9 +70,7 @@ public final class Request extends QueryModule {
   @Requires(Permission.NONE)
   public Value parameterNames() throws QueryException {
     final ValueBuilder vb = new ValueBuilder();
-    for(final Entry<?, ?> s : request().getParameterMap().entrySet()) {
-      vb.add(Str.get(s.getKey()));
-    }
+    for(final String s : request().getParameterMap().keySet()) vb.add(Str.get(s));
     return vb.value();
   }
 
@@ -82,16 +88,6 @@ public final class Request extends QueryModule {
       for(final String v : val) vb.add(Str.get(v));
     }
     return vb.value();
-  }
-
-  /**
-   * Returns the path of the request.
-   * @return path
-   * @throws QueryException query exception
-   */
-  @Requires(Permission.NONE)
-  public String path() throws QueryException {
-    return request().getPathInfo();
   }
 
   /**
