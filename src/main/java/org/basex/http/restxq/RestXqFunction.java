@@ -56,12 +56,13 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   private final StringList produces = new StringList();
   /** Query parameters. */
   private final ArrayList<RestXqParam> queryParams = new ArrayList<RestXqParam>();
-  /** Query parameters. */
+  /** Form parameters. */
   private final ArrayList<RestXqParam> formParams = new ArrayList<RestXqParam>();
-  /** Query parameters. */
+  /** Header parameters. */
   private final ArrayList<RestXqParam> headerParams = new ArrayList<RestXqParam>();
-  /** Query parameters. */
+  /** Cookie parameters. */
   private final ArrayList<RestXqParam> cookieParams = new ArrayList<RestXqParam>();
+
   /** Post/Put variable. */
   private QNm requestBody;
   /** Reference to servlet request. */
@@ -436,7 +437,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   private RestXqParam param(final Value value, final QNm name) throws QueryException {
     // [CG] RESTXQ: allow identical field names?
     final long vs = value.size();
-    if(vs < 2) error(ANN_PARAMS, "%", name.string());
+    if(vs < 2) error(ANN_PARAMS, "%", name.string(), 2);
     // name of parameter
     final String key = toString(value.itemAt(0), name);
     // variable template

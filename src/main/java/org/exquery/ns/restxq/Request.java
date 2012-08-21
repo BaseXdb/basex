@@ -30,20 +30,20 @@ public final class Request extends QueryModule {
    */
   @ContextDependent
   @Requires(Permission.NONE)
-  public Str getAttribute(final HttpServletRequest request, final String key) {
+  public Str attribute(final HttpServletRequest request, final String key) {
     final Object o = request.getSession().getAttribute(key);
     return o == null ? null : Str.get(o.toString());
   }
 
   /**
-   * Sets a session attribute.
+   * Updates a session attribute.
    * @param request servlet request
    * @param key key of the attribute
    * @param value value to be set
    */
   @ContextDependent
   @Requires(Permission.NONE)
-  public void setAttribute(final HttpServletRequest request, final String key,
+  public void updateAttribute(final HttpServletRequest request, final String key,
       final String value) {
     request.getSession().setAttribute(key, value);
   }

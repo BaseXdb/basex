@@ -23,6 +23,10 @@ interface RestXqText {
   byte[] HEADER_PARAM = token("header-param");
   /** Token "cookie-param". */
   byte[] COOKIE_PARAM = token("cookie-param");
+
+  /** Token "query-params". */
+  byte[] QUERY_PARAMS = token("query-params");
+
   /** Token "session-id". */
   byte[] SESSION_ID = token("session-id");
   /** Token "request". */
@@ -47,7 +51,7 @@ interface RestXqText {
   /** Error message. */
   String ANN_UNKNOWN = "Annotation %% is invalid or not supported.";
   /** Error message. */
-  String ANN_PARAMS = "Annotation %% requires at least 2 parameters.";
+  String ANN_PARAMS = "Annotation %% requires at least % parameter(s).";
   /** Error message. */
   String ANN_STRING = "Value of annotation %% is no string: %.";
   /** Error message. */
