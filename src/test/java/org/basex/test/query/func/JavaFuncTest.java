@@ -53,6 +53,13 @@ public class JavaFuncTest extends AdvancedQueryTest {
     query("import module namespace set='java.util.HashSet';" +
         "let $a := (set:add('a'), set:add('b')) return set:size()", "2");
 
+    // use class with capital and lower case
+    query("import module namespace string='http://lang.java/String';" +
+        "string:length()", "0");
+    query("import module namespace string='http://lang.java/string';" +
+        "string:length()", "0");
+
+    // address class extending QueryModule
     query("import module namespace qm='java:org.basex.test.query.func.QueryModuleTest';" +
         "qm:fast(0)", "Apple");
     query("import module namespace qm='java:org.basex.test.query.func.QueryModuleTest';" +
