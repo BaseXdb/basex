@@ -27,10 +27,6 @@ interface RestXqText {
   /** Token "query-params". */
   byte[] QUERY_PARAMS = token("query-params");
 
-  /** Token "session-id". */
-  byte[] SESSION_ID = token("session-id");
-  /** Token "request". */
-  byte[] REQUEST = token("request");
   /** Token "header". */
   byte[] HEADER = token("header");
   /** Token "response". */

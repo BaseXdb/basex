@@ -55,6 +55,7 @@ final class RestXqResponse {
     function = rxf;
     qc = ctx;
     http = hc;
+    qc.http = hc;
   }
 
   /**

@@ -65,12 +65,6 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
 
   /** Post/Put variable. */
   private QNm requestBody;
-  /** Reference to servlet request. */
-  private QNm request;
-  /** Reference to servlet response. */
-  private QNm response;
-  /** Session id variable (deprecated). */
-  private QNm sessionID;
 
   /**
    * Constructor.
@@ -136,15 +130,6 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
         } else if(eq(COOKIE_PARAM, local)) {
           // annotation "cookie-param"
           cookieParams.add(param(value, name));
-        } else if(eq(SESSION_ID, local)) {
-          if(sessionID != null) error(ANN_TWICE, "%", name.string());
-          sessionID = checkVariable(toString(value, name));
-        } else if(eq(REQUEST, local)) {
-          if(request != null) error(ANN_TWICE, "%", name.string());
-          request = checkVariable(toString(value, name));
-        } else if(eq(RESPONSE, local)) {
-          if(response != null) error(ANN_TWICE, "%", name.string());
-          response = checkVariable(toString(value, name));
         } else {
           // method annotations
           final HTTPMethod m = HTTPMethod.get(string(local));
@@ -218,13 +203,6 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
         error(INPUT_CONV, ex);
       }
     }
-
-    // bind session id (deprecated)
-    if(sessionID != null) bind(sessionID, Str.get(http.req.getSession().getId()));
-    // bind request
-    if(request != null) bind(request, new Jav(http.req));
-    // bind request
-    if(response != null) bind(response, new Jav(http.res));
 
     // bind query parameters
     final Map<String, String[]> params = http.params();

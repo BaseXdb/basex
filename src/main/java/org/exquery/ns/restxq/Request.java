@@ -1,7 +1,13 @@
 package org.exquery.ns.restxq;
 
+import java.util.Map.*;
+
 import javax.servlet.http.*;
+
+import org.basex.http.*;
 import org.basex.query.*;
+import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 
 /**
@@ -13,48 +19,88 @@ import org.basex.query.value.item.*;
 public final class Request extends QueryModule {
   /**
    * Returns the session ID.
-   * @param request servlet request
    * @return session id
+   * @throws QueryException query exception
    */
   @Deterministic
   @Requires(Permission.NONE)
-  public String sessionId(final HttpServletRequest request) {
-    return request.getSession().getId();
+  public String sessionId() throws QueryException {
+    return request().getSession().getId();
   }
 
   /**
    * Returns a session attribute.
-   * @param request servlet request
    * @param key key to be requested
    * @return session attribute
+   * @throws QueryException query exception
    */
   @ContextDependent
   @Requires(Permission.NONE)
-  public Str attribute(final HttpServletRequest request, final String key) {
-    final Object o = request.getSession().getAttribute(key);
+  public Str attribute(final String key) throws QueryException {
+    final Object o = request().getSession().getAttribute(key);
     return o == null ? null : Str.get(o.toString());
   }
 
   /**
    * Updates a session attribute.
-   * @param request servlet request
    * @param key key of the attribute
    * @param value value to be set
+   * @throws QueryException query exception
    */
   @ContextDependent
   @Requires(Permission.NONE)
-  public void updateAttribute(final HttpServletRequest request, final String key,
-      final String value) {
-    request.getSession().setAttribute(key, value);
+  public void updateAttribute(final String key, final String value)
+      throws QueryException {
+    request().getSession().setAttribute(key, value);
+  }
+
+  /**
+   * Returns the names of all query parameters.
+   * @return parameter names
+   * @throws QueryException query exception
+   */
+  @Requires(Permission.NONE)
+  public Value parameterNames() throws QueryException {
+    final ValueBuilder vb = new ValueBuilder();
+    for(final Entry<?, ?> s : request().getParameterMap().entrySet()) {
+      vb.add(Str.get(s.getKey()));
+    }
+    return vb.value();
+  }
+
+  /**
+   * Returns the value of a specific query parameter.
+   * @param key key to be requested
+   * @return parameter value
+   * @throws QueryException query exception
+   */
+  @Requires(Permission.NONE)
+  public Value parameter(final String key) throws QueryException {
+    final ValueBuilder vb = new ValueBuilder();
+    final String[] val = request().getParameterValues(key);
+    if(val != null) {
+      for(final String v : val) vb.add(Str.get(v));
+    }
+    return vb.value();
   }
 
   /**
    * Returns the path of the request.
-   * @param request servlet request
    * @return path
+   * @throws QueryException query exception
    */
   @Requires(Permission.NONE)
-  public String path(final HttpServletRequest request) {
-    return request.getPathInfo();
+  public String path() throws QueryException {
+    return request().getPathInfo();
+  }
+
+  /**
+   * Returns the servlet request instance.
+   * @return request
+   * @throws QueryException query exception
+   */
+  private HttpServletRequest request() throws QueryException {
+    if(context.http == null) throw new QueryException("Servlet context required.");
+    return ((HTTPContext) context.http).req;
   }
 }
