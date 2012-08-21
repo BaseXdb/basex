@@ -55,6 +55,9 @@ public final class QueryContext extends Progress {
   /** Database context. */
   public final Context context;
 
+  /** HTTP context. */
+  public Object http;
+
   /** Cached stop word files. */
   public HashMap<String, IO> stop;
   /** Cached thesaurus files. */
