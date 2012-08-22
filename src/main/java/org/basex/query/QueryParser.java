@@ -2167,6 +2167,7 @@ public class QueryParser extends InputParser {
     final int i = ip;
     final QNm name = eQName(null, ctx.sc.nsFunc);
     if(name != null && !keyword(name)) {
+      final InputInfo ii = info();
       final Expr[] args = argumentList(name.string());
       if(args != null) {
         alter = FUNCUNKNOWN;
@@ -2175,10 +2176,10 @@ public class QueryParser extends InputParser {
 
         final Var[] vars = new Var[args.length];
         final boolean part = partial(args, vars);
-        final TypedFunc f = Functions.get(name, args, false, ctx, info());
+        final TypedFunc f = Functions.get(name, args, false, ctx, ii);
         if(f != null) {
           alter = null;
-          return part ? new PartFunc(info(), f, vars, ctx) : f.fun;
+          return part ? new PartFunc(ii, f, vars, ctx) : f.fun;
         }
       }
     }
