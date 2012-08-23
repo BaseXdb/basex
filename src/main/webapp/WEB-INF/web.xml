@@ -86,11 +86,10 @@
     <url-pattern>/restxq/*</url-pattern>
   </servlet-mapping>
 
-  <!--  Mapping for static resources
+  <!--  Mapping for static resources (may be restricted to a sub path) -->
   <servlet-mapping>
     <servlet-name>default</servlet-name>
-    <url-pattern>/static/*</url-pattern>
+    <url-pattern>/*</url-pattern>
   </servlet-mapping>
-  -->
 
 </web-app>
