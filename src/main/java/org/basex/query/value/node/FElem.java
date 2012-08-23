@@ -218,12 +218,33 @@ public final class FElem extends FNode {
 
   /**
    * Adds an attribute and updates its parent reference.
+   * Converts the specified value to a token and calls {@link #add(QNm, byte[])}.
+   * @param nm attribute name
+   * @param value attribute value
+   * @return self reference
+   */
+  public FElem add(final QNm nm, final String value) {
+    return add(nm, token(value));
+  }
+
+  /**
+   * Adds an attribute and updates its parent reference.
    * @param nm attribute name
    * @param value attribute value
    * @return self reference
    */
   public FElem add(final QNm nm, final byte[] value) {
     return add(new FAttr(nm, value));
+  }
+
+  /**
+   * Creates and adds a text node if the specified value is not empty.
+   * Converts the specified string to a token and calls {@link #add(byte[])}.
+   * @param text value of text node
+   * @return self reference
+   */
+  public FElem add(final String text) {
+    return add(token(text));
   }
 
   /**

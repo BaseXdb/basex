@@ -86,8 +86,7 @@ public final class FNIndex extends StandardFunc {
   private Item facets(final QueryContext ctx) throws QueryException {
     final Data data = data(0, ctx);
     final boolean flat = expr.length == 2 && eq(checkStr(expr[1], ctx), FLAT);
-    return new FDoc(Token.EMPTY).add(flat ? flat(data) :
-      tree(data, data.paths.root().get(0)));
+    return new FDoc().add(flat ? flat(data) : tree(data, data.paths.root().get(0)));
   }
 
   /**
@@ -217,14 +216,12 @@ public final class FNIndex extends StandardFunc {
    */
   private static void stats(final Stats stats, final FElem elem) {
     final String k = stats.type.toString().toLowerCase(Locale.ENGLISH);
-    elem.add(Q_TYPE, token(k));
+    elem.add(Q_TYPE, k);
     elem.add(Q_COUNT, token(stats.count));
     switch(stats.type) {
       case CATEGORY:
         for(final byte[] c : stats.cats) {
-          final FElem sub = new FElem(Q_ENTRY);
-          sub.add(Q_COUNT, token(stats.cats.value(c))).add(c);
-          elem.add(sub);
+          elem.add(new FElem(Q_ENTRY).add(Q_COUNT, token(stats.cats.value(c))).add(c));
         }
         break;
       case DOUBLE:

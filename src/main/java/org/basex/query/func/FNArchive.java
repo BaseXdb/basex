@@ -182,7 +182,7 @@ public class FNArchive extends StandardFunc {
 
     // create result element
     final FElem e = new FElem(Q_OPTIONS, NS);
-    if(format != null) e.add(new FElem(Q_FORMAT).add(Q_VALUE, token(format)));
+    if(format != null) e.add(new FElem(Q_FORMAT).add(Q_VALUE, format));
     if(level >= 0) {
       final byte[] lvl = level == 8 ? DEFLATE : level == 0 ? STORED : UNKNOWN;
       e.add(new FElem(Q_ALGORITHM).add(Q_VALUE, lvl));
@@ -212,7 +212,7 @@ public class FNArchive extends StandardFunc {
         if(s != -1) e.add(Q_LAST_MOD, new Dtm(s, info).string(info));
         s = ze.getCompressedSize();
         if(s != -1) e.add(Q_COMP_SIZE, token(s));
-        e.add(token(ze.getName()));
+        e.add(ze.getName());
         vb.add(e);
       }
       return vb;
@@ -410,15 +410,8 @@ public class FNArchive extends StandardFunc {
     }
 
     // data to be compressed
-    byte[] val = null;
-    if(con instanceof AStr) {
-      val = con.string(info);
-      if(en != null && en != Token.UTF8) val = encode(val, en);
-    } else if(con.type == AtomType.B64) {
-      val = ((Bin) con).binary(info);
-    } else {
-      STRB64TYPE.thrw(info, con.type);
-    }
+    byte[] val = checkStrBin(con);
+    if(con instanceof AStr && en != null && en != Token.UTF8) val = encode(val, en);
 
     try {
       out.level(lvl == null ? level : toInt(lvl));

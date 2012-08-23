@@ -1,7 +1,5 @@
 package org.basex.query.func;
 
-import static org.basex.util.Token.*;
-
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -77,7 +75,7 @@ public final class FNRepo extends StandardFunc {
       final FElem elem = new FElem(Q_PACKAGE);
       elem.add(Q_NAME, Package.name(p));
       elem.add(Q_VERSION, Package.version(p));
-      elem.add(Q_TYPE, token(PkgText.EXPATH));
+      elem.add(Q_TYPE, PkgText.EXPATH);
       cache.add(elem);
     }
     // traverse all directories, ignore root entries with dashes
@@ -85,9 +83,8 @@ public final class FNRepo extends StandardFunc {
       if(dir.name().indexOf('-') != -1) continue;
       for(final String s : dir.descendants()) {
         final FElem elem = new FElem(Q_PACKAGE);
-        final String n = dir.name() + '.' + s.replaceAll("\\..*", "").replace('/', '.');
-        elem.add(Q_NAME, token(n));
-        elem.add(Q_TYPE, token(PkgText.INTERNAL));
+        elem.add(Q_NAME, dir.name() + '.' + s.replaceAll("\\..*", "").replace('/', '.'));
+        elem.add(Q_TYPE, PkgText.INTERNAL);
         cache.add(elem);
       }
     }

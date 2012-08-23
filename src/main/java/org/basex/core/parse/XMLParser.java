@@ -157,8 +157,6 @@ final class XMLParser extends CmdParser {
       return new Set(value(root, OPTION), value(root));
     if(e.equals(SHOW_BACKUPS) && check(root))
       return new ShowBackups();
-    if(e.equals(SHOW_DATABASES) && check(root))
-      return new ShowDatabases();
     if(e.equals(SHOW_EVENTS) && check(root))
       return new ShowEvents();
     if(e.equals(SHOW_SESSIONS) && check(root))

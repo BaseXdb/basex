@@ -11,7 +11,6 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.item.ANum;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -283,7 +282,7 @@ public abstract class ParseExpr extends Expr {
    * Returns a token representation or an exception.
    * @param e expression to be evaluated
    * @param ctx query context
-   * @return item
+   * @return string representation
    * @throws QueryException query exception
    */
   public final byte[] checkStr(final Expr e, final QueryContext ctx)
@@ -299,7 +298,7 @@ public abstract class ParseExpr extends Expr {
    * Checks if the specified item is a string or an empty sequence.
    * Returns a token representation or an exception.
    * @param it item to be checked
-   * @return item
+   * @return string representation
    * @throws QueryException query exception
    */
   public final byte[] checkEStr(final Item it) throws QueryException {
@@ -312,7 +311,7 @@ public abstract class ParseExpr extends Expr {
   /**
    * Throws an exception if the context item is not set.
    * @param ctx query context
-   * @return result of check
+   * @return context
    * @throws QueryException query exception
    */
   public final Value checkCtx(final QueryContext ctx) throws QueryException {
@@ -346,6 +345,18 @@ public abstract class ParseExpr extends Expr {
     final Item it = checkItem(e, ctx);
     if(it instanceof Bin) return (Bin) it;
     throw BINARYTYPE.thrw(info, it.type);
+  }
+
+  /**
+   * Checks if the specified expression yields a string or binary item.
+   * @param it item to be checked
+   * @return byte representation
+   * @throws QueryException query exception
+   */
+  public final byte[] checkStrBin(final Item it) throws QueryException {
+    if(it instanceof AStr) return it.string(info);
+    if(it instanceof Bin) return ((Bin) it).binary(info);
+    throw STRBINTYPE.thrw(info, it.type);
   }
 
   /**

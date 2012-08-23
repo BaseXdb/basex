@@ -56,6 +56,11 @@ public enum Err {
   /** BXCO0002. */
   BXCO_ENCODING(BXCO, 2, "Encoding '%' is not supported."),
 
+  // Admin module
+
+  /** BXAD0001. */
+  BXAD_USER(BXAD, 1, "%"),
+
   // Database module
 
   /** BXDB0001. */
@@ -393,7 +398,7 @@ public enum Err {
   /** FORG0006. */
   ELMSTRTYPE(FORG, 6, "element(%) or string expected, % found"),
   /** FORG0006. */
-  STRB64TYPE(FORG, 6, "String or Base64 expected, % found"),
+  STRBINTYPE(FORG, 6, "String or binary type expected, % found"),
   /** FORG0006. */
   ELMOPTION(FORG, 6, "Unknown option: %."),
 
@@ -1021,6 +1026,7 @@ public enum Err {
 
     /** BASX Error type. */ BASX(QueryText.BXERR, QueryText.BXERRORS),
 
+    /** BXAD Error type. */ BXAD(QueryText.BXERR, QueryText.BXERRORS),
     /** BXCL Error type. */ BXCL(QueryText.BXERR, QueryText.BXERRORS),
     /** BXCO Error type. */ BXCO(QueryText.BXERR, QueryText.BXERRORS),
     /** BXDB Error type. */ BXDB(QueryText.BXERR, QueryText.BXERRORS),

@@ -512,7 +512,6 @@ c_set1               = Set global options.
 c_set2               = Sets a database option to a new value.
 c_show1              = Show server information.
 c_show21             = Shows server information:
-c_show22             = shows currently opened databases.
 c_show23             = shows current database sessions.
 c_show24             = shows users (on a database).
 c_show25             = shows backups.

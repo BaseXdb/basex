@@ -512,7 +512,6 @@ c_set1               = Définir les options globales.
 c_set2               = Modifie la valeur d'une option de base de données.
 c_show1              = Montrer les informations du serveur.
 c_show21             = Montre les informations du serveur :
-c_show22             = montre les bases de données actullement ouvertes.
 c_show23             = montre les sessions de la base de données courante.
 c_show24             = montre les utilisateurs (sur une base de données).
 c_show25             = montre les backups.

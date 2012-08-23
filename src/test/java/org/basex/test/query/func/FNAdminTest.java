@@ -53,4 +53,14 @@ public final class FNAdminTest extends AdvancedQueryTest {
     query(_ADMIN_USERS.args(NAME) + "= '" + NAME + "'", "false");
     query(_ADMIN_USERS.args() + "= '" + NAME + "'", "false");
   }
+
+
+  /**
+   * Test method.
+   */
+  @Test
+  public void sessions() {
+    // can only be tested in client/server mode
+    query(_ADMIN_SESSIONS.args(), "");
+  }
 }

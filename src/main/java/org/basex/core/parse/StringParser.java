@@ -174,8 +174,6 @@ final class StringParser extends CmdParser {
         return new Restore(name(cmd));
       case SHOW:
         switch(consume(CmdShow.class, cmd)) {
-          case DATABASES:
-            return new ShowDatabases();
           case SESSIONS:
             return new ShowSessions();
           case USERS:

@@ -1,5 +1,7 @@
 package org.basex.core;
 
+import java.util.*;
+
 /**
  * This class contains information on a single user.
  *
@@ -9,7 +11,7 @@ package org.basex.core;
 public final class User {
   /** User name. */
   public final String name;
-  /** Password. */
+  /** Password (md5-encoded, lower case). */
   public String password;
   /** Permission. */
   public Perm perm;
@@ -22,7 +24,7 @@ public final class User {
    */
   User(final String n, final String p, final Perm r) {
     name = n;
-    password = p;
+    password = p.toLowerCase(Locale.ENGLISH);
     perm = r;
   }
 

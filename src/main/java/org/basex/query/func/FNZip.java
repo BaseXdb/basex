@@ -139,7 +139,7 @@ public final class FNZip extends StandardFunc {
       zf = new ZipFile(file);
       // create result node
       final FElem root = new FElem(Q_FILE, new Atts(ZIP, ZIPURI));
-      root.add(Q_HREF, token(path.path()));
+      root.add(Q_HREF, path.path());
       createEntries(paths(zf).iterator(), root, "");
       return root;
     } catch(final IOException ex) {
@@ -194,7 +194,7 @@ public final class FNZip extends StandardFunc {
    * @return element
    */
   private static FElem createDir(final FElem par, final String name) {
-    final FElem e = new FElem(Q_DIR).add(Q_NAME, token(name));
+    final FElem e = new FElem(Q_DIR).add(Q_NAME, name);
     par.add(e);
     return e;
   }
@@ -205,7 +205,7 @@ public final class FNZip extends StandardFunc {
    * @param name name of directory
    */
   private static void createFile(final FElem par, final String name) {
-    par.add(new FElem(Q_ENTRY).add(Q_NAME, token(name)));
+    par.add(new FElem(Q_ENTRY).add(Q_NAME, name));
   }
 
   /**

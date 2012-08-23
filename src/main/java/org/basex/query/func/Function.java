@@ -578,6 +578,12 @@ public enum Function {
 
   /** XQuery function. */
   _ADMIN_USERS(FNAdmin.class, "users([database])", ELM_ZM, 0, STR),
+  /** XQuery function. */
+  _ADMIN_SESSIONS(FNAdmin.class, "sessions()", ELM_ZM),
+  /** XQuery function: needs to be implemented as updating function.
+  _ADMIN_CREATE_USER(FNAdmin.class, "create-user(name,password[,database])",
+      EMP, 2, STR, STR, STR),
+  */
 
   /* FNIndex functions. */
 

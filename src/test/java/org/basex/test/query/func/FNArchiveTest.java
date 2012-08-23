@@ -57,9 +57,9 @@ public final class FNArchiveTest extends AdvancedQueryTest {
     // invalid modification date
     error(_ARCHIVE_CREATE.args("<archive:entry last-modified='2020'>X</archive:entry>",
         ""), Err.ARCH_DATETIME);
-    // content must be string or base64Binary
+    // content must be string or binary
     error(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", " 123"),
-        Err.STRB64TYPE);
+        Err.STRBINTYPE);
     // wrong encoding
     error(_ARCHIVE_CREATE.args("<archive:entry encoding='x'>X</archive:entry>", ""),
         Err.ARCH_ENCODING);

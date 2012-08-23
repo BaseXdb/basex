@@ -110,7 +110,7 @@ public final class Users {
     final User user = get(usern);
     if(user == null) return false;
 
-    user.password = pass;
+    user.password = pass.toLowerCase(Locale.ENGLISH);
     write();
     return true;
   }

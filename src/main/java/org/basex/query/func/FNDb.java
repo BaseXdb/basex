@@ -288,7 +288,7 @@ public final class FNDb extends StandardFunc {
       public Item next() throws QueryException {
         if(++up >= list.size()) return null;
         final IOFile file = list.get(up);
-        return new FElem(Q_BACKUP).add(Token.token(file.name())).
+        return new FElem(Q_BACKUP).add(file.name()).
             add(Q_SIZE, Token.token(file.length()));
       }
     };
@@ -356,10 +356,9 @@ public final class FNDb extends StandardFunc {
           di = new DataInput(meta.dbfile(DATAINF));
           meta.read(di);
           res.add(Q_RESOURCES, token(meta.ndocs));
-          final String ts = DateTime.format(new Date(meta.dbtime()), DateTime.FULL);
-          res.add(Q_MDATE, token(ts));
-          if(ctx.context.perm(Perm.CREATE, meta)) res.add(Q_PATH, token(meta.original));
-          res.add(token(name));
+          res.add(Q_MDATE, DateTime.format(new Date(meta.dbtime()), DateTime.FULL));
+          if(ctx.context.perm(Perm.CREATE, meta)) res.add(Q_PATH, meta.original);
+          res.add(name);
         } catch(final IOException ex) {
           BXDB_OPEN.thrw(info, ex);
         } finally {
@@ -459,7 +458,7 @@ public final class FNDb extends StandardFunc {
 
     final String tstamp = DateTime.format(new Date(mdate), DateTime.FULL);
     final FElem res = new FElem(Q_RESOURCE).add(path).
-        add(Q_RAW, token(raw)).add(Q_CTYPE, ctype).add(Q_MDATE, token(tstamp));
+        add(Q_RAW, token(raw)).add(Q_CTYPE, ctype).add(Q_MDATE, tstamp);
     return raw ? res.add(Q_SIZE, token(size)) : res;
   }
 
@@ -501,7 +500,7 @@ public final class FNDb extends StandardFunc {
       final FElem n = new FElem(new QNm(lc(token(name))));
       if(cols[0].startsWith(" ")) {
         if(node != null) node.add(n);
-        if(!cols[1].isEmpty()) n.add(token(cols[1]));
+        if(!cols[1].isEmpty()) n.add(cols[1]);
       } else {
         node = n;
         top.add(n);

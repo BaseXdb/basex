@@ -62,6 +62,9 @@ public class XMLCommandTest extends SandboxTest {
     ok("<drop-user name='X' database='X'/>");
     ok("<drop-user name='X'/>");
 
+    ok("<execute><info/></execute>");
+    ok("<execute>info</execute>");
+
     ok("<exit/>");
 
     ok("<export path='X'/>");
@@ -122,8 +125,6 @@ public class XMLCommandTest extends SandboxTest {
     ok("<set option='X'>X</set>");
 
     ok("<show-backups/>");
-
-    ok("<show-databases/>");
 
     ok("<show-events/>");
 

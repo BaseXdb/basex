@@ -68,7 +68,7 @@ public abstract class ExprInfo {
       } else if(o instanceof byte[]) {
         el.add((byte[]) o);
       } else if(o != null) {
-        el.add(Token.token(o.toString()));
+        el.add(o.toString());
       }
     }
   }

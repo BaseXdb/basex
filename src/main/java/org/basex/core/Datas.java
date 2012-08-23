@@ -1,11 +1,8 @@
 package org.basex.core;
 
-import static org.basex.core.Text.*;
-
 import java.util.*;
 
 import org.basex.data.*;
-import org.basex.util.*;
 
 /**
  * This class organizes all currently opened database.
@@ -73,20 +70,6 @@ public final class Datas {
    */
   public synchronized int size() {
     return list.size();
-  }
-
-  /**
-   * Returns information on the opened database instances.
-   * @return data reference
-   */
-  public synchronized String info() {
-    final TokenBuilder tb = new TokenBuilder();
-    tb.addExt(OPENED_DB_X, list.size());
-    tb.add(!list.isEmpty() ? COL : DOT);
-    for(final Data d : list) {
-      tb.add(NL + LI + d.meta.name + " (" + d.pins + "x)");
-    }
-    return tb.toString();
   }
 
   /**

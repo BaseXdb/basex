@@ -512,7 +512,6 @@ c_set1               = Stel globale opties in.
 c_set2               = Stel een nieuwe waarde in voor een database optie.
 c_show1              = Toon server informatie.
 c_show21             = Toont server informatie:
-c_show22             = toont momenteel geopende databases.
 c_show23             = toont actuele database sessies.
 c_show24             = toont gebruikers (van een database).
 c_show25             = toont backups.

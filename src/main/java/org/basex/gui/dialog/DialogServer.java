@@ -71,10 +71,8 @@ public final class DialogServer extends BaseXDialog {
   private final BaseXTextField ports;
   /** Server port. */
   private final BaseXTextField portc;
-  /** Current databases. */
-  private final BaseXEditor sese;
   /** Current sessions. */
-  private final BaseXEditor sedb;
+  private final BaseXEditor sese;
   /** Log text. */
   private final BaseXEditor logt;
   /** Info label. */
@@ -165,22 +163,13 @@ public final class DialogServer extends BaseXDialog {
     sess.border(8).layout(new BorderLayout());
     sese = new BaseXEditor(false, this);
     sese.setFont(start.getFont());
-    sedb = new BaseXEditor(false, this);
-    sedb.setFont(start.getFont());
     refreshSess = new BaseXButton(REFRESH, this);
-
-    p = new BaseXBack(new GridLayout(2, 1, 0, 2));
 
     pp = new BaseXBack(new BorderLayout());
     pp.add(new BaseXLabel(S_SESSIONS + COLS, false, true), BorderLayout.NORTH);
     pp.add(sese, BorderLayout.CENTER);
     p.add(pp);
-
-    pp = new BaseXBack(new BorderLayout());
-    pp.add(new BaseXLabel(DATABASES + COLS, false, true), BorderLayout.NORTH);
-    pp.add(sedb, BorderLayout.CENTER);
-    p.add(pp);
-    sess.add(p, BorderLayout.CENTER);
+    sess.add(pp, BorderLayout.CENTER);
 
     p = new BaseXBack(new BorderLayout(0, 0));
     p.add(refreshSess, BorderLayout.EAST);
@@ -427,7 +416,6 @@ public final class DialogServer extends BaseXDialog {
    */
   private void refreshSess() throws IOException {
     sese.setText(Token.token(cs.execute(new ShowSessions())));
-    sedb.setText(Token.token(cs.execute(new ShowDatabases())));
   }
 
   /**

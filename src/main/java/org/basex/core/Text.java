@@ -366,11 +366,10 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPSHOW = {
-    "[" + CmdShow.BACKUPS + '|' + CmdShow.DATABASES + '|' + CmdShow.EVENTS +
+    "[" + CmdShow.BACKUPS + '|' + CmdShow.EVENTS +
     '|' + CmdShow.SESSIONS + '|' + CmdShow.USERS + ']',
     lang("c_show1"),
     lang("c_show21") + NL +
-    LI + CmdShow.DATABASES + ": " + lang("c_show22") + NL +
     LI + CmdShow.EVENTS + ": " + lang("c_show26") + NL +
     LI + CmdShow.SESSIONS + ": " + lang("c_show23") + NL +
     LI + CmdShow.USERS + " (" + ON + " [database]): " + lang("c_show24") + NL +

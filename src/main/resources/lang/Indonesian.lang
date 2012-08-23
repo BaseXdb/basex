@@ -512,7 +512,6 @@ c_set1               = Atur pilihan umum.
 c_set2               = Atur pilihan dari satu basis data menjadi satu nilai yang baru.
 c_show1              = Tampilkan informasi server.
 c_show21             = Tampilkan informasi server:
-c_show22             = tampilkan basis data yang sedang terbuka.
 c_show23             = tampilkan sesi basis data sekarang.
 c_show24             = tampilkan pengguna (dalam satu basis data).
 c_show25             = tampilkan cadangan.

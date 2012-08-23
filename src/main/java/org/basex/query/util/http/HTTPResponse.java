@@ -120,8 +120,8 @@ public final class HTTPResponse {
     for(final String headerName : conn.getHeaderFields().keySet()) {
       if(headerName != null) {
         final FElem hdr = new FElem(Q_HTTP_HEADER, new Atts(HTTP, HTTPURI));
-        hdr.add(Q_NAME, token(headerName));
-        hdr.add(Q_VALUE, token(conn.getHeaderField(headerName)));
+        hdr.add(Q_NAME, headerName);
+        hdr.add(Q_VALUE, conn.getHeaderField(headerName));
         h.add(hdr);
       }
     }
@@ -134,8 +134,7 @@ public final class HTTPResponse {
    * @return body
    */
   private static FElem createBody(final String mediaType) {
-    return new FElem(Q_HTTP_BODY, new Atts(HTTP, HTTPURI)).add(
-        Q_MEDIA_TYPE, token(mediaType));
+    return new FElem(Q_HTTP_BODY, new Atts(HTTP, HTTPURI)).add(Q_MEDIA_TYPE, mediaType);
   }
 
   /**

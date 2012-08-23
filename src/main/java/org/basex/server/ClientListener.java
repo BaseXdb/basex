@@ -300,11 +300,17 @@ public final class ClientListener extends Thread {
     eout.flush();
   }
 
+  /**
+   * Returns the host and port of a client.
+   * @return string representation
+   */
+  public String address() {
+    return socket.getInetAddress().getHostAddress() + COL + socket.getPort();
+  }
+
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("[");
-    sb.append(socket.getInetAddress().getHostAddress());
-    sb.append(COL).append(socket.getPort()).append(']');
+    final StringBuilder sb = new StringBuilder("[").append(address()).append(']');
     if(context.data() != null) sb.append(COLS).append(context.data().meta.name);
     return sb.toString();
   }

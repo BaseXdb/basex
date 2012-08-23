@@ -24,6 +24,13 @@ public final class FDoc extends FNode {
 
   /**
    * Constructor.
+   */
+  public FDoc() {
+    this(Token.EMPTY);
+  }
+
+  /**
+   * Constructor.
    * @param b base uri
    */
   public FDoc(final byte[] b) {

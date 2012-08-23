@@ -122,12 +122,12 @@ public final class FNPat extends StandardFunc {
     while(pos[0] <= gc && m.end(pos[0]) <= end) {
       final int st = m.start(pos[0]);
       if(st >= 0) { // group matched
-        if(pos[1] < st) nd.add(token(str.substring(pos[1], st)));
+        if(pos[1] < st) nd.add(str.substring(pos[1], st));
         pos = match(m, str, nd, pos[0]);
       } else pos[0]++; // skip it
     }
     if(pos[1] < end) {
-      nd.add(token(str.substring(pos[1], end)));
+      nd.add(str.substring(pos[1], end));
       pos[1] = end;
     }
     par.add(nd);
@@ -140,7 +140,7 @@ public final class FNPat extends StandardFunc {
    * @param par root node
    */
   private static void nonmatch(final String text, final FElem par) {
-    par.add(new FElem(Q_NONMATCH).add(token(text)));
+    par.add(new FElem(Q_NONMATCH).add(text));
   }
 
   /**

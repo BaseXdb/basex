@@ -300,7 +300,7 @@ public final class QueryProcessor extends Progress {
    * @return root node
    */
   public FDoc plan() {
-    final FDoc doc = new FDoc(EMPTY);
+    final FDoc doc = new FDoc();
     ctx.plan(doc);
     return doc;
   }

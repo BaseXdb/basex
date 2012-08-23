@@ -512,7 +512,6 @@ c_set1               = Setaţi opţiunile globale.
 c_set2               = Stabileşte o opţiune a bazei de date la o nouă valoare.
 c_show1              = Afişează informaţii despre server.
 c_show21             = Afişează informaţii despre server:
-c_show22             = arată bazele de date deschise in prezent
 c_show23             = prezinta sesiuni de baze de date actuale.
 c_show24             = afiseaza utilizatorii (unei baze de date).
 c_show25             = arată backupurile.
