@@ -438,6 +438,8 @@ public interface QueryText {
   byte[] CLIENT = token("client");
   /** Convert token. */
   byte[] CONVERT = token("convert");
+  /** Admin token. */
+  byte[] ADMIN = token("admin");
   /** DB token. */
   byte[] DB = token("db");
   /** Index token. */
@@ -555,6 +557,8 @@ public interface QueryText {
   byte[] CLIENTURI = token(BXMODULES + "client");
   /** Convert module URI. */
   byte[] CONVERTURI = token(BXMODULES + "convert");
+  /** Database module URI. */
+  byte[] ADMINURI = token(BXMODULES + "admin");
   /** Database module URI. */
   byte[] DBURI = token(BXMODULES + "db");
   /** Full-text module URI. */

@@ -40,11 +40,11 @@ public final class ShowUsers extends Command {
       return error(NAME_INVALID_X, name);
 
     if(name == null) {
-      out.println(context.users.info(null));
+      out.println(context.users.info(null).finish());
     } else {
       try {
         final Data data = Open.open(name, context);
-        out.println(data.meta.users.info(context.users));
+        out.println(data.meta.users.info(context.users).finish());
         Close.close(data, context);
         return true;
       } catch(final IOException ex) {

@@ -403,6 +403,16 @@ public abstract class ParseExpr extends Expr {
    * @param ctx query context
    * @throws QueryException query exception
    */
+  public final void checkAdmin(final QueryContext ctx) throws QueryException {
+    checkPerm(ctx, Perm.ADMIN);
+  }
+
+  /**
+   * Checks if the current user has create permissions. If negative, an
+   * exception is thrown.
+   * @param ctx query context
+   * @throws QueryException query exception
+   */
   public final void checkCreate(final QueryContext ctx) throws QueryException {
     checkPerm(ctx, Perm.CREATE);
   }

@@ -21,7 +21,7 @@ import org.basex.util.list.*;
  */
 public final class Users {
   /** User array. */
-  private final List<User> list = new ArrayList<User>(0);
+  private final ArrayList<User> list = new ArrayList<User>(0);
   /** Filename; set to {@code null} if the instance handles local users. */
   private IOFile file;
 
@@ -166,19 +166,17 @@ public final class Users {
 
   /**
    * Returns information on all users.
-   * @param users optional second list
+   * @param users optional global user list (for ignoring obsolete local users)
    * @return user information
    */
-  public synchronized byte[] info(final Users users) {
+  public synchronized Table info(final Users users) {
     final Table table = new Table();
     table.description = USERS;
 
     final int sz = file == null ? 3 : 5;
     for(int u = 0; u < sz; ++u) table.header.add(USERHEAD[u]);
 
-    for(final User user : list) {
-      if(users != null) if(users.get(user.name) == null) continue;
-
+    for(final User user : users(users)) {
       final TokenList tl = new TokenList();
       tl.add(user.name);
       tl.add(user.has(Perm.READ) ? "X" : "");
@@ -189,6 +187,19 @@ public final class Users {
       }
       table.contents.add(tl);
     }
-    return table.sort().toTop(token(ADMIN)).finish();
+    return table.sort().toTop(token(ADMIN));
+  }
+
+  /**
+   * Returns all users.
+   * @param users optional second list
+   * @return user information
+   */
+  public synchronized User[] users(final Users users) {
+    final ArrayList<User> al = new ArrayList<User>();
+    for(final User user : list) {
+      if(users == null || users.get(user.name) != null) al.add(user);
+    }
+    return al.toArray(new User[al.size()]);
   }
 }

@@ -572,6 +572,11 @@ public enum Function {
   /** XQuery function. */
   _DB_FLUSH(FNDb.class, "flush(database)", EMP, STR),
 
+  /* FNAdmin functions. */
+
+  /** XQuery function. */
+  _ADMIN_USERS(FNAdmin.class, "users([database])", ELM_ZM, 0, STR),
+
   /* FNIndex functions. */
 
   /** XQuery function. */
@@ -885,6 +890,7 @@ public enum Function {
     URIS.put(FNClient.class,   CLIENTURI);
     URIS.put(FNConvert.class,  CONVERTURI);
     URIS.put(FNDb.class,       DBURI);
+    URIS.put(FNAdmin.class,    ADMINURI);
     URIS.put(FNFt.class,       FTURI);
     URIS.put(FNHof.class,      HOFURI);
     URIS.put(FNHash.class,     HASHURI);
