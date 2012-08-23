@@ -501,6 +501,7 @@ public class CommandTest extends SandboxTest {
     no(new Run(io.path()));
     ok(new CreateDB(NAME, FILE));
     ok(new Run(io.path()));
+    io.delete();
     // test command script (1)
     io = new IOFile("test.bxs");
     io.write(token("<info/>"));

@@ -419,8 +419,8 @@ public final class EditorView extends View {
     errFile = null;
     info.setCursor(!ok && error(msg) ?
         GUIConstants.CURSORHAND : GUIConstants.CURSORARROW);
-    final String m = msg.replaceAll(STOPPED_AT + " .*?(\\r?\\n\\[.*?\\] )?", "").
-        replaceAll(LINE_X.replaceAll("%", ".*?") + COL, "");
+    final String m = msg.replaceAll("^.*\\r?\\n\\[.*?\\]", "").
+        replaceAll(".*" + LINE_X.replaceAll("%", ".*?") + COL, "");
     info.setText(m, ok ? Msg.SUCCESS : Msg.ERROR);
     info.setToolTipText(ok ? null : msg);
     stop.setEnabled(false);
