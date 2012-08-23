@@ -63,6 +63,15 @@ public final class FNClientTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test
+  public void info() {
+    // check if the info string is not empty
+    query("let $a := " + conn() + " return (" +
+        _CLIENT_EXECUTE.args("$a", "xquery 123") + " and " +
+        _CLIENT_INFO.args("$a") + ")", "true");
+  }
+
+  /** Test method. */
+  @Test
   public void query() {
     contains(_CLIENT_EXECUTE.args(conn(), new ShowUsers()), Text.USERHEAD[0]);
     query("let $a := " + conn() + ", $b := " + conn() + " return " +

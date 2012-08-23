@@ -60,6 +60,7 @@ public class FNClient extends StandardFunc {
     switch(sig) {
       case _CLIENT_CONNECT: return connect(ctx);
       case _CLIENT_EXECUTE: return execute(ctx);
+      case _CLIENT_INFO:    return info(ctx);
       case _CLIENT_CLOSE:   return close(ctx);
       default:              return super.item(ctx, ii);
     }
@@ -105,6 +106,16 @@ public class FNClient extends StandardFunc {
     } catch(final IOException ex) {
       throw BXCL_COMM.thrw(info, ex);
     }
+  }
+
+  /**
+   * Executes a command and returns the result as string.
+   * @param ctx query context
+   * @return result
+   * @throws QueryException query exception
+   */
+  private Str info(final QueryContext ctx) throws QueryException {
+    return Str.get(session(ctx, false).info().replaceAll("\\r\\n?", "\n").trim());
   }
 
   /**
