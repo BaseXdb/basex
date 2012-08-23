@@ -48,7 +48,14 @@ public final class If extends Arr {
     if(cond.isValue()) return optPre(eval(ctx).compile(ctx), ctx);
 
     // compile and simplify branches
-    super.compile(ctx);
+    for(int e = 0; e < expr.length; e++) {
+      try {
+        expr[e] = expr[e].compile(ctx);
+      } catch(final QueryException ex) {
+        // replace original expression with error
+        expr[e] = FNInfo.error(ex, info);
+      }
+    }
 
     // if A then B else B -> B (errors in A will be ignored)
     if(expr[0].sameAs(expr[1])) return optPre(expr[0], ctx);

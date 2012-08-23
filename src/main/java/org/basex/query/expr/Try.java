@@ -1,6 +1,7 @@
 package org.basex.query.expr;
 
 import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -15,8 +16,6 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class Try extends Single {
-  /** Query exception. */
-  private QueryException qe;
   /** Catches. */
   private final Catch[] ctch;
 
@@ -42,14 +41,12 @@ public final class Try extends Single {
 
   @Override
   public Expr compile(final QueryContext ctx) throws QueryException {
-    if(qe == null) {
-      try {
-        super.compile(ctx);
-        if(expr.isValue()) return optPre(expr, ctx);
-      } catch(final QueryException ex) {
-        // remember exception
-        qe = ex;
-      }
+    try {
+      super.compile(ctx);
+      if(expr.isValue()) return optPre(expr, ctx);
+    } catch(final QueryException ex) {
+      // replace original return expression with error
+      expr = FNInfo.error(ex, info);
     }
 
     for(final Catch c : ctch) c.compile(ctx);
@@ -68,33 +65,19 @@ public final class Try extends Single {
     final int s = ctx.vars.size();
     try {
       // don't catch errors from error handlers
-      if(qe != null) return err(ctx, qe);
       try {
         return ctx.value(expr);
       } catch(final QueryException ex) {
-        return err(ctx, ex);
+        for(final Catch c : ctch) {
+          final Value val = c.value(ctx, ex);
+          if(val != null) return val;
+        }
+        throw ex;
       }
     } finally {
       // always reset the scope
       ctx.vars.size(s);
     }
-  }
-
-  /**
-   * Handles an exception.
-   * @param ctx query context
-   * @param ex query exception
-   * @return result
-   * @throws QueryException query exception
-   */
-  private Value err(final QueryContext ctx, final QueryException ex)
-      throws QueryException {
-
-    for(final Catch c : ctch) {
-      final Value val = c.value(ctx, ex);
-      if(val != null) return val;
-    }
-    throw ex;
   }
 
   @Override

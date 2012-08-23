@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -43,14 +44,15 @@ public final class TypeCase extends Single {
    * @throws QueryException query exception
    */
   TypeCase compile(final QueryContext ctx, final Value v) throws QueryException {
-    if(var.name == null) {
+    final int s = ctx.vars.size();
+    if(var.name != null) ctx.vars.add(v == null ? var : var.bind(v, ctx).copy());
+    try {
       super.compile(ctx);
-    } else {
-      final int s = ctx.vars.size();
-      ctx.vars.add(v == null ? var : var.bind(v, ctx).copy());
-      super.compile(ctx);
-      ctx.vars.size(s);
+    } catch(final QueryException ex) {
+      // replace original expression with error
+      expr = FNInfo.error(ex, info);
     }
+    ctx.vars.size(s);
     type = expr.type();
     return this;
   }
@@ -73,9 +75,11 @@ public final class TypeCase extends Single {
 
     final int s = ctx.vars.size();
     ctx.vars.add(var.bind(seq, ctx).copy());
-    final ValueIter ic = ctx.value(expr).iter();
-    ctx.vars.size(s);
-    return ic;
+    try {
+      return ctx.value(expr).iter();
+    } finally {
+      ctx.vars.size(s);
+    }
   }
 
   @Override
