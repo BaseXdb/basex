@@ -42,6 +42,8 @@ public final class FNDb extends StandardFunc {
   static final QNm Q_SYSTEM = new QNm("system");
   /** Resource element name. */
   static final QNm Q_DATABASE = new QNm("database");
+  /** Backup element name. */
+  static final QNm Q_BACKUP = new QNm("backup");
   /** Resource element name. */
   static final QNm Q_RESOURCE = new QNm("resource");
   /** Resource element name. */
@@ -71,6 +73,7 @@ public final class FNDb extends StandardFunc {
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(sig) {
       case _DB_OPEN:            return open(ctx).iter();
+      case _DB_BACKUPS:         return backups(ctx);
       case _DB_TEXT:            return valueAccess(true, ctx).iter(ctx);
       case _DB_TEXT_RANGE:      return rangeAccess(true, ctx).iter(ctx);
       case _DB_ATTRIBUTE:       return attribute(valueAccess(false, ctx), ctx, 2);
@@ -256,6 +259,38 @@ public final class FNDb extends StandardFunc {
       public boolean reset() { pos = 0; return true; }
       @Override
       public long size() { return tl.size(); }
+    };
+  }
+
+  /**
+   * Performs the backups function.
+   * @param ctx query context
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  private Iter backups(final QueryContext ctx) throws QueryException {
+    checkCreate(ctx);
+    final String prefix = expr.length == 0 ? null :
+      Token.string(checkStr(expr[0], ctx)) + '-';
+
+    final ArrayList<IOFile> list = new ArrayList<IOFile>();
+    for(final IOFile f : ctx.context.mprop.dbpath().children()) {
+      final String name = f.name();
+      if(name.endsWith(IO.ZIPSUFFIX) && (prefix == null || name.startsWith(prefix))) {
+        list.add(f);
+      }
+    }
+
+    return new Iter() {
+      int up = -1;
+
+      @Override
+      public Item next() throws QueryException {
+        if(++up >= list.size()) return null;
+        final IOFile file = list.get(up);
+        return new FElem(Q_BACKUP).add(Token.token(file.name())).
+            add(Q_SIZE, Token.token(file.length()));
+      }
     };
   }
 

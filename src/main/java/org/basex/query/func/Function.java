@@ -534,7 +534,9 @@ public enum Function {
   /** XQuery function. */
   _DB_LIST(FNDb.class, "list([database[,path]])", STR_ZM, 0, STR, STR),
   /** XQuery function. */
-  _DB_LIST_DETAILS(FNDb.class, "list-details([database[,path]])", NOD_ZM, 0, STR, STR),
+  _DB_LIST_DETAILS(FNDb.class, "list-details([database[,path]])", ELM_ZM, 0, STR, STR),
+  /** XQuery function. */
+  _DB_BACKUPS(FNDb.class, "backups([database])", ELM_ZM, 0, STR),
   /** XQuery function. */
   _DB_SYSTEM(FNDb.class, "system()", STR),
   /** XQuery function. */

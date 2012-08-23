@@ -1,7 +1,6 @@
 package org.basex.query.func;
 
 import org.basex.core.*;
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -55,23 +54,16 @@ public final class FNAdmin extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter users(final QueryContext ctx) throws QueryException {
-    final User[] users;
-    if(expr.length != 0) {
-      final Data data = data(0, ctx);
-      users = data.meta.users.users(ctx.context.users);
-    } else {
-      users = ctx.context.users.users(null);
-    }
+    final User[] users = expr.length == 0 ? ctx.context.users.users(null) :
+      data(0, ctx).meta.users.users(ctx.context.users);
 
     return new Iter() {
-      int up = -1;
-
+      int p = -1;
       @Override
       public Item next() throws QueryException {
-        if(++up >= users.length) return null;
-        final FElem elem = new FElem(Q_USER).add(Token.token(users[up].name));
-        elem.add(Q_PERMISSION, Token.token(users[up].perm.toString()));
-        return elem;
+        return ++p >= users.length ? null :
+          new FElem(Q_USER).add(Token.token(users[p].name)).
+          add(Q_PERMISSION, Token.token(users[p].perm.toString()));
       }
     };
   }
