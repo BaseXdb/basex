@@ -62,7 +62,7 @@ final class RESTRetrieve extends RESTQuery {
       http.initResponse(sprop);
 
       final FElem el = new FElem(DATABASE, new Atts(REST, RESTURI));
-      el.add(Q_NAME, token(http.db()));
+      el.add(Q_NAME, http.db());
       el.add(Q_RESOURCES, token(table.contents.size()));
       list(table, el, RESOURCE, 0);
       ser.serialize(el);
