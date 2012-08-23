@@ -95,12 +95,11 @@ public class FNClient extends StandardFunc {
     final String cmd = Token.string(checkStr(expr[1], ctx));
 
     try {
-      cs.setOutputStream(new ArrayOutput());
+      final ArrayOutput ao = new ArrayOutput();
+      cs.setOutputStream(ao);
       cs.execute(cmd);
-      final ArrayOutput ao = (ArrayOutput) cs.getOutputStream();
-      final byte[] result = ao.toArray();
       cs.setOutputStream(null);
-      return Str.get(result);
+      return Str.get(ao.toArray());
     } catch(final BaseXException ex) {
       throw BXCL_COMMAND.thrw(info, ex);
     } catch(final IOException ex) {
