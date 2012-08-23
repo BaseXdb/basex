@@ -403,12 +403,14 @@ public enum Err {
 
   /** FORX0001. */
   REGMOD(FORX, 1, "Invalid regular modifier: '%'."),
+  /** FORX0002. */
+  REGPAT(FORX, 2, "Invalid pattern: '%'."),
   /** FORX0003. */
   REGROUP(FORX, 3, "Pattern matches empty string."),
   /** FORX0004. */
-  FUNREGREP(FORX, 4, "Invalid replacement expression."),
+  FUNREPBS(FORX, 4, "Replacement string: invalid backslash."),
   /** FORX0004. */
-  REGERR(FORX, 4, "Regular expression: '%'."),
+  FUNREPDOL(FORX, 4, "Replacement string: invalid dollar sign."),
 
   /** FOTY0012. */
   FIVALUE(FOTY, 12, "Item has no typed value: %."),
@@ -889,6 +891,7 @@ public enum Err {
   ORDCLOSED(FOFD, 1340, "Ordinal is not closed: '%'."),
   /** FOFD1350. */
   PICCOMP(FOFD, 1350, "Invalid component in string: '%'."),
+
   /** FOUT1170. */
   RESNF(FOUT, 1170, "Resource '%' cannot be retrieved."),
   /** FOUT1170. */

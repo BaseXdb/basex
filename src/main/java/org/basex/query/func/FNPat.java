@@ -155,16 +155,17 @@ public final class FNPat extends StandardFunc {
     for(int i = 0; i < rep.length; ++i) {
       if(rep[i] == '\\') {
         if(i + 1 == rep.length || rep[i + 1] != '\\' && rep[i + 1] != '$')
-          FUNREGREP.thrw(info);
+          FUNREPBS.thrw(info);
         ++i;
       }
+      if(rep[i] == '$' && (i == 0 || rep[i - 1] != '\\') &&
+        (i + 1 == rep.length || !digit(rep[i + 1]))) FUNREPDOL.thrw(info);
     }
 
     final Pattern p = pattern(expr[1], expr.length == 4 ? expr[3] : null, ctx);
     String r = string(rep);
     if((p.flags() & Pattern.LITERAL) != 0) {
-      r = SLASH.matcher(BSLASH.matcher(r).replaceAll("\\\\\\\\")).
-        replaceAll("\\\\\\$");
+      r = SLASH.matcher(BSLASH.matcher(r).replaceAll("\\\\\\\\")).replaceAll("\\\\\\$");
     }
 
     try {
@@ -172,7 +173,7 @@ public final class FNPat extends StandardFunc {
     } catch(final Exception ex) {
       final String m = ex.getMessage();
       if(m.contains("No group")) REGROUP.thrw(info);
-      throw REGERR.thrw(info, m);
+      throw REGPAT.thrw(info, m);
     }
   }
 
