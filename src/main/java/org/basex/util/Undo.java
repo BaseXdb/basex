@@ -7,8 +7,10 @@ package org.basex.util;
  * @author Christian Gruen
  */
 public final class Undo {
+  /** Maximum size for storing entries in a history. */
+  public static final int MAXSIZE = 100000;
   /** Maximum number of strings to be stored. */
-  private static final int MAX = 200;
+  private static final int MAX = 500;
   /** String history. */
   private final byte[][] hist = new byte[MAX][];
   /** Cursor history. */
@@ -79,7 +81,7 @@ public final class Undo {
    * @param c cursor position
    */
   public void store(final byte[] str, final int c) {
-    if(Token.eq(str, hist[pos])) return;
+    if(Token.eq(str, hist[pos]) || str.length >= MAXSIZE) return;
     if(pos + 1 == MAX) {
       Array.move(hist, 1, -1, pos);
       Array.move(cur, 1, -1, pos--);

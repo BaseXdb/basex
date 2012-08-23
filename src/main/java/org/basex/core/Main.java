@@ -32,6 +32,14 @@ public abstract class Main {
   protected boolean verbose;
   /** Separate serialized items with newlines. */
   protected boolean newline;
+  /** Password reader. */
+  final PasswordReader pwReader = new PasswordReader() {
+    @Override
+    public String password() {
+      Util.out(PASSWORD + COLS);
+      return md5(Util.password());
+    }
+  };
 
   /**
    * Constructor.
@@ -79,9 +87,7 @@ public abstract class Main {
       // skip empty lines
       if(in.isEmpty()) continue;
       try {
-        final CommandParser parser = new CommandParser(in, context);
-        parser.password(cr.getPasswordReader());
-        if(!execute(parser)) {
+        if(!execute(new CommandParser(in, context).pwReader(cr.pwReader()))) {
           // show goodbye message if method returns false
           Util.outln(BYE[new Random().nextInt(4)]);
           return;
@@ -110,14 +116,7 @@ public abstract class Main {
    * @throws IOException database exception
    */
   protected final boolean execute(final String in) throws IOException {
-    final PasswordReader pr = new PasswordReader() {
-      @Override
-      public String password() {
-        Util.out(PASSWORD + COLS);
-        return md5(Util.password());
-      }
-    };
-    return execute(new CommandParser(in, context).password(pr));
+    return execute(new CommandParser(in, context).pwReader(pwReader));
   }
 
   /**

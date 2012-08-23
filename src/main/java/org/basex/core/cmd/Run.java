@@ -5,66 +5,54 @@ import static org.basex.core.Text.*;
 import java.io.*;
 
 import org.basex.core.*;
-import org.basex.core.parse.*;
 import org.basex.io.*;
+import org.basex.io.in.*;
 import org.basex.util.*;
 
 /**
- * Evaluates the 'run' command and processes a query file as XQuery.
+ * Evaluates the 'run' command and processes an input file.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class Run extends AQuery {
-  /** Query string. */
-  private String query;
+public final class Run extends Execute {
+  /** Input reference. */
+  private IO file;
 
   /**
    * Default constructor.
-   * @param file query file
+   * @param fl input file
    */
-  public Run(final String file) {
-    super(Perm.NONE, false, file);
-  }
-
-  @Override
-  protected boolean run() {
-    try {
-      return query(read(context));
-    } catch(final IOException ex) {
-      Util.debug(ex);
-      return error(ex.getMessage());
-    }
-  }
-
-  @Override
-  public boolean updating(final Context ctx) {
-    try {
-      return updating(ctx, read(ctx));
-    } catch(final IOException ex) {
-      return true;
-    }
+  public Run(final String fl) {
+    super(fl);
   }
 
   /**
-   * Returns the query string.
+   * Initializes the specified input.
    * @param ctx database context
-   * @return query string
-   * @throws IOException I/O exception
+   * @return success flag
    */
-  String read(final Context ctx) throws IOException {
-    if(query == null) {
-      final IO io = IO.get(args[0]);
-      if(!io.exists() || io.isDir()) throw new BaseXException(
-          RES_NOT_FOUND_X, ctx.user.has(Perm.CREATE) ? io : args[0]);
-      query = Token.string(io.read());
-      ctx.prop.set(Prop.QUERYPATH, io.path());
-    }
-    return query;
-  }
-
   @Override
-  public void build(final CmdBuilder cb) {
-    cb.init().arg(0);
+  protected boolean init(final Context ctx) {
+    if(file == null) {
+      // check file reference
+      file = IO.get(args[0]);
+      if(!file.exists() || file.isDir()) {
+        error = Util.info(RES_NOT_FOUND_X, ctx.user.has(Perm.CREATE) ? file : args[0]);
+      } else {
+        try {
+          // retrieve file contents
+          args[0] = Token.string(new TextInput(file).content());
+          // interpret as commands if input ends with command script suffix
+          if(file.hasSuffix(IO.BXSSUFFIX)) return super.init(ctx);
+          // otherwise, interpret input as xquery
+          list.add(new XQuery(args[0]));
+        } catch(final IOException ex) {
+          error = ex.getMessage();
+        }
+      }
+    }
+    ctx.prop.set(Prop.QUERYPATH, file.path());
+    return error == null;
   }
 }

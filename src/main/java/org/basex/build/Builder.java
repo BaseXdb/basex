@@ -301,7 +301,7 @@ public abstract class Builder extends Progress {
 
     // check if data ranges exceed database limits,
     // based on the storage details in {@link Data}
-    limit(tags.size(), 0x8000, LIMITTAGS);
+    limit(tags.size(), 0x8000, LIMITELEMS);
     limit(atts.size(), 0x8000, LIMITATTS);
     limit(ns.size(), 0x100, LIMITNS);
     if(meta.size < 0) limit(0, 0, LIMITRANGE);

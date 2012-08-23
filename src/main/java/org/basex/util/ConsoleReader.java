@@ -24,17 +24,12 @@ public abstract class ConsoleReader {
   static final String PASSWORD_PROMPT = PASSWORD + COLS;
 
   /** Password reader. */
-  private final PasswordReader passwordReader;
-
-  /** Base constructor. */
-  protected ConsoleReader() {
-    passwordReader = new PasswordReader() {
-      @Override
-      public String password() {
-        return md5(readPassword());
-      }
-    };
-  }
+  private final PasswordReader pwReader = new PasswordReader() {
+    @Override
+    public String password() {
+      return md5(readPassword());
+    }
+  };
 
   /**
    * Reads next line. If no input, then the method blocks the thread.
@@ -52,8 +47,8 @@ public abstract class ConsoleReader {
    * Create a new password reader for this console.
    * @return a new instance of {@link PasswordReader}
    */
-  public PasswordReader getPasswordReader() {
-    return passwordReader;
+  public PasswordReader pwReader() {
+    return pwReader;
   }
 
   /**

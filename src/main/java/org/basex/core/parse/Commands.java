@@ -49,6 +49,8 @@ public interface Commands {
   String DROP_INDEX = "drop-index";
   /** Command string: "drop-user". */
   String DROP_USER = "drop-user";
+  /** Command string: "execute". */
+  String EXECUTE = "execute";
   /** Command string: "exit". */
   String EXIT = "exit";
   /** Command string: "export". */
@@ -176,8 +178,8 @@ public interface Commands {
     HELP(HELPHELP), INFO(HELPINFO), KILL(HELPKILL), LIST(HELPLIST), OPEN(HELPOPEN),
     OPTIMIZE(HELPOPTIMIZE), PASSWORD(HELPPASSWORD), RENAME(HELPRENAME),
     REPLACE(HELPREPLACE), REPO(HELPREPO), RESTORE(HELPRESTORE), RETRIEVE(HELPRETRIEVE),
-    RUN(HELPRUN), INSPECT(null), SET(HELPSET), SHOW(HELPSHOW), STORE(HELPSTORE),
-    XQUERY(HELPXQUERY);
+    RUN(HELPRUN), EXECUTE(HELPEXECUTE), INSPECT(null), SET(HELPSET), SHOW(HELPSHOW),
+    STORE(HELPSTORE), XQUERY(HELPXQUERY);
 
     /** Help texts. */
     private final String[] help;

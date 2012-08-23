@@ -86,11 +86,11 @@ public class XMLParser extends SingleParser {
       scanner.more();
 
       // get tag name
-      final byte[] tag = consumeToken(Type.TAGNAME);
+      final byte[] tag = consumeToken(Type.ELEMNAME);
       skipSpace();
 
       final byte[] open = tags.pop();
-      if(!eq(open, tag)) throw new BuildException(CLOSINGTAG, det(), tag, open);
+      if(!eq(open, tag)) throw new BuildException(CLOSINGELEM, det(), tag, open);
 
       builder.endElem();
       if(tags.isEmpty()) closed = true;
@@ -101,7 +101,7 @@ public class XMLParser extends SingleParser {
     atts.reset();
 
     // get element name
-    byte[] en = consumeToken(Type.TAGNAME);
+    byte[] en = consumeToken(Type.ELEMNAME);
     if(stripNS) en = local(en);
     skipSpace();
 

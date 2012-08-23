@@ -32,7 +32,7 @@ public final class CommandParser extends InputParser {
    * @param pr password reader
    * @return self reference
    */
-  public CommandParser password(final PasswordReader pr) {
+  public CommandParser pwReader(final PasswordReader pr) {
     parser.password(pr);
     return this;
   }

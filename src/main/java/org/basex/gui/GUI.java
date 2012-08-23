@@ -96,6 +96,15 @@ public final class GUI extends AGUI {
   /** Thread counter. */
   private int threadID;
 
+  /** Password reader. */
+  public static final PasswordReader READER = new PasswordReader() {
+    @Override
+    public String password() {
+      final DialogPass dp = new DialogPass();
+      return dp.ok() ? Token.md5(dp.pass()) : "";
+    }
+  };
+
   /**
    * Default constructor.
    * @param ctx database context
@@ -277,15 +286,8 @@ public final class GUI extends AGUI {
       if(i == in.length()) return;
 
       try {
-        final PasswordReader pr = new PasswordReader() {
-          @Override
-          public String password() {
-            final DialogPass dp = new DialogPass();
-            return dp.ok() ? Token.md5(dp.pass()) : "";
-          }
-        };
         final CommandParser cp = new CommandParser(in.substring(i), context);
-        cp.password(pr);
+        cp.pwReader(READER);
 
         // parse and execute all commands
         execute(false, cp.parse());

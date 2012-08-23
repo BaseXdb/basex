@@ -33,11 +33,14 @@ import org.basex.util.list.*;
  */
 public final class EditorView extends View {
   /** Error string. */
-  private static final String ERRSTRING = STOPPED_AT + ' ' + (LINE_X +
-      ", " + COLUMN_X).replaceAll("%", "([0-9]+)");
-  /** Error file pattern. */
-  private static final Pattern FILEPATTERN =
-    Pattern.compile(ERRSTRING + ' ' + IN_FILE_X.replaceAll("%", "(.*)") + COL);
+  private static final String ERRSTRING = STOPPED_AT + ' ' +
+      (LINE_X + ", " + COLUMN_X).replaceAll("%", "([0-9]+)");
+  /** XQuery error pattern. */
+  private static final Pattern XQERROR =
+    Pattern.compile(ERRSTRING + ' ' + IN_FILE_X.replaceAll("%", "(.*?)") + COL);
+  /** XML error pattern. */
+  private static final Pattern XMLERROR =
+    Pattern.compile(LINE_X.replaceAll("%", "(.*?)") + COL + ".*");
 
   /** Execute Button. */
   final BaseXButton stop;
@@ -201,7 +204,7 @@ public final class EditorView extends View {
     go.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        getEditor().query();
+        getEditor().release(true);
       }
     });
     tabs.addChangeListener(new ChangeListener() {
@@ -213,7 +216,7 @@ public final class EditorView extends View {
         gui.refreshControls();
         refreshMark();
         pos.setText(edit.pos());
-        if(gui.gprop.is(GUIProp.EXECRT)) edit.query();
+        edit.release(false);
       }
     });
 
@@ -233,7 +236,8 @@ public final class EditorView extends View {
 
   @Override
   public void refreshMark() {
-    go.setEnabled(getEditor().executable && !gui.gprop.is(GUIProp.EXECRT));
+    final EditorArea area = getEditor();
+    go.setEnabled(area.script || area.xquery && !gui.gprop.is(GUIProp.EXECRT));
     final Nodes marked = gui.context.marked;
     filter.setEnabled(!gui.gprop.is(GUIProp.FILTERRT) &&
         marked != null && marked.size() != 0);
@@ -273,8 +277,10 @@ public final class EditorView extends View {
   public void open() {
     // open file chooser for XML creation
     final BaseXFileChooser fc = new BaseXFileChooser(OPEN,
-        gui.gprop.get(GUIProp.XQPATH), gui);
+        gui.gprop.get(GUIProp.EDITORPATH), gui);
+    fc.addFilter(BXS_FILES, IO.BXSSUFFIX);
     fc.addFilter(XQUERY_FILES, IO.XQSUFFIXES);
+    fc.addFilter(XML_DOCUMENTS, IO.XMLSUFFIXES);
 
     final IOFile file = fc.select(Mode.FOPEN);
     if(file != null) open(file);
@@ -343,7 +349,7 @@ public final class EditorView extends View {
       edit.setText(file.read());
       gui.gprop.recent(file);
       refresh(false, true);
-      if(gui.gprop.is(GUIProp.EXECRT)) edit.query();
+      edit.release(false);
 
     } catch(final IOException ex) {
       BaseXDialog.error(gui, FILE_NOT_OPENED);
@@ -412,12 +418,13 @@ public final class EditorView extends View {
     errPos = -1;
     errFile = null;
     info.setCursor(!ok && error(msg) ?
-            GUIConstants.CURSORHAND : GUIConstants.CURSORARROW);
-    info.setText(msg.replaceAll(STOPPED_AT + ".*\\r?\\n\\[.*?\\] ", ""),
-        ok ? Msg.SUCCESS : Msg.ERROR);
+        GUIConstants.CURSORHAND : GUIConstants.CURSORARROW);
+    final String m = msg.replaceAll(STOPPED_AT + " .*?(\\r?\\n\\[.*?\\] )?", "").
+        replaceAll(LINE_X.replaceAll("%", ".*?") + COL, "");
+    info.setText(m, ok ? Msg.SUCCESS : Msg.ERROR);
     info.setToolTipText(ok ? null : msg);
     stop.setEnabled(false);
-    go.setEnabled(true);
+    refreshMark();
   }
 
   /**
@@ -426,15 +433,23 @@ public final class EditorView extends View {
    * @return true if error was found
    */
   private boolean error(final String msg) {
-    final Matcher m = FILEPATTERN.matcher(msg.replaceAll("[\\r\\n].*", ""));
-    if(!m.matches()) return true;
+    final String line = msg.replaceAll("[\\r\\n].*", "");
+    Matcher m = XQERROR.matcher(line);
+    int el = 0, ec = 2;
+    if(!m.matches()) {
+      m = XMLERROR.matcher(line);
+      if(!m.matches()) return true;
+      el = Integer.parseInt(m.group(1));
+      errFile = getEditor().file.path();
+    } else {
+      el = Integer.parseInt(m.group(1));
+      ec = Integer.parseInt(m.group(2));
+      errFile = m.group(3);
+    }
 
-    errFile = m.group(3);
     final EditorArea edit = find(IO.get(errFile), false);
     if(edit == null) return true;
 
-    final int el = Integer.parseInt(m.group(1));
-    final int ec = Integer.parseInt(m.group(2));
     // find approximate error position
     final int ll = edit.last.length;
     errPos = ll;
@@ -543,7 +558,7 @@ public final class EditorView extends View {
     int c = 0;
     while(++c < bl.size() && bl.get(c));
     // create io reference
-    final String dir = gui.gprop.get(GUIProp.XQPATH);
+    final String dir = gui.gprop.get(GUIProp.EDITORPATH);
     return new IOFile(dir, FILE + (c == 1 ? "" : c));
   }
 

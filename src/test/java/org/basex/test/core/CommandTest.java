@@ -488,20 +488,38 @@ public class CommandTest extends SandboxTest {
     no(new Store("../x", FILE));
   }
 
-  /** Command test. */
+  /**
+   * Command test.
+   * @throws IOException I/O exception
+   */
   @Test
-  public final void run() {
-    final IOFile io = new IOFile("test.xq");
+  public final void run() throws IOException {
+    // test xquery
+    IOFile io = new IOFile("test.xq");
     no(new Run(io.path()));
-    try {
-      io.write(token("// li"));
-    } catch(final Exception ex) {
-      fail(Util.message(ex));
-    }
+    io.write(token("// li"));
     no(new Run(io.path()));
     ok(new CreateDB(NAME, FILE));
     ok(new Run(io.path()));
+    // test command script (1)
+    io = new IOFile("test.bxs");
+    io.write(token("<info/>"));
+    ok(new Run(io.path()));
+    // test command script (2)
+    io = new IOFile("test.bxs");
+    io.write(token("</>"));
+    no(new Run(io.path()));
     io.delete();
+  }
+
+  /** Command test. */
+  @Test
+  public final void execute() {
+    ok(new Execute(new CreateDB(NAME, FILE).toString()));
+    ok(new XQuery("//li"));
+    ok(new Execute("<info/>"));
+    ok(new Execute("<commands><info/><drop-db name='" + NAME + "'/></commands>"));
+    no(new XQuery("//li"));
   }
 
   /** Command test. */

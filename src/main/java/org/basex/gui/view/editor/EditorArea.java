@@ -7,8 +7,10 @@ import static org.basex.util.Token.*;
 import java.awt.event.*;
 import java.io.*;
 
+import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.core.parse.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.io.*;
@@ -35,8 +37,10 @@ final class EditorArea extends BaseXEditor {
   int threadID;
   /** Last input. */
   byte[] last = EMPTY;
-  /** This flag indicates if the input is an executable XQuery main module. */
-  boolean executable = true;
+  /** This flag indicates if the input is an XQuery main module. */
+  boolean xquery = true;
+  /** This flag indicates if the input is a command script. */
+  boolean script = true;
 
   /** View reference. */
   private final EditorView view;
@@ -124,37 +128,39 @@ final class EditorArea extends BaseXEditor {
     view.pos.setText(pos());
     gui.context.prop.set(Prop.QUERYPATH, file.path());
 
-    if(opened() && !file.hasSuffix(IO.XQSUFFIXES)) {
-      // non-executable input
-      view.info(OK, true);
-      executable = false;
-    } else {
+    script = file.hasSuffix(IO.BXSSUFFIX);
+    xquery = !script && !opened() || file.hasSuffix(IO.XQSUFFIXES);
+    String input = string(in);
+    if(xquery) {
       // check if input is/might be an xquery main module
-      final String qu = in.length == 0 ? "()" : string(in);
-      executable = !module(in);
-      if(executable && (force || gui.gprop.is(GUIProp.EXECRT))) {
+      if(input.isEmpty()) input = "()";
+      xquery = !module(in);
+      if(xquery && (force || gui.gprop.is(GUIProp.EXECRT))) {
         // execute query if forced, or if realtime execution is activated
-        gui.execute(true, new XQuery(qu));
+        gui.execute(true, new XQuery(input));
       } else {
         // parse query
         final QueryContext ctx = new QueryContext(gui.context);
         try {
-          if(!executable) ctx.module(qu);
-          else ctx.parse(qu);
-          //ctx.analyze();
+          if(!xquery) ctx.module(input);
+          else ctx.parse(input);
           view.info(OK, true);
         } catch(final QueryException ex) {
           view.info(ex.getMessage(), false);
         }
       }
+    } else if(force && script) {
+      // execute query if forced, or if realtime execution is activated
+      gui.execute(true, new Execute(input));
+    } else if(script || file.hasSuffix(IO.XMLSUFFIXES)) {
+      try {
+        new EmptyBuilder(new IOContent(in), gui.context).build();
+        if(script) new CommandParser(input, gui.context).parse();
+        view.info(OK, true);
+      } catch(final Exception ex) {
+        view.info(ex.getMessage(), false);
+      }
     }
-  }
-
-  /**
-   * Performs the current query.
-   */
-  void query() {
-    release(true);
   }
 
   /**

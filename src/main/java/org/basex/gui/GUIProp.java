@@ -123,7 +123,7 @@ public final class GUIProp extends AProp {
   /** Path for creating new XML documents. */
   public static final Object[] SAVEPATH = { "SAVEPATH", Prop.HOME };
   /** Path for XQuery files. */
-  public static final Object[] XQPATH = { "XQPATH", Prop.HOME };
+  public static final Object[] EDITORPATH = { "EDITORPATH", Prop.HOME };
   /** Path for stopwords. */
   public static final Object[] STOPPATH = { "STOPPATH", Prop.HOME };
   /** Package path. */
@@ -173,7 +173,7 @@ public final class GUIProp extends AProp {
     String path = null;
     if(file != null) {
       path = file.path();
-      set(XQPATH, file.dir());
+      set(EDITORPATH, file.dir());
       sl.add(path);
     }
     final String[] qu = strings(QUERIES);

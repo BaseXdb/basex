@@ -14,14 +14,14 @@ public interface BuildText {
   /** Builder error. */
   String LIMITRANGE = "%: Input is too large for a single database.";
   /** Builder error. */
-  String LIMITTAGS = "%: Too many different tag names (limit: %).";
+  String LIMITELEMS = "%: Too many different element names (limit: %).";
   /** Builder error. */
   String LIMITATTS = "%: Too many different attribute names (limit: %).";
 
   /** Parser error. */
   String PARSEINV = "%: % expected, % found.";
   /** Parser error. */
-  String CLOSINGTAG = "%: </%> found, </%> expected.";
+  String CLOSINGELEM = "%: </%> found, </%> expected.";
   /** Parser error. */
   String DOCOPEN = "%: Closing element </%> expected.";
   /** Parser error. */
@@ -43,7 +43,7 @@ public interface BuildText {
   /** Scanner error. */
   String CHARACTER = "Invalid character found: '%'";
   /** Scanner error. */
-  String CLOSING = "Tag was not properly closed.";
+  String CLOSING = "Element was not properly closed.";
   /** Scanner error. */
   String COMMDASH = "Missing '-' in comment declaration.";
   /** Scanner error. */
@@ -176,7 +176,7 @@ public interface BuildText {
     /** Document type.          */ DTD("document type"),
     /** Processing instruction. */ PI("processing instruction"),
     /** Opening bracket.        */ L_BR("'<'"),
-    /** Tag name.               */ TAGNAME("tag name"),
+    /** Element name.           */ ELEMNAME("element name"),
     /** Attribute name.         */ ATTNAME("attribute name"),
     /** Closing bracket.        */ R_BR("'>'"),
     /** Whitespace.             */ WS("whitespace"),

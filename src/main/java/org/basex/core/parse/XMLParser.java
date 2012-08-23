@@ -51,7 +51,7 @@ final class XMLParser extends CmdParser {
       final QueryProcessor qa = new QueryProcessor(query, ctx).context(node);
       for(final Item ia : qa.value()) list.add(command(ia));
     } catch(final IOException ex) {
-      throw error(Text.PARSING_CC + "%", ex);
+      throw error(Text.STOPPED_AT + " %", ex);
     }
   }
 
@@ -68,7 +68,7 @@ final class XMLParser extends CmdParser {
     if(e.equals(ALTER_DB) && check(root, NAME, NEWNAME))
       return new AlterDB(value(root, NAME), value(root, NEWNAME));
     if(e.equals(ALTER_USER) && check(root, NAME, "#" + PASSWORD + "?"))
-      return new AlterUser(value(root, NAME), value(root));
+      return new AlterUser(value(root, NAME), password(root));
     if(e.equals(CHECK) && check(root, INPUT))
       return new Check(value(root, INPUT));
     if(e.equals(CLOSE) && check(root))
@@ -84,7 +84,7 @@ final class XMLParser extends CmdParser {
     if(e.equals(CREATE_INDEX) && check(root, TYPE))
       return new Export(value(root, TYPE));
     if(e.equals(CREATE_USER) && check(root, NAME, "#" + PASSWORD + "?"))
-      return new CreateUser(value(root, NAME), value(root));
+      return new CreateUser(value(root, NAME), password(root));
     if(e.equals(CS) && check(root, "#" + QUERY))
       return new Cs(value(root));
     if(e.equals(DELETE) && check(root, PATH))
@@ -132,7 +132,7 @@ final class XMLParser extends CmdParser {
     if(e.equals(OPTIMIZE_ALL) && check(root))
       return new OptimizeAll();
     if(e.equals(PASSWORD) && check(root, "#" + PASSWORD + "?"))
-      return new Password(value(root));
+      return new Password(password(root));
     if(e.equals(RENAME) && check(root, PATH, NEWPATH))
       return new Rename(value(root, PATH), value(root, NEWPATH));
     if(e.equals(REPLACE) && check(root, PATH, "<" + INPUT))
@@ -149,6 +149,8 @@ final class XMLParser extends CmdParser {
       return new Retrieve(value(root, PATH));
     if(e.equals(RUN) && check(root, FILE))
       return new Run(value(root, FILE));
+    if(e.equals(EXECUTE) && check(root, "<" + INPUT))
+      return new Execute(xml(root));
     if(e.equals(INSPECT) && check(root))
       return new Inspect();
     if(e.equals(SET) && check(root, OPTION, "#" + VALUE + "?"))
@@ -189,6 +191,17 @@ final class XMLParser extends CmdParser {
    */
   private String value(final Item root) throws QueryException {
     return execute("string(.)", root);
+  }
+
+  /**
+   * Returns a password (text node).
+   * @param root root node
+   * @return query exception
+   * @throws QueryException query exception
+   */
+  private String password(final Item root) throws QueryException {
+    final String pw = execute("string(.)", root);
+    return pw.isEmpty() && passwords != null ? passwords.password() : "";
   }
 
   /**

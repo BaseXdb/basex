@@ -117,7 +117,7 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Opens a query file. */
+  /** Creates a new file in the editor. */
   C_EDITNEW(NEW + DOTS, "% T", H_NEW_FILE, false, false) {
     @Override
     public void execute(final GUI gui) {
@@ -125,7 +125,7 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Opens a new editor file. */
+  /** Opens a new file in the editor. */
   C_EDITOPEN(OPEN + DOTS, "% R", H_OPEN_FILE, false, false) {
     @Override
     public void execute(final GUI gui) {
@@ -133,7 +133,7 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Saves the current editor file. */
+  /** Saves the current file in the editor. */
   C_EDITSAVE(SAVE, "% S", H_SAVE, false, false) {
     @Override
     public void execute(final GUI gui) {

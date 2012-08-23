@@ -352,7 +352,7 @@ public abstract class Command extends Progress {
    * @param os output stream
    * @return result of check
    */
-  private boolean run(final Context ctx, final OutputStream os) {
+  public boolean run(final Context ctx, final OutputStream os) {
     perf = new Performance();
     context = ctx;
     prop = ctx.prop;

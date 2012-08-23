@@ -340,6 +340,10 @@ public interface Text {
     '[' + C_PATH + ']', lang("c_run1"), lang("c_run2", C_PATH)
   };
   /** Command help. */
+  String[] HELPEXECUTE = {
+    '[' + C_INPUT + ']', lang("c_execute1"), lang("c_execute2", C_PATH)
+  };
+  /** Command help. */
   String[] HELPCS = {
     '[' + C_QUERY + ']', lang("c_cs1"), lang("c_cs2")
   };
@@ -1019,6 +1023,8 @@ public interface Text {
   String JAVA_ARCHIVES = "Java Archives";
   /** File description: XQuery files. */
   String XQUERY_FILES = "XQuery Files";
+  /** File description: Command scripts. */
+  String BXS_FILES = "Command Scripts";
 
   /** Dialog title for database options. */
   String CREATE_DATABASE = lang("create_database");

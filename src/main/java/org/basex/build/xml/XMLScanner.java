@@ -232,7 +232,7 @@ final class XMLScanner extends Progress {
       type = Type.WS;
     } else if(isStartChar(c)) {
       // scan tag name...
-      type = state == State.ATT ? Type.ATTNAME : Type.TAGNAME;
+      type = state == State.ATT ? Type.ATTNAME : Type.ELEMNAME;
       do token.add(c); while(isChar(c = nextChar()));
       prev(1);
       state = State.ATT;
