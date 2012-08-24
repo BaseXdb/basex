@@ -31,8 +31,7 @@ public final class BaseXGUI {
 
   /**
    * Main method.
-   * @param args command-line arguments
-   * An XML document or query file can be specified as argument
+   * @param args text files to open: XML documents, queries, etc.
    */
   public static void main(final String... args) {
     try {
