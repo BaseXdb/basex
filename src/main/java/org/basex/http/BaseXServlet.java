@@ -18,7 +18,7 @@ import org.basex.util.*;
  * <p>Base class for all servlets.</p>
  *
  * @author BaseX Team 2005-12, BSD License
- * @author Dimitar Popov
+ * @author Christian Gruen
  */
 public abstract class BaseXServlet extends HttpServlet {
   @Override
@@ -70,7 +70,7 @@ public abstract class BaseXServlet extends HttpServlet {
   /**
    * Runs the code.
    * @param http HTTP context
-   * @throws Exception exception
+   * @throws Exception any exception
    */
   protected abstract void run(final HTTPContext http) throws Exception;
 }

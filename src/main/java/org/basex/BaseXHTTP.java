@@ -167,7 +167,7 @@ public final class BaseXHTTP {
    * @throws Exception exception
    */
   public void stop() throws Exception {
-    // notify the jetty monitor, that it should stop
+    // notify the jetty monitor to stop
     stop(context.mprop.num(MainProp.STOPPORT));
     // server has been started as separate process and need to be stopped
     if(server) {

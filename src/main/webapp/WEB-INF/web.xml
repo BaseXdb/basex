@@ -33,28 +33,32 @@
   <!-- All database main options, which are usually stored in the .basex
        configuration file (DBPATH, DEBUG, etc.), can be specified as well by
        prefixing the key with "org.basex.". If an option references a relative
-       path, it will be prefixed with the servlet root path.
+       path, it will be prefixed with the servlet root path. -->
   <context-param>
     <param-name>org.basex.dbpath</param-name>
-    <param-value>data</param-value>
-  </context-param>
-  <context-param>
-    <param-name>org.basex.httppath</param-name>
-    <param-value>.</param-value>
+    <param-value>WEB-INF/data</param-value>
   </context-param>
   <context-param>
     <param-name>org.basex.repopath</param-name>
-    <param-value>http</param-value>
+    <param-value>WEB-INF/repo</param-value>
   </context-param>
+
+  <!--
   <context-param>
-    <param-name>org.basex.lang</param-name>
-    <param-value>English</param-value>
+    <param-name>org.basex.httppath</param-name>
+    <param-value>.</param-value>
   </context-param>
   <context-param>
     <param-name>org.basex.debug</param-name>
     <param-value>true</param-value>
   </context-param>
   -->
+
+  <!--  Mapping for static resources (may be restricted to a sub path) -->
+  <servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>/</url-pattern>
+  </servlet-mapping>
 
   <!--  WebDAV Service (can be deactivated by removing this entry) -->
   <servlet>
@@ -86,10 +90,28 @@
     <url-pattern>/restxq/*</url-pattern>
   </servlet-mapping>
 
-  <!--  Mapping for static resources (may be restricted to a sub path) -->
+  <!--  Direct association to XQuery files -->
+  <servlet>
+    <servlet-name>XQuery</servlet-name>
+    <servlet-class>org.basex.http.simple.XQueryServlet</servlet-class>
+  </servlet>
   <servlet-mapping>
-    <servlet-name>default</servlet-name>
-    <url-pattern>/*</url-pattern>
+    <servlet-name>XQuery</servlet-name>
+    <url-pattern>*.xq</url-pattern>
+    <url-pattern>*.xql</url-pattern>
+    <url-pattern>*.xqm</url-pattern>
+    <url-pattern>*.xqu</url-pattern>
+    <url-pattern>*.xquery</url-pattern>
+  </servlet-mapping>
+
+  <!--  Direct association to command scripts -->
+  <servlet>
+    <servlet-name>Script</servlet-name>
+    <servlet-class>org.basex.http.simple.ScriptServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Script</servlet-name>
+    <url-pattern>*.bxs</url-pattern>
   </servlet-mapping>
 
 </web-app>

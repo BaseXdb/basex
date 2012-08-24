@@ -49,7 +49,12 @@ public abstract class HTTPTest extends SandboxTest {
     if(local) sl.add("-l");
     sl.add(new String[] { "-p9996", "-e9997", "-h9998", "-s9999", "-z",
         "-U" + Text.ADMIN, "-P" + Text.ADMIN });
-    http = new BaseXHTTP(sl.toArray());
+    System.setOut(NULL);
+    try {
+      http = new BaseXHTTP(sl.toArray());
+    } finally {
+      System.setOut(OUT);
+    }
   }
 
   /**
@@ -58,7 +63,12 @@ public abstract class HTTPTest extends SandboxTest {
    */
   @AfterClass
   public static void stop() throws Exception {
-    http.stop();
+    System.setOut(NULL);
+    try {
+      http.stop();
+    } finally {
+      System.setOut(OUT);
+    }
   }
 
   // PROTECTED METHODS ==================================================================

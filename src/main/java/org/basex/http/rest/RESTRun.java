@@ -1,7 +1,6 @@
 package org.basex.http.rest;
 
 import static org.basex.core.Text.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
@@ -39,6 +38,6 @@ public class RESTRun extends RESTQuery {
       HTTPErr.NOT_FOUND_X.thrw(RES_NOT_FOUND_X, input);
 
     // perform query
-    query(string(io.read()), http, io.path());
+    query(io.string(), http, io.path());
   }
 }
