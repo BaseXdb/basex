@@ -67,13 +67,13 @@ public final class HTTPContext {
 
     req = rq;
     res = rs;
-    final String m = rq.getMethod();
-    method = HTTPMethod.get(m);
+    final String mth = rq.getMethod();
+    method = HTTPMethod.get(mth);
 
     final StringBuilder uri = new StringBuilder(req.getRequestURL());
     final String qs = req.getQueryString();
     if(qs != null) uri.append('?').append(qs);
-    log(false, m, uri);
+    log("[" + mth + "] " + uri, null);
 
     // set UTF8 as default encoding (can be overwritten)
     res.setCharacterEncoding(UTF8);
@@ -215,7 +215,7 @@ public final class HTTPContext {
    * @throws IOException I/O exception
    */
   public void status(final int code, final String message) throws IOException {
-    log(true, code, message);
+    log(message, code);
     if(session != null) session.close();
     res.resetBuffer();
     res.setStatus(code);
@@ -264,15 +264,14 @@ public final class HTTPContext {
 
   /**
    * Writes a log message.
-   * @param str strings to be written
-   * @param time add performance info
+   * @param info message info
+   * @param type message type (true/false/null: OK, ERROR, REQUEST)
    */
-  public void log(final boolean time, final Object... str) {
-    final Object[] obj = new Object[str.length + (time ? 2 : 1)];
-    obj[0] = remote();
-    System.arraycopy(str, 0, obj, 1, str.length);
-    if(time) obj[obj.length - 1] = perf.toString();
-    context.log.write(obj);
+  public void log(final String info, final Object type) {
+    // add evaluation time if any type is specified
+    context.log.write(type != null ?
+      new Object[] { address(), context.user.name, type, info, perf } :
+      new Object[] { address(), context.user.name, type, info });
   }
 
   // STATIC METHODS =====================================================================
@@ -326,11 +325,8 @@ public final class HTTPContext {
     }
     context = new Context(map);
 
-    if(SERVER.equals(System.getProperty(DBMODE))) {
-      new BaseXServer(context);
-    } else {
-      context.log = new Log(context);
-    }
+    // start server instance
+    if(SERVER.equals(System.getProperty(DBMODE))) new BaseXServer(context);
   }
 
   /**
@@ -377,8 +373,8 @@ public final class HTTPContext {
    * Returns a string with the remote user address.
    * @return user address
    */
-  private String remote() {
-    return new StringBuilder().append('[').append(req.getRemoteAddr()).append(':').
-        append(req.getRemotePort()).append(']').toString();
+  private String address() {
+    return new StringBuilder(req.getRemoteAddr()).append(':').
+        append(req.getRemotePort()).toString();
   }
 }

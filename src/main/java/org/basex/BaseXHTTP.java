@@ -110,15 +110,12 @@ public final class BaseXHTTP {
     }
 
     if(server) {
-      // default mode: start database server
       new BaseXServer(context);
       Util.outln(HTTP + ' ' + SRV_STARTED);
     } else {
-      // local or client mode
       Util.outln(CONSOLE + HTTP + ' ' + SRV_STARTED, SERVERMODE);
-      context.log = new Log(context);
     }
-    context.log.write(HTTP + ' ' + SRV_STARTED);
+    context.log.writeServer(OK, HTTP + ' ' + SRV_STARTED);
 
     jetty = new Server();
     final Connector conn = new SelectChannelConnector();
@@ -156,7 +153,7 @@ public final class BaseXHTTP {
       public void run() {
         Util.outln(HTTP + ' ' + SRV_STOPPED);
         final Log l = context.log;
-        if(l != null) l.write(HTTP + ' ' + SRV_STOPPED);
+        if(l != null) l.writeServer(OK, HTTP + ' ' + SRV_STOPPED);
         context.close();
       }
     });

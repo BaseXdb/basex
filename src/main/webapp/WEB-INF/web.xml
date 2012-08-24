@@ -42,6 +42,10 @@
     <param-name>org.basex.repopath</param-name>
     <param-value>WEB-INF/repo</param-value>
   </context-param>
+  <context-param>
+    <param-name>org.basex.restxqpath</param-name>
+    <param-value>WEB-INF/restxq</param-value>
+  </context-param>
 
   <!--
   <context-param>

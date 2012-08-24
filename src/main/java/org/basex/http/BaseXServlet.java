@@ -37,7 +37,7 @@ public abstract class BaseXServlet extends HttpServlet {
     final HTTPContext http = new HTTPContext(req, res);
     try {
       run(http);
-      http.log(true, SC_OK);
+      http.log("", SC_OK);
     } catch(final HTTPException ex) {
       Util.debug(ex);
       http.status(ex.getStatus(), ex.getMessage());
