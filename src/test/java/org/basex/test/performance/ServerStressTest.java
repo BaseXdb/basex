@@ -73,23 +73,20 @@ public final class ServerStressTest extends SandboxTest {
    * @throws Exception exception
    */
   private void run(final int clients, final int runs) throws Exception {
-    // Run server instance
+    // run server instance
     server = createServer();
-
-    // Create test database
+    // create test database
     final ClientSession cs = createClient();
     cs.execute("create db test " + INPUT);
-
-    // Run clients
+    // run clients
     final Client[] cl = new Client[clients];
     for(int i = 0; i < clients; ++i) cl[i] = new Client(runs);
     for(final Client c : cl) c.start();
     for(final Client c : cl) c.join();
-
-    // Drop database and stop server
+    // drop database and stop server
     cs.execute("drop db test");
     cs.close();
-    server.stop();
+    stopServer(server);
   }
 
   /** Single client. */

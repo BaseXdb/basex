@@ -57,15 +57,14 @@ public final class XQUFServerStressTest extends SandboxTest {
    * @throws Exception exception
    */
   private void run(final int clients, final int runs) throws Exception {
-    // Run server instance
-    /* Server. */
+    // run server instance
     final BaseXServer server = createServer();
     insert(clients, runs);
     delete(clients, runs);
     final ClientSession s = createClient();
     s.execute(new DropDB(NAME));
     s.close();
-    server.stop();
+    stopServer(server);
   }
 
   /**

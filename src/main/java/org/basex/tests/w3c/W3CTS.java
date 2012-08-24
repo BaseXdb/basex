@@ -12,7 +12,6 @@ import org.basex.core.Context;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.io.*;
-import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
@@ -706,12 +705,12 @@ public abstract class W3CTS {
 
   /**
    * Returns the contents of the specified file.
-   * @param f file to be read
+   * @param fl file to be read
    * @return content
    */
-  private static String read(final IO f) {
+  private static String read(final IO fl) {
     try {
-      return string(new NewlineInput(f).content());
+      return fl.string();
     } catch(final IOException ex) {
       Util.errln(ex);
       return "";

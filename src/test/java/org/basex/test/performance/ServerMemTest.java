@@ -63,17 +63,15 @@ public final class ServerMemTest extends SandboxTest {
    * @throws Exception exception
    */
   private void run(final int clients, final int parallel) throws Exception {
-    // Run server instance
+    //run server instance
     server = createServer("-c", "set parallel " + parallel);
-
-    // Run clients
+    // run clients
     final Client[] cl = new Client[clients];
     for(int i = 0; i < clients; ++i) cl[i] = new Client();
     for(final Client c : cl) c.start();
     for(final Client c : cl) c.join();
-
-    // Stop server
-    server.stop();
+    // stop server
+    stopServer(server);
   }
 
   /** Single client. */

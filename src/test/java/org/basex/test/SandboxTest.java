@@ -8,6 +8,7 @@ import java.io.*;
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.io.*;
+import org.basex.io.out.*;
 import org.basex.server.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -20,6 +21,12 @@ import org.junit.*;
  * @author Christian Gruen
  */
 public abstract class SandboxTest {
+  /** Default output stream. */
+  public static final PrintStream OUT = System.out;
+  /** Default error stream. */
+  public static final PrintStream ERR = System.err;
+  /** Null output stream. */
+  public static final PrintStream NULL = new PrintStream(new NullOutput());
   /** Test name. */
   public static final String NAME = Util.name(SandboxTest.class);
   /** Database context. */
@@ -69,11 +76,30 @@ public abstract class SandboxTest {
    * @throws IOException I/O exception
    */
   protected static BaseXServer createServer(final String... args) throws IOException {
-    final StringList sl = new StringList().add("-z").add("-p9999").add("-e9998");
-    for(final String a : args) sl.add(a);
-    final BaseXServer server = new BaseXServer(sl.toArray());
-    server.context.mprop.set(MainProp.DBPATH, sandbox().path());
-    return server;
+    System.setOut(NULL);
+    try {
+      final StringList sl = new StringList().add("-z").add("-p9999").add("-e9998");
+      for(final String a : args) sl.add(a);
+      final BaseXServer server = new BaseXServer(sl.toArray());
+      server.context.mprop.set(MainProp.DBPATH, sandbox().path());
+      return server;
+    } finally {
+      System.setOut(OUT);
+    }
+  }
+
+  /**
+   * Stops a server instance.
+   * @param server server
+   * @throws IOException I/O exception
+   */
+  protected static void stopServer(final BaseXServer server) throws IOException {
+    System.setOut(NULL);
+    try {
+      if(server != null) server.stop();
+    } finally {
+      System.setOut(OUT);
+    }
   }
 
   /**
