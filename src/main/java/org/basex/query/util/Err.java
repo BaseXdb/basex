@@ -56,10 +56,12 @@ public enum Err {
   /** BXCO0002. */
   BXCO_ENCODING(BXCO, 2, "Encoding '%' is not supported."),
 
-  /* Admin module
+  // Admin module
 
-  /** BXAD0001.
-  BXAD_USER(BXAD, 1, "%"), */
+  /** BXAD0001. */
+  BXAD_NOLOGS(BXAD, 1, "Log file not found: '%'."),
+  /* BXAD0002.
+  BXAD_USER(BXAD, 2, "%"), */
 
   // Database module
 
@@ -1026,7 +1028,7 @@ public enum Err {
 
     /** BASX Error type. */ BASX(QueryText.BXERR, QueryText.BXERRORS),
 
-    ///** BXAD Error type. */ BXAD(QueryText.BXERR, QueryText.BXERRORS),
+    /** BXAD Error type. */ BXAD(QueryText.BXERR, QueryText.BXERRORS),
     /** BXCL Error type. */ BXCL(QueryText.BXERR, QueryText.BXERRORS),
     /** BXCO Error type. */ BXCO(QueryText.BXERR, QueryText.BXERRORS),
     /** BXDB Error type. */ BXDB(QueryText.BXERR, QueryText.BXERRORS),

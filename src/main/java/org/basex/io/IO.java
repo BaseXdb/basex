@@ -38,6 +38,8 @@ public abstract class IO {
   public static final String GZSUFFIX = ".gz";
   /** XAR file suffix. */
   public static final String XARSUFFIX = ".xar";
+  /** XQuery log suffix. */
+  public static final String LOGSUFFIX = ".log";
   /** File prefix. */
   public static final String FILEPREF = "file:";
 

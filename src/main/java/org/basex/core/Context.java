@@ -42,7 +42,7 @@ public final class Context {
   /** User reference. */
   public User user;
   /** Log. */
-  public Log log;
+  public final Log log;
 
   // GUI references
   /** Marked nodes. */
@@ -93,6 +93,7 @@ public final class Context {
     users = ctx.users;
     repo = ctx.repo;
     databases = ctx.databases;
+    log = ctx.log;
     listener = cl;
   }
 
@@ -108,6 +109,7 @@ public final class Context {
     locks = mp.is(MainProp.DBLOCKING) ? new DBLocking(mp) : new ProcessLocking(this);
     users = new Users(true);
     repo = new Repo(this);
+    log = new Log(this);
     user = users.get(ADMIN);
     databases = databases();
     listener = null;
