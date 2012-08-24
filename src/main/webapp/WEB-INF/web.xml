@@ -45,10 +45,6 @@
 
   <!--
   <context-param>
-    <param-name>org.basex.httppath</param-name>
-    <param-value>.</param-value>
-  </context-param>
-  <context-param>
     <param-name>org.basex.debug</param-name>
     <param-value>true</param-value>
   </context-param>
@@ -90,27 +86,18 @@
     <url-pattern>/restxq/*</url-pattern>
   </servlet-mapping>
 
-  <!--  Direct association to XQuery files -->
+  <!--  Direct association to queries and scripts -->
   <servlet>
-    <servlet-name>XQuery</servlet-name>
-    <servlet-class>org.basex.http.simple.XQueryServlet</servlet-class>
+    <servlet-name>Direct</servlet-name>
+    <servlet-class>org.basex.http.direct.DirectServlet</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>XQuery</servlet-name>
+    <servlet-name>Direct</servlet-name>
     <url-pattern>*.xq</url-pattern>
     <url-pattern>*.xql</url-pattern>
     <url-pattern>*.xqm</url-pattern>
     <url-pattern>*.xqu</url-pattern>
     <url-pattern>*.xquery</url-pattern>
-  </servlet-mapping>
-
-  <!--  Direct association to command scripts -->
-  <servlet>
-    <servlet-name>Script</servlet-name>
-    <servlet-class>org.basex.http.simple.ScriptServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>Script</servlet-name>
     <url-pattern>*.bxs</url-pattern>
   </servlet-mapping>
 
