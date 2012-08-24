@@ -12,6 +12,7 @@ import org.basex.util.list.*;
 /**
  * This class provides a convenient access to text input.
  * The input encoding will be guessed by analyzing the first bytes.
+ * UTF-8 will be used as fallback.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -29,12 +30,7 @@ public class TextInput extends BufferInput {
    */
   public TextInput(final InputStream is) throws IOException {
     super(is);
-    try {
-      guess();
-    } catch(final IOException ex) {
-      close();
-      throw ex;
-    }
+    guess();
   }
 
   /**
@@ -44,12 +40,7 @@ public class TextInput extends BufferInput {
    */
   public TextInput(final IO io) throws IOException {
     super(io);
-    try {
-      guess();
-    } catch(final IOException ex) {
-      close();
-      throw ex;
-    }
+    guess();
   }
 
   /**
@@ -57,35 +48,40 @@ public class TextInput extends BufferInput {
    * @throws IOException I/O exception
    */
   private void guess() throws IOException {
-    final int a = next();
-    final int b = next();
-    final int c = next();
-    final int d = next();
-    String e = null;
-    int skip = 0;
-    if(a == 0xFF && b == 0xFE) { // BOM: FF FE
-      e = UTF16LE;
-      skip = 2;
-    } else if(a == 0xFE && b == 0xFF) { // BOM: FE FF
-      e = UTF16BE;
-      skip = 2;
-    } else if(a == 0xEF && b == 0xBB && c == 0xBF) { // BOM: EF BB BF
-      skip = 3;
-    } else if(a == '<' && b == 0 && c == '?' && d == 0) {
-      e = UTF16LE;
-    } else if(a == 0 && b == '<' && c == 0 && d == '?') {
-      e = UTF16BE;
+    try {
+      final int a = next();
+      final int b = next();
+      final int c = next();
+      final int d = next();
+      String e = null;
+      int skip = 0;
+      if(a == 0xFF && b == 0xFE) { // BOM: FF FE
+        e = UTF16LE;
+        skip = 2;
+      } else if(a == 0xFE && b == 0xFF) { // BOM: FE FF
+        e = UTF16BE;
+        skip = 2;
+      } else if(a == 0xEF && b == 0xBB && c == 0xBF) { // BOM: EF BB BF
+        skip = 3;
+      } else if(a == '<' && b == 0 && c == '?' && d == 0) {
+        e = UTF16LE;
+      } else if(a == 0 && b == '<' && c == 0 && d == '?') {
+        e = UTF16BE;
+      }
+      reset();
+      for(int s = 0; s < skip; s++) next();
+      decoder = TextDecoder.get(normEncoding(e));
+    } catch(final IOException ex) {
+      close();
+      throw ex;
     }
-    reset();
-    for(int s = 0; s < skip; s++) next();
-    decoder = TextDecoder.get(normEncoding(e));
   }
 
   /**
    * Returns the encoding.
    * @return encoding
    */
-  public String encoding() {
+  public final String encoding() {
     return decoder.encoding;
   }
 
@@ -94,7 +90,7 @@ public class TextInput extends BufferInput {
    * @param v flag to be set
    * @return self reference
    */
-  public TextInput valid(final boolean v) {
+  public final TextInput valid(final boolean v) {
     valid = v;
     decoder.valid = v;
     return this;
@@ -120,13 +116,22 @@ public class TextInput extends BufferInput {
   }
 
   @Override
-  public byte[] content() throws IOException {
+  public final byte[] content() throws IOException {
+    return cache().finish();
+  }
+
+  /**
+   * Retrieves the whole text and closes the stream.
+   * @return token builder instance
+   * @throws IOException I/O exception
+   */
+  public final TokenBuilder cache() throws IOException {
     final TokenBuilder tb = new TokenBuilder(Math.max(ElementList.CAP, (int) length));
     try {
       for(int ch; (ch = read()) != -1;) tb.add(ch);
     } finally {
       close();
     }
-    return tb.finish();
+    return tb;
   }
 }

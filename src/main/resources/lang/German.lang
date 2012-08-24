@@ -295,6 +295,7 @@ show_atts            = Zeige Attribute
 show_name_atts       = Ersetze Tags durch @name-Attribute
 similar_cmd_%        = Alternative: "%"
 simple_file_chooser  = Einfacher Datei-Dialog
+single_cmd           = Einzelnes Kommando erwartet.
 size                 = Größe
 skip_corrupt_files   = Ignoriere korrupte Dateien
 skipped              = Übersprungen

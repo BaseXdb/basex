@@ -43,7 +43,7 @@ public final class XdmInfoTest extends SandboxTest {
   @AfterClass
   public static void stop() throws Exception {
     session.close();
-    server.stop();
+    stopServer(server);
   }
 
   /**

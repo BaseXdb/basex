@@ -24,30 +24,38 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 final class StringParser extends CmdParser {
-  /** Context. */
-  private final InputParser parser;
+  /** Input lines. */
+  private final String[] lines;
   /** Context. */
   private final Context ctx;
+
+  /** Current parser. */
+  private InputParser parser;
 
   /**
    * Constructor.
    * @param in input
-   * @param c context
+   * @param context context
    */
-  StringParser(final String in, final Context c) {
-    parser = new InputParser(in);
-    ctx = c;
+  StringParser(final String in, final Context context) {
+    final String input = in.indexOf('\r') != -1 ? in.replaceAll("\r\n?", "\n") : in;
+    lines = input.indexOf('\n') == -1 ? new String[] { input } : input.split("\n");
+    for(int l = 0; l < lines.length; l++) lines[l] = lines[l].trim();
+    ctx = context;
   }
 
   @Override
   void parse(final ArrayList<Command> list) throws QueryException {
-    while(true) {
-      final Cmd cmd = consume(Cmd.class, null);
-      list.add(parse(cmd));
-      consumeWS();
-      if(!parser.more()) break;
-      if(single) throw help(null, cmd);
-      if(!parser.consume(';')) throw help(null, cmd);
+    for(final String line : lines) {
+      if(line.isEmpty() || line.startsWith("#")) continue;
+      parser = new InputParser(line);
+      while(true) {
+        final Cmd cmd = consume(Cmd.class, null);
+        list.add(parse(cmd));
+        if(!parser.more()) break;
+        if(!eoc()) throw help(null, cmd);
+        parser.consume();
+      }
     }
   }
 
@@ -220,7 +228,7 @@ final class StringParser extends CmdParser {
     boolean q = false;
     while(parser.more()) {
       final char c = parser.curr();
-      if(!q && (c <= ' ' || c == ';')) break;
+      if(!q && (c <= ' ' || eoc())) break;
       if(c == '"') q ^= true;
       else sb.append(c);
       parser.consume();
@@ -257,7 +265,7 @@ final class StringParser extends CmdParser {
   private String xquery(final Cmd cmd) throws QueryException {
     consumeWS();
     final StringBuilder sb = new StringBuilder();
-    if(parser.more() && !parser.curr(';')) {
+    if(!eoc()) {
       final QueryParser p = new QueryParser(parser.input, new QueryContext(ctx));
       p.ip = parser.ip;
       p.parse();
@@ -280,8 +288,7 @@ final class StringParser extends CmdParser {
     while(letterOrDigit(parser.curr()) || parser.curr('-')) {
       sb.append(parser.consume());
     }
-    return finish(cmd, !parser.more() || parser.curr(';') ||
-        ws(parser.curr()) ? sb : null);
+    return finish(cmd, eoc() || ws(parser.curr()) ? sb : null);
   }
 
   /**
@@ -308,8 +315,7 @@ final class StringParser extends CmdParser {
     while(true) {
       final char c = parser.curr();
       if(!letterOrDigit(c) && c != '-' && c != '*' && c != '?' && c != ',') {
-        return finish(cmd, !parser.more() || parser.curr(';') ||
-            ws(parser.curr()) ? sb : null);
+        return finish(cmd, eoc() || ws(parser.curr()) ? sb : null);
       }
       sb.append(parser.consume());
     }
@@ -358,8 +364,7 @@ final class StringParser extends CmdParser {
     final StringBuilder sb = new StringBuilder();
     if(parser.curr() == '-') sb.append(parser.consume());
     while(digit(parser.curr())) sb.append(parser.consume());
-    return finish(cmd, !parser.more() || parser.curr(';') ||
-        ws(parser.curr()) ? sb : null);
+    return finish(cmd, eoc() || ws(parser.curr()) ? sb : null);
   }
 
   /**
@@ -442,6 +447,14 @@ final class StringParser extends CmdParser {
       }
     }
     return list;
+  }
+
+  /**
+   * Consumes end-of-command.
+   * @return true if command has ended
+   */
+  private boolean eoc() {
+    return !parser.more() || lines.length == 1 && parser.curr() == ';';
   }
 
   /**

@@ -295,6 +295,7 @@ show_atts            = Toon attributen
 show_name_atts       = Vervang tags door @name attributen
 similar_cmd_%        = Bedoelde je '%'?
 simple_file_chooser  = Gebruik simpele bestandskiezer
+single_cmd           = Single command expected.
 size                 = Grootte
 skip_corrupt_files   = Sla non-well-formed bestanden over
 skipped              = Overgeslagen

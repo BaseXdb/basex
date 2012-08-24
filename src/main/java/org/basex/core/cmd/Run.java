@@ -6,7 +6,6 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.io.*;
-import org.basex.io.in.*;
 import org.basex.util.*;
 
 /**
@@ -42,7 +41,7 @@ public final class Run extends Execute {
       } else {
         try {
           // retrieve file contents
-          args[0] = Token.string(new TextInput(file).content());
+          args[0] = file.string();
           // interpret as commands if input ends with command script suffix
           if(file.hasSuffix(IO.BXSSUFFIX)) return super.init(ctx);
           // otherwise, interpret input as xquery

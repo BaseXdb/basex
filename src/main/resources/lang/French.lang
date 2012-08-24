@@ -295,6 +295,7 @@ show_atts            = Montrer les attributs
 show_name_atts       = Remplacer les balises par des attributs @name
 similar_cmd_%        = Voulez-vous dire '%' ?
 simple_file_chooser  = Utiliser sélecteur de fichiers simple
+single_cmd           = Single command expected.
 size                 = Taille
 skip_corrupt_files   = Ignorer les fichiers corrompus (mal formés)
 skipped              = Ignoré

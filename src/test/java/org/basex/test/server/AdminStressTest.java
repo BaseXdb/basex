@@ -36,7 +36,7 @@ public final class AdminStressTest extends SandboxTest {
    */
   @AfterClass
   public static void stop() throws IOException {
-    server.stop();
+    stopServer(server);
   }
 
   /**

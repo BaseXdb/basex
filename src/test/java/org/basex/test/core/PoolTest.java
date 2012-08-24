@@ -40,6 +40,17 @@ public final class PoolTest extends SandboxTest {
     session2 = createClient();
   }
 
+  /**
+   * Stops the server.
+   * @throws IOException I/O exception
+   */
+  @AfterClass
+  public static void stop() throws IOException {
+    session1.close();
+    session2.close();
+    stopServer(server);
+  }
+
   /** Create and Drop Tests. */
   @Test
   public void createAndDrop() {
@@ -75,17 +86,6 @@ public final class PoolTest extends SandboxTest {
     ok(new Close(), session2);
     pins(0, NAME);
     ok(new DropDB(NAME), session1);
-  }
-
-  /**
-   * Stops the server.
-   * @throws IOException I/O exception
-   */
-  @AfterClass
-  public static void stop() throws IOException {
-    session1.close();
-    session2.close();
-    server.stop();
   }
 
   /**

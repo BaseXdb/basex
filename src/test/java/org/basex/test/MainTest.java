@@ -6,7 +6,6 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.io.*;
-import org.basex.io.out.*;
 
 /**
  * Tests the command-line arguments of the starter classes.
@@ -15,8 +14,6 @@ import org.basex.io.out.*;
  * @author Christian Gruen
  */
 public abstract class MainTest extends SandboxTest {
-  /** Null output stream. */
-  static final PrintStream NULL = new PrintStream(new NullOutput());
   /** Input file. */
   static final IOFile INPUT = new IOFile(Prop.TMP + NAME + ".in");
 

@@ -296,6 +296,7 @@ show_atts            = Атрибутуудыг харах
 show_name_atts       = @name тагаар атрибутуудыг солих
 similar_cmd_%        = '%'? ийм байх боломжтой
 simple_file_chooser  = Энгийн файл сонголтыг ашиглах
+single_cmd           = Single command expected.
 size                 = Хэмжээ
 skip_corrupt_files   = Алдаатай (буруу бичигдсэн) файлуудыг алгасах
 skipped              = Алгассан

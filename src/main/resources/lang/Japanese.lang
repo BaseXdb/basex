@@ -295,6 +295,7 @@ show_atts            = 属性の表示
 show_name_atts       = タグを@name属性で置き換え
 similar_cmd_%        = '%' の間違いではないですか？
 simple_file_chooser  = 簡易版ファイル選択画面を使用
+single_cmd           = Single command expected.
 size                 = サイズ
 skip_corrupt_files   = 不正な（非整形式の）ファイルをスキップする
 skipped              = スキップしました。

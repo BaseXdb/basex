@@ -37,7 +37,7 @@ public final class FNClientTest extends AdvancedQueryTest {
    */
   @AfterClass
   public static void stop() throws IOException {
-    server.stop();
+    stopServer(server);
   }
 
   /** Test method. */

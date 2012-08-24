@@ -29,10 +29,15 @@ public final class BaseXStandaloneTest extends BaseXTest {
 
   @Override
   protected String run(final String... args) throws IOException {
-    System.setErr(NULL);
-    final ArrayOutput ao = new ArrayOutput();
-    System.setOut(new PrintStream(ao));
-    new BaseX(args);
-    return ao.toString();
+    try {
+      final ArrayOutput ao = new ArrayOutput();
+      System.setOut(new PrintStream(ao));
+      System.setErr(NULL);
+      new BaseX(args);
+      return ao.toString();
+    } finally {
+      System.setOut(OUT);
+      System.setErr(ERR);
+    }
   }
 }

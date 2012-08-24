@@ -295,6 +295,7 @@ show_atts            = Afişează atributele
 show_name_atts       = Înlocuiţi etichete cu atributele @nume
 similar_cmd_%        = Ai vrut sa spui '%'?
 simple_file_chooser  = Utilizaţi selectorul simplu de fisiere
+single_cmd           = Single command expected.
 size                 = Dimensiune
 skip_corrupt_files   = Treci peste fisierele corupte (nu foarte bine formatate)
 skipped              = Trecute peste

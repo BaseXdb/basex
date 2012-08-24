@@ -55,7 +55,7 @@ public final class SemaphoreTest extends SandboxTest {
     sess.execute(new DropDB(NAME));
     sess.close();
     // stop server instance
-    server.stop();
+    stopServer(server);
   }
 
   /**

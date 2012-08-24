@@ -450,6 +450,8 @@ public interface Text {
   String EXPECTING_CMD = lang("expecting_cmd");
   /** Unknown command error. */
   String UNKNOWN_CMD_X = lang("unknown_cmd_%");
+  /** Command syntax information. */
+  String SINGLE_CMD = lang("single_cmd");
   /** Unknown command error. */
   String UNKNOWN_TRY_X = UNKNOWN_CMD_X + ' ' + lang("try_%", "HELP");
   /** Try "help [...]" to get.. */

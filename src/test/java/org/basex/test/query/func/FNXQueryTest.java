@@ -2,9 +2,6 @@ package org.basex.test.query.func;
 
 import static org.basex.query.func.Function.*;
 
-import java.io.*;
-
-import org.basex.io.out.*;
 import org.basex.query.util.*;
 import org.basex.test.query.*;
 import org.junit.*;
@@ -16,9 +13,6 @@ import org.junit.*;
  * @author Christian Gruen
  */
 public final class FNXQueryTest extends AdvancedQueryTest {
-  /** Null output stream. */
-  static final PrintStream NULL = new PrintStream(new NullOutput());
-
   /** Test method. */
   @Test
   public void eval() {
@@ -44,7 +38,6 @@ public final class FNXQueryTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void type() {
-    final PrintStream err = System.err;
     try {
       System.setErr(NULL);
       query(_XQUERY_TYPE.args("()"), "");
@@ -52,7 +45,7 @@ public final class FNXQueryTest extends AdvancedQueryTest {
       query(_XQUERY_TYPE.args("(1, 2, 3)"), "1 2 3");
       query(_XQUERY_TYPE.args("<x a='1' b='2' c='3'/>/@*/data()"), "1 2 3");
     } finally {
-      System.setErr(err);
+      System.setErr(ERR);
     }
   }
 }

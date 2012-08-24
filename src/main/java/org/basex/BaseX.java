@@ -7,7 +7,6 @@ import java.io.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
-import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.server.*;
@@ -82,7 +81,7 @@ public class BaseX extends Main {
           // evaluate commands
           final IO io = IO.get(val);
           if(io.exists() && !io.isDir()) {
-            script(io);
+            execute(io.string());
           } else {
             execute(val);
           }
@@ -174,28 +173,8 @@ public class BaseX extends Main {
    * @throws IOException I/O exception
    */
   private void query(final IO io) throws IOException {
-    final String query = Token.string(new TextInput(io).content());
     execute(new Set(Prop.QUERYPATH, io.path()), false);
-    execute(new XQuery(query), verbose);
-  }
-
-  /**
-   * Runs a command script.
-   * @param io input file
-   * @throws IOException I/O exception
-   */
-  private void script(final IO io) throws IOException {
-    final byte[] cmd = new TextInput(io).content();
-    if(Token.startsWith(cmd, '<')) {
-      execute(Token.string(cmd));
-    } else {
-      final NewlineInput nli = new NewlineInput(new IOContent(cmd));
-      for(String line; (line = nli.readLine()) != null;) {
-        final String l = line.trim();
-        // ignore empty lines and comments
-        if(!l.isEmpty() && !l.startsWith("#")) execute(l);
-      }
-    }
+    execute(new XQuery(io.string()), verbose);
   }
 
   /**

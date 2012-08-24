@@ -295,6 +295,7 @@ show_atts            = Tampilkan Atribut
 show_name_atts       = Ganti tag dengan @name attributes
 similar_cmd_%        = Apakah yang anda maksud adalah '%'?
 simple_file_chooser  = Gunakan pemilih berkas sederhana
+single_cmd           = Single command expected.
 size                 = Ukuran
 skip_corrupt_files   = Lewatkan berkas yang rusak (tidak sesuai format)
 skipped              = Terlewat

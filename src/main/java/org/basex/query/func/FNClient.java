@@ -114,7 +114,7 @@ public class FNClient extends StandardFunc {
    * @throws QueryException query exception
    */
   private Str info(final QueryContext ctx) throws QueryException {
-    return Str.get(session(ctx, false).info().replaceAll("\\r\\n?", "\n").trim());
+    return Str.get(session(ctx, false).info().replaceAll("\r\n?", "\n").trim());
   }
 
   /**

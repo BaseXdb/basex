@@ -295,6 +295,7 @@ show_atts            = Mostra Attributi
 show_name_atts       = Sostituisci i tag con gli attributi @name
 similar_cmd_%        = Intendevi '%'?
 simple_file_chooser  = Usa un selezionatore di documenti semplificato
+single_cmd           = Single command expected.
 size                 = Dimensione
 skip_corrupt_files   = Salta i documenti corrotti (non ben formati)
 skipped              = Saltato

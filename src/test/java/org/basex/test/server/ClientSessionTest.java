@@ -33,7 +33,7 @@ public class ClientSessionTest extends SessionTest {
    */
   @AfterClass
   public static void stop() throws IOException {
-    server.stop();
+    stopServer(server);
   }
 
   /** Starts a session. */

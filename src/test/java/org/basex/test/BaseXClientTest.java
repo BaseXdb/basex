@@ -84,11 +84,10 @@ public final class BaseXClientTest extends BaseXTest {
   private static String run(final String[] args, final String[] sargs)
       throws IOException {
 
-    System.setOut(NULL);
-    System.setErr(NULL);
-    final BaseXServer bxs = createServer(sargs);
+    final BaseXServer server = createServer(sargs);
     final ArrayOutput ao = new ArrayOutput();
     System.setOut(new PrintStream(ao));
+    System.setErr(NULL);
 
     final StringList sl = new StringList();
     sl.add("-p9999").add("-U" + Text.ADMIN).add("-P" + Text.ADMIN).add(args);
@@ -96,7 +95,8 @@ public final class BaseXClientTest extends BaseXTest {
       new BaseXClient(sl.toArray());
       return ao.toString();
     } finally {
-      bxs.stop();
+      System.setErr(ERR);
+      stopServer(server);
     }
   }
 }

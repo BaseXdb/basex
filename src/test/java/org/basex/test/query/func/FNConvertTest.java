@@ -2,9 +2,6 @@ package org.basex.test.query.func;
 
 import static org.basex.query.func.Function.*;
 
-import java.io.*;
-
-import org.basex.io.out.*;
 import org.basex.query.util.*;
 import org.basex.test.query.*;
 import org.junit.*;
@@ -16,9 +13,6 @@ import org.junit.*;
  * @author Christian Gruen
  */
 public final class FNConvertTest extends AdvancedQueryTest {
-  /** Null output stream. */
-  static final PrintStream NULL = new PrintStream(new NullOutput());
-
   /** Test method. */
   @Test
   public void binaryToString() {

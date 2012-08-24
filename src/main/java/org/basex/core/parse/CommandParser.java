@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.basex.core.*;
 import org.basex.query.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
@@ -66,15 +67,17 @@ public final class CommandParser extends InputParser {
 
   /**
    * Parses the input and returns a command list.
-   * @param sngl single command flag
-   * @param sggst suggest flag
+   * @param single input must only contain a single command
+   * @param suggest suggest flag
    * @return commands
    * @throws QueryException query exception
    */
-  private Command[] parse(final boolean sngl, final boolean sggst) throws QueryException {
+  private Command[] parse(final boolean single, final boolean suggest)
+      throws QueryException {
+
     final ArrayList<Command> cmds = new ArrayList<Command>();
-    parser.parse(cmds, sngl, sggst);
-    if(sngl && cmds.size() != 1) throw new QueryException("Single command expected.");
-    return cmds.toArray(new Command[cmds.size()]);
+    parser.parse(cmds, single, suggest);
+    if(!single || cmds.size() == 1) return cmds.toArray(new Command[cmds.size()]);
+    throw new QueryException(null, new QNm(), Text.SINGLE_CMD);
   }
 }

@@ -48,7 +48,7 @@ public final class PermissionTest extends SandboxTest {
    */
   @AfterClass
   public static void stop() throws IOException {
-    server.stop();
+    stopServer(server);
   }
 
   /** Set up method. */

@@ -38,7 +38,7 @@ public class Execute extends Command {
       sb.append(c.info());
       if(!ok) return error(sb.toString());
     }
-    return info(sb.toString().replaceAll("\\r?\\n?$", ""));
+    return info(sb.toString().replaceAll("\r?\n?$", ""));
   }
 
   @Override

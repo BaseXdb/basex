@@ -4,12 +4,13 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.data.*;
+import org.basex.io.in.*;
 import org.xml.sax.*;
 
 /**
  * Generic representation for inputs and outputs. The underlying source can
- * be a local file ({@link IOFile}), a URL ({@link IOUrl}) or a byte array
- * ({@link IOContent}).
+ * be a local file ({@link IOFile}), a URL ({@link IOUrl}), a byte array
+ * ({@link IOContent}), or a stream ({@link IOStream}).
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -126,14 +127,24 @@ public abstract class IO {
   }
 
   /**
-   * Returns the contents.
-   * @return contents
+   * Returns the binary contents.
+   * @return binary contents
    * @throws IOException I/O exception
    */
   public abstract byte[] read() throws IOException;
 
   /**
-   * Tests if the file exists.
+   * Returns the contents as string. The input encoding will be guessed by analyzing the
+   * first bytes. UTF-8 will be used as fallback.
+   * @return string contents
+   * @throws IOException I/O exception
+   */
+  public final String string() throws IOException {
+    return new TextInput(this).cache().toString();
+  }
+
+  /**
+   * Tests if the reference exists.
    * Returns {@code true} for IO instances other than {@link IOFile}.
    * @return result of check
    */
