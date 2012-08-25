@@ -3,6 +3,8 @@ package org.basex.query.func;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -33,6 +35,8 @@ public class UserFunc extends Single {
   /** Updating flag. */
   public final boolean updating;
 
+  /** Map with requested function properties. */
+  protected final EnumMap<Use, Boolean> map = new EnumMap<Expr.Use, Boolean>(Use.class);
   /** Static context. */
   protected final StaticContext sc;
   /** Cast flag. */
@@ -181,6 +185,18 @@ public class UserFunc extends Single {
   @Override
   public ValueIter iter(final QueryContext ctx) throws QueryException {
     return value(ctx).iter();
+  }
+
+  @Override
+  public boolean uses(final Use u) {
+    // handle recursive calls: set dummy value, eventually replace it with final value
+    Boolean b = map.get(u);
+    if(b == null) {
+      map.put(u, false);
+      b = super.uses(u);
+      map.put(u, b);
+    }
+    return b;
   }
 
   @Override

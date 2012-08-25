@@ -55,6 +55,18 @@ public final class MixedTest extends AdvancedQueryTest {
   }
 
   /**
+   * Parse recursive queries.
+   */
+  @Test
+  public void parseRec() {
+    // simple call
+    query("declare function local:x() { if(<a/>) then 1 else local:x() }; local:x()");
+    // call from FLWOR expression
+    query("declare function local:x() { if(<a/>) then 1 else local:x() }; " +
+        "let $x := local:x() return $x", "1");
+  }
+
+  /**
    * Performs count() on parts of a collection.
    * @throws BaseXException database exception
    */
