@@ -96,7 +96,8 @@ public abstract class UserFuncCall extends Arr {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.UPD ? func.updating : func.uses(u) || super.uses(u);
+    // function has not parsed yet: return true if state is still unknown
+    return func == null || (u == Use.UPD ? func.updating : func.uses(u) || super.uses(u));
   }
 
   @Override

@@ -22,7 +22,7 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public abstract class Expr extends ExprInfo {
-  /** Flags that influence query compilation. */
+  /** Flags that influence query compilation. True is returned if property is unknown. */
   public enum Use {
     /** Creates new fragments. Example: node constructor. */ CNS,
     /** Depends on context. Example: context node. */        CTX,
