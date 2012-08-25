@@ -8,6 +8,7 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.io.*;
+import org.basex.util.*;
 
 /**
  * REST-based evaluation of XQuery files.
@@ -29,13 +30,12 @@ public class RESTRun extends RESTQuery {
   @Override
   void run(final HTTPContext http) throws HTTPException, IOException {
     // get root directory for files
-    final String path = http.context().mprop.get(MainProp.HTTPPATH);
+    final IOFile root = new IOFile(http.context().mprop.get(MainProp.HTTPPATH));
 
     // check if file is not found, is a folder or points to parent folder
-    final IOFile root = new IOFile(path);
-    final IOFile io = new IOFile(path, input);
+    final IOFile io = new IOFile(root, input);
     if(!io.exists() || io.isDir() || !io.path().startsWith(root.path()))
-      HTTPErr.NOT_FOUND_X.thrw(RES_NOT_FOUND_X, input);
+      HTTPErr.NOT_FOUND_X.thrw(Util.info(RES_NOT_FOUND_X, input));
 
     // perform query
     query(io.string(), http, io.path());

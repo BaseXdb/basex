@@ -7,12 +7,12 @@ import java.util.Map.Entry;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.core.cmd.Set;
 import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.serial.*;
 import org.basex.server.*;
+import org.basex.util.*;
 
 /**
  * This servlet directly evaluates the specified files.
@@ -23,23 +23,36 @@ import org.basex.server.*;
 public final class DirectServlet extends BaseXServlet {
   @Override
   protected void run(final HTTPContext http) throws Exception {
-    // get root directory for files
-    final String path = http.context().mprop.get(MainProp.HTTPPATH);
-    final String input = http.req.getRequestURI();
+    // get HTTP root directory
+    final IOFile root = new IOFile(http.context().mprop.get(MainProp.HTTPPATH));
 
     // check if file is not found, is a folder or points to parent folder
-    final IOFile root = new IOFile(path);
-    final IOFile io = new IOFile(path, input);
+    final String input = http.req.getRequestURI();
+    final IOFile io = new IOFile(root, input);
     if(!io.exists() || io.isDir() || !io.path().startsWith(root.path()))
-      HTTPErr.NOT_FOUND_X.thrw(RES_NOT_FOUND_X, input);
+      HTTPErr.NOT_FOUND_X.thrw(Util.info(RES_NOT_FOUND_X, input));
 
     final LocalSession session = http.session();
     final OutputStream os = http.res.getOutputStream();
     session.setOutputStream(os);
 
+    // - RESTXQ: concurrency ?
+    // - REST: align parameter syntax and query functionality with Direct/RESTXQ?
+    // - bind query parameters ?
+    // - adopt output parameters ?
+    // - trigger other services from servlet (avoiding additional client communication)?
+
     if(io.hasSuffix(IO.BXSSUFFIX)) {
       // run script
       session.execute(new Run(io.path()));
+
+      /* redirect parameter: redirect to another page
+      final String redirect = http.req.getParameter("redirect");
+      if(redirect != null) {
+        http.res.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
+        http.res.setHeader("location", redirect);
+      }
+      */
     } else if(io.hasSuffix(IO.XQSUFFIXES)) {
       // evaluate query: set local query path
       session.execute(new Set(Prop.QUERYPATH, io.path()));

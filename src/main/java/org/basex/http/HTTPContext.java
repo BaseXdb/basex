@@ -265,7 +265,7 @@ public final class HTTPContext {
   /**
    * Writes a log message.
    * @param info message info
-   * @param type message type (true/false/null: OK, ERROR, REQUEST)
+   * @param type message type (true/false/null: OK, ERROR, REQUEST, Error Code)
    */
   public void log(final String info, final Object type) {
     // add evaluation time if any type is specified
