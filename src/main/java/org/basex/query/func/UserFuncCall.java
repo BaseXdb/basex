@@ -96,7 +96,7 @@ public abstract class UserFuncCall extends Arr {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.UPD ? func.updating : super.uses(u);
+    return u == Use.UPD ? func.updating : func.uses(u) || super.uses(u);
   }
 
   @Override
