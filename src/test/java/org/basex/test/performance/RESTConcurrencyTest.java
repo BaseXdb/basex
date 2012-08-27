@@ -26,10 +26,8 @@ public class RESTConcurrencyTest {
   private static final String DBNAME = Util.name(RESTConcurrencyTest.class);
   /** Context to create and drop the test database. */
   private static final Context CTX = new Context();
-  /** BaseX HTTP port. */
-  private static final int HTTPPORT = CTX.mprop.num(MainProp.HTTPPORT);
   /** BaseX HTTP base URL. */
-  static final String BASE_URL = "http://localhost:" + HTTPPORT + "/rest/" + DBNAME;
+  static final String BASE_URL = "http://localhost:8984/rest/" + DBNAME;
 
   /** BaseX HTTP server instance under test. */
   private Process basexHTTPServer;

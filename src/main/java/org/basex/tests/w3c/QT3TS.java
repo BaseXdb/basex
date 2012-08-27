@@ -153,7 +153,7 @@ public final class QT3TS {
     final XdmValue doc = qdoc.value();
     final XQuery qset = new XQuery("*:test-set", ctx).context(doc);
     final XdmValue set = qset.value();
-    base = IO.get(doc.getBaseURI()).dir();
+    base = IO.get(doc.getBaseURI()).dirPath();
     qdoc.close();
 
     if(supported(set)) {
