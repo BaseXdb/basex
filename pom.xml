@@ -62,7 +62,7 @@
         <version>2.9</version>
         <configuration>
           <!-- <skipTests>true</skipTests> -->
-          <forkMode>always</forkMode> 
+          <forkMode>always</forkMode>
         </configuration>
       </plugin>
       <plugin>
