@@ -11,7 +11,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.lib.directory>lib</project.lib.directory>
-    <jettyVersion>8.1.4.v20120524</jettyVersion>
+    <jettyVersion>8.1.5.v20120716</jettyVersion>
   </properties>
   <licenses>
     <license>
@@ -45,18 +45,6 @@
     <name>BaseX Team</name>
     <url>http://basex.org</url>
   </organization>
-  <developers>
-    <developer>
-      <id>cg</id>
-      <name>Christian Gr&#xFC;n</name>
-      <email>christian.gruen@uni-konstanz.de</email>
-      <roles>
-        <role>architect</role>
-        <role>developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
-  </developers>
   <mailingLists>
     <mailingList>
       <name>BaseX Talk</name>
@@ -90,15 +78,23 @@
       <version>1.0</version>
     </dependency>
     <dependency>
-	  <groupId>org.eclipse.jetty</groupId>
-	  <artifactId>jetty-server</artifactId>
-	  <version>${jettyVersion}</version>
-	</dependency>
-	<dependency>
-	  <groupId>org.eclipse.jetty</groupId>
-	  <artifactId>jetty-servlet</artifactId>
-	  <version>${jettyVersion}</version>
-	</dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-server</artifactId>
+      <version>${jettyVersion}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-servlet</artifactId>
+      <version>${jettyVersion}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-webapp</artifactId>
+      <version>${jettyVersion}</version>
+      <scope>provided</scope>
+    </dependency>
     <dependency>
       <groupId>com.ettrema</groupId>
       <artifactId>milton-api</artifactId>
@@ -117,6 +113,10 @@
           <groupId>org.slf4j</groupId>
         </exclusion>
         <exclusion>
+          <artifactId>slf4j-api</artifactId>      
+          <groupId>org.slf4j</groupId>  	
+        </exclusion>
+        <exclusion>
           <artifactId>log4j</artifactId>
           <groupId>log4j</groupId>
         </exclusion>
@@ -127,17 +127,17 @@
       <artifactId>commons-fileupload</artifactId>
       <version>1.2.2</version>
     </dependency>
-    <dependency>
+    <!--<dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-nop</artifactId>
       <version>1.5.8</version>
+    </dependency>-->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.8.2</version>
+      <scope>test</scope>
     </dependency>
-      <dependency>
-          <groupId>junit</groupId>
-          <artifactId>junit</artifactId>
-          <version>4.8.2</version>
-          <scope>test</scope>
-      </dependency>
   </dependencies>
   <build>
     <finalName>${project.artifactId}-${project.version}</finalName>
@@ -187,23 +187,12 @@
         <artifactId>jetty-maven-plugin</artifactId>
         <version>${jettyVersion}</version>
         <configuration>
-          <connectors>
-            <connector implementation="org.eclipse.jetty.server.nio.SelectChannelConnector">
-              <!-- Choose HTTP port -->
-              <port>8984</port>
-              <!-- Optionally limit HTTP host
-              <host>127.0.0.1</host> -->
-              <maxIdleTime>60000</maxIdleTime>
-            </connector>
-          </connectors>
-          <webAppConfig>
-            <contextPath>/</contextPath>
-          </webAppConfig>
+          <jettyXml>${basedir}/src/main/webapp/WEB-INF/jetty.xml</jettyXml>
           <!-- Key and port for stopping Jetty
           <stopKey>keyToStopJetty</stopKey> 
           <stopPort>8985</stopPort> -->
         </configuration>
-      </plugin> 
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-deploy-plugin</artifactId>
@@ -240,6 +229,7 @@
           </execution>
         </executions>
       </plugin>
+      <!-- Temporarily removed (takes some time)
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
@@ -259,58 +249,45 @@
           <consoleOutput>true</consoleOutput>
           <violationSeverity>warning</violationSeverity>
         </configuration>
-      </plugin>
+      </plugin>-->
     </plugins>
-    <!-- Eclipse Maven plugin does not "support copy-dependencies" -->
-    <!-- we need to tell it to ignore the goal -->
+    <!-- Eclipse Maven plugin does not "support copy-dependencies";
+         we need to tell it to ignore the goal -->
     <pluginManagement>
-     <plugins>
-       <plugin>
-         <groupId>org.eclipse.m2e</groupId>
-         <artifactId>lifecycle-mapping</artifactId>
-         <version>1.0.0</version>
-         <configuration>
-           <lifecycleMappingMetadata>
-             <pluginExecutions>
-               <pluginExecution>
-                 <pluginExecutionFilter>
-                   <groupId>org.apache.maven.plugins</groupId>
-                   <artifactId>maven-dependency-plugin</artifactId>
-                   <versionRange>[2.0,)</versionRange>
-                   <goals>
-                     <goal>copy-dependencies</goal>
-                   </goals>
-                 </pluginExecutionFilter>
-                 <action>
-                   <ignore />
-                 </action>
-               </pluginExecution>
-             </pluginExecutions>
-           </lifecycleMappingMetadata>
-         </configuration>
-       </plugin>
-     </plugins>
-   </pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <versionRange>[1.0,)</versionRange>
+                    <goals>
+                      <goal>copy-dependencies</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore />
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <extensions>
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
-         <artifactId>wagon-ftp</artifactId>
-         <version>2.0</version>
+        <artifactId>wagon-ftp</artifactId>
+        <version>2.0</version>
       </extension>
     </extensions>
-    <resources>
-      <resource>
-        <filtering>false</filtering>
-        <directory>${basedir}/src/main/resources</directory>
-      </resource>
-      <resource>
-        <filtering>false</filtering>
-        <directory>${basedir}/src/test/java</directory>
-        <includes>
-          <include>**/xqj.sig</include>
-        </includes>
-      </resource>
-    </resources>
   </build>
   <distributionManagement>
     <repository>

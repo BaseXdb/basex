@@ -8,41 +8,35 @@ import java.net.*;
 
 import org.basex.core.*;
 import org.basex.http.*;
-import org.basex.http.rest.*;
-import org.basex.http.restxq.*;
-import org.basex.http.webdav.*;
+import org.basex.io.*;
 import org.basex.server.*;
 import org.basex.util.*;
 import org.eclipse.jetty.server.*;
-import org.eclipse.jetty.server.handler.*;
 import org.eclipse.jetty.server.nio.*;
-import org.eclipse.jetty.servlet.*;
+import org.eclipse.jetty.webapp.*;
+import org.eclipse.jetty.xml.*;
 
 /**
  * This is the main class for the starting the database HTTP services.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
+ * @author Dirk Kirsten
  */
 public final class BaseXHTTP {
   /** Database context. */
   final Context context = HTTPContext.init();
+  /** HTTP server. */
+  private final Server jetty;
 
-  /** Activate WebDAV. */
-  private boolean webdav = true;
-  /** Activate REST. */
-  private boolean rest = true;
-  /** Activate RESTXQ. */
-  private boolean restxq = true;
-
-  /** Server/local mode. */
-  private boolean server;
+  /** Stop port. */
+  private int stopPort;
+  /** HTTP port. */
+  private int httpPort;
   /** Start as daemon. */
   private boolean service;
   /** Stopped flag. */
   private boolean stopped;
-  /** HTTP server. */
-  private Server jetty;
 
   /**
    * Main method, launching the HTTP services.
@@ -53,6 +47,7 @@ public final class BaseXHTTP {
     try {
       new BaseXHTTP(args);
     } catch(final Exception ex) {
+      Util.debug(ex);
       Util.errln(ex);
       System.exit(1);
     }
@@ -66,28 +61,37 @@ public final class BaseXHTTP {
   public BaseXHTTP(final String... args) throws Exception {
     parseArguments(args);
 
-    // flag for starting a database server
-    server = !LOCAL.equals(System.getProperty(DBMODE));
+    // create jetty instance and set default context to HTTP path
+    final String webapp = context.mprop.get(MainProp.WEBPATH);
+    jetty = (Server) new XmlConfiguration(initJetty(webapp).inputStream()).configure();
+    jetty.setHandler(new WebAppContext(webapp, "/"));
 
+    // retrieve jetty port
+    for(final Connector c : jetty.getConnectors()) {
+      if(c instanceof SelectChannelConnector) {
+        if(httpPort == 0) httpPort = c.getPort();
+        else c.setPort(httpPort);
+      }
+    }
+    // stop port: one below jetty port
+    if(stopPort == 0) stopPort = httpPort - 1;
+
+    // check if ports are distinct
     final MainProp mprop = context.mprop;
     final int port = mprop.num(MainProp.SERVERPORT);
     final int eport = mprop.num(MainProp.EVENTPORT);
-    final int hport = mprop.num(MainProp.HTTPPORT);
-    final int sport = mprop.num(MainProp.STOPPORT);
-    // check if ports are distinct
     int same = -1;
-    if(port == eport || port == hport || port == sport) same = port;
-    else if(eport == hport || eport == sport) same = eport;
-    else if(hport == sport) same = hport;
+    if(port == eport || port == httpPort || port == stopPort) same = port;
+    else if(eport == httpPort || eport == stopPort) same = eport;
     if(same != -1) throw new BaseXException(PORT_TWICE_X, same);
 
-    final String shost = mprop.get(MainProp.SERVERHOST);
-
+    final HTTPProp hprop = HTTPContext.hprop(context);
+    final boolean server = hprop.is(HTTPProp.SERVER);
     if(service) {
-      start(hport, args);
+      start(httpPort, args);
       Util.outln(HTTP + ' ' + SRV_STARTED);
       if(server) Util.outln(SRV_STARTED);
-      // keep the console window open for a while, so the user can read the message
+      // temporary console windows: keep the message visible for a while
       Performance.sleep(1000);
       return;
     }
@@ -96,16 +100,16 @@ public final class BaseXHTTP {
       stop();
       Util.outln(HTTP + ' ' + SRV_STOPPED);
       if(server) Util.outln(SRV_STOPPED);
-      // keep the console window open for a while, so the user can read the message
+      // temporary console windows: keep the message visible for a while
       Performance.sleep(1000);
       return;
     }
 
     // request password on command line if only the user was specified
-    if(System.getProperty(DBUSER) != null) {
-      while(System.getProperty(DBPASS) == null) {
+    if(!hprop.get(HTTPProp.USER).isEmpty()) {
+      while(hprop.get(HTTPProp.PASSWORD).isEmpty()) {
         Util.out(PASSWORD + COLS);
-        System.setProperty(DBPASS, Util.password());
+        hprop.set(HTTPProp.PASSWORD, Util.password());
       }
     }
 
@@ -117,35 +121,8 @@ public final class BaseXHTTP {
     }
     context.log.writeServer(OK, HTTP + ' ' + SRV_STARTED);
 
-    jetty = new Server();
-    final Connector conn = new SelectChannelConnector();
-    if(!shost.isEmpty()) conn.setHost(shost);
-    conn.setPort(hport);
-    jetty.addConnector(conn);
-
-    final ServletContextHandler jctx = new ServletContextHandler(jetty, "/",
-        ServletContextHandler.SESSIONS);
-
-    if(rest) {
-      jctx.addServlet(RESTServlet.class, "/rest/*");
-    }
-    if(restxq) {
-      jctx.addServlet(RestXqServlet.class, "/restxq/*");
-    }
-    if(webdav) {
-      jctx.addServlet(WebDAVServlet.class, "/webdav/*");
-    }
-
-    final ResourceHandler rh = new ResourceHandler();
-    rh.setWelcomeFiles(new String[] { "index.xml", "index.xhtml", "index.html" });
-    rh.setResourceBase(context.mprop.get(MainProp.HTTPPATH));
-
-    final HandlerList hl = new HandlerList();
-    hl.addHandler(rh);
-    hl.addHandler(jctx);
-    jetty.setHandler(hl);
     jetty.start();
-    new StopServer(sport, shost).start();
+    new StopServer(mprop.get(MainProp.SERVERHOST)).start();
 
     // show info when HTTP server is aborted
     Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -165,13 +142,38 @@ public final class BaseXHTTP {
    */
   public void stop() throws Exception {
     // notify the jetty monitor to stop
-    stop(context.mprop.num(MainProp.STOPPORT));
+    stop(stopPort);
     // server has been started as separate process and need to be stopped
-    if(server) {
+    if(HTTPContext.hprop(context).is(HTTPProp.SERVER)) {
       final int port = context.mprop.num(MainProp.SERVERPORT);
       final int eport = context.mprop.num(MainProp.EVENTPORT);
       BaseXServer.stop(port, eport);
     }
+  }
+
+  /**
+   * Returns an input stream to the Jetty configuration file.
+   * @param root web root path
+   * @return input stream
+   * @throws IOException I/O exception
+   */
+  private static IOFile initJetty(final String root) throws IOException {
+    // try to locate file in HTTP path and development branch
+    final IOFile trg = new IOFile(root + '/' + JETTYCONF);
+    if(!trg.exists()) {
+      // try to copy WEB-INF files from development branch
+      final IOFile src = new IOFile("src/main/webapp/" + JETTYCONF);
+      if(!src.exists()) throw new BaseXException(trg + " not found.");
+      final IOFile trgDir = trg.dir();
+      for(final IOFile s : src.dir().children()) {
+        final IOFile t = new IOFile(trgDir, s.name());
+        if(!s.isDir() && !t.exists()) {
+          Util.errln("Copy " + s + " to " + trgDir);
+          s.copyTo(t);
+        }
+      }
+    }
+    return trg;
   }
 
   /**
@@ -180,6 +182,7 @@ public final class BaseXHTTP {
    * @throws IOException I/O exception
    */
   private void parseArguments(final String[] args) throws IOException {
+    final HTTPProp hprop = HTTPContext.hprop(context);
     final Args arg = new Args(args, this, HTTPINFO, Util.info(CONSOLE, HTTP));
     boolean daemon = false;
     while(arg.more()) {
@@ -195,41 +198,33 @@ public final class BaseXHTTP {
             context.mprop.set(MainProp.EVENTPORT, arg.number());
             break;
           case 'h': // parse HTTP port
-            context.mprop.set(MainProp.HTTPPORT, arg.number());
+            httpPort = arg.number();
             break;
           case 'l': // use local mode
-            System.setProperty(DBMODE, LOCAL);
+            hprop.set(HTTPProp.SERVER, false);
             break;
           case 'n': // parse host name
             context.mprop.set(MainProp.HOST, arg.string());
             break;
           case 'p': // parse server port
-            context.mprop.set(MainProp.PORT, arg.number());
-            context.mprop.set(MainProp.SERVERPORT, context.mprop.num(MainProp.PORT));
-            break;
-          case 'R': // deactivate REST service
-            rest = false;
+            final int p = arg.number();
+            context.mprop.set(MainProp.PORT, p);
+            context.mprop.set(MainProp.SERVERPORT, p);
             break;
           case 'P': // specify password
-            System.setProperty(DBPASS, arg.string());
+            hprop.set(HTTPProp.PASSWORD, arg.string());
             break;
           case 's': // parse stop port
-            context.mprop.set(MainProp.STOPPORT, arg.number());
+            stopPort = arg.number();
             break;
           case 'S': // set service flag
             service = !daemon;
             break;
           case 'U': // specify user name
-            System.setProperty(DBUSER, arg.string());
+            hprop.set(HTTPProp.USER, arg.string());
             break;
-          case 'v': // specify user name
-            System.setProperty(DBVERBOSE, Boolean.TRUE.toString());
-            break;
-          case 'W': // deactivate WebDAV service
-            webdav = false;
-            break;
-          case 'X': // deactivate RESTXQ service
-            restxq = false;
+          case 'v': // verbose output
+            System.setProperty(HTTPINFO, Boolean.TRUE.toString());
             break;
           case 'z': // suppress logging
             context.mprop.set(MainProp.LOG, false);
@@ -253,7 +248,7 @@ public final class BaseXHTTP {
    * @throws BaseXException database exception
    */
   private static void start(final int port, final String... args) throws BaseXException {
-    // check if server is already running (needs some time)
+    // check if server is already running (takes some time)
     if(ping(LOCALHOST, port)) throw new BaseXException(SRV_RUNNING);
 
     Util.start(BaseXHTTP.class, args);
@@ -321,15 +316,14 @@ public final class BaseXHTTP {
 
     /**
      * Constructor.
-     * @param hport HTTP port
      * @param host host address
      * @throws IOException I/O exception
      */
-    StopServer(final int hport, final String host) throws IOException {
+    StopServer(final String host) throws IOException {
       final InetAddress addr = host.isEmpty() ? null : InetAddress.getByName(host);
       ss = new ServerSocket();
-      ss.bind(new InetSocketAddress(addr, hport));
-      stop = stopFile(hport);
+      ss.bind(new InetSocketAddress(addr, stopPort));
+      stop = stopFile(stopPort);
       setDaemon(true);
     }
 
