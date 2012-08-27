@@ -49,7 +49,7 @@ interface RestXqText {
   /** Error message. */
   String ANN_PARAMS = "Annotation %% requires at least % parameter(s).";
   /** Error message. */
-  String ANN_STRING = "Value of annotation %% is no string: %.";
+  String ANN_STRING = "Single string expected for %%, found: %.";
   /** Error message. */
   String INV_TEMPLATE = "Invalid path template: \"%\".";
   /** Error message. */

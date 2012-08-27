@@ -235,7 +235,6 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
    * @throws IOException I/O exception
    */
   private void add(final String tdb, final String tpath) throws IOException {
-    System.out.println("ADD FOLDER");
     final LocalQuery q = http.session().query(
         "declare option db:chop 'false'; " +
         "for $d in " + _DB_LIST.args("$db", "$path") +

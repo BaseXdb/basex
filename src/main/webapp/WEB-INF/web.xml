@@ -5,8 +5,8 @@
   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
   version="2.5">
 
-  <display-name>BaseX HTTP Services</display-name>
-  <description>BaseX HTTP Services</description>
+  <display-name>BaseX: The XML Database and XQuery Processor</display-name>
+  <description>HTTP Services</description>
 
   <!-- The following parameters may also be passed on as system properties: -->
 
@@ -18,9 +18,9 @@
     <param-value>local</param-value>
   </context-param>
 
-  <!-- Login data: by default, no user and password is specified, and the
-       credentials must be passed on by the client. Please check by yourself
-       if it is safe to store your credentials in this file. -->
+  <!-- Default login data: by default, no user and password is specified, and
+       the credentials must be passed on by the client. Please check by yourself
+       if it is safe to store credentials in this file. -->
   <context-param>
     <param-name>org.basex.user</param-name>
     <param-value></param-value>
@@ -30,10 +30,11 @@
     <param-value></param-value>
   </context-param>
 
-  <!-- All database main options, which are usually stored in the .basex
-       configuration file (DBPATH, DEBUG, etc.), can be specified as well by
-       prefixing the key with "org.basex.". If an option references a relative
-       path, it will be prefixed with the servlet root path. -->
+  <!-- All relative paths will be resolved against the webapp path. -->
+  <context-param>
+    <param-name>org.basex.restxqpath</param-name>
+    <param-value>.</param-value>
+  </context-param>
   <context-param>
     <param-name>org.basex.dbpath</param-name>
     <param-value>WEB-INF/data</param-value>
@@ -42,15 +43,13 @@
     <param-name>org.basex.repopath</param-name>
     <param-value>WEB-INF/repo</param-value>
   </context-param>
-  <context-param>
-    <param-name>org.basex.restxqpath</param-name>
-    <param-value>WEB-INF/restxq</param-value>
-  </context-param>
 
-  <!--
+  <!-- All database main options, which are usually stored in the .basex
+       configuration file (HOST, PORT, TIMEOUT, etc.), can be specified by
+       prefixing the key with "org.basex.".
   <context-param>
-    <param-name>org.basex.debug</param-name>
-    <param-value>true</param-value>
+    <param-name>org.basex.timeout</param-name>
+    <param-value>5</param-value>
   </context-param>
   -->
 

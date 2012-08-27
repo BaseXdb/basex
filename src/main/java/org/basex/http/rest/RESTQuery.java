@@ -11,7 +11,6 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.cmd.Set;
 import org.basex.http.*;
-import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.serial.*;
 import org.basex.server.*;
@@ -45,8 +44,7 @@ class RESTQuery extends RESTCode {
 
   @Override
   void run(final HTTPContext http) throws HTTPException, IOException {
-    final String path = new IOFile(http.context().mprop.get(MainProp.HTTPPATH)).path();
-    query(input, http, path);
+    query(input, http, http.context().mprop.get(MainProp.WEBPATH));
   }
 
   /**

@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
+
+<Configure id="Server" class="org.eclipse.jetty.server.Server">
+  <!-- Default connector. -->
+  <Call name="addConnector">
+    <Arg>
+      <New class="org.eclipse.jetty.server.nio.SelectChannelConnector">
+        <Set name="port">8984</Set>
+        <Set name="confidentialPort">8985</Set>
+        <Set name="maxIdleTime">60000</Set>
+        <Set name="reuseAddress">false</Set>
+        <Set name="Acceptors">2</Set>
+      </New>
+    </Arg>
+  </Call>
+
+  <!-- Debugging
+  <Get class="org.eclipse.jetty.util.log.Log" name="log">
+    <Set name="debugEnabled">true</Set>
+  </Get> -->
+
+  <!-- Support for SSL connections.
+  <Call name="addConnector">
+    <Arg>
+      <New class="org.eclipse.jetty.server.ssl.SslSelectChannelConnector">
+        <Set name="Port">8985</Set>
+        <Set name="maxIdleTime">60000</Set>
+        <Set name="keystore"><SystemProperty name="jetty.home" default="."/>/etc/keystore</Set>
+        <Set name="password">jetty</Set>
+        <Set name="keyPassword">jetty</Set>
+        <Set name="truststore"><SystemProperty name="jetty.home" default="."/>/etc/keystore</Set>
+        <Set name="trustPassword">jetty</Set>
+      </New>
+    </Arg>
+  </Call>-->
+</Configure>

@@ -1,7 +1,5 @@
 package org.basex.http;
 
-import org.basex.core.*;
-
 /**
  * This class assembles texts which are used in the HTTP classes.
  *
@@ -18,20 +16,10 @@ public interface HTTPText {
 
   /** HTTP String. */
   String HTTP = "HTTP";
-
-  /** Configuration: database user. */
-  String DBUSER = Prop.DBPREFIX + "user";
-  /** Configuration: database user password. */
-  String DBPASS = Prop.DBPREFIX + "password";
-  /** Configuration: operation mode: "local", "client" or default ({@code null}). */
-  String DBMODE = Prop.DBPREFIX + "mode";
-  /** Configuration: verbose mode. */
-  String DBVERBOSE = Prop.DBPREFIX + "verbose";
-
-  /** Mode: local. */
-  String LOCAL = "local";
-  /** Mode: server. */
-  String SERVER = "server";
+  /** WEB-INF directory. */
+  String WEB_INF = "WEB-INF/";
+  /** Path to jetty configuration file. */
+  String JETTYCONF = WEB_INF + "jetty.xml";
 
   /** Error: no password. */
   String NOPASSWD = "No username/password specified.";

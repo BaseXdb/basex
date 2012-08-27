@@ -385,7 +385,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @throws QueryException HTTP exception
    */
   private String toString(final Value value, final QNm name) throws QueryException {
-    if(!(value instanceof Str)) error(ANN_STRING, "%", name.string());
+    if(!(value instanceof Str)) error(ANN_STRING, "%", name.string(), value);
     return ((Str) value).toJava();
   }
 
@@ -400,9 +400,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       throws QueryException {
 
     final long vs = value.size();
-    for(int v = 0; v < vs; v++) {
-      list.add(toString(value.itemAt(v), name));
-    }
+    for(int v = 0; v < vs; v++) list.add(toString(value.itemAt(v), name));
   }
 
   /**

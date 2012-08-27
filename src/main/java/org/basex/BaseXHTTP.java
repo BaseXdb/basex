@@ -224,7 +224,7 @@ public final class BaseXHTTP {
             hprop.set(HTTPProp.USER, arg.string());
             break;
           case 'v': // verbose output
-            System.setProperty(HTTPINFO, Boolean.TRUE.toString());
+            hprop.set(HTTPProp.VERBOSE, true);
             break;
           case 'z': // suppress logging
             context.mprop.set(MainProp.LOG, false);

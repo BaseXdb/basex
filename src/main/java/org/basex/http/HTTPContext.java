@@ -30,6 +30,8 @@ import org.basex.util.list.*;
 public final class HTTPContext {
   /** Singleton database context. */
   private static Context context;
+  /** Singleton HTTP properties. */
+  private static HTTPProp hprop;
 
   /** Servlet request. */
   public final HttpServletRequest req;
@@ -81,8 +83,9 @@ public final class HTTPContext {
     segments = toSegments(req.getPathInfo());
     path = join(0);
 
-    user = System.getProperty(DBUSER);
-    pass = System.getProperty(DBPASS);
+    final HTTPProp hp = hprop(context);
+    user = hp.get(HTTPProp.USER);
+    pass = hp.get(HTTPProp.PASSWORD);
 
     // set session-specific credentials
     final String auth = req.getHeader(AUTHORIZATION);
@@ -263,6 +266,14 @@ public final class HTTPContext {
   }
 
   /**
+   * Returns the database context.
+   * @return context;
+   */
+  public HTTPProp hprop() {
+    return hprop;
+  }
+
+  /**
    * Writes a log message.
    * @param info message info
    * @param type message type (true/false/null: OK, ERROR, REQUEST, Error Code)
@@ -277,6 +288,21 @@ public final class HTTPContext {
   // STATIC METHODS =====================================================================
 
   /**
+   * Returns the HTTP properties.
+   * @param ctx database context
+   * @return context;
+   */
+  public static HTTPProp hprop(final Context ctx) {
+    if(hprop == null) {
+      hprop = new HTTPProp();
+      // if not modified yet, set restxq to webapp path
+      if(hprop.get(HTTPProp.RESTXQPATH).isEmpty())
+         hprop.set(HTTPProp.RESTXQPATH, ctx.mprop.get(MainProp.WEBPATH));
+    }
+    return hprop;
+  }
+
+  /**
    * Initializes the HTTP context.
    * @return context;
    */
@@ -286,7 +312,7 @@ public final class HTTPContext {
   }
 
   /**
-   * Initializes the servlet context, based on the servlet context.
+   * Initializes the database context, based on the initial servlet context.
    * Parses all context parameters and passes them on to the database context.
    * @param sc servlet context
    * @throws IOException I/O exception
@@ -295,38 +321,52 @@ public final class HTTPContext {
     // skip process if context has already been initialized
     if(context != null) return;
 
-    // set servlet path as home directory
-    final String path = sc.getRealPath("/");
-    System.setProperty(Prop.PATH, path);
+    // set web application path as home directory and HTTPPATH
+    final String webapp = sc.getRealPath("/");
+    set(Prop.PATH, webapp);
+    set(MainProp.WEBPATH[0].toString(), webapp);
 
-    // parse all context parameters
-    final HashMap<String, String> map = new HashMap<String, String>();
-    // store default web root
-    map.put(MainProp.HTTPPATH[0].toString(), path);
-
-    final Enumeration<?> en = sc.getInitParameterNames();
+    // bind all parameters that start with "org.basex." to system properties
+    final Enumeration<String> en = sc.getInitParameterNames();
     while(en.hasMoreElements()) {
-      final String key = en.nextElement().toString();
+      String key = en.nextElement();
       if(!key.startsWith(Prop.DBPREFIX)) continue;
 
-      // only consider parameters that start with "org.basex."
+      // legacy: rewrite obsolete properties
       String val = sc.getInitParameter(key);
-      if(eq(key, DBUSER, DBPASS, DBMODE, DBVERBOSE)) {
-        // store servlet-specific parameters as system properties
-        System.setProperty(key, val);
-      } else {
-        // prefix relative paths with absolute servlet path
-        if(key.endsWith("path") && !new File(val).isAbsolute()) {
-          val = path + File.separator + val;
-        }
-        // store remaining parameters (without project prefix) in map
-        map.put(key.substring(Prop.DBPREFIX.length()).toUpperCase(Locale.ENGLISH), val);
+      String k = key;
+      String v = val;
+      if(key.equals(Prop.DBPREFIX + "httppath")) {
+        k = Prop.DBPREFIX + HTTPProp.RESTXQPATH[0];
+      } else if(key.equals(Prop.DBPREFIX + "mode")) {
+        k = Prop.DBPREFIX + HTTPProp.SERVER[0];
+        v = Boolean.toString(!v.equals("local"));
       }
+      k = k.toLowerCase(Locale.ENGLISH);
+      if(!k.equals(key) || !v.equals(val)) {
+        Util.errln("Warning! Outdated property: " +
+          key + "=" + val + " => " + k + "=" + v);
+      }
+      // prefix relative paths with absolute servlet path
+      if(k.endsWith("path") && !new File(v).isAbsolute()) {
+        Util.debug(k.toUpperCase(Locale.ENGLISH) + ": " + v);
+        v = new IOFile(Prop.HOME, v).path();
+      }
+      set(k, v);
     }
-    context = new Context(map);
+    context = new Context(false);
 
     // start server instance
-    if(SERVER.equals(System.getProperty(DBMODE))) new BaseXServer(context);
+    if(hprop(context).is(HTTPProp.SERVER)) new BaseXServer(context);
+  }
+
+  /**
+   * Sets a system property if it has not already been set before.
+   * @param key key
+   * @param val value
+   */
+  private static synchronized void set(final String key, final Object val) {
+    if(System.getProperty(key) == null) System.setProperty(key, val.toString());
   }
 
   /**

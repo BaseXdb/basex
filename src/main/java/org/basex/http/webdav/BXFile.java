@@ -112,7 +112,6 @@ public final class BXFile extends BXAbstractResource implements FileResource {
    * @throws IOException I/O exception
    */
   protected void add(final String tdb, final String tpath) throws IOException {
-    System.out.println("ADD FILE");
     final LocalSession session = http.session();
     final LocalQuery q = session.query(
         "declare option db:chop 'false'; " +

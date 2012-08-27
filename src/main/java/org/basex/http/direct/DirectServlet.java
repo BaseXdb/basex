@@ -24,7 +24,7 @@ public final class DirectServlet extends BaseXServlet {
   @Override
   protected void run(final HTTPContext http) throws Exception {
     // get HTTP root directory
-    final IOFile root = new IOFile(http.context().mprop.get(MainProp.HTTPPATH));
+    final IOFile root = new IOFile(http.context().mprop.get(MainProp.WEBPATH));
 
     // check if file is not found, is a folder or points to parent folder
     final String input = http.req.getRequestURI();
@@ -35,12 +35,6 @@ public final class DirectServlet extends BaseXServlet {
     final LocalSession session = http.session();
     final OutputStream os = http.res.getOutputStream();
     session.setOutputStream(os);
-
-    // - RESTXQ: concurrency ?
-    // - REST: align parameter syntax and query functionality with Direct/RESTXQ?
-    // - bind query parameters ?
-    // - adopt output parameters ?
-    // - trigger other services from servlet (avoiding additional client communication)?
 
     if(io.hasSuffix(IO.BXSSUFFIX)) {
       // run script
