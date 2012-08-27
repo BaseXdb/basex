@@ -18,12 +18,12 @@ public final class MainProp extends AProp {
   /** Database path. */
   public static final Object[] DBPATH = { "DBPATH",
     Prop.HOME + (USERHOME ? Prop.NAME + "Data" : "data") };
-  /** HTTP path. */
-  public static final Object[] HTTPPATH = { "HTTPPATH",
-    Prop.HOME + (USERHOME ? Prop.NAME + "HTTP" : "http") };
   /** Package repository path. */
   public static final Object[] REPOPATH = { "REPOPATH",
     Prop.HOME + (USERHOME ? Prop.NAME + "Repo" : "repo") };
+  /** Web path. */
+  public static final Object[] WEBPATH = { "WEBPATH",
+    Prop.HOME + (USERHOME ? Prop.NAME + "Web" : "webapp") };
 
   /** Language name. */
   public static final Object[] LANG = { "LANG", Prop.language };
@@ -41,10 +41,6 @@ public final class MainProp extends AProp {
   public static final Object[] SERVERPORT = { "SERVERPORT", 1984 };
   /** Server: port, used for sending events. */
   public static final Object[] EVENTPORT = { "EVENTPORT", 1985 };
-  /** Server: port, used for starting the HTTP server. */
-  public static final Object[] HTTPPORT = { "HTTPPORT", 8984 };
-  /** Server: port, used for stopping the HTTP server. */
-  public static final Object[] STOPPORT = { "STOPPORT", 8985 };
 
   /** Server: proxy host. */
   public static final Object[] PROXYHOST = { "PROXYHOST", "" };
@@ -71,21 +67,11 @@ public final class MainProp extends AProp {
   public static final Object[] DBLOCKING = { "DBLOCKING", false };
 
   /**
-   * Constructor, reading properties from disk.
+   * Constructor, adopting system properties starting with "org.basex.".
+   * @param file if {@code true}, properties will also be read from disk
    */
-  MainProp() {
-    read("");
-    finish();
-  }
-
-  /**
-   * Constructor, assigning the specified properties.
-   * @param map initial properties
-   */
-  MainProp(final HashMap<String, String> map) {
-    for(final Map.Entry<String, String> entry : map.entrySet()) {
-      set(entry.getKey(), entry.getValue());
-    }
+  MainProp(final boolean file) {
+    if(file) read("");
     finish();
   }
 

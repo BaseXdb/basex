@@ -52,7 +52,7 @@ public final class IOUrl extends IO {
   }
 
   @Override
-  public String dir() {
+  public String dirPath() {
     return path.endsWith("/") ? path : path.substring(0, path.lastIndexOf('/') + 1);
   }
 

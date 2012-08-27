@@ -84,7 +84,7 @@ public interface Text {
     "  -L          Append newlines to query results" + NL +
     "  -n<name>    Set server (host) name" + NL +
     "  -o<output>  Write output to file" + NL +
-    "  -p<num>     Set server port" + NL +
+    "  -p<port>    Set server port" + NL +
     "  -P<pass>    Specify user password" + NL +
     "  -s<pars>    Set serialization parameter(s)" + NL +
     "  -U<name>    Specify user name" + NL +
@@ -101,9 +101,9 @@ public interface Text {
     "  stop      Stop running server" + NL +
     "  -c<cmds>  Execute initial database commands" + NL +
     "  -d        Activate debugging mode" + NL +
-    "  -e<num>   Set event port" + NL +
+    "  -e<port>  Set event port" + NL +
     "  -i        Enter interactive mode" + NL +
-    "  -p<num>   Set server port" + NL +
+    "  -p<port>  Set server port" + NL +
     "  -S        Start as service" + NL +
     "  -z        Suppress logging";
 
@@ -116,21 +116,18 @@ public interface Text {
 
   /** HTTP information. */
   String HTTPINFO =
-    " [-dehlnpPRUWz] [stop]" + NL +
+    " [-dehlnpPsSUz] [stop]" + NL +
     "  stop      Stop running server" + NL +
     "  -d        Activate debugging mode" + NL +
-    "  -e<num>   Set event port" + NL +
-    "  -h<num>   Set port of HTTP server" + NL +
+    "  -e<port>  Set event port" + NL +
+    "  -h<port>  Set port of HTTP server" + NL +
     "  -l        Start in local mode" + NL +
     "  -n<name>  Set host name of database server" + NL +
-    "  -p<num>   Set port of database server" + NL +
+    "  -p<port>  Set port of database server" + NL +
     "  -P<pass>  Specify user password" + NL +
-    "  -R        Deactivate REST service" + NL +
-    "  -s        Specify port to stop HTTP server" + NL +
+    "  -s<port>  Specify port to stop HTTP server" + NL +
     "  -S        Start as service" + NL +
     "  -U<name>  Specify user name" + NL +
-    "  -W        Deactivate WebDAV service" + NL +
-    "  -X        Deactivate RESTXQ service" + NL +
     "  -z        Suppress logging";
 
   /** Bug info. */

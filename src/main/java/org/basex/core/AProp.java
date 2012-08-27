@@ -39,95 +39,7 @@ public abstract class AProp implements Iterable<String> {
     } catch(final Exception ex) {
       Util.notexpected(ex);
     }
-  }
-
-  /**
-   * Reads the configuration file and initializes the project properties.
-   * The file is located in the project home directory.
-   * @param prop property file extension
-   */
-  protected synchronized void read(final String prop) {
-    file = new IOFile(HOME + IO.BASEXSUFFIX + prop);
-
-    final StringList read = new StringList();
-    final TokenBuilder err = new TokenBuilder();
-    if(!file.exists()) {
-      err.addExt("Saving properties in \"%\"..." + NL, file);
-    } else {
-      BufferedReader br = null;
-      try {
-        br = new BufferedReader(new FileReader(file.file()));
-        for(String line; (line = br.readLine()) != null;) {
-          line = line.trim();
-          if(line.isEmpty() || line.charAt(0) == '#') continue;
-          final int d = line.indexOf('=');
-          if(d < 0) {
-            err.addExt("%: \"%\" ignored. " + NL, file, line);
-            continue;
-          }
-
-          final String val = line.substring(d + 1).trim();
-          String key = line.substring(0, d).trim();
-
-          // extract numeric value in key
-          int num = 0;
-          final int ss = key.length();
-          for(int s = 0; s < ss; ++s) {
-            if(Character.isDigit(key.charAt(s))) {
-              num = Integer.parseInt(key.substring(s));
-              key = key.substring(0, s);
-              break;
-            }
-          }
-          read.add(key);
-
-          final Object entry = props.get(key);
-          if(entry == null) {
-            err.addExt("%: \"%\" not found. " + NL, file, key);
-          } else if(entry instanceof String) {
-            props.put(key, val);
-          } else if(entry instanceof Integer) {
-            props.put(key, Integer.parseInt(val));
-          } else if(entry instanceof Boolean) {
-            props.put(key, Boolean.parseBoolean(val));
-          } else if(entry instanceof String[]) {
-            if(num == 0) {
-              props.put(key, new String[Integer.parseInt(val)]);
-            } else {
-              ((String[]) entry)[num - 1] = val;
-            }
-          } else if(entry instanceof int[]) {
-            ((int[]) entry)[num] = Integer.parseInt(val);
-          }
-        }
-      } catch(final Exception ex) {
-        err.addExt("% could not be parsed." + NL, file);
-        Util.debug(ex);
-      } finally {
-        if(br != null) try { br.close(); } catch(final IOException ex) { }
-      }
-    }
-
-    // check if all mandatory files have been read
-    try {
-      if(err.isEmpty()) {
-        boolean ok = true;
-        for(final Field f : getClass().getFields()) {
-          final Object obj = f.get(null);
-          if(!(obj instanceof Object[])) continue;
-          final String key = ((Object[]) obj)[0].toString();
-          ok &= read.contains(key);
-        }
-        if(!ok) err.addExt("Saving properties in \"%\"..." + NL, file);
-      }
-    } catch(final IllegalAccessException ex) {
-      Util.notexpected(ex);
-    }
-
-    if(!err.isEmpty()) {
-      Util.err(err.toString());
-      write();
-    }
+    system();
   }
 
   /**
@@ -327,27 +239,6 @@ public abstract class AProp implements Iterable<String> {
   }
 
   /**
-   * Parses a property string and sets the properties accordingly.
-   * @param s property string
-   * @throws IOException io exception
-   */
-  protected final synchronized void parse(final String s) throws IOException {
-    for(final String ser : s.trim().split(",")) {
-      if(ser.isEmpty()) continue;
-      final String[] sprop = ser.split("=", 2);
-
-      final String key = sprop[0].trim();
-      final String val = sprop.length < 2 ? "" : sprop[1];
-      try {
-        if(set(key, val) != null) continue;
-      } catch(final Exception ex) {
-        throw new BaseXException(Text.INVALID_VALUE_X_X, key, val);
-      }
-      throw new BaseXException(unknown(key));
-    }
-  }
-
-  /**
    * Returns an error string for an unknown key.
    * @param key key
    * @return error string
@@ -393,28 +284,6 @@ public abstract class AProp implements Iterable<String> {
     return null;
   }
 
-  /**
-   * Retrieves the specified value. Throws an error if value cannot be read.
-   * @param key key
-   * @param c expected type
-   * @return result
-   */
-  private Object get(final Object[] key, final Class<?> c) {
-    final Object entry = props.get(key[0].toString());
-    if(entry == null) Util.notexpected("Property " + key[0] + " not defined.");
-
-    final Class<?> cc = entry.getClass();
-    if(c != cc) Util.notexpected("Property '" + key[0] + "' is a " + Util.name(cc));
-    return entry;
-  }
-
-  /**
-   * Sets static properties.
-   */
-  void finish() {
-    // nothing to do; if necessary, is overwritten.
-  }
-
   @Override
   public final synchronized Iterator<String> iterator() {
     return props.keySet().iterator();
@@ -428,5 +297,161 @@ public abstract class AProp implements Iterable<String> {
       tb.add(e.getKey()).add('=').addExt(e.getValue());
     }
     return tb.toString();
+  }
+
+  // PROTECTED METHODS ===================================================================
+
+  /**
+   * Reads the configuration file and initializes the project properties.
+   * The file is located in the project home directory.
+   * @param prop property file extension
+   */
+  protected synchronized void read(final String prop) {
+    file = new IOFile(HOME + IO.BASEXSUFFIX + prop);
+
+    final StringList read = new StringList();
+    final TokenBuilder err = new TokenBuilder();
+    if(!file.exists()) {
+      err.addExt("Saving properties in \"%\"..." + NL, file);
+    } else {
+      BufferedReader br = null;
+      try {
+        br = new BufferedReader(new FileReader(file.file()));
+        for(String line; (line = br.readLine()) != null;) {
+          line = line.trim();
+          if(line.isEmpty() || line.charAt(0) == '#') continue;
+          final int d = line.indexOf('=');
+          if(d < 0) {
+            err.addExt("%: \"%\" ignored. " + NL, file, line);
+            continue;
+          }
+
+          final String val = line.substring(d + 1).trim();
+          String key = line.substring(0, d).trim();
+
+          // extract numeric value in key
+          int num = 0;
+          final int ss = key.length();
+          for(int s = 0; s < ss; ++s) {
+            if(Character.isDigit(key.charAt(s))) {
+              num = Integer.parseInt(key.substring(s));
+              key = key.substring(0, s);
+              break;
+            }
+          }
+          read.add(key);
+
+          final Object entry = props.get(key);
+          if(entry == null) {
+            err.addExt("%: \"%\" not found. " + NL, file, key);
+          } else if(entry instanceof String) {
+            props.put(key, val);
+          } else if(entry instanceof Integer) {
+            props.put(key, Integer.parseInt(val));
+          } else if(entry instanceof Boolean) {
+            props.put(key, Boolean.parseBoolean(val));
+          } else if(entry instanceof String[]) {
+            if(num == 0) {
+              props.put(key, new String[Integer.parseInt(val)]);
+            } else {
+              ((String[]) entry)[num - 1] = val;
+            }
+          } else if(entry instanceof int[]) {
+            ((int[]) entry)[num] = Integer.parseInt(val);
+          }
+        }
+      } catch(final Exception ex) {
+        err.addExt("% could not be parsed." + NL, file);
+        Util.debug(ex);
+      } finally {
+        if(br != null) try { br.close(); } catch(final IOException ex) { }
+      }
+    }
+
+    // check if all mandatory files have been read
+    try {
+      if(err.isEmpty()) {
+        boolean ok = true;
+        for(final Field f : getClass().getFields()) {
+          final Object obj = f.get(null);
+          if(!(obj instanceof Object[])) continue;
+          final String key = ((Object[]) obj)[0].toString();
+          ok &= read.contains(key);
+        }
+        if(!ok) err.addExt("Saving properties in \"%\"..." + NL, file);
+      }
+    } catch(final IllegalAccessException ex) {
+      Util.notexpected(ex);
+    }
+
+    if(!err.isEmpty()) {
+      Util.err(err.toString());
+      write();
+    }
+  }
+
+  /**
+   * Parses a property string and sets the properties accordingly.
+   * @param s property string
+   * @throws IOException io exception
+   */
+  protected final synchronized void parse(final String s) throws IOException {
+    for(final String ser : s.trim().split(",")) {
+      if(ser.isEmpty()) continue;
+      final String[] sprop = ser.split("=", 2);
+
+      final String key = sprop[0].trim();
+      final String val = sprop.length < 2 ? "" : sprop[1];
+      try {
+        if(set(key, val) != null) continue;
+      } catch(final Exception ex) {
+        throw new BaseXException(Text.INVALID_VALUE_X_X, key, val);
+      }
+      throw new BaseXException(unknown(key));
+    }
+  }
+
+  /**
+   * Sets static properties.
+   */
+  protected void finish() {
+    // nothing to do; if necessary, is overwritten.
+  }
+
+  // PRIVATE METHODS ====================================================================
+
+  /**
+   * Scans the system properties and initializes the project properties.
+   * All properties starting with {@Code org.basex.} will be assigned as properties
+   * and removed from the global system properties.
+   */
+  private void system() {
+    // collect parameters that start with "org.basex."
+    final StringList sl = new StringList();
+    final Properties pr = System.getProperties();
+    for(final Object key : pr.keySet()) {
+      String k = key.toString();
+      if(k.startsWith(Prop.DBPREFIX)) sl.add(k);
+    }
+    // assign properties and remove existing keys
+    for(final String key : sl) {
+      if(set(key.substring(Prop.DBPREFIX.length()).toUpperCase(Locale.ENGLISH),
+          System.getProperty(key)) != null) pr.remove(key);
+    }
+  }
+
+  /**
+   * Retrieves the specified value. Throws an error if value cannot be read.
+   * @param key key
+   * @param c expected type
+   * @return result
+   */
+  private Object get(final Object[] key, final Class<?> c) {
+    final Object entry = props.get(key[0].toString());
+    if(entry == null) Util.notexpected("Property " + key[0] + " not defined.");
+
+    final Class<?> cc = entry.getClass();
+    if(c != cc) Util.notexpected("Property '" + key[0] + "' is a " + Util.name(cc));
+    return entry;
   }
 }

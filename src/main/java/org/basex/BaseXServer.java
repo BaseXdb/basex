@@ -331,7 +331,6 @@ public final class BaseXServer extends Main implements Runnable {
       new Socket(LOCALHOST, port).close();
       // check if server was really stopped
       while(ping(LOCALHOST, port)) Performance.sleep(50);
-      Performance.sleep(50);
     } catch(final IOException ex) {
       stop.delete();
       throw ex;

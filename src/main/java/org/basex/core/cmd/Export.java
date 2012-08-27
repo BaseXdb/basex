@@ -102,7 +102,7 @@ public final class Export extends Command {
         e.progPos++;
       }
       // create dir if necessary
-      final IOFile dir = new IOFile(f.dir());
+      final IOFile dir = new IOFile(f.dirPath());
       if(!dir.exists()) dir.md();
 
       // serialize file

@@ -132,8 +132,17 @@ public final class IOFile extends IO {
   }
 
   @Override
-  public String dir() {
+  public String dirPath() {
     return isDir() ? path : path.substring(0, path.lastIndexOf('/') + 1);
+  }
+
+  /**
+   * Returns a directory reference. If the file points to a directory, a self reference
+   * is returned
+   * @return directory
+   */
+  public IOFile dir() {
+    return isDir() ? this : new IOFile(path.substring(0, path.lastIndexOf('/') + 1));
   }
 
   /**
@@ -247,7 +256,7 @@ public final class IOFile extends IO {
   }
 
   /**
-   * Copies a file to another destination.
+   * Copies a file to another target.
    * @param trg target
    * @throws IOException I/O exception
    */
@@ -257,7 +266,7 @@ public final class IOFile extends IO {
     final byte[] buf = new byte[bsize];
 
     // create parent directory of target file
-    new IOFile(trg.dir()).md();
+    trg.dir().md();
     final FileInputStream fis = new FileInputStream(file);
     try {
       final FileOutputStream fos = new FileOutputStream(trg.file);

@@ -471,7 +471,7 @@ public final class FNFile extends StandardFunc {
   private void check(final File path) throws QueryException {
     final IOFile io = new IOFile(path);
     if(io.isDir()) FILE_DIR.thrw(info, io);
-    final IOFile dir = new IOFile(io.dir());
+    final IOFile dir = io.dir();
     if(!dir.exists()) FILE_NODIR.thrw(info, dir);
   }
 

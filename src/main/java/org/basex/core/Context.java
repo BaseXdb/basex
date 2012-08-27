@@ -2,8 +2,6 @@ package org.basex.core;
 
 import static org.basex.core.Text.*;
 
-import java.util.*;
-
 import org.basex.data.*;
 import org.basex.index.resource.*;
 import org.basex.io.random.*;
@@ -67,15 +65,15 @@ public final class Context {
    * Default constructor, which is only called once in a project.
    */
   public Context() {
-    this(new MainProp());
+    this(true);
   }
 
   /**
    * Default constructor, which is only called once in a project.
-   * @param props initial properties
+   * @param file retrieve properties from disk
    */
-  public Context(final HashMap<String, String> props) {
-    this(new MainProp(props));
+  public Context(final boolean file) {
+    this(new MainProp(file));
   }
 
   /**

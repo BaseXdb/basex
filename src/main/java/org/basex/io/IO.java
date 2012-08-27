@@ -279,10 +279,10 @@ public abstract class IO {
   }
 
   /**
-   * Returns the directory.
+   * Returns the directory path.
    * @return chopped filename
    */
-  public String dir() {
+  public String dirPath() {
     return "";
   }
 

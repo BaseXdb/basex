@@ -39,18 +39,6 @@
     <name>BaseX Team</name>
     <url>http://basex.org</url>
   </organization>
-  <developers>
-    <developer>
-      <id>cg</id>
-      <name>Christian Gr&#xFC;n</name>
-      <email>christian.gruen@uni-konstanz.de</email>
-      <roles>
-        <role>architect</role>
-        <role>developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
-  </developers>
   <mailingLists>
     <mailingList>
       <name>BaseX Talk</name>
@@ -70,39 +58,39 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-    	<groupId>jp.sourceforge.igo</groupId>
-    	<artifactId>igo</artifactId>
-    	<version>0.4.3</version>
-    	<scope>runtime</scope>
-    	<optional>true</optional>
+      <groupId>jp.sourceforge.igo</groupId>
+      <artifactId>igo</artifactId>
+      <version>0.4.3</version>
+      <scope>runtime</scope>
+      <optional>true</optional>
     </dependency>
     <dependency>
-    	<groupId>org.apache</groupId>
-    	<artifactId>lucene-stemmers</artifactId>
-    	<version>3.4.0</version>
-    	<scope>runtime</scope>
-    	<optional>true</optional>
+      <groupId>org.apache</groupId>
+      <artifactId>lucene-stemmers</artifactId>
+      <version>3.4.0</version>
+      <scope>runtime</scope>
+      <optional>true</optional>
     </dependency>
     <dependency>
-    	<groupId>org.ccil.cowan.tagsoup</groupId>
-    	<artifactId>tagsoup</artifactId>
-    	<version>1.2</version>
-    	<scope>runtime</scope>
-    	<optional>true</optional>
+      <groupId>org.ccil.cowan.tagsoup</groupId>
+      <artifactId>tagsoup</artifactId>
+      <version>1.2</version>
+      <scope>runtime</scope>
+      <optional>true</optional>
     </dependency>
     <dependency>
-    	<groupId>xml-resolver</groupId>
-    	<artifactId>xml-resolver</artifactId>
-    	<version>1.2</version>
-    	<scope>runtime</scope>
-    	<optional>true</optional>
+      <groupId>xml-resolver</groupId>
+      <artifactId>xml-resolver</artifactId>
+      <version>1.2</version>
+      <scope>runtime</scope>
+      <optional>true</optional>
     </dependency>
     <dependency>
-    	<groupId>jline</groupId>
-    	<artifactId>jline</artifactId>
-    	<version>1.0</version>
-    	<scope>runtime</scope>
-    	<optional>true</optional>
+      <groupId>jline</groupId>
+      <artifactId>jline</artifactId>
+      <version>1.0</version>
+      <scope>runtime</scope>
+      <optional>true</optional>
     </dependency>
   </dependencies>
   <build>
@@ -240,7 +228,7 @@
           <descriptorRefs>
             <!- OpenSUSE, ...build sources
             <descriptorRef>src</descriptorRef> ->
-            <!- JAR with all dependencies
+            <!- JAR with all dependencies 
             <descriptorRef>jar-with-dependencies</descriptorRef> ->
           </descriptorRefs>
           <archive>
@@ -251,6 +239,7 @@
           </archive>
         </configuration>
       </plugin>-->
+      <!-- Temporarily removed (takes some time)
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
@@ -272,56 +261,56 @@
           <consoleOutput>true</consoleOutput>
           <violationSeverity>warning</violationSeverity>
         </configuration>
-      </plugin>
+      </plugin>-->
     </plugins>
     <!-- Eclipse Maven plugin does not "support copy-dependencies" -->
     <!-- we need to tell it to ignore the goal -->
     <pluginManagement>
-     <plugins>
-       <plugin>
-         <groupId>org.eclipse.m2e</groupId>
-         <artifactId>lifecycle-mapping</artifactId>
-         <version>1.0.0</version>
-         <configuration>
-           <lifecycleMappingMetadata>
-             <pluginExecutions>
-               <pluginExecution>
-                 <pluginExecutionFilter>
-                   <groupId>org.apache.maven.plugins</groupId>
-                   <artifactId>maven-dependency-plugin</artifactId>
-                   <versionRange>[2.0,)</versionRange>
-                   <goals>
-                     <goal>copy-dependencies</goal>
-                   </goals>
-                 </pluginExecutionFilter>
-                 <action>
-                   <ignore />
-                 </action>
-               </pluginExecution>
-               <pluginExecution>
-                 <pluginExecutionFilter>
-                   <groupId>org.codehaus.mojo</groupId>
-                   <artifactId>javacc-maven-plugin</artifactId>
-                   <versionRange>[2.6,)</versionRange>
-                   <goals>
-                     <goal>javacc</goal>
-                   </goals>
-                 </pluginExecutionFilter>
-                 <action>
-                   <ignore />
-                 </action>
-               </pluginExecution>
-             </pluginExecutions>
-           </lifecycleMappingMetadata>
-         </configuration>
-       </plugin>
-     </plugins>
-   </pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <versionRange>[2.0,)</versionRange>
+                    <goals>
+                      <goal>copy-dependencies</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore />
+                  </action>
+                </pluginExecution>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>javacc-maven-plugin</artifactId>
+                    <versionRange>[2.6,)</versionRange>
+                    <goals>
+                      <goal>javacc</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore />
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <extensions>
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
-         <artifactId>wagon-ftp</artifactId>
-         <version>2.0</version>
+        <artifactId>wagon-ftp</artifactId>
+        <version>2.0</version>
       </extension>
     </extensions>
   </build>

@@ -203,13 +203,13 @@ public final class RepoManager {
     // traverse all files, find exact matches
     final String nm = string(name);
     IOFile path = new IOFile(repo.path(), nm);
-    for(final IOFile ch : new IOFile(path.dir()).children()) {
+    for(final IOFile ch : path.dir().children()) {
       if(ch.name().equals(path.name())) return ch;
     }
     // traverse all files, find prefix matches
     path = new IOFile(repo.path(), nm.replace('.', '/'));
     final String start = path.name() + '.';
-    for(final IOFile ch : new IOFile(path.dir()).children()) {
+    for(final IOFile ch : path.dir().children()) {
       if(ch.name().startsWith(start)) return ch;
     }
     return null;
@@ -271,7 +271,7 @@ public final class RepoManager {
    */
   private boolean md(final IOFile rp, final String path) {
     final IOFile target = new IOFile(rp, path);
-    final IOFile dir = new IOFile(target.dir());
+    final IOFile dir = target.dir();
     dir.md();
     final IOFile[] ch = dir.children(target.name() + ".*");
     for(final IOFile c : ch) c.delete();

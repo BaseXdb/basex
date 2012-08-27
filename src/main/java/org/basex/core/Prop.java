@@ -175,13 +175,6 @@ public final class Prop extends AProp {
   public static final Object[] MAXHITS = { "MAXHITS", -1 };
 
   /**
-   * Constructor.
-   */
-  public Prop() {
-    super();
-  }
-
-  /**
    * <p>Determines the project's home directory for storing property files
    * and directories. The directory is chosen as follows:</p>
    * <ol>

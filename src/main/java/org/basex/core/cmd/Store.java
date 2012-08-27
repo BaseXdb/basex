@@ -85,7 +85,7 @@ public final class Store extends ACreate {
    */
   public static void store(final InputSource in, final IOFile file) throws IOException {
     // add directory if it does not exist anyway
-    new IOFile(file.dir()).md();
+    file.dir().md();
 
     final PrintOutput po = new PrintOutput(file.path());
     try {

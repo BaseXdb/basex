@@ -173,7 +173,7 @@ public final class GUIProp extends AProp {
     String path = null;
     if(file != null) {
       path = file.path();
-      set(EDITORPATH, file.dir());
+      set(EDITORPATH, file.dirPath());
       sl.add(path);
     }
     final String[] qu = strings(QUERIES);

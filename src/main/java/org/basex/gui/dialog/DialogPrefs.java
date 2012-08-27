@@ -74,7 +74,7 @@ public final class DialogPrefs extends BaseXDialog {
       public void actionPerformed(final ActionEvent e) {
         final IOFile file = new BaseXFileChooser(CHOOSE_DIR, path.getText(),
             gui).select(Mode.DOPEN);
-        if(file != null) path.setText(file.dir());
+        if(file != null) path.setText(file.dirPath());
       }
     });
 

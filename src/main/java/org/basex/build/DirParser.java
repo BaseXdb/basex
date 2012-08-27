@@ -58,7 +58,7 @@ public final class DirParser extends Parser {
    */
   public DirParser(final IO source, final Prop pr, final IOFile path) {
     super(source, pr);
-    final String parent = source.dir();
+    final String parent = source.dirPath();
     root = parent.endsWith("/") ? parent : parent + '/';
     skipCorrupt = prop.is(Prop.SKIPCORRUPT);
     archives = prop.is(Prop.ADDARCHIVES);

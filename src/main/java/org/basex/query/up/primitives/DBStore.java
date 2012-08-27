@@ -49,7 +49,7 @@ public final class DBStore extends UpdatePrimitive {
       try {
         final IOFile file = data.meta.binary(string(path));
         if(file == null) UPDBPUTERR.thrw(info, path);
-        new IOFile(file.dir()).md();
+        file.dir().md();
         file.write(map.get(path).input(info));
       } catch(final IOException ex) {
         Util.debug(ex);
