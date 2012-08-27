@@ -10,12 +10,12 @@
 
   <!-- The following parameters may also be passed on as system properties: -->
 
-  <!-- Operation mode: by default, the value is "local": the servlets will
+  <!-- Operation mode. By default, the value is "false": the servlets will
        work with a local database context. If "server" is specified, a database
        server instance will be started after the first call of a service. -->
   <context-param>
-    <param-name>org.basex.mode</param-name>
-    <param-value>local</param-value>
+    <param-name>org.basex.server</param-name>
+    <param-value>false</param-value>
   </context-param>
 
   <!-- Default login data: by default, no user and password is specified, and

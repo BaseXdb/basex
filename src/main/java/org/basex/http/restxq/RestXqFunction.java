@@ -86,7 +86,12 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @throws IOException I/O exception
    */
   void process(final HTTPContext http) throws QueryException, IOException {
-    module.process(http, this);
+    try {
+      module.process(http, this);
+    } catch(final QueryException ex) {
+      if(ex.file() == null) ex.info(function.info);
+      throw ex;
+    }
   }
 
   /**
