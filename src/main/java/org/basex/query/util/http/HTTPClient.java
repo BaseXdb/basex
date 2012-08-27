@@ -9,6 +9,7 @@ import static org.basex.query.util.http.HTTPText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.lang.reflect.*;
 import java.net.*;
 import java.util.*;
 
@@ -85,10 +86,6 @@ public final class HTTPClient {
       } finally {
         conn.disconnect();
       }
-    } catch(final MalformedURLException ex) {
-      throw HC_ERROR.thrw(info, "Invalid URL: " + ex.getMessage());
-    } catch(final ProtocolException ex) {
-      throw HC_ERROR.thrw(info, "Invalid HTTP method: " + ex.getMessage());
     } catch(final IOException ex) {
       Util.debug(ex);
       throw HC_ERROR.thrw(info, ex);
@@ -123,7 +120,16 @@ public final class HTTPClient {
       throws ProtocolException, QueryException {
 
     if(r.bodyContent != null || r.parts.size() != 0) conn.setDoOutput(true);
-    conn.setRequestMethod(string(r.attrs.get(METHOD)).toUpperCase(Locale.ENGLISH));
+    final String method = string(r.attrs.get(METHOD)).toUpperCase(Locale.ENGLISH);
+    try {
+      // set field via reflection to circumvent string check
+      final Field f = conn.getClass().getSuperclass().getDeclaredField("method");
+      f.setAccessible(true);
+      f.set(conn, method);
+    } catch(final Throwable th) {
+      conn.setRequestMethod(method);
+    }
+
     final byte[] timeout = r.attrs.get(TIMEOUT);
     if(timeout != null) conn.setConnectTimeout(parseInt(string(timeout)));
     final byte[] redirect = r.attrs.get(FOLLOW_REDIRECT);
