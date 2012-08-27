@@ -190,7 +190,7 @@
           <jettyXml>${basedir}/src/main/webapp/WEB-INF/jetty.xml</jettyXml>
           <!-- Key and port for stopping Jetty
           <stopKey>keyToStopJetty</stopKey> 
-          <stopPort>8985</stopPort> -->
+          <stopPort>8983</stopPort> -->
         </configuration>
       </plugin>
       <plugin>
