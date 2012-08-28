@@ -107,9 +107,9 @@ public final class DialogPackages extends BaseXDialog {
     if(cmp == install) {
       final String pp = gui.gprop.get(GUIProp.PKGPATH);
       final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR, pp, gui);
-      fc.addFilter(XML_ARCHIVES, IO.XARSUFFIX);
-      fc.addFilter(JAVA_ARCHIVES, IO.JARSUFFIX);
-      fc.addFilter(XQUERY_FILES, IO.XQSUFFIXES);
+      fc.filter(XML_ARCHIVES, IO.XARSUFFIX);
+      fc.filter(JAVA_ARCHIVES, IO.JARSUFFIX);
+      fc.filter(XQUERY_FILES, IO.XQSUFFIXES);
       final IOFile file = fc.select(Mode.FDOPEN);
       if(file == null) return;
       gui.gprop.set(GUIProp.PKGPATH, file.path());

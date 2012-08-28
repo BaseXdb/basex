@@ -63,8 +63,9 @@ public final class BaseXFileChooser {
    * Sets a file filter.
    * @param dsc description
    * @param suf suffix
+   * @return self reference
    */
-  public void addFilter(final String dsc, final String... suf) {
+  public BaseXFileChooser filter(final String dsc, final String... suf) {
     if(fc != null) {
       final FileFilter ff = fc.getFileFilter();
       fc.addChoosableFileFilter(new Filter(suf, dsc));
@@ -74,6 +75,26 @@ public final class BaseXFileChooser {
     }
     // treat first filter as default
     if(suffix == null) suffix = suf[0];
+    return this;
+  }
+
+  /**
+   * Allow multiple choice.
+   * @return self reference
+   */
+  public BaseXFileChooser multi() {
+    if(fc != null) fc.setMultiSelectionEnabled(true);
+    return this;
+  }
+
+  /**
+   * Selects a file or directory.
+   * @param mode type defined by {@link Mode}
+   * @return resulting input reference, or {@code null} if no file was selected
+   */
+  public IOFile select(final Mode mode) {
+    final IOFile[] files = selectAll(mode);
+    return files.length == 0 ? null : files[0];
   }
 
   /**
@@ -81,19 +102,17 @@ public final class BaseXFileChooser {
    * @param mode type defined by {@link Mode}
    * @return resulting input reference
    */
-  public IOFile select(final Mode mode) {
-    IOFile io;
+  public IOFile[] selectAll(final Mode mode) {
     if(fd != null) {
       if(mode == Mode.FDOPEN) fd.setFile(" ");
       fd.setMode(mode == Mode.FSAVE || mode == Mode.DSAVE ?
           FileDialog.SAVE : FileDialog.LOAD);
       fd.setVisible(true);
       final String f = fd.getFile();
-      if(f == null) return null;
-
+      if(f == null) return new IOFile[0];
       final String dir = fd.getDirectory();
-      return new IOFile(mode == Mode.DOPEN || mode == Mode.DSAVE ? dir :
-        dir + '/' + fd.getFile());
+      return new IOFile[] { new IOFile(mode == Mode.DOPEN || mode == Mode.DSAVE ? dir :
+        dir + '/' + fd.getFile()) };
     }
 
     int state = 0;
@@ -114,18 +133,28 @@ public final class BaseXFileChooser {
         state = fc.showDialog(gui, null);
         break;
     }
-    if(state != JFileChooser.APPROVE_OPTION) return null;
-    io = new IOFile(fc.getSelectedFile().getPath());
+    if(state != JFileChooser.APPROVE_OPTION) return new IOFile[0];
 
-    if(mode != Mode.FSAVE) return io;
+    final File[] fl = fc.getSelectedFiles();
+    final IOFile[] files = new IOFile[fl.length];
+    for(int f = 0; f < fl.length; f++) files[f] = new IOFile(fl[f].getPath());
 
-    // add file suffix to file to be saved
-    if(suffix != null && !io.path().contains("."))
-      io = new IOFile(io.path() + suffix);
-
-    // show replace dialog
-    return !io.exists() || BaseXDialog.confirm(gui, Util.info(FILE_EXISTS_X, io)) ?
-        io : null;
+    if(mode == Mode.FSAVE) {
+      // add file suffix to files
+      if(suffix != null) {
+        for(int f = 0; f < fl.length; f++) {
+          final String path = files[f].path();
+          if(path.contains(".")) files[f] = new IOFile(path + suffix);
+        }
+      }
+      // show replace dialog
+      for(final IOFile io : files) {
+        if(io.exists() && !BaseXDialog.confirm(gui, Util.info(FILE_EXISTS_X, io))) {
+          return new IOFile[0];
+        }
+      }
+    }
+    return files;
   }
 
   /**
