@@ -196,11 +196,15 @@ public class GFLWOR extends ParseExpr {
        */
       if(in.size() != 1 || in.uses(Use.NDT) || in.uses(Use.CNS)) continue;
 
-      // find most outer clause that declares no variables that are used in the
-      // inner clause
+      /* - find most outer clause that declares no variables used in the inner clause.
+       *   example: let $x := <a/> for $i in 1 to 2 let $a := $x return $a
+       * - code will not be moved if all clauses are let clauses.
+       *   example: let $x := <a/> let $i := <b/> let $a := $x return ($a, $i)
+       */
       int p = -1;
-      for(int o = i; o-- != 0 && in.count(fl[o]) == 0; p = o);
-      if(p == -1) continue;
+      boolean f = false;
+      for(int o = i; o-- != 0 && in.count(fl[o]) == 0; p = o, f |= fl[o] instanceof For);
+      if(p == -1 || !f) continue;
 
       // move clause
       Array.move(fl, p, 1, i - p);

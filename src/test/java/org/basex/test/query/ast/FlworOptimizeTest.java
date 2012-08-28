@@ -13,7 +13,7 @@ import org.junit.*;
  */
 public final class FlworOptimizeTest extends QueryPlanTest {
   /** Tests the relocation of a static let clause. */
-  @Test public void moveTopTest() {
+  @Test public void moveTop() {
     check("let $b := <x>a</x> " +
         "for $i in 1 to 2 " +
         "let $m := $b " +
@@ -25,7 +25,7 @@ public final class FlworOptimizeTest extends QueryPlanTest {
   }
 
   /** Tests the relocation of a let clause. */
-  @Test public void moveMidTest() {
+  @Test public void moveMid() {
     check("let $seq := ('a', 'b', 'c') " +
         "for $i in 1 to count($seq) " +
         "for $j in $i + 1 to count($seq) " +
@@ -39,7 +39,7 @@ public final class FlworOptimizeTest extends QueryPlanTest {
   }
 
   /** Tests the relocation of a let clause. */
-  @Test public void dontMoveTest() {
+  @Test public void dontMove() {
     check("let $seq := ('a', 'b', 'c') " +
         "for $i in 1 to count($seq) " +
         "for $j in $i + 1 to count($seq) " +
@@ -52,8 +52,17 @@ public final class FlworOptimizeTest extends QueryPlanTest {
     );
   }
 
+  /** Tests the relocation of a let clause. */
+  @Test public void dontMove2() {
+    check("let $a := <a/> let $b := <b/> let $c := $a return ($c,$b)",
+        "<a/>" + Prop.NL + "<b/>",
+        Util.info("//Let[@var='$a'] << //Let[@var='$b'] and " +
+            "//Let[@var='$b'] << //Let[@var='$c']")
+    );
+  }
+
   /** Tests the relocation of a static let clause. */
-  @Test public void moveForTest() {
+  @Test public void moveFor() {
     check("let $x := <x/> " +
         "for $a in 1 to 2 " +
         "for $b in $x " +
