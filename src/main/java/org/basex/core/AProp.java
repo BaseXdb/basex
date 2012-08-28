@@ -435,8 +435,8 @@ public abstract class AProp implements Iterable<String> {
     }
     // assign properties and remove existing keys
     for(final String key : sl) {
-      if(set(key.substring(Prop.DBPREFIX.length()).toUpperCase(Locale.ENGLISH),
-          System.getProperty(key)) != null) pr.remove(key);
+      set(key.substring(Prop.DBPREFIX.length()).toUpperCase(Locale.ENGLISH),
+          System.getProperty(key));
     }
   }
 
