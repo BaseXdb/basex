@@ -3,6 +3,7 @@ package org.basex.test.performance;
 import java.io.*;
 import java.util.*;
 
+import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
@@ -69,46 +70,47 @@ public final class ScanTest extends SandboxTest {
 
   /**
    * Initializes the benchmark.
-   * @throws IOException I/O exception
+   * @throws BaseXException database exception
    */
   @AfterClass
-  public static void finishDB() throws IOException {
+  public static void finishDB() throws BaseXException {
     new DropDB(NAME).execute(context);
   }
 
   /**
-   * Scans a table for elements with text nodes.
-   * @throws Exception exception
+   * Counts the number of elements with text node as child.
+   * @throws BaseXException database exception
    */
   @Test
-  public void elementsWithText() throws Exception {
+  public void elementsWithText() throws BaseXException {
     query("count( //*[text()] )");
   }
 
   /**
-   * Scans a table for elements with text nodes.
-   * @throws Exception exception
+   * Counts the number of elements with text node or attribute as child.
+   * @throws BaseXException database exception
    */
   @Test
-  public void elementsWithTextOrAttribute() throws Exception {
+  public void elementsWithTextOrAttribute() throws BaseXException {
     query("count( descendant::*//(*|@*) )");
   }
 
   /**
-   * Scans a table for elements with text nodes.
-   * @throws Exception exception
+   * Counts the number of elements the text of which does not equal a given string.
+   * @throws BaseXException database exception
    */
   @Test
-  public void textNotEquals() throws Exception {
+  public void textNotEquals() throws BaseXException {
     query("count( //*[text() != ' '] )");
   }
 
   /**
-   * Performs the specified query; the result is ignored.
+   * Performs the specified query; some performance measurements are output and
+   * the result is ignored.
    * @param query query to be evaluated
-   * @throws IOException I/O exception
+   * @throws BaseXException database exception
    */
-  private void query(final String query) throws IOException {
+  private void query(final String query) throws BaseXException {
     Util.outln("Query: " + query);
     // warm up
     new XQuery(query).execute(context);
