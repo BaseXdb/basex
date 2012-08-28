@@ -213,6 +213,7 @@ public final class EditorView extends View {
         final EditorArea edit = getEditor();
         if(edit == null) return;
         edit.setSearch(find);
+        if(edit.opened()) gui.gprop.set(GUIProp.EDITORPATH, edit.file.path());
         gui.refreshControls();
         refreshMark();
         pos.setText(edit.pos());
@@ -558,8 +559,7 @@ public final class EditorView extends View {
     int c = 0;
     while(++c < bl.size() && bl.get(c));
     // create io reference
-    final String dir = gui.gprop.get(GUIProp.EDITORPATH);
-    return new IOFile(dir, FILE + (c == 1 ? "" : c));
+    return new IOFile(gui.gprop.get(GUIProp.EDITORPATH), FILE + (c == 1 ? "" : c));
   }
 
   /**
