@@ -97,7 +97,7 @@ public class BaseXTextField extends JTextField {
 
       @Override
       public void keyReleased(final KeyEvent e) {
-        if(area != null) find();
+        if(area != null) updateKeyword(true);
       }
     });
     if(dialog != null) addKeyListener(dialog.keys);
@@ -107,7 +107,7 @@ public class BaseXTextField extends JTextField {
       @Override
       public void drop(final Object object) {
         setText(object.toString());
-        find();
+        updateKeyword(true);
         if(dialog != null) dialog.action(BaseXTextField.this);
       }
     });
@@ -115,13 +115,13 @@ public class BaseXTextField extends JTextField {
 
   /**
    * Searches the current keyword if an editor is attached.
+   * @param search automatically search keyword
    */
-  void find() {
+  void updateKeyword(final boolean search) {
     if(area == null) return;
     final String text = getText().trim().toLowerCase(Locale.ENGLISH);
     final String old = area.keyword(text);
-    if(text.equals(old)) return;
-    find(text);
+    if(search && !text.equals(old)) find(text);
   }
 
   /**
@@ -138,6 +138,7 @@ public class BaseXTextField extends JTextField {
    */
   public final void setSearch(final BaseXEditor a) {
     area = a;
+    updateKeyword(false);
     BaseXLayout.setWidth(this, 100);
   }
 
