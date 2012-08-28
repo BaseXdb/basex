@@ -81,6 +81,7 @@ final class RestXqResponse {
 
     // compile and evaluate function
     try {
+      qc.context.register(qc);
       Value result = qc.value(bfc.compile(qc));
       final Value update = qc.update();
       if(update != null) result = update;
@@ -108,6 +109,7 @@ final class RestXqResponse {
       ser.close();
     } finally {
       qc.close();
+      qc.context.unregister(qc);
     }
   }
 
