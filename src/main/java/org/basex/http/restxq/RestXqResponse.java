@@ -10,6 +10,7 @@ import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.expr.Expr.*;
 import org.basex.query.func.*;
 import org.basex.query.path.*;
 import org.basex.query.value.*;
@@ -81,6 +82,8 @@ final class RestXqResponse {
 
     // compile and evaluate function
     try {
+      // assign local updating flag
+      qc.updating = bfc.uses(Use.UPD);
       qc.context.register(qc);
       Value result = qc.value(bfc.compile(qc));
       final Value update = qc.update();
