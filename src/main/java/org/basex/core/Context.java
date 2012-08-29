@@ -264,7 +264,7 @@ public final class Context {
     StringList sl = new StringList();
     if(!pr.databases(sl)) {
       // databases cannot be determined... pass on all existing databases
-      sl = databases.listDBs();
+      sl = null;
     } else {
       // replace empty string with currently opened database and return array
       for(int d = 0; d < sl.size(); d++) {

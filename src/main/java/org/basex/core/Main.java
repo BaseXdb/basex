@@ -104,7 +104,6 @@ public abstract class Main {
    * @throws IOException I/O exception
    */
   protected void quit() throws IOException {
-    execute(new Exit(), true);
     if(out == System.out || out == System.err) out.flush();
     else out.close();
   }

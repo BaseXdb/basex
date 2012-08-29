@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.*;
 import java.util.concurrent.locks.*;
 
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -57,6 +58,9 @@ public final class DBLocking implements ILocking {
 
   @Override
   public void acquire(final Progress pr, final StringList db) {
+    // No databases specified: lock globally
+    if(db == null) Util.notimplemented("Global locks in DBLocking not implemented yet.");
+
     final Thread thread = Thread.currentThread();
     if(locked.containsKey(thread))
       throw new IllegalMonitorStateException("Thread already holds one or more locks.");

@@ -203,7 +203,6 @@ public final class BaseXServer extends Main implements Runnable {
       cs.quit();
     }
     super.quit();
-    context.close();
 
     try {
       // close interactive input if server was stopped by another process

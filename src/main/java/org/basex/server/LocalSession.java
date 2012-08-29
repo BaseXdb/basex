@@ -105,11 +105,7 @@ public class LocalSession extends Session {
 
   @Override
   public synchronized void close() {
-    try {
-      execute(new Exit());
-    } catch(final IOException ex) {
-      Util.debug(ex);
-    }
+    new Close().run(ctx);
   }
 
   @Override
