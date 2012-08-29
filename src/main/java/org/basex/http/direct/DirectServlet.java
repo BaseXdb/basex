@@ -81,55 +81,113 @@ public final class DirectServlet extends BaseXServlet {
 
     // process list of commands
     final TokenBuilder info = new TokenBuilder();
+    BaseXException bxe = null;
     for(final Command c : list) {
-      String inf;
+      String inf = null;
       if(c instanceof XQuery) {
         // create query instance
         final Query qu = session.query(c.args[0]);
         // initializes the response with query serialization options
         http.initResponse(new SerializerProp(qu.options()));
-        // run query
-        qu.execute();
-        inf = qu.info();
+        try {
+          // run query
+          qu.execute();
+          inf = qu.info();
+        } catch(final BaseXException ex) {
+          bxe = ex;
+        }
       } else {
-        session.execute(c);
-        inf = session.info();
+        try {
+          session.execute(c);
+          inf = session.info();
+        } catch(final BaseXException ex) {
+          bxe = ex;
+        }
       }
+      if(bxe != null) break;
       info.add(inf.trim().replaceAll("\r\n?", "\n")).add('\n');
     }
 
+    // redirect page and results
     if(redirect) {
-      final String ovar = http.req.getParameter("@output");
-      final String ivar = http.req.getParameter("@info");
-      String uri = http.req.getParameter("@redirect");
-
-      final TokenBuilder tb = new TokenBuilder();
+      final String err = bxe == null ? "" : bxe.getMessage().replaceAll("\r\n?", "\n");
       if(http.method == HTTPMethod.POST) {
-        // post request: return html form with javascript to trigger client-side reload
-        tb.add("<html><body onload='document.forms[\"form\"].submit()'>");
-        tb.add("<form name='form' action='" + uri + "' method='post'>");
-        if(ovar != null) {
-          tb.add("<input type='hidden' name='" + ovar + "' value='");
-          tb.add(os.toString().replace("'", "&apos;")).add("'/>");
-        }
-        if(ivar != null) {
-          tb.add("<input type='hidden' name='" + ivar + "' value='");
-          tb.add(info.toString().replace("'", "&apos;")).add("'/>");
-        }
-        tb.add("</form></body></html>");
-        http.res.getOutputStream().write(tb.finish());
+        redirectPOST(http, os, info, err);
       } else {
-        // bind query output to specified variable
-        if(ovar != null) uri += (uri.indexOf('?') != -1 ? '&' : '?') + ovar + '=' +
-            Token.string(Token.uri(Token.token(os.toString()), false));
-        // bind query info to specified variable
-        if(ivar != null) uri += (uri.indexOf('?') != -1 ? '&' : '?') + ivar + '=' +
-            Token.string(Token.uri(info.finish(), false));
-
-        // set status and location
-        http.status(HttpServletResponse.SC_MOVED_TEMPORARILY, null);
-        http.res.setHeader("location", uri);
+        redirect(http, os, info, err);
       }
     }
+  }
+
+  /**
+   * Creates a redirect URI.
+   * @param http http context
+   * @param os output stream
+   * @param info info message
+   * @param err error message
+   * @throws IOException I/O exception
+   */
+  private void redirect(final HTTPContext http, final OutputStream os,
+      final TokenBuilder info, final String err) throws IOException {
+    final String ovar = http.req.getParameter("@output");
+    final String evar = http.req.getParameter("@error");
+    final String ivar = http.req.getParameter("@info");
+    String uri = http.req.getParameter("@redirect");
+    uri += createParam(ovar, os, uri);
+    uri += createParam(ivar, info, uri);
+    uri += createParam(evar, err, uri);
+    // set status and location
+    http.status(HttpServletResponse.SC_MOVED_TEMPORARILY, null);
+    http.res.setHeader("location", uri);
+  }
+
+  /**
+   * Creates a parameter string.
+   * @param name variable name
+   * @param value value
+   * @param uri existing uri
+   * @return input element string
+   */
+  private String createParam(final String name, final Object value, final String uri) {
+    return name == null ? "" : (uri.indexOf('?') != -1 ? '&' : '?') + name + '=' +
+        Token.string(Token.uri(Token.token(value.toString()), false));
+  }
+
+  /**
+   * Creates a POST redirect form.
+   * @param http http context
+   * @param os output stream
+   * @param info info message
+   * @param err error message
+   * @throws IOException I/O exception
+   */
+  private void redirectPOST(final HTTPContext http, final OutputStream os,
+      final TokenBuilder info, final String err) throws IOException {
+    final String ovar = http.req.getParameter("@output");
+    final String evar = http.req.getParameter("@error");
+    final String ivar = http.req.getParameter("@info");
+    String uri = http.req.getParameter("@redirect");
+
+    // post request: return html form with javascript to trigger client-side reload
+    final TokenBuilder tb = new TokenBuilder();
+    tb.add("<html><body onload='document.forms[\"form\"].submit()'>");
+    tb.add("<form name='form' action='" + uri + "' method='post'>");
+    // bind outputs to specified variables
+    tb.add(createInput(ovar, os));
+    tb.add(createInput(ivar, info));
+    tb.add(createInput(evar, err));
+    tb.add("</form></body></html>");
+    http.res.getOutputStream().write(tb.finish());
+  }
+
+  /**
+   * Creates an input element.
+   * @param name variable name
+   * @param value value
+   * @return input element string
+   */
+  private String createInput(final String name, final Object value) {
+    return name == null ? "" : "<input type='hidden' name='" + name + "' value='" +
+      value.toString().replace("'", "&apos;") + "'/>";
   }
 }
