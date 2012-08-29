@@ -142,11 +142,13 @@ public final class UserFuncs extends ExprInfo {
   /**
    * Checks if all functions have been correctly declared, and initializes
    * all function calls.
+   * @param qc query context
    * @throws QueryException query exception
    */
-  public void check() throws QueryException {
+  public void check(final QueryContext qc) throws QueryException {
     // initialize function calls
     for(int i = 0; i < funcs.length; ++i) {
+      qc.updating |= funcs[i].updating && calls[i].length != 0;
       for(final UserFuncCall c : calls[i]) c.init(funcs[i]);
     }
 

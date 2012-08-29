@@ -26,6 +26,11 @@ public final class FNXQueryTest extends AdvancedQueryTest {
     error(_XQUERY_EVAL.args("1+"), Err.INCOMPLETE);
     error("declare variable $a:=1;" + _XQUERY_EVAL.args("\"$a\""), Err.VARUNDEF);
     error("for $a in (1,2) return " + _XQUERY_EVAL.args("\"$a\""), Err.VARUNDEF);
+    // check updating expressions
+    error(_XQUERY_EVAL.args("delete node ()"), Err.BXXQ_UPDATING);
+    error(_XQUERY_EVAL.args("declare %updating function local:x() {()}; local:x()"),
+        Err.BXXQ_UPDATING);
+    query(_XQUERY_EVAL.args("declare %updating function local:x() {()}; 1"));
   }
 
   /** Test method. */

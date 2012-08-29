@@ -213,7 +213,7 @@ public class QueryParser extends InputParser {
     }
 
     // check function calls
-    ctx.funcs.check();
+    ctx.funcs.check(ctx);
 
     // check placement of updating expressions if any updating expressions have been found
     if(ctx.updates != null) {
@@ -885,7 +885,7 @@ public class QueryParser extends InputParser {
     wsCheck(PAR2);
 
     final UserFunc func = new UserFunc(info(), name, args, optAsType(), ann, true, ctx);
-    if(func.updating) ctx.updating(true);
+    if(func.updating) ctx.updating(false);
 
     if(!wsConsumeWs(EXTERNAL)) {
       ctx.funcs.add(func, info());
