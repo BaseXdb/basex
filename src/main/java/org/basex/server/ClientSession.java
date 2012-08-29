@@ -101,9 +101,9 @@ public class ClientSession extends Session {
 
     super(output);
     ehost = host;
-    // 5 seconds timeout
     socket = new Socket();
     try {
+      // limit timeout to five seconds
       socket.connect(new InetSocketAddress(host, port), 5000);
     } catch(final IllegalArgumentException ex) {
       throw new BaseXException(ex);

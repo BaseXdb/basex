@@ -39,7 +39,7 @@ public abstract class AProp implements Iterable<String> {
     } catch(final Exception ex) {
       Util.notexpected(ex);
     }
-    system();
+    setSystem();
   }
 
   /**
@@ -425,15 +425,15 @@ public abstract class AProp implements Iterable<String> {
    * All properties starting with {@Code org.basex.} will be assigned as properties
    * and removed from the global system properties.
    */
-  private void system() {
+  public void setSystem() {
     // collect parameters that start with "org.basex."
     final StringList sl = new StringList();
     final Properties pr = System.getProperties();
     for(final Object key : pr.keySet()) {
-      String k = key.toString();
+      final String k = key.toString();
       if(k.startsWith(Prop.DBPREFIX)) sl.add(k);
     }
-    // assign properties and remove existing keys
+    // assign properties
     for(final String key : sl) {
       set(key.substring(Prop.DBPREFIX.length()).toUpperCase(Locale.ENGLISH),
           System.getProperty(key));

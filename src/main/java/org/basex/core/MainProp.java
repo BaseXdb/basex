@@ -34,8 +34,7 @@ public final class MainProp extends AProp {
   public static final Object[] HOST = { "HOST", Text.LOCALHOST };
   /** Server: port, used for connecting new clients. */
   public static final Object[] PORT = { "PORT", 1984 };
-  /** Server: host, used for binding the server. Empty
-   * string for wildcard.*/
+  /** Server: host, used for binding the server. Empty string for wildcard.*/
   public static final Object[] SERVERHOST = { "SERVERHOST", "" };
   /** Server: port, used for binding the server. */
   public static final Object[] SERVERPORT = { "SERVERPORT", 1984 };

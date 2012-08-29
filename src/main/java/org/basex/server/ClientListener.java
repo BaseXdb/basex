@@ -70,6 +70,7 @@ public final class ClientListener extends Thread {
     socket = s;
     server = srv;
     last = System.currentTimeMillis();
+    setDaemon(true);
   }
 
   @Override
@@ -195,11 +196,13 @@ public final class ClientListener extends Thread {
       if(running) {
         // send {OK}
         send(true);
-        server.unblock(address);
+        context.blocker.remove(address);
         context.add(this);
       } else {
         if(!us.isEmpty()) log(ACCESS_DENIED, false);
-        new ClientDelayer(server.block(address), this, server).start();
+        // delay users with wrong passwords
+        for(int d = context.blocker.delay(address); d > 0; d--) Performance.sleep(1000);
+        send(false);
       }
     } catch(final IOException ex) {
       if(running) {

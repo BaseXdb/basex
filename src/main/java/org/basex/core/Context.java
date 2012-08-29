@@ -22,6 +22,8 @@ import org.basex.util.list.*;
 public final class Context {
   /** Client listener. Set to {@code null} in standalone/server mode. */
   public final ClientListener listener;
+  /** Blocked clients. */
+  public final ClientBlocker blocker;
   /** Client-related properties. */
   public final Prop prop = new Prop();
   /** Main properties. */
@@ -87,6 +89,7 @@ public final class Context {
     datas = ctx.datas;
     events = ctx.events;
     sessions = ctx.sessions;
+    blocker = ctx.blocker;
     locks = ctx.locks;
     users = ctx.users;
     repo = ctx.repo;
@@ -104,6 +107,7 @@ public final class Context {
     datas = new Datas();
     events = new Events();
     sessions = new Sessions();
+    blocker = new ClientBlocker();
     locks = mp.is(MainProp.DBLOCKING) ? new DBLocking(mp) : new ProcessLocking(this);
     users = new Users(true);
     repo = new Repo(this);

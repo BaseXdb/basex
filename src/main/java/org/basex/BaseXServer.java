@@ -11,7 +11,6 @@ import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.server.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -24,28 +23,24 @@ import org.basex.util.list.*;
  */
 public final class BaseXServer extends Main implements Runnable {
   /** Flag for server activity. */
-  public volatile boolean running;
+  volatile boolean running;
   /** Event server socket. */
   ServerSocket esocket;
   /** Stop file. */
   IOFile stop;
 
-  /** EventsListener. */
-  private EventListener events;
-  /** Temporarily blocked clients. */
-  private final TokenIntMap blocked = new TokenIntMap();
   /** New sessions. */
   private final HashSet<ClientListener> auth = new HashSet<ClientListener>();
-  /** Initial commands. */
-  private StringList commands;
-
-  /** Start as daemon. */
-  private boolean service;
   /** Stopped flag. */
   private volatile boolean stopped;
-
+  /** EventsListener. */
+  private EventListener events;
+  /** Initial commands. */
+  private StringList commands;
   /** Server socket. */
   private ServerSocket socket;
+  /** Start as daemon. */
+  private boolean service;
 
   /**
    * Main method, launching the server process.
@@ -333,30 +328,6 @@ public final class BaseXServer extends Main implements Runnable {
     } catch(final IOException ex) {
       stop.delete();
       throw ex;
-    }
-  }
-
-  /**
-   * Registers the client and calculates the delay after unsuccessful logins.
-   * @param client client address
-   * @return delay
-   */
-  public int block(final byte[] client) {
-    synchronized(blocked) {
-      int delay = blocked.value(client);
-      delay = delay == -1 ? 1 : Math.min(delay, 1024) * 2;
-      blocked.add(client, delay);
-      return delay;
-    }
-  }
-
-  /**
-   * Resets the login delay after successful login.
-   * @param client client address
-   */
-  public void unblock(final byte[] client) {
-    synchronized(blocked) {
-      blocked.delete(client);
     }
   }
 
