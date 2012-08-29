@@ -131,7 +131,7 @@ final class RestXqResponse {
         final byte[] sta = n.attribute(new QNm(STATUS));
         if(sta != null) {
           final byte[] msg = n.attribute(new QNm(REASON));
-          http.status(toInt(sta), msg != null ? string(msg) : "");
+          http.status(toInt(sta), msg != null ? string(msg) : null);
         }
         for(final ANode c : n.children()) {
           // process http:header element
