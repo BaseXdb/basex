@@ -32,7 +32,7 @@ public final class FNRepo extends StandardFunc {
    * @param f function definition
    * @param e arguments
    */
-  protected FNRepo(final InputInfo ii, final Function f, final Expr[] e) {
+  public FNRepo(final InputInfo ii, final Function f, final Expr[] e) {
     super(ii, f, e);
   }
 

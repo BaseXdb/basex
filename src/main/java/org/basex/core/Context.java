@@ -268,12 +268,14 @@ public final class Context {
     // get touched databases
     StringList sl = new StringList();
     if(!pr.databases(sl)) {
-      // databases cannot be determined... pass on all existing databases
+      // old: databases cannot be determined... pass on all existing databases
+      //sl = databases.listDBs();
+      // databases cannot be determined... pass null reference
       sl = null;
-    } else {
+    } else if(data != null) {
       // replace empty string with currently opened database and return array
       for(int d = 0; d < sl.size(); d++) {
-        if(data != null && sl.get(d).isEmpty()) sl.set(d, data.meta.name);
+        if(sl.get(d).isEmpty()) sl.set(d, data.meta.name);
       }
     }
     locks.acquire(pr, sl);

@@ -107,8 +107,6 @@ public interface Commands {
   String SET = "set";
   /** Command string: "show-backups". */
   String SHOW_BACKUPS = "show-backups";
-  /** Command string: "show-databases". */
-  String SHOW_DATABASES = "show-databases";
   /** Command string: "show-events". */
   String SHOW_EVENTS = "show-events";
   /** Command string: "show-sessions". */

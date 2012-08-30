@@ -145,27 +145,6 @@ public abstract class Command extends Progress {
   }
 
   /**
-   * Returns the names of the databases that will be touched by the command.
-   * {@code null} is returned if the touched databases cannot be statically determined.
-   * @param ctx database context
-   * @return databases
-   * @see #databases(StringList)
-   */
-  String[] databases(final Context ctx) {
-    // get touched databases
-    final StringList sl = new StringList();
-    if(!databases(sl)) return null;
-
-    // replace empty string with currently opened database and return array
-    final Data dt = ctx.data();
-    final String[] tmp = new String[sl.size()];
-    for(int d = 0; d < tmp.length; d++) {
-      tmp[d] = dt != null && sl.get(d).isEmpty() ? dt.meta.name : sl.get(d);
-    }
-    return tmp;
-  }
-
-  /**
    * Checks if the command has updated any data.
    * If this method is called before command execution, it always returns {@code true}.
    * @return result of check

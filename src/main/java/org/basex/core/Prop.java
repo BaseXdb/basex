@@ -236,7 +236,7 @@ public final class Prop extends AProp {
    */
   private static String homePath() {
     // check user specific property
-    String path = getSystem(PATH);
+    String path = System.getProperty(PATH);
     if(path != null) return path + File.separator;
 
     // check working directory for property file

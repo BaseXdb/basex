@@ -14,8 +14,6 @@ public final class LookupInput extends InputStream {
   private final InputStream input;
   /** Current value. */
   private int curr;
-  /** Size. */
-  private long size;
 
   /**
    * Constructor.
@@ -38,19 +36,8 @@ public final class LookupInput extends InputStream {
   @Override
   public int read() throws IOException {
     final int v = curr;
-    if(v != -1) {
-      curr = input.read();
-      size++;
-    }
+    if(v != -1) curr = input.read();
     return v;
-  }
-
-  /**
-   * Returns the number of read bytes.
-   * @return read bytes
-   */
-  public long size() {
-    return size - 1;
   }
 
   @Override
