@@ -291,7 +291,7 @@ public final class HTTPContext {
     // add evaluation time if any type is specified
     context.log.write(type != null ?
       new Object[] { address(), context.user.name, type, info, perf } :
-      new Object[] { address(), context.user.name, type, info });
+      new Object[] { address(), context.user.name, null, info });
   }
 
   // STATIC METHODS =====================================================================
@@ -301,7 +301,7 @@ public final class HTTPContext {
    * @param ctx database context
    * @return context;
    */
-  public static HTTPProp hprop(final Context ctx) {
+  public static synchronized HTTPProp hprop(final Context ctx) {
     if(hprop == null) {
       hprop = new HTTPProp();
       // if not modified yet, set restxq to webapp path
