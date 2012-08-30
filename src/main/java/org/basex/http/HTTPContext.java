@@ -32,6 +32,8 @@ public final class HTTPContext {
   private static Context context;
   /** Singleton HTTP properties. */
   private static HTTPProp hprop;
+  /** Initialization flag. */
+  private static boolean init;
 
   /** Servlet request. */
   public final HttpServletRequest req;
@@ -242,9 +244,17 @@ public final class HTTPContext {
    */
   public LocalSession session() throws IOException {
     if(session == null) {
-      if(user == null || user.isEmpty() || pass == null || pass.isEmpty())
-        throw new LoginException(NOPASSWD);
-      session = new LocalSession(context(), user, pass);
+      final byte[] address = token(req.getRemoteAddr());
+      try {
+        if(user == null || user.isEmpty() || pass == null || pass.isEmpty())
+          throw new LoginException(NOPASSWD);
+        session = new LocalSession(context(), user, pass);
+        context.blocker.remove(address);
+      } catch(final LoginException ex) {
+        // delay users with wrong passwords
+        for(int d = context.blocker.delay(address); d > 0; d--) Performance.sleep(1000);
+        throw ex;
+      }
     }
     return session;
   }
@@ -316,14 +326,15 @@ public final class HTTPContext {
    * @param sc servlet context
    * @throws IOException I/O exception
    */
-  static synchronized void init(final ServletContext sc) throws IOException {
-    // skip process if context has already been initialized
-    if(context != null) return;
+  public static synchronized void init(final ServletContext sc) throws IOException {
+    // check if HTTP context has already been initialized
+    if(init) return;
+    init = true;
 
     // set web application path as home directory and HTTPPATH
     final String webapp = sc.getRealPath("/");
-    set(Prop.PATH, webapp);
-    set(MainProp.WEBPATH[0].toString(), webapp);
+    Prop.setSystem(Prop.PATH, webapp);
+    Prop.setSystem(MainProp.WEBPATH, webapp);
 
     // bind all parameters that start with "org.basex." to system properties
     final Enumeration<String> en = sc.getInitParameterNames();
@@ -349,23 +360,19 @@ public final class HTTPContext {
       // prefix relative paths with absolute servlet path
       if(k.endsWith("path") && !new File(v).isAbsolute()) {
         Util.debug(k.toUpperCase(Locale.ENGLISH) + ": " + v);
-        v = new IOFile(Prop.HOME, v).path();
+        v = new IOFile(webapp, v).path();
       }
-      set(k, v);
+      Prop.setSystem(k, v);
     }
-    context = new Context(false);
+
+    // create context, update property instances
+    if(context == null) context = new Context(false);
+    hprop(context).setSystem();
+    context.mprop.setSystem();
+    context.prop.setSystem();
 
     // start server instance
     if(hprop(context).is(HTTPProp.SERVER)) new BaseXServer(context);
-  }
-
-  /**
-   * Sets a system property if it has not already been set before.
-   * @param key key
-   * @param val value
-   */
-  private static synchronized void set(final String key, final Object val) {
-    if(System.getProperty(key) == null) System.setProperty(key, val.toString());
   }
 
   /**

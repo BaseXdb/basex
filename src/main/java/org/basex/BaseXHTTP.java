@@ -63,8 +63,9 @@ public final class BaseXHTTP {
 
     // create jetty instance and set default context to HTTP path
     final String webapp = context.mprop.get(MainProp.WEBPATH);
+    final WebAppContext wac = new WebAppContext(webapp, "/");
     jetty = (Server) new XmlConfiguration(initJetty(webapp).inputStream()).configure();
-    jetty.setHandler(new WebAppContext(webapp, "/"));
+    jetty.setHandler(wac);
 
     // retrieve jetty port
     for(final Connector c : jetty.getConnectors()) {
@@ -76,53 +77,39 @@ public final class BaseXHTTP {
     // stop port: one below jetty port
     if(stopPort == 0) stopPort = httpPort - 1;
 
-    // check if ports are distinct
-    final MainProp mprop = context.mprop;
-    final int port = mprop.num(MainProp.SERVERPORT);
-    final int eport = mprop.num(MainProp.EVENTPORT);
-    int same = -1;
-    if(port == eport || port == httpPort || port == stopPort) same = port;
-    else if(eport == httpPort || eport == stopPort) same = eport;
-    if(same != -1) throw new BaseXException(PORT_TWICE_X, same);
-
-    final HTTPProp hprop = HTTPContext.hprop(context);
-    final boolean server = hprop.is(HTTPProp.SERVER);
-    if(service) {
-      start(httpPort, args);
-      Util.outln(HTTP + ' ' + SRV_STARTED);
-      if(server) Util.outln(SRV_STARTED);
+    // stop server
+    if(stopped) {
+      stop();
+      Util.outln(HTTP + ' ' + SRV_STOPPED);
       // temporary console windows: keep the message visible for a while
       Performance.sleep(1000);
       return;
     }
 
-    if(stopped) {
-      stop();
-      Util.outln(HTTP + ' ' + SRV_STOPPED);
-      if(server) Util.outln(SRV_STOPPED);
+    // start web server in a new process
+    if(service) {
+      start(httpPort, args);
+      Util.outln(HTTP + ' ' + SRV_STARTED);
       // temporary console windows: keep the message visible for a while
       Performance.sleep(1000);
       return;
     }
 
     // request password on command line if only the user was specified
-    if(!hprop.get(HTTPProp.USER).isEmpty()) {
-      while(hprop.get(HTTPProp.PASSWORD).isEmpty()) {
+    if(!Prop.getSystem(HTTPProp.USER).isEmpty()) {
+      while(Prop.getSystem(HTTPProp.PASSWORD).isEmpty()) {
         Util.out(PASSWORD + COLS);
-        hprop.set(HTTPProp.PASSWORD, Util.password());
+        Prop.setSystem(HTTPProp.PASSWORD, Util.password());
       }
     }
 
-    if(server) {
-      new BaseXServer(context);
-      Util.outln(HTTP + ' ' + SRV_STARTED);
-    } else {
-      Util.outln(CONSOLE + HTTP + ' ' + SRV_STARTED, SERVERMODE);
-    }
-    context.log.writeServer(OK, HTTP + ' ' + SRV_STARTED);
-
+    // try to start web server
     jetty.start();
-    new StopServer(mprop.get(MainProp.SERVERHOST)).start();
+    Util.outln(HTTP + ' ' + SRV_STARTED, SERVERMODE);
+
+    // initialize http context, start daemon for stopping web server
+    HTTPContext.init(wac.getServletContext());
+    new StopServer(context.mprop.get(MainProp.SERVERHOST)).start();
 
     // show info when HTTP server is aborted
     Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -134,6 +121,9 @@ public final class BaseXHTTP {
         context.close();
       }
     });
+
+    // log server start at very end (logging flag could have been updated in web.xml)
+    context.log.writeServer(OK, HTTP + ' ' + SRV_STARTED);
   }
 
   /**
@@ -182,37 +172,36 @@ public final class BaseXHTTP {
    * @throws IOException I/O exception
    */
   private void parseArguments(final String[] args) throws IOException {
-    final HTTPProp hprop = HTTPContext.hprop(context);
     final Args arg = new Args(args, this, HTTPINFO, Util.info(CONSOLE, HTTP));
     boolean daemon = false;
     while(arg.more()) {
       if(arg.dash()) {
         switch(arg.next()) {
           case 'd': // activate debug mode
-            context.mprop.set(MainProp.DEBUG, true);
+            Prop.setSystem(MainProp.DEBUG, true);
             break;
           case 'D': // hidden flag: daemon mode
             daemon = true;
             break;
           case 'e': // parse event port
-            context.mprop.set(MainProp.EVENTPORT, arg.number());
+            Prop.setSystem(MainProp.EVENTPORT, arg.number());
             break;
           case 'h': // parse HTTP port
             httpPort = arg.number();
             break;
           case 'l': // use local mode
-            hprop.set(HTTPProp.SERVER, false);
+            Prop.setSystem(HTTPProp.SERVER, false);
             break;
           case 'n': // parse host name
-            context.mprop.set(MainProp.HOST, arg.string());
+            Prop.setSystem(MainProp.HOST, arg.string());
             break;
           case 'p': // parse server port
             final int p = arg.number();
-            context.mprop.set(MainProp.PORT, p);
-            context.mprop.set(MainProp.SERVERPORT, p);
+            Prop.setSystem(MainProp.PORT, p);
+            Prop.setSystem(MainProp.SERVERPORT, p);
             break;
           case 'P': // specify password
-            hprop.set(HTTPProp.PASSWORD, arg.string());
+            Prop.setSystem(HTTPProp.PASSWORD, arg.string());
             break;
           case 's': // parse stop port
             stopPort = arg.number();
@@ -221,13 +210,13 @@ public final class BaseXHTTP {
             service = !daemon;
             break;
           case 'U': // specify user name
-            hprop.set(HTTPProp.USER, arg.string());
+            Prop.setSystem(HTTPProp.USER, arg.string());
             break;
           case 'v': // verbose output
-            hprop.set(HTTPProp.VERBOSE, true);
+            Prop.setSystem(HTTPProp.VERBOSE, true);
             break;
           case 'z': // suppress logging
-            context.mprop.set(MainProp.LOG, false);
+            Prop.setSystem(MainProp.LOG, false);
             break;
           default:
             arg.usage();
@@ -248,11 +237,7 @@ public final class BaseXHTTP {
    * @throws BaseXException database exception
    */
   private static void start(final int port, final String... args) throws BaseXException {
-    // check if server is already running (takes some time)
-    if(ping(LOCALHOST, port)) throw new BaseXException(SRV_RUNNING);
-
     Util.start(BaseXHTTP.class, args);
-
     // try to connect to the new server instance
     for(int c = 0; c < 10; ++c) {
       if(ping(LOCALHOST, port)) return;
