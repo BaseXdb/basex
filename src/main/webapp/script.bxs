@@ -1,0 +1,45 @@
+<!-- This is an example for a BaseX command script. It allows
+  developers to execute several commands by a single call. -->
+<commands>
+  <!-- creates a database -->
+  <create-db name='test'/>
+
+  <!-- adds documents and returns some textual output -->
+  <xquery>
+    for $i in 1 to 10000
+    let $doc := document { element text { $i } }
+    return db:add('test', $doc, $i || '.xml')
+  </xquery>
+
+  <!-- creates some textual output -->
+  <xquery><![CDATA[
+    declare option output:method 'xhtml';
+    declare option output:omit-xml-declaration 'no';
+
+    declare variable $db := 'test';
+    declare variable $docs := 10000;
+
+    <html xmlns="http://www.w3.org/1999/xhtml">
+      <head>
+        <title>Command Scripting</title>
+        <link rel="stylesheet" type="text/css" href="/style.css"/>
+      </head>
+      <body>
+        <div class="right"><img src="/basex.svg" width="75"/></div>
+        <h2>Command Scripting</h2>
+        <div>A new <code>{ $db }</code> database with { $docs } documents was created.<br/>
+          Result of <code>db:info('{ $db }')</code>:
+          <pre>{ serialize(db:info($db)) }</pre>
+        </div>
+        <hr/>
+        <p>The source of this file (<code>{ static-base-uri() }</code>)
+        is shown below:</p>
+        <pre>{ unparsed-text(static-base-uri()) }</pre>
+        <p class='right'><a href='..'>...back to main page</a></p>
+      </body>
+    </html>
+  ]]></xquery>
+
+  <!-- remove created database -->
+  <drop-db name='test'/>
+</commands>

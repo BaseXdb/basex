@@ -18,7 +18,7 @@ declare %restxq:path("")
       <link rel="stylesheet" type="text/css" href="/style.css"/>
     </head>
     <body>
-      <div style="float:right"><img src="/basex.svg" width="75"/></div>
+      <div class="right"><img src="/basex.svg" width="75"/></div>
       <h2>{ $title }</h2>
       <p><a href="http://docs.basex.org/wiki/RESTXQ">RESTXQ</a> is a new API
       that facilitates the use of XQuery as a Server Side processing language
@@ -36,11 +36,10 @@ declare %restxq:path("")
         <input name="message" size="50"></input>
         <input type="submit" /></p>
       </form>
-      <p>The source of this file is shown below:</p>
-      <hr/>
+      <p>The source of this file (<code>{ static-base-uri() }</code>)
+      is shown below:</p>
       <pre>{ unparsed-text(static-base-uri()) }</pre>
-      <hr/>
-      <p style='text-align:right;'><a href='..'>...back to main page</a></p>
+      <p class='right'><a href='..'>...back to main page</a></p>
     </body>
   </html>
 };
