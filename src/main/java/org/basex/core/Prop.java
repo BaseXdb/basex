@@ -181,11 +181,12 @@ public final class Prop extends AProp {
    * @return value, or empty string
    */
   public static String getSystem(final Object[] key) {
-    return getSystem(key.length > 0 ? key[0].toString() : "");
+    return key.length > 0 ? getSystem(key[0].toString()) : "";
   }
 
   /**
-   * Returns a system property.
+   * Returns a system property. If necessary, the key will
+   * be converted to lower-case and prefixed with {@link #DBPREFIX}.
    * @param key {@link Prop} key
    * @return value, or empty string
    */
@@ -198,17 +199,16 @@ public final class Prop extends AProp {
 
   /**
    * Sets a system property if it has not been set before.
-   * Ensures that the key is lower-case and starts with {@link #DBPREFIX}.
    * @param key {@link Prop} key
    * @param val value
    */
   public static void setSystem(final Object[] key, final Object val) {
-    setSystem(key.length > 0 ? key[0].toString() : "", val);
+    if(key.length > 0) setSystem(key[0].toString(), val);
   }
 
   /**
-   * Sets a system property if it has not been set before.
-   * Ensures that the key is lower-case and starts with {@link #DBPREFIX}.
+   * Sets a system property if it has not been set before. If necessary, the key will
+   * be converted to lower-case and prefixed with {@link #DBPREFIX}.
    * @param key key
    * @param val value
    */
@@ -236,7 +236,7 @@ public final class Prop extends AProp {
    */
   private static String homePath() {
     // check user specific property
-    String path = System.getProperty(PATH);
+    String path = getSystem(PATH);
     if(path != null) return path + File.separator;
 
     // check working directory for property file
@@ -254,7 +254,7 @@ public final class Prop extends AProp {
     }
 
     // not found; choose user home directory as default
-    return Prop.USERHOME;
+    return USERHOME;
   }
 
   /**
@@ -286,7 +286,7 @@ public final class Prop extends AProp {
     }
     try {
       // return path, using the correct encoding
-      return new String(tb.finish(), Prop.ENCODING);
+      return new String(tb.finish(), ENCODING);
     } catch(final Exception ex) {
       // use default path; not expected to occur
       Util.stack(ex);

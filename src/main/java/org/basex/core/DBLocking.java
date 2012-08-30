@@ -1,5 +1,6 @@
 package org.basex.core;
 
+import static org.basex.core.Prop.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -139,18 +140,17 @@ public final class DBLocking implements ILocking {
    */
   @Override
   public String toString() {
-    final String nl = System.getProperty("line.separator");
     final String ind = "| ";
-    final StringBuilder sb = new StringBuilder(nl);
-    sb.append("Locking" + nl);
-    sb.append(ind + "Transactions running: " + transactions.get() + nl);
-    sb.append(ind + "Transaction queue: " + queue + nl);
-    sb.append(ind + "Held locks by object:" + nl);
+    final StringBuilder sb = new StringBuilder(NL);
+    sb.append("Locking" + NL);
+    sb.append(ind + "Transactions running: " + transactions.get() + NL);
+    sb.append(ind + "Transaction queue: " + queue + NL);
+    sb.append(ind + "Held locks by object:" + NL);
     for(final Object object : locks.keySet())
-      sb.append(ind + ind + object + " -> " + locks.get(object) + nl);
-    sb.append(ind + "Held locks by transaction:" + nl);
+      sb.append(ind + ind + object + " -> " + locks.get(object) + NL);
+    sb.append(ind + "Held locks by transaction:" + NL);
     for(final Thread thread : locked.keySet())
-      sb.append(ind + ind + thread + " -> " + locked.get(thread) + nl);
+      sb.append(ind + ind + thread + " -> " + locked.get(thread) + NL);
     return sb.toString();
   }
 
