@@ -514,33 +514,33 @@ public enum Function {
   /* FNDb functions. */
 
   /** XQuery function. */
-  _DB_OPEN(FNDb.class, "open(database[,path])", NOD_ZM, 1, STR, STR),
+  _DB_OPEN(FNDb.class, "open(database[,path])", NOD_ZM, 1, ITEM, STR),
   /** XQuery function. */
-  _DB_OPEN_PRE(FNDb.class, "open-pre(database,pre)", NOD_ZM, STR, ITR),
+  _DB_OPEN_PRE(FNDb.class, "open-pre(database,pre)", NOD_ZM, ITEM, ITR),
   /** XQuery function. */
-  _DB_OPEN_ID(FNDb.class, "open-id(database,id)", NOD_ZM, STR, ITR),
+  _DB_OPEN_ID(FNDb.class, "open-id(database,id)", NOD_ZM, ITEM, ITR),
   /** XQuery function. */
-  _DB_TEXT(FNDb.class, "text(database,string)", NOD_ZM, STR, ITEM),
+  _DB_TEXT(FNDb.class, "text(database,string)", NOD_ZM, ITEM, ITEM),
   /** XQuery function. */
-  _DB_TEXT_RANGE(FNDb.class, "text-range(database,from,to)", NOD_ZM, STR, ITEM, ITEM),
+  _DB_TEXT_RANGE(FNDb.class, "text-range(database,from,to)", NOD_ZM, ITEM, ITEM, ITEM),
   /** XQuery function. */
   _DB_ATTRIBUTE(FNDb.class, "attribute(database,string[,name])",
-      NOD_ZM, 2, STR, ITEM, STR),
+      NOD_ZM, 2, ITEM, ITEM, STR),
   /** XQuery function. */
   _DB_ATTRIBUTE_RANGE(FNDb.class, "attribute-range(database,from,to[,name])",
-      NOD_ZM, 3, STR, ITEM, ITEM, STR),
+      NOD_ZM, 3, ITEM, ITEM, ITEM, STR),
   /** XQuery function. */
-  _DB_FULLTEXT(FNDb.class, "fulltext(database,string)", NOD_ZM, STR, STR),
+  _DB_FULLTEXT(FNDb.class, "fulltext(database,string)", NOD_ZM, ITEM, STR),
   /** XQuery function. */
-  _DB_LIST(FNDb.class, "list([database[,path]])", STR_ZM, 0, STR, STR),
+  _DB_LIST(FNDb.class, "list([database[,path]])", STR_ZM, 0, ITEM, STR),
   /** XQuery function. */
-  _DB_LIST_DETAILS(FNDb.class, "list-details([database[,path]])", ELM_ZM, 0, STR, STR),
+  _DB_LIST_DETAILS(FNDb.class, "list-details([database[,path]])", ELM_ZM, 0, ITEM, STR),
   /** XQuery function. */
-  _DB_BACKUPS(FNDb.class, "backups([database])", ELM_ZM, 0, STR),
+  _DB_BACKUPS(FNDb.class, "backups([database])", ELM_ZM, 0, ITEM),
   /** XQuery function. */
   _DB_SYSTEM(FNDb.class, "system()", STR),
   /** XQuery function. */
-  _DB_INFO(FNDb.class, "info(database)", STR, STR),
+  _DB_INFO(FNDb.class, "info(database)", STR, ITEM),
   /** XQuery function. */
   _DB_NODE_ID(FNDb.class, "node-id(nodes)", ITR_ZM, NOD_ZM),
   /** XQuery function. */
@@ -550,29 +550,29 @@ public enum Function {
   /** XQuery function. */
   _DB_OUTPUT(FNDb.class, "output(expression)", EMP, ITEM_ZM),
   /** XQuery function. */
-  _DB_ADD(FNDb.class, "add(database,input[,path])", EMP, 2, STR, DOC_ZM, STR),
+  _DB_ADD(FNDb.class, "add(database,input[,path])", EMP, 2, ITEM, DOC_ZM, STR),
   /** XQuery function. */
-  _DB_DELETE(FNDb.class, "delete(database,path)", EMP, STR, STR),
+  _DB_DELETE(FNDb.class, "delete(database,path)", EMP, ITEM, STR),
   /** XQuery function. */
-  _DB_RENAME(FNDb.class, "rename(database,path,newpath)", EMP, STR, STR, STR),
+  _DB_RENAME(FNDb.class, "rename(database,path,newpath)", EMP, ITEM, STR, STR),
   /** XQuery function. */
-  _DB_REPLACE(FNDb.class, "replace(database,path,item)", EMP, STR, STR, ITEM),
+  _DB_REPLACE(FNDb.class, "replace(database,path,item)", EMP, ITEM, STR, ITEM),
   /** XQuery function. */
-  _DB_OPTIMIZE(FNDb.class, "optimize(database[,all])", EMP, 1, STR, BLN),
+  _DB_OPTIMIZE(FNDb.class, "optimize(database[,all])", EMP, 1, ITEM, BLN),
   /** XQuery function. */
-  _DB_RETRIEVE(FNDb.class, "retrieve(database,path)", B64, STR, STR),
+  _DB_RETRIEVE(FNDb.class, "retrieve(database,path)", B64, ITEM, STR),
   /** XQuery function. */
-  _DB_STORE(FNDb.class, "store(database,path,input)", EMP, STR, STR, ITEM),
+  _DB_STORE(FNDb.class, "store(database,path,input)", EMP, ITEM, STR, ITEM),
   /** XQuery function. */
-  _DB_IS_XML(FNDb.class, "is-xml(database,path)", BLN, STR, STR),
+  _DB_IS_XML(FNDb.class, "is-xml(database,path)", BLN, ITEM, STR),
   /** XQuery function. */
-  _DB_IS_RAW(FNDb.class, "is-raw(database,path)", BLN, STR, STR),
+  _DB_IS_RAW(FNDb.class, "is-raw(database,path)", BLN, ITEM, STR),
   /** XQuery function. */
-  _DB_EXISTS(FNDb.class, "exists(database[,path])", BLN, 1, STR, STR),
+  _DB_EXISTS(FNDb.class, "exists(database[,path])", BLN, 1, ITEM, STR),
   /** XQuery function. */
-  _DB_CONTENT_TYPE(FNDb.class, "content-type(database,path)", ITEM, STR, STR),
+  _DB_CONTENT_TYPE(FNDb.class, "content-type(database,path)", ITEM, ITEM, STR),
   /** XQuery function. */
-  _DB_FLUSH(FNDb.class, "flush(database)", EMP, STR),
+  _DB_FLUSH(FNDb.class, "flush(database)", EMP, ITEM),
 
   /* FNAdmin functions. */
 

@@ -522,7 +522,7 @@ public final class FNDb extends StandardFunc {
     final Item it = checkItem(expr[1], ctx);
     final String path = expr.length < 3 ? "" : path(2, ctx);
 
-    ctx.updates.add(new DBAdd(data, info, it, path, ctx.context), ctx);
+    ctx.updates.add(new DBAdd(data, it, path, ctx.context, info), ctx);
     return null;
   }
 
@@ -553,7 +553,7 @@ public final class FNDb extends StandardFunc {
         if(bin.isDir()) BXDB_SINGLE.thrw(info);
         ctx.updates.add(new DBStore(data, path, doc, info), ctx);
       } else {
-        ctx.updates.add(new DBAdd(data, info, doc, path, ctx.context), ctx);
+        ctx.updates.add(new DBAdd(data, doc, path, ctx.context, info), ctx);
       }
     }
     return null;

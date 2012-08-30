@@ -35,15 +35,15 @@ public final class DBAdd extends InsertBase {
   /**
    * Constructor.
    * @param d target database
-   * @param i input info
    * @param it document to add
    * @param p document(s) path
    * @param c database context
+   * @param ii input info
    */
-  public DBAdd(final Data d, final InputInfo i, final Item it, final String p,
-      final Context c) {
+  public DBAdd(final Data d, final Item it, final String p, final Context c,
+      final InputInfo ii) {
 
-    super(PrimitiveType.INSERTAFTER, -1, d, i, null);
+    super(PrimitiveType.INSERTAFTER, -1, d, ii, null);
     docs.add(it);
     paths.add(token(p));
     ctx = c;
