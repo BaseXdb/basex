@@ -74,19 +74,20 @@ public final class Log {
    * @param str strings to be written
    */
   public synchronized void write(final Object... str) {
-    if(!mprop.is(MainProp.LOG)) return;
+    if(!mprop.is(MainProp.LOG)) {
+      close();
+      return;
+    }
 
     // initializes the output stream and returns the current date
     final Date date = new Date();
     try {
+      // check if day has changed
       final String nstart = DateTime.format(date, DateTime.DATE);
-      if(fos != null && !start.equals(nstart)) {
-        // day has changed..
-        fos.close();
-        fos = null;
-      }
+      if(fos != null && !start.equals(nstart)) close();
+
+      // create new log file
       if(fos == null) {
-        // create new log file
         final IOFile dir = dir();
         dir.md();
         fos = new FileOutputStream(new IOFile(dir, nstart + IO.LOGSUFFIX).file(), true);
@@ -107,8 +108,22 @@ public final class Log {
       }
       tb.add(Prop.NL);
 
+      // write and flush text
       fos.write(tb.finish());
       fos.flush();
+    } catch(final IOException ex) {
+      Util.stack(ex);
+    }
+  }
+
+  /**
+   * Closes the log file.
+   */
+  public synchronized void close() {
+    if(fos == null) return;
+    try {
+      fos.close();
+      fos = null;
     } catch(final IOException ex) {
       Util.stack(ex);
     }

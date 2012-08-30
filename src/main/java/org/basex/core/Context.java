@@ -123,6 +123,7 @@ public final class Context {
   public synchronized void close() {
     while(!sessions.isEmpty()) sessions.get(0).quit();
     datas.close();
+    log.close();
   }
 
   /**
