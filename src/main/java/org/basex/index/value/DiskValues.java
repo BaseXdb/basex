@@ -5,6 +5,7 @@ import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.util.concurrent.atomic.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
@@ -40,7 +41,7 @@ public class DiskValues implements Index {
   /** Synchronization object. */
   protected final Object monitor = new Object();
   /** Number of current index entries. */
-  protected volatile int size;
+  protected AtomicInteger size = new AtomicInteger();
 
   /**
    * Constructor, initializing the index structure.
@@ -65,7 +66,7 @@ public class DiskValues implements Index {
     text = txt;
     idxl = new DataAccess(d.meta.dbfile(pref + "l"));
     idxr = new DataAccess(d.meta.dbfile(pref + "r"));
-    size = idxl.read4();
+    size.set(idxl.read4());
   }
 
   @Override
@@ -80,7 +81,8 @@ public class DiskValues implements Index {
     synchronized(monitor) {
       final long l = idxl.length() + idxr.length();
       tb.add(LI_SIZE + Performance.format(l, true) + NL);
-      for(int m = 0; m < size; ++m) {
+      final int s = size.get();
+      for(int m = 0; m < s; ++m) {
         final long pos = idxr.read5(m * 5L);
         final int oc = idxl.readNum(pos);
         if(stats.adding(oc)) stats.add(data.text(pre(idxl.readNum()), text));
@@ -148,7 +150,8 @@ public class DiskValues implements Index {
    * @return entries
    */
   private EntryIterator allKeys(final boolean reverse) {
-    return reverse ? keysWithinReverse(0, size - 1) : keysWithin(0, size - 1);
+    final int s = size.get() - 1;
+    return reverse ? keysWithinReverse(0, s) : keysWithin(0, s);
   }
 
   /**
@@ -158,9 +161,10 @@ public class DiskValues implements Index {
    * @return entries
    */
   private EntryIterator keysFrom(final byte[] key, final boolean reverse) {
+    final int s = size.get() - 1;
     int i = get(key);
     if(i < 0) i = -i - 1;
-    return reverse ? keysWithinReverse(0, i - 1) : keysWithin(i, size - 1);
+    return reverse ? keysWithinReverse(0, i - 1) : keysWithin(i, s);
   }
 
   /**
@@ -171,12 +175,13 @@ public class DiskValues implements Index {
   private EntryIterator keysWithPrefix(final byte[] prefix) {
     final int i = get(prefix);
     return new EntryIterator() {
+      final int s = size.get();
       int ix = (i < 0 ? -i - 1 : i) - 1; // -1 in order to use the faster ++ix operator
       int count = -1;
 
       @Override
       public byte[] next() {
-        if(++ix < size) {
+        if(++ix < s) {
           synchronized(monitor) {
             final IndexEntry entry = readKeyAt(ix);
             if(startsWith(entry.key, prefix)) {
@@ -314,7 +319,8 @@ public class DiskValues implements Index {
     final IntList pres = new IntList();
     synchronized(monitor) {
       final int i = get(tok.min);
-      for(int l = i < 0 ? -i - 1 : tok.mni ? i : i + 1; l < size; l++) {
+      final int s = size.get();
+      for(int l = i < 0 ? -i - 1 : tok.mni ? i : i + 1; l < s; l++) {
         final int ps = idxl.readNum(idxr.read5(l * 5L));
         int id = idxl.readNum();
         final int pre = pre(id);
@@ -349,7 +355,8 @@ public class DiskValues implements Index {
 
     final IntList pres = new IntList();
     synchronized(monitor) {
-      for(int l = 0; l < size; ++l) {
+      final int s = size.get();
+      for(int l = 0; l < s; ++l) {
         final int ds = idxl.readNum(idxr.read5(l * 5L));
         int id = idxl.readNum();
         final int pre = pre(id);
@@ -415,7 +422,7 @@ public class DiskValues implements Index {
    * @return if the key is found: index of the key else: (-(insertion point) - 1)
    */
   protected int get(final byte[] key) {
-    return get(key, 0, size - 1);
+    return get(key, 0, size.get() - 1);
   }
 
   /**

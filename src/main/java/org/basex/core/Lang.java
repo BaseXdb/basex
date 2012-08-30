@@ -121,9 +121,7 @@ public final class Lang {
           final JarEntry entry = je.nextElement();
           final String name = entry.getName();
           if(!name.startsWith(pre) || !name.endsWith(SUFFIX)) continue;
-
-          final byte[] cont = new byte[(int) entry.getSize()];
-          new DataInputStream(jar.getInputStream(entry)).readFully(cont);
+          final byte[] cont = new IOStream(jar.getInputStream(entry)).read();
           langs.add(name.replaceAll(".*/|." + SUFFIX, ""));
           creds.add(credits(cont));
         }

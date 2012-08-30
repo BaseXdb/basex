@@ -19,7 +19,7 @@ import org.junit.*;
 public abstract class UpdateTest extends SandboxTest {
   /** Test file we do updates with. */
   private static final String TESTFILE = "src/test/resources/test.xml";
-  /** Main memory flag. */
+  /** Main memory flag; can be changed for testing. */
   private static boolean mainmem;
 
   /** JUnit tag. */

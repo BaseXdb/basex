@@ -46,13 +46,14 @@ public final class UpdatableDiskValues extends DiskValues {
 
   @Override
   public synchronized void flush() {
-    idxl.write4(0, size);
+    idxl.write4(0, size.get());
     super.flush();
   }
 
   @Override
   public synchronized void index(final TokenObjMap<IntList> m) {
-    final int last = size - 1;
+    final int s = size.get();
+    final int last = s - 1;
 
     // create a sorted list of all keys: allows faster binary search
     final TokenList allkeys = new TokenList(m.keys()).sort(true);
@@ -71,7 +72,7 @@ public final class UpdatableDiskValues extends DiskValues {
     }
 
     // insert new keys, starting from the biggest one
-    for(int j = nkeys.size() - 1, i = last, pos = size + j; j >= 0; --j) {
+    for(int j = nkeys.size() - 1, i = last, pos = s + j; j >= 0; --j) {
       final byte[] key = nkeys.get(j);
 
       final int ins = -(1 + get(key, 0, i));
@@ -89,7 +90,7 @@ public final class UpdatableDiskValues extends DiskValues {
       // [DP] should the entry be added to the cache?
     }
 
-    size += nkeys.size();
+    size.set(s + nkeys.size());
   }
 
   /**
@@ -129,8 +130,9 @@ public final class UpdatableDiskValues extends DiskValues {
     // delete ids and create a list of the key positions which should be deleted
     final IntList empty = new IntList(m.size());
     int p = 0;
+    final int s = size.get() - 1;
     for(final byte[] key : allkeys) {
-      p = get(key, p, size - 1);
+      p = get(key, p, s);
       if(p < 0) p = -(p + 1); // should not occur, but anyway
       else if(deleteIds(p, key, m.get(key).sort().toArray()) == 0) empty.add(p);
     }
@@ -151,7 +153,7 @@ public final class UpdatableDiskValues extends DiskValues {
     final int numold = idxl.readNum(pos);
 
     if(numold == ids.length) {
-      // all ids should be deteted: the key itself will be deleted, too
+      // all ids should be detected: the key itself will be deleted, too
       cache.delete(key);
       return 0;
     }
@@ -183,7 +185,8 @@ public final class UpdatableDiskValues extends DiskValues {
   private void deleteKeys(final int[] keys) {
     // shift all keys to the left, skipping the ones which have to be deleted
     int j = 0;
-    for(int pos = keys[j++], i = pos + 1; i < size; ++i) {
+    final int s = size.get();
+    for(int pos = keys[j++], i = pos + 1; i < s; ++i) {
       if(j < keys.length && i == keys[j]) ++j;
       else {
         idxr.write5(pos * 5L, idxr.read5(i * 5L));
@@ -191,7 +194,7 @@ public final class UpdatableDiskValues extends DiskValues {
       }
     }
     // reduce the size of the index
-    size -= j;
+    size.set(s - j);
   }
 
   @Override
@@ -207,7 +210,6 @@ public final class UpdatableDiskValues extends DiskValues {
         deleteKeys(tmp);
       }
     }
-
     // add the id to the new key
     insertId(n, id);
   }
@@ -223,7 +225,8 @@ public final class UpdatableDiskValues extends DiskValues {
       ix = -(ix + 1);
 
       // shift all entries with bigger keys to the right
-      for(int i = size; i > ix; --i)
+      final int s = size.get();
+      for(int i = s; i > ix; --i)
         idxr.write5(i * 5L, idxr.read5((i - 1) * 5L));
 
       // add the key and the id
@@ -231,7 +234,7 @@ public final class UpdatableDiskValues extends DiskValues {
       ctext.add(ix, key);
       // [DP] should the entry be added to the cache?
 
-      ++size;
+      size.set(s + 1);
     } else {
       // add id to the list of ids in the index node
       final long pos = idxr.read5(ix * 5L);

@@ -230,7 +230,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
       new RepoManager(context).install(token("src/test/resources/pkg"));
       fail("Not existing package not detected.");
     } catch(final QueryException ex) {
-      check(ex, Err.BXRE_WHICH);
+      check(null, ex, Err.BXRE_WHICH);
     }
     // try to install a package
     new RepoInstall(REPO + "pkg3.xar", null).execute(context);
@@ -302,7 +302,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
       new RepoManager(context).delete(token("xyz"));
       fail("Not installed package not detected.");
     } catch(final QueryException ex) {
-      check(ex, Err.BXRE_WHICH);
+      check(null, ex, Err.BXRE_WHICH);
     }
     // install a package without dependencies (pkg3)
     new RepoInstall(REPO + "pkg3.xar", null).execute(context);
@@ -335,7 +335,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
       new RepoManager(context).delete(token(PKG3ID));
       fail("Package involved in a dependency was deleted.");
     } catch(final QueryException ex) {
-      check(ex, Err.BXRE_DEP);
+      check(null, ex, Err.BXRE_DEP);
     }
     // try to delete pkg4 (use package name)
     new RepoDelete(PKG4, null).execute(context);
@@ -401,7 +401,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
          new PkgParser(context.repo, null).parse(desc));
       fail(exp);
     } catch(final QueryException ex) {
-      check(ex, err);
+      check(null, ex, err);
     }
   }
 

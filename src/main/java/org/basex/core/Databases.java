@@ -148,9 +148,7 @@ public final class Databases {
     for(final byte[] database : dbs) {
       if(null == database) continue;
       final String name = string(database);
-      if(null == name || pattern.matcher(name).matches()) {
-        list.add(name);
-      }
+      if(pattern.matcher(name).matches()) list.add(name);
     }
   }
 

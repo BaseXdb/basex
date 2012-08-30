@@ -194,7 +194,6 @@ public final class Encryption {
 
     // create hash value from input message
     final Key key = new SecretKeySpec(k, string(a));
-    byte[] hash = null;
 
     final byte[] aa = a.length == 0 ? DEFA : a;
     if(!ALGHMAC.contains(lc(aa))) CX_INVHASH.thrw(info, aa);
@@ -206,15 +205,13 @@ public final class Encryption {
     try {
       final Mac mac = Mac.getInstance(string(ALGHMAC.get(lc(aa))));
       mac.init(key);
-      hash = mac.doFinal(msg);
-
+      final byte[] hash = mac.doFinal(msg);
+      // convert to specified encoding, base64 as a standard, else use hex
+      return Str.get(b64 ? Base64.encode(hash) : hex(hash, true));
     } catch(final NoSuchAlgorithmException e) {
-      CX_INVHASH.thrw(info, e);
+      throw CX_INVHASH.thrw(info, e);
     } catch(final InvalidKeyException e) {
-      CX_KEYINV.thrw(info, e);
+      throw CX_KEYINV.thrw(info, e);
     }
-
-    // convert to specified encoding, base64 as a standard, else use hex
-    return Str.get(b64 ? Base64.encode(hash) : hex(hash, true));
   }
 }

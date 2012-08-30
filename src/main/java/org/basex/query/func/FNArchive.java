@@ -121,8 +121,8 @@ public class FNArchive extends StandardFunc {
          format.equals("gzip") && !eq(alg, DEFLATE)) {
         ARCH_SUPP.thrw(info, ALGORITHM, alg);
       }
-      if(alg.equals(STORED)) level = ZipEntry.STORED;
-      else if(alg.equals(DEFLATE)) level = ZipEntry.DEFLATED;
+      if(eq(alg, STORED)) level = ZipEntry.STORED;
+      else if(eq(alg, DEFLATE)) level = ZipEntry.DEFLATED;
     }
     out.level(level);
 

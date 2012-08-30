@@ -67,10 +67,9 @@ public final class HTMLParser extends XMLParser {
 
     try {
       // tries to extract the encoding from the input
-      byte[] content = io.read();
-      final TextInput ti = new TextInput(new IOContent(content));
+      final TextInput ti = new TextInput(io);
       String enc = ti.encoding();
-      content = ti.readBytes();
+      final byte[] content = ti.content();
 
       // looks for a charset definition
       final byte[] encoding = token("charset=");
@@ -105,7 +104,7 @@ public final class HTMLParser extends XMLParser {
       if(props.is(HTMLProp.OMITXML)) {
         opt("omit-xml-declaration", "yes");
       }
-      if((p = props.get(HTMLProp.METHOD)) != null) {
+      if(!(p = props.get(HTMLProp.METHOD)).isEmpty()) {
         opt("method", p);
       }
       if(props.is(HTMLProp.NOBOGONS)) {
@@ -138,13 +137,13 @@ public final class HTMLParser extends XMLParser {
       if(props.is(HTMLProp.LEXICAL)) {
         reader.setProperty("http://xml.org/sax/properties/lexical-handler", writer);
       }
-      if((p = props.get(HTMLProp.DOCTYPESYS)) != null) {
+      if(!(p = props.get(HTMLProp.DOCTYPESYS)).isEmpty()) {
         opt("doctype-system", p);
       }
-      if((p = props.get(HTMLProp.DOCTYPEPUB)) != null) {
+      if(!(p = props.get(HTMLProp.DOCTYPEPUB)).isEmpty()) {
         opt("doctype-public", p);
       }
-      if((p = props.get(HTMLProp.ENCODING)) != null) {
+      if(!(p = props.get(HTMLProp.ENCODING)).isEmpty()) {
         is.setEncoding(p);
       }
       // end TagSoup options

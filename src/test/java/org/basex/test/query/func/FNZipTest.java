@@ -200,9 +200,7 @@ public final class FNZipTest extends AdvancedQueryTest {
       zf = new ZipFile(TMPZIP);
       final ZipEntry ze = zf.getEntry(file);
       assertNotNull("File not found: " + file, ze);
-      final DataInputStream is = new DataInputStream(zf.getInputStream(ze));
-      final byte[] dt = new byte[(int) ze.getSize()];
-      is.readFully(dt);
+      final byte[] dt = new IOStream(zf.getInputStream(ze)).read();
       assertTrue("Wrong contents in file \"" + file + "\":" + Prop.NL +
           "Expected: " + string(data) + Prop.NL + "Found: " + string(dt),
           eq(data, dt));

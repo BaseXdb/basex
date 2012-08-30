@@ -146,9 +146,7 @@ public final class FNGen extends StandardFunc {
     checkCreate(ctx);
     final byte[] file = checkEStr(expr[1], ctx);
     final ANode nd = checkNode(checkNoEmpty(expr[0].item(ctx, info)));
-
-    if(nd == null || nd.type != NodeType.DOC && nd.type != NodeType.ELM)
-      UPFOTYPE.thrw(info, expr[0]);
+    if(nd.type != NodeType.DOC && nd.type != NodeType.ELM) UPFOTYPE.thrw(info, expr[0]);
 
     final Uri u = Uri.uri(file);
     if(u == Uri.EMPTY || !u.isValid()) UPFOURI.thrw(info, file);

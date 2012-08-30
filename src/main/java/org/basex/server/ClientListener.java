@@ -548,6 +548,6 @@ public final class ClientListener extends Thread {
     final Log log = context.log;
     if(log != null) log.write(type != null ?
       new Object[] { address(), user, type, info, perf } :
-      new Object[] { address(), user, type, info });
+      new Object[] { address(), user, null, info });
   }
 }

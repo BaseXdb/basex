@@ -365,9 +365,7 @@ public final class SeqType {
     // return original sequence if no casting is necessary
     if(in && ins && val.homogeneous()) return val;
 
-    // check heterogeneous sequences
-    Value v = n;
-    // no way around it...
+    // check heterogeneous sequences; no way around it...
     final Item[] items = new Item[size];
     items[0] = n;
     for(int i = 1; ins && i < size; i++) {
@@ -376,9 +374,8 @@ public final class SeqType {
       ins = checkKind(n);
       items[i] = n;
     }
-    v = Seq.get(items, size);
     if(!ins) Err.treat(ii, this, val);
-    return v;
+    return Seq.get(items, size);
   }
 
   /**

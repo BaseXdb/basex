@@ -65,6 +65,9 @@ public final class DBLocking implements ILocking {
     if(locked.containsKey(thread))
       throw new IllegalMonitorStateException("Thread already holds one or more locks.");
 
+    // [JE] synchronization of concurrent objects (transactions, queue) may be
+    //  superfluous/incorrect. it could suffice to use ordinary LinkedList and int.
+
     // Wait in queue if necessary
     synchronized(queue) {
       queue.add(thread);

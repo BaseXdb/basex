@@ -67,10 +67,9 @@ public abstract class AdvancedQueryTest extends SandboxTest {
     qp.ctx.sc.baseURI(".");
     try {
       final String res = qp.execute().toString().replaceAll("(\\r|\\n) *", "");
-      fail("Query did not fail:\n" + query + "\n[E] " +
-          error[0] + "...\n[F] " + res);
+      fail("Query did not fail:\n" + query + "\n[E] " + error[0] + "...\n[F] " + res);
     } catch(final QueryException ex) {
-      check(ex, error);
+      check(query, ex, error);
     } finally {
       qp.close();
     }
@@ -78,16 +77,27 @@ public abstract class AdvancedQueryTest extends SandboxTest {
 
   /**
    * Checks if an exception yields one of the specified error codes.
+   * @param query query
    * @param ex exception
    * @param error expected errors
    */
-  protected static void check(final QueryException ex, final Err... error) {
+  protected static void check(final String query, final QueryException ex,
+      final Err... error) {
     if(error.length == 0) Util.notexpected("No error code specified");
     final byte[] msg = Token.token(ex.getMessage());
     boolean found = false;
     for(final Err e : error) found |= Token.contains(msg, e.qname().local());
-    if(!found) fail('\'' + Token.string(error[0].qname().string()) +
-        "' not contained in '" + Token.string(msg) + "'.");
+    if(!found) {
+      final TokenBuilder tb = new TokenBuilder("\n");
+      if(query != null) tb.add("Query: ").add(query).add("\n");
+      tb.add("Error(s): ");
+      int c = 0;
+      for(final Err er : error) {
+        if(c++ != 0) tb.add('/');
+        tb.add(er.qname().string());
+      }
+      fail(tb.add("\nResult: ").add(msg).toString());
+    }
   }
 
   /**

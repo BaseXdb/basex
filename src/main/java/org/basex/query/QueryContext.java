@@ -66,9 +66,6 @@ public final class QueryContext extends Progress {
   public final HashMap<String, String> dbOptions = new HashMap<String, String>();
   /** Global options (will be set after query execution). */
   public final HashMap<String, Object> globalOpt = new HashMap<String, Object>();
-  /** Names of the databases that may be touched by this query.
-   * Set to {@code null} if the affected databases are unknown. */
-  public StringList db;
 
   /** Current context value. */
   public Value value;
@@ -276,8 +273,6 @@ public final class QueryContext extends Progress {
    */
   public Value update() throws QueryException {
     if(updating) {
-      // refresh list of touched databases
-      db = updates.databases();
       updates.apply();
       if(updates.size() != 0 && context.data() != null) context.update();
       if(output.size() != 0) return output.value();

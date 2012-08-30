@@ -270,7 +270,9 @@ public final class LockingTest extends SandboxTest {
      */
     public synchronized void release() {
       requestRelease = true;
-      notify();
+      // [JE] notify() -> notifyAll() is probably what you want? see e.g.:
+      // http://stackoverflow.com/questions/37026/java-notify-vs-notifyall-all-over-again
+      notifyAll();
     }
   }
 

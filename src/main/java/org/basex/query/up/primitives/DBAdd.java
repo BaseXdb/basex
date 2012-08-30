@@ -101,8 +101,9 @@ public final class DBAdd extends InsertBase {
     // add slash to the target if the addressed file is an archive or directory
     IO io = null;
     if(doc instanceof AStr) {
-      io = IO.get(string(doc.string(info)));
-      if(!io.exists()) WHICHRES.thrw(info, pth);
+      final byte[] cont = doc.string(info);
+      io = IO.get(string(cont));
+      if(!io.exists()) WHICHRES.thrw(info, cont);
       if(!name.endsWith("/") && (io.isDir() || io.isArchive())) name += "/";
     }
 
