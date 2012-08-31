@@ -80,7 +80,7 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public final boolean isVacuous() {
-    return !uses(Use.UPD) && type == SeqType.EMP;
+    return !uses(Use.UPD) && type.eq(SeqType.EMP);
   }
 
   @Override

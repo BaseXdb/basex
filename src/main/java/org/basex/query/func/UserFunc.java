@@ -188,6 +188,11 @@ public class UserFunc extends Single {
   }
 
   @Override
+  public final boolean isVacuous() {
+    return !uses(Use.UPD) && ret.eq(SeqType.EMP);
+  }
+
+  @Override
   public boolean uses(final Use u) {
     // handle recursive calls: set dummy value, eventually replace it with final value
     Boolean b = map.get(u);

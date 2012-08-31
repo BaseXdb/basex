@@ -95,6 +95,11 @@ public abstract class UserFuncCall extends Arr {
   }
 
   @Override
+  public final boolean isVacuous() {
+    return func != null && func.isVacuous();
+  }
+
+  @Override
   public boolean uses(final Use u) {
     // function has not parsed yet: return true if state is still unknown
     return func == null || (u == Use.UPD ? func.updating : func.uses(u) || super.uses(u));
