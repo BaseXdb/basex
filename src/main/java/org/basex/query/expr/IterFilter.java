@@ -2,7 +2,6 @@ package org.basex.query.expr;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 
 /**
@@ -31,22 +30,12 @@ final class IterFilter extends Filter {
       public Item next() throws QueryException {
         // first call - initialize iterator
         if(iter == null) iter = ctx.iter(root);
-
-        // cache context
-        final Value cv = ctx.value;
-        final long cp = ctx.pos;
-        final long cs = ctx.size;
-        try {
-          for(Item it; (it = iter.next()) != null;) {
-            ctx.checkStop();
-            if(preds(it, ctx)) return it;
-          }
-          return null;
-        } finally {
-          ctx.value = cv;
-          ctx.pos = cp;
-          ctx.size = cs;
+        // filter sequence
+        for(Item it; (it = iter.next()) != null;) {
+          ctx.checkStop();
+          if(preds(it, ctx)) return it;
         }
+        return null;
       }
     };
   }

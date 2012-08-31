@@ -10,6 +10,7 @@ import org.basex.query.expr.CmpV.OpV;
 import org.basex.query.func.*;
 import org.basex.query.path.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -125,14 +126,19 @@ public abstract class Preds extends ParseExpr {
 
     // set context item and position
     Item i = null;
-    for(final Expr p : preds) {
-      ctx.value = it;
-      i = p.test(ctx, info);
-      if(i == null) return false;
+    final Value cv = ctx.value;
+    try {
+      for(final Expr p : preds) {
+        ctx.value = it;
+        i = p.test(ctx, info);
+        if(i == null) return false;
+      }
+      // item accepted.. adopt last scoring value
+      it.score(i.score());
+      return true;
+    } finally {
+      ctx.value = cv;
     }
-    // item accepted.. adopt last scoring value
-    it.score(i.score());
-    return true;
   }
 
   @Override

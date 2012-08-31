@@ -2,7 +2,6 @@ package org.basex.query.expr;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 
 /**
@@ -69,10 +68,8 @@ final class IterPosFilter extends Filter {
         }
 
         // cache context
-        final Value cv = ctx.value;
         final long cp = ctx.pos;
         final long cs = ctx.size;
-
         try {
           Item item;
           if(direct) {
@@ -103,7 +100,6 @@ final class IterPosFilter extends Filter {
           return item;
         } finally {
           // reset context and return result
-          ctx.value = cv;
           ctx.pos = cp;
           ctx.size = cs;
         }
