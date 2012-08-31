@@ -58,23 +58,18 @@
   </issueManagement>
   <dependencies>
     <dependency>
-      <groupId>net.xqj</groupId>
-      <artifactId>basex-xqj</artifactId>
-      <version>1.2.0</version>
-    </dependency>
-    <dependency>
       <groupId>org.basex</groupId>
       <artifactId>basex</artifactId>
       <version>7.4-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <groupId>org.xmldb</groupId>
-      <artifactId>xmldb-api</artifactId>
-      <version>1.0</version>
+      <groupId>net.xqj</groupId>
+      <artifactId>basex-xqj</artifactId>
+      <version>1.2.0</version>
     </dependency>
     <dependency>
-      <groupId>javax.xml.xquery</groupId>
-      <artifactId>xqj-api</artifactId>
+      <groupId>org.xmldb</groupId>
+      <artifactId>xmldb-api</artifactId>
       <version>1.0</version>
     </dependency>
     <dependency>
@@ -113,12 +108,12 @@
           <groupId>org.slf4j</groupId>
         </exclusion>
         <exclusion>
-          <artifactId>slf4j-api</artifactId>      
-          <groupId>org.slf4j</groupId>  	
-        </exclusion>
-        <exclusion>
           <artifactId>log4j</artifactId>
           <groupId>log4j</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>slf4j-api</artifactId>      
+          <groupId>org.slf4j</groupId>  	
         </exclusion>
       </exclusions>
     </dependency>
@@ -127,11 +122,11 @@
       <artifactId>commons-fileupload</artifactId>
       <version>1.2.2</version>
     </dependency>
-    <!--<dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-nop</artifactId>
       <version>1.5.8</version>
-    </dependency>-->
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
