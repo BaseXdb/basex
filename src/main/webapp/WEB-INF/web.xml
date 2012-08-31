@@ -30,11 +30,12 @@
     <param-value></param-value>
   </context-param>
 
-  <!-- All relative paths will be resolved against the webapp path.
+  <!-- All relative paths will be resolved against the webapp path. -->
   <context-param>
     <param-name>org.basex.restxqpath</param-name>
     <param-value>.</param-value>
   </context-param>
+  <!--
   <context-param>
     <param-name>org.basex.dbpath</param-name>
     <param-value>WEB-INF/data</param-value>
