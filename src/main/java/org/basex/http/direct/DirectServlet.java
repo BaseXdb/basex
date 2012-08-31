@@ -116,6 +116,8 @@ public final class DirectServlet extends BaseXServlet {
       } else {
         redirect(http, os, info, err);
       }
+    } else if(bxe != null) {
+      throw bxe;
     }
   }
 
