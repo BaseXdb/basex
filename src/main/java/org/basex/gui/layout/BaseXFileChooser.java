@@ -135,16 +135,17 @@ public final class BaseXFileChooser {
     }
     if(state != JFileChooser.APPROVE_OPTION) return new IOFile[0];
 
-    final File[] fl = fc.getSelectedFiles();
+    final File[] fl = fc.isMultiSelectionEnabled() ? fc.getSelectedFiles() :
+      new File[] { fc.getSelectedFile() };
     final IOFile[] files = new IOFile[fl.length];
     for(int f = 0; f < fl.length; f++) files[f] = new IOFile(fl[f].getPath());
 
     if(mode == Mode.FSAVE) {
       // add file suffix to files
       if(suffix != null) {
-        for(int f = 0; f < fl.length; f++) {
+        for(int f = 0; f < files.length; f++) {
           final String path = files[f].path();
-          if(path.contains(".")) files[f] = new IOFile(path + suffix);
+          if(!path.contains(".")) files[f] = new IOFile(path + suffix);
         }
       }
       // show replace dialog
