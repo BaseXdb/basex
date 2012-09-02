@@ -2,12 +2,13 @@
 <!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
 
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
-  <!-- Default connector. -->
+  <!-- Default connector. The Jetty stop port can be specified 
+       in the .basex or pom.xml configuration file.  -->
   <Call name="addConnector">
     <Arg>
       <New class="org.eclipse.jetty.server.nio.SelectChannelConnector">
         <Set name="port">8984</Set>
-        <Set name="confidentialPort">8985</Set>
+        <Set name="confidentialPort">8986</Set>
         <Set name="maxIdleTime">60000</Set>
         <Set name="reuseAddress">false</Set>
         <Set name="Acceptors">2</Set>
@@ -24,7 +25,7 @@
   <Call name="addConnector">
     <Arg>
       <New class="org.eclipse.jetty.server.ssl.SslSelectChannelConnector">
-        <Set name="Port">8985</Set>
+        <Set name="Port">8986</Set>
         <Set name="maxIdleTime">60000</Set>
         <Set name="keystore"><SystemProperty name="jetty.home" default="."/>/etc/keystore</Set>
         <Set name="password">jetty</Set>

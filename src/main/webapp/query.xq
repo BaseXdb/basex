@@ -7,7 +7,7 @@ declare option output:omit-xml-declaration 'no';
     <link rel="stylesheet" type="text/css" href="/style.css"/>
   </head>
   <body>
-    <div class="right"><img src="/basex.svg" width="75"/></div>
+    <div class="right"><img src="/basex.svg" width="96"/></div>
     <h2>XQuery Evaluation</h2>
     <div>This page was directly created by the addressed XQuery file.<br/>
       Result of <code>1 to 10</code>: { 1 to 10 }.

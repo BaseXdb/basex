@@ -25,7 +25,7 @@
         <link rel="stylesheet" type="text/css" href="/style.css"/>
       </head>
       <body>
-        <div class="right"><img src="/basex.svg" width="75"/></div>
+        <div class="right"><img src="/basex.svg" width="96"/></div>
         <h2>Command Scripting</h2>
         <div>A new <code>{ $db }</code> database with { $docs } documents was created.<br/>
           Result of <code>db:info('{ $db }')</code>:

@@ -1,5 +1,6 @@
 body, td {
   font-family: "Trebuchet MS","Droid sans", sans-serif;
+  overflow-y: scroll;
   margin: 1.2em;
   border: 0;
 }
