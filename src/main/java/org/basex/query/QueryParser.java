@@ -1254,7 +1254,7 @@ public class QueryParser extends InputParser {
         wsCheck(DEFAULT);
       }
       wsCheck(RETURN);
-      cases.set(0, single());
+      cases.set(0, check(single(), NOSWITCH));
       exprs = Array.add(exprs, new SwitchCase(info(), cases.finish()));
     } while(cases.size() != 1);
 
