@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 
 import java.io.*;
 import java.net.*;
+import java.util.*;
 
 import org.basex.*;
 import org.basex.core.*;
@@ -42,7 +43,7 @@ public abstract class HTTPTest extends SandboxTest {
    */
   protected static void init(final String rt, final boolean local) throws Exception {
     initContext(CONTEXT);
-    assertTrue(new IOFile(HTTPContext.hprop(CONTEXT).get(HTTPProp.RESTXQPATH)).md());
+    assertTrue(new IOFile(CONTEXT.mprop.get(MainProp.WEBPATH)).md());
     root = rt;
 
     final StringList sl = new StringList();
@@ -69,6 +70,15 @@ public abstract class HTTPTest extends SandboxTest {
     } finally {
       System.setOut(OUT);
     }
+
+    // cleanup: remove project specific system properties
+    final StringList sl = new StringList();
+    final Properties pr = System.getProperties();
+    for(final Object s : pr.keySet()) {
+      final String st = s.toString();
+      if(st.startsWith(Prop.DBPREFIX)) sl.add(st);
+    }
+    for(final String s : sl) pr.remove(s);
   }
 
   // PROTECTED METHODS ==================================================================

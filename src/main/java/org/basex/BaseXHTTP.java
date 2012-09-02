@@ -28,9 +28,6 @@ public final class BaseXHTTP {
   final Context context = HTTPContext.init();
   /** HTTP server. */
   private final Server jetty;
-
-  /** Stop port. */
-  private int stopPort;
   /** HTTP port. */
   private int httpPort;
   /** Start as daemon. */
@@ -62,7 +59,8 @@ public final class BaseXHTTP {
     parseArguments(args);
 
     // create jetty instance and set default context to HTTP path
-    final String webapp = context.mprop.get(MainProp.WEBPATH);
+    final MainProp mprop = context.mprop;
+    final String webapp = mprop.get(MainProp.WEBPATH);
     final WebAppContext wac = new WebAppContext(webapp, "/");
     jetty = (Server) new XmlConfiguration(initJetty(webapp).inputStream()).configure();
     jetty.setHandler(wac);
@@ -74,8 +72,6 @@ public final class BaseXHTTP {
         else c.setPort(httpPort);
       }
     }
-    // stop port: one below jetty port
-    if(stopPort == 0) stopPort = httpPort - 1;
 
     // stop server
     if(stopped) {
@@ -96,20 +92,23 @@ public final class BaseXHTTP {
     }
 
     // request password on command line if only the user was specified
-    if(!Prop.getSystem(HTTPProp.USER).isEmpty()) {
-      while(Prop.getSystem(HTTPProp.PASSWORD).isEmpty()) {
+    if(!Prop.getSystem(MainProp.USER).isEmpty()) {
+      while(Prop.getSystem(MainProp.PASSWORD).isEmpty()) {
         Util.out(PASSWORD + COLS);
-        Prop.setSystem(HTTPProp.PASSWORD, Util.password());
+        Prop.setSystem(MainProp.PASSWORD, Util.password());
       }
     }
 
-    // try to start web server
+    // start web server
     jetty.start();
     Util.outln(HTTP + ' ' + SRV_STARTED, SERVERMODE);
 
-    // initialize http context, start daemon for stopping web server
+    // initialize web.xml settings
     HTTPContext.init(wac.getServletContext());
-    new StopServer(context.mprop.get(MainProp.SERVERHOST)).start();
+
+    // start daemon for stopping web server
+    final int stop = mprop.num(MainProp.STOPPORT);
+    if(stop >= 0) new StopServer(mprop.get(MainProp.SERVERHOST), stop).start();
 
     // show info when HTTP server is aborted
     Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -122,7 +121,7 @@ public final class BaseXHTTP {
       }
     });
 
-    // log server start at very end (logging flag could have been updated in web.xml)
+    // log server start at very end (logging flag could have been updated by web.xml)
     context.log.writeServer(OK, HTTP + ' ' + SRV_STARTED);
   }
 
@@ -132,11 +131,14 @@ public final class BaseXHTTP {
    */
   public void stop() throws Exception {
     // notify the jetty monitor to stop
-    stop(stopPort);
+    final MainProp mprop = context.mprop;
+    final int stop = mprop.num(MainProp.STOPPORT);
+    if(stop >= 0) stop(stop);
+
     // server has been started as separate process and need to be stopped
-    if(HTTPContext.hprop(context).is(HTTPProp.SERVER)) {
-      final int port = context.mprop.num(MainProp.SERVERPORT);
-      final int eport = context.mprop.num(MainProp.EVENTPORT);
+    if(!mprop.is(MainProp.HTTPLOCAL)) {
+      final int port = mprop.num(MainProp.SERVERPORT);
+      final int eport = mprop.num(MainProp.EVENTPORT);
       BaseXServer.stop(port, eport);
     }
   }
@@ -172,6 +174,8 @@ public final class BaseXHTTP {
    * @throws IOException I/O exception
    */
   private void parseArguments(final String[] args) throws IOException {
+    /* command-line properties not be stored in system properties (instead of
+     * context.mprop). this way, they will not be overwritten by web.xml settings. */
     final Args arg = new Args(args, this, HTTPINFO, Util.info(CONSOLE, HTTP));
     boolean daemon = false;
     while(arg.more()) {
@@ -190,7 +194,7 @@ public final class BaseXHTTP {
             httpPort = arg.number();
             break;
           case 'l': // use local mode
-            Prop.setSystem(HTTPProp.SERVER, false);
+            Prop.setSystem(MainProp.HTTPLOCAL, true);
             break;
           case 'n': // parse host name
             Prop.setSystem(MainProp.HOST, arg.string());
@@ -201,19 +205,16 @@ public final class BaseXHTTP {
             Prop.setSystem(MainProp.SERVERPORT, p);
             break;
           case 'P': // specify password
-            Prop.setSystem(HTTPProp.PASSWORD, arg.string());
+            Prop.setSystem(MainProp.PASSWORD, arg.string());
             break;
           case 's': // parse stop port
-            stopPort = arg.number();
+            Prop.setSystem(MainProp.STOPPORT, arg.number());
             break;
           case 'S': // set service flag
             service = !daemon;
             break;
           case 'U': // specify user name
-            Prop.setSystem(HTTPProp.USER, arg.string());
-            break;
-          case 'v': // verbose output
-            Prop.setSystem(HTTPProp.VERBOSE, true);
+            Prop.setSystem(MainProp.USER, arg.string());
             break;
           case 'z': // suppress logging
             Prop.setSystem(MainProp.LOG, false);
@@ -302,13 +303,14 @@ public final class BaseXHTTP {
     /**
      * Constructor.
      * @param host host address
+     * @param port stop port
      * @throws IOException I/O exception
      */
-    StopServer(final String host) throws IOException {
+    StopServer(final String host, final int port) throws IOException {
       final InetAddress addr = host.isEmpty() ? null : InetAddress.getByName(host);
       ss = new ServerSocket();
-      ss.bind(new InetSocketAddress(addr, stopPort));
-      stop = stopFile(stopPort);
+      ss.bind(new InetSocketAddress(addr, port));
+      stop = stopFile(port);
       setDaemon(true);
     }
 

@@ -168,7 +168,7 @@ public final class DirectServlet extends BaseXServlet {
     final String ovar = http.req.getParameter("@output");
     final String evar = http.req.getParameter("@error");
     final String ivar = http.req.getParameter("@info");
-    String uri = http.req.getParameter("@redirect");
+    final String uri = http.req.getParameter("@redirect");
 
     // post request: return html form with javascript to trigger client-side reload
     final TokenBuilder tb = new TokenBuilder();

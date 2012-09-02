@@ -2,8 +2,10 @@ package org.basex.http.restxq;
 
 import static org.basex.http.restxq.RestXqText.*;
 
+import java.io.*;
 import java.util.*;
 
+import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.query.*;
@@ -20,6 +22,8 @@ final class RestXqModules {
 
   /** Module cache. */
   private HashMap<String, RestXqModule> modules = new HashMap<String, RestXqModule>();
+  /** RESTXQ path. */
+  private IOFile restxq;
   /** Private constructor. */
   private RestXqModules() { }
 
@@ -65,12 +69,16 @@ final class RestXqModules {
    * @throws QueryException query exception
    */
   private void analyze(final HTTPContext http) throws QueryException {
+    // initialize RESTXQ directory (may be relative against WEBPATH)
+    if(restxq == null) {
+      final File fl = new File(http.context().mprop.get(MainProp.RESTXQPATH));
+      restxq = fl.isAbsolute() ? new IOFile(fl) :
+        new IOFile(http.context().mprop.get(MainProp.WEBPATH), fl.getPath());
+    }
+
     // create new cache
     final HashMap<String, RestXqModule> tmp = new HashMap<String, RestXqModule>();
-
-    // parse HTTP directory
-    final IOFile root = new IOFile(http.hprop().get(HTTPProp.RESTXQPATH));
-    for(final IOFile file : root.children()) {
+    for(final IOFile file : restxq.children()) {
       // only accept XQuery files with suffix ".xqm"
       if(!file.path().endsWith(IO.XQMSUFFIX)) continue;
 

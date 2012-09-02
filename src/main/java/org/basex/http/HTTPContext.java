@@ -30,8 +30,6 @@ import org.basex.util.list.*;
 public final class HTTPContext {
   /** Singleton database context. */
   private static Context context;
-  /** Singleton HTTP properties. */
-  private static HTTPProp hprop;
   /** Initialization flag. */
   private static boolean init;
 
@@ -85,9 +83,9 @@ public final class HTTPContext {
     segments = toSegments(req.getPathInfo());
     path = join(0);
 
-    final HTTPProp hp = hprop(context);
-    user = hp.get(HTTPProp.USER);
-    pass = hp.get(HTTPProp.PASSWORD);
+    final MainProp mprop = context().mprop;
+    user = mprop.get(MainProp.USER);
+    pass = mprop.get(MainProp.PASSWORD);
 
     // set session-specific credentials
     final String auth = req.getHeader(AUTHORIZATION);
@@ -275,14 +273,6 @@ public final class HTTPContext {
   }
 
   /**
-   * Returns the database context.
-   * @return context;
-   */
-  public HTTPProp hprop() {
-    return hprop;
-  }
-
-  /**
    * Writes a log message.
    * @param info message info
    * @param type message type (true/false/null: OK, ERROR, REQUEST, Error Code)
@@ -295,21 +285,6 @@ public final class HTTPContext {
   }
 
   // STATIC METHODS =====================================================================
-
-  /**
-   * Returns the HTTP properties.
-   * @param ctx database context
-   * @return context;
-   */
-  public static synchronized HTTPProp hprop(final Context ctx) {
-    if(hprop == null) {
-      hprop = new HTTPProp();
-      // if not modified yet, set restxq to webapp path
-      if(hprop.get(HTTPProp.RESTXQPATH).isEmpty())
-         hprop.set(HTTPProp.RESTXQPATH, ctx.mprop.get(MainProp.WEBPATH));
-    }
-    return hprop;
-  }
 
   /**
    * Initializes the HTTP context.
@@ -339,24 +314,28 @@ public final class HTTPContext {
     // bind all parameters that start with "org.basex." to system properties
     final Enumeration<String> en = sc.getInitParameterNames();
     while(en.hasMoreElements()) {
-      String key = en.nextElement();
+      final String key = en.nextElement();
       if(!key.startsWith(Prop.DBPREFIX)) continue;
 
-      // legacy: rewrite obsolete properties
-      String val = sc.getInitParameter(key);
+      // legacy: rewrite obsolete properties. will be removed some versions later
+      final String val = sc.getInitParameter(key);
       String k = key;
       String v = val;
       if(key.equals(Prop.DBPREFIX + "httppath")) {
-        k = Prop.DBPREFIX + HTTPProp.RESTXQPATH[0];
+        k = Prop.DBPREFIX + MainProp.RESTXQPATH[0];
       } else if(key.equals(Prop.DBPREFIX + "mode")) {
-        k = Prop.DBPREFIX + HTTPProp.SERVER[0];
-        v = Boolean.toString(!v.equals("local"));
+        k = Prop.DBPREFIX + MainProp.HTTPLOCAL[0];
+        v = Boolean.toString(v.equals("local"));
+      } else if(key.equals(Prop.DBPREFIX + "server")) {
+        k = Prop.DBPREFIX + MainProp.HTTPLOCAL[0];
+        v = Boolean.toString(!Boolean.parseBoolean(v));
       }
       k = k.toLowerCase(Locale.ENGLISH);
       if(!k.equals(key) || !v.equals(val)) {
         Util.errln("Warning! Outdated property: " +
           key + "=" + val + " => " + k + "=" + v);
       }
+
       // prefix relative paths with absolute servlet path
       if(k.endsWith("path") && !new File(v).isAbsolute()) {
         Util.debug(k.toUpperCase(Locale.ENGLISH) + ": " + v);
@@ -366,13 +345,15 @@ public final class HTTPContext {
     }
 
     // create context, update property instances
-    if(context == null) context = new Context(false);
-    hprop(context).setSystem();
-    context.mprop.setSystem();
-    context.prop.setSystem();
+    if(context == null) {
+      context = new Context(false);
+    } else {
+      context.mprop.setSystem();
+      context.prop.setSystem();
+    }
 
     // start server instance
-    if(hprop(context).is(HTTPProp.SERVER)) new BaseXServer(context);
+    if(!context.mprop.is(MainProp.HTTPLOCAL)) new BaseXServer(context);
   }
 
   /**

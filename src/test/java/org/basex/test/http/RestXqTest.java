@@ -7,7 +7,6 @@ import static org.junit.Assert.*;
 import java.io.*;
 
 import org.basex.core.*;
-import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.junit.*;
@@ -397,7 +396,7 @@ public final class RestXqTest extends HTTPTest {
    */
   private static void install(final String function) throws IOException {
     // delete old module
-    final String path = HTTPContext.hprop(context).get(HTTPProp.RESTXQPATH);
+    final String path = context.mprop.get(MainProp.WEBPATH);
     for(final IOFile f : new IOFile(path).children()) assertTrue(f.delete());
     // create new module
     module().write(new TokenBuilder(HEADER).add(function).finish());
@@ -408,7 +407,7 @@ public final class RestXqTest extends HTTPTest {
    * @return test module
    */
   private static IOFile module() {
-    final String path = HTTPContext.hprop(context).get(HTTPProp.RESTXQPATH);
+    final String path = context.mprop.get(MainProp.WEBPATH);
     return new IOFile(path, NAME + count++ + IO.XQMSUFFIX);
   }
 }

@@ -25,8 +25,8 @@ public enum HTTPErr {
   NOT_FOUND_X(SC_NOT_FOUND, "%"),
   /** Error: 404, "No path specified.". */
   NO_PATH(SC_NOT_FOUND, "No path specified."),
-  /** Error: 404, "No XQuery function found to process the request.". */
-  NO_XQUERY(SC_NOT_FOUND, "No XQuery function found to process the request."),
+  /** Error: 404, "No function found to process the request.". */
+  NO_XQUERY(SC_NOT_FOUND, "No function found that matches the request."),
 
   /** Error 501, "Method not supported: %.". */
   NOT_IMPLEMENTED_X(SC_NOT_IMPLEMENTED, "Method not supported: %.");

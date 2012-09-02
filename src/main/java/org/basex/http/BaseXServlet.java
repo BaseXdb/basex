@@ -54,7 +54,7 @@ public abstract class BaseXServlet extends HttpServlet {
       Util.errln(Util.bug(ex));
       http.status(SC_INTERNAL_SERVER_ERROR, Util.info(UNEXPECTED, ex));
     } finally {
-      if(http.hprop().is(HTTPProp.VERBOSE)) {
+      if(Prop.debug) {
         Util.outln("_ REQUEST _________________________________" + Prop.NL + req);
         final Enumeration<String> en = req.getHeaderNames();
         while(en.hasMoreElements()) {
