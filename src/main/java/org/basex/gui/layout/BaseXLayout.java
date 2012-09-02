@@ -204,7 +204,7 @@ public final class BaseXLayout {
         } else if(DECFONT.is(e)) {
           nfs = Math.max(1, fs - 1);
         } else if(NORMFONT.is(e)) {
-          nfs = 12;
+          nfs = 13;
         }
         if(fs != nfs) {
           gui.gprop.set(GUIProp.FONTSIZE, nfs);
