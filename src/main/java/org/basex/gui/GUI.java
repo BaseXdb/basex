@@ -502,15 +502,6 @@ public final class GUI extends AGUI {
  }
 
  /**
-  * Sets a main property and displays the command in the info view.
-  * @param pr property to be set
-  * @param val value
-  */
- public void setMain(final Object[] pr, final Object val) {
-   set(context.mprop, pr, val);
- }
-
- /**
   * Sets a property and displays the command in the info view.
   * @param prop property instance
   * @param pr property to be set

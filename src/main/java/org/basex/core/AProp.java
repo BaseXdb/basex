@@ -26,54 +26,51 @@ public abstract class AProp implements Iterable<String> {
   private IOFile file;
 
   /**
-   * Constructor, initializing the default options.
+   * Constructor.
    */
-  protected AProp() {
+  public AProp() {
+    this(null);
+  }
+
+  /**
+   * Constructor, reading options from a configuration file.
+   * @param suffix if {@code null}, file parsing will be skipped
+   */
+  public AProp(final String suffix) {
     try {
       for(final Field f : getClass().getFields()) {
         final Object obj = f.get(null);
         if(!(obj instanceof Object[])) continue;
         final Object[] arr = (Object[]) obj;
-        props.put(arr[0].toString(), arr[1]);
+        if(arr.length > 1) props.put(arr[0].toString(), arr[1]);
       }
     } catch(final Exception ex) {
       Util.notexpected(ex);
     }
+    if(suffix != null) read(suffix);
     setSystem();
+    finish();
   }
 
   /**
    * Writes the properties to disk.
    */
   public final synchronized void write() {
-    final StringBuilder user = new StringBuilder();
-    BufferedReader br = null;
-    try {
-      // caches options specified by the user
-      if(file.exists()) {
-        br = new BufferedReader(new FileReader(file.file()));
-        for(String line; (line = br.readLine()) != null;) {
-          if(line.equals(PROPUSER)) break;
-        }
-        for(String line; (line = br.readLine()) != null;) {
-          user.append(line).append(NL);
-        }
-      }
-    } catch(final Exception ex) {
-      Util.debug(ex);
-    } finally {
-      if(br != null) try { br.close(); } catch(final IOException e) { }
-    }
-
     BufferedWriter bw = null;
     try {
       bw = new BufferedWriter(new FileWriter(file.file()));
-      bw.write(PROPHEADER + NL);
+      bw.write(PROPHEADER);
 
       for(final Field f : getClass().getFields()) {
         final Object obj = f.get(null);
         if(!(obj instanceof Object[])) continue;
-        final String key = ((Object[]) obj)[0].toString();
+
+        final Object[] o = (Object[]) obj;
+        final String key = o[0].toString();
+        if(o.length == 1) {
+          bw.write(NL + "# " + key + NL);
+          continue;
+        }
 
         final Object val = props.get(key);
         if(val instanceof String[]) {
@@ -93,8 +90,6 @@ public abstract class AProp implements Iterable<String> {
           bw.write(key + " = " + val + NL);
         }
       }
-      bw.write(NL + PROPUSER + NL);
-      bw.write(user.toString());
     } catch(final Exception ex) {
       Util.errln("% could not be written.", file);
       Util.debug(ex);
@@ -284,6 +279,26 @@ public abstract class AProp implements Iterable<String> {
     return null;
   }
 
+  /**
+   * Scans the system properties and initializes the project properties.
+   * All properties starting with {@Code org.basex.} will be assigned as properties
+   * and removed from the global system properties.
+   */
+  public void setSystem() {
+    // collect parameters that start with "org.basex."
+    final StringList sl = new StringList();
+    final Properties pr = System.getProperties();
+    for(final Object key : pr.keySet()) {
+      final String k = key.toString();
+      if(k.startsWith(Prop.DBPREFIX)) sl.add(k);
+    }
+    // assign properties
+    for(final String key : sl) {
+      set(key.substring(Prop.DBPREFIX.length()).toUpperCase(Locale.ENGLISH),
+          System.getProperty(key));
+    }
+  }
+
   @Override
   public final synchronized Iterator<String> iterator() {
     return props.keySet().iterator();
@@ -302,11 +317,41 @@ public abstract class AProp implements Iterable<String> {
   // PROTECTED METHODS ===================================================================
 
   /**
+   * Parses a property string and sets the properties accordingly.
+   * @param s property string
+   * @throws IOException io exception
+   */
+  protected final synchronized void parse(final String s) throws IOException {
+    for(final String ser : s.trim().split(",")) {
+      if(ser.isEmpty()) continue;
+      final String[] sprop = ser.split("=", 2);
+
+      final String key = sprop[0].trim();
+      final String val = sprop.length < 2 ? "" : sprop[1];
+      try {
+        if(set(key, val) != null) continue;
+      } catch(final Exception ex) {
+        throw new BaseXException(Text.INVALID_VALUE_X_X, key, val);
+      }
+      throw new BaseXException(unknown(key));
+    }
+  }
+
+  /**
+   * Sets static properties.
+   */
+  protected void finish() {
+    // nothing to do; if necessary, is overwritten.
+  }
+
+  // PRIVATE METHODS ====================================================================
+
+  /**
    * Reads the configuration file and initializes the project properties.
    * The file is located in the project home directory.
    * @param prop property file extension
    */
-  protected synchronized void read(final String prop) {
+  private synchronized void read(final String prop) {
     file = new IOFile(HOME + IO.BASEXSUFFIX + prop);
 
     final StringList read = new StringList();
@@ -375,7 +420,9 @@ public abstract class AProp implements Iterable<String> {
         for(final Field f : getClass().getFields()) {
           final Object obj = f.get(null);
           if(!(obj instanceof Object[])) continue;
-          final String key = ((Object[]) obj)[0].toString();
+          final Object[] arr = (Object[]) obj;
+          if(arr.length < 2) continue;
+          final String key = arr[0].toString();
           ok &= read.contains(key);
         }
         if(!ok) err.addExt("Saving properties in \"%\"..." + NL, file);
@@ -387,56 +434,6 @@ public abstract class AProp implements Iterable<String> {
     if(!err.isEmpty()) {
       Util.err(err.toString());
       write();
-    }
-  }
-
-  /**
-   * Parses a property string and sets the properties accordingly.
-   * @param s property string
-   * @throws IOException io exception
-   */
-  protected final synchronized void parse(final String s) throws IOException {
-    for(final String ser : s.trim().split(",")) {
-      if(ser.isEmpty()) continue;
-      final String[] sprop = ser.split("=", 2);
-
-      final String key = sprop[0].trim();
-      final String val = sprop.length < 2 ? "" : sprop[1];
-      try {
-        if(set(key, val) != null) continue;
-      } catch(final Exception ex) {
-        throw new BaseXException(Text.INVALID_VALUE_X_X, key, val);
-      }
-      throw new BaseXException(unknown(key));
-    }
-  }
-
-  /**
-   * Sets static properties.
-   */
-  protected void finish() {
-    // nothing to do; if necessary, is overwritten.
-  }
-
-  // PRIVATE METHODS ====================================================================
-
-  /**
-   * Scans the system properties and initializes the project properties.
-   * All properties starting with {@Code org.basex.} will be assigned as properties
-   * and removed from the global system properties.
-   */
-  public void setSystem() {
-    // collect parameters that start with "org.basex."
-    final StringList sl = new StringList();
-    final Properties pr = System.getProperties();
-    for(final Object key : pr.keySet()) {
-      final String k = key.toString();
-      if(k.startsWith(Prop.DBPREFIX)) sl.add(k);
-    }
-    // assign properties
-    for(final String key : sl) {
-      set(key.substring(Prop.DBPREFIX.length()).toUpperCase(Locale.ENGLISH),
-          System.getProperty(key));
     }
   }
 

@@ -30,14 +30,7 @@ public final class Set extends AGet {
     final String key = args[0].toUpperCase(Locale.ENGLISH);
     final String val = args[1];
     try {
-      String v = prop.set(key, val);
-      if(v == null && !context.client()) {
-        // disallow modification of database path if any database is opened
-        if(key.equals(MainProp.DBPATH[0]) && context.datas.size() > 0) {
-          return error(INVALID_VALUE_X_X, key, val);
-        }
-        v = mprop.set(key, val);
-      }
+      final String v = prop.set(key, val);
       return v == null ? error(prop.unknown(key)) : info(key + COLS + v);
     } catch(final Exception ex) {
       Util.debug(ex);

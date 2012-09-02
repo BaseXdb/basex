@@ -105,11 +105,11 @@ public final class DialogServer extends BaseXDialog {
     connect = new BaseXButton(CONNECT, this);
     disconnect = new BaseXButton(DISCONNECT, this);
 
-    final MainProp mprop = ctx.mprop;
-    host = new BaseXTextField(mprop.get(MainProp.HOST), this);
-    ports = new BaseXTextField(Integer.toString(mprop.num(MainProp.SERVERPORT)), this);
-    portc = new BaseXTextField(Integer.toString(mprop.num(MainProp.PORT)), this);
-    admuser = new BaseXTextField(gui.gprop.get(GUIProp.SERVERUSER), this);
+    final GUIProp gprop = gui.gprop;
+    host = new BaseXTextField(gprop.get(GUIProp.S_HOST), this);
+    ports = new BaseXTextField(Integer.toString(gprop.num(GUIProp.S_SERVERPORT)), this);
+    portc = new BaseXTextField(Integer.toString(gprop.num(GUIProp.S_PORT)), this);
+    admuser = new BaseXTextField(gprop.get(GUIProp.S_USER), this);
     admpass = new BaseXPassword(this);
     infoC = new BaseXLabel(" ").border(12, 0, 0, 0);
 
@@ -260,14 +260,13 @@ public final class DialogServer extends BaseXDialog {
    * @return boolean success
    */
   private boolean ping(final boolean local) {
-    final MainProp mprop = ctx.mprop;
-    return BaseXServer.ping(local ? LOCALHOST : mprop.get(MainProp.HOST),
-        mprop.num(local ? MainProp.SERVERPORT : MainProp.PORT));
+    final GUIProp gprop = gui.gprop;
+    return BaseXServer.ping(local ? LOCALHOST : gprop.get(GUIProp.S_HOST),
+      gprop.num(local ? GUIProp.S_SERVERPORT : GUIProp.S_PORT));
   }
 
   @Override
   public void action(final Object cmp) {
-    final MainProp mprop = ctx.mprop;
     Msg icon = Msg.SUCCESS;
     String msg = null;
     String msg2 = null;
@@ -278,10 +277,10 @@ public final class DialogServer extends BaseXDialog {
     try {
       if(cmp == start) {
         final String p = ports.getText();
-        gui.setMain(MainProp.SERVERPORT, p);
+        gui.gprop.set(GUIProp.S_SERVERPORT, p);
         if(host.getText().equals(LOCALHOST)) {
-          gui.setMain(MainProp.PORT, p);
-          gui.setMain(MainProp.EVENTPORT, Integer.valueOf(p) + 1);
+          gui.gprop.set(GUIProp.S_PORT, p);
+          gui.gprop.set(GUIProp.S_EVENTPORT, Integer.valueOf(p) + 1);
           portc.setText(p);
         }
         try {
@@ -294,26 +293,27 @@ public final class DialogServer extends BaseXDialog {
           icon = Msg.ERROR;
         }
       } else if(cmp == stop) {
-        gui.gprop.set(GUIProp.SERVERUSER, admuser.getText());
-        if(running) BaseXServer.stop(mprop.num(MainProp.SERVERPORT),
-            mprop.num(MainProp.EVENTPORT));
+        if(running) BaseXServer.stop(gui.gprop.num(GUIProp.S_SERVERPORT),
+            gui.gprop.num(GUIProp.S_EVENTPORT));
         running = ping(true);
         connected = connected && ping(false);
         if(!connected) msg = SRV_STOPPED;
-        if(host.getText().equals(LOCALHOST)) admpass.setText("");
         if(!connected) setTitle(S_SERVER_ADMIN);
       } else if(cmp == connect) {
         final String pw = new String(admpass.getPassword());
-        admpass.setText("");
-        gui.setMain(MainProp.HOST, host.getText());
-        gui.setMain(MainProp.PORT, Integer.parseInt(portc.getText()));
-        cs = new ClientSession(ctx, gui.gprop.get(GUIProp.SERVERUSER), pw);
+        final String us = admuser.getText();
+        final String hs = host.getText();
+        final int pc = Integer.parseInt(portc.getText());
+        gui.gprop.set(GUIProp.S_HOST, hs);
+        gui.gprop.set(GUIProp.S_PORT, pc);
+        gui.gprop.set(GUIProp.S_USER, us);
+        gui.gprop.set(GUIProp.S_PASSWORD, pw);
+        cs = new ClientSession(ctx, us, pw);
         user.setSess(cs);
         dbsP.setSess(cs);
         connected = true;
-        setTitle(S_SERVER_ADMIN + LI + admuser.getText() + '@' +
-                host.getText() + COL + portc.getText());
-        msg = Util.info(S_CONNECTED, host.getText(), portc.getText());
+        setTitle(S_SERVER_ADMIN + LI + us + '@' + hs + COL + pc);
+        msg = Util.info(S_CONNECTED, hs, pc);
         refreshSess();
         disconnect.requestFocusInWindow();
       } else if(cmp == disconnect) {
@@ -403,11 +403,7 @@ public final class DialogServer extends BaseXDialog {
     refreshLog.setEnabled(logc.getSelectedIndex() != -1);
     delete.setEnabled(logc.getSelectedIndex() != -1);
     deleteAll.setEnabled(logc.getItemCount() > 0);
-    if(admuser.hasFocus()) {
-      admpass.setText("");
-      connect.setEnabled(false);
-    }
-    mprop.write();
+    if(admuser.hasFocus()) connect.setEnabled(false);
   }
 
   /**

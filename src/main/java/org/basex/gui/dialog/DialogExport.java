@@ -61,7 +61,7 @@ public final class DialogExport extends BaseXDialog {
     // output label
     BaseXBack pp = new BaseXBack(new TableLayout(1, 2, 8, 0));
 
-    path = new BaseXTextField(main.gprop.get(GUIProp.CREATEPATH), this);
+    path = new BaseXTextField(main.gprop.get(GUIProp.INPUTPATH), this);
     pp.add(path);
 
     final BaseXButton browse = new BaseXButton(BROWSE_D, this);
@@ -180,7 +180,7 @@ public final class DialogExport extends BaseXDialog {
     ok = !pth.isEmpty();
 
     if(ok) {
-      gui.gprop.set(GUIProp.CREATEPATH, pth);
+      gui.gprop.set(GUIProp.INPUTPATH, pth);
       if(comp == params) {
         // validate serialization parameters
         try {

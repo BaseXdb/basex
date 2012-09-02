@@ -456,7 +456,7 @@ public final class ClientListener extends Thread {
     String err = null;
     try {
       final QueryListener qp;
-      StringBuilder info = new StringBuilder();
+      final StringBuilder info = new StringBuilder();
       if(sc == ServerCmd.QUERY) {
         final String query = arg;
         qp = new QueryListener(query, context);

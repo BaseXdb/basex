@@ -61,9 +61,6 @@ public final class BaseXGUI {
 
     // read properties
     final GUIProp gprop = new GUIProp();
-    // deactivate real-time execution and filtering
-    gprop.set(GUIProp.FILTERRT, false);
-    gprop.set(GUIProp.EXECRT, false);
     // cache results to pass them on to all visualizations
     context.prop.set(Prop.CACHEQUERY, true);
     // reduce number of results to save memory
@@ -91,8 +88,8 @@ public final class BaseXGUI {
             gui.editor.open(io);
           } else if(!xml) {
             // only parse first xml file
-            gprop.set(GUIProp.CREATEPATH, io.path());
-            gprop.set(GUIProp.CREATENAME, io.dbname());
+            gprop.set(GUIProp.INPUTPATH, io.path());
+            gprop.set(GUIProp.DBNAME, io.dbname());
             DialogProgress.execute(gui, new Check(file));
             xml = true;
           }

@@ -25,10 +25,6 @@ public class BaseX extends Main {
   private IntList ops;
   /** Command arguments. */
   private StringList vals;
-  /** User name. */
-  String user;
-  /** Password. */
-  String pass;
 
   /** Flag for writing properties to disk. */
   private boolean writeProps;
@@ -222,10 +218,10 @@ public class BaseX extends Main {
             context.mprop.set(MainProp.PORT, arg.number());
           } else if(c == 'P') {
             // specify password
-            pass = arg.string();
+            context.mprop.set(MainProp.PASSWORD, arg.string());
           } else if(c == 'U') {
             // specify user name
-            user = arg.string();
+            context.mprop.set(MainProp.USER, arg.string());
           } else {
             arg.usage();
           }

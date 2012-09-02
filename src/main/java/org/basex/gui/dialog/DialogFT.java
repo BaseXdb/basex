@@ -97,7 +97,7 @@ final class DialogFT extends BaseXBack {
     add(check[F_STOP]);
     add(Box.createVerticalStrut(4));
     final BaseXBack b3 = new BaseXBack(new TableLayout(1, 2, 8, 0));
-    swpath = new BaseXTextField(sw.isEmpty() ? d.gui.gprop.get(GUIProp.STOPPATH) : sw, d);
+    swpath = new BaseXTextField(sw.isEmpty() ? d.gui.gprop.get(GUIProp.DATAPATH) : sw, d);
     b3.add(swpath);
 
     swbrowse = new BaseXButton(BROWSE_D, d);
@@ -118,11 +118,11 @@ final class DialogFT extends BaseXBack {
   void chooseStop() {
     final GUIProp gprop = dialog.gui.gprop;
     final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR,
-        gprop.get(GUIProp.STOPPATH), dialog.gui);
+        gprop.get(GUIProp.DATAPATH), dialog.gui);
     final IO file = fc.select(Mode.FOPEN);
     if(file != null) {
       swpath.setText(file.path());
-      gprop.set(GUIProp.STOPPATH, file.path());
+      gprop.set(GUIProp.DATAPATH, file.path());
     }
   }
 
@@ -140,7 +140,7 @@ final class DialogFT extends BaseXBack {
     final String sw = swpath.getText().trim();
     final IO file = IO.get(sw);
     final boolean exists = !sw.isEmpty() && file.exists();
-    if(exists) dialog.gui.gprop.set(GUIProp.STOPPATH, sw);
+    if(exists) dialog.gui.gprop.set(GUIProp.DATAPATH, sw);
   }
 
   /**

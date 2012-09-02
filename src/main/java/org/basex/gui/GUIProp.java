@@ -16,6 +16,21 @@ import org.basex.util.list.*;
 public final class GUIProp extends AProp {
   // DATABASE & PROGRAM PATHS =================================================
 
+  /** Comment: written to property file. */
+  public static final Object[] C_PATHS = { "Paths" };
+
+  /** Path to database input. */
+  public static final Object[] INPUTPATH = { "INPUTPATH", Prop.HOME };
+  /** Path for additional material. */
+  public static final Object[] DATAPATH = { "DATAPATH", Prop.HOME };
+  /** Path to working directory. */
+  public static final Object[] WORKPATH = { "WORKPATH", Prop.HOME };
+  /** Last editor files. */
+  public static final Object[] EDITOR = { "EDITOR", new String[0] };
+
+  /** Comment: written to property file. */
+  public static final Object[] C_LAYOUT = { "Layout" };
+
   /** Default GUI Font. */
   public static final Object[] FONT = { "FONT", Font.SANS_SERIF };
   /** Default GUI Monospace Font. */
@@ -34,7 +49,15 @@ public final class GUIProp extends AProp {
   /** Paint gradients as background. */
   public static final Object[] GRADIENT = { "GRADIENT", true };
 
-  // MAIN WINDOW OPTIONS ======================================================
+  /** Comment: written to property file. */
+  public static final Object[] C_WINDOWS = { "Windows" };
+
+  /** Last updated version. */
+  public static final Object[] UPDATEVERSION = { "UPDATEVERSION",
+    Prop.VERSION.replaceAll(" .*", "") };
+
+  /** GUI Layout. */
+  public static final Object[] VIEWS = { "VIEWS", GUIConstants.VIEWS };
 
   /** GUI height. */
   public static final Object[] GUISIZE = { "GUISIZE", new int[] { 1004, 748 } };
@@ -49,9 +72,6 @@ public final class GUIProp extends AProp {
   public static final Object[] SHOWINPUT = { "SHOWINPUT", true };
   /** Flag for displaying the status bar in the GUI window. */
   public static final Object[] SHOWSTATUS = { "SHOWSTATUS", true };
-
-  /** GUI Layout. */
-  public static final Object[] VIEWS = { "VIEWS", GUIConstants.VIEWS };
 
   /** Flag for activated info view. */
   public static final Object[] SHOWINFO = { "SHOWINFO", true };
@@ -72,6 +92,13 @@ public final class GUIProp extends AProp {
   /** Flag for activated tree view. */
   public static final Object[] SHOWTREE = { "SHOWTREE", false };
 
+  /** Dialog location. */
+  public static final Object[] MAPLAYOUTLOC = { "MAPLAYOUTLOC", new int[] { 790, 520 } };
+  /** Dialog location. */
+  public static final Object[] FONTSLOC = { "FONTSLOC", new int[] { 10, 530 } };
+  /** Dialog location. */
+  public static final Object[] COLORSLOC = { "COLORSLOC", new int[] { 530, 620 } };
+
   /** Flag for Java look and feel. */
   public static final Object[] JAVALOOK = { "JAVALOOK", false };
   /** Flag for dissolving name attributes. */
@@ -81,14 +108,36 @@ public final class GUIProp extends AProp {
   /** Flag for showing the simple file dialog. */
   public static final Object[] SIMPLEFD = { "SIMPLEFD", false };
 
-  // LAYOUT & INPUT OPTIONS ===================================================
-
   /** Current input mode in global text field (Search, XQuery, Command). */
   public static final Object[] SEARCHMODE = { "SEARCHMODE", 0 };
   /** Flag for realtime context filtering. */
   public static final Object[] FILTERRT = { "FILTERRT", false };
   /** Flag for realtime query execution. */
   public static final Object[] EXECRT = { "EXECRT", false };
+
+  /** Name of new database. */
+  public static final Object[] DBNAME = { "CREATENAME", "" };
+  /** Last insertion type. */
+  public static final Object[] LASTINSERT = { "LASTINSERT", 1 };
+
+  /** Comment: written to property file. */
+  public static final Object[] C_SERVER = { "Server Dialog" };
+
+  /** Server: host, used for connecting new clients. */
+  public static final Object[] S_HOST = { "S_HOST", Text.LOCALHOST };
+  /** Server: port, used for connecting new clients. */
+  public static final Object[] S_PORT = { "S_PORT", 1984 };
+  /** Server: port, used for binding the server. */
+  public static final Object[] S_SERVERPORT = { "S_SERVERPORT", 1984 };
+  /** Server: port, used for sending events. */
+  public static final Object[] S_EVENTPORT = { "S_EVENTPORT", 1985 };
+  /** Default user. */
+  public static final Object[] S_USER = { "S_USER", "" };
+  /** Default password. */
+  public static final Object[] S_PASSWORD = { "S_PASSWORD", "" };
+
+  /** Comment: written to property file. */
+  public static final Object[] C_VISUALIZATIONS = { "Visualizations" };
 
   /** Show attributes in treemap. */
   public static final Object[] MAPATTS = { "MAPATTS", false };
@@ -111,28 +160,13 @@ public final class GUIProp extends AProp {
   /** Logarithmic plot. */
   public static final Object[] PLOTYLOG = { "PLOTYLOG", false };
 
-  /** Dialog location. */
-  public static final Object[] MAPLAYOUTLOC = { "MAPLAYOUTLOC", new int[] { 790, 520 } };
-  /** Dialog location. */
-  public static final Object[] FONTSLOC = { "FONTSLOC", new int[] { 10, 530 } };
-  /** Dialog location. */
-  public static final Object[] COLORSLOC = { "COLORSLOC", new int[] { 530, 620 } };
+  /** Maximum text size to be displayed. */
+  public static final Object[] MAXTEXT = { "MAXTEXT", 1 << 21 };
+  /** Maximum number of hits to be displayed (-1: return all hits; default: 250K). */
+  public static final Object[] MAXHITS = { "MAXHITS", 250000 };
 
-  /** Path for creating new databases. */
-  public static final Object[] CREATEPATH = { "CREATEPATH", Prop.HOME };
-  /** Path for creating new XML documents. */
-  public static final Object[] SAVEPATH = { "SAVEPATH", Prop.HOME };
-  /** Path for XQuery files. */
-  public static final Object[] EDITORPATH = { "EDITORPATH", Prop.HOME };
-  /** Path for stopwords. */
-  public static final Object[] STOPPATH = { "STOPPATH", Prop.HOME };
-  /** Package path. */
-  public static final Object[] PKGPATH = { "PKGPATH", Prop.HOME };
-  /** Name of new database. */
-  public static final Object[] CREATENAME = { "CREATENAME", "" };
-
-  /** Last insertion type. */
-  public static final Object[] LASTINSERT = { "LASTINSERT", 1 };
+  /** Comment: written to property file. */
+  public static final Object[] C_HISTORY = { "History" };
 
   /** Last command inputs. */
   public static final Object[] COMMANDS = { "COMMANDS", new String[0] };
@@ -140,27 +174,16 @@ public final class GUIProp extends AProp {
   public static final Object[] SEARCH = { "SEARCH", new String[0] };
   /** Last XQuery inputs. */
   public static final Object[] XQUERY = { "XQUERY", new String[0] };
-  /** Last XQuery files. */
-  public static final Object[] QUERIES = { "QUERIES", new String[0] };
-
-  /** Last updated version. */
-  public static final Object[] UPDATEVERSION = { "UPDATEVERSION",
-    Prop.VERSION.replaceAll(" .*", "") };
-
-  /** Server user. */
-  public static final Object[] SERVERUSER = { "SERVERUSER", "admin" };
-
-  /** Maximum text size to be displayed. */
-  public static final Object[] MAXTEXT = { "MAXTEXT", 1 << 21 };
-  /** Maximum number of hits to be displayed (-1: return all hits; default: 250K). */
-  public static final Object[] MAXHITS = { "MAXHITS", 250000 };
 
   /**
    * Constructor.
    */
   public GUIProp() {
-    read("gui");
+    super("gui");
     recent(null);
+    // reset realtime operations
+    set(GUIProp.FILTERRT, false);
+    set(GUIProp.EXECRT, false);
     Prop.gui = true;
   }
 
@@ -173,14 +196,14 @@ public final class GUIProp extends AProp {
     String path = null;
     if(file != null) {
       path = file.path();
-      set(EDITORPATH, file.dirPath());
+      set(WORKPATH, file.dirPath());
       sl.add(path);
     }
-    final String[] qu = strings(QUERIES);
+    final String[] qu = strings(EDITOR);
     for(int q = 0; q < qu.length && q < 9; ++q) {
       final String f = qu[q];
       if(!f.equalsIgnoreCase(path) && IO.get(f).exists()) sl.add(f);
     }
-    set(QUERIES, sl.toArray());
+    set(EDITOR, sl.toArray());
   }
 }

@@ -27,7 +27,7 @@ public final class Get extends AGet {
   protected boolean run() throws IOException {
     final String key = args[0].toUpperCase(Locale.ENGLISH);
     Object type = prop.get(key);
-    if(type == null && !context.client()) type = mprop.get(key);
+    if(type == null && context.user.has(Perm.ADMIN)) type = mprop.get(key);
     if(type == null) return error(prop.unknown(key));
     out.println(key + COLS + type);
     return true;

@@ -243,7 +243,7 @@ final class DialogParsing extends BaseXBack {
   void catchoose() {
     final GUIProp gprop = gui.gprop;
     final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR,
-        gprop.get(GUIProp.CREATEPATH), gui).filter(XML_DOCUMENTS, IO.XMLSUFFIX);
+        gprop.get(GUIProp.INPUTPATH), gui).filter(XML_DOCUMENTS, IO.XMLSUFFIX);
 
     final IO file = fc.select(Mode.FDOPEN);
     if(file != null) cfile.setText(file.path());

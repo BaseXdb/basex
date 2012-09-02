@@ -186,11 +186,11 @@ public final class TextView extends View implements ActionListener {
   @Override
   public void actionPerformed(final ActionEvent e) {
     final BaseXFileChooser fc = new BaseXFileChooser(SAVE_AS,
-        gui.gprop.get(GUIProp.SAVEPATH), gui);
+        gui.gprop.get(GUIProp.WORKPATH), gui);
 
     final IO file = fc.select(Mode.FSAVE);
     if(file == null) return;
-    gui.gprop.set(GUIProp.SAVEPATH, file.path());
+    gui.gprop.set(GUIProp.WORKPATH, file.path());
 
     PrintOutput out = null;
     gui.cursor(CURSORWAIT, true);

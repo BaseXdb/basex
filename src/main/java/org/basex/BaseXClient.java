@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 
 import java.io.*;
 
+import org.basex.core.*;
 import org.basex.server.*;
 import org.basex.util.*;
 
@@ -48,11 +49,13 @@ public final class BaseXClient extends BaseX {
   protected Session session() throws IOException {
     if(session == null) {
       // user/password input
-      while(user == null) {
+      String user = context.mprop.get(MainProp.USER);
+      String pass = context.mprop.get(MainProp.PASSWORD);
+      while(user.isEmpty()) {
         Util.out(USERNAME + COLS);
         user = Util.input();
       }
-      while(pass == null) {
+      while(pass.isEmpty()) {
         Util.out(PASSWORD + COLS);
         pass = Util.password();
       }

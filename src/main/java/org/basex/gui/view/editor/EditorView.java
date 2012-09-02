@@ -167,10 +167,10 @@ public final class EditorView extends View {
             open(new IOFile(ac.getActionCommand()));
           }
         };
-        if(gui.gprop.strings(GUIProp.QUERIES).length == 0) {
+        if(gui.gprop.strings(GUIProp.EDITOR).length == 0) {
           popup.add(new JMenuItem("- No recently opened files -"));
         }
-        for(final String en : gui.gprop.strings(GUIProp.QUERIES)) {
+        for(final String en : gui.gprop.strings(GUIProp.EDITOR)) {
           final JMenuItem jmi = new JMenuItem(en);
           jmi.addActionListener(al);
           popup.add(jmi);
@@ -213,7 +213,7 @@ public final class EditorView extends View {
         final EditorArea edit = getEditor();
         if(edit == null) return;
         edit.setSearch(find);
-        if(edit.opened()) gui.gprop.set(GUIProp.EDITORPATH, edit.file.path());
+        if(edit.opened()) gui.gprop.set(GUIProp.WORKPATH, edit.file.path());
         gui.refreshControls();
         refreshMark();
         pos.setText(edit.pos());
@@ -278,7 +278,7 @@ public final class EditorView extends View {
   public void open() {
     // open file chooser for XML creation
     final BaseXFileChooser fc = new BaseXFileChooser(OPEN,
-        gui.gprop.get(GUIProp.EDITORPATH), gui);
+        gui.gprop.get(GUIProp.WORKPATH), gui);
     fc.filter(BXS_FILES, IO.BXSSUFFIX);
     fc.filter(XQUERY_FILES, IO.XQSUFFIXES);
     fc.filter(XML_DOCUMENTS, IO.XMLSUFFIXES);
@@ -558,7 +558,7 @@ public final class EditorView extends View {
     int c = 0;
     while(++c < bl.size() && bl.get(c));
     // create io reference
-    return new IOFile(gui.gprop.get(GUIProp.EDITORPATH), FILE + (c == 1 ? "" : c));
+    return new IOFile(gui.gprop.get(GUIProp.WORKPATH), FILE + (c == 1 ? "" : c));
   }
 
   /**

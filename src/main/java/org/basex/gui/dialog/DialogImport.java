@@ -73,8 +73,8 @@ public final class DialogImport extends BaseXBack {
     // add options
     add(new BaseXLabel(FILE_OR_DIR + COL, true, true).border(0, 0, 6, 0));
 
-    final String in = gui.gprop.get(GUIProp.CREATEPATH);
-    input = new BaseXTextField(gui.gprop.get(GUIProp.CREATEPATH), dial);
+    final String in = gui.gprop.get(GUIProp.INPUTPATH);
+    input = new BaseXTextField(gui.gprop.get(GUIProp.INPUTPATH), dial);
 
     final IO io = IO.get(in);
     if(io instanceof IOFile && !in.isEmpty()) dbname = io.dbname();
@@ -135,7 +135,7 @@ public final class DialogImport extends BaseXBack {
    * @return file chooser
    */
   IOFile inputFile() {
-    final String path = gui.gprop.get(GUIProp.CREATEPATH);
+    final String path = gui.gprop.get(GUIProp.INPUTPATH);
     final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR, path, gui);
     fc.filter(XML_DOCUMENTS, IO.XMLSUFFIXES);
     fc.filter(HTML_DOCUMENTS, IO.HTMLSUFFIXES);
@@ -144,7 +144,7 @@ public final class DialogImport extends BaseXBack {
     fc.filter(PLAIN_TEXT, IO.TXTSUFFIXES);
     fc.filter(ZIP_ARCHIVES, IO.ZIPSUFFIXES);
     final IOFile file = fc.select(Mode.FDOPEN);
-    if(file != null) gui.gprop.set(GUIProp.CREATEPATH, file.path());
+    if(file != null) gui.gprop.set(GUIProp.INPUTPATH, file.path());
     return file;
   }
 
@@ -159,7 +159,7 @@ public final class DialogImport extends BaseXBack {
 
     final String in = input.getText().trim();
     final IO io = IO.get(in);
-    gui.gprop.set(GUIProp.CREATEPATH, in);
+    gui.gprop.set(GUIProp.INPUTPATH, in);
     final boolean dir = io.isDir();
 
     final String type = parser();

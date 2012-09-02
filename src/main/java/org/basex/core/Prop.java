@@ -47,10 +47,7 @@ public final class Prop extends AProp {
   public static final String HOME = homePath();
 
   /** Property information. */
-  static final String PROPHEADER = "# Property File." + NL +
-      "# You can set additional options at the end of the file." + NL;
-  /** Property information. */
-  static final String PROPUSER = "# User defined section";
+  static final String PROPHEADER = "# " + NAME + " Property File." + NL;
 
   // STATIC OPTIONS =====================================================================
 
@@ -65,24 +62,23 @@ public final class Prop extends AProp {
 
   // OPTIONS ============================================================================
 
-  /** Flag for whitespace chopping. */
-  public static final Object[] CHOP = { "CHOP", true };
-  /** Use internal XML parser. */
-  public static final Object[] INTPARSE = { "INTPARSE", true };
-  /** Flag for parsing DTDs in internal parser. */
-  public static final Object[] DTD = { "DTD", false };
-  /** Path to XML Catalog file. */
-  public static final Object[] CATFILE = { "CATFILE", "" };
+  // General
+
+  /** Flag for creating a main memory database. */
+  public static final Object[] MAINMEM = { "MAINMEM", false };
+  /** Flag for opening a database after creating it. */
+  public static final Object[] CREATEONLY = { "CREATEONLY", false };
+
+  // Parsing
+
   /** Path for filtering XML Documents. */
   public static final Object[] CREATEFILTER = { "CREATEFILTER", "*.xml" };
   /** Flag for adding archives to a database. */
   public static final Object[] ADDARCHIVES = { "ADDARCHIVES", true };
-  /** Flag for adding remaining files as raw files. */
-  public static final Object[] ADDRAW = { "ADDRAW", false };
   /** Flag for skipping corrupt files. */
   public static final Object[] SKIPCORRUPT = { "SKIPCORRUPT", false };
-  /** Strips namespaces. */
-  public static final Object[] STRIPNS = { "STRIPNS", false };
+  /** Flag for adding remaining files as raw files. */
+  public static final Object[] ADDRAW = { "ADDRAW", false };
   /** Define import parser. */
   public static final Object[] PARSER = { "PARSER", "xml" };
   /** Define parser options. */
@@ -94,6 +90,21 @@ public final class Prop extends AProp {
     "html=false,omit-xml-declaration=false,method=xml,nons=false,nobogons=false," +
     "nodefaults=false,nocolons=false,norestart=false,ignorable=false,emptybogons=false," +
     "any=false,norootbogons=false,nocdata=false,lexical=false,encoding=utf-8" };
+
+  // XML Parsing
+
+  /** Flag for whitespace chopping. */
+  public static final Object[] CHOP = { "CHOP", true };
+  /** Use internal XML parser. */
+  public static final Object[] INTPARSE = { "INTPARSE", true };
+  /** Strips namespaces. */
+  public static final Object[] STRIPNS = { "STRIPNS", false };
+  /** Flag for parsing DTDs in internal parser. */
+  public static final Object[] DTD = { "DTD", false };
+  /** Path to XML Catalog file. */
+  public static final Object[] CATFILE = { "CATFILE", "" };
+
+  // Indexing
 
   /** Flag for creating a text index. */
   public static final Object[] TEXTINDEX = { "TEXTINDEX", true };
@@ -108,24 +119,8 @@ public final class Prop extends AProp {
   public static final Object[] MAXCATS = { "MAXCATS", 100 };
   /** Flag for automatic index update. */
   public static final Object[] UPDINDEX = { "UPDINDEX", false };
-  /** Flag for opening a database after creating it. */
-  public static final Object[] CREATEONLY = { "CREATEONLY", false };
-  /** Garbage collecting mode. */
-  public static final Object[] SINGLEGC = { "SINGLEGC", false };
 
-  /** Writes original files back after updates. */
-  public static final Object[] WRITEBACK = { "WRITEBACK", false };
-  /** Flag for creating a main memory database. */
-  public static final Object[] MAINMEM = { "MAINMEM", false };
-  /** Forces database creation for unknown documents. */
-  public static final Object[] FORCECREATE = { "FORCECREATE", false };
-  /** Flushes the database after each update. */
-  public static final Object[] AUTOFLUSH = { "AUTOFLUSH", true };
-
-  /** Maximum number of index occurrences to print. */
-  public static final Object[] MAXSTAT = { "MAXSTAT", 30 };
-  /** Flag for tail-call optimization. */
-  public static final Object[] TAILCALLS = { "TAILCALLS", 42 };
+  // Full-Text
 
   /** Flag for full-text stemming. */
   public static final Object[] STEMMING = { "STEMMING", false };
@@ -137,27 +132,34 @@ public final class Prop extends AProp {
   public static final Object[] LANGUAGE = { "LANGUAGE", "en" };
   /** Path to full-text stopword list. */
   public static final Object[] STOPWORDS = { "STOPWORDS", "" };
-  /** Levenshtein default error. */
-  public static final Object[] LSERROR = { "LSERROR", 0 };
+
+  // Query Options
 
   /** Detailed query information. */
   public static final Object[] QUERYINFO = { "QUERYINFO", false };
   /** Default XQuery version. */
   public static final Object[] XQUERY3 = { "XQUERY3", true };
-  /** Flag for serializing query results. */
-  public static final Object[] SERIALIZE = { "SERIALIZE", true };
   /** External variables, separated by commas. */
   public static final Object[] BINDINGS = { "BINDINGS", "" };
-  /** Serialization parameters, separated by commas. */
-  public static final Object[] SERIALIZER = { "SERIALIZER", "" };
-  /** Exporter serialization parameters. */
-  public static final Object[] EXPORTER = { "EXPORTER", "" };
   /** Path to current query. */
   public static final Object[] QUERYPATH = { "QUERYPATH", "" };
   /** Caches the query results. */
   public static final Object[] CACHEQUERY = { "CACHEQUERY", false };
+  /** Forces database creation for unknown documents. */
+  public static final Object[] FORCECREATE = { "FORCECREATE", false };
+  /** Levenshtein default error. */
+  public static final Object[] LSERROR = { "LSERROR", 0 };
   /** Number of query executions. */
   public static final Object[] RUNS = { "RUNS", 1 };
+
+  // Serialize
+
+  /** Flag for serializing query results. */
+  public static final Object[] SERIALIZE = { "SERIALIZE", true };
+  /** Serialization parameters, separated by commas. */
+  public static final Object[] SERIALIZER = { "SERIALIZER", "" };
+  /** Exporter serialization parameters. */
+  public static final Object[] EXPORTER = { "EXPORTER", "" };
 
   /** Prints an XML plan. */
   public static final Object[] XMLPLAN = { "XMLPLAN", false };
@@ -172,7 +174,20 @@ public final class Prop extends AProp {
   /** Path to dotty. */
   public static final Object[] DOTTY = { "DOTTY", "dotty" };
 
-  /** Maximum number of hits to be displayed in the GUI (will be overwritten). */
+  /** Flushes the database after each update. */
+  public static final Object[] AUTOFLUSH = { "AUTOFLUSH", true };
+  /** Writes original files back after updates. */
+  public static final Object[] WRITEBACK = { "WRITEBACK", false };
+  /** Maximum number of index occurrences to print. */
+  public static final Object[] MAXSTAT = { "MAXSTAT", 30 };
+
+  // Other
+
+  /** Hidden: garbage collecting mode. */
+  public static final Object[] SINGLEGC = { "SINGLEGC", false };
+  /** Hidden: flag for tail-call optimization. */
+  public static final Object[] TAILCALLS = { "TAILCALLS", 42 };
+  /** Hidden: maximum number of hits to be displayed in the GUI (will be overwritten). */
   public static final Object[] MAXHITS = { "MAXHITS", -1 };
 
   /**
@@ -213,7 +228,7 @@ public final class Prop extends AProp {
    * @param val value
    */
   public static void setSystem(final String key, final Object val) {
-    final String k = (key.startsWith(DBPREFIX) ? key : DBPREFIX + key).
+    final String k = (key.indexOf('.') != -1 ? key : DBPREFIX + key).
         toLowerCase(Locale.ENGLISH);
     if(System.getProperty(k) == null) System.setProperty(k, val.toString());
   }

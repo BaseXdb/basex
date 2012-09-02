@@ -52,7 +52,7 @@ public final class DialogNew extends BaseXDialog {
     final Prop prop = gui.context.prop;
     final GUIProp gprop = main.gprop;
 
-    target = new BaseXTextField(gprop.get(GUIProp.CREATENAME), this);
+    target = new BaseXTextField(gprop.get(GUIProp.DBNAME), this);
 
     final BaseXBack pnl = new BaseXBack(new TableLayout(2, 1));
     pnl.add(new BaseXLabel(NAME_OF_DB + COLS, false, true).border(8, 0, 6, 0));
@@ -109,7 +109,7 @@ public final class DialogNew extends BaseXDialog {
     Msg icon = Msg.ERROR;
     if(ok) {
       ok = MetaData.validName(nm, false);
-      if(ok) gui.gprop.set(GUIProp.CREATENAME, nm);
+      if(ok) gui.gprop.set(GUIProp.DBNAME, nm);
 
       if(!ok) {
         // name of database is invalid

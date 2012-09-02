@@ -101,7 +101,7 @@ public final class Log {
         tb.add('\t');
         String st;
         if(s == null) st = REQUEST;
-        else if(s instanceof Boolean) st = ((Boolean) s) ? OK : ERROR;
+        else if(s instanceof Boolean) st = (Boolean) s ? OK : ERROR;
         else if(s instanceof Throwable) st = Util.message((Throwable) s);
         else st = s.toString();
         tb.add(chop(token(st.replaceAll("\\s+", " ").trim()), ml));
