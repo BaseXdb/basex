@@ -26,6 +26,16 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public class BaseXEditor extends BaseXPanel {
+  /** Editor action. */
+  public enum Action {
+    /** Check for changes; do nothing if input has not changed. */
+    CHECK,
+    /** Enforce parsing of input. */
+    PARSE,
+    /** Enforce execution of input. */
+    EXECUTE;
+  };
+
   /** Text array to be written. */
   protected transient BaseXTextTokens text = new BaseXTextTokens(EMPTY);
   /** Renderer reference. */
@@ -627,10 +637,10 @@ public class BaseXEditor extends BaseXPanel {
 
   /**
    * Releases a key or mouse. Can be overwritten to react on events.
-   * @param force force querying
+   * @param action action
    */
   @SuppressWarnings("unused")
-  protected void release(final boolean force) { }
+  protected void release(final Action action) { }
 
   // EDITOR COMMANDS ==========================================================
 
@@ -737,7 +747,7 @@ public class BaseXEditor extends BaseXPanel {
     text.setCaret();
     rend.calc();
     showCursor(2);
-    release(false);
+    release(Action.CHECK);
   }
 
   /** Cursor. */

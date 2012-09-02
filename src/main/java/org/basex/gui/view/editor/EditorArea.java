@@ -113,14 +113,16 @@ final class EditorArea extends BaseXEditor {
   @Override
   public void keyReleased(final KeyEvent e) {
     super.keyReleased(e);
-    if(!e.isActionKey() && !modifier(e)) release(EXEC.is(e));
+    if(!e.isActionKey() && !modifier(e)) {
+      release(EXEC.is(e) ? Action.EXECUTE : Action.CHECK);
+    }
   }
 
   @Override
-  protected void release(final boolean force) {
+  protected void release(final Action action) {
     final byte[] in = getText();
     final boolean eq = eq(in, last);
-    if(eq && !force) return;
+    if(eq && action == Action.CHECK) return;
     last = in;
     view.refresh(modified || !eq, false);
     threadID++;
@@ -135,7 +137,7 @@ final class EditorArea extends BaseXEditor {
       // check if input is/might be an xquery main module
       if(input.isEmpty()) input = "()";
       xquery = !module(in);
-      if(xquery && (force || gui.gprop.is(GUIProp.EXECRT))) {
+      if(xquery && (action == Action.EXECUTE || gui.gprop.is(GUIProp.EXECRT))) {
         // execute query if forced, or if realtime execution is activated
         gui.execute(true, new XQuery(input));
       } else {
@@ -149,7 +151,7 @@ final class EditorArea extends BaseXEditor {
           view.info(ex.getMessage(), false);
         }
       }
-    } else if(force && script) {
+    } else if(action == Action.EXECUTE && script) {
       // execute query if forced, or if realtime execution is activated
       gui.execute(true, new Execute(input));
     } else if(script || file.hasSuffix(IO.XMLSUFFIXES)) {

@@ -18,6 +18,7 @@ import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.*;
+import org.basex.gui.layout.BaseXEditor.Action;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
 import org.basex.gui.layout.BaseXLayout.DropHandler;
 import org.basex.gui.view.*;
@@ -204,7 +205,7 @@ public final class EditorView extends View {
     go.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        getEditor().release(true);
+        getEditor().release(Action.EXECUTE);
       }
     });
     tabs.addChangeListener(new ChangeListener() {
@@ -217,7 +218,7 @@ public final class EditorView extends View {
         gui.refreshControls();
         refreshMark();
         pos.setText(edit.pos());
-        edit.release(false);
+        edit.release(Action.PARSE);
       }
     });
 
@@ -349,7 +350,7 @@ public final class EditorView extends View {
       edit.setText(file.read());
       gui.gprop.recent(file);
       refresh(false, true);
-      edit.release(false);
+      edit.release(Action.PARSE);
 
     } catch(final IOException ex) {
       BaseXDialog.error(gui, FILE_NOT_OPENED);
@@ -569,8 +570,7 @@ public final class EditorView extends View {
     final EditorArea edit = new EditorArea(this, newTabFile());
     edit.setFont(GUIConstants.mfont);
 
-    final BaseXBack tab = new BaseXBack(
-        new BorderLayout(10, 0)).mode(Fill.NONE);
+    final BaseXBack tab = new BaseXBack(new BorderLayout(10, 0)).mode(Fill.NONE);
     tab.add(edit.label, BorderLayout.CENTER);
 
     final BaseXButton close = tabButton("editclose");
