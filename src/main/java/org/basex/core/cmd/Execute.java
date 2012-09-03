@@ -5,6 +5,7 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.query.*;
+import org.basex.util.list.*;
 
 /**
  * Evaluates the 'execute' command and runs a command script.
@@ -24,7 +25,17 @@ public class Execute extends Command {
    * @param input user input
    */
   public Execute(final String input) {
-    super(Perm.NONE, false, input);
+    super(Perm.ADMIN, false, input);
+  }
+
+  @Override
+  public boolean newData(final Context ctx) {
+    return new Close().run(ctx);
+  }
+
+  @Override
+  protected boolean databases(final StringList db) {
+    return false;
   }
 
   @Override

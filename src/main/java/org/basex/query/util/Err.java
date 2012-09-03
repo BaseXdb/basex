@@ -438,7 +438,7 @@ public enum Err {
   /** FOUP0002. */
   UPDBRENAMEERR(FOUP, 2, "Resource \"%\" could not be renamed."),
   /** FOUP0002. */
-  UPDBOPTERR(FOUP, 2, "Resource \"%\" could not be optimized."),
+  UPDBOPTERR(FOUP, 2, "%"),
 
   /** FTDY0016. */
   FTWEIGHT(FTDY, 16, "Weight value out of range: %."),
