@@ -87,7 +87,7 @@ public final class DirectServlet extends BaseXServlet {
       if(c instanceof XQuery) {
         // create query instance
         final Query qu = session.query(c.args[0]);
-        // initializes the response with query serialization options
+        // initialize the response with query serialization options
         http.initResponse(new SerializerProp(qu.options()));
         try {
           // run query
