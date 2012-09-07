@@ -62,8 +62,8 @@ public final class QueryContext extends Progress {
   public HashMap<String, IO> stop;
   /** Cached thesaurus files. */
   public HashMap<String, IO> thes;
-  /** Query options (are valid during query execution). */
-  public final HashMap<String, String> dbOptions = new HashMap<String, String>();
+  /** Local options (key/value pairs), set by option declarations. */
+  public final StringList dbOptions = new StringList();
   /** Global options (will be set after query execution). */
   public final HashMap<String, Object> globalOpt = new HashMap<String, Object>();
 
@@ -183,12 +183,9 @@ public final class QueryContext extends Progress {
     // dump compilation info
     if(inf) compInfo(NL + COMPILING_C);
 
-    // temporarily set database values (size check added for better performance)
-    if(!dbOptions.isEmpty()) {
-      for(final Entry<String, String> e : dbOptions.entrySet()) {
-        context.prop.set(e.getKey(), e.getValue());
-      }
-    }
+    // set database options
+    final StringList o = dbOptions;
+    for(int s = 0; s < o.size(); s += 2) context.prop.set(o.get(s), o.get(s + 1));
 
     if(ctxItem != null) {
       // evaluate initial expression
