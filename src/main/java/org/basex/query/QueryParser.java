@@ -562,7 +562,8 @@ public class QueryParser extends InputParser {
       if(obj == null) error(BASX_OPTIONS, key);
       // cache old value (to be reset after query evaluation)
       ctx.globalOpt.put(key, obj);
-      ctx.dbOptions.put(key, string(val));
+      ctx.dbOptions.add(key);
+      ctx.dbOptions.add(string(val));
     }
     // ignore unknown options
   }

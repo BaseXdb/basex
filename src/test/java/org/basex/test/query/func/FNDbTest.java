@@ -267,7 +267,7 @@ public final class FNDbTest extends AdvancedQueryTest {
     query(_DB_ADD.args(NAME, " document { <root/> }", "t2.xml"));
     query(COUNT.args(COLLECTION.args(NAME + "/t2.xml") + "/root"), "1");
 
-    query(_DB_ADD.args(NAME, " document { <root/> }", "test/t3.xml"));
+    query(_DB_ADD.args(NAME, " <root/>", "test/t3.xml"));
     query(COUNT.args(COLLECTION.args(NAME + "/test/t3.xml") + "/root"), "1");
 
     query(_DB_ADD.args(NAME, FILE, "in/"));

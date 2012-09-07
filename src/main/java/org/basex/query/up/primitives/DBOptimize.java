@@ -37,8 +37,7 @@ public final class DBOptimize extends UpdatePrimitive {
 
   @Override
   public void merge(final UpdatePrimitive p) {
-    final DBOptimize o = (DBOptimize) p;
-    if(o.all) all = o.all;
+    all |= ((DBOptimize) p).all;
   }
 
   @Override
