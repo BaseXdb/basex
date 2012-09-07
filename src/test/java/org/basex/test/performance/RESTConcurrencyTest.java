@@ -16,7 +16,12 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 import org.junit.*;
 
-/** Concurrency tests of BaseX REST API. */
+/**
+ * Concurrency tests of BaseX REST API.
+ *
+ * @author BaseX Team 2005-12, BSD License
+ * @author Dimitar Popov
+ */
 public class RESTConcurrencyTest {
   /** Time-out in (ms): increase if running on a slower system. */
   private static final long TIMEOUT = 600;

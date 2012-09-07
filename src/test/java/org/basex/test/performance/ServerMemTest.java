@@ -13,10 +13,8 @@ import org.junit.*;
  * @author Christian Gruen
  */
 public final class ServerMemTest extends SandboxTest {
-  /** Query to be run ("%" may be used as placeholder for dynamic content). */
-  private static final String QUERY =
-    "(for $i in 1 to 50000 order by $i return $i)[1]";
-
+  /** Query to be run. */
+  private static final String QUERY = "(for $i in 1 to 50000 order by $i return $i)[1]";
   /** Server reference. */
   BaseXServer server;
 
@@ -25,8 +23,8 @@ public final class ServerMemTest extends SandboxTest {
    * @throws Exception exception
    */
   @Test
-  public void clients10parallel10() throws Exception {
-    run(10, 10);
+  public void clients10() throws Exception {
+    run(10);
   }
 
   /**
@@ -34,37 +32,18 @@ public final class ServerMemTest extends SandboxTest {
    * @throws Exception exception
    */
   @Test
-  public void clients10parallel100() throws Exception {
-    run(10, 100);
-  }
-
-  /**
-   * Runs the test.
-   * @throws Exception exception
-   */
-  @Test
-  public void clients100parallel10() throws Exception {
-    run(100, 10);
-  }
-
-  /**
-   * Runs the test.
-   * @throws Exception exception
-   */
-  @Test
-  public void clients100parallel100() throws Exception {
-    run(100, 100);
+  public void clients100() throws Exception {
+    run(100);
   }
 
   /**
    * Runs the stress test.
    * @param clients number of clients
-   * @param parallel number of parallel runs
    * @throws Exception exception
    */
-  private void run(final int clients, final int parallel) throws Exception {
+  private void run(final int clients) throws Exception {
     //run server instance
-    server = createServer("-c", "set parallel " + parallel);
+    server = createServer();
     // run clients
     final Client[] cl = new Client[clients];
     for(int i = 0; i < clients; ++i) cl[i] = new Client();
