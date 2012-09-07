@@ -49,7 +49,6 @@ public abstract class AProp implements Iterable<String> {
     }
     if(suffix != null) read(suffix);
     setSystem();
-    finish();
   }
 
   /**
@@ -204,7 +203,6 @@ public abstract class AProp implements Iterable<String> {
    */
   public final synchronized void setObject(final String key, final Object val) {
     props.put(key, val);
-    finish();
   }
 
   /**
@@ -314,7 +312,52 @@ public abstract class AProp implements Iterable<String> {
     return tb.toString();
   }
 
-  // PROTECTED METHODS ===================================================================
+  /**
+   * Returns a system property.
+   * @param key {@link Prop} key
+   * @return value, or empty string
+   */
+  public static String getSystem(final Object[] key) {
+    return key.length > 0 ? getSystem(key[0].toString()) : "";
+  }
+
+  // STATIC METHODS =====================================================================
+
+  /**
+   * Returns a system property. If necessary, the key will
+   * be converted to lower-case and prefixed with {@link #DBPREFIX}.
+   * @param key {@link Prop} key
+   * @return value, or empty string
+   */
+  public static String getSystem(final String key) {
+    final String k = (key.startsWith(DBPREFIX) ? key : DBPREFIX + key).
+        toLowerCase(Locale.ENGLISH);
+    final String v = System.getProperty(k);
+    return v == null ? "" : v;
+  }
+
+  /**
+   * Sets a system property if it has not been set before.
+   * @param key {@link Prop} key
+   * @param val value
+   */
+  public static void setSystem(final Object[] key, final Object val) {
+    if(key.length > 0) setSystem(key[0].toString(), val);
+  }
+
+  /**
+   * Sets a system property if it has not been set before. If necessary, the key will
+   * be converted to lower-case and prefixed with {@link #DBPREFIX}.
+   * @param key key
+   * @param val value
+   */
+  public static void setSystem(final String key, final Object val) {
+    final String k = (key.indexOf('.') != -1 ? key : DBPREFIX + key).
+        toLowerCase(Locale.ENGLISH);
+    if(System.getProperty(k) == null) System.setProperty(k, val.toString());
+  }
+
+  // PROTECTED METHODS ==================================================================
 
   /**
    * Parses a property string and sets the properties accordingly.
@@ -335,13 +378,6 @@ public abstract class AProp implements Iterable<String> {
       }
       throw new BaseXException(unknown(key));
     }
-  }
-
-  /**
-   * Sets static properties.
-   */
-  protected void finish() {
-    // nothing to do; if necessary, is overwritten.
   }
 
   // PRIVATE METHODS ====================================================================

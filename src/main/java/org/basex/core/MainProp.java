@@ -99,11 +99,11 @@ public final class MainProp extends AProp {
     Prop.debug = is(DEBUG);
     final String ph = get(PROXYHOST);
     final String pp = Integer.toString(num(PROXYPORT));
-    Prop.setSystem("http.proxyHost", ph);
-    Prop.setSystem("http.proxyPort", pp);
-    Prop.setSystem("https.proxyHost", ph);
-    Prop.setSystem("https.proxyPort", pp);
-    Prop.setSystem("http.nonProxyHosts", get(NONPROXYHOSTS));
+    AProp.setSystem("http.proxyHost", ph);
+    AProp.setSystem("http.proxyPort", pp);
+    AProp.setSystem("https.proxyHost", ph);
+    AProp.setSystem("https.proxyPort", pp);
+    AProp.setSystem("http.nonProxyHosts", get(NONPROXYHOSTS));
   }
 
   /**
