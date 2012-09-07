@@ -56,7 +56,6 @@ final class RestXqResponse {
     function = rxf;
     qc = ctx;
     http = hc;
-    qc.http = hc;
   }
 
   /**
@@ -77,6 +76,7 @@ final class RestXqResponse {
     try {
       // assign local updating flag
       qc.updating = bfc.uses(Use.UPD);
+      qc.context(http, null);
       qc.context.register(qc);
 
       // set database options

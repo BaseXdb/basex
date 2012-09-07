@@ -77,8 +77,10 @@ class RESTQuery extends RESTCode {
     // set base path to correctly resolve local references
     session.execute(new Set(Prop.QUERYPATH, path));
 
-    // create query instance
+    // create query instance and bind http context
     final Query qu = session.query(in);
+    qu.context(http);
+
     // bind external variables
     for(final Entry<String, String[]> e : variables.entrySet()) {
       final String[] val = e.getValue();
