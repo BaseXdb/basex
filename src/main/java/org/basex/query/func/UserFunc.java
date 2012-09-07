@@ -198,7 +198,7 @@ public class UserFunc extends Single {
     Boolean b = map.get(u);
     if(b == null) {
       map.put(u, false);
-      b = super.uses(u);
+      b = expr == null || super.uses(u);
       map.put(u, b);
     }
     return b;

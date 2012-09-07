@@ -422,7 +422,12 @@ public final class FNSeq extends StandardFunc {
   }
 
   @Override
+  public boolean xquery3() {
+    return oneOf(sig, HEAD, TAIL);
+  }
+
+  @Override
   public boolean uses(final Use u) {
-    return u == Use.X30 && oneOf(sig, HEAD, TAIL) || super.uses(u);
+    return u == Use.X30 && xquery3() || super.uses(u);
   }
 }

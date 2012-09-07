@@ -128,6 +128,11 @@ public final class FNMap extends StandardFunc {
   }
 
   @Override
+  public boolean xquery3() {
+    return true;
+  }
+
+  @Override
   public boolean uses(final Use u) {
     return u == Use.X30 || super.uses(u);
   }

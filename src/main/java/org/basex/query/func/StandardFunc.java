@@ -61,6 +61,14 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
+   * Returns true if this is an XQuery 3.0 function.
+   * @return result of check
+   */
+  public boolean xquery3() {
+    return false;
+  }
+
+  /**
    * Atomizes the specified item.
    * @param it input item
    * @param ii input info
@@ -127,7 +135,7 @@ public abstract class StandardFunc extends Arr {
    * @return text entry
    * @throws QueryException query exception
    */
-  public String encoding(final int i, final Err err, final QueryContext ctx)
+  String encoding(final int i, final Err err, final QueryContext ctx)
       throws QueryException {
     if(i >= expr.length) return null;
     final String enc = string(checkStr(expr[i], ctx));

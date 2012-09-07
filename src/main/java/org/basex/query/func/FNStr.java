@@ -309,8 +309,12 @@ public final class FNStr extends StandardFunc {
   }
 
   @Override
+  public boolean xquery3() {
+    return sig == Function.STRING_JOIN && expr.length == 1;
+  }
+
+  @Override
   public boolean uses(final Use u) {
-    return u == Use.X30 && sig == Function.STRING_JOIN && expr.length == 1 ||
-      super.uses(u);
+    return u == Use.X30 && xquery3() || super.uses(u);
   }
 }

@@ -8,7 +8,6 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.Expr.Use;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -53,13 +52,12 @@ public final class Functions extends TokenSet {
    * Returns the specified function.
    * @param name function qname
    * @param args optional arguments
-   * @param ctx query context
    * @param ii input info
    * @return function instance
    * @throws QueryException query exception
    */
-  public StandardFunc get(final QNm name, final Expr[] args, final QueryContext ctx,
-      final InputInfo ii) throws QueryException {
+  public StandardFunc get(final QNm name, final Expr[] args, final InputInfo ii)
+      throws QueryException {
 
     final int id = id(name.id());
     if(id == 0) return null;
@@ -69,7 +67,6 @@ public final class Functions extends TokenSet {
     if(!eq(fl.uri(), name.uri())) return null;
 
     final StandardFunc f = fl.get(ii, args);
-    if(!ctx.sc.xquery3 && f.uses(Use.X30)) FEATURE30.thrw(ii);
     // check number of arguments
     if(args.length < fl.min || args.length > fl.max) XPARGS.thrw(ii, fl);
     return f;
@@ -149,8 +146,9 @@ public final class Functions extends TokenSet {
     }
 
     // pre-defined functions
-    final StandardFunc fun = Functions.get().get(name, args, ctx, ii);
+    final StandardFunc fun = Functions.get().get(name, args, ii);
     if(fun != null) {
+      if(!ctx.sc.xquery3 && fun.xquery3()) FEATURE30.thrw(ii);
       for(final Function f : Function.UPDATING) {
         if(fun.sig == f) {
           ctx.updating(true);

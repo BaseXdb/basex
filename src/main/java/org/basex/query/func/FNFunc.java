@@ -249,6 +249,11 @@ public final class FNFunc extends StandardFunc {
   }
 
   @Override
+  public boolean xquery3() {
+    return true;
+  }
+
+  @Override
   public boolean uses(final Use u) {
     return u == Use.CTX && oneOf(sig, PARTIAL_APPLY, FUNCTION_LOOKUP) ||
         u == Use.X30 || super.uses(u);

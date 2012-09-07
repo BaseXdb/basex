@@ -1,6 +1,7 @@
 package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.func.Function.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
@@ -217,8 +218,13 @@ public final class FNPat extends StandardFunc {
   }
 
   @Override
+  public boolean xquery3() {
+    return sig == ANALYZE_STRING;
+  }
+
+  @Override
   public boolean uses(final Use u) {
-    return sig == Function.ANALYZE_STRING && (u == Use.X30 || u == Use.CNS) ||
+    return u == Use.X30 && xquery3() || u == Use.CNS && sig == ANALYZE_STRING ||
         super.uses(u);
   }
 }
