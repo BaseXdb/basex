@@ -83,6 +83,7 @@
   <servlet>
     <servlet-name>RESTXQ</servlet-name>
     <servlet-class>org.basex.http.restxq.RestXqServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>
     <servlet-name>RESTXQ</servlet-name>

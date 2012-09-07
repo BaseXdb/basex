@@ -183,6 +183,7 @@ public final class BaseXHTTP {
         switch(arg.next()) {
           case 'd': // activate debug mode
             Prop.setSystem(MainProp.DEBUG, true);
+            Prop.debug = true;
             break;
           case 'D': // hidden flag: daemon mode
             daemon = true;
