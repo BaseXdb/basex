@@ -92,10 +92,10 @@ public final class BaseXHTTP {
     }
 
     // request password on command line if only the user was specified
-    if(!Prop.getSystem(MainProp.USER).isEmpty()) {
-      while(Prop.getSystem(MainProp.PASSWORD).isEmpty()) {
+    if(!AProp.getSystem(MainProp.USER).isEmpty()) {
+      while(AProp.getSystem(MainProp.PASSWORD).isEmpty()) {
         Util.out(PASSWORD + COLS);
-        Prop.setSystem(MainProp.PASSWORD, Util.password());
+        AProp.setSystem(MainProp.PASSWORD, Util.password());
       }
     }
 
@@ -182,43 +182,43 @@ public final class BaseXHTTP {
       if(arg.dash()) {
         switch(arg.next()) {
           case 'd': // activate debug mode
-            Prop.setSystem(MainProp.DEBUG, true);
+            AProp.setSystem(MainProp.DEBUG, true);
             Prop.debug = true;
             break;
           case 'D': // hidden flag: daemon mode
             daemon = true;
             break;
           case 'e': // parse event port
-            Prop.setSystem(MainProp.EVENTPORT, arg.number());
+            AProp.setSystem(MainProp.EVENTPORT, arg.number());
             break;
           case 'h': // parse HTTP port
             httpPort = arg.number();
             break;
           case 'l': // use local mode
-            Prop.setSystem(MainProp.HTTPLOCAL, true);
+            AProp.setSystem(MainProp.HTTPLOCAL, true);
             break;
           case 'n': // parse host name
-            Prop.setSystem(MainProp.HOST, arg.string());
+            AProp.setSystem(MainProp.HOST, arg.string());
             break;
           case 'p': // parse server port
             final int p = arg.number();
-            Prop.setSystem(MainProp.PORT, p);
-            Prop.setSystem(MainProp.SERVERPORT, p);
+            AProp.setSystem(MainProp.PORT, p);
+            AProp.setSystem(MainProp.SERVERPORT, p);
             break;
           case 'P': // specify password
-            Prop.setSystem(MainProp.PASSWORD, arg.string());
+            AProp.setSystem(MainProp.PASSWORD, arg.string());
             break;
           case 's': // parse stop port
-            Prop.setSystem(MainProp.STOPPORT, arg.number());
+            AProp.setSystem(MainProp.STOPPORT, arg.number());
             break;
           case 'S': // set service flag
             service = !daemon;
             break;
           case 'U': // specify user name
-            Prop.setSystem(MainProp.USER, arg.string());
+            AProp.setSystem(MainProp.USER, arg.string());
             break;
           case 'z': // suppress logging
-            Prop.setSystem(MainProp.LOG, false);
+            AProp.setSystem(MainProp.LOG, false);
             break;
           default:
             arg.usage();

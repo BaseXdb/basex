@@ -308,8 +308,8 @@ public final class HTTPContext {
 
     // set web application path as home directory and HTTPPATH
     final String webapp = sc.getRealPath("/");
-    Prop.setSystem(Prop.PATH, webapp);
-    Prop.setSystem(MainProp.WEBPATH, webapp);
+    AProp.setSystem(Prop.PATH, webapp);
+    AProp.setSystem(MainProp.WEBPATH, webapp);
 
     // bind all parameters that start with "org.basex." to system properties
     final Enumeration<String> en = sc.getInitParameterNames();
@@ -341,7 +341,7 @@ public final class HTTPContext {
         Util.debug(k.toUpperCase(Locale.ENGLISH) + ": " + v);
         v = new IOFile(webapp, v).path();
       }
-      Prop.setSystem(k, v);
+      AProp.setSystem(k, v);
     }
 
     // create context, update property instances
