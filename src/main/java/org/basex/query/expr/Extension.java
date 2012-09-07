@@ -36,7 +36,12 @@ public final class Extension extends Single {
 
   @Override
   public Expr compile(final QueryContext ctx) throws QueryException {
-    expr.compile(ctx);
+    try {
+      for(final Pragma p : pragmas) p.init(ctx, info);
+      expr = expr.compile(ctx);
+    } finally {
+      for(final Pragma p : pragmas) p.finish(ctx);
+    }
     return this;
   }
 
@@ -48,10 +53,10 @@ public final class Extension extends Single {
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
     try {
-      for(final Pragma g : pragmas) g.init(ctx, info);
+      for(final Pragma p : pragmas) p.init(ctx, info);
       return ctx.value(expr);
     } finally {
-      for(final Pragma g : pragmas) g.finish(ctx);
+      for(final Pragma p : pragmas) p.finish(ctx);
     }
   }
 
