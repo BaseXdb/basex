@@ -229,7 +229,7 @@ public final class BaseXServer extends Main implements Runnable {
             commands.add(arg.string());
             break;
           case 'd': // activate debug mode
-            context.mprop.set(MainProp.DEBUG, true);
+            Prop.debug = true;
             break;
           case 'D': // hidden flag: daemon mode
             daemon = true;
