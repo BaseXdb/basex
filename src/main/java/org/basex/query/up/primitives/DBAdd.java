@@ -134,8 +134,11 @@ public final class DBAdd extends InsertBase {
       }
     } else if(doc instanceof ANode) {
       // adding a document node
-      final ANode nd = (ANode) doc;
-      if(nd.type != NodeType.DOC) UPDOCTYPE.thrw(info, nd);
+      ANode nd = (ANode) doc;
+      if(nd.type != NodeType.DOC) {
+        if(nd.type == NodeType.ATT) UPDOCTYPE.thrw(info, nd);
+        nd = new FDoc().add(nd);
+      }
       mdata = new MemData(data);
       new DataBuilder(mdata).build(nd);
       mdata.update(0, Data.DOC, pth);
