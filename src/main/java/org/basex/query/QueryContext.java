@@ -501,7 +501,12 @@ public final class QueryContext extends Progress {
    * @throws QueryException query exception
    */
   public void context(final Object val, final String type) throws QueryException {
-    ctxItem = cast(val, type);
+    // bind http context to extra variable
+    if(val.getClass().getName().equals("org.basex.http.HTTPContext")) {
+      http = val;
+    } else {
+      ctxItem = cast(val, type);
+    }
   }
 
   /**
