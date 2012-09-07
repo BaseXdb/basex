@@ -84,7 +84,7 @@ public class BaseX extends Main {
           console = false;
         } else if(c == 'd') {
           // toggle debug mode
-          context.mprop.set(MainProp.DEBUG, !context.mprop.is(MainProp.DEBUG));
+          Prop.debug ^= true;
         } else if(c == 'D') {
           // hidden option: show/hide dot query graph
           prop = Prop.DOTPLAN;
