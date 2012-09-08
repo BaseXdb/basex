@@ -1,9 +1,11 @@
 package org.basex.query.value.node;
 
 import org.basex.api.dom.*;
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -74,6 +76,17 @@ public abstract class ANode extends Item {
    * @return node copy
    */
   public abstract ANode deepCopy();
+
+  /**
+   * Returns a database node representation of the node.
+   * @param prop properties
+   * @return database node
+   */
+  public DBNode dbCopy(final Prop prop) {
+    final MemData md = new MemData(prop);
+    new DataBuilder(md).build(this);
+    return new DBNode(md);
+  }
 
   /**
    * Returns the name of the node, composed of an optional prefix

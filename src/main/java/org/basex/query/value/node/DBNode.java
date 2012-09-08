@@ -209,37 +209,15 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final ANode deepCopy() {
-    // adopt meta data and index structures if database is a main-memory instance
-    final MemData md = data.inMemory() ? new MemData(data) : new MemData(data.meta.prop);
+  public DBNode dbCopy(final Prop prop) {
+    final MemData md = data.inMemory() ? new MemData(data) : new MemData(prop);
     new DataBuilder(md).build(this);
     return new DBNode(md);
+  }
 
-    /*if(hasChildren()) {
-      // adopt index structures if database is a main-memory instance
-      final MemData md = data.inMemory() ?
-          new MemData(data) : new MemData(data.meta.prop);
-      new DataBuilder(md).build(this);
-      return new DBNode(md, 0);
-    }
-    // create object-based fragments for nodes without children (faster)
-    switch((NodeType) type) {
-      case ATT:
-        return new FAttr(qname(), string());
-      case PI:
-        return new FPI(qname(), string());
-      case TXT:
-        return new FTxt(string());
-      case COM:
-        return new FComm(string());
-      case DOC:
-        return new FDoc(new NodeCache(), baseURI());
-      default:
-        final NodeCache atts = new NodeCache();
-        final AxisIter ai = attributes();
-        for(ANode it; (it = ai.next()) != null;) atts.add(it.finish());
-        return new FElem(qname(), null, atts, namespaces());
-    }*/
+  @Override
+  public final ANode deepCopy() {
+    return dbCopy(data.meta.prop);
   }
 
   @Override

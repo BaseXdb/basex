@@ -3,7 +3,6 @@ package org.basex.query.up.expr;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.flwor.*;
@@ -73,16 +72,14 @@ public final class Transform extends Arr {
     try {
       for(final Let fo : copies) {
         final Iter ir = ctx.iter(fo.expr);
-        final Item i = ir.next();
+        Item i = ir.next();
         if(i == null || !(i instanceof ANode) || ir.next() != null) UPCOPYMULT.thrw(info);
 
         // copy node to main memory data instance
-        final MemData md = new MemData(ctx.context.prop);
-        new DataBuilder(md).build((ANode) i);
-
+        i = ((ANode) i).dbCopy(ctx.context.prop);
         // add resulting node to variable
-        ctx.vars.add(fo.var.bind(new DBNode(md), ctx).copy());
-        pu.addData(md);
+        ctx.vars.add(fo.var.bind(i, ctx).copy());
+        pu.addData(i.data());
       }
       ctx.value(expr[0]);
       ctx.updates.apply();

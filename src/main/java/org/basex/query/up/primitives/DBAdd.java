@@ -11,7 +11,6 @@ import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -139,8 +138,7 @@ public final class DBAdd extends InsertBase {
         if(nd.type == NodeType.ATT) UPDOCTYPE.thrw(info, nd);
         nd = new FDoc().add(nd);
       }
-      mdata = new MemData(data);
-      new DataBuilder(mdata).build(nd);
+      mdata = (MemData) nd.dbCopy(data.meta.prop).data;
       mdata.update(0, Data.DOC, pth);
     } else {
       throw STRNODTYPE.thrw(info, this, doc.type);
