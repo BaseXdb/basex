@@ -198,4 +198,46 @@ public abstract class HTTPTest extends SandboxTest {
     }
     return ao.toString();
   }
+
+  /**
+   * Executes the specified PUT request.
+   * @param u url
+   * @param is input stream
+   * @throws IOException I/O exception
+   */
+  protected static void put(final String u, final InputStream is) throws IOException {
+    put(u, is, null);
+  }
+
+  /**
+   * Executes the specified PUT request.
+   * @param u url
+   * @param is input stream
+   * @param ctype content type (optional, may be {@code null})
+   * @throws IOException I/O exception
+   */
+  protected static void put(final String u, final InputStream is,
+      final String ctype) throws IOException {
+
+    final URL url = new URL(u);
+    final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+    conn.setDoOutput(true);
+    conn.setRequestMethod(PUT.name());
+    if(ctype != null) conn.setRequestProperty(MimeTypes.CONTENT_TYPE, ctype);
+    final OutputStream bos = new BufferedOutputStream(conn.getOutputStream());
+    if(is != null) {
+      // send input stream if it not empty
+      final BufferedInputStream bis = new BufferedInputStream(is);
+      for(int i; (i = bis.read()) != -1;) bos.write(i);
+      bis.close();
+      bos.close();
+    }
+    try {
+      read(conn.getInputStream());
+    } catch(final IOException ex) {
+      throw error(conn, ex);
+    } finally {
+      conn.disconnect();
+    }
+  }
 }

@@ -1,6 +1,5 @@
 package org.basex.test.http;
 
-import static org.basex.http.HTTPMethod.*;
 import static org.basex.io.MimeTypes.*;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
@@ -10,7 +9,6 @@ import java.net.*;
 
 import org.basex.core.*;
 import org.basex.http.rest.*;
-import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.func.*;
 import org.basex.util.*;
@@ -82,8 +80,8 @@ public class RESTTest extends HTTPTest {
    */
   @Test
   public void get3() throws IOException {
-    put(NAME, new ArrayInput("<a/>"));
-    put(NAME + "/raw", new ArrayInput("XXX"), APP_OCTET);
+    put(ROOT + NAME, new ArrayInput("<a/>"));
+    put(ROOT + NAME + "/raw", new ArrayInput("XXX"), APP_OCTET);
     assertEquals("<a/>", get(NAME + '/' + NAME + ".xml"));
     assertEquals("XXX", get(NAME + "/raw"));
     delete(NAME);
@@ -342,7 +340,7 @@ public class RESTTest extends HTTPTest {
    */
   @Test
   public void put1() throws IOException {
-    put(NAME, null);
+    put(ROOT + NAME, null);
     assertEquals("0", get(NAME + "?query=count(/)"));
     delete(NAME);
   }
@@ -353,7 +351,7 @@ public class RESTTest extends HTTPTest {
    */
   @Test
   public void put2() throws IOException {
-    put(NAME, new ArrayInput(token("<a>A</a>")));
+    put(ROOT + NAME, new ArrayInput(token("<a>A</a>")));
     assertEquals("A", get(NAME + "?query=/*/text()"));
     delete(NAME);
   }
@@ -364,8 +362,8 @@ public class RESTTest extends HTTPTest {
    */
   @Test
   public void put3() throws IOException {
-    put(NAME, new FileInputStream(FILE));
-    put(NAME, new FileInputStream(FILE));
+    put(ROOT + NAME, new FileInputStream(FILE));
+    put(ROOT + NAME, new FileInputStream(FILE));
     assertEquals("XML", get(NAME + "?query=//title/text()"));
     delete(NAME);
   }
@@ -376,9 +374,9 @@ public class RESTTest extends HTTPTest {
    */
   @Test
   public void put4() throws IOException {
-    put(NAME, null);
-    put(NAME + "/a", new ArrayInput(token("<a>A</a>")));
-    put(NAME + "/b", new ArrayInput(token("<b>B</b>")));
+    put(ROOT + NAME, null);
+    put(ROOT + NAME + "/a", new ArrayInput(token("<a>A</a>")));
+    put(ROOT + NAME + "/b", new ArrayInput(token("<b>B</b>")));
     assertEquals("2", get(NAME + "?query=count(//text())"));
     assertEquals("2", get("?query=count(" + Function._DB_OPEN.args(NAME) + "//text())"));
     assertEquals("1", get("?query=count(" + Function._DB_OPEN.args(NAME, "b") + "/*)"));
@@ -391,13 +389,13 @@ public class RESTTest extends HTTPTest {
    */
   @Test
   public void putOption() throws IOException {
-    put(NAME + "?" + Prop.CHOP[0] + "=true", new FileInputStream(FILE));
+    put(ROOT + NAME + "?" + Prop.CHOP[0] + "=true", new FileInputStream(FILE));
     assertEquals("5", get(NAME + "?query=count(//text())"));
-    put(NAME + "?" + Prop.CHOP[0] + "=false", new FileInputStream(FILE));
+    put(ROOT + NAME + "?" + Prop.CHOP[0] + "=false", new FileInputStream(FILE));
     assertEquals("22", get(NAME + "?query=count(//text())"));
 
     try {
-      put(NAME + "?xxx=yyy", new FileInputStream(FILE));
+      put(ROOT + NAME + "?xxx=yyy", new FileInputStream(FILE));
       fail("Error expected.");
     } catch(final IOException ex) {
     }
@@ -409,7 +407,7 @@ public class RESTTest extends HTTPTest {
    */
   @Test
   public void delete1() throws IOException {
-    put(NAME, new FileInputStream(FILE));
+    put(ROOT + NAME, new FileInputStream(FILE));
     // delete database
     assertEquals(delete(NAME).trim(), Util.info(Text.DB_DROPPED_X, NAME));
     try {
@@ -426,9 +424,9 @@ public class RESTTest extends HTTPTest {
    */
   @Test
   public void delete2() throws IOException {
-    put(NAME, null);
-    put(NAME + "/a", new ArrayInput(token("<a/>")));
-    put(NAME + "/b", new ArrayInput(token("<b/>")));
+    put(ROOT + NAME, null);
+    put(ROOT + NAME + "/a", new ArrayInput(token("<a/>")));
+    put(ROOT + NAME + "/b", new ArrayInput(token("<b/>")));
     // delete 'a' directory
     assertStartsWith(delete(NAME + "/a"), "1 ");
     // delete 'b' directory
@@ -451,7 +449,7 @@ public class RESTTest extends HTTPTest {
    */
   @Test
   public void deleteOption() throws IOException {
-    put(NAME, null);
+    put(ROOT + NAME, null);
     delete(NAME + "/a?" + Prop.CHOP[0] + "=true");
     try {
       delete(NAME + "/a?xxx=true");
@@ -469,48 +467,6 @@ public class RESTTest extends HTTPTest {
    */
   private static void assertContains(final String str, final String sub) {
     if(!str.contains(sub)) fail('\'' + sub + "' not contained in '" + str + "'.");
-  }
-
-  /**
-   * Executes the specified PUT request.
-   * @param query request
-   * @param is input stream
-   * @throws IOException I/O exception
-   */
-  private static void put(final String query, final InputStream is) throws IOException {
-    put(query, is, null);
-  }
-
-  /**
-   * Executes the specified PUT request.
-   * @param query request
-   * @param is input stream
-   * @param ctype content type (optional, may be {@code null})
-   * @throws IOException I/O exception
-   */
-  private static void put(final String query, final InputStream is, final String ctype)
-      throws IOException {
-
-    final URL url = new URL(ROOT + query);
-    final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-    conn.setDoOutput(true);
-    conn.setRequestMethod(PUT.name());
-    if(ctype != null) conn.setRequestProperty(MimeTypes.CONTENT_TYPE, ctype);
-    final OutputStream bos = new BufferedOutputStream(conn.getOutputStream());
-    if(is != null) {
-      // send input stream if it not empty
-      final BufferedInputStream bis = new BufferedInputStream(is);
-      for(int i; (i = bis.read()) != -1;) bos.write(i);
-      bis.close();
-      bos.close();
-    }
-    try {
-      read(conn.getInputStream());
-    } catch(final IOException ex) {
-      throw error(conn, ex);
-    } finally {
-      conn.disconnect();
-    }
   }
 
   /**

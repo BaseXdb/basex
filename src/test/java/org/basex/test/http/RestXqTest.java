@@ -271,48 +271,6 @@ public final class RestXqTest extends HTTPTest {
         "function m:f($v) {$v};", "?a=1", "1");
   }
 
-  /** Retrieve session id.
-   * @throws Exception exception */
-  @Test public void sessionID() throws Exception {
-    get("declare %R:path('') function m:f() { count(request:session-id()) };",
-        "", "1");
-  }
-
-  /** Retrieve and update attributes.
-   * @throws Exception exception */
-  @Test public void attribute() throws Exception {
-    get("declare %R:path('') function m:f() { " +
-        "request:update-attribute('a','b'), request:attribute('a') };",
-        "", "b");
-  }
-
-  /** Retrieve and update attributes.
-   * @throws Exception exception */
-  @Test public void path() throws Exception {
-    get("declare %R:path('a/b') function m:f() { " +
-        "request:path() };",
-        "a/b", "/a/b");
-  }
-
-  /** Retrieve and update parameters.
-   * @throws Exception exception */
-  @Test public void parameterNames() throws Exception {
-    get("declare %R:path('') function m:f() { " +
-        " count(request:parameter-names()) };",
-        "?a=b&c=d&e=f", "3");
-  }
-
-  /** Retrieve and update parameters.
-   * @throws Exception exception */
-  @Test public void parameter() throws Exception {
-    get("declare %R:path('') function m:f() { " +
-        " request:parameter('a') };",
-        "?a=b", "b");
-    get("declare %R:path('') function m:f() { " +
-        " count(request:parameter('a')) };",
-        "?a=b&a=c", "2");
-  }
-
   // PRIVATE METHODS ==========================================================
 
   /**
@@ -339,8 +297,7 @@ public final class RestXqTest extends HTTPTest {
    */
   private static void get(final String function, final String query, final String exp)
       throws IOException {
-    install("import module namespace request = 'http://exquery.org/ns/restxq/request'; " +
-      function);
+    install(function);
     assertEquals(exp, get(query));
   }
 

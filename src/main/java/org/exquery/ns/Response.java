@@ -1,4 +1,4 @@
-package org.exquery.ns.restxq;
+package org.exquery.ns;
 
 import org.basex.query.*;
 
