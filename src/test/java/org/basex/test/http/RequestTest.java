@@ -103,6 +103,48 @@ public class RequestTest extends HTTPTest {
   public void parameter() throws Exception {
     assertEquals("b", get("?query=" + request("R:parameter('a')") + "&a=b"));
     assertEquals("b c", get("?query=" + request("R:parameter('a')") + "&a=b&a=c"));
+    assertEquals("b", get("?query=" + request("R:parameter('a','c')") + "&a=b"));
+    assertEquals("c", get("?query=" + request("R:parameter('x','c')") + "&a=b"));
+  }
+
+  /**
+   * Function test.
+   * @throws Exception exception
+   */
+  @Test
+  public void headerNames() throws Exception {
+    final String query = "R:header-names()";
+    assertEquals("Host Accept Connection User-Agent", get("?query=" + request(query)));
+  }
+
+  /**
+   * Function test.
+   * @throws Exception exception
+   */
+  @Test
+  public void header() throws Exception {
+    assertEquals("localhost:9998", get("?query=" + request("R:header('Host')")));
+    assertEquals("def", get("?query=" + request("R:header('ABC', 'def')")));
+  }
+
+  /**
+   * Function test.
+   * @throws Exception exception
+   */
+  @Test
+  public void cookieNames() throws Exception {
+    final String query = "count(R:cookie-names())";
+    assertEquals("0", get("?query=" + request(query)));
+  }
+
+  /**
+   * Function test.
+   * @throws Exception exception
+   */
+  @Test
+  public void cookie() throws Exception {
+    final String query = "count(R:cookie('x'))";
+    assertEquals("0", get("?query=" + request(query)));
   }
 
   // PRIVATE METHODS ====================================================================
