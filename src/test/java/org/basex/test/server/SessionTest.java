@@ -158,7 +158,6 @@ public abstract class SessionTest extends SandboxTest {
    * @throws IOException I/O exception
    */
   @Test
-  @Ignore("OverlappingLocking")
   public final void replace() throws IOException {
     session.execute("create db " + NAME);
     assertEqual("0", session.query("count(" + _DB_OPEN.args(NAME) + ')').execute());

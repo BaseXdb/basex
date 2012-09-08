@@ -167,7 +167,7 @@ VERSION 7.0.1 (October 23, 2011) ---------------------------------------
   - Start scripts have been improved
 
   XQUERY
-  - much faster execution of cnt() when applied to opened databases
+  - much faster execution of count() when applied to opened databases
 
   SERVER
   - Flag -c connects to an existing database server
