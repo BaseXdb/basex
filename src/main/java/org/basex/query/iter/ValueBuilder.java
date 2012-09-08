@@ -41,23 +41,11 @@ public final class ValueBuilder extends ValueIter implements Result {
   }
 
   /**
-   * Constructor.
-   * @param it item array
-   * @param s size
-   */
-  public ValueBuilder(final Item[] it, final int s) {
-    item = it;
-    size = s;
-  }
-
-  /**
    * Adds the contents of a value.
    * @param val value to be added
    */
   public void add(final Value val) {
-    for(final long sz = val.size(); item.length - size < sz;) {
-      item = extend(item);
-    }
+    for(final long sz = val.size(); item.length - size < sz;) item = extend(item);
     size += val.writeTo(item, size);
   }
 

@@ -35,6 +35,15 @@ public final class Uri extends Str {
   /**
    * Creates a new uri instance.
    * @param uri value
+   * @return uri instance
+   */
+  public static Uri uri(final String uri) {
+    return uri(Token.token(uri), true);
+  }
+
+  /**
+   * Creates a new uri instance.
+   * @param uri value
    * @param normalize chop leading and trailing whitespaces
    * @return uri instance
    */

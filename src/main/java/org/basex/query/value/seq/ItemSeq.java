@@ -54,10 +54,14 @@ public final class ItemSeq extends Seq {
   public SeqType type() {
     if(ret == null) {
       Type t = item[0].type;
-      for(int s = 1; s < size && t != AtomType.ITEM; s++) {
-        if(t != item[s].type) t = AtomType.ITEM;
+      for(int s = 1; s < size; s++) {
+        if(t != item[s].type) {
+          t = AtomType.ITEM;
+          break;
+        }
       }
       ret = t;
+      type = t;
     }
     return SeqType.get(ret, Occ.ONE_MORE);
   }

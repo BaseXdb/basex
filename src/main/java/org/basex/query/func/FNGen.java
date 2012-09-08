@@ -210,7 +210,7 @@ public final class FNGen extends StandardFunc {
     try {
       final String p = string(path);
       if(p.indexOf('#') != -1) FRAGID.thrw(info, p);
-      if(!Uri.uri(token(p)).isValid()) INVURL.thrw(info, p);
+      if(!Uri.uri(p).isValid()) INVURL.thrw(info, p);
 
       IO io = base.merge(p);
       final String rp = ctx.resource.resources.get(io.path());

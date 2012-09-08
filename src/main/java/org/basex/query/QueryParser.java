@@ -440,7 +440,7 @@ public class QueryParser extends InputParser {
    */
   private void annotation(final Ann ann) throws QueryException {
     final QNm name = eQName(QNAMEINV, ctx.sc.nsFunc);
-    final ValueBuilder vb = new ValueBuilder(1);
+    final ValueBuilder vb = new ValueBuilder();
     if(wsConsumeWs(PAR1)) {
       do {
         final Item it = literal();

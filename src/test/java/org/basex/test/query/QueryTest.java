@@ -116,7 +116,7 @@ public abstract class QueryTest extends SandboxTest {
    * @return node array
    */
   protected static ValueBuilder empty() {
-    return new ValueBuilder(new Item[] {}, 0);
+    return new ValueBuilder();
   }
 
   /**
@@ -185,6 +185,8 @@ public abstract class QueryTest extends SandboxTest {
    * @return iterator
    */
   private static ValueBuilder item(final Item i) {
-    return new ValueBuilder(new Item[] { i }, 1);
+    final ValueBuilder vb = new ValueBuilder();
+    vb.add(i);
+    return vb;
   }
 }

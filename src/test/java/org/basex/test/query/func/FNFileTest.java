@@ -113,7 +113,6 @@ public final class FNFileTest extends AdvancedQueryTest {
     error(_FILE_LIST.args(PATH1), Err.FILE_NODIR);
     contains(_FILE_LIST.args(PATH), NAME);
     contains(_FILE_LIST.args(PATH, "false()"), NAME);
-    contains(_FILE_LIST.args(PATH, "false()", "Sandbox"), NAME);
     contains(_FILE_LIST.args(PATH, "false()", NAME), NAME);
     query(_FILE_LIST.args(PATH, "false()", "XXX"), "");
     query(_FILE_DELETE.args(PATH1));

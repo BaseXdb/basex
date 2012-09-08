@@ -111,7 +111,7 @@ public final class FNInfo extends StandardFunc {
    * Returns all environment variables.
    * @return iterator
    */
-  private Iter avlEnvVars() {
+  private ValueIter avlEnvVars() {
     final ValueBuilder vb = new ValueBuilder();
     for(final Object k : System.getenv().keySet().toArray()) vb.add(Str.get(k));
     return vb;
@@ -123,7 +123,7 @@ public final class FNInfo extends StandardFunc {
    * @return iterator
    * @throws QueryException query exception
    */
-  private Item envVar(final QueryContext ctx) throws QueryException {
+  private Str envVar(final QueryContext ctx) throws QueryException {
     final String e = System.getenv(Token.string(checkEStr(expr[0], ctx)));
     return e != null ? Str.get(e) : null;
   }

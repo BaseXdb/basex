@@ -11,9 +11,12 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.regex.parse.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * String pattern functions.
@@ -51,8 +54,16 @@ public final class FNPat extends StandardFunc {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(sig) {
-      case TOKENIZE: return tokenize(checkEStr(expr[0], ctx), ctx);
+      case TOKENIZE: return tokenize(ctx).iter();
       default:       return super.iter(ctx);
+    }
+  }
+
+  @Override
+  public Value value(final QueryContext ctx) throws QueryException {
+    switch(sig) {
+      case TOKENIZE: return tokenize(ctx);
+      default:       return super.value(ctx);
     }
   }
 
@@ -180,27 +191,27 @@ public final class FNPat extends StandardFunc {
 
   /**
    * Evaluates the tokenize function.
-   * @param val input value
    * @param ctx query context
    * @return function result
    * @throws org.basex.query.QueryException query exception
    */
-  private Iter tokenize(final byte[] val, final QueryContext ctx) throws QueryException {
+  private Value tokenize(final QueryContext ctx) throws QueryException {
+    final byte[] val = checkEStr(expr[0], ctx);
     final Pattern p = pattern(expr[1], expr.length == 3 ? expr[2] : null, ctx);
     if(p.matcher("").matches()) REGROUP.thrw(info);
 
-    final ValueBuilder vb = new ValueBuilder();
+    final TokenList tl = new TokenList();
     final String str = string(val);
     if(!str.isEmpty()) {
       final Matcher m = p.matcher(str);
       int s = 0;
       while(m.find()) {
-        vb.add(Str.get(str.substring(s, m.start())));
+        tl.add(str.substring(s, m.start()));
         s = m.end();
       }
-      vb.add(Str.get(str.substring(s, str.length())));
+      tl.add(str.substring(s, str.length()));
     }
-    return vb;
+    return StrSeq.get(tl);
   }
 
   /**

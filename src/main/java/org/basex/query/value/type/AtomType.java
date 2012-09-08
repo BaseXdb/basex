@@ -632,7 +632,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Item cast(final Object o, final InputInfo ii) {
-      return Uri.uri(token(o.toString()));
+      return Uri.uri(o.toString());
     }
   },
 

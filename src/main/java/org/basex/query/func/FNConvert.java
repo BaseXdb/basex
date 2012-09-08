@@ -172,7 +172,7 @@ public final class FNConvert extends StandardFunc {
    */
   private Value binaryToBytes(final QueryContext ctx) throws QueryException {
     try {
-      return new ByteSeq(checkItem(expr[0], ctx).input(info).content());
+      return BytSeq.get(checkItem(expr[0], ctx).input(info).content());
     } catch(final IOException ex) {
       throw BXCO_STRING.thrw(info, ex);
     }
@@ -263,7 +263,7 @@ public final class FNConvert extends StandardFunc {
   private byte[] bytesToBinary(final QueryContext ctx) throws QueryException {
     final Value v = expr[0].value(ctx);
     // directly pass on byte array
-    if(v instanceof ByteSeq) return ((ByteSeq) v).bytes();
+    if(v instanceof BytSeq) return ((BytSeq) v).toJava();
 
     // check if all arguments are bytes
     final Iter ir = v.iter();

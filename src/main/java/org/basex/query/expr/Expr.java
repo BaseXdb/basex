@@ -228,18 +228,16 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Returns the static type of the evaluated value. For simplicity,
-   * some types have been merged to super types. As an example, many numeric types
-   * are treated as integers.
+   * Returns the static type of the evaluated value. For simplicity, some types have been
+   * merged to super types. As an example, many numeric types are treated as integers.
    * @return result of check
    */
   public abstract SeqType type();
 
   /**
-   * Returns true if the expression is iterable, i.e., if it will not contain
-   * any duplicate nodes and if all nodes will be are sorted.
-   * The return value of this method is only relevant for node sequences.
-   * It is e.g. called by {@link AxisPath}.
+   * Returns true if the expression is iterable, i.e., if it will not contain any
+   * duplicate nodes and if all nodes will be are sorted. The return value of this method
+   * is only relevant for node sequences. It is e.g. called by {@link AxisPath}.
    * @return result of check
    */
   public boolean iterable() {
@@ -247,9 +245,8 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Checks if an expression can be rewritten to an index access.
-   * If this method is implemented, {@link #indexEquivalent} must be
-   * implemented as well.
+   * Checks if an expression can be rewritten to an index access. If this method is
+   * implemented, {@link #indexEquivalent} must be implemented as well.
    * @param ic index context
    * @return true if an index can be used
    * @throws QueryException query exception
@@ -260,9 +257,8 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Returns an equivalent expression which accesses an index structure.
-   * Will be called if {@link #indexAccessible} is returns true for an
-   * expression.
+   * Returns an equivalent expression which accesses an index structure. Will be called
+   * if {@link #indexAccessible} is returns true for an expression.
    * @param ic index context
    * @return equivalent index-expression
    * @throws QueryException query exception

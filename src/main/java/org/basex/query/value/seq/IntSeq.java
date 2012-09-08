@@ -1,102 +1,103 @@
 package org.basex.query.value.seq;
 
-import static org.basex.query.util.Err.*;
+import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.Occ;
-import org.basex.util.*;
 
 /**
- * Sequence of {@link Int Integers}, containing at least two of them.
+ * Sequence of items of type {@link Int xs:integer}, containing at least two of them.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public final class IntSeq extends Seq {
+public final class IntSeq extends NativeSeq {
   /** Values. */
-  private final long[] vals;
+  private final long[] values;
 
   /**
    * Constructor.
-   * @param ints integers
-   * @param t int type
+   * @param vals values
+   * @param t type
    */
-  private IntSeq(final long[] ints, final Type t) {
-    super(ints.length, t);
-    vals = ints;
+  private IntSeq(final long[] vals, final Type t) {
+    super(vals.length, t);
+    values = vals;
   }
 
   @Override
-  public boolean homogeneous() {
-    return true;
+  public Int itemAt(final long pos) {
+    return Int.get(values[(int) pos], type);
   }
 
   @Override
-  public Item itemAt(final long pos) {
-    return Int.get(vals[(int) pos], type);
+  public boolean sameAs(final Expr cmp) {
+    if(!(cmp instanceof IntSeq)) return false;
+    final IntSeq is = (IntSeq) cmp;
+    return type == is.type && Arrays.equals(values, is.values);
   }
 
   @Override
-  public long[] toJava() {
-    return vals.clone();
+  public Object toJava() throws QueryException {
+    switch((AtomType) type) {
+      case BYT:
+        final byte[] t1 = new byte[(int) size];
+        for(int s = 0; s < size; s++) t1[s] = (byte) values[s];
+        return t1;
+      case SHR:
+      case UBY:
+        short[] t2 = new short[(int) size];
+        for(int s = 0; s < size; s++) t2[s] = (short) values[s];
+        return t2;
+      case INT:
+      case USH:
+        short[] t3 = new short[(int) size];
+        for(int s = 0; s < size; s++) t3[s] = (short) values[s];
+        return t3;
+      default:
+        return values;
+    }
   }
 
-  @Override
-  public int writeTo(final Item[] arr, final int start) {
-    final int w = Math.min(vals.length, arr.length - start);
-    for(int i = 0; i < w; i++) arr[start + i] = itemAt(i);
-    return w;
-  }
-
-  @Override
-  public Item ebv(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    throw CONDTYPE.thrw(ii, this);
-  }
-
-  @Override
-  public SeqType type() {
-    return SeqType.get(type, Occ.ONE_MORE);
-  }
+  // STATIC METHODS =====================================================================
 
   /**
-   * Creates a sequence with the specified integers.
-   * @param val integers
+   * Creates a sequence with the specified items.
+   * @param items items
    * @param type type
    * @return value
    */
-  public static Value get(final long[] val, final Type type) {
-    return val.length == 0 ? Empty.SEQ : val.length == 1 ?
-        Int.get(val[0], type) : new IntSeq(val, type);
+  public static Value get(final long[] items, final Type type) {
+    return items.length == 0 ? Empty.SEQ : items.length == 1 ?
+        Int.get(items[0], type) : new IntSeq(items, type);
   }
 
   /**
-   * Creates a sequence with the integers in the specified expressions.
-   * @param expr expressions
+   * Creates a sequence with the items in the specified expressions.
+   * @param vals values
    * @param size size of resulting sequence
-   * @param type type
+   * @param type data type
    * @return value
    * @throws QueryException query exception
    */
-  public static Value get(final Expr[] expr, final long size, final Type type)
+  public static Value get(final Value[] vals, final long size, final Type type)
       throws QueryException {
 
     final long[] tmp = new long[(int) size];
     int t = 0;
-    for(final Expr e : expr) {
-      // speed up construction for items and integer sequences
-      if(e instanceof Item) {
-        tmp[t++] = ((Item) e).itr(null);
-      } else if(e instanceof IntSeq) {
-        final IntSeq val = (IntSeq) e;
-        final long vs = val.size();
-        for(int v = 0; v < vs; v++) tmp[t++] = val.vals[v];
+    for(final Value val : vals) {
+      // speed up construction, depending on input
+      final int vs = (int) val.size();
+      if(val instanceof Item) {
+        tmp[t++] = ((Item) val).itr(null);
+      } else if(val instanceof IntSeq) {
+        final IntSeq sq = (IntSeq) val;
+        System.arraycopy(sq.values, 0, tmp, t, vs);
+        t += vs;
       } else {
-        final Value val = (Value) e;
-        final long vs = val.size();
         for(int v = 0; v < vs; v++) tmp[t++] = val.itemAt(v).itr(null);
       }
     }

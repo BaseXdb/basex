@@ -16,7 +16,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class DBNodeSeq extends Seq {
+public final class DBNodeSeq extends NativeSeq {
   /** Data reference. */
   private final Data data;
   /** Pre values. */
@@ -65,11 +65,6 @@ public final class DBNodeSeq extends Seq {
   }
 
   @Override
-  public SeqType type() {
-    return SeqType.DOC_OM;
-  }
-
-  @Override
   public boolean iterable() {
     return true;
   }
@@ -82,18 +77,7 @@ public final class DBNodeSeq extends Seq {
   }
 
   @Override
-  public int writeTo(final Item[] arr, final int start) {
-    for(int i = 0; i < pres.length; i++) arr[i + start] = itemAt(i);
-    return pres.length;
-  }
-
-  @Override
   public DBNode itemAt(final long pos) {
     return new DBNode(data, pres[(int) pos]);
-  }
-
-  @Override
-  public boolean homogeneous() {
-    return true;
   }
 }

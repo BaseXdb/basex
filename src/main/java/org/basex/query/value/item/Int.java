@@ -13,7 +13,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public class Int extends ANum {
+public final class Int extends ANum {
   /** Constant values. */
   private static final Int[] NUMS;
   /** Integer value. */
@@ -71,42 +71,42 @@ public class Int extends ANum {
   }
 
   @Override
-  public final byte[] string() {
+  public byte[] string() {
     return val == 0 ? Token.ZERO : Token.token(val);
   }
 
   @Override
-  public final boolean bool(final InputInfo ii) {
+  public boolean bool(final InputInfo ii) {
     return val != 0;
   }
 
   @Override
-  public final long itr() {
+  public long itr() {
     return val;
   }
 
   @Override
-  public final float flt() {
+  public float flt() {
     return val;
   }
 
   @Override
-  public final double dbl() {
+  public double dbl() {
     return val;
   }
 
   @Override
-  public final BigDecimal dec(final InputInfo ii) {
+  public BigDecimal dec(final InputInfo ii) {
     return BigDecimal.valueOf(val);
   }
 
   @Override
-  public final boolean eq(final InputInfo ii, final Item it) throws QueryException {
+  public boolean eq(final InputInfo ii, final Item it) throws QueryException {
     return it instanceof Int ? val == ((Int) it).val : val == it.dbl(ii);
   }
 
   @Override
-  public final int diff(final InputInfo ii, final Item it) throws QueryException {
+  public int diff(final InputInfo ii, final Item it) throws QueryException {
     if(it instanceof Int) {
       final long i = ((Int) it).val;
       return val < i ? -1 : val > i ? 1 : 0;
@@ -116,7 +116,7 @@ public class Int extends ANum {
   }
 
   @Override
-  public final Object toJava() {
+  public Object toJava() {
     switch((AtomType) type) {
       case BYT: return (byte) val;
       case SHR:
@@ -130,7 +130,7 @@ public class Int extends ANum {
   }
 
   @Override
-  public final boolean sameAs(final Expr cmp) {
+  public boolean sameAs(final Expr cmp) {
     if(!(cmp instanceof Int)) return false;
     final Int i = (Int) cmp;
     return type == i.type && val == i.val;

@@ -38,20 +38,18 @@ public abstract class JavaMapping extends Arr {
   static final String NEW = "new";
   /** Input Java types. */
   private static final Class<?>[] JAVA = {
-    String.class,     boolean.class,  Boolean.class,      byte.class,
-    Byte.class,       short.class,    Short.class,        int.class,
-    Integer.class,    long.class,     Long.class,         float.class,
-    Float.class,      double.class,   Double.class,       BigDecimal.class,
-    BigInteger.class, QName.class,    char.class,         Character.class,
+    String.class,     boolean.class,    Boolean.class, byte.class,     Byte.class,
+    short.class,      Short.class,      int.class,     Integer.class,  long.class,
+    Long.class,       float.class,      Float.class,   double.class,   Double.class,
+    BigDecimal.class, BigInteger.class, QName.class,   char.class,     Character.class,
     URI.class,        URL.class
   };
   /** Resulting XQuery types. */
   private static final Type[] XQUERY = {
-    AtomType.STR, AtomType.BLN, AtomType.BLN, AtomType.BYT,
-    AtomType.BYT, AtomType.SHR, AtomType.SHR, AtomType.INT,
-    AtomType.INT, AtomType.LNG, AtomType.LNG, AtomType.FLT,
-    AtomType.FLT, AtomType.DBL, AtomType.DBL, AtomType.DEC,
-    AtomType.ITR, AtomType.QNM, AtomType.STR, AtomType.STR,
+    AtomType.STR, AtomType.BLN, AtomType.BLN, AtomType.BYT, AtomType.BYT,
+    AtomType.SHR, AtomType.SHR, AtomType.INT, AtomType.INT, AtomType.LNG,
+    AtomType.LNG, AtomType.FLT, AtomType.FLT, AtomType.DBL, AtomType.DBL,
+    AtomType.DEC, AtomType.ITR, AtomType.QNM, AtomType.STR, AtomType.STR,
     AtomType.URI, AtomType.URI
   };
 
@@ -100,54 +98,52 @@ public abstract class JavaMapping extends Arr {
     Type type = type(res);
     if(type != null) return type.cast(res, null);
 
-    // character array: string
-    if(res instanceof char[]) return Str.get(new String((char[]) res));
+    // primitive arrays
+    if(res instanceof byte[])    return BytSeq.get((byte[]) res);
+    if(res instanceof long[])    return IntSeq.get((long[]) res, AtomType.ITR);
+    if(res instanceof char[])    return Str.get(new String((char[]) res));
+    if(res instanceof boolean[]) return BlnSeq.get((boolean[]) res);
+    if(res instanceof double[])  return DblSeq.get((double[]) res);
+    if(res instanceof float[])   return FltSeq.get((float[]) res);
 
     // no array: return Java type
     if(!res.getClass().isArray()) return new Jav(res);
     final int s = Array.getLength(res);
-    // empty array: empty sequence
+    // empty array
     if(s == 0) return Empty.SEQ;
-
-    // byte array: byte sequence
-    if(res instanceof byte[]) {
-      final byte[] values = (byte[]) res;
-      return s > 1 ? new ByteSeq(values) : new Int(values[0], AtomType.BYT);
+    // string array
+    if(res instanceof String[]) {
+      final String[] r = (String[]) res;
+      final byte[][] b = new byte[r.length][];
+      for(int v = 0; v < s; v++) b[v] = Token.token(r[v]);
+      return StrSeq.get(b);
     }
-
-    final Item[] items = new Item[s];
-    if(res instanceof boolean[]) {
-      type = AtomType.BLN;
-      final boolean[] values = (boolean[]) res;
-      for(int v = 0; v < s; v++) items[v] = Bln.get(values[v]);
-    } else if(res instanceof short[]) {
-      type = AtomType.SHR;
-      final short[] values = (short[]) res;
-      for(int v = 0; v < s; v++) items[v] = new Int(values[v], type);
-    } else if(res instanceof int[]) {
-      type = AtomType.INT;
-      final int[] values = (int[]) res;
-      for(int v = 0; v < s; v++) items[v] = new Int(values[v], type);
-    } else if(res instanceof long[]) {
-      type = AtomType.ITR;
-      final long[] values = (long[]) res;
-      for(int v = 0; v < s; v++) items[v] = Int.get(values[v]);
-    } else if(res instanceof float[]) {
-      type = AtomType.FLT;
-      final float[] values = (float[]) res;
-      for(int v = 0; v < s; v++) items[v] = Flt.get(values[v]);
-    } else if(res instanceof double[]) {
-      type = AtomType.DBL;
-      final double[] values = (double[]) res;
-      for(int v = 0; v < s; v++) items[v] = Dbl.get(values[v]);
-    } else {
-      final ValueBuilder vb = new ValueBuilder();
-      for(final Object o : (Object[]) res) {
-        vb.add(o instanceof Value ? (Value) o : new Jav(o));
-      }
-      return vb.value();
+    // character array
+    if(res instanceof char[][]) {
+      final char[][] r = (char[][]) res;
+      final byte[][] b = new byte[r.length][];
+      for(int v = 0; v < s; v++) b[v] = Token.token(new String(r[v]));
+      return StrSeq.get(b);
     }
-    return Seq.get(items, s, type);
+    // short array
+    if(res instanceof short[]) {
+      final short[] r = (short[]) res;
+      final long[] b = new long[r.length];
+      for(int v = 0; v < s; v++) b[v] = r[v];
+      return IntSeq.get(b, AtomType.SHR);
+    }
+    // integer array
+    if(res instanceof int[]) {
+      final int[] r = (int[]) res;
+      final long[] b = new long[r.length];
+      for(int v = 0; v < s; v++) b[v] = r[v];
+      return IntSeq.get(b, AtomType.INT);
+    }
+    // any other array (also nested ones)
+    final Object[] obj = (Object[]) res;
+    final ValueBuilder vb = new ValueBuilder(obj.length);
+    for(final Object o : obj) vb.add(toValue(o));
+    return vb.value();
   }
 
   /**

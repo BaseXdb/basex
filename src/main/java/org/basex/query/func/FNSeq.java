@@ -13,7 +13,6 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.path.*;
 import org.basex.query.util.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -385,21 +384,28 @@ public final class FNSeq extends StandardFunc {
    * @return iterator
    * @throws QueryException query exception
    */
-  private ValueIter reverse(final QueryContext ctx) throws QueryException {
-    // has to be strictly evaluated
-    final Value val = ctx.value(expr[0]);
-    final ValueIter iter = val.iter();
-    // if only one item found: no reversion necessary
-    return val.size() == 1 ? iter : new ValueIter() {
-      final long s = iter.size();
+  private Iter reverse(final QueryContext ctx) throws QueryException {
+    // materialize value if number of results is unknown
+    final Iter iter = ctx.iter(expr[0]);
+    final long s = iter.size();
+    if(s == -1) {
+      // estimate result size (could be known in the original expression)
+      final ValueBuilder vb = new ValueBuilder(Math.max((int) expr[0].size(), 1));
+      for(Item it; (it = iter.next()) != null;) vb.add(it);
+      Array.reverse(vb.item, 0, (int) vb.size());
+      return vb;
+    }
+
+    // return iterator if only a single result will be returned
+    return s == 0 ? Empty.ITER : s == 1 ? iter : new Iter() {
       long c = s;
 
       @Override
-      public Item next() {
+      public Item next() throws QueryException {
         return --c >= 0 ? iter.get(c) : null;
       }
       @Override
-      public Item get(final long i) {
+      public Item get(final long i) throws QueryException {
         return iter.get(s - i - 1);
       }
       @Override
@@ -409,14 +415,7 @@ public final class FNSeq extends StandardFunc {
       @Override
       public boolean reset() {
         c = s;
-        return true;
-      }
-      @Override
-      public Value value() {
-        final Item[] arr = new Item[(int) val.size()];
-        final int written = val.writeTo(arr, 0);
-        Array.reverse(arr, 0, written);
-        return Seq.get(arr, written);
+        return iter.reset();
       }
     };
   }

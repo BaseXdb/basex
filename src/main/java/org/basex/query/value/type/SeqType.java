@@ -108,6 +108,8 @@ public final class SeqType {
   public static final SeqType ITR_ZM = new SeqType(AtomType.ITR, Occ.ZERO_MORE);
   /** One or more numbers. */
   public static final SeqType ITR_OM = new SeqType(AtomType.ITR, Occ.ONE_MORE);
+  /** One or more numbers. */
+  public static final SeqType BYT_OM = new SeqType(AtomType.BYT, Occ.ONE_MORE);
   /** Single node. */
   public static final SeqType NOD = NodeType.NOD.seqType();
   /** Zero or one nodes. */
@@ -130,6 +132,8 @@ public final class SeqType {
   public static final SeqType STR_ZO = new SeqType(AtomType.STR, Occ.ZERO_ONE);
   /** Zero or more strings. */
   public static final SeqType STR_ZM = new SeqType(AtomType.STR, Occ.ZERO_MORE);
+  /** One or more strings. */
+  public static final SeqType STR_OM = new SeqType(AtomType.STR, Occ.ONE_MORE);
   /** Zero or one NCName. */
   public static final SeqType NCN_ZO = new SeqType(AtomType.NCN, Occ.ZERO_ONE);
   /** Single date. */

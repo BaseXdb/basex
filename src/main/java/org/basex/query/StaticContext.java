@@ -105,7 +105,7 @@ public final class StaticContext {
       baseURI = Uri.EMPTY;
     } else {
       final IO io = IO.get(uri);
-      baseURI = Uri.uri(token(io instanceof IOFile ? io.url() : uri));
+      baseURI = Uri.uri(io instanceof IOFile ? io.url() : uri);
     }
   }
 

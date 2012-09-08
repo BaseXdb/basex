@@ -136,8 +136,8 @@ public final class JavaFunc extends JavaMapping {
         next = arg;
       } else {
         final Type jtype = type(par);
-        if(jtype == null || !arg.type.instanceOf(jtype)
-            && !jtype.instanceOf(arg.type)) return null;
+        if(jtype == null || !arg.type.instanceOf(jtype) && !jtype.instanceOf(arg.type))
+          return null;
         next = arg.toJava();
       }
       val[a++] = next;

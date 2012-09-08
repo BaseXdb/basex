@@ -160,7 +160,7 @@ public final class FNFile extends StandardFunc {
    * @return result
    */
   private static Uri pathToUri(final File path) {
-    return Uri.uri(token(path.toURI().toString()));
+    return Uri.uri(path.toURI().toString());
   }
 
   /**
