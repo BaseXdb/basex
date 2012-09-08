@@ -21,7 +21,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -410,11 +410,11 @@ public abstract class W3CTS {
           if(xml || frag) {
             iter.reset();
             try {
-              final ValueBuilder vb = toIter(expect.replaceAll(
+              final ValueIter vb = toIter(expect.replaceAll(
                   "^<\\?xml.*?\\?>", "").trim(), frag);
               if(Compare.deep(iter, vb, null)) break;
               vb.reset();
-              final ValueBuilder ia = toIter(actual, frag);
+              final ValueIter ia = toIter(actual, frag);
               if(Compare.deep(ia, vb, null)) break;
             } catch(final Throwable ex) {
               Util.errln('\n' + outname + ':');
@@ -511,19 +511,18 @@ public abstract class W3CTS {
    * @param frag fragment flag
    * @return iterator
    */
-  private ValueBuilder toIter(final String xml, final boolean frag) {
-    final ValueBuilder it = new ValueBuilder();
+  private ValueIter toIter(final String xml, final boolean frag) {
     try {
       final String str = frag ? "<X>" + xml + "</X>" : xml;
       final Data d = CreateDB.mainMem(IO.get(str), context);
+      final IntList il = new IntList();
       for(int p = frag ? 2 : 0; p < d.meta.size; p += d.size(p, d.kind(p))) {
-        it.add(new DBNode(d, p));
+        il.add(p);
       }
+      return DBNodeSeq.get(il, d, false, false).iter();
     } catch(final IOException ex) {
-      return new ValueBuilder(
-          new Item[] { Str.get(Long.toString(System.nanoTime())) }, 1);
+      return Str.get(Long.toString(System.nanoTime())).iter();
     }
-    return it;
   }
 
   /**
