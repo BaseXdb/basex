@@ -6,10 +6,10 @@ import javax.servlet.http.*;
 
 import org.basex.http.*;
 import org.basex.query.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
+import org.basex.query.value.seq.*;
+import org.basex.util.list.*;
 
 /**
  * This module contains functions for handling servlet requests.
@@ -64,8 +64,8 @@ public final class Request extends QueryModule {
    * @throws QueryException query exception
    */
   @Deterministic @Requires(Permission.NONE)
-  public Uri path() throws QueryException {
-    return Uri.uri(Token.token(request().getRequestURI()));
+  public Str path() throws QueryException {
+    return Str.get(request().getRequestURI());
   }
 
   /**
@@ -86,7 +86,7 @@ public final class Request extends QueryModule {
    */
   @Deterministic @Requires(Permission.NONE)
   public Uri uri() throws QueryException {
-    return Uri.uri(Token.token(request().getRequestURL().toString()));
+    return Uri.uri(request().getRequestURL().toString());
   }
 
   /**
@@ -136,9 +136,9 @@ public final class Request extends QueryModule {
    */
   @Deterministic @Requires(Permission.NONE)
   public Value parameterNames() throws QueryException {
-    final ValueBuilder vb = new ValueBuilder();
-    for(final String s : request().getParameterMap().keySet()) vb.add(Str.get(s));
-    return vb.value();
+    final TokenList tl = new TokenList();
+    for(final String s : request().getParameterMap().keySet()) tl.add(s);
+    return StrSeq.get(tl);
   }
 
   /**
@@ -161,11 +161,11 @@ public final class Request extends QueryModule {
    */
   @Deterministic @Requires(Permission.NONE)
   public Value parameter(final Str key, final Value def) throws QueryException {
-    final ValueBuilder vb = new ValueBuilder();
     final String[] val = request().getParameterValues(key.toJava());
     if(val == null) return def;
-    for(final String v : val) vb.add(Str.get(v));
-    return vb.value();
+    final TokenList tl = new TokenList(val.length);
+    for(final String v : val) tl.add(v);
+    return StrSeq.get(tl);
   }
 
   /**
@@ -175,10 +175,10 @@ public final class Request extends QueryModule {
    */
   @Deterministic @Requires(Permission.NONE)
   public Value headerNames() throws QueryException {
-    final ValueBuilder vb = new ValueBuilder();
+    final TokenList tl = new TokenList();
     final Enumeration<String> en = request().getHeaderNames();
-    while(en.hasMoreElements()) vb.add(Str.get(en.nextElement()));
-    return vb.value();
+    while(en.hasMoreElements()) tl.add(en.nextElement());
+    return StrSeq.get(tl);
   }
 
   /**
@@ -212,9 +212,9 @@ public final class Request extends QueryModule {
    */
   @Deterministic @Requires(Permission.NONE)
   public Value cookieNames() throws QueryException {
-    final ValueBuilder vb = new ValueBuilder();
-    for(final Cookie c : request().getCookies()) vb.add(Str.get(c.getName()));
-    return vb.value();
+    final TokenList tl = new TokenList();
+    for(final Cookie c : request().getCookies()) tl.add(c.getName());
+    return StrSeq.get(tl);
   }
 
   /**
