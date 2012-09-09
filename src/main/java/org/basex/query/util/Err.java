@@ -130,9 +130,9 @@ public enum Err {
   // Session module
 
   /** BXSQ0001. */
-  BXSE_FITEM(BXSE, 1, "Function items cannot be stored in sessions: %"),
+  BXSE_FITEM(BXSE, 1, "Function items cannot be stored in sessions."),
   /** BXSQ0001. */
-  BXSE_GET(BXSE, 2, "Type of stored attribute is unknown: %"),
+  BXSE_GET(BXSE, 2, "Stored attribute cannot be retrieved: %"),
 
   // SQL module
 
