@@ -32,7 +32,7 @@ public class SessionTest extends HTTPTest {
    * @throws Exception exception
    */
   @Test
-  public void sessionId() throws Exception {
+  public void id() throws Exception {
     assertEquals("1", get("?query=" + request("count(S:id())")));
   }
 
@@ -41,8 +41,8 @@ public class SessionTest extends HTTPTest {
    * @throws Exception exception
    */
   @Test
-  public void attribute() throws Exception {
-    assertEquals("", get("?query=" + request("S:attribute('a')")));
+  public void names() throws Exception {
+    assertEquals("a", get("?query=" + request("S:set('a','b'), S:names()")));
   }
 
   /**
@@ -50,9 +50,27 @@ public class SessionTest extends HTTPTest {
    * @throws Exception exception
    */
   @Test
-  public void updateAttribute() throws Exception {
-    final String query = "S:update-attribute('a','b'), S:attribute('a')";
+  public void get() throws Exception {
+    assertEquals("", get("?query=" + request("S:get('a')")));
+  }
+
+  /**
+   * Function test.
+   * @throws Exception exception
+   */
+  @Test
+  public void set() throws Exception {
+    final String query = "S:set('a','b'), S:get('a')";
     assertEquals("b", get("?query=" + request(query)));
+  }
+
+  /**
+   * Function test.
+   * @throws Exception exception
+   */
+  @Test
+  public void close() throws Exception {
+    assertEquals("", get("?query=" + request("S:close()")));
   }
 
   // PRIVATE METHODS ====================================================================

@@ -28,7 +28,6 @@ public final class Session extends QueryModule {
    * @return session id
    * @throws QueryException query exception
    */
-  @Deterministic
   @Requires(Permission.NONE)
   public Str id() throws QueryException {
     return Str.get(session().getId());
@@ -39,9 +38,8 @@ public final class Session extends QueryModule {
    * @return session attribute
    * @throws QueryException query exception
    */
-  @ContextDependent
   @Requires(Permission.NONE)
-  public Value attributes() throws QueryException {
+  public Value names() throws QueryException {
     final TokenList tl = new TokenList();
     final Enumeration<String> en = session().getAttributeNames();
     while(en.hasMoreElements()) tl.add(en.nextElement());
@@ -54,10 +52,9 @@ public final class Session extends QueryModule {
    * @return session attribute
    * @throws QueryException query exception
    */
-  @ContextDependent
   @Requires(Permission.NONE)
-  public Item attribute(final Str key) throws QueryException {
-    return attribute(key, null);
+  public Item get(final Str key) throws QueryException {
+    return get(key, null);
   }
 
   /**
@@ -67,13 +64,12 @@ public final class Session extends QueryModule {
    * @return session attribute
    * @throws QueryException query exception
    */
-  @ContextDependent
   @Requires(Permission.NONE)
-  public Item attribute(final Str key, final Item def) throws QueryException {
+  public Item get(final Str key, final Item def) throws QueryException {
     final Object o = session().getAttribute(key.toJava());
     if(o == null) return def;
-    if(!(o instanceof Item)) BXSE_GET.thrw(null, Util.name(o));
-    return (Item) o;
+    if(o instanceof Item) return (Item) o;
+    throw BXSE_GET.thrw(null, Util.name(o));
   }
 
   /**
@@ -82,18 +78,36 @@ public final class Session extends QueryModule {
    * @param item item to be stored
    * @throws QueryException query exception
    */
-  @ContextDependent
   @Requires(Permission.NONE)
-  public void updateAttribute(final Str key, final Item item) throws QueryException {
+  public void set(final Str key, final Item item) throws QueryException {
     Item it = item;
     final Data d = it.data();
     if(d != null && !d.inMemory()) {
       // convert database node to main memory data instance
       it = ((ANode) it).dbCopy(context.context.prop);
     } else if(it instanceof FItem) {
-      BXSE_FITEM.thrw(null, it);
+      BXSE_FITEM.thrw(null);
     }
     session().setAttribute(key.toJava(), it);
+  }
+
+  /**
+   * Removes a session attribute.
+   * @param key key of the attribute
+   * @throws QueryException query exception
+   */
+  @Requires(Permission.NONE)
+  public void delete(final Str key) throws QueryException {
+    session().removeAttribute(key.toJava());
+  }
+
+  /**
+   * Invalidates a session.
+   * @throws QueryException query exception
+   */
+  @Requires(Permission.NONE)
+  public void close() throws QueryException {
+    session().invalidate();
   }
 
   /**
