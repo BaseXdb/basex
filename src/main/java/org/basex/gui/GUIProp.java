@@ -200,7 +200,7 @@ public final class GUIProp extends AProp {
       sl.add(path);
     }
     final String[] qu = strings(EDITOR);
-    for(int q = 0; q < qu.length && q < 9; ++q) {
+    for(int q = 0; q < qu.length && q < 14; ++q) {
       final String f = qu[q];
       if(!f.equalsIgnoreCase(path) && IO.get(f).exists()) sl.add(f);
     }
