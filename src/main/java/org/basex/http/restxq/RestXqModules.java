@@ -84,7 +84,6 @@ final class RestXqModules {
     }
 
     // create new cache
-    System.out.println("CREATE...");
     final HashMap<String, RestXqModule> tmp = new HashMap<String, RestXqModule>();
     for(final IOFile file : restxq.children()) {
       // only accept XQuery files with suffix ".xqm"
@@ -100,7 +99,6 @@ final class RestXqModules {
       } else {
         // create new module
         module = new RestXqModule(file);
-        System.out.println("- " + file);
       }
       // add module if it has been parsed, and if it contains annotations
       if(parsed || module.analyze(http)) {
