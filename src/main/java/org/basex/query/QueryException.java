@@ -23,12 +23,10 @@ public final class QueryException extends Exception {
   private transient Value value = Empty.SEQ;
   /** Error reference. */
   private Err err;
-  /** File reference. */
-  private String file;
   /** Code suggestions. */
   private StringList suggest;
   /** Error line and column. */
-  private int[] lineCol;
+  private InputInfo info;
   /** Marked error column. */
   private int markedCol;
 
@@ -82,7 +80,7 @@ public final class QueryException extends Exception {
    * @return error column
    */
   public int col() {
-    return lineCol == null ? 0 : lineCol[1];
+    return info == null ? 0 : info.lineCol()[1];
   }
 
   /**
@@ -98,7 +96,7 @@ public final class QueryException extends Exception {
    * @return error line
    */
   public int line() {
-    return lineCol == null ? 0 : lineCol[0];
+    return info == null ? 0 : info.lineCol()[0];
   }
 
   /**
@@ -106,7 +104,7 @@ public final class QueryException extends Exception {
    * @return error line
    */
   public String file() {
-    return file;
+    return info == null ? null : info.file();
   }
 
   /**
@@ -135,8 +133,7 @@ public final class QueryException extends Exception {
    * @return self reference
    */
   public QueryException info(final InputInfo ii) {
-    file = ii.file;
-    lineCol = ii.lineCol();
+    info = ii;
     return this;
   }
 
@@ -156,11 +153,10 @@ public final class QueryException extends Exception {
    */
   void pos(final InputParser parser) {
     markedCol = parser.im;
+    if(info != null) return;
     // check if line/column information has already been added
-    if(lineCol != null) return;
-
-    file = parser.file;
-    lineCol = InputInfo.lineCol(parser.input, Math.min(parser.im, parser.il));
+    parser.ip = Math.min(parser.im, parser.il);
+    info = new InputInfo(parser);
   }
 
   /**
@@ -195,12 +191,7 @@ public final class QueryException extends Exception {
   @Override
   public String getMessage() {
     final TokenBuilder tb = new TokenBuilder();
-    if(lineCol != null) {
-      tb.add(STOPPED_AT).add(' ').addExt(LINE_X, lineCol[0]);
-      if(lineCol[1] != 0) tb.add(QueryText.SEP).addExt(COLUMN_X, lineCol[1]);
-      if(file != null) tb.add(' ').addExt(IN_FILE_X, file);
-      tb.add(COL).add(NL);
-    }
+    if(info != null) tb.add(STOPPED_AT).add(' ').add(info.toString()).add(COL).add(NL);
     final byte[] code = name.local();
     if(code.length != 0) tb.add('[').add(code).add("] ");
     return tb.add(getLocalizedMessage()).toString();

@@ -1,5 +1,9 @@
 package org.basex.util;
 
+import static org.basex.core.Text.*;
+
+import org.basex.query.*;
+
 /**
  * This class contains the original query, its file reference, and line/column
  * information.
@@ -9,13 +13,13 @@ package org.basex.util;
  */
 public final class InputInfo {
   /** File reference. */
-  public final String file;
+  private final String file;
   /** Input query. */
   private final String query;
   /** Parse position. */
   private final int pos;
   /** Line and column number. */
-  private int[] lc;
+  private int[] lineCol;
 
   /**
    * Constructor.
@@ -28,12 +32,20 @@ public final class InputInfo {
   }
 
   /**
+   * Returns the input reference.
+   * @return input reference
+   */
+  public String file() {
+    return file;
+  }
+
+  /**
    * Returns an array with the line and column position of the associated expression.
    * @return line and column position
    */
   public int[] lineCol() {
-    if(lc == null) lc = lineCol(query, Math.min(pos - 1, query.length()));
-    return lc;
+    if(lineCol == null) lineCol = lineCol(query, Math.min(pos - 1, query.length()));
+    return lineCol;
   }
 
   /**
@@ -66,7 +78,11 @@ public final class InputInfo {
 
   @Override
   public String toString() {
-    final int[] p = lineCol();
-    return Util.info("InputInfo[Line %, Column %]", p[0], p[1]);
+    final TokenBuilder tb = new TokenBuilder();
+    final int[] lc = lineCol();
+    tb.addExt(LINE_X, lc[0]);
+    if(lc[1] != 0) tb.add(QueryText.SEP).addExt(COLUMN_X, lc[1]);
+    if(file != null) tb.add(' ').addExt(IN_FILE_X, file);
+    return tb.toString();
   }
 }
