@@ -66,19 +66,19 @@ public final class FNArchiveTest extends AdvancedQueryTest {
     // errors while converting a string
     error(_ARCHIVE_CREATE.args("<archive:entry encoding='US-ASCII'>X</archive:entry>",
         "\u00fc"), Err.ARCH_ENCODE);
-    error(COUNT.args(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
-        " map { 'format':='rar' }")), Err.ARCH_SUPP);
+    error(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
+        " map { 'format':='rar' }"), Err.ARCH_SUPP);
     // format not supported
-    error(COUNT.args(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
-        "<archive:options><archive:format value='rar'/></archive:options>")),
+    error(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
+        "<archive:options><archive:format value='rar'/></archive:options>"),
         Err.ARCH_SUPP);
     // algorithm not supported
-    error(COUNT.args(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
-        "<archive:options><archive:algorithm value='unknown'/></archive:options>")),
+    error(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
+        "<archive:options><archive:algorithm value='unknown'/></archive:options>"),
         Err.ARCH_SUPP);
     // algorithm not supported
-    error(COUNT.args(_ARCHIVE_CREATE.args("('x','y')", "('a','b')",
-        "<archive:options><archive:format value='gzip'/></archive:options>")),
+    error(_ARCHIVE_CREATE.args("('x','y')", "('a','b')",
+        "<archive:options><archive:format value='gzip'/></archive:options>"),
         Err.ARCH_ONE);
   }
 

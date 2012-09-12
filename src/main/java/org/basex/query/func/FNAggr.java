@@ -62,15 +62,12 @@ public final class FNAggr extends StandardFunc {
   public Expr comp(final QueryContext ctx) throws QueryException {
     final Expr e = expr[0];
     final long c = e.size();
-    if(c < 0 || e.uses(Use.NDT) || e.uses(Use.CNS)) return this;
+    if(c < 0 || e.uses(Use.NDT)) return this;
 
     switch(sig) {
-      case COUNT:
-        return Int.get(c);
-      case SUM:
-        return c == 0 ? expr.length == 2 ? expr[1] : Int.get(0) : this;
-      default:
-        return this;
+      case COUNT: return Int.get(c);
+      case SUM:   return c == 0 ? expr.length == 2 ? expr[1] : Int.get(0) : this;
+      default:    return this;
     }
   }
 
