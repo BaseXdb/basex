@@ -71,5 +71,5 @@ interface RestXqText {
   /** Error message. */
   String INPUT_CONV = "Input could not be converted: %";
   /** Error message. */
-  String PATH_CONFLICT = "Several functions assigned to path \"%\".";
+  String PATH_CONFLICT = "Several functions assigned to path \"%\":%";
 }

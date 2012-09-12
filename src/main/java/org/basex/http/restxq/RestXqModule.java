@@ -19,11 +19,11 @@ import org.basex.util.*;
  */
 final class RestXqModule {
   /** Supported methods. */
-  private final ArrayList<RestXqFunction> functions = new ArrayList<RestXqFunction>();
+  final ArrayList<RestXqFunction> functions = new ArrayList<RestXqFunction>();
   /** File reference. */
-  private final IOFile file;
+  final IOFile file;
   /** Parsing timestamp. */
-  private long time;
+  long time;
 
   /**
    * Constructor.
@@ -46,6 +46,8 @@ final class RestXqModule {
     // loop through all functions
     final QueryContext qc = parse(http);
     for(final UserFunc uf : qc.funcs.funcs()) {
+      // consider only functions that are defined in this module
+      if(!file.name().equals(new IOFile(uf.info.file()).name())) continue;
       final RestXqFunction rxf = new RestXqFunction(uf, qc, this);
       if(rxf.analyze()) functions.add(rxf);
     }

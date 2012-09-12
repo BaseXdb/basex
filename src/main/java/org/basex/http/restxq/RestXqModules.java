@@ -9,6 +9,7 @@ import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.util.*;
 
 /**
  * This class caches RESXQ modules found in the HTTP root directory.
@@ -56,7 +57,13 @@ final class RestXqModules {
       first = list.get(0);
       // disallow more than one path with the same specifity
       if(first.compareTo(list.get(1)) == 0) {
-        first.error(PATH_CONFLICT, first.path);
+        final TokenBuilder tb = new TokenBuilder();
+        for(final RestXqFunction rxf : list) {
+          if(first.compareTo(rxf) != 0) break;
+          tb.add(Prop.NL).add(rxf.function.info.toString());
+          tb.add(" (module: ").add(Text.LI + rxf.module.file.name()).add(")");
+        }
+        first.error(PATH_CONFLICT, first.path, tb);
       }
     }
     // choose most specific function
@@ -77,6 +84,7 @@ final class RestXqModules {
     }
 
     // create new cache
+    System.out.println("CREATE...");
     final HashMap<String, RestXqModule> tmp = new HashMap<String, RestXqModule>();
     for(final IOFile file : restxq.children()) {
       // only accept XQuery files with suffix ".xqm"
@@ -92,6 +100,7 @@ final class RestXqModules {
       } else {
         // create new module
         module = new RestXqModule(file);
+        System.out.println("- " + file);
       }
       // add module if it has been parsed, and if it contains annotations
       if(parsed || module.analyze(http)) {
