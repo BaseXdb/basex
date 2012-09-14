@@ -639,7 +639,10 @@ public class BaseXEditor extends BaseXPanel {
       ch = sb.toString();
     }
 
-    if(ch != null) text.add(ch);
+    if(ch != null) {
+      undo.cursor(text.cursor());
+      text.add(ch);
+    }
     text.setCaret();
     rend.calc();
     showCursor(2);
@@ -665,7 +668,9 @@ public class BaseXEditor extends BaseXPanel {
    */
   final void undo() {
     if(undo == null) return;
-    text = new BaseXTextTokens(undo.prev());
+    final byte[] t = undo.prev();
+    if(t == text.text()) return;
+    text = new BaseXTextTokens(t);
     rend.setText(text);
     text.pos(undo.cursor());
     text.setCaret();
@@ -676,7 +681,9 @@ public class BaseXEditor extends BaseXPanel {
    */
   final void redo() {
     if(undo == null) return;
-    text = new BaseXTextTokens(undo.next());
+    final byte[] t = undo.next();
+    if(t == text.text()) return;
+    text = new BaseXTextTokens(t);
     rend.setText(text);
     text.pos(undo.cursor());
     text.setCaret();
@@ -722,11 +729,12 @@ public class BaseXEditor extends BaseXPanel {
    */
   final boolean paste(final String txt) {
     if(txt == null || undo == null) return false;
-    text.pos(text.cursor());
-    undo.cursor(text.cursor());
+    final int tc = text.cursor();
+    text.pos(tc);
+    undo.cursor(tc);
     if(text.marked()) text.delete();
     text.add(txt);
-    undo.store(text.text(), text.cursor());
+    undo.store(text.text(), tc);
     return true;
   }
 
@@ -735,10 +743,11 @@ public class BaseXEditor extends BaseXPanel {
    */
   final void delete() {
     if(undo == null) return;
-    text.pos(text.cursor());
-    undo.cursor(text.cursor());
+    final int tc = text.cursor();
+    text.pos(tc);
+    undo.cursor(tc);
     text.delete();
-    undo.store(text.text(), text.cursor());
+    undo.store(text.text(), tc);
     text.setCaret();
   }
 

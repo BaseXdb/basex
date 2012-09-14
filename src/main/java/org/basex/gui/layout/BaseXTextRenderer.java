@@ -319,12 +319,6 @@ public final class BaseXTextRenderer extends BaseXBack {
         high = true;
       }
 
-      // mark error
-      if(text.erroneous()) {
-        g.setColor(GUIConstants.LRED);
-        g.fillRect(x, y - fontH + 4, wordW, fontH);
-      }
-
       // mark text
       int xx = x;
       if(text.markStart()) {
@@ -332,21 +326,31 @@ public final class BaseXTextRenderer extends BaseXBack {
         while(text.more()) {
           final int cw = charW(g, text.curr());
           if(text.inMark()) {
-            g.setColor(GUIConstants.color(3));
-            g.fillRect(xx, y - fontH + 4, cw, fontH);
+            g.setColor(GUIConstants.color(2));
+            g.fillRect(xx, y - fontH * 4 / 5, cw, fontH);
           }
           xx += cw;
           text.next();
         }
         text.pos(p);
       }
+
       if(found()) {
         int cw = 0;
-        for(int c = 0; c < keyword.length(); ++c) {
-          cw += charW(g, keyword.charAt(c));
+        for(int c = 0; c < keyword.length(); ++c) cw += charW(g, keyword.charAt(c));
+        g.setColor(GUIConstants.color(text.cursor() == text.pos() ? 4 : 2));
+        g.fillRect(x, y - fontH * 4 / 5, cw, fontH);
+      }
+
+      // mark error
+      if(text.erroneous()) {
+        final int s = Math.max(1, fontH / 8);
+        g.setColor(GUIConstants.LRED);
+        g.fillRect(x, y + 2, wordW, s);
+        g.setColor(GUIConstants.RED);
+        for(int xp = x; xp < x + wordW; xp++) {
+          if((xp & 1) == 0) g.drawLine(xp, y + 2, xp, y + s + 1);
         }
-        g.setColor(GUIConstants.color(text.cursor() == text.pos() ? 5 : 2));
-        g.fillRect(x, y - fontH + 4, cw, fontH);
       }
 
       // don't write whitespaces
@@ -409,8 +413,8 @@ public final class BaseXTextRenderer extends BaseXBack {
    * @param xx x position
    */
   private void cursor(final Graphics g, final int xx) {
-    g.setColor(Color.black);
-    g.drawLine(xx, y - fontH + 4, xx, y + 3);
+    g.setColor(GUIConstants.DGRAY);
+    g.fillRect(xx, y - fontH * 4 / 5, 2, fontH);
   }
 
   /**
