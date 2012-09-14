@@ -43,6 +43,11 @@ public class BaseXEditor extends BaseXPanel {
   /** Undo history; if set to {@code null}, text will be read-only. */
   final transient Undo undo;
 
+  /** Delay for highlighting an error. */
+  private static final int ERROR_DELAY = 500;
+  /** Thread counter. */
+  int threadID;
+
   /** Scrollbar reference. */
   private final BaseXBar scroll;
   /** Search field. */
@@ -261,11 +266,22 @@ public class BaseXEditor extends BaseXPanel {
 
   /**
    * Moves the error marker. {@code -1} removes the marker.
-   * @param s start of optional error mark
+   * @param pos start of optional error mark
    */
-  public final void error(final int s) {
-    text.error(s);
-    rend.repaint();
+  public final void error(final int pos) {
+    final int tid = ++threadID;
+    text.error(pos);
+    if(pos == -1) {
+      rend.repaint();
+    } else {
+      new Thread() {
+        @Override
+        public void run() {
+          Performance.sleep(ERROR_DELAY);
+          if(tid == threadID) rend.repaint();
+        }
+      }.start();
+    }
   }
 
   @Override

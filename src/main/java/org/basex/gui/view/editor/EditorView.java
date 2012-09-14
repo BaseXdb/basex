@@ -464,7 +464,7 @@ public final class EditorView extends View {
         c = 0;
       }
     }
-    edit.markError(errPos);
+    edit.error(errPos);
     return errPos != -1;
   }
 

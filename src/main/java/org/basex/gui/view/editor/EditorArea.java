@@ -15,7 +15,6 @@ import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.util.*;
 
 /**
  * This class extends the text editor by XQuery features.
@@ -33,8 +32,6 @@ final class EditorArea extends BaseXEditor {
   long tstamp;
   /** Flag for modified content. */
   boolean modified;
-  /** Thread counter. */
-  int threadID;
   /** Last input. */
   byte[] last = EMPTY;
   /** This flag indicates if the input is an XQuery main module. */
@@ -125,7 +122,6 @@ final class EditorArea extends BaseXEditor {
     if(eq && action == Action.CHECK) return;
     last = in;
     view.refresh(modified || !eq, false);
-    threadID++;
 
     view.pos.setText(pos());
     gui.context.prop.set(Prop.QUERYPATH, file.path());
@@ -190,21 +186,6 @@ final class EditorArea extends BaseXEditor {
   void jumpError(final int pos) {
     requestFocusInWindow();
     setCaret(pos);
-  }
-
-  /**
-   * Highlights the error.
-   * @param pos error position
-   */
-  void markError(final int pos) {
-    final int thread = threadID;
-    new Thread() {
-      @Override
-      public void run() {
-        Performance.sleep(pos == -1 ? 0 : 500);
-        if(thread == threadID) error(pos);
-      }
-    }.start();
   }
 
   /**

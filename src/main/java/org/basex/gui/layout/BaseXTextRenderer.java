@@ -13,7 +13,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-final class BaseXTextRenderer extends BaseXBack {
+public final class BaseXTextRenderer extends BaseXBack {
   /** Vertical start position. */
   private final BaseXBar bar;
 
