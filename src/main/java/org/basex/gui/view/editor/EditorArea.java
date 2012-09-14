@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 
 import java.awt.event.*;
 import java.io.*;
+import java.util.regex.*;
 
 import org.basex.build.*;
 import org.basex.core.*;
@@ -23,6 +24,10 @@ import org.basex.query.*;
  * @author Christian Gruen
  */
 final class EditorArea extends BaseXEditor {
+  /** Pattern for detecting library modules. */
+  private static final Pattern LIBMOD_PATTERN = Pattern.compile(
+    "^(xquery( version ['\"].*?['\"])?( encoding ['\"].*?['\"])?; ?)?module namespace.*");
+
   /** File label. */
   final BaseXLabel label;
 
@@ -189,12 +194,12 @@ final class EditorArea extends BaseXEditor {
   }
 
   /**
-   * Verifies if the specified query is a module.
+   * Analyzes the first 80 characters to decide if the query is a module.
    * @param qu query to check
    * @return result of check
    */
   private static boolean module(final byte[] qu) {
-    final String mod = "module namespace ";
-    return QueryProcessor.removeComments(string(qu), mod.length() + 1).startsWith(mod);
+    final String start = QueryProcessor.removeComments(string(qu), 80);
+    return LIBMOD_PATTERN.matcher(start).matches();
   }
 }
