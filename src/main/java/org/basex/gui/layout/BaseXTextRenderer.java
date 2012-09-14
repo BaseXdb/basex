@@ -338,7 +338,7 @@ public final class BaseXTextRenderer extends BaseXBack {
       if(found()) {
         int cw = 0;
         for(int c = 0; c < keyword.length(); ++c) cw += charW(g, keyword.charAt(c));
-        g.setColor(GUIConstants.color(text.cursor() == text.pos() ? 4 : 2));
+        g.setColor(GUIConstants.color(text.cursor() == text.pos() ? 4 : 1));
         g.fillRect(x, y - fontH * 4 / 5, cw, fontH);
       }
 
