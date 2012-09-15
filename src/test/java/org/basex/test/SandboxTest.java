@@ -51,6 +51,7 @@ public abstract class SandboxTest {
     final IOFile sb = sandbox();
     ctx.mprop.set(MainProp.DBPATH, sb.path() + "/data");
     ctx.mprop.set(MainProp.WEBPATH, sb.path() + "/webapp");
+    ctx.mprop.set(MainProp.RESTXQPATH, sb.path() + "/webapp");
     ctx.mprop.set(MainProp.REPOPATH, sb.path() + "/repo");
   }
 
