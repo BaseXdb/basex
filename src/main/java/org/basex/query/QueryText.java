@@ -687,6 +687,8 @@ public interface QueryText {
   /** Optimization info. */
   String OPTREMOVE = "%: removing %";
   /** Optimization info. */
+  String OPTREMCTX = "removing context expression (.)";
+  /** Optimization info. */
   String OPTFORLET = "moving for/let clauses";
   /** Optimization info. */
   String OPTSWAP = "swapping operands: %";
@@ -704,8 +706,6 @@ public interface QueryText {
   String OPTCAST = "removing redundant % cast.";
   /** Optimization info. */
   String OPTVAR = "removing variable %";
-  /** Optimization info. */
-  String OPTPREF = "removing namespace test for \"%\"";
   /** Optimization info. */
   String OPTNAME = "removing unknown element/attribute %";
   /** Optimization info. */

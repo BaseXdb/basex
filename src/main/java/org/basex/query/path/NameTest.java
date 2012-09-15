@@ -57,11 +57,8 @@ public final class NameTest extends Test {
       // no results if default and database namespaces of elements are different
       final byte[] nse = ctx.sc.nsElem != null ? ctx.sc.nsElem : Token.EMPTY;
       ok = type == NodeType.ATT || Token.eq(ns, nse);
-      if(ok) {
-        // namespace is irrelevant or identical: ignore prefix to speed up test
-        ctx.compInfo(OPTPREF, this);
-        mode = Mode.NAME;
-      }
+      // namespace is irrelevant or identical: ignore prefix to speed up test
+      if(ok) mode = Mode.NAME;
     }
 
     // check existence of tag/attribute names

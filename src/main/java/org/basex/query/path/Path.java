@@ -54,7 +54,19 @@ public abstract class Path extends ParseExpr {
   public static Path get(final InputInfo ii, final Expr r, final Expr... path) {
     // check if all steps are axis steps
     boolean axes = true;
-    for(final Expr p : path) axes &= p instanceof AxisStep;
+    for(int p = 0; p < path.length; p++) {
+      Expr e = path[p];
+      if(e instanceof Context) {
+        e = AxisStep.get(((Context) e).info, Axis.SELF, Test.NOD);
+      } else if(e instanceof Filter) {
+        final Filter f = (Filter) e;
+        if(f.root instanceof Context) {
+          e = AxisStep.get(f.info, Axis.SELF, Test.NOD, f.preds);
+        }
+      }
+      axes &= e instanceof AxisStep;
+      path[p] = e;
+    }
     return axes ? new AxisPath(ii, r, path).finish(null) : new MixedPath(ii, r, path);
   }
 
@@ -68,7 +80,10 @@ public abstract class Path extends ParseExpr {
   public final Expr compile(final QueryContext ctx) throws QueryException {
     if(root != null) {
       root = root.compile(ctx);
-      if(root instanceof Context) root = null;
+      if(root instanceof Context) {
+        ctx.compInfo(OPTREMCTX);
+        root = null;
+      }
     }
 
     final Value v = ctx.value;

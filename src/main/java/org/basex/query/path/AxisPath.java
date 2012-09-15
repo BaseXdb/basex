@@ -378,7 +378,7 @@ public class AxisPath extends Path {
   public final Path copy() {
     final Expr[] stps = new Expr[steps.length];
     for(int s = 0; s < steps.length; ++s) stps[s] = AxisStep.get(step(s));
-    return get(info, root, stps);
+    return new AxisPath(info, root, stps);
   }
 
   /**

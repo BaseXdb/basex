@@ -20,7 +20,7 @@ import org.basex.util.list.*;
  */
 public class Filter extends Preds {
   /** Expression. */
-  Expr root;
+  public Expr root;
 
   /**
    * Constructor.
