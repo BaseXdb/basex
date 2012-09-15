@@ -42,7 +42,7 @@ final class RestXqModules {
    * @throws QueryException query exception
    * @return instance
    */
-  RestXqFunction find(final HTTPContext http) throws QueryException {
+  synchronized RestXqFunction find(final HTTPContext http) throws QueryException {
     analyze(http);
     // collect all functions
     final ArrayList<RestXqFunction> list = new ArrayList<RestXqFunction>();
@@ -82,32 +82,44 @@ final class RestXqModules {
       restxq = fl.isAbsolute() ? new IOFile(fl) :
         new IOFile(http.context().mprop.get(MainProp.WEBPATH), fl.getPath());
     }
-
     // create new cache
-    final HashMap<String, RestXqModule> tmp = new HashMap<String, RestXqModule>();
-    for(final IOFile file : restxq.children()) {
-      // only accept XQuery files with suffix ".xqm"
-      if(!file.path().endsWith(IO.XQMSUFFIX)) continue;
+    final HashMap<String, RestXqModule> cache = new HashMap<String, RestXqModule>();
+    analyze(http, restxq, cache);
+    modules = cache;
+  }
 
-      final String path = file.path();
-      RestXqModule module = modules.get(path);
+  /**
+   * Analyzes the specified path.
+   * @param root root path
+   * @param http http context
+   * @param cache cached modules
+   * @throws QueryException query exception
+   */
+  private void analyze(final HTTPContext http, final IOFile root,
+      final HashMap<String, RestXqModule> cache) throws QueryException {
 
-      boolean parsed = false;
-      if(module != null) {
-        // check if module has been modified
-        parsed = module.uptodate();
-      } else {
-        // create new module
-        module = new RestXqModule(file);
-      }
-      // add module if it has been parsed, and if it contains annotations
-      if(parsed || module.analyze(http)) {
-        module.touch();
-        tmp.put(path, module);
+    for(final IOFile file : root.children()) {
+      if(file.isDir()) {
+        analyze(http, file, cache);
+      } else if(file.path().endsWith(IO.XQMSUFFIX)) {
+        // all files with .xqm suffix will be parsed for RESTXQ annotations
+        final String path = file.path();
+        RestXqModule module = modules.get(path);
+
+        boolean parsed = false;
+        if(module != null) {
+          // check if module has been modified
+          parsed = module.uptodate();
+        } else {
+          // create new module
+          module = new RestXqModule(file);
+        }
+        // add module if it has been parsed, and if it contains annotations
+        if(parsed || module.analyze(http)) {
+          module.touch();
+          cache.put(path, module);
+        }
       }
     }
-
-    // replace cache with new one
-    modules = tmp;
   }
 }
