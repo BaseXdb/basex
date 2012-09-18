@@ -81,11 +81,14 @@ public final class InlineFunc extends UserFunc {
 
   @Override
   public void plan(final FElem plan) {
+    addPlan(plan, planElem());
+    /* avoid recursive calls
     final FElem el = planElem();
     addPlan(plan, el, expr);
     for(int i = 0; i < args.length; ++i) {
       el.add(planAttr(ARG + i, args[i].name.string()));
     }
+    */
   }
 
   @Override
