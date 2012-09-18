@@ -90,9 +90,12 @@ public final class DynamicFunc extends Arr {
 
   @Override
   public void plan(final FElem plan) {
+    addPlan(plan, planElem());
+    /* avoid recursive calls
     final FElem el = planElem();
     addPlan(plan, el, expr[expr.length - 1]);
     for(int i = 0; i < expr.length - 1; i++) expr[i].plan(el);
+    */
   }
 
   @Override
