@@ -55,7 +55,7 @@ final class RESTRetrieve extends RESTQuery {
       ser.close();
     } else if(!exists(http)) {
       // list database resources
-      final Table table = new Table(session.execute(new List(http.path())));
+      final Table table = new Table(session.execute(new List(http.db(), http.dbpath())));
       final String serial = http.serialization;
       final SerializerProp sprop = new SerializerProp(serial);
       final Serializer ser = Serializer.get(http.res.getOutputStream(), sprop);

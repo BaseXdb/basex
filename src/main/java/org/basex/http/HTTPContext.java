@@ -49,8 +49,6 @@ public final class HTTPContext {
 
   /** Segments. */
   private final String[] segments;
-  /** Full path. */
-  private final String path;
   /** Current user session. */
   private LocalSession session;
   /** User name. */
@@ -79,9 +77,7 @@ public final class HTTPContext {
 
     // set UTF8 as default encoding (can be overwritten)
     res.setCharacterEncoding(UTF8);
-
     segments = toSegments(req.getPathInfo());
-    path = join(0);
 
     final MainProp mprop = context().mprop;
     user = mprop.get(MainProp.USER);
@@ -162,14 +158,6 @@ public final class HTTPContext {
    */
   public int depth() {
     return segments.length;
-  }
-
-  /**
-   * Returns the complete path.
-   * @return path depth
-   */
-  public String path() {
-    return path;
   }
 
   /**
