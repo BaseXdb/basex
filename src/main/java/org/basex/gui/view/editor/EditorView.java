@@ -320,7 +320,7 @@ public final class EditorView extends View {
    */
   public void newFile() {
     addTab();
-    refresh(false, true);
+    refresh(true);
   }
 
   /**
@@ -349,7 +349,7 @@ public final class EditorView extends View {
       // set new text, update file history and refresh the file modification
       edit.setText(file.read());
       gui.gprop.recent(file);
-      refresh(false, true);
+      refresh(true);
       edit.release(Action.PARSE);
 
     } catch(final IOException ex) {
@@ -498,18 +498,18 @@ public final class EditorView extends View {
 
   /**
    * Refreshes the query modification flag.
-   * @param mod modification flag
    * @param force action
    */
-  void refresh(final boolean mod, final boolean force) {
+  void refresh(final boolean force) {
     final EditorArea edit = getEditor();
     refreshMark();
-    if(edit.modified == mod && !force) return;
 
+    boolean oe = edit.modified;
+    edit.modified = edit.hist != null && edit.hist.modified();
+    if(edit.modified == oe && !force) return;
     String title = edit.file().name();
-    if(mod) title += "*";
+    if(edit.modified) title += "*";
     edit.label.setText(title);
-    edit.modified = mod;
     gui.refreshControls();
   }
 
@@ -535,9 +535,8 @@ public final class EditorView extends View {
       final EditorArea edit = getEditor();
       file.write(edit.getText());
       edit.file(file);
-      edit.tstamp = file.timeStamp();
       gui.gprop.recent(file);
-      refresh(false, true);
+      refresh(true);
     } catch(final IOException ex) {
       BaseXDialog.error(gui, FILE_NOT_SAVED);
     }
@@ -597,7 +596,7 @@ public final class EditorView extends View {
       @Override
       public void actionPerformed(final ActionEvent e) {
         addTab();
-        refresh(false, true);
+        refresh(true);
       }
     });
     tabs.add(new BaseXBack(), add, 0);

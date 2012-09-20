@@ -123,7 +123,7 @@ public final class BaseXTextRenderer extends BaseXBack {
         if(np >= cp && (np > cp || !same || !forward)) {
           if(forward || lp != 0) {
             h = hh;
-            text.setCaret(forward ? np : lp);
+            text.setCursor(forward ? np : lp);
             return forward ? ny : ly;
           }
           cp = Integer.MAX_VALUE;
@@ -134,10 +134,10 @@ public final class BaseXTextRenderer extends BaseXBack {
 
       h = hh;
       if(cp == 0 || cp == Integer.MAX_VALUE) {
-        text.setCaret(lp);
+        text.setCursor(lp);
         return ly;
       }
-      text.setCaret(0);
+      text.setCursor(0);
     }
   }
 
@@ -467,7 +467,7 @@ public final class BaseXTextRenderer extends BaseXBack {
 
       if(!finish) text.startMark();
       else text.endMark();
-      text.setCaret();
+      text.setCursor();
     }
     repaint();
   }

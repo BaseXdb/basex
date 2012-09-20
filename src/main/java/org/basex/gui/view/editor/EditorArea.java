@@ -77,8 +77,7 @@ final class EditorArea extends BaseXEditor {
   }
 
   /**
-   * Returns {@code true} if a file has been opened from disk
-   * (i.e., has a valid timestamp and filename).
+   * Returns {@code true} if a file exists for the given text.
    * @return result of check
    */
   boolean opened() {
@@ -126,7 +125,7 @@ final class EditorArea extends BaseXEditor {
     final boolean eq = eq(in, last);
     if(eq && action == Action.CHECK) return;
     last = in;
-    view.refresh(modified || !eq, false);
+    view.refresh(false);
 
     view.pos.setText(pos());
     gui.context.prop.set(Prop.QUERYPATH, file.path());
@@ -182,6 +181,7 @@ final class EditorArea extends BaseXEditor {
     file = f;
     tstamp = f.timeStamp();
     setSyntax(file, true);
+    if(hist != null) hist.save();
   }
 
   /**

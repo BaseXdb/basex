@@ -38,10 +38,10 @@ public class BaseXEditor extends BaseXPanel {
 
   /** Text array to be written. */
   protected transient BaseXTextTokens text = new BaseXTextTokens(EMPTY);
+  /** Undo history; if set to {@code null}, text will be read-only. */
+  public final transient History hist;
   /** Renderer reference. */
   final BaseXTextRenderer rend;
-  /** Undo history; if set to {@code null}, text will be read-only. */
-  final transient Undo undo;
 
   /** Delay for highlighting an error. */
   private static final int ERROR_DELAY = 500;
@@ -89,15 +89,15 @@ public class BaseXEditor extends BaseXPanel {
     add(rend, BorderLayout.CENTER);
     add(scroll, BorderLayout.EAST);
 
-    Undo un = null;
+    History un = null;
     if(edit) {
       setBackground(Color.white);
       setBorder(new MatteBorder(1, 1, 0, 0, GUIConstants.color(6)));
-      un = new Undo();
+      un = new History();
     } else {
       mode(Fill.NONE);
     }
-    undo = un;
+    hist = un;
 
     new BaseXPopup(this, edit ?
       new GUICommand[] { new UndoCmd(), new RedoCmd(), null, new CutCmd(),
@@ -111,7 +111,6 @@ public class BaseXEditor extends BaseXPanel {
    */
   public void setText(final byte[] t) {
     setText(t, t.length);
-    if(undo != null) undo.reset(t);
   }
 
   /**
@@ -185,9 +184,7 @@ public class BaseXEditor extends BaseXPanel {
     for(int r = 0; r < s; ++r) {
       final byte b = t[r];
       // support characters, highlighting codes, tabs and newlines
-      if(b >= ' ' || b <= TokenBuilder.MARK || b == 0x09 || b == 0x0A) {
-        t[ns++] = t[r];
-      }
+      if(b >= ' ' || b <= TokenBuilder.MARK || b == 0x09 || b == 0x0A) t[ns++] = t[r];
       eq &= ns < ts && ns < s && t[ns] == tt[ns];
     }
     eq &= ns == ts;
@@ -198,7 +195,7 @@ public class BaseXEditor extends BaseXPanel {
       rend.setText(text);
       scroll.pos(0);
     }
-    if(undo != null) undo.store(t.length != ns ? Arrays.copyOf(t, ns) : t, 0);
+    if(hist != null) hist.store(t.length != ns ? Arrays.copyOf(t, ns) : t, 0, 0);
     SwingUtilities.invokeLater(calc);
   }
 
@@ -228,7 +225,7 @@ public class BaseXEditor extends BaseXPanel {
    * @param p cursor position
    */
   public final void setCaret(final int p) {
-    text.setCaret(p);
+    text.setCursor(p);
     showCursor(1);
     cursor(true);
   }
@@ -241,7 +238,7 @@ public class BaseXEditor extends BaseXPanel {
       @Override
       public void run() {
         text.pos(text.size());
-        text.setCaret();
+        text.setCursor();
         showCursor(2);
       }
     });
@@ -297,7 +294,7 @@ public class BaseXEditor extends BaseXPanel {
    */
   final void selectAll() {
     text.selectAll();
-    text.setCaret();
+    text.setCursor();
     rend.repaint();
   }
 
@@ -321,9 +318,7 @@ public class BaseXEditor extends BaseXPanel {
   @Override
   public void mouseClicked(final MouseEvent e) {
     if(!SwingUtilities.isMiddleMouseButton(e)) return;
-    if(!paste()) return;
-    finish();
-    repaint();
+    new PasteCmd().execute(gui);
   }
 
   @Override
@@ -346,7 +341,7 @@ public class BaseXEditor extends BaseXPanel {
     if(SwingUtilities.isMiddleMouseButton(e)) copy();
 
     final boolean marking = e.isShiftDown();
-    final boolean nomark = !text.marked();
+    final boolean nomark = !text.marking();
     if(SwingUtilities.isLeftMouseButton(e)) {
       final int c = e.getClickCount();
       if(c == 1) {
@@ -402,7 +397,8 @@ public class BaseXEditor extends BaseXPanel {
     }
 
     // set cursor position and reset last column
-    text.pos(text.cursor());
+    final int pc = text.cursor();
+    text.pos(pc);
     if(!PREVLINE.is(e) && !NEXTLINE.is(e)) lastCol = -1;
 
     if(FINDNEXT.is(e) || FINDNEXT2.is(e)) {
@@ -422,7 +418,7 @@ public class BaseXEditor extends BaseXPanel {
     final boolean marking = e.isShiftDown() &&
       !DELNEXT.is(e) && !DELPREV.is(e) && !PASTE2.is(e) && !COMMENT.is(e) &&
       !DELLINE.is(e) && !REDOSTEP.is(e);
-    final boolean nomark = !text.marked();
+    final boolean nomark = !text.marking();
     if(marking && nomark) text.startMark();
     boolean down = true;
     boolean consumed = true;
@@ -472,16 +468,30 @@ public class BaseXEditor extends BaseXPanel {
       // refresh scroll position
       text.endMark();
       text.checkMark();
-    } else if(undo != null) {
+    } else if(hist != null) {
       // edit operations...
       if(CUT1.is(e) || CUT2.is(e)) {
-        cut();
+        if(copy()) text.delete();
       } else if(PASTE1.is(e) || PASTE2.is(e)) {
-        paste();
+        final String clip = clip();
+        if(clip != null) {
+          if(text.marked()) text.delete();
+          text.add(clip);
+        }
       } else if(UNDOSTEP.is(e)) {
-        undo();
+        final byte[] t = hist.prev();
+        if(t != null) {
+          text = new BaseXTextTokens(t);
+          text.pos(hist.cursor());
+          rend.setText(text);
+        }
       } else if(REDOSTEP.is(e)) {
-        redo();
+        final byte[] t = hist.next();
+        if(t != null) {
+          text = new BaseXTextTokens(t);
+          text.pos(hist.cursor());
+          rend.setText(text);
+        }
       } else if(COMMENT.is(e)) {
         text.comment(rend.getSyntax());
       } else if(DELLINE.is(e)) {
@@ -499,7 +509,6 @@ public class BaseXEditor extends BaseXPanel {
           }
           text.endMark();
         }
-        undo.cursor(text.cursor());
         text.delete();
       } else if(DELLINESTART.is(e) || DELPREVWORD.is(e) || DELPREV.is(e)) {
         if(nomark) {
@@ -514,7 +523,6 @@ public class BaseXEditor extends BaseXPanel {
           }
           text.endMark();
         }
-        undo.cursor(text.cursor());
         text.delete();
         down = false;
       } else {
@@ -523,8 +531,9 @@ public class BaseXEditor extends BaseXPanel {
     }
     if(consumed) e.consume();
 
-    text.setCaret();
+    text.setCursor();
     if(txt != text.text()) rend.calc();
+    hist.store(text.text(), pc, text.cursor());
     showCursor(down ? 2 : 0);
   }
 
@@ -586,16 +595,16 @@ public class BaseXEditor extends BaseXPanel {
 
   @Override
   public void keyTyped(final KeyEvent e) {
-    if(undo == null || control(e) || DELNEXT.is(e) || DELPREV.is(e) || ESCAPE.is(e))
+    if(hist == null || control(e) || DELNEXT.is(e) || DELPREV.is(e) || ESCAPE.is(e))
       return;
 
-    text.pos(text.cursor());
-    // string to be added
-    String ch = String.valueOf(e.getKeyChar());
+    final byte[] txt = text.text();
+    final int pc = text.cursor();
+    text.pos(pc);
 
     // remember if marked text is to be deleted
+    String ch = String.valueOf(e.getKeyChar());
     boolean del = true;
-    final byte[] txt = text.text();
     if(TAB.is(e)) {
       if(text.marked()) {
         // check if lines are to be indented
@@ -639,19 +648,12 @@ public class BaseXEditor extends BaseXPanel {
       ch = sb.toString();
     }
 
-    if(ch != null) {
-      undo.cursor(text.cursor());
-      text.add(ch);
-    }
-    text.setCaret();
+    if(ch != null) text.add(ch);
+    text.setCursor();
     rend.calc();
     showCursor(2);
     e.consume();
-  }
-
-  @Override
-  public void keyReleased(final KeyEvent e) {
-    if(undo != null) undo.store(text.text(), text.cursor());
+    hist.store(text.text(), pc, text.cursor());
   }
 
   /**
@@ -662,40 +664,6 @@ public class BaseXEditor extends BaseXPanel {
   protected void release(final Action action) { }
 
   // EDITOR COMMANDS ==========================================================
-
-  /**
-   * Undoes the text.
-   */
-  final void undo() {
-    if(undo == null) return;
-    final byte[] t = undo.prev();
-    if(t == text.text()) return;
-    text = new BaseXTextTokens(t);
-    rend.setText(text);
-    text.pos(undo.cursor());
-    text.setCaret();
-  }
-
-  /**
-   * Redoes the text.
-   */
-  final void redo() {
-    if(undo == null) return;
-    final byte[] t = undo.next();
-    if(t == text.text()) return;
-    text = new BaseXTextTokens(t);
-    rend.setText(text);
-    text.pos(undo.cursor());
-    text.setCaret();
-  }
-
-  /**
-   * Cuts the selected text to the clipboard.
-   */
-  final void cut() {
-    text.pos(text.cursor());
-    if(copy()) delete();
-  }
 
   /**
    * Copies the selected text to the clipboard.
@@ -715,43 +683,6 @@ public class BaseXEditor extends BaseXPanel {
   }
 
   /**
-   * Pastes the clipboard text.
-   * @return success flag
-   */
-  final boolean paste() {
-    return paste(clip());
-  }
-
-  /**
-   * Pastes the specified string.
-   * @param txt string to be pasted
-   * @return success flag
-   */
-  final boolean paste(final String txt) {
-    if(txt == null || undo == null) return false;
-    final int tc = text.cursor();
-    text.pos(tc);
-    undo.cursor(tc);
-    if(text.marked()) text.delete();
-    text.add(txt);
-    undo.store(text.text(), tc);
-    return true;
-  }
-
-  /**
-   * Deletes the selected text.
-   */
-  final void delete() {
-    if(undo == null) return;
-    final int tc = text.cursor();
-    text.pos(tc);
-    undo.cursor(tc);
-    text.delete();
-    undo.store(text.text(), tc);
-    text.setCaret();
-  }
-
-  /**
    * Returns the clipboard text.
    * @return text
    */
@@ -767,9 +698,11 @@ public class BaseXEditor extends BaseXPanel {
 
   /**
    * Finishes a command.
+   * @param old old cursor position; store entry to history if position != -1
    */
-  void finish() {
-    text.setCaret();
+  void finish(final int old) {
+    text.setCursor();
+    if(old != -1) hist.store(text.text(), old, text.cursor());
     rend.calc();
     showCursor(2);
     release(Action.CHECK);
@@ -837,12 +770,17 @@ public class BaseXEditor extends BaseXPanel {
   class UndoCmd extends TextCmd {
     @Override
     public void execute(final GUI main) {
-      undo();
-      finish();
+      if(hist == null) return;
+      final byte[] t = hist.prev();
+      if(t == null) return;
+      text = new BaseXTextTokens(t);
+      text.pos(hist.cursor());
+      rend.setText(text);
+      finish(-1);
     }
     @Override
     public void refresh(final GUI main, final AbstractButton button) {
-      button.setEnabled(!undo.first());
+      button.setEnabled(!hist.first());
     }
     @Override
     public String label() {
@@ -854,12 +792,17 @@ public class BaseXEditor extends BaseXPanel {
   class RedoCmd extends TextCmd {
     @Override
     public void execute(final GUI main) {
-      redo();
-      finish();
+      if(hist == null) return;
+      final byte[] t = hist.next();
+      if(t == null) return;
+      text = new BaseXTextTokens(t);
+      text.pos(hist.cursor());
+      rend.setText(text);
+      finish(-1);
     }
     @Override
     public void refresh(final GUI main, final AbstractButton button) {
-      button.setEnabled(!undo.last());
+      button.setEnabled(!hist.last());
     }
     @Override
     public String label() {
@@ -871,8 +814,13 @@ public class BaseXEditor extends BaseXPanel {
   class CutCmd extends TextCmd {
     @Override
     public void execute(final GUI main) {
-      cut();
-      finish();
+      if(hist == null) return;
+      final int tc = text.cursor();
+      text.pos(tc);
+      if(!copy()) return;
+      text.delete();
+      text.setCursor();
+      finish(tc);
     }
     @Override
     public void refresh(final GUI main, final AbstractButton button) {
@@ -904,7 +852,14 @@ public class BaseXEditor extends BaseXPanel {
   class PasteCmd extends TextCmd {
     @Override
     public void execute(final GUI main) {
-      if(paste()) finish();
+      if(hist == null) return;
+      final int tc = text.cursor();
+      text.pos(tc);
+      final String txt = clip();
+      if(txt == null) return;
+      if(text.marked()) text.delete();
+      text.add(txt);
+      finish(tc);
     }
     @Override
     public void refresh(final GUI main, final AbstractButton button) {
@@ -920,8 +875,11 @@ public class BaseXEditor extends BaseXPanel {
   class DelCmd extends TextCmd {
     @Override
     public void execute(final GUI main) {
-      delete();
-      finish();
+      if(hist == null) return;
+      final int tc = text.cursor();
+      text.pos(tc);
+      text.delete();
+      finish(tc);
     }
     @Override
     public void refresh(final GUI main, final AbstractButton button) {

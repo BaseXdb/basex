@@ -440,11 +440,19 @@ public final class BaseXTextTokens {
   }
 
   /**
-   * Tests if some text is marked.
+   * Tests if text is currently being marked, or has already been marked.
+   * @return result of check
+   */
+  boolean marking() {
+    return ms != -1;
+  }
+
+  /**
+   * Tests if text has been marked.
    * @return result of check
    */
   boolean marked() {
-    return ms != -1;
+    return ms != me;
   }
 
   /**
@@ -564,17 +572,17 @@ public final class BaseXTextTokens {
   }
 
   /**
-   * Sets the caret position to the specified counter.
-   * @param c caret position
+   * Sets the cursor to the specified position.
+   * @param c cursor position
    */
-  void setCaret(final int c) {
+  void setCursor(final int c) {
     pc = c;
   }
 
   /**
-   * Sets the caret position to the current counter.
+   * Sets the cursor to the current position.
    */
-  void setCaret() {
+  void setCursor() {
     pc = ps;
   }
 
