@@ -160,9 +160,9 @@ public class BaseXEditor extends BaseXPanel {
    * @return {@code true} if the keyword was found
    */
   final boolean find() {
-    final int p = rend.find(true, false);
-    scroll(p);
-    return p != 0;
+    final int y = rend.find(true, false);
+    scroll(y);
+    return y != -1;
   }
 
   /**
@@ -170,10 +170,12 @@ public class BaseXEditor extends BaseXPanel {
    * @param y vertical position
    */
   final void scroll(final int y) {
+    if(y == -1) return;
     // updates the visible area
+    final int h = getHeight();
     final int p = scroll.pos();
-    final int m = y + rend.fontH() * 3 - getHeight();
-    if(y != 0 && (p < m || p > y)) scroll.pos(y - getHeight() / 2);
+    final int m = y + rend.fontH() * 3 - h;
+    if(p < m || p > y) scroll.pos(y - h / 2);
     repaint();
   }
 
@@ -232,7 +234,7 @@ public class BaseXEditor extends BaseXPanel {
    * Sets a new cursor position.
    * @param p cursor position
    */
-  public final void setCaret(final int p) {
+  public final void setCursor(final int p) {
     text.setCursor(p);
     showCursor(1);
     cursor(true);
@@ -467,7 +469,7 @@ public class BaseXEditor extends BaseXPanel {
       down(1, marking);
     } else if(FINDERROR.is(e)) {
       final int p = text.error();
-      if(p != -1) setCaret(p);
+      if(p != -1) setCursor(p);
     } else {
       consumed = false;
     }

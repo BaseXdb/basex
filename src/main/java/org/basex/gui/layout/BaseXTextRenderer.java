@@ -102,26 +102,24 @@ public final class BaseXTextRenderer extends BaseXBack {
    * Finds the current keyword and returns the text position.
    * @param forward forward/backward browsing
    * @param same string is the same as last time
-   * @return new position
+   * @return new vertical position, or {@code -1}
    */
   int find(final boolean forward, final boolean same) {
-    if(search.length == 0) return 0;
+    if(search.length == 0) return -1;
 
     while(true) {
       final int hh = h;
-      int lp = 0;
-      int ly = 0;
-      int cp = text.cursor();
+      int lp = -1, ly = -1, cp = text.cursor();
 
       h = Integer.MAX_VALUE;
       final Graphics g = getGraphics();
-      for(init(g, 0); more(g); next()) {
+      for(init(g); more(g); next()) {
         if(!found()) continue;
 
         final int np = text.pos();
         final int ny = y - fontH;
         if(np >= cp && (np > cp || !same || !forward)) {
-          if(forward || lp != 0) {
+          if(forward || lp != -1) {
             h = hh;
             text.setCursor(forward ? np : lp);
             text.startMark();
@@ -136,11 +134,11 @@ public final class BaseXTextRenderer extends BaseXBack {
       }
 
       h = hh;
-      if(cp == 0 || cp == Integer.MAX_VALUE) {
-        text.setCursor(lp);
+      if(cp == -1 || cp == Integer.MAX_VALUE) {
+        text.setCursor(Math.max(0, lp));
         return ly;
       }
-      text.setCursor(0);
+      text.setCursor(-1);
     }
   }
 
@@ -154,7 +152,7 @@ public final class BaseXTextRenderer extends BaseXBack {
     final Graphics g = getGraphics();
     int col = 1;
     int line = 1;
-    init(g, 0);
+    init(g);
     boolean more = true;
     while(more(g)) {
       final int p = text.pos();
@@ -191,13 +189,21 @@ public final class BaseXTextRenderer extends BaseXBack {
     final Graphics g = getGraphics();
     w = Integer.MAX_VALUE;
     h = Integer.MAX_VALUE;
-    init(g, 0);
+    init(g);
     int max = 0;
     while(more(g)) {
       if(text.curr() == 0x0A) max = Math.max(x, max);
       next();
     }
     return new Dimension(Math.max(x, max) + fwidth[' '], y + fontH);
+  }
+
+  /**
+   * Initializes the renderer.
+   * @param g graphics reference
+   */
+  private void init(final Graphics g) {
+    init(g, 0);
   }
 
   /**
@@ -222,7 +228,7 @@ public final class BaseXTextRenderer extends BaseXBack {
     w = getWidth() - (off >> 1);
     h = Integer.MAX_VALUE;
     final Graphics g = getGraphics();
-    init(g, 0);
+    init(g);
     while(more(g)) next();
     h = getHeight() + fontH;
     bar.height(y + off);
@@ -236,7 +242,7 @@ public final class BaseXTextRenderer extends BaseXBack {
     final int hh = h;
     h = Integer.MAX_VALUE;
     final Graphics g = getGraphics();
-    init(g, 0);
+    init(g);
     while(more(g) && !text.edited()) next();
     h = hh;
     return y - fontH;

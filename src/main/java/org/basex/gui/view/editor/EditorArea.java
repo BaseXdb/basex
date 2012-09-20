@@ -191,7 +191,7 @@ final class EditorArea extends BaseXEditor {
    */
   void jumpError(final int pos) {
     requestFocusInWindow();
-    setCaret(pos);
+    setCursor(pos);
   }
 
   /**

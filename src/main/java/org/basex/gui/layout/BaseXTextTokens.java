@@ -559,6 +559,7 @@ public final class BaseXTextTokens {
    */
   public void error(final int s) {
     es = s;
+    if(es == text.length) es--;
   }
 
   // CURSOR ===================================================================
@@ -572,7 +573,7 @@ public final class BaseXTextTokens {
   }
 
   /**
-   * Checks if the cursor moves over the current token.
+   * Checks if the text cursor moves over the current token.
    * @return result of check
    */
   boolean edited() {
@@ -580,7 +581,7 @@ public final class BaseXTextTokens {
   }
 
   /**
-   * Sets the cursor to the specified position.
+   * Sets the text cursor to the specified position.
    * @param c cursor position
    */
   void setCursor(final int c) {
@@ -588,14 +589,14 @@ public final class BaseXTextTokens {
   }
 
   /**
-   * Sets the cursor to the current position.
+   * Sets the text cursor to the current position.
    */
   void setCursor() {
     pc = ps;
   }
 
   /**
-   * Returns the cursor position.
+   * Returns the position of the text cursor.
    * @return cursor position
    */
   int cursor() {
