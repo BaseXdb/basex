@@ -38,8 +38,8 @@ public class BaseXEditor extends BaseXPanel {
 
   /** Text array to be written. */
   protected transient BaseXTextTokens text = new BaseXTextTokens(EMPTY);
-  /** Undo history; if set to {@code null}, text will be read-only. */
-  public final transient History hist;
+  /** Undo history. */
+  public transient History hist;
   /** Renderer reference. */
   final BaseXTextRenderer rend;
 
@@ -89,20 +89,27 @@ public class BaseXEditor extends BaseXPanel {
     add(rend, BorderLayout.CENTER);
     add(scroll, BorderLayout.EAST);
 
-    History un = null;
+    hist = new History(edit ? EMPTY : null);
     if(edit) {
       setBackground(Color.white);
       setBorder(new MatteBorder(1, 1, 0, 0, GUIConstants.color(6)));
-      un = new History();
     } else {
       mode(Fill.NONE);
     }
-    hist = un;
 
     new BaseXPopup(this, edit ?
       new GUICommand[] { new UndoCmd(), new RedoCmd(), null, new CutCmd(),
         new CopyCmd(), new PasteCmd(), new DelCmd(), null, new AllCmd() } :
       new GUICommand[] { new CopyCmd(), null, new AllCmd() });
+  }
+
+  /**
+   * Initializes the text.
+   * @param t text to be set
+   */
+  public void initText(final byte[] t) {
+    setText(t);
+    hist = new History(t);
   }
 
   /**
@@ -178,6 +185,7 @@ public class BaseXEditor extends BaseXPanel {
   public final void setText(final byte[] t, final int s) {
     // remove invalid characters and compare old with new string
     int ns = 0;
+    final int pc = text.cursor();
     final int ts = text.size();
     final byte[] tt = text.text();
     boolean eq = true;
@@ -195,7 +203,7 @@ public class BaseXEditor extends BaseXPanel {
       rend.setText(text);
       scroll.pos(0);
     }
-    if(hist != null) hist.store(t.length != ns ? Arrays.copyOf(t, ns) : t, 0, 0);
+    hist.store(t.length != ns ? Arrays.copyOf(t, ns) : t, pc, 0);
     SwingUtilities.invokeLater(calc);
   }
 
@@ -468,7 +476,7 @@ public class BaseXEditor extends BaseXPanel {
       // refresh scroll position
       text.endMark();
       text.checkMark();
-    } else if(hist != null) {
+    } else if(hist.active()) {
       // edit operations...
       if(CUT1.is(e) || CUT2.is(e)) {
         if(copy()) text.delete();
@@ -532,8 +540,11 @@ public class BaseXEditor extends BaseXPanel {
     if(consumed) e.consume();
 
     text.setCursor();
-    if(txt != text.text()) rend.calc();
-    hist.store(text.text(), pc, text.cursor());
+    final byte[] tmp = text.text();
+    if(txt != tmp) {
+      rend.calc();
+      hist.store(tmp, pc, text.cursor());
+    }
     showCursor(down ? 2 : 0);
   }
 
@@ -595,7 +606,7 @@ public class BaseXEditor extends BaseXPanel {
 
   @Override
   public void keyTyped(final KeyEvent e) {
-    if(hist == null || control(e) || DELNEXT.is(e) || DELPREV.is(e) || ESCAPE.is(e))
+    if(!hist.active() || control(e) || DELNEXT.is(e) || DELPREV.is(e) || ESCAPE.is(e))
       return;
 
     final byte[] txt = text.text();
@@ -770,7 +781,7 @@ public class BaseXEditor extends BaseXPanel {
   class UndoCmd extends TextCmd {
     @Override
     public void execute(final GUI main) {
-      if(hist == null) return;
+      if(!hist.active()) return;
       final byte[] t = hist.prev();
       if(t == null) return;
       text = new BaseXTextTokens(t);
@@ -792,7 +803,7 @@ public class BaseXEditor extends BaseXPanel {
   class RedoCmd extends TextCmd {
     @Override
     public void execute(final GUI main) {
-      if(hist == null) return;
+      if(!hist.active()) return;
       final byte[] t = hist.next();
       if(t == null) return;
       text = new BaseXTextTokens(t);
@@ -814,7 +825,7 @@ public class BaseXEditor extends BaseXPanel {
   class CutCmd extends TextCmd {
     @Override
     public void execute(final GUI main) {
-      if(hist == null) return;
+      if(!hist.active()) return;
       final int tc = text.cursor();
       text.pos(tc);
       if(!copy()) return;
@@ -852,7 +863,7 @@ public class BaseXEditor extends BaseXPanel {
   class PasteCmd extends TextCmd {
     @Override
     public void execute(final GUI main) {
-      if(hist == null) return;
+      if(!hist.active()) return;
       final int tc = text.cursor();
       text.pos(tc);
       final String txt = clip();
@@ -875,7 +886,7 @@ public class BaseXEditor extends BaseXPanel {
   class DelCmd extends TextCmd {
     @Override
     public void execute(final GUI main) {
-      if(hist == null) return;
+      if(!hist.active()) return;
       final int tc = text.cursor();
       text.pos(tc);
       text.delete();

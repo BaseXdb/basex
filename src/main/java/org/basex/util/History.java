@@ -1,5 +1,6 @@
 package org.basex.util;
 
+
 /**
  * This class stores strings in a history.
  *
@@ -7,15 +8,18 @@ package org.basex.util;
  * @author Christian Gruen
  */
 public final class History {
-  /** Maximum size for storing entries in a history. */
-  public static final int MAXSIZE = 100000;
+  /** Maximum size for storing entries in a history (currently: 10 MB). */
+  private static final int MAXBYTES = 10000000;
+  /** Maximum number of entries to be stored. */
+  private static final int MAX = 1024;
 
-  /** Maximum number of strings to be stored. */
-  private static final int MAX = 500;
   /** String history. */
-  private final byte[][] hist = new byte[MAX][];
+  private final byte[][] hist;
   /** Cursor history. */
-  private final int[] cur = new int[MAX];
+  private final int[] cur;
+  /** Active flag. */
+  private final boolean active;
+
   /** Maximum of stored entries. */
   private int max;
   /** History position. */
@@ -25,9 +29,26 @@ public final class History {
 
   /**
    * Constructor.
+   * @param text initial text
    */
-  public History() {
-    hist[0] = Token.EMPTY;
+  public History(final byte[] text) {
+    active = text != null;
+    if(active) {
+      cur = new int[MAX];
+      hist = new byte[MAX][];
+      hist[0] = text;
+    } else {
+      cur = null;
+      hist = null;
+    }
+  }
+
+  /**
+   * Indicates if the history is active.
+   * @return result of check
+   */
+  public boolean active() {
+    return active;
   }
 
   /**
@@ -51,7 +72,7 @@ public final class History {
    * @return previous string
    */
   public byte[] prev() {
-    return pos != 0 ? hist[--pos] : null;
+    return pos > 0 ? hist[--pos] : null;
   }
 
   /**
@@ -77,16 +98,28 @@ public final class History {
    * @param nc new cursor position
    */
   public void store(final byte[] str, final int oc, final int nc) {
-    if(str == hist[pos] || Token.eq(str, hist[pos]) || str.length >= MAXSIZE) return;
-    cur[pos] = Math.min(hist[pos].length, oc);
-    if(pos + 1 == MAX) {
-      Array.move(hist, 1, -1, pos);
-      Array.move(cur, 1, -1, pos--);
-      saved--;
+    if(!active || str == hist[pos] || Token.eq(str, hist[pos])) return;
+
+    // summarize and limit size of new and existing entries
+    int off = pos + 1;
+    int size = str.length;
+    for(; off > 0 && size < MAXBYTES; off--) size += hist[off - 1].length;
+    // enough space: limit number of entries
+    if(off == 0 && pos + 1 == MAX) off = 1;
+    // remove entries
+    if(off > 0) {
+      Array.move(hist, off, -off, MAX - off);
+      Array.move(cur, off, -off, MAX - off);
+      saved -= off;
+      pos -= off;
     }
+    // save new entry
+    if(pos >= 0) cur[pos] = oc;
     hist[++pos] = str;
     cur[pos] = nc;
     max = pos;
+    // remove old entries to save memory
+    for(int p = pos + 1; p < MAX; p++) hist[p] = null;
   }
 
   /**

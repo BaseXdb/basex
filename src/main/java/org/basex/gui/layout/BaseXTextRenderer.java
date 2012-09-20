@@ -35,7 +35,7 @@ public final class BaseXTextRenderer extends BaseXBack {
   /** Width of current word. */
   private int wordW;
   /** Search keyword. */
-  private String keyword = "";
+  private byte[] search = Token.EMPTY;
 
   /** Border offset. */
   private int off;
@@ -93,19 +93,19 @@ public final class BaseXTextRenderer extends BaseXBack {
    * @return old keyword
    */
   String keyword(final String key) {
-    final String k = keyword;
-    keyword = key;
+    final String k = Token.string(search);
+    search = Token.token(key);
     return k;
   }
 
   /**
    * Finds the current keyword and returns the text position.
-   * @param forward backward browsing
+   * @param forward forward/backward browsing
    * @param same string is the same as last time
    * @return new position
    */
   int find(final boolean forward, final boolean same) {
-    if(keyword.isEmpty()) return 0;
+    if(search.length == 0) return 0;
 
     while(true) {
       final int hh = h;
@@ -124,6 +124,9 @@ public final class BaseXTextRenderer extends BaseXBack {
           if(forward || lp != 0) {
             h = hh;
             text.setCursor(forward ? np : lp);
+            text.startMark();
+            text.forward(search.length);
+            text.endMark();
             return forward ? ny : ly;
           }
           cp = Integer.MAX_VALUE;
@@ -319,30 +322,28 @@ public final class BaseXTextRenderer extends BaseXBack {
         high = true;
       }
 
-      // mark text
-      int xx = x;
+      // mark selected text
       if(text.markStart()) {
         final int p = text.pos();
-        while(text.more()) {
-          final int cw = charW(g, text.curr());
-          if(text.inMark()) {
-            g.setColor(GUIConstants.color(2));
-            g.fillRect(xx, y - fontH * 4 / 5, cw, fontH);
-          }
-          xx += cw;
-          text.next();
-        }
+        int xx = x, cw = 0;
+        for(; !text.inMark() && text.more(); text.next()) xx += charW(g, text.curr());
+        for(; text.inMark() && text.more(); text.next()) cw += charW(g, text.curr());
+        g.setColor(GUIConstants.color(2));
+        g.fillRect(xx, y - fontH * 4 / 5, cw, fontH);
         text.pos(p);
       }
 
+      // mark found text
       if(found()) {
         int cw = 0;
-        for(int c = 0; c < keyword.length(); ++c) cw += charW(g, keyword.charAt(c));
-        g.setColor(GUIConstants.color(text.cursor() == text.pos() ? 4 : 1));
+        for(int c = 0; c < search.length; c += Token.cl(search, c)) {
+          cw += charW(g, Token.cp(search, c));
+        }
+        g.setColor(GUIConstants.color(text.cursor() == text.pos() ? 4 : 2));
         g.fillRect(x, y - fontH * 4 / 5, cw, fontH);
       }
 
-      // mark error
+      // underline parsing error
       if(text.erroneous()) {
         final int s = Math.max(1, fontH / 8);
         g.setColor(GUIConstants.LRED);
@@ -373,7 +374,7 @@ public final class BaseXTextRenderer extends BaseXBack {
 
       // show cursor
       if(cursor && text.edited()) {
-        xx = x;
+        int xx = x;
         final int p = text.pos();
         while(text.more()) {
           if(text.cursor() == text.pos()) {
@@ -393,18 +394,16 @@ public final class BaseXTextRenderer extends BaseXBack {
    * @return result of check
    */
   private boolean found() {
-    if(keyword.isEmpty()) return false;
+    if(search.length == 0) return false;
 
-    final int sl = keyword.length();
-    final int wl = text.length();
+    final int sl = search.length, wl = text.length(), p = text.pos();
     if(wl < sl) return false;
-    final int p = text.pos();
-    int s = -1;
-    while(++s != sl) {
-      if(Character.toLowerCase(text.next()) != keyword.charAt(s)) break;
+    int c = 0;
+    for(; c < search.length; c += Token.cl(search, c)) {
+      if(Token.lc(text.next()) != Token.lc(Token.cp(search, c))) break;
     }
     text.pos(p);
-    return s == sl;
+    return c == sl;
   }
 
   /**

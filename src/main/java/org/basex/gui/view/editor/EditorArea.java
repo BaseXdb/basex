@@ -38,7 +38,7 @@ final class EditorArea extends BaseXEditor {
   /** Flag for modified content. */
   boolean modified;
   /** Last input. */
-  byte[] last = EMPTY;
+  byte[] last;
   /** This flag indicates if the input is an XQuery main module. */
   boolean xquery = true;
   /** This flag indicates if the input is a command script. */
@@ -58,6 +58,7 @@ final class EditorArea extends BaseXEditor {
     file = f;
     label = new BaseXLabel(f.name());
     setSyntax(f, false);
+    initText(EMPTY);
 
     addFocusListener(new FocusAdapter() {
       @Override
@@ -181,7 +182,7 @@ final class EditorArea extends BaseXEditor {
     file = f;
     tstamp = f.timeStamp();
     setSyntax(file, true);
-    if(hist != null) hist.save();
+    hist.save();
   }
 
   /**

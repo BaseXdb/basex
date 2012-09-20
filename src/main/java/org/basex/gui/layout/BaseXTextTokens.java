@@ -16,17 +16,17 @@ public final class BaseXTextTokens {
 
   /** Text array to be written. */
   private byte[] text = EMPTY;
-  /** Current start position. */
-  private int ps;
-  /** Current end position. */
-  private int pe;
   /** Current cursor position. */
   private int pc;
-  /** Start of a text mark. */
+  /** Start position of a token. */
+  private int ps;
+  /** End position of a token. */
+  private int pe;
+  /** Start position of a text mark. */
   private int ms = -1;
-  /** End of a text mark. */
+  /** End position of a text mark. */
   private int me = -1;
-  /** Start of an error mark. */
+  /** Start position of an error highlighting. */
   private int es = -1;
 
   /**
@@ -163,6 +163,14 @@ public final class BaseXTextTokens {
     final int c = curr();
     if(ps < text.length) ps += cl(text, ps);
     return c;
+  }
+
+  /**
+   * Moves the given number of bytes forward.
+   * @param b bytes
+   */
+  void forward(final int b) {
+    ps += b;
   }
 
   /**
@@ -463,7 +471,7 @@ public final class BaseXTextTokens {
   }
 
   /**
-   * Tests if the current position is marked.
+   * Tests if the current text position is marked.
    * @return result of check
    */
   boolean markStart() {

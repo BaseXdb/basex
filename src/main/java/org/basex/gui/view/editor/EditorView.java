@@ -338,16 +338,18 @@ public final class EditorView extends View {
         tabs.setSelectedComponent(edit);
         // check if file in memory was modified, and save it if necessary
         if(!confirm(edit)) return edit;
+
+        edit.setText(file.read());
       } else {
         // get current editor
         edit = getEditor();
         // create new tab if current text is stored on disk or has been modified
         if(edit.opened() || edit.modified) edit = addTab();
         edit.file(file);
+        edit.initText(file.read());
       }
 
-      // set new text, update file history and refresh the file modification
-      edit.setText(file.read());
+      // update file history and refresh the file modification
       gui.gprop.recent(file);
       refresh(true);
       edit.release(Action.PARSE);
@@ -621,7 +623,7 @@ public final class EditorView extends View {
    * @return {@code false} if confirmation was canceled
    */
   private boolean confirm(final EditorArea edit) {
-    if(edit.modified) {
+    if(edit.modified && (edit.opened() || edit.getText().length != 0)) {
       final Boolean ok = BaseXDialog.yesNoCancel(gui,
           Util.info(CLOSE_FILE_X, edit.file().name()));
       if(ok == null || ok && !save()) return false;
