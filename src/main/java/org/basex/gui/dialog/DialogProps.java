@@ -87,8 +87,7 @@ public final class DialogProps extends BaseXDialog {
     for(int i = 0; i < LABELS.length; ++i) {
       labels[i] = new BaseXLabel(LABELS[i]).large();
       panels[i] = new BaseXBack(new BorderLayout(0, 4));
-      infos[i] = new BaseXEditor(false, this);
-      infos[i].setText(Token.token(PLEASE_WAIT_D));
+      infos[i] = new BaseXEditor(false, this, Token.token(PLEASE_WAIT_D));
       BaseXLayout.setHeight(infos[i], 200);
       if(i != 1) {
         indxs[i] = new BaseXButton(" ", this);
@@ -213,8 +212,7 @@ public final class DialogProps extends BaseXDialog {
    * @return text box
    */
   private BaseXEditor text(final byte[] txt) {
-    final BaseXEditor text = new BaseXEditor(false, this);
-    text.setText(txt);
+    final BaseXEditor text = new BaseXEditor(false, this, txt);
     BaseXLayout.setHeight(text, 200);
     return text;
   }

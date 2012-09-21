@@ -46,6 +46,15 @@ public final class BaseXTextTokens {
   }
 
   /**
+   * Sets a new text.
+   * @param t new text
+   */
+  void text(final byte[] t) {
+    text = t;
+    noMark();
+  }
+
+  /**
    * Checks if the text contains more words.
    * @return result of check
    */
@@ -76,11 +85,22 @@ public final class BaseXTextTokens {
   }
 
   /**
-   * Returns the length of the current word.
-   * @return length
+   * Returns true if the search string is found.
+   * @param search search string to be found
+   * @return result of check
    */
-  int length() {
-    return pe - ps;
+  boolean found(final byte[] search) {
+    if(search.length == 0) return false;
+
+    final int sl = search.length, wl = pe - ps;
+    if(wl < sl) return false;
+
+    // exact search (faster)
+    final int p = pos();
+    int s = 0;
+    while(s < sl && Token.lc(next()) == Token.cp(search, s)) s += Token.cl(search, s);
+    pos(p);
+    return s == sl;
   }
 
   /**

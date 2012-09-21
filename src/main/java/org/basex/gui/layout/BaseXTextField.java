@@ -4,12 +4,12 @@ import static org.basex.gui.layout.BaseXKeys.*;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.*;
 
 import javax.swing.*;
 
 import org.basex.gui.*;
 import org.basex.gui.layout.BaseXLayout.DropHandler;
+import org.basex.util.*;
 
 /**
  * Project specific text field implementation.
@@ -70,7 +70,7 @@ public class BaseXTextField extends JTextField {
       public void focusGained(final FocusEvent e) {
         if(area != null) {
           selectAll();
-          find(getText().trim());
+          find();
         }
       }
     });
@@ -97,7 +97,7 @@ public class BaseXTextField extends JTextField {
 
       @Override
       public void keyReleased(final KeyEvent e) {
-        if(area != null) updateKeyword(true);
+        if(area != null) updateSearch(true);
       }
     });
     if(dialog != null) addKeyListener(dialog.keys);
@@ -107,29 +107,26 @@ public class BaseXTextField extends JTextField {
       @Override
       public void drop(final Object object) {
         setText(object.toString());
-        updateKeyword(true);
+        updateSearch(true);
         if(dialog != null) dialog.action(BaseXTextField.this);
       }
     });
   }
 
   /**
-   * Searches the current keyword if an editor is attached.
+   * Assigns the current input to an attached editor.
    * @param search automatically search keyword
    */
-  void updateKeyword(final boolean search) {
-    if(area == null) return;
-    final String text = getText().trim().toLowerCase(Locale.ENGLISH);
-    final String old = area.keyword(text);
-    if(search && !text.equals(old)) find(text);
+  void updateSearch(final boolean search) {
+    if(area != null && area.setSearch(Token.token(getText())) && search) find();
   }
 
   /**
    * Finds the specified keyword in the attached editor.
-   * @param t current text
    */
-  void find(final String t) {
-    setBackground(area.find() || t.isEmpty() ? GUIConstants.WHITE : GUIConstants.LRED);
+  void find() {
+    setBackground(area.find() || getText().isEmpty() ?
+      GUIConstants.WHITE : GUIConstants.LRED);
   }
 
   /**
@@ -138,7 +135,7 @@ public class BaseXTextField extends JTextField {
    */
   public final void setSearch(final BaseXEditor a) {
     area = a;
-    updateKeyword(false);
+    updateSearch(false);
     BaseXLayout.setWidth(this, 100);
   }
 

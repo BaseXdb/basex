@@ -98,6 +98,8 @@ public final class GUIProp extends AProp {
   public static final Object[] FONTSLOC = { "FONTSLOC", new int[] { 10, 530 } };
   /** Dialog location. */
   public static final Object[] COLORSLOC = { "COLORSLOC", new int[] { 530, 620 } };
+  /** Dialog location. */
+  public static final Object[] REPLACELOC = { "REPLACELOC", new int[] { 530, 230 } };
 
   /** Flag for Java look and feel. */
   public static final Object[] JAVALOOK = { "JAVALOOK", false };
@@ -166,6 +168,18 @@ public final class GUIProp extends AProp {
   public static final Object[] MAXHITS = { "MAXHITS", 250000 };
 
   /** Comment: written to property file. */
+  public static final Object[] C_SEARCH = { "Search" };
+
+  /** Search text. */
+  public static final Object[] SR_SEARCH = { "SR_SEARCH", "" };
+  /** Replace text. */
+  public static final Object[] SR_REPLACE = { "SR_REPLACE", "" };
+  /** Regular expressions. */
+  public static final Object[] SR_REGEX = { "SR_REGEX", false };
+  /** Match case. */
+  public static final Object[] SR_CASE = { "SR_CASE", false };
+
+  /** Comment: written to property file. */
   public static final Object[] C_HISTORY = { "History" };
 
   /** Last command inputs. */
@@ -174,6 +188,7 @@ public final class GUIProp extends AProp {
   public static final Object[] SEARCH = { "SEARCH", new String[0] };
   /** Last XQuery inputs. */
   public static final Object[] XQUERY = { "XQUERY", new String[0] };
+
 
   /**
    * Constructor.

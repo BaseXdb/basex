@@ -40,9 +40,8 @@ public final class DialogMessage extends BaseXDialog {
     b.setIcon(ic.large);
     back.add(b);
 
-    final BaseXEditor text = new BaseXEditor(false, this);
+    final BaseXEditor text = new BaseXEditor(false, this, Token.token(txt));
     text.setFont(b.getFont());
-    text.setText(Token.token(txt));
     back.add(text);
 
     set(back, BorderLayout.NORTH);

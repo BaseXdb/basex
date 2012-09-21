@@ -758,6 +758,21 @@ public interface Text {
   /** "Path". */
   String PATH = lang("path");
 
+  /** Command info. */
+  String REPLACE = lang("replace");
+  /** "Replace Text". */
+  String REPLACE_TEXT = lang("replace_text");
+  /** Command info. */
+  String REPLACE_WITH = lang("replace_with");
+  /** "Match case". */
+  String MATCH_CASE = lang("match_case");
+  /** "Regular expression". */
+  String REGULAR_EXPR = lang("regular_expr");
+  /** "Strings were successfully replaced.". */
+  String STRINGS_REPLACED = lang("strings_replaced");
+  /** "% string(s) were replaced.". */
+  String STRINGS_REPLACED_X = lang("strings_replaced_%");
+
   /** Info on whitespace chopping. */
   String WS_CHOPPING = lang("ws_chopping");
   /** Info on text indexing. */
@@ -1340,6 +1355,8 @@ public interface Text {
   String H_NEW_FILE = lang("h_new_file");
   /** Command info. */
   String H_OPEN_FILE = lang("h_open_file");
+  /** Command info. */
+  String H_REPLACE = lang("h_replace");
   /** Help string. */
   String H_CLOSE_FILE = lang("h_close_file");
   /** Command info. */

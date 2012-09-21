@@ -13,7 +13,7 @@ import javax.swing.*;
  */
 public final class BaseXCheckBox extends JCheckBox {
   /**
-   * Default constructor.
+   * Checkbox.
    * @param txt checkbox text
    * @param sel initial selection state
    * @param win parent window
@@ -23,8 +23,8 @@ public final class BaseXCheckBox extends JCheckBox {
   }
 
   /**
-   * Default constructor.
-   * @param label button title
+   * Constructor.
+   * @param label checkbox text
    * @param sel initial selection state
    * @param dist distance to next component
    * @param win parent window
@@ -39,10 +39,12 @@ public final class BaseXCheckBox extends JCheckBox {
     BaseXLayout.addInteraction(this, win);
     if(!(win instanceof BaseXDialog)) return;
 
+    final BaseXDialog dialog = (BaseXDialog) win;
+    BaseXLayout.setMnemonic(this, dialog.mnem);
     addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        ((BaseXDialog) win).action(e.getSource());
+        dialog.action(e.getSource());
       }
     });
   }

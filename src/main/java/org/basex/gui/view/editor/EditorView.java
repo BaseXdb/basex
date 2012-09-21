@@ -17,6 +17,7 @@ import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.GUIConstants.Msg;
+import org.basex.gui.dialog.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXEditor.Action;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
@@ -147,10 +148,8 @@ public final class EditorView extends View {
       public void actionPerformed(final ActionEvent e) {
         final JPopupMenu pop = new JPopupMenu();
         final StringBuilder mnem = new StringBuilder();
-        final JMenuItem sa =
-          GUIMenu.newItem(GUICommands.C_EDITSAVE, gui, mnem);
-        final JMenuItem sas =
-          GUIMenu.newItem(GUICommands.C_EDITSAVEAS, gui, mnem);
+        final JMenuItem sa = GUIMenu.newItem(GUICommands.C_EDITSAVE, gui, mnem);
+        final JMenuItem sas = GUIMenu.newItem(GUICommands.C_EDITSAVEAS, gui, mnem);
         GUICommands.C_EDITSAVE.refresh(gui, sa);
         GUICommands.C_EDITSAVEAS.refresh(gui, sas);
         pop.add(sa);
@@ -316,6 +315,23 @@ public final class EditorView extends View {
   }
 
   /**
+   * Searches and replaces texts.
+   */
+  public void replace() {
+    final DialogReplace dr = new DialogReplace(gui);
+    if(!dr.ok()) return;
+    try {
+      final EditorArea edit = getEditor();
+      final int nr = edit.replace(dr.search.getText(),
+          dr.replace.getText(), dr.regex.isSelected(), dr.casee.isSelected());
+      gui.status.setText(nr >= 0 ? Util.info(STRINGS_REPLACED_X,  nr) : STRINGS_REPLACED);
+      edit.release(Action.PARSE);
+    } catch(final Exception ex) {
+      BaseXDialog.error(gui, ERROR_C + ex.getMessage());
+    }
+  }
+
+  /**
    * Creates a new file.
    */
   public void newFile() {
@@ -338,7 +354,6 @@ public final class EditorView extends View {
         tabs.setSelectedComponent(edit);
         // check if file in memory was modified, and save it if necessary
         if(!confirm(edit)) return edit;
-
         edit.setText(file.read());
       } else {
         // get current editor

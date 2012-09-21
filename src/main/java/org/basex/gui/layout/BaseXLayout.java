@@ -15,6 +15,7 @@ import java.util.List;
 
 import javax.swing.*;
 
+import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.util.*;
 
@@ -98,6 +99,27 @@ public final class BaseXLayout {
         comp.requestFocusInWindow();
       }
     });
+  }
+
+  /**
+   * Sets a mnemomic for the specified button.
+   * @param b button
+   * @param mnem mnemonics that have already been assigned
+   */
+  public static void setMnemonic(final AbstractButton b, final StringBuilder mnem) {
+    // do not set mnemonics for Mac! Alt+key used for special characters.
+    if(Prop.MAC) return;
+
+    // find and assign unused mnemomic
+    final String label = b.getText();
+    for(int l = 0; l < label.length(); l++) {
+      final char ch = Character.toLowerCase(label.charAt(l));
+      if(!Token.letter(ch) || mnem.indexOf(Character.toString(ch)) != -1)
+        continue;
+      b.setMnemonic(ch);
+      mnem.append(ch);
+      break;
+    }
   }
 
   /**

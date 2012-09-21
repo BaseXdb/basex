@@ -46,7 +46,7 @@ public final class GUIMenu extends JMenuBar {
     final StringBuilder gmnem = new StringBuilder();
     for(int b = 0; b < MENUBAR.length; ++b) {
       final JMenu menu = new JMenu(MENUBAR[b]);
-      BaseXButton.setMnemonic(menu, gmnem);
+      BaseXLayout.setMnemonic(menu, gmnem);
 
       // create menu point for each sub menu entry
       final StringBuilder mnem = new StringBuilder();
@@ -90,7 +90,7 @@ public final class GUIMenu extends JMenuBar {
         cmd.execute(gui);
       }
     });
-    BaseXButton.setMnemonic(item, mnem);
+    BaseXLayout.setMnemonic(item, mnem);
     item.setToolTipText(cmd.help());
     return item;
   }

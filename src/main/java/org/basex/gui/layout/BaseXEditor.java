@@ -8,6 +8,7 @@ import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.regex.*;
 
 import javax.swing.*;
 import javax.swing.Timer;
@@ -17,6 +18,7 @@ import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.io.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This class provides a text viewer and editor, using the
@@ -37,7 +39,7 @@ public class BaseXEditor extends BaseXPanel {
   };
 
   /** Text array to be written. */
-  protected transient BaseXTextTokens text = new BaseXTextTokens(EMPTY);
+  protected final transient BaseXTextTokens text = new BaseXTextTokens(EMPTY);
   /** Undo history. */
   public transient History hist;
   /** Renderer reference. */
@@ -59,6 +61,16 @@ public class BaseXEditor extends BaseXPanel {
    * @param win parent window
    */
   public BaseXEditor(final boolean edit, final Window win) {
+    this(edit, win, EMPTY);
+  }
+
+  /**
+   * Default constructor.
+   * @param edit editable flag
+   * @param win parent window
+   * @param txt initial text
+   */
+  public BaseXEditor(final boolean edit, final Window win, final byte[] txt) {
     super(win);
     setFocusable(true);
     setFocusTraversalKeysEnabled(!edit);
@@ -89,7 +101,9 @@ public class BaseXEditor extends BaseXPanel {
     add(rend, BorderLayout.CENTER);
     add(scroll, BorderLayout.EAST);
 
-    hist = new History(edit ? EMPTY : null);
+    setText(txt);
+    hist = new History(edit ? txt : null);
+
     if(edit) {
       setBackground(Color.white);
       setBorder(new MatteBorder(1, 1, 0, 0, GUIConstants.color(6)));
@@ -107,7 +121,7 @@ public class BaseXEditor extends BaseXPanel {
    * Initializes the text.
    * @param t text to be set
    */
-  public void initText(final byte[] t) {
+  public final void initText(final byte[] t) {
     setText(t);
     hist = new History(t);
   }
@@ -118,6 +132,52 @@ public class BaseXEditor extends BaseXPanel {
    */
   public void setText(final byte[] t) {
     setText(t, t.length);
+  }
+
+  /**
+   * Searches and replaces text.
+   * @param search text to be found
+   * @param replace text to be replaced
+   * @param regex regular expression
+   * @param casee match case
+   * @return number of replacements
+   */
+  public final int replace(final String search, final String replace,
+      final boolean regex, final boolean casee) {
+
+    if(regex) {
+      final Pattern p = Pattern.compile(search, casee ? 0 : Pattern.CASE_INSENSITIVE);
+      final String rplc = p.matcher(Token.string(text.text())).replaceAll(replace);
+      setText(Token.token(rplc));
+      return -1;
+    }
+
+    int c = 0;
+    final byte[] srch = casee ? Token.token(search) : Token.lc(Token.token(search));
+    final byte[] rplc = Token.token(replace);
+    final ByteList bl = new ByteList();
+    final byte[] old = text.text();
+    final int ss = srch.length, os = old.length;
+    for(int o = 0; o < os;) {
+      int s = 0;
+      if(o + ss <= os) {
+        if(casee) {
+          for(; s < ss && old[o + s] == srch[s]; s++);
+        } else {
+          for(; s < ss && Token.lc(Token.cp(old, o + s)) == Token.cp(srch, s);
+              s += Token.cl(srch, s));
+        }
+      }
+      if(s == ss) {
+        bl.add(rplc);
+        o += s;
+        c++;
+      } else {
+        bl.add(old[o++]);
+      }
+    }
+    setText(bl.toArray());
+    return c;
   }
 
   /**
@@ -147,17 +207,17 @@ public class BaseXEditor extends BaseXPanel {
   }
 
   /**
-   * Sets a new keyword.
-   * @param key new keyword
-   * @return old keyword
+   * Sets a new search string.
+   * @param in new input
+   * @return {@code true} if input has changed
    */
-  String keyword(final String key) {
-    return rend.keyword(key);
+  final boolean setSearch(final byte[] in) {
+    return rend.setSearch(in);
   }
 
   /**
-   * Finds the current keyword.
-   * @return {@code true} if the keyword was found
+   * Finds the current search string.
+   * @return {@code true} if the search string was found
    */
   final boolean find() {
     final int y = rend.find(true, false);
@@ -170,12 +230,11 @@ public class BaseXEditor extends BaseXPanel {
    * @param y vertical position
    */
   final void scroll(final int y) {
-    if(y == -1) return;
     // updates the visible area
     final int h = getHeight();
     final int p = scroll.pos();
     final int m = y + rend.fontH() * 3 - h;
-    if(p < m || p > y) scroll.pos(y - h / 2);
+    if(y != -1 && (p < m || p > y)) scroll.pos(y - h / 2);
     repaint();
   }
 
@@ -201,11 +260,11 @@ public class BaseXEditor extends BaseXPanel {
 
     // new text is different...
     if(!eq) {
-      text = new BaseXTextTokens(Arrays.copyOf(t, ns));
-      rend.setText(text);
+      text.text(Arrays.copyOf(t, ns));
+      text.setCursor(0);
       scroll.pos(0);
     }
-    hist.store(t.length != ns ? Arrays.copyOf(t, ns) : t, pc, 0);
+    if(hist != null) hist.store(t.length != ns ? Arrays.copyOf(t, ns) : t, pc, 0);
     SwingUtilities.invokeLater(calc);
   }
 
@@ -491,16 +550,14 @@ public class BaseXEditor extends BaseXPanel {
       } else if(UNDOSTEP.is(e)) {
         final byte[] t = hist.prev();
         if(t != null) {
-          text = new BaseXTextTokens(t);
+          text.text(t);
           text.pos(hist.cursor());
-          rend.setText(text);
         }
       } else if(REDOSTEP.is(e)) {
         final byte[] t = hist.next();
         if(t != null) {
-          text = new BaseXTextTokens(t);
+          text.text(t);
           text.pos(hist.cursor());
-          rend.setText(text);
         }
       } else if(COMMENT.is(e)) {
         text.comment(rend.getSyntax());
@@ -786,9 +843,8 @@ public class BaseXEditor extends BaseXPanel {
       if(!hist.active()) return;
       final byte[] t = hist.prev();
       if(t == null) return;
-      text = new BaseXTextTokens(t);
+      text.text(t);
       text.pos(hist.cursor());
-      rend.setText(text);
       finish(-1);
     }
     @Override
@@ -808,9 +864,8 @@ public class BaseXEditor extends BaseXPanel {
       if(!hist.active()) return;
       final byte[] t = hist.next();
       if(t == null) return;
-      text = new BaseXTextTokens(t);
+      text.text(t);
       text.pos(hist.cursor());
-      rend.setText(text);
       finish(-1);
     }
     @Override

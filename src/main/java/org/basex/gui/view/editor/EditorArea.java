@@ -58,7 +58,6 @@ final class EditorArea extends BaseXEditor {
     file = f;
     label = new BaseXLabel(f.name());
     setSyntax(f, false);
-    initText(EMPTY);
 
     addFocusListener(new FocusAdapter() {
       @Override
