@@ -766,10 +766,10 @@ public interface Text {
   String REPLACE_WITH = lang("replace_with");
   /** "Match case". */
   String MATCH_CASE = lang("match_case");
+  /** "Multi-line mode". */
+  String MULTI_LINE = lang("multi_line");
   /** "Regular expression". */
   String REGULAR_EXPR = lang("regular_expr");
-  /** "Strings were successfully replaced.". */
-  String STRINGS_REPLACED = lang("strings_replaced");
   /** "% string(s) were replaced.". */
   String STRINGS_REPLACED_X = lang("strings_replaced_%");
 

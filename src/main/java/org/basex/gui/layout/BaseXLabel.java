@@ -70,10 +70,12 @@ public class BaseXLabel extends JLabel {
    * If the text is {@code null}, no text and icon is shown.
    * @param text warning text
    * @param icon flag for displaying a warning or error icon
+   * @return self reference
    */
-  public void setText(final String text, final Msg icon) {
+  public BaseXLabel setText(final String text, final Msg icon) {
     setIcon(text == null ? null : icon.small);
     setText(text == null ? " " : text);
+    return this;
   }
 
   /**

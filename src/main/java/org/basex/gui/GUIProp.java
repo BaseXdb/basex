@@ -178,6 +178,8 @@ public final class GUIProp extends AProp {
   public static final Object[] SR_REGEX = { "SR_REGEX", false };
   /** Match case. */
   public static final Object[] SR_CASE = { "SR_CASE", false };
+  /** Multi-line mode. */
+  public static final Object[] SR_MULTI = { "SR_MULTI", false };
 
   /** Comment: written to property file. */
   public static final Object[] C_HISTORY = { "History" };

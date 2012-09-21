@@ -111,8 +111,7 @@ public final class EditorView extends View {
     /* Scroll Pane. */
     final BaseXBack south = new BaseXBack(Fill.NONE).layout(
         new BorderLayout(8, 0));
-    info = new BaseXLabel(" ");
-    info.setText(OK, Msg.SUCCESS);
+    info = new BaseXLabel().setText(OK, Msg.SUCCESS);
     pos = new BaseXLabel(" ");
 
     sp = new BaseXBack(Fill.NONE).layout(new BorderLayout(8, 0));
@@ -322,9 +321,9 @@ public final class EditorView extends View {
     if(!dr.ok()) return;
     try {
       final EditorArea edit = getEditor();
-      final int nr = edit.replace(dr.search.getText(),
-          dr.replace.getText(), dr.regex.isSelected(), dr.casee.isSelected());
-      gui.status.setText(nr >= 0 ? Util.info(STRINGS_REPLACED_X,  nr) : STRINGS_REPLACED);
+      final int nr = edit.replace(dr.search.getText(), dr.replace.getText(),
+          dr.regex.isSelected(), dr.casee.isSelected(), dr.multi.isSelected());
+      gui.status.setText(Util.info(STRINGS_REPLACED_X,  nr));
       edit.release(Action.PARSE);
     } catch(final Exception ex) {
       BaseXDialog.error(gui, ERROR_C + ex.getMessage());
@@ -418,8 +417,7 @@ public final class EditorView extends View {
       public void run() {
         Performance.sleep(200);
         if(thread == threadID) {
-          info.setToolTipText(null);
-          info.setText(PLEASE_WAIT_D, Msg.SUCCESS);
+          info.setText(PLEASE_WAIT_D, Msg.SUCCESS).setToolTipText(null);
           stop.setEnabled(true);
         }
       }
@@ -439,8 +437,7 @@ public final class EditorView extends View {
         GUIConstants.CURSORHAND : GUIConstants.CURSORARROW);
     final String m = msg.replaceAll("^.*\\r?\\n\\[.*?\\]", "").
         replaceAll(".*" + LINE_X.replaceAll("%", ".*?") + COL, "");
-    info.setText(m, ok ? Msg.SUCCESS : Msg.ERROR);
-    info.setToolTipText(ok ? null : msg);
+    info.setText(m, ok ? Msg.SUCCESS : Msg.ERROR).setToolTipText(ok ? null : msg);
     stop.setEnabled(false);
     refreshMark();
   }

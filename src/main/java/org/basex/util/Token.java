@@ -112,9 +112,7 @@ public final class Token {
    * @param length length
    * @return string
    */
-  public static String string(final byte[] token, final int start,
-      final int length) {
-
+  public static String string(final byte[] token, final int start, final int length) {
     if(length <= 0) return "";
     final char[] str = new char[length];
     for(int i = 0; i < length; ++i) {

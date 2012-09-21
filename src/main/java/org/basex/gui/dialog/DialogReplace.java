@@ -25,6 +25,8 @@ public final class DialogReplace extends BaseXDialog {
   public final BaseXCheckBox regex;
   /** Case sensitivity. */
   public final BaseXCheckBox casee;
+  /** Multi-line mode. */
+  public final BaseXCheckBox multi;
 
   /** User feedback. */
   private final BaseXLabel info;
@@ -45,19 +47,21 @@ public final class DialogReplace extends BaseXDialog {
     replace = new BaseXTextField(gprop.get(GUIProp.SR_REPLACE), this);
     regex = new BaseXCheckBox(REGULAR_EXPR, gprop.is(GUIProp.SR_REGEX), this);
     casee = new BaseXCheckBox(MATCH_CASE, gprop.is(GUIProp.SR_CASE), this);
-    info = new BaseXLabel(" ").border(8, 0, 16, 0);
+    multi = new BaseXCheckBox(MULTI_LINE, gprop.is(GUIProp.SR_MULTI), this);
+    info = new BaseXLabel().border(8, 0, 8, 0).setText(" ", Msg.ERROR);
 
-    BaseXBack p = new BaseXBack(new TableLayout(5, 1, 8, 2));
+    BaseXBack p = new BaseXBack(new TableLayout(6, 1, 8, 2));
     p.add(new BaseXLabel(SEARCH + COLS, false, true));
     p.add(search);
     p.add(new BaseXLabel(REPLACE_WITH + COLS, false, true).border(8, 0, 0, 0));
     p.add(replace);
     p.add(info);
+    p.add(casee);
     set(p, BorderLayout.CENTER);
 
-    final BaseXBack options = new BaseXBack(new TableLayout(2, 1));
+    final BaseXBack options = new BaseXBack(new TableLayout(3, 1));
     options.add(regex);
-    options.add(casee);
+    options.add(multi);
 
     p = new BaseXBack(new BorderLayout());
     p.add(options, BorderLayout.WEST);
@@ -77,6 +81,8 @@ public final class DialogReplace extends BaseXDialog {
     gprop.set(GUIProp.SR_REPLACE, rt);
     gprop.set(GUIProp.SR_REGEX, re);
     gprop.set(GUIProp.SR_CASE, casee.isSelected());
+    gprop.set(GUIProp.SR_MULTI, multi.isSelected());
+    multi.setEnabled(re);
     ok = !st.isEmpty();
 
     String inf = null;

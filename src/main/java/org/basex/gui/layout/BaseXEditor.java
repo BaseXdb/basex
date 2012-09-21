@@ -140,43 +140,62 @@ public class BaseXEditor extends BaseXPanel {
    * @param replace text to be replaced
    * @param regex regular expression
    * @param casee match case
+   * @param multi multi-line mode
    * @return number of replacements
    */
   public final int replace(final String search, final String replace,
-      final boolean regex, final boolean casee) {
-
-    if(regex) {
-      final Pattern p = Pattern.compile(search, casee ? 0 : Pattern.CASE_INSENSITIVE);
-      final String rplc = p.matcher(Token.string(text.text())).replaceAll(replace);
-      setText(Token.token(rplc));
-      return -1;
-    }
+      final boolean regex, final boolean casee, final boolean multi) {
 
     int c = 0;
-    final byte[] srch = casee ? Token.token(search) : Token.lc(Token.token(search));
-    final byte[] rplc = Token.token(replace);
-    final ByteList bl = new ByteList();
-    final byte[] old = text.text();
-    final int ss = srch.length, os = old.length;
-    for(int o = 0; o < os;) {
-      int s = 0;
-      if(o + ss <= os) {
-        if(casee) {
-          for(; s < ss && old[o + s] == srch[s]; s++);
-        } else {
-          for(; s < ss && Token.lc(Token.cp(old, o + s)) == Token.cp(srch, s);
-              s += Token.cl(srch, s));
-        }
-      }
-      if(s == ss) {
-        bl.add(rplc);
-        o += s;
+    byte[] txt = null;
+    if(regex) {
+      int flags = Pattern.DOTALL;
+      if(!casee) flags |= Pattern.CASE_INSENSITIVE;
+      final Pattern p = Pattern.compile(search, flags);
+      if(multi) {
+        txt = Token.token(p.matcher(Token.string(text.text())).replaceAll(replace));
         c++;
       } else {
-        bl.add(old[o++]);
+        final TokenBuilder tb = new TokenBuilder();
+        final byte[] old = text.text();
+        final int os = old.length;
+        int s = 0, o = 0;
+        for(; o <= os; o++) {
+          if(o == os ? o != s : old[o] == '\n') {
+            tb.add(p.matcher(Token.string(old, s, o - s)).replaceAll(replace)).add('\n');
+            c++;
+            s = o + 1;
+          }
+        }
+        txt = tb.finish();
       }
+    } else {
+      final byte[] srch = casee ? Token.token(search) : Token.lc(Token.token(search));
+      final byte[] rplc = Token.token(replace);
+      final ByteList bl = new ByteList();
+      final byte[] old = text.text();
+      final int ss = srch.length, os = old.length;
+      for(int o = 0; o < os;) {
+        int s = 0;
+        if(o + ss <= os) {
+          if(casee) {
+            for(; s < ss && old[o + s] == srch[s]; s++);
+          } else {
+            for(; s < ss && Token.lc(Token.cp(old, o + s)) == Token.cp(srch, s);
+                s += Token.cl(srch, s));
+          }
+        }
+        if(s == ss) {
+          bl.add(rplc);
+          o += s;
+          c++;
+        } else {
+          bl.add(old[o++]);
+        }
+      }
+      if(c != 0) txt = bl.toArray();
     }
-    setText(bl.toArray());
+    if(txt != null) setText(txt);
     return c;
   }
 
