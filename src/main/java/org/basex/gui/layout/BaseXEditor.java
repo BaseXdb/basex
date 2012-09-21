@@ -102,7 +102,7 @@ public class BaseXEditor extends BaseXPanel {
     add(scroll, BorderLayout.EAST);
 
     setText(txt);
-    hist = new History(edit ? txt : null);
+    hist = new History(edit ? text.text() : null);
 
     if(edit) {
       setBackground(Color.white);
@@ -123,7 +123,7 @@ public class BaseXEditor extends BaseXPanel {
    */
   public final void initText(final byte[] t) {
     setText(t);
-    hist = new History(t);
+    hist = new History(text.text());
   }
 
   /**
@@ -156,9 +156,9 @@ public class BaseXEditor extends BaseXPanel {
         txt = Token.token(p.matcher(Token.string(text.text())).replaceAll(replace));
         c++;
       } else {
-        final TokenBuilder tb = new TokenBuilder();
         final byte[] old = text.text();
         final int os = old.length;
+        final TokenBuilder tb = new TokenBuilder(os);
         int s = 0, o = 0;
         for(; o <= os; o++) {
           if(o == os ? o != s : old[o] == '\n') {
