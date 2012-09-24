@@ -116,7 +116,9 @@ public final class EditorText {
    */
   void search(final SearchContext sc) {
     if(sc.equals(search)) {
-      sc.nr = search.nr;
+      // adopt results if search criteria have not changed
+      sc.start = search.start;
+      sc.end = search.end;
     } else {
       sc.search(text);
       search = sc;

@@ -297,10 +297,11 @@ public class Editor extends BaseXPanel {
     try {
       rend.search(sc);
       gui.status.setText(sc.search.isEmpty() ? OK :
-        Util.info(Util.info(STRINGS_FOUND_X,  sc.nr)));
+        Util.info(Util.info(STRINGS_FOUND_X,  sc.nr())));
       jump(SearchDir.SAME);
     } catch(final Exception ex) {
-      gui.status.setText(ERROR_C + ex.getMessage().replaceAll(Prop.NL + ".*", ""));
+      final String msg = ex.getMessage().replaceAll(Prop.NL + ".*", "");
+      gui.status.setError(REGULAR_EXPR + COLS + msg);
     }
   }
 
@@ -315,9 +316,10 @@ public class Editor extends BaseXPanel {
         setText(rc.text);
         release(Action.CHECK);
       }
-      gui.status.setText(Util.info(STRINGS_REPLACED_X,  rc.search.nr));
+      gui.status.setText(Util.info(STRINGS_REPLACED_X,  rc.nr()));
     } catch(final Exception ex) {
-      gui.status.setText(ERROR_C + ex.getMessage().replaceAll(Prop.NL + ".*", ""));
+      final String msg = ex.getMessage().replaceAll(Prop.NL + ".*", "");
+      gui.status.setError(REGULAR_EXPR + COLS + msg);
     }
   }
 

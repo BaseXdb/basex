@@ -49,12 +49,12 @@ public final class IntSeq extends NativeSeq {
         return t1;
       case SHR:
       case UBY:
-        short[] t2 = new short[(int) size];
+        final short[] t2 = new short[(int) size];
         for(int s = 0; s < size; s++) t2[s] = (short) values[s];
         return t2;
       case INT:
       case USH:
-        short[] t3 = new short[(int) size];
+        final short[] t3 = new short[(int) size];
         for(int s = 0; s < size; s++) t3[s] = (short) values[s];
         return t3;
       default:

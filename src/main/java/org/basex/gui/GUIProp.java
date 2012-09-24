@@ -180,6 +180,10 @@ public final class GUIProp extends AProp {
   public static final Object[] SR_CASE = { "SR_CASE", false };
   /** Multi-line mode. */
   public static final Object[] SR_MULTI = { "SR_MULTI", false };
+  /** Last searched strings. */
+  public static final Object[] SEARCHED = { "SEARCHED", new String[0] };
+  /** Last replaced strings. */
+  public static final Object[] REPLACED = { "REPLACED", new String[0] };
 
   /** Comment: written to property file. */
   public static final Object[] C_HISTORY = { "History" };
@@ -217,7 +221,7 @@ public final class GUIProp extends AProp {
       sl.add(path);
     }
     final String[] qu = strings(EDITOR);
-    for(int q = 0; q < qu.length && q < 14; ++q) {
+    for(int q = 0; q < qu.length && q < 11; q++) {
       final String f = qu[q];
       if(!f.equalsIgnoreCase(path) && IO.get(f).exists()) sl.add(f);
     }

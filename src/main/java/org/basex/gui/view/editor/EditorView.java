@@ -86,7 +86,8 @@ public final class EditorView extends View implements EditorNotifier {
     final BaseXButton hist = new BaseXButton(gui, "hist", H_RECENTLY_OPEN);
     final BaseXButton srch = new BaseXButton(gui, "search", H_REPLACE);
 
-    BaseXBack buttons = new BaseXBack(Fill.NONE).layout(new TableLayout(1, 4, 1, 0));
+    final BaseXBack buttons = new BaseXBack(Fill.NONE);
+    buttons.layout(new TableLayout(1, 4, 1, 0));
     buttons.add(srch);
     buttons.add(openB);
     buttons.add(saveB);
@@ -217,7 +218,6 @@ public final class EditorView extends View implements EditorNotifier {
       public void stateChanged(final ChangeEvent e) {
         final EditorArea ea = getEditor();
         if(ea == null) return;
-        saveB.setEnabled(!ea.opened() || ea.modified);
         search.search();
         gui.refreshControls();
         pos.setText(ea.pos());
@@ -257,6 +257,7 @@ public final class EditorView extends View implements EditorNotifier {
     header.setFont(GUIConstants.lfont);
     for(final EditorArea edit : editors()) edit.setFont(GUIConstants.mfont);
     refreshMark();
+    search.refreshLayout();
   }
 
   @Override
@@ -503,7 +504,7 @@ public final class EditorView extends View implements EditorNotifier {
   void refresh(final boolean force) {
     // update modification flag
     final EditorArea edit = getEditor();
-    boolean oe = edit.modified;
+    final boolean oe = edit.modified;
     edit.modified = edit.hist != null && edit.hist.modified();
     if(edit.modified == oe && !force) return;
 

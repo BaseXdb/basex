@@ -70,7 +70,7 @@ public final class GUIInput extends BaseXTextField {
             final String[] hs = i == 0 ? gprop.strings(GUIProp.SEARCH) :
               i == 1 ? gprop.strings(GUIProp.XQUERY) :
               gprop.strings(GUIProp.COMMANDS);
-            for(int p = 0; p < hs.length && sl.size() < 10; ++p) {
+            for(int p = 0; p < hs.length && sl.size() < 11; ++p) {
               if(!hs[p].equals(txt)) sl.add(hs[p]);
             }
             gprop.set(i == 0 ? GUIProp.SEARCH : i == 1 ? GUIProp.XQUERY :

@@ -78,6 +78,8 @@ public final class SearchPanel extends BaseXBack {
     add(center, BorderLayout.CENTER);
     add(east, BorderLayout.EAST);
 
+    refreshLayout();
+
     // add interaction to search field
     search.addFocusListener(new FocusAdapter() {
       @Override
@@ -138,6 +140,16 @@ public final class SearchPanel extends BaseXBack {
         view.getEditor().replace(new ReplaceContext(replace.getText()));
       }
     });
+  }
+
+  /**
+   * Refreshes the layout.
+   */
+  public void refreshLayout() {
+    final String mf = gui.gprop.get(GUIProp.MONOFONT);
+    final Font font = new Font(mf, 0, search.getFont().getSize());
+    search.setFont(font);
+    replace.setFont(font);
   }
 
   /**

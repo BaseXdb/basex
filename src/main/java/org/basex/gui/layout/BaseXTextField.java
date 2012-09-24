@@ -9,6 +9,7 @@ import javax.swing.*;
 
 import org.basex.gui.*;
 import org.basex.gui.layout.BaseXLayout.DropHandler;
+import org.basex.util.list.*;
 
 /**
  * Project specific text field implementation.
@@ -21,6 +22,8 @@ public class BaseXTextField extends JTextField {
   public static final int DWIDTH = 350;
   /** Last input. */
   String last = "";
+  /** History pointer. */
+  int hist;
 
   /**
    * Constructor.
@@ -82,6 +85,49 @@ public class BaseXTextField extends JTextField {
         if(dialog != null) dialog.action(BaseXTextField.this);
       }
     });
+  }
+
+  /**
+   * Attaches a history.
+   * @param gprop gui properties
+   * @param option option
+   */
+  public void history(final GUIProp gprop, final Object[] option) {
+    addKeyListener(new KeyAdapter() {
+      @Override
+      public void keyPressed(final KeyEvent e) {
+        if(ENTER.is(e)) {
+          store(gprop, option);
+        } else if(NEXTLINE.is(e)) {
+          final String[] qu = gprop.strings(option);
+          if(hist < qu.length) {
+            setText(qu[++hist]);
+          }
+        } else if(PREVLINE.is(e)) {
+          final String[] qu = gprop.strings(option);
+          if(hist > 0) {
+            setText(qu[++hist]);
+          }
+        }
+      }
+    });
+  }
+
+  /**
+   * Stores the current history.
+   * @param gprop gui properties
+   * @param option option
+   */
+  void store(final GUIProp gprop, final Object[] option) {
+    final StringList sl = new StringList();
+    final String[] qu = gprop.strings(option);
+    final String input = getText();
+    sl.add(input);
+    for(int q = 0; q < qu.length && q < 11; q++) {
+      final String f = qu[q];
+      if(!f.equals(input)) sl.add(f);
+    }
+    gprop.set(option, sl.toArray());
   }
 
   @Override

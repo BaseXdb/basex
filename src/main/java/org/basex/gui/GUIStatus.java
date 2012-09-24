@@ -41,6 +41,17 @@ public final class GUIStatus extends BaseXPanel {
    */
   public void setText(final String txt) {
     label.setText(txt);
-    repaint();
+    label.setForeground(Color.BLACK);
+    //repaint();
+  }
+
+  /**
+   * Sets the status text.
+   * @param txt the text to be set
+   */
+  public void setError(final String txt) {
+    label.setText(txt);
+    label.setForeground(GUIConstants.RED);
+    //repaint();
   }
 }

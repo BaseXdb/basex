@@ -22,13 +22,10 @@ public class SearchContext {
   /** Search string. */
   final String search;
 
-  /** Number of hits. */
-  int nr;
-
   /** Start positions. */
-  final IntList start = new IntList();
+  IntList start = new IntList();
   /** End positions. */
-  final IntList end = new IntList();
+  IntList end = new IntList();
 
   /**
    * Constructor.
@@ -41,7 +38,8 @@ public class SearchContext {
     multi = panel.multi.isSelected();
     String s = mcase ? srch : srch.toLowerCase(Locale.ENGLISH);
     // speed up regular expressions starting with wildcards
-    if(regex && s.startsWith(".*")) s = "^" + s;
+    if(regex && (s.startsWith(".*") || s.startsWith("(.*") ||
+        s.startsWith(".+") || s.startsWith("(.+"))) s = "^" + s;
     search = s;
   }
 
@@ -52,7 +50,6 @@ public class SearchContext {
   void search(final byte[] txt) {
     start.reset();
     end.reset();
-    nr = 0;
 
     final byte[] text = txt;
     if(regex) {
@@ -74,7 +71,6 @@ public class SearchContext {
             c++;
           }
           end.add(p);
-          nr++;
         }
       } else {
         final int os = text.length;
@@ -95,7 +91,6 @@ public class SearchContext {
                 c++;
               }
               end.add(p);
-              nr++;
             }
             if(o < os) tb.add('\n');
             t = o + 1;
@@ -120,13 +115,20 @@ public class SearchContext {
         if(s == ss) {
           start.add(t);
           end.add(t + ss);
-          nr++;
           t += ss;
         } else {
           t++;
         }
       }
     }
+  }
+
+  /**
+   * Returns the number of results.
+   * @return number of results
+   */
+  int nr() {
+    return start.size();
   }
 
   @Override

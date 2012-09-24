@@ -122,6 +122,7 @@ public final class TextView extends View implements EditorNotifier {
   public void refreshLayout() {
     header.setFont(lfont);
     area.setFont(mfont);
+    search.refreshLayout();
   }
 
   @Override

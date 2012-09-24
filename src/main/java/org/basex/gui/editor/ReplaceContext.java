@@ -18,6 +18,8 @@ public class ReplaceContext {
   String replace;
   /** Text. */
   byte[] text;
+  /** Number of replacements. */
+  int nr;
 
   /**
    * Constructor.
@@ -69,5 +71,14 @@ public class ReplaceContext {
         text = bl.toArray();
       }
     }
+    nr = search.nr();
+  }
+
+  /**
+   * Returns the number of results.
+   * @return number of results
+   */
+  int nr() {
+    return nr;
   }
 }
