@@ -14,6 +14,7 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Msg;
+import org.basex.gui.editor.*;
 import org.basex.gui.layout.*;
 import org.basex.io.*;
 import org.basex.server.*;
@@ -72,9 +73,9 @@ public final class DialogServer extends BaseXDialog {
   /** Server port. */
   private final BaseXTextField portc;
   /** Current sessions. */
-  private final BaseXEditor sese;
+  private final Editor sese;
   /** Log text. */
-  private final BaseXEditor logt;
+  private final Editor logt;
   /** Info label. */
   private final BaseXLabel infoC;
   /** Info label. */
@@ -161,7 +162,7 @@ public final class DialogServer extends BaseXDialog {
 
     // session tab
     sess.border(8).layout(new BorderLayout());
-    sese = new BaseXEditor(false, this);
+    sese = new Editor(false, this);
     sese.setFont(start.getFont());
     refreshSess = new BaseXButton(REFRESH, this);
 
@@ -181,7 +182,7 @@ public final class DialogServer extends BaseXDialog {
     deleteAll = new BaseXButton(DELETE_ALL, this);
 
     logc = new BaseXCombo(this);
-    logt = new BaseXEditor(false, this);
+    logt = new Editor(false, this);
     logt.setFont(start.getFont());
     BaseXLayout.setHeight(logt, 100);
 

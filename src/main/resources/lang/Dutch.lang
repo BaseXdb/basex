@@ -315,6 +315,7 @@ stemming             = Stam zoeken
 stop                 = Stop
 stopped_at           = Gestopt bij
 stopword_list        = Stopword lijst
+strings_found_%      = % string(s) found.
 strings_replaced_%   = % string(s) replaced.
 strip_ns             = Strip namespaces
 syntax               = Syntax

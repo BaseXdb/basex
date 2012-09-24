@@ -316,6 +316,7 @@ stemming             = Зогсоолт
 stop                 = Зогсоох
 stopped_at           = дээр зогссон
 stopword_list        = Үгийн зогсолт бүрийн тухайн жагсаалт
+strings_found_%      = % string(s) found.
 strings_replaced_%   = % string(s) replaced.
 strip_ns             = Strip namespaces
 syntax               = Өгүүлбэрийн бүтэц

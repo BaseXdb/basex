@@ -768,6 +768,8 @@ public interface Text {
   String MULTI_LINE = lang("multi_line");
   /** "Regular expression". */
   String REGULAR_EXPR = lang("regular_expr");
+  /** "% string(s) found.". */
+  String STRINGS_FOUND_X = lang("strings_found_%");
   /** "% string(s) replaced.". */
   String STRINGS_REPLACED_X = lang("strings_replaced_%");
 

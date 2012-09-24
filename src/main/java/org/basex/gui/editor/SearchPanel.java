@@ -1,4 +1,4 @@
-package org.basex.gui.layout;
+package org.basex.gui.editor;
 
 import static org.basex.core.Text.*;
 import static org.basex.gui.layout.BaseXKeys.*;
@@ -8,9 +8,9 @@ import java.awt.event.*;
 
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
+import org.basex.gui.editor.Editor.SearchDir;
+import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXLayout.DropHandler;
-import org.basex.gui.layout.SearchContext.SearchDir;
-import org.basex.util.*;
 
 /**
  * This panel provides search and replace facilities.
@@ -18,7 +18,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class BaseXSearch extends BaseXBack {
+public final class SearchPanel extends BaseXBack {
   /** GUI reference. */
   final GUI gui;
   /** Editor view. */
@@ -44,7 +44,7 @@ public final class BaseXSearch extends BaseXBack {
    * @param ev editor view
    * @param update add replace components
    */
-  public BaseXSearch(final GUI main, final EditorNotifier ev, final boolean update) {
+  public SearchPanel(final GUI main, final EditorNotifier ev, final boolean update) {
     layout(new BorderLayout(2, 0));
     mode(Fill.NONE);
 
@@ -59,12 +59,12 @@ public final class BaseXSearch extends BaseXBack {
     multi = onOffButton("s_multi", MULTI_LINE, GUIProp.SR_MULTI);
     rplc  = new BaseXButton(main, "s_replace", REPLACE_ALL);
     close = new BaseXButton(main, "s_close", CLOSE);
-    multi.setEnabled(false);
+    multi.setEnabled(regex.isEnabled());
 
     final BaseXBack west = new BaseXBack(Fill.NONE).layout(new TableLayout(1, 3, 1, 0));
     west.add(mcase);
-    //west.add(regex);
-    //west.add(multi);
+    west.add(regex);
+    west.add(multi);
 
     final BaseXBack center = new BaseXBack(Fill.NONE).layout(new GridLayout(1, 2, 2, 0));
     center.add(search);
@@ -135,7 +135,7 @@ public final class BaseXSearch extends BaseXBack {
     rplc.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        view.getEditor().replace(Token.token(replace.getText()));
+        view.getEditor().replace(new ReplaceContext(replace.getText()));
       }
     });
   }

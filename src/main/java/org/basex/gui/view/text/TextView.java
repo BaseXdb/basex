@@ -12,6 +12,7 @@ import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
+import org.basex.gui.editor.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
 import org.basex.gui.view.*;
@@ -21,21 +22,21 @@ import org.basex.io.serial.*;
 import org.basex.util.*;
 
 /**
- * This class offers a fast text view, using the {@link BaseXEditor} class.
+ * This class offers a fast text view, using the {@link Editor} class.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class TextView extends View implements EditorNotifier {
   /** Search panel. */
-  final BaseXSearch search;
+  final SearchPanel search;
 
   /** Header string. */
   private final BaseXLabel header;
   /** Home button. */
   private final BaseXButton home;
   /** Text Area. */
-  private final BaseXEditor area;
+  private final Editor area;
   /** Center panel. */
   private final BaseXBack center;
 
@@ -73,9 +74,9 @@ public final class TextView extends View implements EditorNotifier {
     add(b, BorderLayout.NORTH);
 
     center = new BaseXBack(Fill.NONE).layout(new BorderLayout(0, 2));
-    search = new BaseXSearch(gui, this, false);
-    area = new BaseXEditor(false, gui);
-    area.setSyntax(new XMLSyntax());
+    search = new SearchPanel(gui, this, false);
+    area = new Editor(false, gui);
+    area.setSyntax(new SyntaxXML());
     area.setSearch(search);
 
     center.add(area, BorderLayout.CENTER);
@@ -144,7 +145,7 @@ public final class TextView extends View implements EditorNotifier {
   }
 
   @Override
-  public BaseXEditor getEditor() {
+  public Editor getEditor() {
     return area;
   }
 

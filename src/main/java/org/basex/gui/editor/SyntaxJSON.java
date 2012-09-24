@@ -1,4 +1,4 @@
-package org.basex.gui.layout;
+package org.basex.gui.editor;
 
 import java.awt.*;
 
@@ -10,7 +10,7 @@ import org.basex.gui.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class JSONSyntax extends BaseXSyntax {
+public final class SyntaxJSON extends Syntax {
   /** Quoted flag. */
   private boolean quoted;
 
@@ -20,7 +20,7 @@ public final class JSONSyntax extends BaseXSyntax {
   }
 
   @Override
-  public Color getColor(final BaseXTextTokens text) {
+  public Color getColor(final EditorText text) {
     final int ch = text.curr();
     final boolean quote = text.curr() == '"';
     Color color = quoted || quote ? GUIConstants.BLUE : Color.black;

@@ -1,4 +1,4 @@
-package org.basex.gui.layout;
+package org.basex.gui.editor;
 
 import static org.basex.core.Text.*;
 import static org.basex.gui.layout.BaseXKeys.*;
@@ -8,7 +8,6 @@ import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.util.*;
-import java.util.regex.*;
 
 import javax.swing.*;
 import javax.swing.Timer;
@@ -17,19 +16,28 @@ import javax.swing.border.*;
 import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
-import org.basex.gui.layout.SearchContext.*;
+import org.basex.gui.layout.*;
 import org.basex.io.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * This class provides a text viewer and editor, using the
- * {@link BaseXTextRenderer} class to render the text.
+ * {@link Renderer} class to render the text.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public class BaseXEditor extends BaseXPanel {
+public class Editor extends BaseXPanel {
+  /** Search direction. */
+  public enum SearchDir {
+    /** Same position. */
+    SAME,
+    /** Forward. */
+    FORWARD,
+    /** Backward. */
+    BACKWARD
+  }
+
   /** Editor action. */
   public enum Action {
     /** Check for changes; do nothing if input has not changed. */
@@ -41,11 +49,11 @@ public class BaseXEditor extends BaseXPanel {
   };
 
   /** Text array to be written. */
-  protected final transient BaseXTextTokens text = new BaseXTextTokens(EMPTY);
+  protected final transient EditorText text = new EditorText(EMPTY);
   /** Undo history. */
   public transient History hist;
   /** Renderer reference. */
-  final BaseXTextRenderer rend;
+  final Renderer rend;
   /** Scrollbar reference. */
   final BaseXBar scroll;
 
@@ -55,14 +63,14 @@ public class BaseXEditor extends BaseXPanel {
   int threadID;
 
   /** Search field. */
-  private BaseXSearch search;
+  private SearchPanel search;
 
   /**
    * Default constructor.
    * @param edit editable flag
    * @param win parent window
    */
-  public BaseXEditor(final boolean edit, final Window win) {
+  public Editor(final boolean edit, final Window win) {
     this(edit, win, EMPTY);
   }
 
@@ -72,7 +80,7 @@ public class BaseXEditor extends BaseXPanel {
    * @param win parent window
    * @param txt initial text
    */
-  public BaseXEditor(final boolean edit, final Window win, final byte[] txt) {
+  public Editor(final boolean edit, final Window win, final byte[] txt) {
     super(win);
     setFocusable(true);
     setFocusTraversalKeysEnabled(!edit);
@@ -98,7 +106,7 @@ public class BaseXEditor extends BaseXPanel {
 
     layout(new BorderLayout(4, 0));
     scroll = new BaseXBar(this);
-    rend = new BaseXTextRenderer(text, scroll);
+    rend = new Renderer(text, scroll);
 
     add(rend, BorderLayout.CENTER);
     add(scroll, BorderLayout.EAST);
@@ -179,17 +187,17 @@ public class BaseXEditor extends BaseXPanel {
    */
   protected final void setSyntax(final IO file, final boolean opened) {
     setSyntax(
-      !opened || file.hasSuffix(IO.XQSUFFIXES) ? new XQuerySyntax() :
-      file.hasSuffix(IO.JSONSUFFIX) ? new JSONSyntax() :
+      !opened || file.hasSuffix(IO.XQSUFFIXES) ? new SyntaxXQuery() :
+      file.hasSuffix(IO.JSONSUFFIX) ? new SyntaxJSON() :
       file.hasSuffix(IO.XMLSUFFIXES) || file.hasSuffix(IO.HTMLSUFFIXES) ||
-      file.hasSuffix(IO.BXSSUFFIX) ? new XMLSyntax() : BaseXSyntax.SIMPLE);
+      file.hasSuffix(IO.BXSSUFFIX) ? new SyntaxXML() : Syntax.SIMPLE);
   }
 
   /**
    * Sets a syntax highlighter.
    * @param s syntax reference
    */
-  public final void setSyntax(final BaseXSyntax s) {
+  public final void setSyntax(final Syntax s) {
     rend.setSyntax(s);
   }
 
@@ -277,7 +285,7 @@ public class BaseXEditor extends BaseXPanel {
    * Installs a search panel.
    * @param s search panel
    */
-  public final void setSearch(final BaseXSearch s) {
+  public final void setSearch(final SearchPanel s) {
     search = s;
   }
 
@@ -288,11 +296,29 @@ public class BaseXEditor extends BaseXPanel {
   public final void search(final SearchContext sc) {
     try {
       rend.search(sc);
+      gui.status.setText(sc.search.isEmpty() ? OK :
+        Util.info(Util.info(STRINGS_FOUND_X,  sc.nr)));
+      jump(SearchDir.SAME);
     } catch(final Exception ex) {
-      final String inf = ex.getMessage().replaceAll(Prop.NL + ".*", "");
-      gui.status.setText(ERROR_C + inf);
+      gui.status.setText(ERROR_C + ex.getMessage().replaceAll(Prop.NL + ".*", ""));
     }
-    jump(SearchDir.SAME);
+  }
+
+  /**
+   * Replaces the text.
+   * @param rc replace context
+   */
+  public final void replace(final ReplaceContext rc) {
+    try {
+      rend.replace(rc);
+      if(rc.text != null) {
+        setText(rc.text);
+        release(Action.CHECK);
+      }
+      gui.status.setText(Util.info(STRINGS_REPLACED_X,  rc.search.nr));
+    } catch(final Exception ex) {
+      gui.status.setText(ERROR_C + ex.getMessage().replaceAll(Prop.NL + ".*", ""));
+    }
   }
 
   /**
@@ -307,87 +333,6 @@ public class BaseXEditor extends BaseXPanel {
     final int m = y + rend.fontH() * 3 - h;
     if(y != -1 && (p < m || p > y)) scroll.pos(y - h / 2);
     repaint();
-  }
-
-  /**
-   * Replaces the text.
-   * @param r replace text
-   */
-  public final void replace(final byte[] r) {
-    try {
-      final SearchResult sr = rend.replace(r);
-      if(sr.text != null) {
-        setText(sr.text);
-        release(Action.CHECK);
-      }
-      gui.status.setText(Util.info(STRINGS_REPLACED_X,  sr.nr));
-    } catch(final Exception ex) {
-      BaseXDialog.error(gui, ERROR_C + ex.getMessage());
-    }
-  }
-
-  /**
-   * Searches and replaces text.
-   * @param src text to be found
-   * @param replace text to be replaced
-   * @param regex regular expression
-   * @param mcase match case
-   * @param multi multi-line mode
-   * @return number of replacements
-   */
-  public final int replace(final String src, final String replace,
-      final boolean regex, final boolean mcase, final boolean multi) {
-
-    int c = 0;
-    final byte[] old = text.text();
-    byte[] txt = null;
-    if(regex) {
-      int flags = Pattern.DOTALL;
-      if(!mcase) flags |= Pattern.CASE_INSENSITIVE;
-      final Pattern p = Pattern.compile(src, flags);
-      if(multi) {
-        txt = Token.token(p.matcher(Token.string(old)).replaceAll(replace));
-        c++;
-      } else {
-        final int os = old.length;
-        final TokenBuilder tb = new TokenBuilder(os);
-        for(int s = 0, o = 0; o <= os; o++) {
-          if(o < os ? old[o] == '\n' : o != s) {
-            tb.add(p.matcher(Token.string(old, s, o - s)).replaceAll(replace));
-            if(o < os) tb.add('\n');
-            c++;
-            s = o + 1;
-          }
-        }
-        txt = tb.finish();
-      }
-    } else {
-      final byte[] srch = mcase ? Token.token(src) : Token.lc(Token.token(src));
-      final byte[] rplc = Token.token(replace);
-      final ByteList bl = new ByteList();
-      final int ss = srch.length, os = old.length;
-      for(int o = 0; o < os;) {
-        int s = 0;
-        if(o + ss <= os) {
-          if(mcase) {
-            for(; s < ss && old[o + s] == srch[s]; s++);
-          } else {
-            for(; s < ss && Token.lc(Token.cp(old, o + s)) == Token.cp(srch, s);
-                s += Token.cl(srch, s));
-          }
-        }
-        if(s == ss) {
-          bl.add(rplc);
-          o += s;
-          c++;
-        } else {
-          bl.add(old[o++]);
-        }
-      }
-      if(c != 0) txt = bl.toArray();
-    }
-    if(txt != null) setText(txt);
-    return c;
   }
 
   // MOUSE INTERACTIONS =================================================================

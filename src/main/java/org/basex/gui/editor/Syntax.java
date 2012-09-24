@@ -1,4 +1,4 @@
-package org.basex.gui.layout;
+package org.basex.gui.editor;
 
 import static org.basex.util.Token.*;
 
@@ -11,13 +11,13 @@ import java.awt.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-abstract class BaseXSyntax {
+abstract class Syntax {
   /** Simple syntax. */
-  static final BaseXSyntax SIMPLE = new BaseXSyntax() {
+  static final Syntax SIMPLE = new Syntax() {
     @Override
     public void init() { }
     @Override
-    public Color getColor(final BaseXTextTokens tokens) { return Color.black; }
+    public Color getColor(final EditorText tokens) { return Color.black; }
   };
 
   /**
@@ -30,7 +30,7 @@ abstract class BaseXSyntax {
    * @param tokens tokenizer
    * @return color
    */
-  public abstract Color getColor(final BaseXTextTokens tokens);
+  public abstract Color getColor(final EditorText tokens);
 
   /**
    * Returns the start of a comment.

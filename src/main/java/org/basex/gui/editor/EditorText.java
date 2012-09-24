@@ -1,18 +1,18 @@
-package org.basex.gui.layout;
+package org.basex.gui.editor;
 
 import static org.basex.util.Token.*;
 
-import org.basex.gui.layout.SearchContext.SearchDir;
+import org.basex.gui.editor.Editor.SearchDir;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * This class allows the iteration on tokens.
+ * This class contains the rendered text.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class BaseXTextTokens {
+public final class EditorText {
   /** Tab width. */
   static final int TAB = 2;
 
@@ -39,7 +39,7 @@ public final class BaseXTextTokens {
    * Constructor.
    * @param t text
    */
-  BaseXTextTokens(final byte[] t) {
+  EditorText(final byte[] t) {
     text = t;
   }
 
@@ -60,7 +60,7 @@ public final class BaseXTextTokens {
   void text(final byte[] t, final boolean reset) {
     text = t;
     if(reset) noSelect();
-    if(search != null) search.search(text);
+    if(search != null) search.search(t);
   }
 
   /**
@@ -111,22 +111,24 @@ public final class BaseXTextTokens {
   }
 
   /**
-   * Sets a new search context.
-   * @param sc new search context
+   * Sets a new search processor.
+   * @param sc search processor
    */
   void search(final SearchContext sc) {
-    if(sc.equals(search)) return;
-    sc.search(text);
-    search = sc;
+    if(sc.equals(search)) {
+      sc.nr = search.nr;
+    } else {
+      sc.search(text);
+      search = sc;
+    }
   }
 
   /**
    * Replaces the text.
-   * @param replace replace text
-   * @return result
+   * @param rc replace context
    */
-  SearchResult replace(final byte[] replace) {
-    return search.replace(text, replace);
+  void replace(final ReplaceContext rc) {
+    rc.replace(search, text);
   }
 
   /**
@@ -370,7 +372,7 @@ public final class BaseXTextTokens {
    * (Un)comments highlighted text or line.
    * @param syntax syntax highlighter
    */
-  void comment(final BaseXSyntax syntax) {
+  void comment(final Syntax syntax) {
     final byte[] start = syntax.commentOpen();
     final byte[] end = syntax.commentEnd();
     boolean add = true;

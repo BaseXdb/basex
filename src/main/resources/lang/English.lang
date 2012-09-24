@@ -315,6 +315,7 @@ stemming             = Stemming
 stop                 = Stop
 stopped_at           = Stopped at
 stopword_list        = Stopword List
+strings_found_%      = % string(s) found.
 strings_replaced_%   = % string(s) replaced.
 strip_ns             = Strip namespaces
 syntax               = Syntax

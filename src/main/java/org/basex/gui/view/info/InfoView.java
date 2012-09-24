@@ -10,6 +10,7 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.*;
+import org.basex.gui.editor.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.view.*;
 import org.basex.util.*;
@@ -31,7 +32,7 @@ public final class InfoView extends View {
   /** North label. */
   private final BaseXBack north;
   /** Text Area. */
-  private final BaseXEditor area;
+  private final Editor area;
 
   /** Query statistics. */
   private IntList stat = new IntList();
@@ -64,7 +65,7 @@ public final class InfoView extends View {
     north.add(timer, BorderLayout.SOUTH);
     add(north, BorderLayout.NORTH);
 
-    area = new BaseXEditor(false, gui);
+    area = new Editor(false, gui);
     add(area, BorderLayout.CENTER);
     refreshLayout();
   }

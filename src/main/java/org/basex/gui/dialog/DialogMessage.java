@@ -6,6 +6,7 @@ import java.awt.event.*;
 import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Msg;
+import org.basex.gui.editor.*;
 import org.basex.gui.layout.*;
 import org.basex.util.*;
 
@@ -40,7 +41,7 @@ public final class DialogMessage extends BaseXDialog {
     b.setIcon(ic.large);
     back.add(b);
 
-    final BaseXEditor text = new BaseXEditor(false, this, Token.token(txt));
+    final Editor text = new Editor(false, this, Token.token(txt));
     text.setFont(b.getFont());
     back.add(text);
 

@@ -17,8 +17,9 @@ import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.GUIConstants.Msg;
+import org.basex.gui.editor.*;
+import org.basex.gui.editor.Editor.Action;
 import org.basex.gui.layout.*;
-import org.basex.gui.layout.BaseXEditor.Action;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
 import org.basex.gui.layout.BaseXLayout.DropHandler;
 import org.basex.gui.view.*;
@@ -67,7 +68,7 @@ public final class EditorView extends View implements EditorNotifier {
   private final BaseXButton filter;
 
   /** Search panel. */
-  public final BaseXSearch search;
+  public final SearchPanel search;
 
   /**
    * Default constructor.
@@ -99,7 +100,7 @@ public final class EditorView extends View implements EditorNotifier {
     final BaseXBack center = new BaseXBack(Fill.NONE).layout(new BorderLayout(0, 2));
     tabs = new BaseXTabs(gui);
     tabs.setFocusable(false);
-    search = new BaseXSearch(gui, this, true);
+    search = new SearchPanel(gui, this, true);
     addCreateTab();
     final EditorArea edit = addTab();
 

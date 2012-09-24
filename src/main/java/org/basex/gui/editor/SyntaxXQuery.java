@@ -1,4 +1,4 @@
-package org.basex.gui.layout;
+package org.basex.gui.editor;
 
 import static org.basex.data.DataText.*;
 
@@ -17,7 +17,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class XQuerySyntax extends BaseXSyntax {
+public final class SyntaxXQuery extends Syntax {
   /** Error color. */
   private static final HashSet<String> KEYS = new HashSet<String>();
   /** Error color. */
@@ -61,7 +61,7 @@ public final class XQuerySyntax extends BaseXSyntax {
   }
 
   @Override
-  public Color getColor(final BaseXTextTokens text) {
+  public Color getColor(final EditorText text) {
     final int ch = text.curr();
 
     // opened quote

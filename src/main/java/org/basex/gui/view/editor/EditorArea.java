@@ -13,6 +13,7 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.parse.*;
 import org.basex.gui.*;
+import org.basex.gui.editor.*;
 import org.basex.gui.layout.*;
 import org.basex.io.*;
 import org.basex.query.*;
@@ -23,7 +24,7 @@ import org.basex.query.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-final class EditorArea extends BaseXEditor {
+final class EditorArea extends Editor {
   /** Pattern for detecting library modules. */
   private static final Pattern LIBMOD_PATTERN = Pattern.compile(
     "^(xquery( version ['\"].*?['\"])?( encoding ['\"].*?['\"])?; ?)?module namespace.*");

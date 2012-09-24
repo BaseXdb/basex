@@ -1,4 +1,4 @@
-package org.basex.gui.layout;
+package org.basex.gui.editor;
 
 import static org.basex.data.DataText.*;
 import static org.basex.gui.GUIConstants.*;
@@ -11,7 +11,7 @@ import java.awt.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class XMLSyntax extends BaseXSyntax {
+public final class SyntaxXML extends Syntax {
   /** Last quote. */
   private int quote;
   /** Tag flag. */
@@ -30,7 +30,7 @@ public final class XMLSyntax extends BaseXSyntax {
   }
 
   @Override
-  public Color getColor(final BaseXTextTokens text) {
+  public Color getColor(final EditorText text) {
     final int ch = text.curr();
     if(comm > 0) {
       if(ch == '<') {

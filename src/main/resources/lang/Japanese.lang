@@ -315,6 +315,7 @@ stemming             = 語幹処理
 stop                 = 終了
 stopped_at           = 停止しました
 stopword_list        = ストップワードリスト
+strings_found_%      = % string(s) found.
 strings_replaced_%   = % string(s) replaced.
 strip_ns             = 名前空間の除去
 syntax               = 文法

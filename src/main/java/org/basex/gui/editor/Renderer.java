@@ -1,10 +1,11 @@
-package org.basex.gui.layout;
+package org.basex.gui.editor;
 
 import java.awt.*;
 
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
-import org.basex.gui.layout.SearchContext.SearchDir;
+import org.basex.gui.editor.Editor.SearchDir;
+import org.basex.gui.layout.*;
 import org.basex.util.*;
 
 /**
@@ -14,7 +15,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class BaseXTextRenderer extends BaseXBack {
+public final class Renderer extends BaseXBack {
   /** Vertical start position. */
   private final BaseXBar bar;
 
@@ -48,9 +49,9 @@ public final class BaseXTextRenderer extends BaseXBack {
   private int h;
 
   /** Text array to be written. */
-  private final BaseXTextTokens text;
+  private final EditorText text;
   /** Vertical start position. */
-  private transient BaseXSyntax syntax = BaseXSyntax.SIMPLE;
+  private transient Syntax syntax = Syntax.SIMPLE;
   /** Visibility of cursor. */
   private boolean cursor;
 
@@ -59,7 +60,7 @@ public final class BaseXTextRenderer extends BaseXBack {
    * @param t text to be drawn
    * @param b scrollbar reference
    */
-  BaseXTextRenderer(final BaseXTextTokens t, final BaseXBar b) {
+  Renderer(final EditorText t, final BaseXBar b) {
     mode(Fill.NONE).setFont(GUIConstants.dfont);
     text = t;
     bar = b;
@@ -88,11 +89,10 @@ public final class BaseXTextRenderer extends BaseXBack {
 
   /**
    * Replaces the text.
-   * @param replace replace text
-   * @return replaced text
+   * @param rc replace context
    */
-  SearchResult replace(final byte[] replace) {
-    return text.replace(replace);
+  void replace(final ReplaceContext rc) {
+    text.replace(rc);
   }
 
   /**
@@ -438,7 +438,7 @@ public final class BaseXTextRenderer extends BaseXBack {
    */
   private int charW(final Graphics g, final int cp) {
     return cp < ' ' || g == null ?  cp == '\t' ?
-      fwidth[' '] * BaseXTextTokens.TAB : 0 : cp < 256 ? fwidth[cp] :
+      fwidth[' '] * EditorText.TAB : 0 : cp < 256 ? fwidth[cp] :
       cp >= 0xD800 && cp <= 0xDC00 ? 0 : g.getFontMetrics().charWidth(cp);
   }
 
@@ -470,7 +470,7 @@ public final class BaseXTextRenderer extends BaseXBack {
    * Sets a syntax highlighter.
    * @param s syntax highlighter
    */
-  void setSyntax(final BaseXSyntax s) {
+  void setSyntax(final Syntax s) {
     syntax = s;
   }
 
@@ -478,7 +478,7 @@ public final class BaseXTextRenderer extends BaseXBack {
    * Returns the syntax highlighter.
    * @return syntax highlighter
    */
-  BaseXSyntax getSyntax() {
+  Syntax getSyntax() {
     return syntax;
   }
 }

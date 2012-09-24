@@ -1,4 +1,4 @@
-package org.basex.gui.layout;
+package org.basex.gui.editor;
 
 /**
  * This interfaces passes on notifications to text areas.
@@ -11,5 +11,5 @@ public interface EditorNotifier {
    * Returns the current editor.
    * @return editor
    */
-  BaseXEditor getEditor();
+  Editor getEditor();
 }
