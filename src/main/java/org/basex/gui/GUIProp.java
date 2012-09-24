@@ -3,8 +3,6 @@ package org.basex.gui;
 import java.awt.*;
 
 import org.basex.core.*;
-import org.basex.io.*;
-import org.basex.util.list.*;
 
 /**
  * This class contains properties which are used in the GUI.
@@ -27,6 +25,8 @@ public final class GUIProp extends AProp {
   public static final Object[] WORKPATH = { "WORKPATH", Prop.HOME };
   /** Last editor files. */
   public static final Object[] EDITOR = { "EDITOR", new String[0] };
+  /** Input paths. */
+  public static final Object[] INPUTS = { "INPUTS", new String[0] };
 
   /** Comment: written to property file. */
   public static final Object[] C_LAYOUT = { "Layout" };
@@ -201,30 +201,9 @@ public final class GUIProp extends AProp {
    */
   public GUIProp() {
     super("gui");
-    recent(null);
     // reset realtime operations
     set(GUIProp.FILTERRT, false);
     set(GUIProp.EXECRT, false);
     Prop.gui = true;
-  }
-
-  /**
-   * Refreshes the list of recent query files and updates the query path.
-   * @param file new file
-   */
-  public void recent(final IOFile file) {
-    final StringList sl = new StringList();
-    String path = null;
-    if(file != null) {
-      path = file.path();
-      set(WORKPATH, file.dirPath());
-      sl.add(path);
-    }
-    final String[] qu = strings(EDITOR);
-    for(int q = 0; q < qu.length && q < 11; q++) {
-      final String f = qu[q];
-      if(!f.equalsIgnoreCase(path) && IO.get(f).exists()) sl.add(f);
-    }
-    set(EDITOR, sl.toArray());
   }
 }

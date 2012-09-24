@@ -44,6 +44,8 @@ public final class EditorView extends View implements EditorNotifier {
   private static final Pattern XMLERROR =
     Pattern.compile(LINE_X.replaceAll("%", "(.*?)") + COL + ".*");
 
+  /** History Button. */
+  final BaseXButton hist;
   /** Execute Button. */
   final BaseXButton stop;
   /** Info label. */
@@ -81,10 +83,10 @@ public final class EditorView extends View implements EditorNotifier {
 
     header = new BaseXLabel(EDITOR, true, false);
 
+    final BaseXButton srch = new BaseXButton(gui, "search", H_REPLACE);
     final BaseXButton openB = BaseXButton.command(GUICommands.C_EDITOPEN, gui);
     final BaseXButton saveB = new BaseXButton(gui, "save", H_SAVE);
-    final BaseXButton hist = new BaseXButton(gui, "hist", H_RECENTLY_OPEN);
-    final BaseXButton srch = new BaseXButton(gui, "search", H_REPLACE);
+    hist = new BaseXButton(gui, "hist", H_RECENTLY_OPEN);
 
     final BaseXBack buttons = new BaseXBack(Fill.NONE);
     buttons.layout(new TableLayout(1, 4, 1, 0));
@@ -101,7 +103,7 @@ public final class EditorView extends View implements EditorNotifier {
     final BaseXBack center = new BaseXBack(Fill.NONE).layout(new BorderLayout(0, 2));
     tabs = new BaseXTabs(gui);
     tabs.setFocusable(false);
-    search = new SearchPanel(gui, this, true);
+    search = new SearchPanel(gui, this, srch, true);
     addCreateTab();
     final EditorArea edit = addTab();
 
@@ -143,12 +145,6 @@ public final class EditorView extends View implements EditorNotifier {
     refreshLayout();
 
     // add listeners
-    srch.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        search.activate(true);
-      }
-    });
     saveB.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
@@ -166,24 +162,19 @@ public final class EditorView extends View implements EditorNotifier {
     hist.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        final JPopupMenu popup = new JPopupMenu();
+        final JPopupMenu pm = new JPopupMenu();
         final ActionListener al = new ActionListener() {
           @Override
           public void actionPerformed(final ActionEvent ac) {
             open(new IOFile(ac.getActionCommand()));
           }
         };
-        if(gui.gprop.strings(GUIProp.EDITOR).length == 0) {
-          popup.add(new JMenuItem("- No recently opened files -"));
-        }
-        for(final String en : gui.gprop.strings(GUIProp.EDITOR)) {
-          final JMenuItem jmi = new JMenuItem(en);
-          jmi.addActionListener(al);
-          popup.add(jmi);
-        }
-        popup.show(hist, 0, hist.getHeight());
+        final String[] files = gui.gprop.strings(GUIProp.EDITOR);
+        for(final String en : files) pm.add(new JMenuItem(en)).addActionListener(al);
+        pm.show(hist, 0, hist.getHeight());
       }
     });
+    refreshHistory(null);
     info.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(final MouseEvent e) {
@@ -325,7 +316,7 @@ public final class EditorView extends View implements EditorNotifier {
    */
   public void newFile() {
     addTab();
-    refresh(true);
+    refreshControls(true);
   }
 
   /**
@@ -354,14 +345,35 @@ public final class EditorView extends View implements EditorNotifier {
       }
 
       // update file history and refresh the file modification
-      gui.gprop.recent(file);
-      refresh(true);
+      refreshHistory(file);
+      refreshControls(true);
       edit.release(Action.PARSE);
 
     } catch(final IOException ex) {
       BaseXDialog.error(gui, FILE_NOT_OPENED);
     }
     return edit;
+  }
+
+  /**
+   * Refreshes the list of recent query files and updates the query path.
+   * @param file new file
+   */
+  private void refreshHistory(final IOFile file) {
+    final StringList sl = new StringList();
+    String path = null;
+    if(file != null) {
+      path = file.path();
+      gui.gprop.set(GUIProp.WORKPATH, file.dirPath());
+      sl.add(path);
+    }
+    final String[] qu = gui.gprop.strings(GUIProp.EDITOR);
+    for(int q = 0; q < qu.length && q < 11; q++) {
+      final String f = qu[q];
+      if(!f.equalsIgnoreCase(path) && IO.get(f).exists()) sl.add(f);
+    }
+    gui.gprop.set(GUIProp.EDITOR, sl.toArray());
+    hist.setEnabled(!sl.isEmpty());
   }
 
   /**
@@ -501,7 +513,7 @@ public final class EditorView extends View implements EditorNotifier {
    * Refreshes the query modification flag.
    * @param force action
    */
-  void refresh(final boolean force) {
+  void refreshControls(final boolean force) {
     // update modification flag
     final EditorArea edit = getEditor();
     final boolean oe = edit.modified;
@@ -541,8 +553,8 @@ public final class EditorView extends View implements EditorNotifier {
       final EditorArea edit = getEditor();
       file.write(edit.getText());
       edit.file(file);
-      gui.gprop.recent(file);
-      refresh(true);
+      refreshHistory(file);
+      refreshControls(true);
     } catch(final IOException ex) {
       BaseXDialog.error(gui, FILE_NOT_SAVED);
     }
@@ -603,7 +615,7 @@ public final class EditorView extends View implements EditorNotifier {
       @Override
       public void actionPerformed(final ActionEvent e) {
         addTab();
-        refresh(true);
+        refreshControls(true);
       }
     });
     tabs.add(new BaseXBack(), add, 0);

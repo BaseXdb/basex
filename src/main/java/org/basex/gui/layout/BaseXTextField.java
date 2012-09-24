@@ -9,7 +9,6 @@ import javax.swing.*;
 
 import org.basex.gui.*;
 import org.basex.gui.layout.BaseXLayout.DropHandler;
-import org.basex.util.list.*;
 
 /**
  * Project specific text field implementation.
@@ -20,6 +19,8 @@ import org.basex.util.list.*;
 public class BaseXTextField extends JTextField {
   /** Default width of text fields. */
   public static final int DWIDTH = 350;
+  /** History. */
+  BaseXHistory hstr;
   /** Last input. */
   String last = "";
   /** History pointer. */
@@ -89,25 +90,22 @@ public class BaseXTextField extends JTextField {
 
   /**
    * Attaches a history.
-   * @param gprop gui properties
+   * @param gui gui reference
    * @param option option
    */
-  public void history(final GUIProp gprop, final Object[] option) {
+  public void history(final GUI gui, final Object[] option) {
+    hstr = new BaseXHistory(gui, option);
     addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
         if(ENTER.is(e)) {
-          store(gprop, option);
-        } else if(NEXTLINE.is(e)) {
-          final String[] qu = gprop.strings(option);
-          if(hist < qu.length) {
-            setText(qu[++hist]);
-          }
-        } else if(PREVLINE.is(e)) {
-          final String[] qu = gprop.strings(option);
-          if(hist > 0) {
-            setText(qu[++hist]);
-          }
+          store();
+        } else if(NEXTLINE.is(e) || PREVLINE.is(e)) {
+          final boolean next = NEXTLINE.is(e);
+          final String[] qu = gui.gprop.strings(option);
+          if(qu.length == 0) return;
+          hist = next ? Math.min(qu.length - 1, hist + 1) : Math.max(0, hist - 1);
+          setText(qu[hist]);
         }
       }
     });
@@ -115,19 +113,9 @@ public class BaseXTextField extends JTextField {
 
   /**
    * Stores the current history.
-   * @param gprop gui properties
-   * @param option option
    */
-  void store(final GUIProp gprop, final Object[] option) {
-    final StringList sl = new StringList();
-    final String[] qu = gprop.strings(option);
-    final String input = getText();
-    sl.add(input);
-    for(int q = 0; q < qu.length && q < 11; q++) {
-      final String f = qu[q];
-      if(!f.equals(input)) sl.add(f);
-    }
-    gprop.set(option, sl.toArray());
+  public void store() {
+    if(hstr != null) hstr.store(getText());
   }
 
   @Override

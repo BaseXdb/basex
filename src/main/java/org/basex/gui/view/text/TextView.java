@@ -37,8 +37,6 @@ public final class TextView extends View implements EditorNotifier {
   private final BaseXButton home;
   /** Text Area. */
   private final Editor area;
-  /** Center panel. */
-  private final BaseXBack center;
 
   /** Result command. */
   private Command cmd;
@@ -60,7 +58,7 @@ public final class TextView extends View implements EditorNotifier {
     home.setEnabled(false);
 
     final BaseXButton save = new BaseXButton(gui, "save", H_SAVE_RESULT);
-    final BaseXButton srch = new BaseXButton(gui, "search", H_REPLACE);
+    final BaseXButton srch = new BaseXButton(gui, "search", SEARCH);
 
     final BaseXBack buttons = new BaseXBack(Fill.NONE);
     buttons.layout(new TableLayout(1, 3, 1, 0));
@@ -73,8 +71,9 @@ public final class TextView extends View implements EditorNotifier {
     b.add(header, BorderLayout.CENTER);
     add(b, BorderLayout.NORTH);
 
-    center = new BaseXBack(Fill.NONE).layout(new BorderLayout(0, 2));
-    search = new SearchPanel(gui, this, false);
+    final BaseXBack center = new BaseXBack(Fill.NONE).layout(new BorderLayout(0, 2));
+    search = new SearchPanel(gui, this, srch, false);
+    search.setVisible(false);
     area = new Editor(false, gui);
     area.setSyntax(new SyntaxXML());
     area.setSearch(search);
@@ -82,18 +81,11 @@ public final class TextView extends View implements EditorNotifier {
     center.add(area, BorderLayout.CENTER);
     center.add(search, BorderLayout.SOUTH);
     add(center, BorderLayout.CENTER);
-    search.setVisible(false);
 
     save.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
         save();
-      }
-    });
-    srch.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        search.activate(true);
       }
     });
     refreshLayout();

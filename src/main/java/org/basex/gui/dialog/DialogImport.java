@@ -75,6 +75,7 @@ public final class DialogImport extends BaseXBack {
 
     final String in = gui.gprop.get(GUIProp.INPUTPATH);
     input = new BaseXTextField(gui.gprop.get(GUIProp.INPUTPATH), dial);
+    input.history(gui, GUIProp.INPUTS);
 
     final IO io = IO.get(in);
     if(io instanceof IOFile && !in.isEmpty()) dbname = io.dbname();
@@ -190,6 +191,7 @@ public final class DialogImport extends BaseXBack {
     gui.set(Prop.ADDARCHIVES, archives.isSelected());
     gui.set(Prop.SKIPCORRUPT, skipCorrupt.isSelected());
     gui.set(Prop.ADDRAW, addRaw.isSelected());
+    input.store();
     parsing.setOptions(type);
   }
 

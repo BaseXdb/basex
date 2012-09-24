@@ -61,20 +61,11 @@ public final class GUIInput extends BaseXTextField {
             completeInput();
           } else {
             // store current input in history
-            final String txt = getText();
-            final StringList sl = new StringList().add(txt);
-
-            final GUIProp gprop = gui.gprop;
-            final int i = main.context.data() == null ? 2 :
-              gprop.num(GUIProp.SEARCHMODE);
-            final String[] hs = i == 0 ? gprop.strings(GUIProp.SEARCH) :
-              i == 1 ? gprop.strings(GUIProp.XQUERY) :
-              gprop.strings(GUIProp.COMMANDS);
-            for(int p = 0; p < hs.length && sl.size() < 11; ++p) {
-              if(!hs[p].equals(txt)) sl.add(hs[p]);
-            }
-            gprop.set(i == 0 ? GUIProp.SEARCH : i == 1 ? GUIProp.XQUERY :
-              GUIProp.COMMANDS, sl.toArray());
+            final Data data = main.context.data();
+            final int i = data == null ? 2 : gui.gprop.num(GUIProp.SEARCHMODE);
+            final Object[] options = i == 0 ? GUIProp.SEARCH : i == 1 ?
+              GUIProp.XQUERY : GUIProp.COMMANDS;
+            new BaseXHistory(main, options).store(getText());
 
             // evaluate the input
             if(e.getModifiers() == 0) main.execute();

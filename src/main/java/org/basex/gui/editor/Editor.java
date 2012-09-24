@@ -796,8 +796,8 @@ public class Editor extends BaseXPanel {
   private final transient Runnable calc = new Runnable() {
     @Override
     public void run() {
-      scroll.pos(scroll.pos());
       rend.calc();
+      scroll.pos(scroll.pos());
       rend.repaint();
     }
   };

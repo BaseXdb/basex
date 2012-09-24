@@ -22,7 +22,10 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class InfoView extends View {
+public final class InfoView extends View implements EditorNotifier {
+  /** Search panel. */
+  final SearchPanel search;
+
   /** Old text. */
   private final TokenBuilder text = new TokenBuilder();
   /** Header label. */
@@ -30,9 +33,11 @@ public final class InfoView extends View {
   /** Timer label. */
   private final BaseXLabel timer;
   /** North label. */
-  private final BaseXBack north;
+  private final BaseXBack title;
   /** Text Area. */
   private final Editor area;
+  /** Buttons. */
+  final BaseXBack buttons;
 
   /** Query statistics. */
   private IntList stat = new IntList();
@@ -57,17 +62,40 @@ public final class InfoView extends View {
     super(INFOVIEW, man);
     border(6, 6, 6, 6).layout(new BorderLayout());
 
-    north = new BaseXBack(Fill.NONE).layout(new BorderLayout());
+    title = new BaseXBack(Fill.NONE).layout(new BorderLayout());
     header = new BaseXLabel(QUERY_INFO);
-    north.add(header, BorderLayout.NORTH);
-    north.add(header, BorderLayout.NORTH);
+    title.add(header, BorderLayout.NORTH);
     timer = new BaseXLabel(" ", true, false);
-    north.add(timer, BorderLayout.SOUTH);
+    title.add(timer, BorderLayout.SOUTH);
+
+    final BaseXButton srch = new BaseXButton(gui, "search", SEARCH);
+
+    buttons = new BaseXBack(Fill.NONE);
+    buttons.layout(new TableLayout(1, 1, 1, 0));
+    buttons.add(srch);
+
+    final BaseXBack north = new BaseXBack(Fill.NONE).layout(new BorderLayout());
+    north.add(buttons, BorderLayout.EAST);
+    north.add(title, BorderLayout.CENTER);
     add(north, BorderLayout.NORTH);
 
+    final BaseXBack center = new BaseXBack(Fill.NONE).layout(new BorderLayout(0, 2));
+    search = new SearchPanel(gui, this, srch, false);
+    search.setVisible(false);
     area = new Editor(false, gui);
-    add(area, BorderLayout.CENTER);
+    area.setSearch(search);
+
+    center.add(area, BorderLayout.CENTER);
+    center.add(search, BorderLayout.SOUTH);
+    add(center, BorderLayout.CENTER);
     refreshLayout();
+
+    srch.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(final ActionEvent e) {
+        search.activate(true);
+      }
+    });
   }
 
   @Override
@@ -90,6 +118,7 @@ public final class InfoView extends View {
     header.setFont(lfont);
     timer.setFont(font);
     area.setFont(font);
+    search.refreshLayout();
   }
 
   @Override
@@ -105,6 +134,11 @@ public final class InfoView extends View {
   @Override
   protected boolean db() {
     return false;
+  }
+
+  @Override
+  public Editor getEditor() {
+    return area;
   }
 
   /**
@@ -262,8 +296,8 @@ public final class InfoView extends View {
     final int l = stat.size();
     if(l == 0) return;
 
-    h = north.getHeight();
-    w = getWidth() - 8;
+    h = title.getHeight();
+    w = getWidth() - 10 - buttons.getWidth();
     bw = gui.gprop.num(GUIProp.FONTSIZE) * 2 + w / 10;
     bs = bw / (l - 1);
 

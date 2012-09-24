@@ -182,8 +182,7 @@ public final class GUI extends AGUI {
             pop.setVisible(false);
           }
         };
-        final int i = context.data() == null ? 2 :
-          gprop.num(GUIProp.SEARCHMODE);
+        final int i = context.data() == null ? 2 : gprop.num(GUIProp.SEARCHMODE);
         final String[] hs = gprop.strings(i == 0 ? GUIProp.SEARCH : i == 1 ?
             GUIProp.XQUERY : GUIProp.COMMANDS);
         for(final String en : hs) {
@@ -603,9 +602,9 @@ public final class GUI extends AGUI {
     menu.refresh();
 
     final int i = context.data() == null ? 2 : gprop.num(GUIProp.SEARCHMODE);
-    final String[] hs = i == 0 ? gprop.strings(GUIProp.SEARCH) : i == 1 ?
-        gprop.strings(GUIProp.XQUERY) : gprop.strings(GUIProp.COMMANDS);
-    hist.setEnabled(hs.length != 0);
+    final Object[] options = i == 0 ? GUIProp.SEARCH : i == 1 ?
+      GUIProp.XQUERY : GUIProp.COMMANDS;
+    hist.setEnabled(gprop.strings(options).length != 0);
   }
 
   /**

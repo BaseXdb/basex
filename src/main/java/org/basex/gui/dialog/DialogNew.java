@@ -23,7 +23,7 @@ public final class DialogNew extends BaseXDialog {
   /** General dialog. */
   private final DialogImport general;
   /** Database name. */
-  private final BaseXTextField target;
+  private final BaseXTextField dbname;
   /** Buttons. */
   private final BaseXBack buttons;
 
@@ -52,11 +52,11 @@ public final class DialogNew extends BaseXDialog {
     final Prop prop = gui.context.prop;
     final GUIProp gprop = main.gprop;
 
-    target = new BaseXTextField(gprop.get(GUIProp.DBNAME), this);
+    dbname = new BaseXTextField(gprop.get(GUIProp.DBNAME), this);
 
     final BaseXBack pnl = new BaseXBack(new TableLayout(2, 1));
     pnl.add(new BaseXLabel(NAME_OF_DB + COLS, false, true).border(8, 0, 6, 0));
-    pnl.add(target);
+    pnl.add(dbname);
 
     // option panels
     final BaseXTabs tabs = new BaseXTabs(this);
@@ -100,9 +100,9 @@ public final class DialogNew extends BaseXDialog {
     ft.action(ftxindex.isSelected());
 
     // ...must be located before remaining checks
-    if(comp == general.browse || comp == general.input) target.setText(general.dbname);
+    if(comp == general.browse || comp == general.input) dbname.setText(general.dbname);
 
-    final String nm = target.getText().trim();
+    final String nm = dbname.getText().trim();
     ok = valid && !nm.isEmpty();
 
     String inf = !valid ? RES_NOT_FOUND : !ok ? ENTER_DB_NAME : null;

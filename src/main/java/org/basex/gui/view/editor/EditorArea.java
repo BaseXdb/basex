@@ -122,7 +122,7 @@ final class EditorArea extends Editor {
 
   @Override
   protected void release(final Action action) {
-    view.refresh(false);
+    view.refreshControls(false);
     final byte[] in = getText();
     final boolean eq = eq(in, last);
     if(eq && action == Action.CHECK) return;

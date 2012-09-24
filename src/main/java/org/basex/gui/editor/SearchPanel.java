@@ -21,6 +21,8 @@ import org.basex.gui.layout.BaseXLayout.DropHandler;
 public final class SearchPanel extends BaseXBack {
   /** GUI reference. */
   final GUI gui;
+  /** Search button. */
+  final BaseXButton button;
   /** Editor view. */
   final EditorNotifier view;
   /** Action: close panel. */
@@ -42,17 +44,23 @@ public final class SearchPanel extends BaseXBack {
    * Constructor.
    * @param main gui reference
    * @param ev editor view
+   * @param act button for activating the search
    * @param update add replace components
    */
-  public SearchPanel(final GUI main, final EditorNotifier ev, final boolean update) {
+  public SearchPanel(final GUI main, final EditorNotifier ev,
+      final BaseXButton act, final boolean update) {
+
     layout(new BorderLayout(2, 0));
     mode(Fill.NONE);
 
     gui = main;
     view = ev;
+    button = act;
     search = new BaseXTextField(main);
+    search.history(gui, GUIProp.SEARCHED);
     search.setToolTipText(SEARCH);
     replace = new BaseXTextField(main);
+    replace.history(gui, GUIProp.REPLACED);
     replace.setToolTipText(REPLACE_WITH);
     regex = onOffButton("s_regex", REGULAR_EXPR, GUIProp.SR_REGEX);
     mcase = onOffButton("s_case", MATCH_CASE, GUIProp.SR_CASE);
@@ -78,9 +86,13 @@ public final class SearchPanel extends BaseXBack {
     add(center, BorderLayout.CENTER);
     add(east, BorderLayout.EAST);
 
-    refreshLayout();
-
     // add interaction to search field
+    button.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(final ActionEvent e) {
+        activate(true);
+      }
+    });
     search.addFocusListener(new FocusAdapter() {
       @Override
       public void focusGained(final FocusEvent e) {
@@ -137,6 +149,8 @@ public final class SearchPanel extends BaseXBack {
     rplc.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
+        search.store();
+        replace.store();
         view.getEditor().replace(new ReplaceContext(replace.getText()));
       }
     });
@@ -146,10 +160,10 @@ public final class SearchPanel extends BaseXBack {
    * Refreshes the layout.
    */
   public void refreshLayout() {
-    final String mf = gui.gprop.get(GUIProp.MONOFONT);
-    final Font font = new Font(mf, 0, search.getFont().getSize());
-    search.setFont(font);
-    replace.setFont(font);
+    final String mf = view.getEditor().getFont().getFamily();
+    final Font f = new Font(mf, 0, search.getFont().getSize());
+    search.setFont(f);
+    replace.setFont(f);
   }
 
   /**
@@ -159,6 +173,7 @@ public final class SearchPanel extends BaseXBack {
   public void activate(final boolean focus) {
     if(!isVisible()) {
       super.setVisible(true);
+      button.setSelected(true);
       search();
     }
     if(focus) search.requestFocusInWindow();
@@ -170,6 +185,7 @@ public final class SearchPanel extends BaseXBack {
   public void deactivate() {
     if(!isVisible()) return;
     super.setVisible(false);
+    button.setSelected(false);
     view.getEditor().requestFocusInWindow();
     search();
   }
@@ -179,6 +195,7 @@ public final class SearchPanel extends BaseXBack {
    */
   public void search() {
     final String text = isVisible() ? search.getText() : "";
+    rplc.setEnabled(!text.isEmpty());
     view.getEditor().search(new SearchContext(this, text));
   }
 
