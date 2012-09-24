@@ -759,9 +759,7 @@ public interface Text {
   String PATH = lang("path");
 
   /** Command info. */
-  String REPLACE = lang("replace");
-  /** "Replace Text". */
-  String REPLACE_TEXT = lang("replace_text");
+  String REPLACE_ALL = lang("replace_all");
   /** Command info. */
   String REPLACE_WITH = lang("replace_with");
   /** "Match case". */
@@ -770,7 +768,7 @@ public interface Text {
   String MULTI_LINE = lang("multi_line");
   /** "Regular expression". */
   String REGULAR_EXPR = lang("regular_expr");
-  /** "% string(s) were replaced.". */
+  /** "% string(s) replaced.". */
   String STRINGS_REPLACED_X = lang("strings_replaced_%");
 
   /** Info on whitespace chopping. */

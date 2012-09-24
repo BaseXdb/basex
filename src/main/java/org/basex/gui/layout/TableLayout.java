@@ -42,8 +42,8 @@ public final class TableLayout implements LayoutManager {
    * When displayed, the grid has the minimum size.
    * @param r number of rows
    * @param c number of columns
-   * @param ix horizontal inset size
-   * @param iy vertical inset size
+   * @param ix horizontal gap
+   * @param iy vertical gap
    */
   public TableLayout(final int r, final int c, final int ix, final int iy) {
     rows = r;

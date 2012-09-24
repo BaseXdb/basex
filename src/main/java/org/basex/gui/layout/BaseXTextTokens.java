@@ -2,7 +2,9 @@ package org.basex.gui.layout;
 
 import static org.basex.util.Token.*;
 
+import org.basex.gui.layout.SearchContext.SearchDir;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This class allows the iteration on tokens.
@@ -14,6 +16,8 @@ public final class BaseXTextTokens {
   /** Tab width. */
   static final int TAB = 2;
 
+  /** Search context. */
+  private SearchContext search;
   /** Text array to be written. */
   private byte[] text = EMPTY;
   /** Current cursor position. */
@@ -22,12 +26,14 @@ public final class BaseXTextTokens {
   private int ps;
   /** End position of a token. */
   private int pe;
-  /** Start position of a text mark. */
+  /** Start position of a text selection. */
   private int ms = -1;
-  /** End position of a text mark. */
+  /** End position of a text selection. */
   private int me = -1;
   /** Start position of an error highlighting. */
   private int es = -1;
+  /** Current search position. */
+  private int sp;
 
   /**
    * Constructor.
@@ -43,6 +49,18 @@ public final class BaseXTextTokens {
   void init() {
     ps = 0;
     pe = 0;
+    sp = 0;
+  }
+
+  /**
+   * Sets a new text.
+   * @param t new text
+   * @param reset reset selection
+   */
+  void text(final byte[] t, final boolean reset) {
+    text = t;
+    if(reset) noSelect();
+    if(search != null) search.search(text);
   }
 
   /**
@@ -50,15 +68,14 @@ public final class BaseXTextTokens {
    * @param t new text
    */
   void text(final byte[] t) {
-    text = t;
-    noMark();
+    text(t, false);
   }
 
   /**
    * Checks if the text contains more words.
    * @return result of check
    */
-  boolean moreWords() {
+  boolean moreTokens() {
     // quit if text has ended
     if(pe >= text.length) return false;
     ps = pe;
@@ -77,47 +94,47 @@ public final class BaseXTextTokens {
   }
 
   /**
-   * Returns the token as word.
-   * @return word
+   * Returns the token as string.
+   * @return string
    */
-  public String nextWord() {
+  public String nextString() {
     return string(text, ps, pe - ps);
   }
 
   /**
-   * Returns true if the search string is found.
-   * @param search search string to be found
-   * @return result of check
+   * Moves one character forward.
+   * @param select selection flag
+   * @return character
    */
-  boolean found(final byte[] search) {
-    if(search.length == 0) return false;
-
-    final int sl = search.length, wl = pe - ps;
-    if(wl < sl) return false;
-
-    // exact search (faster)
-    final int p = pos();
-    int s = 0;
-    while(s < sl && Token.lc(next()) == Token.cp(search, s)) s += Token.cl(search, s);
-    pos(p);
-    return s == sl;
+  int next(final boolean select) {
+    return noSelect(select, true) ? curr() : next();
   }
 
   /**
-   * Moves one character forward.
-   * @param mark mark flag
-   * @return character
+   * Sets a new search context.
+   * @param sc new search context
    */
-  int next(final boolean mark) {
-    return noMark(mark, true) ? curr() : next();
+  void search(final SearchContext sc) {
+    if(sc.equals(search)) return;
+    sc.search(text);
+    search = sc;
+  }
+
+  /**
+   * Replaces the text.
+   * @param replace replace text
+   * @return result
+   */
+  SearchResult replace(final byte[] replace) {
+    return search.replace(text, replace);
   }
 
   /**
    * Moves one token forward.
-   * @param mark mark flag
+   * @param select selection flag
    */
-  void nextToken(final boolean mark) {
-    int ch = next(mark);
+  void nextToken(final boolean select) {
+    int ch = next(select);
     if(ch == '\n') return;
     if(Character.isLetterOrDigit(ch)) {
       while(Character.isLetterOrDigit(ch)) ch = next();
@@ -134,10 +151,10 @@ public final class BaseXTextTokens {
 
   /**
    * Moves one token back.
-   * @param mark mark flag
+   * @param select selection flag
    */
-  void prevToken(final boolean mark) {
-    int ch = prev(mark);
+  void prevToken(final boolean select) {
+    int ch = prev(select);
     if(ch == '\n') return;
     if(Character.isLetterOrDigit(ch)) {
       while(Character.isLetterOrDigit(ch)) ch = prev();
@@ -209,36 +226,36 @@ public final class BaseXTextTokens {
     return ps;
   }
 
-  // POSITION =================================================================
+  // POSITION ===========================================================================
 
   /**
    * Moves to the beginning of the line.
-   * @param mark mark flag
+   * @param select selection flag
    * @return number of moved characters
    */
-  int bol(final boolean mark) {
+  int bol(final boolean select) {
     int c = 0;
     if(ps == 0) return 0;
-    do c += curr() == '\t' ? TAB : 1; while(prev(mark) != '\n');
-    if(ps != 0 || curr() == '\n') next(mark);
+    do c += curr() == '\t' ? TAB : 1; while(prev(select) != '\n');
+    if(ps != 0 || curr() == '\n') next(select);
     return c;
   }
 
   /**
    * Moves to the end of the line.
-   * @param mark mark flag
+   * @param select selection flag
    */
-  void eol(final boolean mark) {
-    forward(Integer.MAX_VALUE, mark);
+  void eol(final boolean select) {
+    forward(Integer.MAX_VALUE, select);
   }
 
   /**
    * Moves one character back and returns the found character.
-   * @param mark mark flag
+   * @param select selection flag
    * @return character
    */
-  int prev(final boolean mark) {
-    return noMark(mark, false) ? curr() : prev();
+  int prev(final boolean select) {
+    return noSelect(select, false) ? curr() : prev();
   }
 
   /**
@@ -256,13 +273,13 @@ public final class BaseXTextTokens {
   /**
    * Moves to the specified position of to the of the line.
    * @param p position to move to
-   * @param mark mark flag
+   * @param select selection flag
    */
-  void forward(final int p, final boolean mark) {
+  void forward(final int p, final boolean select) {
     int nc = 0;
     while(curr() != '\n') {
       if((nc += curr() == '\t' ? TAB : 1) >= p) return;
-      next(mark);
+      next(select);
     }
   }
 
@@ -271,9 +288,7 @@ public final class BaseXTextTokens {
    * @param str string
    */
   void add(final String str) {
-    final TokenBuilder tb = new TokenBuilder();
-    tb.add(text, 0, ps);
-    int cc = 0;
+    final TokenBuilder tb = new TokenBuilder(str.length() << 1);
     final int cl = str.length();
     for(int c = 0; c < cl; ++c) {
       // ignore invalid characters
@@ -281,11 +296,15 @@ public final class BaseXTextTokens {
       if(ch == '\r') continue;
       if(ch < ' ' && !ws(ch)) ch = '\n';
       tb.add(ch);
-      ++cc;
     }
-    tb.add(text, ps, text.length);
-    text = tb.finish();
-    for(int c = 0; c < cc; ++c) next();
+    final int tl = text.length;
+    final int ts = tb.size();
+    final byte[] tmp = new byte[tl + ts];
+    System.arraycopy(text, 0, tmp, 0, ps);
+    System.arraycopy(tb.finish(), 0, tmp, ps, ts);
+    System.arraycopy(text, ps, tmp, ps + ts, tl - ps);
+    text(tmp);
+    ps += ts;
   }
 
   /**
@@ -298,11 +317,11 @@ public final class BaseXTextTokens {
     // extend selection to match whole lines
     pos(s);
     bol(true);
-    startMark();
+    startSelect();
     pos(e);
     forward(Integer.MAX_VALUE, true);
     next(true);
-    endMark();
+    endSelect();
 
     // decide if to use tab or spaces
     boolean tab = false;
@@ -343,7 +362,7 @@ public final class BaseXTextTokens {
     }
     tb.add(text, ps, text.length);
     ps = me;
-    text = tb.finish();
+    text(tb.finish());
   }
 
 
@@ -358,17 +377,17 @@ public final class BaseXTextTokens {
     int min = ps;
     int max = ps;
 
-    if(marked()) {
+    if(selected()) {
       min = ps < ms ? ps : ms;
       max = ps > ms ? ps : ms;
-      // marked
+      // selected
       final int mn = Math.max(min + start.length, max - end.length);
       if(indexOf(text, start, min) == min && indexOf(text, end, mn) == mn) {
         final TokenBuilder tb = new TokenBuilder();
         tb.add(text, 0, min);
         tb.add(text, min + start.length, max - end.length);
         tb.add(text, max, text.length);
-        text = tb.finish();
+        text(tb.finish());
         ms = min;
         me = max - start.length - end.length;
         ps = me;
@@ -391,19 +410,20 @@ public final class BaseXTextTokens {
   }
 
   /**
-   * Deletes the current character.
+   * Deletes the current character or selection.
    * Assumes that the current position allows a deletion.
    */
   void delete() {
-    if(text.length == 0) return;
-    final TokenBuilder tb = new TokenBuilder();
-    final int s = marked() ? Math.min(ms, me) : ps;
-    final int e = marked() ? Math.max(ms, me) : ps + cl(text, ps);
-    tb.add(text, 0, s);
-    if(e < text.length) tb.add(text, e, text.length);
-    text = tb.finish();
+    final int tl = text.length;
+    if(tl == 0) return;
+    final int s = selected() ? Math.min(ms, me) : ps;
+    final int e = selected() ? Math.max(ms, me) : ps + cl(text, ps);
+    final byte[] tmp = new byte[tl - e + s];
+    System.arraycopy(text, 0, tmp, 0, s);
+    System.arraycopy(text, e, tmp, s, tl - e);
+    text(tmp);
     ps = s;
-    noMark();
+    noSelect();
   }
 
   /**
@@ -411,26 +431,26 @@ public final class BaseXTextTokens {
    */
   void deleteLine() {
     bol(false);
-    startMark();
+    startSelect();
     eol(true);
     next(true);
-    endMark();
+    endSelect();
     delete();
   }
 
-  // TEXT MARKING =============================================================
+  // TEXT SELECTION =====================================================================
 
   /**
    * Jumps to the maximum/minimum position and resets the selection.
-   * @param mark marking flag
+   * @param select selection flag
    * @param max maximum/minimum flag
-   * @return true if mark was reset
+   * @return true if selection was reset
    */
-  private boolean noMark(final boolean mark, final boolean max) {
-    final boolean rs = !mark && marked();
+  private boolean noSelect(final boolean select, final boolean max) {
+    final boolean rs = !select && selected();
     if(rs) {
       ps = max ^ ms < me ? ms : me;
-      noMark();
+      noSelect();
     }
     return rs;
   }
@@ -438,81 +458,81 @@ public final class BaseXTextTokens {
   /**
    * Resets the selection.
    */
-  void noMark() {
+  void noSelect() {
     ms = -1;
     me = -1;
   }
 
   /**
-   * Sets the start of a text mark.
+   * Sets the start of a text selection.
    */
-  void startMark() {
+  void startSelect() {
     ms = ps;
     me = ps;
   }
 
   /**
-   * Sets the end of a text mark.
+   * Sets the end of a text selection.
    */
-  void endMark() {
+  void endSelect() {
     me = ps;
   }
 
   /**
-   * Returns the start of the text mark. The value is {@code -1} if no
+   * Returns the start of the text selection. The value is {@code -1} if no
    * text is selected.
-   * @return start mark
+   * @return start selection
    */
   int start() {
     return ms;
   }
 
   /**
-   * Tests if text is currently being marked, or has already been marked.
+   * Tests if text is currently being selected, or has already been selected.
    * @return result of check
    */
-  boolean marking() {
+  boolean selecting() {
     return ms != -1;
   }
 
   /**
-   * Tests if text has been marked.
+   * Tests if text has been selected.
    * @return result of check
    */
-  boolean marked() {
+  boolean selected() {
     return ms != me;
   }
 
   /**
-   * Checks the validity of the mark.
+   * Checks the validity of the selection.
    */
-  void checkMark() {
-    if(ms == me) noMark();
+  void checkSelect() {
+    if(ms == me) noSelect();
   }
 
   /**
-   * Tests if the current text position is marked.
+   * Tests if the current text position is selected.
    * @return result of check
    */
-  boolean markStart() {
-    return marked() &&
-        (inMark() || (ms < me ? ms >= ps && ms < pe : me >= ps && me < pe));
+  boolean selectStart() {
+    return selected() &&
+        (inSelect() || (ms < me ? ms >= ps && ms < pe : me >= ps && me < pe));
   }
 
   /**
-   * Tests if the current position is marked.
+   * Tests if the current position is selected.
    * @return result of check
    */
-  boolean inMark() {
+  boolean inSelect() {
     return ms < me ? ps >= ms && ps < me : ps >= me && ps < ms;
   }
 
   /**
-   * Returns the marked substring.
+   * Returns the selected substring.
    * @return substring
    */
   String copy() {
-    if(!marked()) return "";
+    if(!selected()) return "";
     final TokenBuilder tb = new TokenBuilder();
     final int e = ms < me ? me : ms;
     for(int s = ms < me ? ms : me; s < e; s += cl(text, s)) {
@@ -533,13 +553,13 @@ public final class BaseXTextTokens {
       if(c == '\n' || ch != ftChar(c)) break;
     }
     if(pos() != 0) next(true);
-    startMark();
+    startSelect();
     while(pos() < size()) {
       final int c = curr();
       if(c == '\n' || ch != ftChar(c)) break;
       next(true);
     }
-    endMark();
+    endSelect();
   }
 
   /**
@@ -548,9 +568,9 @@ public final class BaseXTextTokens {
   void selectLine() {
     pos(cursor());
     bol(true);
-    startMark();
+    startSelect();
     eol(true);
-    endMark();
+    endSelect();
   }
 
   /**
@@ -558,23 +578,23 @@ public final class BaseXTextTokens {
    */
   void selectAll() {
     pos(0);
-    startMark();
+    startSelect();
     pos(size());
-    endMark();
+    endSelect();
   }
 
-  // ERROR MARK ===============================================================
+  // ERROR HIGHLIGHTING =================================================================
 
   /**
-   * Returns the error marker.
-   * @return error marker
+   * Returns the error position.
+   * @return error position
    */
   int error() {
     return es;
   }
 
   /**
-   * Sets the error marker.
+   * Sets the error position.
    * @param s start position
    */
   public void error(final int s) {
@@ -582,7 +602,63 @@ public final class BaseXTextTokens {
     if(es == text.length) es--;
   }
 
-  // CURSOR ===================================================================
+  // SEARCH HIGHLIGHTING ================================================================
+
+  /**
+   * Returns true if the cursor focuses a search string.
+   * @return result of check
+   */
+  boolean searchStart() {
+    if(search == null) return false;
+    final IntList start = search.start;
+    if(sp == start.size()) return false;
+    final IntList end = search.end;
+    while(ps > end.get(sp)) {
+      if(++sp == start.size()) return false;
+    }
+    return pe > start.get(sp);
+  }
+
+  /**
+   * Tests if the current position is within a search term.
+   * @return result of check
+   */
+  boolean inSearch() {
+    final IntList start = search.start;
+    if(sp >= start.size() || ps < start.get(sp)) return false;
+    final IntList end = search.end;
+    final boolean in = ps < end.get(sp);
+    if(!in) sp++;
+    return in;
+  }
+
+  /**
+   * Selects a search string.
+   * @param dir search direction
+   * @return {@code true} if cursor was moved
+   */
+  boolean jump(final SearchDir dir) {
+    if(search.start.isEmpty()) {
+      noSelect();
+      return false;
+    }
+
+    int s = search.start.sortedIndexOf(pc);
+    switch(dir) {
+      case SAME:     s = s < 0 ? -s - 1 : s;     break;
+      case FORWARD:  s = s < 0 ? -s - 1 : s + 1; break;
+      case BACKWARD: s = s < 0 ? -s - 2 : s - 1; break;
+    }
+    final int sl = search.start.size();
+    if(s < 0) s = sl - 1;
+    else if(s == sl) s = 0;
+    ms = search.start.get(s);
+    me = search.end.get(s);
+    pc = ms;
+    return true;
+  }
+
+  // CURSOR =============================================================================
 
   /**
    * Tests if the current token is erroneous.

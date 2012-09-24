@@ -11,7 +11,7 @@ import org.basex.gui.layout.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-final class GUIToolBar extends JToolBar {
+public final class GUIToolBar extends JToolBar {
   /** Toolbar commands. */
   private final GUICommand[] cmd;
   /** Reference to main window. */
@@ -22,7 +22,7 @@ final class GUIToolBar extends JToolBar {
    * @param tb toolbar commands
    * @param main reference to the main window
    */
-  GUIToolBar(final GUICommand[] tb, final GUI main) {
+  public GUIToolBar(final GUICommand[] tb, final GUI main) {
     setFloatable(false);
     cmd = tb;
     gui = main;

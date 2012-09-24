@@ -4,6 +4,7 @@ import java.awt.*;
 
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
+import org.basex.gui.layout.SearchContext.SearchDir;
 import org.basex.util.*;
 
 /**
@@ -34,8 +35,6 @@ public final class BaseXTextRenderer extends BaseXBack {
 
   /** Width of current word. */
   private int wordW;
-  /** Search string. */
-  private byte[] search = Token.EMPTY;
 
   /** Border offset. */
   private int off;
@@ -80,63 +79,36 @@ public final class BaseXTextRenderer extends BaseXBack {
   }
 
   /**
-   * Sets a new search text.
-   * @param in new input
-   * @return {@code true} if input has changed
+   * Sets a new search context.
+   * @param sc new search context
    */
-  boolean setSearch(final byte[] in) {
-    final byte[] s = search;
-    search = Token.lc(in);
-    return !Token.eq(s, search);
+  void search(final SearchContext sc) {
+    text.search(sc);
   }
 
   /**
-   * Finds the current search string and returns the vertical text position.
-   * @param forward forward/backward browsing
-   * @param same string is the same as last time
+   * Replaces the text.
+   * @param replace replace text
+   * @return replaced text
+   */
+  SearchResult replace(final byte[] replace) {
+    return text.replace(replace);
+  }
+
+  /**
+   * Jumps to a search string.
+   * @param dir search direction
    * @return new vertical position, or {@code -1}
    */
-  int find(final boolean forward, final boolean same) {
-    if(search.length == 0) {
-      text.noMark();
-      return -1;
-    }
+  int jump(final SearchDir dir) {
+    if(!text.jump(dir)) return -1;
 
-    while(true) {
-      final int hh = h;
-      int lp = -1, ly = -1, cp = text.cursor();
-
-      h = Integer.MAX_VALUE;
-      final Graphics g = getGraphics();
-      for(init(g); more(g); next()) {
-        if(!found()) continue;
-
-        final int np = text.pos();
-        final int ny = y - fontH;
-        if(np >= cp && (np > cp || !same || !forward)) {
-          if(forward || lp != -1) {
-            h = hh;
-            text.setCursor(forward ? np : lp);
-            text.startMark();
-            text.forward(search.length);
-            text.endMark();
-            return forward ? ny : ly;
-          }
-          cp = Integer.MAX_VALUE;
-        }
-        lp = np;
-        ly = ny;
-      }
-
-      h = hh;
-      if(cp == -1 || cp == Integer.MAX_VALUE) {
-        text.setCursor(Math.max(0, lp));
-        text.noMark();
-        return ly;
-      }
-      text.setCursor(-1);
-      text.noMark();
-    }
+    final int hh = h;
+    h = Integer.MAX_VALUE;
+    final Graphics g = getGraphics();
+    for(init(g); more(g) && text.pos() < text.cursor(); next());
+    h = hh;
+    return y;
   }
 
   /**
@@ -263,7 +235,7 @@ public final class BaseXTextRenderer extends BaseXBack {
    */
   private boolean more(final Graphics g) {
     // no more words found; quit
-    if(!text.moreWords()) return false;
+    if(!text.moreTokens()) return false;
 
     // calculate word width
     int ww = 0;
@@ -326,26 +298,27 @@ public final class BaseXTextRenderer extends BaseXBack {
       }
 
       // mark selected text
-      boolean mark = text.markStart();
-      if(mark) {
-        final int p = text.pos();
+      final int cp = text.pos();
+      if(text.selectStart()) {
         int xx = x, cw = 0;
-        for(; !text.inMark() && text.more(); text.next()) xx += charW(g, text.curr());
-        for(; text.inMark() && text.more(); text.next()) cw += charW(g, text.curr());
+        while(!text.inSelect() && text.more()) xx += charW(g, text.next());
+        while(text.inSelect() && text.more()) cw += charW(g, text.next());
         g.setColor(GUIConstants.color(2));
         g.fillRect(xx, y - fontH * 4 / 5, cw, fontH);
-        text.pos(p);
+        text.pos(cp);
       }
 
       // mark found text
-      if(found()) {
+      int xx = x;
+      while(text.more() && text.searchStart()) {
         int cw = 0;
-        for(int c = 0; c < search.length; c += Token.cl(search, c)) {
-          cw += charW(g, Token.cp(search, c));
-        }
-        g.setColor(GUIConstants.color(mark ? 5 : 2));
-        g.fillRect(x, y - fontH * 4 / 5, cw, fontH);
+        while(!text.inSearch() && text.more()) xx += charW(g, text.next());
+        while(text.inSearch() && text.more()) cw += charW(g, text.next());
+        g.setColor(GUIConstants.color2A);
+        g.fillRect(xx, y - fontH * 4 / 5, cw, fontH);
+        xx += cw;
       }
+      text.pos(cp);
 
       // underline parsing error
       if(text.erroneous()) {
@@ -361,7 +334,7 @@ public final class BaseXTextRenderer extends BaseXBack {
       // don't write whitespaces
       if(ch > ' ') {
         g.setColor(color);
-        String n = text.nextWord();
+        String n = text.nextString();
         int ww = w - x;
         if(x + wordW > ww) {
           // shorten string if it cannot be completely shown (saves memory)
@@ -378,8 +351,7 @@ public final class BaseXTextRenderer extends BaseXBack {
 
       // show cursor
       if(cursor && text.edited()) {
-        int xx = x;
-        final int p = text.pos();
+        xx = x;
         while(text.more()) {
           if(text.cursor() == text.pos()) {
             cursor(g, xx);
@@ -387,18 +359,10 @@ public final class BaseXTextRenderer extends BaseXBack {
           }
           xx += charW(g, text.next());
         }
-        text.pos(p);
+        text.pos(cp);
       }
     }
     next();
-  }
-
-  /**
-   * Returns true if the search string is found.
-   * @return result of check
-   */
-  private boolean found() {
-    return text.found(search);
   }
 
   /**
@@ -415,7 +379,7 @@ public final class BaseXTextRenderer extends BaseXBack {
    * Finishes the selection.
    */
   void stopSelect() {
-    text.checkMark();
+    text.checkSelect();
   }
 
   /**
@@ -425,7 +389,7 @@ public final class BaseXTextRenderer extends BaseXBack {
    * @param finish states if selection is in progress
    */
   void select(final int pos, final Point p, final boolean finish) {
-    if(!finish) text.noMark();
+    if(!finish) text.noSelect();
     p.y -= 3;
 
     final Graphics g = getGraphics();
@@ -459,8 +423,8 @@ public final class BaseXTextRenderer extends BaseXBack {
         next();
       }
 
-      if(!finish) text.startMark();
-      else text.endMark();
+      if(!finish) text.startSelect();
+      else text.endSelect();
       text.setCursor();
     }
     repaint();

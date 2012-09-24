@@ -133,13 +133,13 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Searches and replaces text. */
-  C_EDITREPLACE(REPLACE + DOTS, "% H", H_REPLACE, false, false) {
+  /** Searches and replaces text.
+  C_EDITFIND(FINDREPLACE + DOTS, "% F", H_REPLACE, false, false) {
     @Override
     public void execute(final GUI gui) {
-      gui.editor.replace();
+      gui.editor.search.activate(true);
     }
-  },
+  }, */
 
   /** Saves the current file in the editor. */
   C_EDITSAVE(SAVE, "% S", H_SAVE, false, false) {

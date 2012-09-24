@@ -14,8 +14,10 @@ import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.border.*;
 
+import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
+import org.basex.gui.layout.SearchContext.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -44,16 +46,16 @@ public class BaseXEditor extends BaseXPanel {
   public transient History hist;
   /** Renderer reference. */
   final BaseXTextRenderer rend;
+  /** Scrollbar reference. */
+  final BaseXBar scroll;
 
   /** Delay for highlighting an error. */
   private static final int ERROR_DELAY = 500;
   /** Thread counter. */
   int threadID;
 
-  /** Scrollbar reference. */
-  private final BaseXBar scroll;
   /** Search field. */
-  private BaseXTextField find;
+  private BaseXSearch search;
 
   /**
    * Default constructor.
@@ -132,80 +134,7 @@ public class BaseXEditor extends BaseXPanel {
    */
   public void setText(final byte[] t) {
     setText(t, t.length);
-  }
-
-  /**
-   * Searches and replaces text.
-   * @param search text to be found
-   * @param replace text to be replaced
-   * @param regex regular expression
-   * @param casee match case
-   * @param multi multi-line mode
-   * @return number of replacements
-   */
-  public final int replace(final String search, final String replace,
-      final boolean regex, final boolean casee, final boolean multi) {
-
-    int c = 0;
-    byte[] txt = null;
-    if(regex) {
-      int flags = Pattern.DOTALL;
-      if(!casee) flags |= Pattern.CASE_INSENSITIVE;
-      final Pattern p = Pattern.compile(search, flags);
-      if(multi) {
-        txt = Token.token(p.matcher(Token.string(text.text())).replaceAll(replace));
-        c++;
-      } else {
-        final byte[] old = text.text();
-        final int os = old.length;
-        final TokenBuilder tb = new TokenBuilder(os);
-        int s = 0, o = 0;
-        for(; o <= os; o++) {
-          if(o == os ? o != s : old[o] == '\n') {
-            tb.add(p.matcher(Token.string(old, s, o - s)).replaceAll(replace)).add('\n');
-            c++;
-            s = o + 1;
-          }
-        }
-        txt = tb.finish();
-      }
-    } else {
-      final byte[] srch = casee ? Token.token(search) : Token.lc(Token.token(search));
-      final byte[] rplc = Token.token(replace);
-      final ByteList bl = new ByteList();
-      final byte[] old = text.text();
-      final int ss = srch.length, os = old.length;
-      for(int o = 0; o < os;) {
-        int s = 0;
-        if(o + ss <= os) {
-          if(casee) {
-            for(; s < ss && old[o + s] == srch[s]; s++);
-          } else {
-            for(; s < ss && Token.lc(Token.cp(old, o + s)) == Token.cp(srch, s);
-                s += Token.cl(srch, s));
-          }
-        }
-        if(s == ss) {
-          bl.add(rplc);
-          o += s;
-          c++;
-        } else {
-          bl.add(old[o++]);
-        }
-      }
-      if(c != 0) txt = bl.toArray();
-    }
-    if(txt != null) setText(txt);
-    return c;
-  }
-
-  /**
-   * Adds a search dialog.
-   * @param f search field
-   */
-  public final void setSearch(final BaseXTextField f) {
-    f.setSearch(this);
-    find = f;
+    error(-1);
   }
 
   /**
@@ -218,46 +147,6 @@ public class BaseXEditor extends BaseXPanel {
   }
 
   /**
-   * Finds the next/previous occurrence of the current keyword.
-   * @param forward forward search
-   */
-  final void find(final boolean forward) {
-    scroll(rend.find(forward, true));
-  }
-
-  /**
-   * Sets a new search string.
-   * @param in new input
-   * @return {@code true} if input has changed
-   */
-  final boolean setSearch(final byte[] in) {
-    return rend.setSearch(in);
-  }
-
-  /**
-   * Finds the current search string.
-   * @return {@code true} if the search string was found
-   */
-  final boolean find() {
-    final int y = rend.find(true, false);
-    scroll(y);
-    return y != -1;
-  }
-
-  /**
-   * Displays the search term.
-   * @param y vertical position
-   */
-  final void scroll(final int y) {
-    // updates the visible area
-    final int h = getHeight();
-    final int p = scroll.pos();
-    final int m = y + rend.fontH() * 3 - h;
-    if(y != -1 && (p < m || p > y)) scroll.pos(y - h / 2);
-    repaint();
-  }
-
-  /**
    * Sets the output text.
    * @param t output text
    * @param s text size
@@ -267,22 +156,18 @@ public class BaseXEditor extends BaseXPanel {
     int ns = 0;
     final int pc = text.cursor();
     final int ts = text.size();
-    final byte[] tt = text.text();
+    final byte[] old = text.text();
     boolean eq = true;
     for(int r = 0; r < s; ++r) {
       final byte b = t[r];
       // support characters, highlighting codes, tabs and newlines
       if(b >= ' ' || b <= TokenBuilder.MARK || b == 0x09 || b == 0x0A) t[ns++] = t[r];
-      eq &= ns < ts && ns < s && t[ns] == tt[ns];
+      eq &= ns < ts && ns < s && t[ns] == old[ns];
     }
     eq &= ns == ts;
 
     // new text is different...
-    if(!eq) {
-      text.text(Arrays.copyOf(t, ns));
-      text.setCursor(0);
-      scroll.pos(0);
-    }
+    if(!eq) text.text(Arrays.copyOf(t, ns));
     if(hist != null) hist.store(t.length != ns ? Arrays.copyOf(t, ns) : t, pc, 0);
     SwingUtilities.invokeLater(calc);
   }
@@ -386,7 +271,126 @@ public class BaseXEditor extends BaseXPanel {
     rend.repaint();
   }
 
-  // MOUSE INTERACTIONS =======================================================
+  // SEARCH OPERATIONS ==================================================================
+
+  /**
+   * Installs a search panel.
+   * @param s search panel
+   */
+  public final void setSearch(final BaseXSearch s) {
+    search = s;
+  }
+
+  /**
+   * Performs a search.
+   * @param sc search context
+   */
+  public final void search(final SearchContext sc) {
+    try {
+      rend.search(sc);
+    } catch(final Exception ex) {
+      final String inf = ex.getMessage().replaceAll(Prop.NL + ".*", "");
+      gui.status.setText(ERROR_C + inf);
+    }
+    jump(SearchDir.SAME);
+  }
+
+  /**
+   * Jumps to a search string.
+   * @param dir search direction
+   */
+  final void jump(final SearchDir dir) {
+    // updates the visible area
+    final int y = rend.jump(dir);
+    final int h = getHeight();
+    final int p = scroll.pos();
+    final int m = y + rend.fontH() * 3 - h;
+    if(y != -1 && (p < m || p > y)) scroll.pos(y - h / 2);
+    repaint();
+  }
+
+  /**
+   * Replaces the text.
+   * @param r replace text
+   */
+  public final void replace(final byte[] r) {
+    try {
+      final SearchResult sr = rend.replace(r);
+      if(sr.text != null) {
+        setText(sr.text);
+        release(Action.CHECK);
+      }
+      gui.status.setText(Util.info(STRINGS_REPLACED_X,  sr.nr));
+    } catch(final Exception ex) {
+      BaseXDialog.error(gui, ERROR_C + ex.getMessage());
+    }
+  }
+
+  /**
+   * Searches and replaces text.
+   * @param src text to be found
+   * @param replace text to be replaced
+   * @param regex regular expression
+   * @param mcase match case
+   * @param multi multi-line mode
+   * @return number of replacements
+   */
+  public final int replace(final String src, final String replace,
+      final boolean regex, final boolean mcase, final boolean multi) {
+
+    int c = 0;
+    final byte[] old = text.text();
+    byte[] txt = null;
+    if(regex) {
+      int flags = Pattern.DOTALL;
+      if(!mcase) flags |= Pattern.CASE_INSENSITIVE;
+      final Pattern p = Pattern.compile(src, flags);
+      if(multi) {
+        txt = Token.token(p.matcher(Token.string(old)).replaceAll(replace));
+        c++;
+      } else {
+        final int os = old.length;
+        final TokenBuilder tb = new TokenBuilder(os);
+        for(int s = 0, o = 0; o <= os; o++) {
+          if(o < os ? old[o] == '\n' : o != s) {
+            tb.add(p.matcher(Token.string(old, s, o - s)).replaceAll(replace));
+            if(o < os) tb.add('\n');
+            c++;
+            s = o + 1;
+          }
+        }
+        txt = tb.finish();
+      }
+    } else {
+      final byte[] srch = mcase ? Token.token(src) : Token.lc(Token.token(src));
+      final byte[] rplc = Token.token(replace);
+      final ByteList bl = new ByteList();
+      final int ss = srch.length, os = old.length;
+      for(int o = 0; o < os;) {
+        int s = 0;
+        if(o + ss <= os) {
+          if(mcase) {
+            for(; s < ss && old[o + s] == srch[s]; s++);
+          } else {
+            for(; s < ss && Token.lc(Token.cp(old, o + s)) == Token.cp(srch, s);
+                s += Token.cl(srch, s));
+          }
+        }
+        if(s == ss) {
+          bl.add(rplc);
+          o += s;
+          c++;
+        } else {
+          bl.add(old[o++]);
+        }
+      }
+      if(c != 0) txt = bl.toArray();
+    }
+    if(txt != null) setText(txt);
+    return c;
+  }
+
+  // MOUSE INTERACTIONS =================================================================
 
   @Override
   public final void mouseEntered(final MouseEvent e) {
@@ -429,12 +433,12 @@ public class BaseXEditor extends BaseXPanel {
     if(SwingUtilities.isMiddleMouseButton(e)) copy();
 
     final boolean marking = e.isShiftDown();
-    final boolean nomark = !text.marking();
+    final boolean nomark = !text.selecting();
     if(SwingUtilities.isLeftMouseButton(e)) {
       final int c = e.getClickCount();
       if(c == 1) {
         // selection mode
-        if(marking && nomark) text.startMark();
+        if(marking && nomark) text.startSelect();
         rend.select(scroll.pos(), e.getPoint(), marking);
       } else if(c == 2) {
         text.selectWord();
@@ -450,6 +454,30 @@ public class BaseXEditor extends BaseXPanel {
 
   @Override
   public void keyPressed(final KeyEvent e) {
+    // handle search operations
+    if(search != null) {
+      if(ESCAPE.is(e)) {
+        search.deactivate();
+        return;
+      }
+      if(FIND.is(e)) {
+        search.activate(true);
+        return;
+      }
+      if(FINDNEXT.is(e) || FINDNEXT2.is(e)) {
+        final boolean vis = search.isVisible();
+        search.activate(false);
+        jump(vis ? SearchDir.FORWARD : SearchDir.SAME);
+        return;
+      }
+      if(FINDPREV.is(e) || FINDPREV2.is(e)) {
+        final boolean vis = search.isVisible();
+        search.activate(false);
+        jump(vis ? SearchDir.BACKWARD : SearchDir.SAME);
+        return;
+      }
+    }
+    // ignore modifier keys
     if(modifier(e)) return;
 
     // operations that change the focus are put first..
@@ -459,10 +487,6 @@ public class BaseXEditor extends BaseXPanel {
     }
     if(NEXTTAB.is(e)) {
       transferFocus();
-      return;
-    }
-    if(FIND.is(e)) {
-      if(find != null) find.requestFocusInWindow();
       return;
     }
 
@@ -489,14 +513,6 @@ public class BaseXEditor extends BaseXPanel {
     text.pos(pc);
     if(!PREVLINE.is(e) && !NEXTLINE.is(e)) lastCol = -1;
 
-    if(FINDNEXT.is(e) || FINDNEXT2.is(e)) {
-      scroll(rend.find(true, true));
-      return;
-    }
-    if(FINDPREV.is(e) || FINDPREV2.is(e)) {
-      scroll(rend.find(false, true));
-      return;
-    }
     if(SELECTALL.is(e)) {
       selectAll();
       return;
@@ -506,8 +522,8 @@ public class BaseXEditor extends BaseXPanel {
     final boolean marking = e.isShiftDown() &&
       !DELNEXT.is(e) && !DELPREV.is(e) && !PASTE2.is(e) && !COMMENT.is(e) &&
       !DELLINE.is(e) && !REDOSTEP.is(e);
-    final boolean nomark = !text.marking();
-    if(marking && nomark) text.startMark();
+    final boolean nomark = !text.selecting();
+    if(marking && nomark) text.startSelect();
     boolean down = true;
     boolean consumed = true;
 
@@ -519,11 +535,11 @@ public class BaseXEditor extends BaseXPanel {
       text.prevToken(marking);
       down = false;
     } else if(TEXTSTART.is(e)) {
-      if(!marking) text.noMark();
+      if(!marking) text.noSelect();
       text.pos(0);
       down = false;
     } else if(TEXTEND.is(e)) {
-      if(!marking) text.noMark();
+      if(!marking) text.noSelect();
       text.pos(text.size());
     } else if(LINESTART.is(e)) {
       text.bol(marking);
@@ -554,8 +570,8 @@ public class BaseXEditor extends BaseXPanel {
 
     if(marking) {
       // refresh scroll position
-      text.endMark();
-      text.checkMark();
+      text.endSelect();
+      text.checkSelect();
     } else if(hist.active()) {
       // edit operations...
       if(CUT1.is(e) || CUT2.is(e)) {
@@ -563,19 +579,19 @@ public class BaseXEditor extends BaseXPanel {
       } else if(PASTE1.is(e) || PASTE2.is(e)) {
         final String clip = clip();
         if(clip != null) {
-          if(text.marked()) text.delete();
+          if(text.selected()) text.delete();
           text.add(clip);
         }
       } else if(UNDOSTEP.is(e)) {
         final byte[] t = hist.prev();
         if(t != null) {
-          text.text(t);
+          text.text(t, true);
           text.pos(hist.cursor());
         }
       } else if(REDOSTEP.is(e)) {
         final byte[] t = hist.next();
         if(t != null) {
-          text.text(t);
+          text.text(t, true);
           text.pos(hist.cursor());
         }
       } else if(COMMENT.is(e)) {
@@ -585,7 +601,7 @@ public class BaseXEditor extends BaseXPanel {
       } else if(DELLINEEND.is(e) || DELNEXTWORD.is(e) || DELNEXT.is(e)) {
         if(nomark) {
           if(text.pos() == text.size()) return;
-          text.startMark();
+          text.startSelect();
           if(DELNEXTWORD.is(e)) {
             text.nextToken(true);
           } else if(DELLINEEND.is(e)) {
@@ -593,13 +609,13 @@ public class BaseXEditor extends BaseXPanel {
           } else {
             text.next(true);
           }
-          text.endMark();
+          text.endSelect();
         }
         text.delete();
       } else if(DELLINESTART.is(e) || DELPREVWORD.is(e) || DELPREV.is(e)) {
         if(nomark) {
           if(text.pos() == 0) return;
-          text.startMark();
+          text.startSelect();
           if(DELPREVWORD.is(e)) {
             text.prevToken(true);
           } else if(DELLINESTART.is(e)) {
@@ -607,7 +623,7 @@ public class BaseXEditor extends BaseXPanel {
           } else {
             text.prev();
           }
-          text.endMark();
+          text.endSelect();
         }
         text.delete();
         down = false;
@@ -648,7 +664,7 @@ public class BaseXEditor extends BaseXPanel {
    * @param mark mark flag
    */
   private void down(final int l, final boolean mark) {
-    if(!mark) text.noMark();
+    if(!mark) text.noSelect();
     final int x = text.bol(mark);
     if(lastCol == -1) lastCol = x;
     for(int i = 0; i < l; ++i) {
@@ -665,7 +681,7 @@ public class BaseXEditor extends BaseXPanel {
    * @param mark mark flag
    */
   private void up(final int l, final boolean mark) {
-    if(!mark) text.noMark();
+    if(!mark) text.noSelect();
     final int x = text.bol(mark);
     if(lastCol == -1) lastCol = x;
     if(text.pos() == 0) {
@@ -695,7 +711,7 @@ public class BaseXEditor extends BaseXPanel {
     String ch = String.valueOf(e.getKeyChar());
     boolean del = true;
     if(TAB.is(e)) {
-      if(text.marked()) {
+      if(text.selected()) {
         // check if lines are to be indented
         final int s = Math.min(text.pos(), text.start());
         final int l = Math.max(text.pos(), text.start()) - 1;
@@ -716,7 +732,7 @@ public class BaseXEditor extends BaseXPanel {
     }
 
     // delete marked text
-    if(text.marked() && del) text.delete();
+    if(text.selected() && del) text.delete();
 
     if(ENTER.is(e)) {
       // adopt indentation from previous line
@@ -761,7 +777,7 @@ public class BaseXEditor extends BaseXPanel {
   final boolean copy() {
     final String txt = text.copy();
     if(txt.isEmpty()) {
-      text.noMark();
+      text.noSelect();
       return false;
     }
 
@@ -826,7 +842,6 @@ public class BaseXEditor extends BaseXPanel {
 
   @Override
   public final void componentResized(final ComponentEvent e) {
-    scroll.pos(0);
     SwingUtilities.invokeLater(calc);
   }
 
@@ -834,6 +849,7 @@ public class BaseXEditor extends BaseXPanel {
   private final transient Runnable calc = new Runnable() {
     @Override
     public void run() {
+      scroll.pos(scroll.pos());
       rend.calc();
       rend.repaint();
     }
@@ -862,7 +878,7 @@ public class BaseXEditor extends BaseXPanel {
       if(!hist.active()) return;
       final byte[] t = hist.prev();
       if(t == null) return;
-      text.text(t);
+      text.text(t, true);
       text.pos(hist.cursor());
       finish(-1);
     }
@@ -883,7 +899,7 @@ public class BaseXEditor extends BaseXPanel {
       if(!hist.active()) return;
       final byte[] t = hist.next();
       if(t == null) return;
-      text.text(t);
+      text.text(t, true);
       text.pos(hist.cursor());
       finish(-1);
     }
@@ -911,7 +927,7 @@ public class BaseXEditor extends BaseXPanel {
     }
     @Override
     public void refresh(final GUI main, final AbstractButton button) {
-      button.setEnabled(text.marked());
+      button.setEnabled(text.selected());
     }
     @Override
     public String label() {
@@ -927,7 +943,7 @@ public class BaseXEditor extends BaseXPanel {
     }
     @Override
     public void refresh(final GUI main, final AbstractButton button) {
-      button.setEnabled(text.marked());
+      button.setEnabled(text.selected());
     }
     @Override
     public String label() {
@@ -944,7 +960,7 @@ public class BaseXEditor extends BaseXPanel {
       text.pos(tc);
       final String txt = clip();
       if(txt == null) return;
-      if(text.marked()) text.delete();
+      if(text.selected()) text.delete();
       text.add(txt);
       finish(tc);
     }
@@ -970,7 +986,7 @@ public class BaseXEditor extends BaseXPanel {
     }
     @Override
     public void refresh(final GUI main, final AbstractButton button) {
-      button.setEnabled(text.marked());
+      button.setEnabled(text.selected());
     }
     @Override
     public String label() {

@@ -8,8 +8,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 
-import javax.swing.*;
-
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.gui.*;
@@ -28,13 +26,19 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class TextView extends View implements ActionListener {
+public final class TextView extends View implements EditorNotifier {
+  /** Search panel. */
+  final BaseXSearch search;
+
   /** Header string. */
   private final BaseXLabel header;
   /** Home button. */
   private final BaseXButton home;
   /** Text Area. */
   private final BaseXEditor area;
+  /** Center panel. */
+  private final BaseXBack center;
+
   /** Result command. */
   private Command cmd;
   /** Result nodes. */
@@ -49,37 +53,48 @@ public final class TextView extends View implements ActionListener {
 
     border(6, 6, 6, 6).layout(new BorderLayout(0, 4)).setFocusable(false);
 
-    final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout());
+    header = new BaseXLabel(TEXT, true, false);
 
     home = BaseXButton.command(GUICommands.C_HOME, gui);
     home.setEnabled(false);
 
-    BaseXBack sp = new BaseXBack(Fill.NONE).layout(new TableLayout(1, 2));
-    sp.add(home);
-    sp.add(Box.createHorizontalStrut(8));
-    b.add(sp, BorderLayout.WEST);
+    final BaseXButton save = new BaseXButton(gui, "save", H_SAVE_RESULT);
+    final BaseXButton srch = new BaseXButton(gui, "search", H_REPLACE);
 
-    header = new BaseXLabel(TEXT, true, false);
+    final BaseXBack buttons = new BaseXBack(Fill.NONE);
+    buttons.layout(new TableLayout(1, 3, 1, 0));
+    buttons.add(srch);
+    buttons.add(home);
+    buttons.add(save);
+
+    final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout());
+    b.add(buttons, BorderLayout.EAST);
     b.add(header, BorderLayout.CENTER);
-
-    final BaseXButton save = new BaseXButton(gui, "save", token(H_SAVE_RESULT));
-    save.addActionListener(this);
-    /* Find text field. */
-    final BaseXTextField find = new BaseXTextField(gui);
-    BaseXLayout.setHeight(find, (int) save.getPreferredSize().getHeight());
-
-    sp = new BaseXBack(Fill.NONE).layout(new TableLayout(1, 3));
-    sp.add(find);
-    sp.add(Box.createHorizontalStrut(5));
-    sp.add(save);
-    b.add(sp, BorderLayout.EAST);
     add(b, BorderLayout.NORTH);
 
+    center = new BaseXBack(Fill.NONE).layout(new BorderLayout(0, 2));
+    search = new BaseXSearch(gui, this, false);
     area = new BaseXEditor(false, gui);
     area.setSyntax(new XMLSyntax());
-    area.setSearch(find);
-    add(area, BorderLayout.CENTER);
+    area.setSearch(search);
 
+    center.add(area, BorderLayout.CENTER);
+    center.add(search, BorderLayout.SOUTH);
+    add(center, BorderLayout.CENTER);
+    search.setVisible(false);
+
+    save.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(final ActionEvent e) {
+        save();
+      }
+    });
+    srch.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(final ActionEvent e) {
+        search.activate(true);
+      }
+    });
     refreshLayout();
   }
 
@@ -126,6 +141,11 @@ public final class TextView extends View implements ActionListener {
   @Override
   protected boolean db() {
     return false;
+  }
+
+  @Override
+  public BaseXEditor getEditor() {
+    return area;
   }
 
   /**
@@ -183,8 +203,10 @@ public final class TextView extends View implements ActionListener {
     home.setEnabled(gui.context.data() != null);
   }
 
-  @Override
-  public void actionPerformed(final ActionEvent e) {
+  /**
+   * Saves the displayed text.
+   */
+  void save() {
     final BaseXFileChooser fc = new BaseXFileChooser(SAVE_AS,
         gui.gprop.get(GUIProp.WORKPATH), gui);
 

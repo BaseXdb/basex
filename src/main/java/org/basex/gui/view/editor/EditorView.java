@@ -17,7 +17,6 @@ import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.GUIConstants.Msg;
-import org.basex.gui.dialog.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXEditor.Action;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
@@ -33,7 +32,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class EditorView extends View {
+public final class EditorView extends View implements EditorNotifier {
   /** Error string. */
   private static final String ERRSTRING = STOPPED_AT + ' ' +
       (LINE_X + ", " + COLUMN_X).replaceAll("%", "([0-9]+)");
@@ -52,8 +51,6 @@ public final class EditorView extends View {
   final BaseXLabel pos;
   /** Query area. */
   final BaseXTabs tabs;
-  /** Search field. */
-  final BaseXTextField find;
   /** Execute button. */
   final BaseXButton go;
   /** Thread counter. */
@@ -69,6 +66,9 @@ public final class EditorView extends View {
   /** Filter button. */
   private final BaseXButton filter;
 
+  /** Search panel. */
+  public final BaseXSearch search;
+
   /**
    * Default constructor.
    * @param man view manager
@@ -76,72 +76,77 @@ public final class EditorView extends View {
   public EditorView(final ViewNotifier man) {
     super(EDITORVIEW, man);
 
-    border(6, 6, 6, 6).layout(new BorderLayout()).setFocusable(false);
+    border(6, 6, 6, 6).layout(new BorderLayout(0, 2)).setFocusable(false);
 
     header = new BaseXLabel(EDITOR, true, false);
 
     final BaseXButton openB = BaseXButton.command(GUICommands.C_EDITOPEN, gui);
-    final BaseXButton saveB = new BaseXButton(gui, "editsave", token(H_SAVE));
-    final BaseXButton hist = new BaseXButton(gui, "hist", token(H_RECENTLY_OPEN));
+    final BaseXButton saveB = new BaseXButton(gui, "save", H_SAVE);
+    final BaseXButton hist = new BaseXButton(gui, "hist", H_RECENTLY_OPEN);
+    final BaseXButton srch = new BaseXButton(gui, "search", H_REPLACE);
 
-    find = new BaseXTextField(gui);
-    BaseXLayout.setHeight(find, (int) openB.getPreferredSize().getHeight());
+    BaseXBack buttons = new BaseXBack(Fill.NONE).layout(new TableLayout(1, 4, 1, 0));
+    buttons.add(srch);
+    buttons.add(openB);
+    buttons.add(saveB);
+    buttons.add(hist);
 
-    BaseXBack sp = new BaseXBack(Fill.NONE).layout(new TableLayout(1, 7));
-    sp.add(find);
-    sp.add(Box.createHorizontalStrut(5));
-    sp.add(openB);
-    sp.add(Box.createHorizontalStrut(1));
-    sp.add(saveB);
-    sp.add(Box.createHorizontalStrut(1));
-    sp.add(hist);
-
-    final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout());
+    final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout(8, 0));
     b.add(header, BorderLayout.CENTER);
-    b.add(sp, BorderLayout.EAST);
+    b.add(buttons, BorderLayout.EAST);
     add(b, BorderLayout.NORTH);
 
+    final BaseXBack center = new BaseXBack(Fill.NONE).layout(new BorderLayout(0, 2));
     tabs = new BaseXTabs(gui);
     tabs.setFocusable(false);
-
+    search = new BaseXSearch(gui, this, true);
     addCreateTab();
-    addTab().setSearch(find);
-    add(tabs, BorderLayout.CENTER);
+    final EditorArea edit = addTab();
 
-    /* Scroll Pane. */
-    final BaseXBack south = new BaseXBack(Fill.NONE).layout(
-        new BorderLayout(8, 0));
+    center.add(tabs, BorderLayout.CENTER);
+    center.add(search, BorderLayout.SOUTH);
+    add(center, BorderLayout.CENTER);
+    search.setVisible(false);
+
+    // status and query pane
     info = new BaseXLabel().setText(OK, Msg.SUCCESS);
     pos = new BaseXLabel(" ");
+    pos.setText(edit.pos());
 
-    sp = new BaseXBack(Fill.NONE).layout(new BorderLayout(8, 0));
-    sp.add(info, BorderLayout.CENTER);
-    sp.add(pos, BorderLayout.EAST);
-
-    south.add(sp, BorderLayout.CENTER);
-
-    stop = new BaseXButton(gui, "stop", token(H_STOP_PROCESS));
+    stop = new BaseXButton(gui, "stop", H_STOP_PROCESS);
     stop.addKeyListener(this);
     stop.setEnabled(false);
 
-    go = new BaseXButton(gui, "go", token(H_EXECUTE_QUERY));
+    go = new BaseXButton(gui, "go", H_EXECUTE_QUERY);
     go.addKeyListener(this);
 
     filter = BaseXButton.command(GUICommands.C_FILTER, gui);
     filter.addKeyListener(this);
 
-    sp = new BaseXBack(Fill.NONE).border(4, 0, 0, 0).layout(
-        new TableLayout(1, 5));
-    sp.add(stop);
-    sp.add(Box.createHorizontalStrut(1));
-    sp.add(go);
-    sp.add(Box.createHorizontalStrut(1));
-    sp.add(filter);
-    south.add(sp, BorderLayout.EAST);
+    final BaseXBack status = new BaseXBack(Fill.NONE).layout(new BorderLayout(4, 0));
+    status.add(info, BorderLayout.CENTER);
+    status.add(pos, BorderLayout.EAST);
+
+    final BaseXBack query = new BaseXBack(Fill.NONE).layout(new TableLayout(1, 3, 1, 0));
+    query.add(stop);
+    query.add(go);
+    query.add(filter);
+
+    final BaseXBack south = new BaseXBack(Fill.NONE).border(4, 0, 0, 0);
+    south.layout(new BorderLayout(8, 0));
+    south.add(status, BorderLayout.CENTER);
+    south.add(query, BorderLayout.EAST);
     add(south, BorderLayout.SOUTH);
+
     refreshLayout();
 
     // add listeners
+    srch.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(final ActionEvent e) {
+        search.activate(true);
+      }
+    });
     saveB.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
@@ -180,15 +185,15 @@ public final class EditorView extends View {
     info.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(final MouseEvent e) {
-        EditorArea edit = getEditor();
+        EditorArea ea = getEditor();
         if(errFile != null) {
-          edit = find(IO.get(errFile), false);
-          if(edit == null) edit = open(new IOFile(errFile));
-          tabs.setSelectedComponent(edit);
+          ea = find(IO.get(errFile), false);
+          if(ea == null) ea = open(new IOFile(errFile));
+          tabs.setSelectedComponent(ea);
         }
         if(errPos == -1) return;
-        edit.jumpError(errPos);
-        pos.setText(edit.pos());
+        ea.jumpError(errPos);
+        pos.setText(ea.pos());
       }
     });
     stop.addActionListener(new ActionListener() {
@@ -209,14 +214,14 @@ public final class EditorView extends View {
     tabs.addChangeListener(new ChangeListener() {
       @Override
       public void stateChanged(final ChangeEvent e) {
-        final EditorArea edit = getEditor();
-        if(edit == null) return;
-        edit.setSearch(find);
-        if(edit.opened()) gui.gprop.set(GUIProp.WORKPATH, edit.file.path());
+        final EditorArea ea = getEditor();
+        if(ea == null) return;
+        saveB.setEnabled(!ea.opened() || ea.modified);
+        search.search();
         gui.refreshControls();
+        pos.setText(ea.pos());
+        ea.release(Action.PARSE);
         refreshMark();
-        pos.setText(edit.pos());
-        edit.release(Action.PARSE);
       }
     });
 
@@ -236,8 +241,8 @@ public final class EditorView extends View {
 
   @Override
   public void refreshMark() {
-    final EditorArea area = getEditor();
-    go.setEnabled(area.script || area.xquery && !gui.gprop.is(GUIProp.EXECRT));
+    final EditorArea edit = getEditor();
+    go.setEnabled(edit.script || edit.xquery && !gui.gprop.is(GUIProp.EXECRT));
     final Nodes marked = gui.context.marked;
     filter.setEnabled(!gui.gprop.is(GUIProp.FILTERRT) &&
         marked != null && marked.size() != 0);
@@ -311,23 +316,6 @@ public final class EditorView extends View {
     if(file == null) return false;
     save(file);
     return true;
-  }
-
-  /**
-   * Searches and replaces texts.
-   */
-  public void replace() {
-    final DialogReplace dr = new DialogReplace(gui);
-    if(!dr.ok()) return;
-    try {
-      final EditorArea edit = getEditor();
-      final int nr = edit.replace(dr.search.getText(), dr.replace.getText(),
-          dr.regex.isSelected(), dr.casee.isSelected(), dr.multi.isSelected());
-      gui.status.setText(Util.info(STRINGS_REPLACED_X,  nr));
-      edit.release(Action.PARSE);
-    } catch(final Exception ex) {
-      BaseXDialog.error(gui, ERROR_C + ex.getMessage());
-    }
   }
 
   /**
@@ -497,15 +485,12 @@ public final class EditorView extends View {
    * @return result of check
    */
   public boolean saveable() {
-    final EditorArea area = getEditor();
-    return !area.opened() || area.modified;
+    final EditorArea edit = getEditor();
+    return !edit.opened() || edit.modified;
   }
 
-  /**
-   * Returns the current editor.
-   * @return editor
-   */
-  EditorArea getEditor() {
+  @Override
+  public EditorArea getEditor() {
     final Component c = tabs.getSelectedComponent();
     return c instanceof EditorArea ? (EditorArea) c : null;
   }
@@ -515,16 +500,21 @@ public final class EditorView extends View {
    * @param force action
    */
   void refresh(final boolean force) {
+    // update modification flag
     final EditorArea edit = getEditor();
-    refreshMark();
-
     boolean oe = edit.modified;
     edit.modified = edit.hist != null && edit.hist.modified();
     if(edit.modified == oe && !force) return;
+
+    // update tab title
     String title = edit.file().name();
-    if(edit.modified) title += "*";
+    if(edit.modified) title += '*';
     edit.label.setText(title);
+
+    // update components
     gui.refreshControls();
+    pos.setText(edit.pos());
+    refreshMark();
   }
 
   /**
@@ -582,12 +572,13 @@ public final class EditorView extends View {
   EditorArea addTab() {
     final EditorArea edit = new EditorArea(this, newTabFile());
     edit.setFont(GUIConstants.mfont);
+    edit.setSearch(search);
 
     final BaseXBack tab = new BaseXBack(new BorderLayout(10, 0)).mode(Fill.NONE);
     tab.add(edit.label, BorderLayout.CENTER);
 
-    final BaseXButton close = tabButton("editclose");
-    close.setRolloverIcon(BaseXLayout.icon("editclose2"));
+    final BaseXButton close = tabButton("e_close");
+    close.setRolloverIcon(BaseXLayout.icon("e_close2"));
     close.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
@@ -604,8 +595,8 @@ public final class EditorView extends View {
    * Adds a tab for creating new tabs.
    */
   private void addCreateTab() {
-    final BaseXButton add = tabButton("editnew");
-    add.setRolloverIcon(BaseXLayout.icon("editnew2"));
+    final BaseXButton add = tabButton("e_new");
+    add.setRolloverIcon(BaseXLayout.icon("e_new2"));
     add.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {

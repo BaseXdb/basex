@@ -11,7 +11,6 @@ import javax.swing.*;
 import javax.swing.border.*;
 
 import org.basex.gui.*;
-import org.basex.util.*;
 
 /**
  * Project specific button implementation.
@@ -55,10 +54,10 @@ public class BaseXButton extends JButton {
    * @param img image reference
    * @param hlp help text
    */
-  public BaseXButton(final Window gui, final String img, final byte[] hlp) {
+  public BaseXButton(final Window gui, final String img, final String hlp) {
     super(BaseXLayout.icon(img));
     BaseXLayout.addInteraction(this, gui);
-    if(hlp != null) setToolTipText(Token.string(hlp));
+    if(hlp != null) setToolTipText(hlp);
 
     // trim horizontal button margins
     final Insets in = getMargin();
@@ -75,8 +74,7 @@ public class BaseXButton extends JButton {
    * @param r right distance
    * @return self reference
    */
-  public BaseXButton border(final int t, final int l, final int b,
-      final int r) {
+  public BaseXButton border(final int t, final int l, final int b, final int r) {
     setBorder(new EmptyBorder(t, l, b, r));
     return this;
   }
@@ -89,7 +87,7 @@ public class BaseXButton extends JButton {
    */
   public static BaseXButton command(final GUICommand cmd, final GUI gui) {
     final BaseXButton button = new BaseXButton(gui,
-        cmd.toString().toLowerCase(Locale.ENGLISH), Token.token(cmd.help()));
+        cmd.toString().toLowerCase(Locale.ENGLISH), cmd.help());
     button.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {

@@ -9,7 +9,6 @@ import javax.swing.*;
 
 import org.basex.gui.*;
 import org.basex.gui.layout.BaseXLayout.DropHandler;
-import org.basex.util.*;
 
 /**
  * Project specific text field implementation.
@@ -22,8 +21,6 @@ public class BaseXTextField extends JTextField {
   public static final int DWIDTH = 350;
   /** Last input. */
   String last = "";
-  /** Attached text area to search in. */
-  BaseXEditor area;
 
   /**
    * Constructor.
@@ -65,16 +62,6 @@ public class BaseXTextField extends JTextField {
       selectAll();
     }
 
-    addFocusListener(new FocusAdapter() {
-      @Override
-      public void focusGained(final FocusEvent e) {
-        if(area != null) {
-          selectAll();
-          find();
-        }
-      }
-    });
-
     addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
@@ -83,21 +70,6 @@ public class BaseXTextField extends JTextField {
           setText(last);
           last = t;
         }
-        // attached text area
-        if(area == null) return;
-        if(ESCAPE.is(e) || ENTER.is(e) && getText().trim().isEmpty()) {
-          area.requestFocusInWindow();
-          setBackground(GUIConstants.WHITE);
-        } else if(FINDPREV.is(e) || FINDPREV2.is(e) || ENTER.is(e) && e.isShiftDown()) {
-          area.find(false);
-        } else if(FINDNEXT.is(e) || FINDNEXT2.is(e) || ENTER.is(e)) {
-          area.find(true);
-        }
-      }
-
-      @Override
-      public void keyReleased(final KeyEvent e) {
-        if(area != null) updateSearch(true);
       }
     });
     if(dialog != null) addKeyListener(dialog.keys);
@@ -107,36 +79,9 @@ public class BaseXTextField extends JTextField {
       @Override
       public void drop(final Object object) {
         setText(object.toString());
-        updateSearch(true);
         if(dialog != null) dialog.action(BaseXTextField.this);
       }
     });
-  }
-
-  /**
-   * Assigns the current input to an attached editor.
-   * @param search automatically search keyword
-   */
-  void updateSearch(final boolean search) {
-    if(area != null && area.setSearch(Token.token(getText())) && search) find();
-  }
-
-  /**
-   * Finds the specified keyword in the attached editor.
-   */
-  void find() {
-    setBackground(area.find() || getText().isEmpty() ?
-      GUIConstants.WHITE : GUIConstants.LRED);
-  }
-
-  /**
-   * Activates search functionality to the text field.
-   * @param a text area to search
-   */
-  public final void setSearch(final BaseXEditor a) {
-    area = a;
-    updateSearch(false);
-    BaseXLayout.setWidth(this, 100);
   }
 
   @Override

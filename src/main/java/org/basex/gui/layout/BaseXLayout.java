@@ -265,8 +265,11 @@ public final class BaseXLayout {
    */
   private static URL imageURL(final String name) {
     final String path = "/img/" + name + ".png";
-    final URL url = GUI.class.getResource(path);
-    if(url == null) Util.errln("Not found: " + path);
+    URL url = GUI.class.getResource(path);
+    if(url == null) {
+      Util.errln("Not found: " + path);
+      url = GUI.class.getResource("/img/" + Prop.NAME + ".png");
+    }
     return url;
   }
 

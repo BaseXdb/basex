@@ -99,7 +99,7 @@ public final class XQuerySyntax extends BaseXSyntax {
     }
 
     // special characters
-    final String word = text.nextWord();
+    final String word = text.nextString();
     if(KEYS.contains(word)) return GUIConstants.BLUE;
     // special characters
     if(FUNC.contains(word)) return FUNS;

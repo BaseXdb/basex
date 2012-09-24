@@ -86,8 +86,8 @@ final class EditorArea extends BaseXEditor {
 
   @Override
   public void setText(final byte[] t) {
-    super.setText(t);
     last = getText();
+    super.setText(t);
   }
 
   @Override
@@ -121,15 +121,13 @@ final class EditorArea extends BaseXEditor {
 
   @Override
   protected void release(final Action action) {
+    view.refresh(false);
     final byte[] in = getText();
     final boolean eq = eq(in, last);
     if(eq && action == Action.CHECK) return;
     last = in;
-    view.refresh(false);
 
-    view.pos.setText(pos());
     gui.context.prop.set(Prop.QUERYPATH, file.path());
-
     script = file.hasSuffix(IO.BXSSUFFIX);
     xquery = !script && !opened() || file.hasSuffix(IO.XQSUFFIXES);
     String input = string(in);

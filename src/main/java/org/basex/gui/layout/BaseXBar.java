@@ -95,10 +95,9 @@ public final class BaseXBar extends BaseXPanel {
    */
   public void pos(final int p) {
     final int pp = Math.max(0, Math.min(height - getHeight(), p));
-    if(pos != pp) {
-      pos = pp;
-      repaint();
-    }
+    if(pos == pp) return;
+    pos = pp;
+    repaint();
   }
 
   /**

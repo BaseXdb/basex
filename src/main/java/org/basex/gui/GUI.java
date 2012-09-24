@@ -2,7 +2,6 @@ package org.basex.gui;
 
 import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
-import static org.basex.util.Token.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -170,7 +169,7 @@ public final class GUI extends AGUI {
 
     input = new GUIInput(this);
 
-    hist = new BaseXButton(this, "hist", token(H_SHOW_HISTORY));
+    hist = new BaseXButton(this, "hist", H_SHOW_HISTORY);
     hist.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
@@ -201,7 +200,7 @@ public final class GUI extends AGUI {
     b.add(input, BorderLayout.CENTER);
     nav.add(b, BorderLayout.CENTER);
 
-    go = new BaseXButton(this, "go", token(H_EXECUTE_QUERY));
+    go = new BaseXButton(this, "go", H_EXECUTE_QUERY);
     go.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
