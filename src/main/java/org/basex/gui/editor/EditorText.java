@@ -77,19 +77,23 @@ public final class EditorText {
    */
   boolean moreTokens() {
     // quit if text has ended
-    if(pe >= text.length) return false;
-    ps = pe;
+    final byte[] txt = text;
+    final int tl = txt.length;
+    int ppe = pe;
+    if(ppe >= tl) return false;
+    ps = ppe;
 
     // find next token boundary
-    int ch = cp(text, ps);
-    pe += cl(text, ps);
-    if(!ftChar(ch)) return true;
-
-    while(pe < text.length) {
-      ch = cp(text, pe);
-      if(!ftChar(ch)) break;
-      pe += cl(text, pe);
+    int ch = cp(txt, ppe);
+    ppe += cl(txt, ppe);
+    if(ftChar(ch)) {
+      while(ppe < tl) {
+        ch = cp(txt, ppe);
+        if(!ftChar(ch)) break;
+        ppe += cl(txt, ppe);
+      }
     }
+    pe = ppe;
     return true;
   }
 
@@ -98,7 +102,10 @@ public final class EditorText {
    * @return string
    */
   public String nextString() {
-    return string(text, ps, pe - ps);
+    final byte[] txt = text;
+    final int ppe = pe;
+    final int pps = ps;
+    return ppe <= txt.length ? string(txt, pps, ppe - pps) : "";
   }
 
   /**

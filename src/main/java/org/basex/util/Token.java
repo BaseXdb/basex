@@ -114,12 +114,12 @@ public final class Token {
    */
   public static String string(final byte[] token, final int start, final int length) {
     if(length <= 0) return "";
+    /// check if string contains non-ascii characters
+    final int e = start + length;
+    for(int p = start; p < e; ++p) if(token[p] < 0) return utf8(token, start, length);
+    /// copy ascii characters to character array
     final char[] str = new char[length];
-    for(int i = 0; i < length; ++i) {
-      final byte b = token[start + i];
-      if(b < 0) return utf8(token, start, length);
-      str[i] = (char) b;
-    }
+    for(int p = 0; p < length; ++p) str[p] = (char) token[start + p];
     return new String(str);
   }
 
@@ -130,13 +130,11 @@ public final class Token {
    * @param length length
    * @return string
    */
-  private static String utf8(final byte[] token, final int start,
-      final int length) {
-
+  private static String utf8(final byte[] token, final int start, final int length) {
     // input is assumed to be correct UTF8. if input contains codepoints
     // larger than Character.MAX_CODE_POINT, results might be unexpected.
 
-    final StringBuilder sb = new StringBuilder(length);
+    final StringBuilder sb = new StringBuilder(length << 1);
     final int il = Math.min(start + length, token.length);
     for(int i = start; i < il; i += cl(token, i)) {
       final int cp = cp(token, i);
