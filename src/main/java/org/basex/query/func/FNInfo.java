@@ -141,7 +141,7 @@ public final class FNInfo extends StandardFunc {
 
     // if GUI is used, or if user is no admin, trace info is cached
     if(Prop.gui || !ctx.context.user.has(Perm.ADMIN)) {
-      ctx.evalInfo(tb.finish());
+      ctx.evalInfo(tb.toString());
     } else {
       Util.errln(tb.toString());
     }
