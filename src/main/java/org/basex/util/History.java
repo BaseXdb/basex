@@ -1,6 +1,5 @@
 package org.basex.util;
 
-
 /**
  * This class stores strings in a history.
  *
@@ -100,10 +99,17 @@ public final class History {
   public void store(final byte[] str, final int oc, final int nc) {
     if(!active || str == hist[pos] || Token.eq(str, hist[pos])) return;
 
+    // merge consecutive character inputs without deletions
+    int len = str.length;
+    if(pos > 0 && cur[pos] == oc && oc + 1 == nc && hist[pos - 1].length < len) {
+      hist[pos] = str;
+      cur[pos] = nc;
+      return;
+    }
+
     // summarize and limit size of new and existing entries
     int off = pos + 1;
-    int size = str.length;
-    for(; off > 0 && size < MAXBYTES; off--) size += hist[off - 1].length;
+    for(; off > 0 && len < MAXBYTES; off--) len += hist[off - 1].length;
     // enough space: limit number of entries
     if(off == 0 && pos + 1 == MAX) off = 1;
     // remove entries
