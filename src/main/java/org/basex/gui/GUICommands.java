@@ -556,9 +556,11 @@ public enum GUICommands implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       gui.gprop.invert(GUIProp.EXECRT);
-      gui.refreshControls();
       gui.stop();
-      gui.notify.layout();
+      // refresh buttons in input bar
+      gui.refreshControls();
+      // refresh editor buttons
+      gui.editor.refreshMark();
     }
 
     @Override
@@ -574,8 +576,10 @@ public enum GUICommands implements GUICommand {
     public void execute(final GUI gui) {
       final boolean rt = gui.gprop.invert(GUIProp.FILTERRT);
       gui.stop();
+      // refresh buttons in input bar
       gui.refreshControls();
-      gui.notify.layout();
+      // refresh editor buttons
+      gui.editor.refreshMark();
 
       final Context ctx = gui.context;
       final boolean root = ctx.root();

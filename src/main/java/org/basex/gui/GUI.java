@@ -379,11 +379,7 @@ public final class GUI extends AGUI {
       updating = cmd.updating(context);
 
       // updates the query editor
-      if(edit) {
-        editor.start();
-      } else if(editor.visible()) {
-        editor.reset();
-      }
+      if(edit) editor.start();
 
       // reset visualizations if data reference will be changed
       if(cmd.newData(context)) notify.init();
@@ -408,7 +404,7 @@ public final class GUI extends AGUI {
       // sends feedback to the query editor
       final boolean interrupted = inf.startsWith(INTERRUPTED);
       if(edit) {
-        editor.info(interrupted ? INTERRUPTED : ok ? OK : inf, ok || interrupted);
+        editor.info(interrupted ? INTERRUPTED : ok ? OK : inf, ok || interrupted, true);
       }
 
       // check if query feedback was evaluated in the query view

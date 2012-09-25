@@ -126,6 +126,7 @@ public final class EditorView extends View implements EditorNotifier {
 
     filter = BaseXButton.command(GUICommands.C_FILTER, gui);
     filter.addKeyListener(this);
+    filter.setEnabled(false);
 
     final BaseXBack status = new BaseXBack(Fill.NONE).layout(new BorderLayout(4, 0));
     status.add(info, BorderLayout.CENTER);
@@ -194,7 +195,6 @@ public final class EditorView extends View implements EditorNotifier {
      public void actionPerformed(final ActionEvent e) {
         stop.setEnabled(false);
         go.setEnabled(false);
-        info.setText(OK, Msg.SUCCESS);
         gui.stop();
       }
     });
@@ -213,7 +213,6 @@ public final class EditorView extends View implements EditorNotifier {
         gui.refreshControls();
         pos.setText(ea.pos());
         ea.release(Action.PARSE);
-        refreshMark();
       }
     });
 
@@ -235,9 +234,8 @@ public final class EditorView extends View implements EditorNotifier {
   public void refreshMark() {
     final EditorArea edit = getEditor();
     go.setEnabled(edit.script || edit.xquery && !gui.gprop.is(GUIProp.EXECRT));
-    final Nodes marked = gui.context.marked;
-    filter.setEnabled(!gui.gprop.is(GUIProp.FILTERRT) &&
-        marked != null && marked.size() != 0);
+    final Nodes mrk = gui.context.marked;
+    filter.setEnabled(!gui.gprop.is(GUIProp.FILTERRT) && mrk != null && mrk.size() != 0);
   }
 
   @Override
@@ -247,7 +245,6 @@ public final class EditorView extends View implements EditorNotifier {
   public void refreshLayout() {
     header.setFont(GUIConstants.lfont);
     for(final EditorArea edit : editors()) edit.setFont(GUIConstants.mfont);
-    refreshMark();
     search.refreshLayout();
   }
 
@@ -399,17 +396,6 @@ public final class EditorView extends View implements EditorNotifier {
   }
 
   /**
-   * Initializes the info message.
-   */
-  public void reset() {
-    ++threadID;
-    errFile = null;
-    info.setToolTipText(null);
-    info.setText(OK, Msg.SUCCESS);
-    stop.setEnabled(false);
-  }
-
-  /**
    * Starts a thread, which shows a waiting info after a short timeout.
    */
   public void start() {
@@ -427,21 +413,24 @@ public final class EditorView extends View implements EditorNotifier {
   }
 
   /**
-   * Evaluates the info message resulting from a query execution.
+   * Evaluates the info message resulting from a parsed or executed query.
    * @param msg info message
-   * @param ok true if query was successful
+   * @param ok {@code true} if evaluation was successful
+   * @param up update
    */
-  public void info(final String msg, final boolean ok) {
+  public void info(final String msg, final boolean ok, final boolean up) {
     ++threadID;
     errPos = -1;
     errFile = null;
     info.setCursor(!ok && error(msg) ?
         GUIConstants.CURSORHAND : GUIConstants.CURSORARROW);
-    final String m = msg.replaceAll("^.*\\r?\\n\\[.*?\\]", "").
+    final String m = msg.replaceAll("^.*\r?\n\\[.*?\\]", "").
         replaceAll(".*" + LINE_X.replaceAll("%", ".*?") + COL, "");
     info.setText(m, ok ? Msg.SUCCESS : Msg.ERROR).setToolTipText(ok ? null : msg);
-    stop.setEnabled(false);
-    refreshMark();
+    if(up) {
+      stop.setEnabled(false);
+      refreshMark();
+    }
   }
 
   /**
@@ -528,7 +517,7 @@ public final class EditorView extends View implements EditorNotifier {
     // update components
     gui.refreshControls();
     pos.setText(edit.pos());
-    refreshMark();
+    //refreshMark();
   }
 
   /**
