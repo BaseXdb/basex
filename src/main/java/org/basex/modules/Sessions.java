@@ -17,56 +17,57 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * This module contains functions for processing server-side session data.
+ * This module contains functions for processing global sessions.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class Session extends QueryModule {
+public final class Sessions extends QueryModule {
   /**
-   * Returns the session ID.
-   * @return session id
-   * @throws QueryException query exception
+   * Returns the ids of all registered sessions.
+   * @return session ids
    */
-  @Requires(Permission.NONE)
-  public Str id() throws QueryException {
-    return Str.get(session().getId());
+  public Value ids() {
+    final HashMap<String, HttpSession> http = SessionListener.sessions();
+    final TokenList tl = new TokenList(http.size());
+    for(final String s : http.keySet()) tl.add(s);
+    return StrSeq.get(tl);
   }
 
   /**
-   * Returns all session attributes.
+   * Returns all attributes of the specified session.
+   * @param id session id
    * @return session attributes
    * @throws QueryException query exception
    */
-  @Requires(Permission.NONE)
-  public Value names() throws QueryException {
+  public Value names(final Str id) throws QueryException {
     final TokenList tl = new TokenList();
-    final Enumeration<String> en = session().getAttributeNames();
+    final Enumeration<String> en = session(id).getAttributeNames();
     while(en.hasMoreElements()) tl.add(en.nextElement());
     return StrSeq.get(tl);
   }
 
   /**
-   * Returns a session attribute.
+   * Returns the specified session attribute of a session.
+   * @param id session id
    * @param key key to be requested
    * @return session attribute
    * @throws QueryException query exception
    */
-  @Requires(Permission.NONE)
-  public Item get(final Str key) throws QueryException {
-    return get(key, null);
+  public Item get(final Str id, final Str key) throws QueryException {
+    return get(id, key, null);
   }
 
   /**
-   * Returns a session attribute.
+   * Returns the specified session attribute of a session.
+   * @param id session id
    * @param key key to be requested
    * @param def default item
    * @return session attribute
    * @throws QueryException query exception
    */
-  @Requires(Permission.NONE)
-  public Item get(final Str key, final Item def) throws QueryException {
-    final Object o = session().getAttribute(key.toJava());
+  public Item get(final Str id, final Str key, final Item def) throws QueryException {
+    final Object o = session(id).getAttribute(key.toJava());
     if(o == null) return def;
     if(o instanceof Item) return (Item) o;
     throw BXSE_GET.thrw(null, Util.name(o));
@@ -74,12 +75,12 @@ public final class Session extends QueryModule {
 
   /**
    * Updates a session attribute.
+   * @param id session id
    * @param key key of the attribute
    * @param item item to be stored
    * @throws QueryException query exception
    */
-  @Requires(Permission.NONE)
-  public void set(final Str key, final Item item) throws QueryException {
+  public void set(final Str id, final Str key, final Item item) throws QueryException {
     Item it = item;
     final Data d = it.data();
     if(d != null && !d.inMemory()) {
@@ -88,35 +89,39 @@ public final class Session extends QueryModule {
     } else if(it instanceof FItem) {
       BXSE_FITEM.thrw(null);
     }
-    session().setAttribute(key.toJava(), it);
+    session(id).setAttribute(key.toJava(), it);
   }
 
   /**
    * Removes a session attribute.
+   * @param id session id
    * @param key key of the attribute
    * @throws QueryException query exception
    */
-  @Requires(Permission.NONE)
-  public void delete(final Str key) throws QueryException {
-    session().removeAttribute(key.toJava());
+  public void delete(final Str id, final Str key) throws QueryException {
+    session(id).removeAttribute(key.toJava());
   }
 
   /**
    * Invalidates a session.
+   * @param id session id
    * @throws QueryException query exception
    */
-  @Requires(Permission.NONE)
-  public void close() throws QueryException {
-    session().invalidate();
+  public void close(final Str id) throws QueryException {
+    session(id).invalidate();
   }
 
   /**
-   * Returns the session instance.
+   * Returns the specified session.
+   * @param id ids
    * @return request
    * @throws QueryException query exception
    */
-  private HttpSession session() throws QueryException {
+  private HttpSession session(final Str id) throws QueryException {
     if(context.http == null) BXSE_SESS.thrw(null);
-    return ((HTTPContext) context.http).req.getSession();
+    final HashMap<String, HttpSession> http = SessionListener.sessions();
+    final HttpSession session = http.get(id.toJava());
+    if(session == null) BXSE_WHICH.thrw(null, id);
+    return session;
   }
 }

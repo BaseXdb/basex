@@ -51,13 +51,26 @@
   </context-param>
   -->
 
-  <!--  Mapping for static resources (may be restricted to a sub path) -->
+  <!-- Global session listener -->
+  <listener>
+    <listener-class>org.basex.http.SessionListener</listener-class>
+  </listener>
+
+  <!-- Mapping for static resources (may be restricted to a sub path) -->
+  <servlet>
+    <servlet-name>default</servlet-name>
+    <init-param>
+      <param-name>useFileMappedBuffer</param-name>
+      <param-value>false</param-value>
+    </init-param>
+    <load-on-startup>0</load-on-startup>
+  </servlet>
   <servlet-mapping>
     <servlet-name>default</servlet-name>
     <url-pattern>/</url-pattern>
   </servlet-mapping>
 
-  <!--  WebDAV Service (can be deactivated by removing this entry) -->
+  <!-- WebDAV Service (can be deactivated by removing this entry) -->
   <servlet>
     <servlet-name>WebDAV</servlet-name>
     <servlet-class>org.basex.http.webdav.WebDAVServlet</servlet-class>
@@ -68,7 +81,7 @@
     <url-pattern>/webdav/*</url-pattern>
   </servlet-mapping>
 
-  <!--  REST Service (can be deactivated by removing this entry) -->
+  <!-- REST Service (can be deactivated by removing this entry) -->
   <servlet>
     <servlet-name>REST</servlet-name>
     <servlet-class>org.basex.http.rest.RESTServlet</servlet-class>
@@ -79,7 +92,7 @@
     <url-pattern>/rest/*</url-pattern>
   </servlet-mapping>
 
-  <!--  RESTXQ Service (can be deactivated by removing this entry) -->
+  <!-- RESTXQ Service (can be deactivated by removing this entry) -->
   <servlet>
     <servlet-name>RESTXQ</servlet-name>
     <servlet-class>org.basex.http.restxq.RestXqServlet</servlet-class>
@@ -91,7 +104,7 @@
     <load-on-startup>1</load-on-startup>
   </servlet-mapping>
 
-  <!--  Direct association to queries and scripts -->
+  <!-- Direct association to queries and scripts -->
   <servlet>
     <servlet-name>Direct</servlet-name>
     <servlet-class>org.basex.http.direct.DirectServlet</servlet-class>
