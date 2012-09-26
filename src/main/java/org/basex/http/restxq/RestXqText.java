@@ -39,6 +39,12 @@ interface RestXqText {
   byte[] NAME = token("name");
   /** Token "value". */
   byte[] VALUE = token("value");
+  /** Token "location". */
+  byte[] LOCATION = token("location");
+  /** Token "redirect". */
+  byte[] REDIRECT = token("redirect");
+  /** Token "forward". */
+  byte[] FORWARD = token("forward");
 
   /** Error message. */
   String ANN_MISSING = "Annotation % is missing.";
@@ -65,11 +71,13 @@ interface RestXqText {
   /** Error message. */
   String UNKNOWN_SER = "Unknown serialization parameter \"%\".";
   /** Error message. */
-  String HEAD_METHOD = "HEAD method must only return 'rest:reponse' element.";
+  String HEAD_METHOD = "HEAD method must only return one 'restxq:response' element.";
   /** Error message. */
   String METHOD_VALUE = "Method % does not allow values.";
   /** Error message. */
   String INPUT_CONV = "Input could not be converted: %";
   /** Error message. */
   String PATH_CONFLICT = "Several functions assigned to path \"%\":%";
+  /** Error message. */
+  String NO_VALUE = "% element has no string value.";
 }

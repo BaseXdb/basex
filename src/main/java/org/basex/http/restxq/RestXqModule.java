@@ -84,12 +84,9 @@ final class RestXqModule {
    * Processes the HTTP request.
    * @param http HTTP context
    * @param func function to be processed
-   * @throws QueryException query exception
-   * @throws IOException I/O exception
+   * @throws Exception exception
    */
-  void process(final HTTPContext http, final RestXqFunction func)
-      throws QueryException, IOException {
-
+  void process(final HTTPContext http, final RestXqFunction func) throws Exception {
     // create new XQuery instance
     final QueryContext qc = parse(http);
     // loop through all functions

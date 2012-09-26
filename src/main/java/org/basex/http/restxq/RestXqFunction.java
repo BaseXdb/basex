@@ -80,12 +80,11 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
 
   /**
    * Processes the HTTP request.
-   * @param http HTTP context
    * Parses new modules and discards obsolete ones.
-   * @throws QueryException query exception
-   * @throws IOException I/O exception
+   * @param http HTTP context
+   * @throws Exception exception
    */
-  void process(final HTTPContext http) throws QueryException, IOException {
+  void process(final HTTPContext http) throws Exception {
     try {
       module.process(http, this);
     } catch(final QueryException ex) {

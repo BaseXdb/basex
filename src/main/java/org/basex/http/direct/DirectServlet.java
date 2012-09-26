@@ -141,7 +141,7 @@ public final class DirectServlet extends BaseXServlet {
     uri += createParam(evar, err, uri);
     // set status and location
     http.status(HttpServletResponse.SC_MOVED_TEMPORARILY, null);
-    http.res.setHeader("location", uri);
+    http.res.setHeader(HTTPText.LOCATION, uri);
   }
 
   /**
