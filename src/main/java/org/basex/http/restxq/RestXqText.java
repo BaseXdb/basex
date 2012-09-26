@@ -79,5 +79,5 @@ interface RestXqText {
   /** Error message. */
   String PATH_CONFLICT = "Several functions assigned to path \"%\":%";
   /** Error message. */
-  String NO_VALUE = "% element has no string value.";
+  String NO_VALUE = "'%' element has no string value.";
 }

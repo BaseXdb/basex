@@ -99,14 +99,14 @@ final class RestXqResponse {
         // send redirect to browser
         if(RESTXQ_REDIRECT.eq(node)) {
           final ANode ch = node.children().next();
-          if(ch == null || ch.type != NodeType.TXT) function.error(NO_VALUE);
+          if(ch == null || ch.type != NodeType.TXT) function.error(NO_VALUE, node.name());
           http.res.sendRedirect(string(ch.string()));
           return;
         }
         // server-side forwarding
         if(RESTXQ_FORWARD.eq(node)) {
           final ANode ch = node.children().next();
-          if(ch == null || ch.type != NodeType.TXT) function.error(NO_VALUE);
+          if(ch == null || ch.type != NodeType.TXT) function.error(NO_VALUE, node.name());
           http.req.getRequestDispatcher(string(ch.string())).forward(http.req, http.res);
           return;
         }
