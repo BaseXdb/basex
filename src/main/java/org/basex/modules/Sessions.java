@@ -35,6 +35,28 @@ public final class Sessions extends QueryModule {
   }
 
   /**
+   * Returns the creation time of the session.
+   * @param id session id
+   * @return creation time
+   * @throws QueryException query exception
+   */
+  @Requires(Permission.NONE)
+  public Dtm created(final Str id) throws QueryException {
+    return new Dtm(session(id).getCreationTime(), null);
+  }
+
+  /**
+   * Returns the last access time of the session.
+   * @param id session id
+   * @return creation time
+   * @throws QueryException query exception
+   */
+  @Requires(Permission.NONE)
+  public Dtm accessed(final Str id) throws QueryException {
+    return new Dtm(session(id).getLastAccessedTime(), null);
+  }
+
+  /**
    * Returns all attributes of the specified session.
    * @param id session id
    * @return session attributes
