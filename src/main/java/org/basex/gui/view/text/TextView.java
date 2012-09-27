@@ -27,16 +27,16 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class TextView extends View implements EditorNotifier {
-  /** Search panel. */
-  final SearchPanel search;
+public final class TextView extends View {
+  /** Search editor. */
+  final SearchEditor search;
 
   /** Header string. */
   private final BaseXLabel header;
   /** Home button. */
   private final BaseXButton home;
   /** Text Area. */
-  private final Editor edit;
+  private final Editor text;
 
   /** Result command. */
   private Command cmd;
@@ -71,14 +71,10 @@ public final class TextView extends View implements EditorNotifier {
     b.add(header, BorderLayout.CENTER);
     add(b, BorderLayout.NORTH);
 
-    final BaseXBack center = new BaseXBack(Fill.NONE).layout(new BorderLayout(0, 2));
-    edit = new Editor(false, gui);
-    edit.setSyntax(new SyntaxXML());
-    search = new SearchPanel(gui).button(srch).editor(edit);
-
-    center.add(edit, BorderLayout.CENTER);
-    center.add(search, BorderLayout.SOUTH);
-    add(center, BorderLayout.CENTER);
+    text = new Editor(false, gui);
+    text.setSyntax(new SyntaxXML());
+    search = new SearchEditor(gui, text).button(srch);
+    add(search, BorderLayout.CENTER);
 
     save.addActionListener(new ActionListener() {
       @Override
@@ -111,8 +107,8 @@ public final class TextView extends View implements EditorNotifier {
   @Override
   public void refreshLayout() {
     header.setFont(lfont);
-    edit.setFont(mfont);
-    search.refreshLayout();
+    text.setFont(mfont);
+    search.panel().refreshLayout();
   }
 
   @Override
@@ -133,11 +129,6 @@ public final class TextView extends View implements EditorNotifier {
   @Override
   protected boolean db() {
     return false;
-  }
-
-  @Override
-  public Editor getEditor() {
-    return edit;
   }
 
   /**
@@ -190,7 +181,7 @@ public final class TextView extends View implements EditorNotifier {
     if(out.finished() && size >= chop.length) {
       System.arraycopy(chop, 0, buf, size - chop.length, chop.length);
     }
-    edit.setText(buf, size);
+    text.setText(buf, size);
     header.setText(TEXT + (out.finished() ? CHOPPED : ""));
     home.setEnabled(gui.context.data() != null);
   }
@@ -220,7 +211,7 @@ public final class TextView extends View implements EditorNotifier {
       } else if(ns != null) {
         ns.serialize(Serializer.get(out));
       } else {
-        final byte[] txt = edit.getText();
+        final byte[] txt = text.getText();
         for(final byte t : txt) if(t < 0 || t > ' ' || ws(t)) out.write(t);
       }
     } catch(final IOException ex) {

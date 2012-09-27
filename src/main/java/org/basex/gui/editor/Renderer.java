@@ -61,7 +61,7 @@ public final class Renderer extends BaseXBack {
    * @param b scrollbar reference
    */
   Renderer(final EditorText t, final BaseXBar b) {
-    mode(Fill.NONE).setFont(GUIConstants.dfont);
+    mode(Fill.NONE);
     text = t;
     bar = b;
   }

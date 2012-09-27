@@ -6,8 +6,6 @@ import static org.basex.gui.GUIConstants.*;
 import java.awt.*;
 import java.awt.event.*;
 
-import javax.swing.*;
-
 import org.basex.util.*;
 
 /**
@@ -35,12 +33,15 @@ public final class BaseXMem extends BaseXPanel {
       addMouseMotionListener(this);
     }
 
-    new Timer(500, new ActionListener() {
+    final Thread t = new Thread() {
       @Override
-      public void actionPerformed(final ActionEvent e) {
+      public void run() {
         repaint();
+        Performance.sleep(500);
       }
-    }).start();
+    };
+    t.setDaemon(true);
+    t.start();
   }
 
   @Override

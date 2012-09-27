@@ -17,6 +17,7 @@ import javax.swing.*;
 
 import org.basex.core.*;
 import org.basex.gui.*;
+import org.basex.gui.editor.*;
 import org.basex.util.*;
 
 /**
@@ -176,12 +177,10 @@ public final class BaseXLayout {
         @Override
         public void keyPressed(final KeyEvent e) {
           final Object s = e.getSource();
-          if(s instanceof BaseXCombo && ((BaseXCombo) s).isPopupVisible())
-            return;
-
+          if(s instanceof BaseXCombo && ((BaseXCombo) s).isPopupVisible()) return;
           // process key events
-          if(ENTER.is(e)) {
-            if(!(s instanceof BaseXButton)) d.close();
+          if(ENTER.is(e) && !(s instanceof BaseXButton) && !(s instanceof Editor)) {
+            d.close();
           } else if(ESCAPE.is(e)) {
             d.cancel();
           }

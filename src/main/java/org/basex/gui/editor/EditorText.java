@@ -55,20 +55,11 @@ public final class EditorText {
   /**
    * Sets a new text.
    * @param t new text
-   * @param reset reset selection
-   */
-  void text(final byte[] t, final boolean reset) {
-    text = t;
-    if(reset) noSelect();
-    if(search != null) search.search(t);
-  }
-
-  /**
-   * Sets a new text.
-   * @param t new text
    */
   void text(final byte[] t) {
-    text(t, false);
+    text = t;
+    noSelect();
+    if(search != null) search.search(t);
   }
 
   /**
@@ -373,7 +364,10 @@ public final class EditorText {
     }
     tb.add(text, ps, text.length);
     ps = me;
+    final int ss = ms;
     text(tb.finish());
+    ms = ss;
+    me = ps;
   }
 
 
@@ -434,7 +428,6 @@ public final class EditorText {
     System.arraycopy(text, e, tmp, s, tl - e);
     text(tmp);
     ps = s;
-    noSelect();
   }
 
   /**

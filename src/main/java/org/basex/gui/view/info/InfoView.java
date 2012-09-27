@@ -22,9 +22,9 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class InfoView extends View implements EditorNotifier {
+public final class InfoView extends View {
   /** Search panel. */
-  final SearchPanel search;
+  final SearchEditor search;
 
   /** Old text. */
   private final TokenBuilder text = new TokenBuilder();
@@ -69,7 +69,6 @@ public final class InfoView extends View implements EditorNotifier {
     title.add(timer, BorderLayout.SOUTH);
 
     final BaseXButton srch = new BaseXButton(gui, "search", SEARCH);
-
     buttons = new BaseXBack(Fill.NONE);
     buttons.layout(new TableLayout(1, 1, 1, 0));
     buttons.add(srch);
@@ -81,19 +80,13 @@ public final class InfoView extends View implements EditorNotifier {
 
     final BaseXBack center = new BaseXBack(Fill.NONE).layout(new BorderLayout(0, 2));
     area = new Editor(false, gui);
-    search = new SearchPanel(gui).button(srch).editor(area);
+    search = new SearchEditor(gui, area).button(srch);
+    add(search, BorderLayout.CENTER);
 
     center.add(area, BorderLayout.CENTER);
     center.add(search, BorderLayout.SOUTH);
     add(center, BorderLayout.CENTER);
     refreshLayout();
-
-    srch.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        search.activate(true);
-      }
-    });
   }
 
   @Override
@@ -116,7 +109,7 @@ public final class InfoView extends View implements EditorNotifier {
     header.setFont(lfont);
     timer.setFont(font);
     area.setFont(font);
-    search.refreshLayout();
+    search.panel().refreshLayout();
   }
 
   @Override
@@ -132,11 +125,6 @@ public final class InfoView extends View implements EditorNotifier {
   @Override
   protected boolean db() {
     return false;
-  }
-
-  @Override
-  public Editor getEditor() {
-    return area;
   }
 
   /**

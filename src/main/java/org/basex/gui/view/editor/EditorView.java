@@ -33,7 +33,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class EditorView extends View implements EditorNotifier {
+public final class EditorView extends View {
   /** Error string. */
   private static final String ERRSTRING = STOPPED_AT + ' ' +
       (LINE_X + ", " + COLUMN_X).replaceAll("%", "([0-9]+)");
@@ -100,18 +100,15 @@ public final class EditorView extends View implements EditorNotifier {
     b.add(buttons, BorderLayout.EAST);
     add(b, BorderLayout.NORTH);
 
-    final BaseXBack center = new BaseXBack(Fill.NONE).layout(new BorderLayout(0, 2));
     tabs = new BaseXTabs(gui);
     tabs.setFocusable(false);
-    search = new SearchPanel(gui).button(srch);
+    final SearchEditor se = new SearchEditor(gui, tabs, null).button(srch);
+    search = se.panel();
     addCreateTab();
-    final EditorArea edit = addTab();
-
-    center.add(tabs, BorderLayout.CENTER);
-    center.add(search, BorderLayout.SOUTH);
-    add(center, BorderLayout.CENTER);
+    add(se, BorderLayout.CENTER);
 
     // status and query pane
+    final EditorArea edit = addTab();
     info = new BaseXLabel().setText(OK, Msg.SUCCESS);
     pos = new BaseXLabel(" ");
     pos.setText(edit.pos());
@@ -491,7 +488,10 @@ public final class EditorView extends View implements EditorNotifier {
     return !edit.opened() || edit.modified;
   }
 
-  @Override
+  /**
+   * Returns the current editor.
+   * @return editor
+   */
   public EditorArea getEditor() {
     final Component c = tabs.getSelectedComponent();
     return c instanceof EditorArea ? (EditorArea) c : null;

@@ -127,9 +127,10 @@ public final class DialogProps extends BaseXDialog {
       info.bold().add(NL + NAMESPACES + NL).norm().add(data.nspaces.info());
     }
 
-    final Editor text = text(info.finish());
+    final Editor text = new Editor(false, this, info.finish());
     text.setFont(f);
-    tabGeneral.add(text, BorderLayout.CENTER);
+    BaseXLayout.setHeight(text, 200);
+    tabGeneral.add(new SearchEditor(main, text), BorderLayout.CENTER);
 
     tabs = new BaseXTabs(this);
     tabs.addTab(RESOURCES, tabRes);
@@ -194,37 +195,19 @@ public final class DialogProps extends BaseXDialog {
 
   /**
    * Adds index information to the specified panel and tab.
-   * @param p index offset
+   * @param i index offset
    * @param tab panel tab
    * @param info optional info to display
    */
-  private void add(final int p, final BaseXBack tab, final BaseXBack info) {
+  private void add(final int i, final BaseXBack tab, final BaseXBack info) {
     final BaseXBack idx = new BaseXBack(new BorderLayout(8, 0));
-    idx.add(labels[p], BorderLayout.WEST);
-    if(indxs[p] != null) idx.add(indxs[p], BorderLayout.EAST);
-    panels[p].add(idx, BorderLayout.NORTH);
+    idx.add(labels[i], BorderLayout.WEST);
+    if(indxs[i] != null) idx.add(indxs[i], BorderLayout.EAST);
+    panels[i].add(idx, BorderLayout.NORTH);
 
-    BaseXBack b = info;
-    if(b == null) {
-      b = new BaseXBack(Fill.NONE).layout(new BorderLayout(0, 2));
-      final SearchPanel search = new SearchPanel(gui).editor(infos[p]);
-      b.add(infos[p], BorderLayout.CENTER);
-      b.add(search, BorderLayout.SOUTH);
-    }
-    panels[p].add(b, BorderLayout.CENTER);
-    //panels[p].add(info != null ? info : infos[p], BorderLayout.CENTER);
-    tab.add(panels[p]);
-  }
-
-  /**
-   * Returns a text box.
-   * @param txt contents
-   * @return text box
-   */
-  private Editor text(final byte[] txt) {
-    final Editor text = new Editor(false, this, txt);
-    BaseXLayout.setHeight(text, 200);
-    return text;
+    final BaseXBack b = info != null ? info : new SearchEditor(gui, infos[i]);
+    panels[i].add(b, BorderLayout.CENTER);
+    tab.add(panels[i]);
   }
 
   @Override

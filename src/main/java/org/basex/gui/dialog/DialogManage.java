@@ -82,7 +82,7 @@ public final class DialogManage extends BaseXDialog {
     // first tab
     final BaseXBack tab1 = new BaseXBack(new BorderLayout(0, 8)).border(8);
     tab1.add(doc1, BorderLayout.NORTH);
-    tab1.add(detail, BorderLayout.CENTER);
+    tab1.add(new SearchEditor(main, detail), BorderLayout.CENTER);
     tab1.add(newButtons(drop, rename, copy, open), BorderLayout.SOUTH);
 
     doc2 = new BaseXLabel(" ").border(0, 0, 6, 0);

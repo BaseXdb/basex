@@ -168,7 +168,7 @@ public final class DialogServer extends BaseXDialog {
 
     pp = new BaseXBack(new BorderLayout());
     pp.add(new BaseXLabel(S_SESSIONS + COLS, false, true), BorderLayout.NORTH);
-    pp.add(sese, BorderLayout.CENTER);
+    pp.add(new SearchEditor(main, sese), BorderLayout.CENTER);
     p.add(pp);
     sess.add(pp, BorderLayout.CENTER);
 
@@ -197,7 +197,7 @@ public final class DialogServer extends BaseXDialog {
     pp.add(deleteAll);
     p.add(pp, BorderLayout.WEST);
     logs.add(p, BorderLayout.NORTH);
-    logs.add(logt, BorderLayout.CENTER);
+    logs.add(new SearchEditor(main, logt), BorderLayout.CENTER);
 
     p = new BaseXBack(new BorderLayout(8, 0));
     p.add(infoL, BorderLayout.WEST);

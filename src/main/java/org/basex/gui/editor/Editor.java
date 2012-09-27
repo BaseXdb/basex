@@ -27,7 +27,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public class Editor extends BaseXPanel implements EditorNotifier {
+public class Editor extends BaseXPanel {
   /** Search direction. */
   public enum SearchDir {
     /** Same position. */
@@ -110,6 +110,7 @@ public class Editor extends BaseXPanel implements EditorNotifier {
     layout(new BorderLayout(4, 0));
     scroll = new BaseXBar(this);
     rend = new Renderer(text, scroll);
+    setFont(GUIConstants.dmfont);
 
     add(rend, BorderLayout.CENTER);
     add(scroll, BorderLayout.EAST);
@@ -251,11 +252,6 @@ public class Editor extends BaseXPanel implements EditorNotifier {
       rend.setFont(f);
       rend.repaint();
     }
-  }
-
-  @Override
-  public Editor getEditor() {
-    return this;
   }
 
   /**
@@ -548,13 +544,13 @@ public class Editor extends BaseXPanel implements EditorNotifier {
       } else if(UNDOSTEP.is(e)) {
         final byte[] t = hist.prev();
         if(t != null) {
-          text.text(t, true);
+          text.text(t);
           text.pos(hist.cursor());
         }
       } else if(REDOSTEP.is(e)) {
         final byte[] t = hist.next();
         if(t != null) {
-          text.text(t, true);
+          text.text(t);
           text.pos(hist.cursor());
         }
       } else if(COMMENT.is(e)) {
@@ -672,14 +668,16 @@ public class Editor extends BaseXPanel implements EditorNotifier {
 
     // remember if marked text is to be deleted
     String ch = String.valueOf(e.getKeyChar());
-    boolean del = true;
+    boolean indent = false;
     if(TAB.is(e)) {
       if(text.selected()) {
         // check if lines are to be indented
         final int s = Math.min(text.pos(), text.start());
         final int l = Math.max(text.pos(), text.start()) - 1;
-        for(int p = s; p <= l && p < txt.length; p++) del &= txt[p] != '\n';
-        if(!del) {
+        int p = s;
+        for(; p <= l && p < txt.length; p++) indent |= txt[p] != '\n';
+        indent |= p == txt.length;
+        if(indent) {
           text.indent(s, l, e.isShiftDown());
           ch = null;
         }
@@ -695,7 +693,7 @@ public class Editor extends BaseXPanel implements EditorNotifier {
     }
 
     // delete marked text
-    if(text.selected() && del) text.delete();
+    if(text.selected() && !indent) text.delete();
 
     if(ENTER.is(e)) {
       // adopt indentation from previous line
@@ -841,7 +839,7 @@ public class Editor extends BaseXPanel implements EditorNotifier {
       if(!hist.active()) return;
       final byte[] t = hist.prev();
       if(t == null) return;
-      text.text(t, true);
+      text.text(t);
       text.pos(hist.cursor());
       finish(-1);
     }
@@ -862,7 +860,7 @@ public class Editor extends BaseXPanel implements EditorNotifier {
       if(!hist.active()) return;
       final byte[] t = hist.next();
       if(t == null) return;
-      text.text(t, true);
+      text.text(t);
       text.pos(hist.cursor());
       finish(-1);
     }

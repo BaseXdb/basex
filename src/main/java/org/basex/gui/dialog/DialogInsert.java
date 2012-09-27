@@ -109,7 +109,7 @@ public final class DialogInsert extends BaseXDialog {
   void change(final Object src) {
     int n = 0;
     for(int r = 0; r < radio.length; ++r) if(src == radio[r]) n = r;
-    BaseXLayout.setHeight(input2, n == Data.ATTR ? 25 : 150);
+    BaseXLayout.setHeight(input2, n == Data.ATTR ? 25 : 350);
 
     back.removeAll();
     back.layout(new BorderLayout(0, 4));
@@ -122,7 +122,7 @@ public final class DialogInsert extends BaseXDialog {
     if(n != Data.ELEM) {
       final BaseXBack b = new BaseXBack(new BorderLayout(0, 4));
       b.add(label2, BorderLayout.NORTH);
-      b.add(input2, BorderLayout.CENTER);
+      b.add(new SearchEditor(gui, input2), BorderLayout.CENTER);
       back.add(b, BorderLayout.CENTER);
     }
     pack();

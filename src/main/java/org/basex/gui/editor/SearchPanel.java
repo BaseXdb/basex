@@ -45,7 +45,7 @@ public final class SearchPanel extends BaseXBack {
    * Constructor.
    * @param main gui reference
    */
-  public SearchPanel(final GUI main) {
+  SearchPanel(final GUI main) {
     layout(new BorderLayout(2, 0));
     mode(Fill.NONE);
     setVisible(false);
@@ -54,9 +54,11 @@ public final class SearchPanel extends BaseXBack {
     search = new BaseXTextField(main);
     search.history(gui, GUIProp.SEARCHED);
     search.setToolTipText(SEARCH);
+    search.setPreferredSize(null);
     replace = new BaseXTextField(main);
     replace.history(gui, GUIProp.REPLACED);
     replace.setToolTipText(REPLACE_WITH);
+    replace.setPreferredSize(null);
     regex = onOffButton("s_regex", REGULAR_EXPR, GUIProp.SR_REGEX);
     mcase = onOffButton("s_case", MATCH_CASE, GUIProp.SR_CASE);
     multi = onOffButton("s_multi", MULTI_LINE, GUIProp.SR_MULTI);
@@ -154,15 +156,15 @@ public final class SearchPanel extends BaseXBack {
     add(west, BorderLayout.WEST);
     add(center, BorderLayout.CENTER);
     add(east, BorderLayout.EAST);
+    refreshLayout();
     return this;
   }
 
   /**
    * Sets the search button.
    * @param b button
-   * @return self reference
    */
-  public SearchPanel button(final BaseXButton b) {
+  public void setButton(final BaseXButton b) {
     button = b;
     button.addActionListener(new ActionListener() {
       @Override
@@ -171,7 +173,6 @@ public final class SearchPanel extends BaseXBack {
         else activate(true);
       }
     });
-    return this;
   }
 
   /**

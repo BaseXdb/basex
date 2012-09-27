@@ -244,8 +244,6 @@ public final class GUIConstants {
 
   // FONTS ====================================================================
 
-  /** Default monospace font. */
-  public static Font dfont;
   /** Large font. */
   public static Font lfont;
   /** Font. */
@@ -254,6 +252,8 @@ public final class GUIConstants {
   public static Font bfont;
   /** Monospace font. */
   public static Font mfont;
+  /** Default monospace font. */
+  public static Font dmfont;
 
   /** Default monospace font widths. */
   private static int[] dwidth;
@@ -320,11 +320,11 @@ public final class GUIConstants {
     mfont = new Font(prop.get(GUIProp.MONOFONT), type, size);
     bfont = new Font(f, Font.BOLD, size);
     lfont = new Font(f, type, size + 10);
-    dfont = new Font(prop.get(GUIProp.MONOFONT), 0,
+    dmfont = new Font(prop.get(GUIProp.MONOFONT), 0,
         UIManager.getFont("TextArea.font").getSize() - 1);
 
     final Container comp = new Container();
-    dwidth  = comp.getFontMetrics(dfont).getWidths();
+    dwidth  = comp.getFontMetrics(dmfont).getWidths();
     fwidth  = comp.getFontMetrics(font).getWidths();
     lwidth  = comp.getFontMetrics(lfont).getWidths();
     mfwidth = comp.getFontMetrics(mfont).getWidths();
@@ -350,7 +350,7 @@ public final class GUIConstants {
     if(f == mfont) return mfwidth;
     if(f == bfont) return bwidth;
     if(f == lfont) return lwidth;
-    if(f == dfont) return dwidth;
+    if(f == dmfont) return dwidth;
     return new Container().getFontMetrics(f).getWidths();
   }
 
