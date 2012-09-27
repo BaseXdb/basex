@@ -23,6 +23,8 @@ public interface BuildText {
   /** Parser error. */
   String CLOSINGELEM = "%: </%> found, </%> expected.";
   /** Parser error. */
+  String OPEN = "%: Opening element <%> expected.";
+  /** Parser error. */
   String DOCOPEN = "%: Closing element </%> expected.";
   /** Parser error. */
   String MOREROOTS = "%: No elements allowed after closed root element.";
