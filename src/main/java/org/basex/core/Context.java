@@ -313,8 +313,8 @@ public final class Context {
    * @return result of check
    */
   public boolean perm(final Perm p, final MetaData md) {
-    final User us = md == null || p == Perm.CREATE || p == Perm.ADMIN ?
-        null : md.users.get(user.name);
+    final User us = md == null || p == Perm.CREATE || p == Perm.ADMIN ? null :
+      md.users.get(user.name);
     return (us == null ? user : us).has(p);
   }
 

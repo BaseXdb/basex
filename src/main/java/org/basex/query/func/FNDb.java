@@ -516,9 +516,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item add(final QueryContext ctx) throws QueryException {
-    checkWrite(ctx);
-
-    final Data data = data(0, ctx);
+    final Data data = checkWrite(data(0, ctx), ctx);
     final Item it = checkItem(expr[1], ctx);
     final String path = expr.length < 3 ? "" : path(2, ctx);
 
@@ -533,9 +531,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item replace(final QueryContext ctx) throws QueryException {
-    checkWrite(ctx);
-
-    final Data data = data(0, ctx);
+    final Data data = checkWrite(data(0, ctx), ctx);
     final String path = path(1, ctx);
     final Item doc = checkItem(expr[2], ctx);
 
@@ -566,9 +562,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item delete(final QueryContext ctx) throws QueryException {
-    checkWrite(ctx);
-
-    final Data data = data(0, ctx);
+    final Data data = checkWrite(data(0, ctx), ctx);
     final String path = path(1, ctx);
 
     // delete XML resources
@@ -592,9 +586,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item rename(final QueryContext ctx) throws QueryException {
-    checkWrite(ctx);
-
-    final Data data = data(0, ctx);
+    final Data data = checkWrite(data(0, ctx), ctx);
     final String source = path(1, ctx);
     final String target = path(2, ctx);
 
@@ -623,9 +615,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item optimize(final QueryContext ctx) throws QueryException {
-    checkWrite(ctx);
-
-    final Data data = data(0, ctx);
+    final Data data = checkWrite(data(0, ctx), ctx);
     final boolean all = expr.length == 2 && checkBln(expr[1], ctx);
     ctx.updates.add(new DBOptimize(data, ctx.context, all, info), ctx);
     return null;
@@ -638,9 +628,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item store(final QueryContext ctx) throws QueryException {
-    checkWrite(ctx);
-
-    final Data data = data(0, ctx);
+    final Data data = checkWrite(data(0, ctx), ctx);
     final String path = path(1, ctx);
     if(data.inMemory()) BXDB_MEM.thrw(info, data.meta.name);
     final IOFile file = data.meta.binary(path);
@@ -658,8 +646,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item flush(final QueryContext ctx) throws QueryException {
-    checkWrite(ctx);
-    ctx.updates.add(new DBFlush(data(0, ctx), info), ctx);
+    ctx.updates.add(new DBFlush(checkWrite(data(0, ctx), ctx), info), ctx);
     return null;
   }
 

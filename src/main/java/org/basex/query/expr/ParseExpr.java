@@ -5,6 +5,7 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import org.basex.core.*;
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
@@ -429,13 +430,18 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the current user has write permissions. If negative, an
-   * exception is thrown.
+   * Checks if the current user has write permissions for the specified database.
+   * If negative, an exception is thrown.
+   * @param data data reference
    * @param ctx query context
+   * @return data reference
    * @throws QueryException query exception
    */
-  public final void checkWrite(final QueryContext ctx) throws QueryException {
-    checkPerm(ctx, Perm.WRITE);
+  public final Data checkWrite(final Data data, final QueryContext ctx)
+      throws QueryException {
+
+    if(!ctx.context.perm(Perm.WRITE, data.meta)) BASX_PERM.thrw(info, Perm.WRITE);
+    return data;
   }
 
   /**
