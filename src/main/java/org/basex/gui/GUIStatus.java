@@ -30,9 +30,7 @@ public final class GUIStatus extends BaseXPanel {
     layout(new BorderLayout(4, 0));
     label = new BaseXLabel(OK).border(0, 4, 0, 0);
     add(label, BorderLayout.CENTER);
-    /* Memory usage. */
-    final BaseXMem mem = new BaseXMem(main, true);
-    add(mem, BorderLayout.EAST);
+    add(new BaseXMem(main, true), BorderLayout.EAST);
   }
 
   /**
@@ -42,7 +40,6 @@ public final class GUIStatus extends BaseXPanel {
   public void setText(final String txt) {
     label.setText(txt);
     label.setForeground(Color.BLACK);
-    //repaint();
   }
 
   /**
@@ -52,6 +49,5 @@ public final class GUIStatus extends BaseXPanel {
   public void setError(final String txt) {
     label.setText(txt);
     label.setForeground(GUIConstants.RED);
-    //repaint();
   }
 }

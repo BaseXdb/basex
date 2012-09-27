@@ -6,6 +6,8 @@ import static org.basex.gui.GUIConstants.*;
 import java.awt.*;
 import java.awt.event.*;
 
+import javax.swing.*;
+
 import org.basex.util.*;
 
 /**
@@ -32,6 +34,13 @@ public final class BaseXMem extends BaseXPanel {
       addMouseListener(this);
       addMouseMotionListener(this);
     }
+
+    new Timer(500, new ActionListener() {
+      @Override
+      public void actionPerformed(final ActionEvent e) {
+        repaint();
+      }
+    }).start();
   }
 
   @Override
@@ -40,7 +49,8 @@ public final class BaseXMem extends BaseXPanel {
 
     final Runtime rt = Runtime.getRuntime();
     final long max = rt.maxMemory();
-    final long used = rt.totalMemory() - rt.freeMemory();
+    final long total = rt.totalMemory();
+    final long used = total - rt.freeMemory();
     final int ww = getWidth();
     final int hh = getHeight();
 
@@ -53,9 +63,13 @@ public final class BaseXMem extends BaseXPanel {
     g.drawLine(ww - 3, 0, ww - 3, hh - 3);
     g.drawLine(0, hh - 3, ww - 3, hh - 3);
 
+    // show total memory usage
+    g.setColor(color1);
+    g.fillRect(2, 2, Math.max(1, (int) (total * (ww - 6) / max)), hh - 6);
+
     // show current memory usage
     final boolean full = used * 6 / 5 > max;
-    g.setColor(full ? colormark4 : color1);
+    g.setColor(full ? colormark4 : color3);
     g.fillRect(2, 2, Math.max(1, (int) (used * (ww - 6) / max)), hh - 6);
 
     // print current memory usage
@@ -73,12 +87,12 @@ public final class BaseXMem extends BaseXPanel {
     repaint();
 
     final Runtime rt = Runtime.getRuntime();
-    final long occ = rt.totalMemory();
     final long max = rt.maxMemory();
-    final long used = occ - rt.freeMemory();
+    final long total = rt.totalMemory();
+    final long used = total - rt.freeMemory();
 
     final String inf = TOTAL_MEM_C + Performance.format(max, true) + NL
-        + RESERVED_MEM_C + Performance.format(occ, true) + NL + MEMUSED_C
+        + RESERVED_MEM_C + Performance.format(total, true) + NL + MEMUSED_C
         + Performance.format(used, true) + NL + NL + H_USED_MEM;
 
     BaseXDialog.info(gui, inf);
