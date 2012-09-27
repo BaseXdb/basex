@@ -135,28 +135,30 @@ public final class SearchPanel extends BaseXBack {
    * @return self reference
    */
   public SearchPanel editor(final Editor e) {
-    editor = e;
     final boolean ed = e.isEditable();
-    e.setSearch(this);
+    if(editor == null || ed != editor.isEditable()) {
+      removeAll();
+      final BaseXBack wst = new BaseXBack(Fill.NONE).layout(new TableLayout(1, 3, 1, 0));
+      wst.add(mcase);
+      wst.add(regex);
+      wst.add(multi);
 
-    removeAll();
-    final BaseXBack west = new BaseXBack(Fill.NONE).layout(new TableLayout(1, 3, 1, 0));
-    west.add(mcase);
-    west.add(regex);
-    west.add(multi);
+      final BaseXBack ctr = new BaseXBack(Fill.NONE).layout(new GridLayout(1, 2, 2, 0));
+      ctr.add(search);
+      if(ed) ctr.add(replace);
 
-    final BaseXBack center = new BaseXBack(Fill.NONE).layout(new GridLayout(1, 2, 2, 0));
-    center.add(search);
-    if(ed) center.add(replace);
+      final BaseXBack est = new BaseXBack(Fill.NONE).layout(new TableLayout(1, 3, 1, 0));
+      if(ed) est.add(rplc);
+      est.add(close);
 
-    final BaseXBack east = new BaseXBack(Fill.NONE).layout(new TableLayout(1, 3, 1, 0));
-    if(ed) east.add(rplc);
-    east.add(close);
+      add(wst, BorderLayout.WEST);
+      add(ctr, BorderLayout.CENTER);
+      add(est, BorderLayout.EAST);
+    }
 
-    add(west, BorderLayout.WEST);
-    add(center, BorderLayout.CENTER);
-    add(east, BorderLayout.EAST);
+    editor = e;
     refreshLayout();
+    e.setSearch(this);
     return this;
   }
 
@@ -179,6 +181,7 @@ public final class SearchPanel extends BaseXBack {
    * Refreshes the layout.
    */
   public void refreshLayout() {
+    if(editor == null) return;
     final String mf = editor.getFont().getFamily();
     final Font f = new Font(mf, 0, search.getFont().getSize());
     search.setFont(f);

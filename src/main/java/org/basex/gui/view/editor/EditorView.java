@@ -109,6 +109,8 @@ public final class EditorView extends View {
 
     // status and query pane
     final EditorArea edit = addTab();
+    search.editor(edit);
+
     info = new BaseXLabel().setText(OK, Msg.SUCCESS);
     pos = new BaseXLabel(" ");
     pos.setText(edit.pos());
@@ -205,6 +207,7 @@ public final class EditorView extends View {
       public void stateChanged(final ChangeEvent e) {
         final EditorArea ea = getEditor();
         if(ea == null) return;
+        search.editor(ea);
         search.search();
         gui.refreshControls();
         pos.setText(ea.pos());
@@ -574,7 +577,6 @@ public final class EditorView extends View {
   EditorArea addTab() {
     final EditorArea edit = new EditorArea(this, newTabFile());
     edit.setFont(GUIConstants.mfont);
-    search.editor(edit);
 
     final BaseXBack tab = new BaseXBack(new BorderLayout(10, 0)).mode(Fill.NONE);
     tab.add(edit.label, BorderLayout.CENTER);
