@@ -103,14 +103,13 @@ public final class EditorView extends View implements EditorNotifier {
     final BaseXBack center = new BaseXBack(Fill.NONE).layout(new BorderLayout(0, 2));
     tabs = new BaseXTabs(gui);
     tabs.setFocusable(false);
-    search = new SearchPanel(gui, this, srch, true);
+    search = new SearchPanel(gui).button(srch);
     addCreateTab();
     final EditorArea edit = addTab();
 
     center.add(tabs, BorderLayout.CENTER);
     center.add(search, BorderLayout.SOUTH);
     add(center, BorderLayout.CENTER);
-    search.setVisible(false);
 
     // status and query pane
     info = new BaseXLabel().setText(OK, Msg.SUCCESS);
@@ -575,7 +574,7 @@ public final class EditorView extends View implements EditorNotifier {
   EditorArea addTab() {
     final EditorArea edit = new EditorArea(this, newTabFile());
     edit.setFont(GUIConstants.mfont);
-    edit.setSearch(search);
+    search.editor(edit);
 
     final BaseXBack tab = new BaseXBack(new BorderLayout(10, 0)).mode(Fill.NONE);
     tab.add(edit.label, BorderLayout.CENTER);

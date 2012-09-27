@@ -27,7 +27,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public class Editor extends BaseXPanel {
+public class Editor extends BaseXPanel implements EditorNotifier {
   /** Search direction. */
   public enum SearchDir {
     /** Same position. */
@@ -56,6 +56,8 @@ public class Editor extends BaseXPanel {
   final Renderer rend;
   /** Scrollbar reference. */
   final BaseXBar scroll;
+  /** Editable flag. */
+  boolean editable;
 
   /** Delay for highlighting an error. */
   private static final int ERROR_DELAY = 500;
@@ -84,6 +86,7 @@ public class Editor extends BaseXPanel {
     super(win);
     setFocusable(true);
     setFocusTraversalKeysEnabled(!edit);
+    editable = edit;
 
     addMouseMotionListener(this);
     addMouseWheelListener(this);
@@ -194,6 +197,14 @@ public class Editor extends BaseXPanel {
   }
 
   /**
+   * Returns the editable flag.
+   * @return boolean result
+   */
+  public final boolean isEditable() {
+    return editable;
+  }
+
+  /**
    * Sets a syntax highlighter.
    * @param s syntax reference
    */
@@ -242,6 +253,11 @@ public class Editor extends BaseXPanel {
     }
   }
 
+  @Override
+  public Editor getEditor() {
+    return this;
+  }
+
   /**
    * Moves the error marker. {@code -1} removes the marker.
    * @param pos start of optional error mark
@@ -285,7 +301,7 @@ public class Editor extends BaseXPanel {
    * Installs a search panel.
    * @param s search panel
    */
-  public final void setSearch(final SearchPanel s) {
+  final void setSearch(final SearchPanel s) {
     search = s;
   }
 
@@ -293,7 +309,7 @@ public class Editor extends BaseXPanel {
    * Performs a search.
    * @param sc search context
    */
-  public final void search(final SearchContext sc) {
+  final void search(final SearchContext sc) {
     try {
       rend.search(sc);
       gui.status.setText(sc.search.isEmpty() ? OK :
@@ -309,7 +325,7 @@ public class Editor extends BaseXPanel {
    * Replaces the text.
    * @param rc replace context
    */
-  public final void replace(final ReplaceContext rc) {
+  final void replace(final ReplaceContext rc) {
     try {
       rend.replace(rc);
       if(rc.text != null) {

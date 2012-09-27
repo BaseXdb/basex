@@ -80,10 +80,8 @@ public final class InfoView extends View implements EditorNotifier {
     add(north, BorderLayout.NORTH);
 
     final BaseXBack center = new BaseXBack(Fill.NONE).layout(new BorderLayout(0, 2));
-    search = new SearchPanel(gui, this, srch, false);
-    search.setVisible(false);
     area = new Editor(false, gui);
-    area.setSearch(search);
+    search = new SearchPanel(gui).button(srch).editor(area);
 
     center.add(area, BorderLayout.CENTER);
     center.add(search, BorderLayout.SOUTH);

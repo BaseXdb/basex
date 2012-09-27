@@ -21,10 +21,6 @@ import org.basex.gui.layout.BaseXLayout.DropHandler;
 public final class SearchPanel extends BaseXBack {
   /** GUI reference. */
   final GUI gui;
-  /** Search button. */
-  final BaseXButton button;
-  /** Editor view. */
-  final EditorNotifier view;
   /** Action: close panel. */
   final BaseXButton close;
   /** Search text. */
@@ -40,22 +36,21 @@ public final class SearchPanel extends BaseXBack {
   /** Action: replace text. */
   final BaseXButton rplc;
 
+  /** Search button. */
+  BaseXButton button;
+  /** Current editor reference. */
+  Editor editor;
+
   /**
    * Constructor.
    * @param main gui reference
-   * @param ev editor view
-   * @param act button for activating the search
-   * @param update add replace components
    */
-  public SearchPanel(final GUI main, final EditorNotifier ev,
-      final BaseXButton act, final boolean update) {
-
+  public SearchPanel(final GUI main) {
     layout(new BorderLayout(2, 0));
     mode(Fill.NONE);
+    setVisible(false);
 
     gui = main;
-    view = ev;
-    button = act;
     search = new BaseXTextField(main);
     search.history(gui, GUIProp.SEARCHED);
     search.setToolTipText(SEARCH);
@@ -69,30 +64,7 @@ public final class SearchPanel extends BaseXBack {
     close = new BaseXButton(main, "s_close", CLOSE);
     multi.setEnabled(regex.isEnabled());
 
-    final BaseXBack west = new BaseXBack(Fill.NONE).layout(new TableLayout(1, 3, 1, 0));
-    west.add(mcase);
-    west.add(regex);
-    west.add(multi);
-
-    final BaseXBack center = new BaseXBack(Fill.NONE).layout(new GridLayout(1, 2, 2, 0));
-    center.add(search);
-    if(update) center.add(replace);
-
-    final BaseXBack east = new BaseXBack(Fill.NONE).layout(new TableLayout(1, 3, 1, 0));
-    if(update) east.add(rplc);
-    east.add(close);
-
-    add(west, BorderLayout.WEST);
-    add(center, BorderLayout.CENTER);
-    add(east, BorderLayout.EAST);
-
     // add interaction to search field
-    button.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        activate(true);
-      }
-    });
     search.addFocusListener(new FocusAdapter() {
       @Override
       public void focusGained(final FocusEvent e) {
@@ -102,15 +74,14 @@ public final class SearchPanel extends BaseXBack {
     search.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
-        if(ESCAPE.is(e) || ENTER.is(e) && search.getText().trim().isEmpty()) {
-          deactivate();
-        } else if(FINDPREV.is(e) || FINDPREV2.is(e) || FINDNEXT.is(e) ||
-            FINDNEXT2.is(e)) {
-          view.getEditor().requestFocusInWindow();
+        if(FINDPREV.is(e) || FINDPREV2.is(e) || FINDNEXT.is(e) || FINDNEXT2.is(e)) {
+          editor.requestFocusInWindow();
         } else if(ENTER.is(e) && e.isShiftDown()) {
-          view.getEditor().jump(SearchDir.BACKWARD);
+          editor.jump(SearchDir.BACKWARD);
         } else if(ENTER.is(e)) {
-          view.getEditor().jump(SearchDir.FORWARD);
+          editor.jump(SearchDir.FORWARD);
+        } else if(ESCAPE.is(e)) {
+          deactivate();
         }
       }
       @Override
@@ -151,16 +122,63 @@ public final class SearchPanel extends BaseXBack {
       public void actionPerformed(final ActionEvent e) {
         search.store();
         replace.store();
-        view.getEditor().replace(new ReplaceContext(replace.getText()));
+        editor.replace(new ReplaceContext(replace.getText()));
       }
     });
+  }
+
+  /**
+   * Sets the specified editor and updates the component layout.
+   * @param e editor
+   * @return self reference
+   */
+  public SearchPanel editor(final Editor e) {
+    editor = e;
+    final boolean ed = e.isEditable();
+    e.setSearch(this);
+
+    removeAll();
+    final BaseXBack west = new BaseXBack(Fill.NONE).layout(new TableLayout(1, 3, 1, 0));
+    west.add(mcase);
+    west.add(regex);
+    west.add(multi);
+
+    final BaseXBack center = new BaseXBack(Fill.NONE).layout(new GridLayout(1, 2, 2, 0));
+    center.add(search);
+    if(ed) center.add(replace);
+
+    final BaseXBack east = new BaseXBack(Fill.NONE).layout(new TableLayout(1, 3, 1, 0));
+    if(ed) east.add(rplc);
+    east.add(close);
+
+    add(west, BorderLayout.WEST);
+    add(center, BorderLayout.CENTER);
+    add(east, BorderLayout.EAST);
+    return this;
+  }
+
+  /**
+   * Sets the search button.
+   * @param b button
+   * @return self reference
+   */
+  public SearchPanel button(final BaseXButton b) {
+    button = b;
+    button.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(final ActionEvent e) {
+        if(isVisible()) deactivate();
+        else activate(true);
+      }
+    });
+    return this;
   }
 
   /**
    * Refreshes the layout.
    */
   public void refreshLayout() {
-    final String mf = view.getEditor().getFont().getFamily();
+    final String mf = editor.getFont().getFamily();
     final Font f = new Font(mf, 0, search.getFont().getSize());
     search.setFont(f);
     replace.setFont(f);
@@ -173,7 +191,7 @@ public final class SearchPanel extends BaseXBack {
   public void activate(final boolean focus) {
     if(!isVisible()) {
       super.setVisible(true);
-      button.setSelected(true);
+      if(button != null) button.setSelected(true);
       search();
     }
     if(focus) search.requestFocusInWindow();
@@ -185,8 +203,8 @@ public final class SearchPanel extends BaseXBack {
   public void deactivate() {
     if(!isVisible()) return;
     super.setVisible(false);
-    button.setSelected(false);
-    view.getEditor().requestFocusInWindow();
+    if(button != null) button.setSelected(false);
+    editor.requestFocusInWindow();
     search();
   }
 
@@ -196,7 +214,7 @@ public final class SearchPanel extends BaseXBack {
   public void search() {
     final String text = isVisible() ? search.getText() : "";
     rplc.setEnabled(!text.isEmpty());
-    view.getEditor().search(new SearchContext(this, text));
+    editor.search(new SearchContext(this, text));
   }
 
   // PRIVATE METHODS ====================================================================

@@ -36,7 +36,7 @@ public final class TextView extends View implements EditorNotifier {
   /** Home button. */
   private final BaseXButton home;
   /** Text Area. */
-  private final Editor area;
+  private final Editor edit;
 
   /** Result command. */
   private Command cmd;
@@ -72,13 +72,11 @@ public final class TextView extends View implements EditorNotifier {
     add(b, BorderLayout.NORTH);
 
     final BaseXBack center = new BaseXBack(Fill.NONE).layout(new BorderLayout(0, 2));
-    search = new SearchPanel(gui, this, srch, false);
-    search.setVisible(false);
-    area = new Editor(false, gui);
-    area.setSyntax(new SyntaxXML());
-    area.setSearch(search);
+    edit = new Editor(false, gui);
+    edit.setSyntax(new SyntaxXML());
+    search = new SearchPanel(gui).button(srch).editor(edit);
 
-    center.add(area, BorderLayout.CENTER);
+    center.add(edit, BorderLayout.CENTER);
     center.add(search, BorderLayout.SOUTH);
     add(center, BorderLayout.CENTER);
 
@@ -113,7 +111,7 @@ public final class TextView extends View implements EditorNotifier {
   @Override
   public void refreshLayout() {
     header.setFont(lfont);
-    area.setFont(mfont);
+    edit.setFont(mfont);
     search.refreshLayout();
   }
 
@@ -139,7 +137,7 @@ public final class TextView extends View implements EditorNotifier {
 
   @Override
   public Editor getEditor() {
-    return area;
+    return edit;
   }
 
   /**
@@ -192,7 +190,7 @@ public final class TextView extends View implements EditorNotifier {
     if(out.finished() && size >= chop.length) {
       System.arraycopy(chop, 0, buf, size - chop.length, chop.length);
     }
-    area.setText(buf, size);
+    edit.setText(buf, size);
     header.setText(TEXT + (out.finished() ? CHOPPED : ""));
     home.setEnabled(gui.context.data() != null);
   }
@@ -222,7 +220,7 @@ public final class TextView extends View implements EditorNotifier {
       } else if(ns != null) {
         ns.serialize(Serializer.get(out));
       } else {
-        final byte[] txt = area.getText();
+        final byte[] txt = edit.getText();
         for(final byte t : txt) if(t < 0 || t > ' ' || ws(t)) out.write(t);
       }
     } catch(final IOException ex) {

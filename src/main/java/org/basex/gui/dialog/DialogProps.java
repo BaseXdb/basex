@@ -203,7 +203,16 @@ public final class DialogProps extends BaseXDialog {
     idx.add(labels[p], BorderLayout.WEST);
     if(indxs[p] != null) idx.add(indxs[p], BorderLayout.EAST);
     panels[p].add(idx, BorderLayout.NORTH);
-    panels[p].add(info != null ? info : infos[p], BorderLayout.CENTER);
+
+    BaseXBack b = info;
+    if(b == null) {
+      b = new BaseXBack(Fill.NONE).layout(new BorderLayout(0, 2));
+      final SearchPanel search = new SearchPanel(gui).editor(infos[p]);
+      b.add(infos[p], BorderLayout.CENTER);
+      b.add(search, BorderLayout.SOUTH);
+    }
+    panels[p].add(b, BorderLayout.CENTER);
+    //panels[p].add(info != null ? info : infos[p], BorderLayout.CENTER);
     tab.add(panels[p]);
   }
 
