@@ -11,13 +11,13 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class Check extends ACreate {
+public final class Check extends Command {
   /**
    * Default constructor.
    * @param path file path
    */
   public Check(final String path) {
-    super(path);
+    super(Perm.NONE, path);
   }
 
   @Override
