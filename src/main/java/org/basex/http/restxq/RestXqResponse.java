@@ -76,6 +76,8 @@ final class RestXqResponse {
     function.bind(http);
 
     // compile and evaluate function
+    String redirect = null;
+    String forward = null;
     try {
       // assign local updating flag
       qc.updating = bfc.uses(Use.UPD);
@@ -100,14 +102,13 @@ final class RestXqResponse {
         if(RESTXQ_REDIRECT.eq(node)) {
           final ANode ch = node.children().next();
           if(ch == null || ch.type != NodeType.TXT) function.error(NO_VALUE, node.name());
-          http.res.sendRedirect(string(ch.string()));
-          return;
+          redirect = string(ch.string());
         }
         // server-side forwarding
         if(RESTXQ_FORWARD.eq(node)) {
           final ANode ch = node.children().next();
           if(ch == null || ch.type != NodeType.TXT) function.error(NO_VALUE, node.name());
-          http.req.getRequestDispatcher(string(ch.string())).forward(http.req, http.res);
+          forward = string(ch.string());
           return;
         }
         if(RESTXQ_RESPONSE.eq(node)) {
@@ -127,9 +128,16 @@ final class RestXqResponse {
       final Serializer ser = Serializer.get(http.res.getOutputStream(), sp);
       for(; item != null; item = iter.next()) ser.serialize(item);
       ser.close();
+
     } finally {
       qc.close();
       qc.context.unregister(qc);
+
+      if(redirect != null) {
+        http.res.sendRedirect(redirect);
+      } else if(forward != null) {
+        http.req.getRequestDispatcher(forward).forward(http.req, http.res);
+      }
     }
   }
 

@@ -271,6 +271,26 @@ public final class RestXqTest extends HTTPTest {
         "function m:f($v) {$v};", "?a=1", "1");
   }
 
+  /**
+   * Redirect request.
+   * @throws Exception exception */
+  @Test public void redirect() throws Exception {
+    final String f =
+      "declare %R:path('')  function m:a() { element R:redirect { 'a' } };" +
+      "declare %R:path('a') function m:b() { 'R' };";
+    get(f, "", "R");
+  }
+
+  /**
+   * Forward request.
+   * @throws Exception exception */
+  @Test public void forward() throws Exception {
+    final String f =
+      "declare %R:path('')  function m:a() { element R:forward { 'a' } };" +
+      "declare %R:path('a') function m:b() { 'F' };";
+    get(f, "", "F");
+  }
+
   // PRIVATE METHODS ==========================================================
 
   /**
