@@ -374,7 +374,7 @@ public class Editor extends BaseXPanel {
 
   @Override
   public void mouseReleased(final MouseEvent e) {
-    if(SwingUtilities.isLeftMouseButton(e)) rend.stopSelect();
+    if(SwingUtilities.isLeftMouseButton(e)) text.checkSelect();
   }
 
   @Override
@@ -535,7 +535,7 @@ public class Editor extends BaseXPanel {
 
     if(marking) {
       // refresh scroll position
-      text.endSelect();
+      text.finishSelect();
     } else if(hist.active()) {
       // edit operations...
       if(CUT1.is(e) || CUT2.is(e)) {
@@ -573,7 +573,7 @@ public class Editor extends BaseXPanel {
           } else {
             text.next(true);
           }
-          text.endSelect();
+          text.finishSelect();
         }
         text.delete();
       } else if(DELLINESTART.is(e) || DELPREVWORD.is(e) || DELPREV.is(e)) {
@@ -587,7 +587,7 @@ public class Editor extends BaseXPanel {
           } else {
             text.prev();
           }
-          text.endSelect();
+          text.finishSelect();
         }
         text.delete();
         down = false;

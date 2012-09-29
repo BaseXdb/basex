@@ -418,7 +418,7 @@ public final class Renderer extends BaseXBack {
       }
 
       if(!finish) text.startSelect();
-      else text.endSelect();
+      else text.extendSelect();
       text.setCursor();
     }
     repaint();

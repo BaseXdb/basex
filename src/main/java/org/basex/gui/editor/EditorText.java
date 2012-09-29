@@ -325,7 +325,7 @@ public final class EditorText {
     pos(e);
     forward(Integer.MAX_VALUE, true);
     next(true);
-    endSelect();
+    finishSelect();
 
     // decide if to use tab or spaces
     boolean tab = false;
@@ -440,7 +440,7 @@ public final class EditorText {
     startSelect();
     eol(true);
     next(true);
-    endSelect();
+    finishSelect();
     delete();
   }
 
@@ -478,9 +478,16 @@ public final class EditorText {
   }
 
   /**
-   * Sets the end of a text selection.
+   * Extends the text selection.
    */
-  void endSelect() {
+  void extendSelect() {
+    me = ps;
+  }
+
+  /**
+   * Finishes a text selection.
+   */
+  void finishSelect() {
     me = ps;
     checkSelect();
   }
@@ -494,6 +501,13 @@ public final class EditorText {
     ms = s;
     me = e;
     checkSelect();
+  }
+
+  /**
+   * Checks the validity of the selection.
+   */
+  void checkSelect() {
+    if(ms == me) noSelect();
   }
 
   /**
@@ -519,13 +533,6 @@ public final class EditorText {
    */
   boolean selected() {
     return ms != me;
-  }
-
-  /**
-   * Checks the validity of the selection.
-   */
-  void checkSelect() {
-    if(ms == me) noSelect();
   }
 
   /**
@@ -576,7 +583,7 @@ public final class EditorText {
       if(c == '\n' || ch != ftChar(c)) break;
       next(true);
     }
-    endSelect();
+    finishSelect();
   }
 
   /**
@@ -587,7 +594,7 @@ public final class EditorText {
     bol(true);
     startSelect();
     eol(true);
-    endSelect();
+    finishSelect();
   }
 
   /**
