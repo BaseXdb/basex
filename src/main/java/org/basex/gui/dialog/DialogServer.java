@@ -277,16 +277,15 @@ public final class DialogServer extends BaseXDialog {
 
     try {
       if(cmp == start) {
-        final String p = ports.getText();
-        gui.gprop.set(GUIProp.S_SERVERPORT, p);
-        if(host.getText().equals(LOCALHOST)) {
-          gui.gprop.set(GUIProp.S_PORT, p);
-          gui.gprop.set(GUIProp.S_EVENTPORT, Integer.valueOf(p) + 1);
-          portc.setText(p);
-        }
         try {
-          final int port = Integer.parseInt(p);
-          BaseXServer.start(port, "-p", p, "-e", Integer.toString(port + 1));
+          final int p = Integer.parseInt(ports.getText());
+          gui.gprop.set(GUIProp.S_SERVERPORT, p);
+          if(host.getText().equals(LOCALHOST)) {
+            gui.gprop.set(GUIProp.S_PORT, p);
+            gui.gprop.set(GUIProp.S_EVENTPORT, p + 1);
+            portc.setText(String.valueOf(p));
+          }
+          BaseXServer.start(p, "-p", Integer.toString(p), "-e", Integer.toString(p + 1));
           msg = SRV_STARTED;
           running = true;
         } catch(final BaseXException ex) {

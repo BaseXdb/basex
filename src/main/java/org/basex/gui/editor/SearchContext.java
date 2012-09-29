@@ -12,7 +12,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public class SearchContext {
+public final class SearchContext {
   /** Mode: match case. */
   final boolean mcase;
   /** Mode: regular expression. */
@@ -21,11 +21,8 @@ public class SearchContext {
   final boolean multi;
   /** Search string. */
   final String search;
-
-  /** Start positions. */
-  IntList start = new IntList();
-  /** End positions. */
-  IntList end = new IntList();
+  /** Number of results. */
+  int nr;
 
   /**
    * Constructor.
@@ -46,10 +43,12 @@ public class SearchContext {
   /**
    * Performs the search.
    * @param txt text to be searched
+   * @return result positions
    */
-  void search(final byte[] txt) {
-    start.reset();
-    end.reset();
+  IntList[] search(final byte[] txt) {
+    final IntList start = new IntList();
+    final IntList end = new IntList();
+    if(search.isEmpty()) return new IntList[] { start, end };
 
     final byte[] text = txt;
     if(regex) {
@@ -99,28 +98,50 @@ public class SearchContext {
       }
     } else {
       final byte[] srch = Token.token(search);
-      final int ss = srch.length, ts = text.length;
-      if(ss == 0) return;
-
-      for(int t = 0; t < ts;) {
-        int s = 0;
-        if(t + ss <= ts) {
+      final int ss = srch.length, os = text.length;
+      for(int o = 0; o < os;) {
+        int sp = 0;
+        if(o + ss <= os) {
           if(mcase) {
-            for(; s < ss && text[t + s] == srch[s]; s++);
+            for(; sp < ss && text[o + sp] == srch[sp]; sp++);
           } else {
-            for(; s < ss && Token.lc(Token.cp(text, t + s)) == Token.cp(srch, s);
-                s += Token.cl(srch, s));
+            for(; sp < ss && Token.lc(Token.cp(text, o + sp)) == Token.cp(srch, sp);
+                sp += Token.cl(srch, sp));
           }
         }
-        if(s == ss) {
-          start.add(t);
-          end.add(t + ss);
-          t += ss;
+        if(sp == ss) {
+          start.add(o);
+          end.add(o + ss);
+          o += ss;
         } else {
-          t++;
+          o++;
         }
       }
     }
+    nr = start.size();
+    return new IntList[] { start, end };
+  }
+
+  /**
+   * Checks if the specified string matches the search string.
+   * @param string string to be checked
+   * @return result of check
+   */
+  boolean matches(final String string) {
+    // ignore empty strings and others that stretch over multiple lines
+    if(string.isEmpty() || string.contains("\n")) return true;
+
+    if(regex) {
+      try {
+        int flags = Pattern.DOTALL;
+        if(!mcase) flags |= Pattern.CASE_INSENSITIVE;
+        final Pattern pattern = Pattern.compile(search, flags);
+        return pattern.matcher(string).matches();
+      } catch(final Exception ex) {
+        return false;
+      }
+    }
+    return mcase ? search.equals(string) : search.equalsIgnoreCase(string);
   }
 
   /**
@@ -128,7 +149,7 @@ public class SearchContext {
    * @return number of results
    */
   int nr() {
-    return start.size();
+    return nr;
   }
 
   @Override

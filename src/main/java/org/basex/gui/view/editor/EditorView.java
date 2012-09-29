@@ -108,12 +108,11 @@ public final class EditorView extends View {
     add(se, BorderLayout.CENTER);
 
     // status and query pane
-    final EditorArea edit = addTab();
-    search.editor(edit);
+    search.editor(addTab());
 
     info = new BaseXLabel().setText(OK, Msg.SUCCESS);
     pos = new BaseXLabel(" ");
-    pos.setText(edit.pos());
+    posCode.invokeLater();
 
     stop = new BaseXButton(gui, "stop", H_STOP_PROCESS);
     stop.addKeyListener(this);
@@ -185,7 +184,7 @@ public final class EditorView extends View {
         }
         if(errPos == -1) return;
         ea.jumpError(errPos);
-        pos.setText(ea.pos());
+        posCode.invokeLater();
       }
     });
     stop.addActionListener(new ActionListener() {
@@ -210,7 +209,7 @@ public final class EditorView extends View {
         search.editor(ea);
         search.search();
         gui.refreshControls();
-        pos.setText(ea.pos());
+        posCode.invokeLater();
         ea.release(Action.PARSE);
       }
     });
@@ -518,9 +517,17 @@ public final class EditorView extends View {
 
     // update components
     gui.refreshControls();
-    pos.setText(edit.pos());
-    //refreshMark();
+    posCode.invokeLater();
   }
+
+  /** Code for setting cursor position. */
+  final GUICode posCode = new GUICode() {
+    @Override
+    public void eval(final Object arg) {
+      final int[] lc = getEditor().pos();
+      pos.setText(lc[0] + " : " + lc[1]);
+    }
+  };
 
   /**
    * Finds the editor that contains the specified file.

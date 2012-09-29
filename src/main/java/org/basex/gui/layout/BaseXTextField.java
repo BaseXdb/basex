@@ -20,7 +20,7 @@ public class BaseXTextField extends JTextField {
   /** Default width of text fields. */
   public static final int DWIDTH = 350;
   /** History. */
-  BaseXHistory hstr;
+  BaseXHistory history;
   /** Last input. */
   String last = "";
   /** History pointer. */
@@ -94,7 +94,7 @@ public class BaseXTextField extends JTextField {
    * @param option option
    */
   public void history(final GUI gui, final Object[] option) {
-    hstr = new BaseXHistory(gui, option);
+    history = new BaseXHistory(gui, option);
     addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
@@ -115,7 +115,9 @@ public class BaseXTextField extends JTextField {
    * Stores the current history.
    */
   public void store() {
-    if(hstr != null) hstr.store(getText());
+    if(history == null) return;
+    history.store(getText());
+    hist = 0;
   }
 
   @Override

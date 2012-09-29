@@ -267,9 +267,8 @@ public final class BaseXServer extends Main implements Runnable {
    * @throws IOException I/O exception
    */
   public void stop() throws IOException {
-    final int port = context.mprop.num(MainProp.SERVERPORT);
-    final int eport = context.mprop.num(MainProp.EVENTPORT);
-    stop(port, eport);
+    final MainProp mprop = context.mprop;
+    stop(mprop.num(MainProp.SERVERPORT), mprop.num(MainProp.EVENTPORT));
   }
 
   // STATIC METHODS ===========================================================

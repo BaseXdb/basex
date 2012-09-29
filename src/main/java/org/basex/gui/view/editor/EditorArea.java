@@ -46,7 +46,7 @@ final class EditorArea extends Editor {
   boolean script = true;
 
   /** View reference. */
-  private final EditorView view;
+  final EditorView view;
 
   /**
    * Constructor.
@@ -94,7 +94,7 @@ final class EditorArea extends Editor {
   @Override
   public void mouseReleased(final MouseEvent e) {
     super.mouseReleased(e);
-    view.pos.setText(pos());
+    view.posCode.invokeLater();
   }
 
   @Override
@@ -102,7 +102,7 @@ final class EditorArea extends Editor {
     final byte[] t = text.text();
     super.keyPressed(e);
     if(t != text.text()) error(-1);
-    else view.pos.setText(pos());
+    view.posCode.invokeLater();
   }
 
   @Override

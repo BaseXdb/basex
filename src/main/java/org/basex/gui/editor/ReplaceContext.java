@@ -1,9 +1,10 @@
 package org.basex.gui.editor;
 
+import static org.basex.util.Token.*;
+
 import java.util.regex.*;
 
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * This class summarizes the result of a replacement.
@@ -18,8 +19,6 @@ public class ReplaceContext {
   String replace;
   /** Text. */
   byte[] text;
-  /** Number of replacements. */
-  int nr;
 
   /**
    * Constructor.
@@ -33,52 +32,63 @@ public class ReplaceContext {
    * Replaces text.
    * @param sc search context
    * @param txt text
+   * @param start start offset
+   * @param end end offset
+   * @return resulting end marker
    */
-  void replace(final SearchContext sc, final byte[] txt) {
+  int[] replace(final SearchContext sc, final byte[] txt, final int start,
+      final int end) {
+
+    final int os = txt.length;
     search = sc;
-    if(!sc.start.isEmpty()) {
+    if(sc.search.isEmpty()) {
+      text = txt;
+    } else {
+      final TokenBuilder tb = new TokenBuilder(os);
+      tb.add(txt, 0, start);
       if(sc.regex) {
         // regular expressions, ignoring position arrays
         int flags = Pattern.DOTALL;
         if(!sc.mcase) flags |= Pattern.CASE_INSENSITIVE;
         final Pattern p = Pattern.compile(sc.search, flags);
         if(sc.multi) {
-          text = Token.token(p.matcher(Token.string(txt)).replaceAll(replace));
+          tb.add(p.matcher(string(txt, start, end)).replaceAll(replace));
         } else {
-          final int os = txt.length;
-          final TokenBuilder tb = new TokenBuilder(os);
-          for(int s = 0, o = 0; o <= os; o++) {
-            if(o < os ? txt[o] == '\n' : o != s) {
-              tb.add(p.matcher(Token.string(txt, s, o - s)).replaceAll(replace));
-              if(o < os) tb.add('\n');
-              s = o + 1;
+          for(int e = start, s = start; e <= end; e++) {
+            if(e < end ? txt[e] == '\n' : e != s) {
+              tb.add(p.matcher(string(txt, s, e - s)).replaceAll(replace));
+              if(e < end) tb.add('\n');
+              s = e + 1;
             }
           }
-          text = tb.finish();
         }
       } else {
-        // standard replacement, using existing position arrays
-        final int ss = sc.start.size();
-        final byte[] rplc = Token.token(replace);
-        final ByteList bl = new ByteList();
-        int s1 = 0;
-        for(int p = 0; p < ss; p++) {
-          final int s2 = sc.start.get(p);
-          bl.add(txt, s1, s2).add(rplc);
-          s1 = sc.end.get(p);
+        final byte[] srch = token(sc.search);
+        final byte[] rplc = token(replace);
+        final int ss = srch.length;
+        int s1 = start;
+        for(int s = start; s < end;) {
+          int sp = 0;
+          if(s + ss <= end) {
+            if(sc.mcase) {
+              while(sp < ss && txt[s + sp] == srch[sp]) sp++;
+            } else {
+              while(sp < ss && lc(cp(txt, s + sp)) == cp(srch, sp)) sp += cl(srch, sp);
+            }
+          }
+          if(sp == ss) {
+            tb.add(txt, s1, s).add(rplc);
+            s += ss;
+            s1 = s;
+          } else {
+            s++;
+          }
         }
-        bl.add(txt, s1, txt.length);
-        text = bl.toArray();
+        tb.add(txt, s1, end);
       }
+      tb.add(txt, end, os);
+      text = tb.finish();
     }
-    nr = search.nr();
-  }
-
-  /**
-   * Returns the number of results.
-   * @return number of results
-   */
-  int nr() {
-    return nr;
+    return new int[] { start, end - os + text.length };
   }
 }

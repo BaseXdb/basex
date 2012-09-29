@@ -32,6 +32,7 @@ public final class BaseXHistory {
    * @param input new input
    */
   public void store(final String input) {
+    if(input == null) return;
     final StringList sl = new StringList(MAX).add(input);
     for(final String s : gui.gprop.strings(history)) {
       if(sl.size() < MAX &&  !input.equals(s)) sl.add(s);

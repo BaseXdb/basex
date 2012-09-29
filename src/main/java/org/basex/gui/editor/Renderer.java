@@ -76,7 +76,9 @@ public final class Renderer extends BaseXBack {
   @Override
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
-    write(g, bar.pos());
+    init(g, bar.pos());
+    while(more(g)) write(g);
+    if(cursor && text.cursor() == text.size()) cursor(g, x);
   }
 
   /**
@@ -90,23 +92,26 @@ public final class Renderer extends BaseXBack {
   /**
    * Replaces the text.
    * @param rc replace context
+   * @return selection offsets
    */
-  void replace(final ReplaceContext rc) {
-    text.replace(rc);
+  int[] replace(final ReplaceContext rc) {
+    return text.replace(rc);
   }
 
   /**
    * Jumps to a search string.
    * @param dir search direction
+   * @param select select hit
    * @return new vertical position, or {@code -1}
    */
-  int jump(final SearchDir dir) {
-    if(!text.jump(dir)) return -1;
+  int jump(final SearchDir dir, final boolean select) {
+    final int pos = text.jump(dir, select);
+    if(pos == -1) return -1;
 
     final int hh = h;
     h = Integer.MAX_VALUE;
     final Graphics g = getGraphics();
-    for(init(g); more(g) && text.pos() < text.cursor(); next());
+    for(init(g); more(g) && text.pos() < pos; next());
     h = hh;
     return y;
   }
@@ -218,17 +223,6 @@ public final class Renderer extends BaseXBack {
   }
 
   /**
-   * Writes the text.
-   * @param g graphics reference
-   * @param pos current text position
-   */
-  private void write(final Graphics g, final int pos) {
-    init(g, pos);
-    while(more(g)) write(g);
-    if(cursor && text.cursor() == text.size()) cursor(g, x);
-  }
-
-  /**
    * Checks if the text has more words to print.
    * @param g graphics reference
    * @return true if the text has more words
@@ -303,7 +297,7 @@ public final class Renderer extends BaseXBack {
         int xx = x, cw = 0;
         while(!text.inSelect() && text.more()) xx += charW(g, text.next());
         while(text.inSelect() && text.more()) cw += charW(g, text.next());
-        g.setColor(GUIConstants.color(2));
+        g.setColor(GUIConstants.color(3));
         g.fillRect(xx, y - fontH * 4 / 5, cw, fontH);
         text.pos(cp);
       }

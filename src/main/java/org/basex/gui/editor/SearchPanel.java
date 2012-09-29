@@ -22,7 +22,7 @@ public final class SearchPanel extends BaseXBack {
   /** GUI reference. */
   final GUI gui;
   /** Action: close panel. */
-  final BaseXButton close;
+  final BaseXButton cls;
   /** Search text. */
   final BaseXTextField search;
   /** Replace text. */
@@ -63,7 +63,7 @@ public final class SearchPanel extends BaseXBack {
     mcase = onOffButton("s_case", MATCH_CASE, GUIProp.SR_CASE);
     multi = onOffButton("s_multi", MULTI_LINE, GUIProp.SR_MULTI);
     rplc  = new BaseXButton(main, "s_replace", REPLACE_ALL);
-    close = new BaseXButton(main, "s_close", CLOSE);
+    cls = new BaseXButton(main, "s_close", CLOSE);
     multi.setEnabled(regex.isEnabled());
 
     // add interaction to search field
@@ -77,13 +77,12 @@ public final class SearchPanel extends BaseXBack {
       @Override
       public void keyPressed(final KeyEvent e) {
         if(FINDPREV.is(e) || FINDPREV2.is(e) || FINDNEXT.is(e) || FINDNEXT2.is(e)) {
-          editor.requestFocusInWindow();
-        } else if(ENTER.is(e) && e.isShiftDown()) {
-          editor.jump(SearchDir.BACKWARD);
-        } else if(ENTER.is(e)) {
-          editor.jump(SearchDir.FORWARD);
+          editor.text.noSelect();
+          deactivate(false);
         } else if(ESCAPE.is(e)) {
-          deactivate();
+          deactivate(search.getText().isEmpty());
+        } else if(ENTER.is(e)) {
+          editor.jump(e.isShiftDown() ? SearchDir.BACKWARD : SearchDir.FORWARD, true);
         }
       }
       @Override
@@ -104,7 +103,7 @@ public final class SearchPanel extends BaseXBack {
     replace.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
-        if(ESCAPE.is(e)) deactivate();
+        if(ESCAPE.is(e)) deactivate(true);
       }
       @Override
       public void keyReleased(final KeyEvent e) {
@@ -112,10 +111,10 @@ public final class SearchPanel extends BaseXBack {
       }
     });
 
-    close.addActionListener(new ActionListener() {
+    cls.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        deactivate();
+        deactivate(true);
       }
     });
 
@@ -149,7 +148,7 @@ public final class SearchPanel extends BaseXBack {
 
       final BaseXBack est = new BaseXBack(Fill.NONE).layout(new TableLayout(1, 3, 1, 0));
       if(ed) est.add(rplc);
-      est.add(close);
+      est.add(cls);
 
       add(wst, BorderLayout.WEST);
       add(ctr, BorderLayout.CENTER);
@@ -171,8 +170,8 @@ public final class SearchPanel extends BaseXBack {
     button.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        if(isVisible()) deactivate();
-        else activate(true);
+        if(isVisible()) deactivate(true);
+        else activate(null);
       }
     });
   }
@@ -190,26 +189,41 @@ public final class SearchPanel extends BaseXBack {
 
   /**
    * Activates the search panel.
-   * @param focus focus search field
+   * @param string search string; triggers new search if different than old string
+   * @return {@code true} if panel was opened
    */
-  public void activate(final boolean focus) {
-    if(!isVisible()) {
-      super.setVisible(true);
+  public boolean activate(final String string) {
+    boolean action = !isVisible();
+    if(action) {
+      setVisible(true);
       if(button != null) button.setSelected(true);
-      search();
     }
-    if(focus) search.requestFocusInWindow();
+    if(string == null) {
+      search.requestFocusInWindow();
+    } else if(!new SearchContext(this, search.getText()).matches(string)) {
+      // set new, different search string
+      search.setText(string);
+      regex.setSelected(false);
+      action = true;
+    }
+    // search if string has changed, or if panel was hidden
+    if(action) search();
+    return action;
   }
 
   /**
    * Deactivates the search panel.
+   * @param close close panel
+   * @return {@code true} if panel was closed
    */
-  public void deactivate() {
-    if(!isVisible()) return;
-    super.setVisible(false);
-    if(button != null) button.setSelected(false);
+  public boolean deactivate(final boolean close) {
+    search.store();
     editor.requestFocusInWindow();
+    if(!close || !isVisible()) return false;
+    setVisible(false);
+    if(button != null) button.setSelected(false);
     search();
+    return true;
   }
 
   /**

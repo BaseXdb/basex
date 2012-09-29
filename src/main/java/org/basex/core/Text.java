@@ -770,8 +770,8 @@ public interface Text {
   String REGULAR_EXPR = lang("regular_expr");
   /** "% string(s) found.". */
   String STRINGS_FOUND_X = lang("strings_found_%");
-  /** "% string(s) replaced.". */
-  String STRINGS_REPLACED_X = lang("strings_replaced_%");
+  /** "Strings were replaced.". */
+  String STRINGS_REPLACED = lang("strings_replaced");
 
   /** Info on whitespace chopping. */
   String WS_CHOPPING = lang("ws_chopping");

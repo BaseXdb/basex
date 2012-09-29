@@ -28,14 +28,17 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public class Editor extends BaseXPanel {
+  /** Delay for highlighting an error. */
+  private static final int ERROR_DELAY = 500;
+
   /** Search direction. */
   public enum SearchDir {
-    /** Same position. */
-    SAME,
-    /** Forward. */
+    /** Current hit. */
+    CURRENT,
+    /** Next hit. */
     FORWARD,
-    /** Backward. */
-    BACKWARD
+    /** Previous hit. */
+    BACKWARD,
   }
 
   /** Editor action. */
@@ -58,12 +61,6 @@ public class Editor extends BaseXPanel {
   final BaseXBar scroll;
   /** Editable flag. */
   boolean editable;
-
-  /** Delay for highlighting an error. */
-  private static final int ERROR_DELAY = 500;
-  /** Thread counter. */
-  int threadID;
-
   /** Search field. */
   private SearchPanel search;
 
@@ -153,9 +150,8 @@ public class Editor extends BaseXPanel {
    * Returns the cursor coordinates.
    * @return line/column
    */
-  public final String pos() {
-    final int[] pos = rend.pos();
-    return pos[0] + " : " + pos[1];
+  public final int[] pos() {
+    return rend.pos();
   }
 
   /**
@@ -181,7 +177,7 @@ public class Editor extends BaseXPanel {
     // new text is different...
     if(!eq) text.text(Arrays.copyOf(t, ns));
     if(hist != null) hist.store(t.length != ns ? Arrays.copyOf(t, ns) : t, pc, 0);
-    SwingUtilities.invokeLater(calc);
+    componentResized(null);
   }
 
   /**
@@ -230,8 +226,7 @@ public class Editor extends BaseXPanel {
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
-        text.pos(text.size());
-        text.setCursor();
+        text.setCursor(text.size());
         showCursor(2);
       }
     });
@@ -254,12 +249,15 @@ public class Editor extends BaseXPanel {
     }
   }
 
+  /** Thread counter. */
+  int errorID;
+
   /**
    * Moves the error marker. {@code -1} removes the marker.
    * @param pos start of optional error mark
    */
   public final void error(final int pos) {
-    final int tid = ++threadID;
+    final int eid = ++errorID;
     text.error(pos);
     if(pos == -1) {
       rend.repaint();
@@ -268,7 +266,7 @@ public class Editor extends BaseXPanel {
         @Override
         public void run() {
           Performance.sleep(ERROR_DELAY);
-          if(tid == threadID) rend.repaint();
+          if(eid == errorID) rend.repaint();
         }
       }.start();
     }
@@ -302,6 +300,14 @@ public class Editor extends BaseXPanel {
   }
 
   /**
+   * Returns the search panel.
+   * @return search panel
+   */
+  public final SearchPanel getSearch() {
+    return search;
+  }
+
+  /**
    * Performs a search.
    * @param sc search context
    */
@@ -310,9 +316,9 @@ public class Editor extends BaseXPanel {
       rend.search(sc);
       gui.status.setText(sc.search.isEmpty() ? OK :
         Util.info(Util.info(STRINGS_FOUND_X,  sc.nr())));
-      jump(SearchDir.SAME);
+      jump(SearchDir.CURRENT, false);
     } catch(final Exception ex) {
-      final String msg = ex.getMessage().replaceAll(Prop.NL + ".*", "");
+      final String msg = Util.message(ex).replaceAll(Prop.NL + ".*", "");
       gui.status.setError(REGULAR_EXPR + COLS + msg);
     }
   }
@@ -323,14 +329,18 @@ public class Editor extends BaseXPanel {
    */
   final void replace(final ReplaceContext rc) {
     try {
-      rend.replace(rc);
+      final int[] select = rend.replace(rc);
       if(rc.text != null) {
+        final boolean sel = text.selected();
         setText(rc.text);
+        if(sel) text.select(select[0], select[1]);
+        text.setCursor(select[0]);
         release(Action.CHECK);
       }
-      gui.status.setText(Util.info(STRINGS_REPLACED_X,  rc.nr()));
+      gui.status.setText(Util.info(STRINGS_REPLACED));
     } catch(final Exception ex) {
-      final String msg = ex.getMessage().replaceAll(Prop.NL + ".*", "");
+      ex.printStackTrace();
+      final String msg = Util.message(ex).replaceAll(Prop.NL + ".*", "");
       gui.status.setError(REGULAR_EXPR + COLS + msg);
     }
   }
@@ -338,15 +348,16 @@ public class Editor extends BaseXPanel {
   /**
    * Jumps to a search string.
    * @param dir search direction
+   * @param select select hit
    */
-  final void jump(final SearchDir dir) {
+  final void jump(final SearchDir dir, final boolean select) {
     // updates the visible area
-    final int y = rend.jump(dir);
+    final int y = rend.jump(dir, select);
     final int h = getHeight();
     final int p = scroll.pos();
     final int m = y + rend.fontH() * 3 - h;
     if(y != -1 && (p < m || p > y)) scroll.pos(y - h / 2);
-    repaint();
+    rend.repaint();
   }
 
   // MOUSE INTERACTIONS =================================================================
@@ -416,23 +427,18 @@ public class Editor extends BaseXPanel {
     // handle search operations
     if(search != null) {
       if(ESCAPE.is(e)) {
-        search.deactivate();
+        search.deactivate(true);
         return;
       }
       if(FIND.is(e)) {
-        search.activate(true);
+        search.activate(null);
         return;
       }
-      if(FINDNEXT.is(e) || FINDNEXT2.is(e)) {
+      if(FINDNEXT.is(e) || FINDNEXT2.is(e) || FINDPREV.is(e) || FINDPREV2.is(e)) {
         final boolean vis = search.isVisible();
-        search.activate(false);
-        jump(vis ? SearchDir.FORWARD : SearchDir.SAME);
-        return;
-      }
-      if(FINDPREV.is(e) || FINDPREV2.is(e)) {
-        final boolean vis = search.isVisible();
-        search.activate(false);
-        jump(vis ? SearchDir.BACKWARD : SearchDir.SAME);
+        search.activate(text.copy());
+        jump(vis ? FINDNEXT.is(e) || FINDNEXT2.is(e) ?
+          SearchDir.FORWARD : SearchDir.BACKWARD : SearchDir.CURRENT, true);
         return;
       }
     }
@@ -530,7 +536,6 @@ public class Editor extends BaseXPanel {
     if(marking) {
       // refresh scroll position
       text.endSelect();
-      text.checkSelect();
     } else if(hist.active()) {
       // edit operations...
       if(CUT1.is(e) || CUT2.is(e)) {
@@ -595,25 +600,44 @@ public class Editor extends BaseXPanel {
     text.setCursor();
     final byte[] tmp = text.text();
     if(txt != tmp) {
-      rend.calc();
       hist.store(tmp, pc, text.cursor());
+      calcCode.invokeLater(down);
+    } else {
+      showCursor(down ? 2 : 0);
     }
-    showCursor(down ? 2 : 0);
   }
+
+  /** Thread counter. */
+  private final GUICode calcCode = new GUICode() {
+    @Override
+    public void eval(final Object arg) {
+      rend.calc();
+      showCursor((Boolean) arg ? 2 : 0);
+    }
+  };
+
+  /** Thread counter. */
+  private final GUICode cursorCode = new GUICode() {
+    @Override
+    public void eval(final Object arg) {
+      // updates the visible area
+      final int p = scroll.pos();
+      final int y = rend.cursorY();
+      final int m = y + rend.fontH() * 3 - getHeight();
+      if(p < m || p > y) {
+        final int align = ((Integer) arg).intValue();
+        scroll.pos(align == 0 ? y : align == 1 ? y - getHeight() / 2 : m);
+        rend.repaint();
+      }
+    }
+  };
 
   /**
    * Displays the currently edited text area.
    * @param align vertical alignment
    */
   final void showCursor(final int align) {
-    // updates the visible area
-    final int p = scroll.pos();
-    final int y = rend.cursorY();
-    final int m = y + rend.fontH() * 3 - getHeight();
-    if(p < m || p > y) {
-      scroll.pos(align == 0 ? y : align == 1 ? y - getHeight() / 2 : m);
-      rend.repaint();
-    }
+    cursorCode.invokeLater(align);
   }
 
   /**
@@ -716,10 +740,9 @@ public class Editor extends BaseXPanel {
 
     if(ch != null) text.add(ch);
     text.setCursor();
-    rend.calc();
-    showCursor(2);
-    e.consume();
     hist.store(text.text(), pc, text.cursor());
+    calcCode.invokeLater(true);
+    e.consume();
   }
 
   /**
@@ -769,8 +792,7 @@ public class Editor extends BaseXPanel {
   void finish(final int old) {
     text.setCursor();
     if(old != -1) hist.store(text.text(), old, text.cursor());
-    rend.calc();
-    showCursor(2);
+    calcCode.invokeLater(true);
     release(Action.CHECK);
   }
 
@@ -801,20 +823,21 @@ public class Editor extends BaseXPanel {
     rend.repaint();
   }
 
-  @Override
-  public final void componentResized(final ComponentEvent e) {
-    SwingUtilities.invokeLater(calc);
-  }
-
   /** Calculation counter. */
-  private final transient Runnable calc = new Runnable() {
+  private final GUICode resizeCode = new GUICode() {
     @Override
-    public void run() {
+    public void eval(final Object arg) {
       rend.calc();
+      // update scrollbar to display value within valid range
       scroll.pos(scroll.pos());
       rend.repaint();
     }
   };
+
+  @Override
+  public final void componentResized(final ComponentEvent e) {
+    resizeCode.invokeLater();
+  }
 
   /** Text command. */
   abstract static class TextCmd implements GUICommand {

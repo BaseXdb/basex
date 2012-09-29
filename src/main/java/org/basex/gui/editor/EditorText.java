@@ -18,6 +18,9 @@ public final class EditorText {
 
   /** Search context. */
   private SearchContext search;
+  /** Start and end positions of search terms. */
+  IntList[] spos = { new IntList(), new IntList() };
+
   /** Text array to be written. */
   private byte[] text = EMPTY;
   /** Current cursor position. */
@@ -59,7 +62,7 @@ public final class EditorText {
   void text(final byte[] t) {
     text = t;
     noSelect();
-    if(search != null) search.search(t);
+    if(search != null) spos = search.search(t);
   }
 
   /**
@@ -113,22 +116,21 @@ public final class EditorText {
    * @param sc search processor
    */
   void search(final SearchContext sc) {
-    if(sc.equals(search)) {
-      // adopt results if search criteria have not changed
-      sc.start = search.start;
-      sc.end = search.end;
-    } else {
-      sc.search(text);
-      search = sc;
-    }
+    // skip search if criteria have not changed
+    if(sc.equals(search)) return;
+    spos = sc.search(text);
+    search = sc;
   }
 
   /**
    * Replaces the text.
    * @param rc replace context
+   * @return selection offsets
    */
-  void replace(final ReplaceContext rc) {
-    rc.replace(search, text);
+  int[] replace(final ReplaceContext rc) {
+    final int start = selected() ? Math.min(ms, me) : 0;
+    final int end = selected() ? Math.max(ms, me) : text.length;
+    return rc.replace(search, text, start, end);
   }
 
   /**
@@ -183,7 +185,7 @@ public final class EditorText {
    * @return current character
    */
   public int curr() {
-    return ps >= text.length ? '\n' : cp(text, ps);
+    return ps < 0 || ps >= text.length ? '\n' : cp(text, ps);
   }
 
   /**
@@ -376,8 +378,8 @@ public final class EditorText {
    * @param syntax syntax highlighter
    */
   void comment(final Syntax syntax) {
-    final byte[] start = syntax.commentOpen();
-    final byte[] end = syntax.commentEnd();
+    final byte[] st = syntax.commentOpen();
+    final byte[] en = syntax.commentEnd();
     boolean add = true;
     int min = ps;
     int max = ps;
@@ -386,15 +388,15 @@ public final class EditorText {
       min = ps < ms ? ps : ms;
       max = ps > ms ? ps : ms;
       // selected
-      final int mn = Math.max(min + start.length, max - end.length);
-      if(indexOf(text, start, min) == min && indexOf(text, end, mn) == mn) {
+      final int mn = Math.max(min + st.length, max - en.length);
+      if(indexOf(text, st, min) == min && indexOf(text, en, mn) == mn) {
         final TokenBuilder tb = new TokenBuilder();
         tb.add(text, 0, min);
-        tb.add(text, min + start.length, max - end.length);
+        tb.add(text, min + st.length, max - en.length);
         tb.add(text, max, text.length);
         text(tb.finish());
         ms = min;
-        me = max - start.length - end.length;
+        me = max - st.length - en.length;
         ps = me;
         add = false;
       }
@@ -405,11 +407,11 @@ public final class EditorText {
 
     if(add) {
       pos(max);
-      add(string(end));
+      add(string(en));
       pos(min);
-      add(string(start));
+      add(string(st));
       ms = min;
-      me = max + start.length + end.length;
+      me = max + st.length + en.length;
       ps = me;
     }
   }
@@ -480,6 +482,18 @@ public final class EditorText {
    */
   void endSelect() {
     me = ps;
+    checkSelect();
+  }
+
+  /**
+   * Selects the specified area.
+   * @param s start position
+   * @param e end position
+   */
+  void select(final int s, final int e) {
+    ms = s;
+    me = e;
+    checkSelect();
   }
 
   /**
@@ -532,11 +546,10 @@ public final class EditorText {
   }
 
   /**
-   * Returns the selected substring.
-   * @return substring
+   * Returns the selected string.
+   * @return token builder
    */
   String copy() {
-    if(!selected()) return "";
     final TokenBuilder tb = new TokenBuilder();
     final int e = ms < me ? me : ms;
     for(int s = ms < me ? ms : me; s < e; s += cl(text, s)) {
@@ -581,10 +594,7 @@ public final class EditorText {
    * Selects the whole text.
    */
   void selectAll() {
-    pos(0);
-    startSelect();
-    pos(size());
-    endSelect();
+    select(0, size());
   }
 
   // ERROR HIGHLIGHTING =================================================================
@@ -614,13 +624,12 @@ public final class EditorText {
    */
   boolean searchStart() {
     if(search == null) return false;
-    final IntList start = search.start;
-    if(sp == start.size()) return false;
-    final IntList end = search.end;
-    while(ps > end.get(sp)) {
-      if(++sp == start.size()) return false;
+    final IntList[] sps = spos;
+    if(sp == sps[0].size()) return false;
+    while(ps > sps[1].get(sp)) {
+      if(++sp == sps[0].size()) return false;
     }
-    return pe > start.get(sp);
+    return pe > sps[0].get(sp);
   }
 
   /**
@@ -628,10 +637,8 @@ public final class EditorText {
    * @return result of check
    */
   boolean inSearch() {
-    final IntList start = search.start;
-    if(sp >= start.size() || ps < start.get(sp)) return false;
-    final IntList end = search.end;
-    final boolean in = ps < end.get(sp);
+    if(sp >= spos[0].size() || ps < spos[0].get(sp)) return false;
+    final boolean in = ps < spos[1].get(sp);
     if(!in) sp++;
     return in;
   }
@@ -639,27 +646,31 @@ public final class EditorText {
   /**
    * Selects a search string.
    * @param dir search direction
-   * @return {@code true} if cursor was moved
+   * @param select select hit
+   * @return new cursor position, or {@code -1}
    */
-  boolean jump(final SearchDir dir) {
-    if(search.start.isEmpty()) {
-      noSelect();
-      return false;
+  int jump(final SearchDir dir, final boolean select) {
+    if(spos[0].isEmpty()) {
+      if(select) noSelect();
+      return -1;
     }
 
-    int s = search.start.sortedIndexOf(pc);
+    int s = spos[0].sortedIndexOf(pc);
     switch(dir) {
-      case SAME:     s = s < 0 ? -s - 1 : s;     break;
+      case CURRENT:  s = s < 0 ? -s - 1 : s;     break;
       case FORWARD:  s = s < 0 ? -s - 1 : s + 1; break;
       case BACKWARD: s = s < 0 ? -s - 2 : s - 1; break;
     }
-    final int sl = search.start.size();
+    final int sl = spos[0].size();
     if(s < 0) s = sl - 1;
     else if(s == sl) s = 0;
-    ms = search.start.get(s);
-    me = search.end.get(s);
-    pc = ms;
-    return true;
+    final int pos = spos[0].get(s);
+    if(select) {
+      pc = pos;
+      ms = pos;
+      me = spos[1].get(s);
+    }
+    return pos;
   }
 
   // CURSOR =============================================================================

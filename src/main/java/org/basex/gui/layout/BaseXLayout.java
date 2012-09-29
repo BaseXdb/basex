@@ -178,11 +178,18 @@ public final class BaseXLayout {
         public void keyPressed(final KeyEvent e) {
           final Object s = e.getSource();
           if(s instanceof BaseXCombo && ((BaseXCombo) s).isPopupVisible()) return;
-          // process key events
-          if(ENTER.is(e) && !(s instanceof BaseXButton) && !(s instanceof Editor)) {
+
+          // do not key close dialog of button or editor is focused
+          if(ENTER.is(e) && !(s instanceof BaseXButton || s instanceof Editor)) {
             d.close();
           } else if(ESCAPE.is(e)) {
-            d.cancel();
+            // do not key cancel dialog if search panel is opened
+            boolean close = true;
+            if(s instanceof Editor) {
+              final SearchPanel sp = ((Editor) s).getSearch();
+              close = sp == null || !sp.deactivate(true);
+            }
+            if(close) d.cancel();
           }
         }
       });
