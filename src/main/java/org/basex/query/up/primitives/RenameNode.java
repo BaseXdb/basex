@@ -3,6 +3,7 @@ package org.basex.query.up.primitives;
 import static org.basex.query.util.Err.*;
 
 import org.basex.data.*;
+import org.basex.data.atomic.*;
 import org.basex.query.*;
 import org.basex.query.up.*;
 import org.basex.query.value.item.*;
@@ -15,16 +16,16 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
-public final class RenameNode extends ValueUpdate {
+public final class RenameNode extends UpdatePrimitive {
   /** New name. */
   private final QNm name;
 
   /**
    * Constructor.
-   * @param p pre
-   * @param d data
+   * @param p target node pre value
+   * @param d target data reference
    * @param i input info
-   * @param nm new QName
+   * @param nm new QName / new name value
    */
   public RenameNode(final int p, final Data d, final InputInfo i,
       final QNm nm) {
@@ -33,29 +34,34 @@ public final class RenameNode extends ValueUpdate {
   }
 
   @Override
-  public void apply() {
-    data.update(pre, data.kind(pre), name.string(), name.uri());
-  }
-
-  @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
-    UPMULTREN.thrw(info, targetNode());
+    UPMULTREN.thrw(info, getTargetNode());
   }
 
   @Override
   public void update(final NamePool pool) {
-    final DBNode node = targetNode();
+    final DBNode node = getTargetNode();
     pool.add(name, node.type);
     pool.remove(node);
   }
 
   @Override
   public String toString() {
-    return Util.name(this) + '[' + targetNode() + ", " + name + ']';
+    return Util.name(this) + '[' + getTargetNode() + ", " + name + ']';
   }
 
   @Override
   public int size() {
     return 1;
+  }
+
+  @Override
+  public void addAtomics(final AtomicUpdateList l) {
+    l.addRename(targetPre, data.kind(targetPre), name.string(), name.uri());
+  }
+
+  @Override
+  public UpdatePrimitive[] substitute() {
+    return new UpdatePrimitive[] { this };
   }
 }

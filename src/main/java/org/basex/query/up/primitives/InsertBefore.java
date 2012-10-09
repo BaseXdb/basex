@@ -1,6 +1,9 @@
 package org.basex.query.up.primitives;
 
 import org.basex.data.*;
+import org.basex.data.atomic.*;
+import org.basex.query.*;
+import org.basex.query.up.*;
 import org.basex.query.util.*;
 import org.basex.util.*;
 
@@ -10,12 +13,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
-public final class InsertBefore extends InsertBase {
-  /** Parent of node to be inserted. Need to cache this as delete and replace
-   * primitives (which are executed before insert before) mess with parent
-   * values.
-   */
-  private final int par;
+public final class InsertBefore extends NodeCopy {
   /**
    * Constructor.
    * @param p pre
@@ -25,25 +23,26 @@ public final class InsertBefore extends InsertBase {
    */
   public InsertBefore(final int p, final Data d, final InputInfo i, final ANodeList c) {
     super(PrimitiveType.INSERTBEFORE, p, d, i, c);
-    par = d.parent(p, d.kind(p));
   }
 
   @Override
-  public void apply() {
-    super.apply();
-    data.insert(pre, par, md);
+  public void merge(final UpdatePrimitive p) throws QueryException {
+    final InsertBefore newOne = (InsertBefore) p;
+    final ANodeList newInsert = newOne.insert;
+    for(int j = 0; j < newInsert.size(); j++)
+      insert.add(newInsert.get(j));
   }
 
   @Override
-  public boolean adjacentTexts(final int c) {
-    final int p = pre + c;
-    boolean merged = false;
-    final int mds = md.meta.size;
-    if(md.kind(0) == Data.TEXT)
-      merged = mergeTexts(data, p - 1, p);
-    if(!merged && md.kind(mds - 1) == Data.TEXT)
-      merged |= mergeTexts(data, p + mds - 1, p + mds);
-
-    return merged;
+  public void addAtomics(final AtomicUpdateList l) {
+    l.addInsert(targetPre, data.parent(targetPre, data.kind(targetPre)), insseq, false);
   }
+
+  @Override
+  public UpdatePrimitive[] substitute() {
+    return new UpdatePrimitive[] { this };
+  }
+
+  @Override
+  public void update(final NamePool pool) { }
 }

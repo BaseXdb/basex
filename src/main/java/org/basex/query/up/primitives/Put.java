@@ -1,7 +1,7 @@
 package org.basex.query.up.primitives;
 
-import static org.basex.core.Text.*;
 import static org.basex.query.util.Err.*;
+import static org.basex.core.Text.*;
 
 import java.io.*;
 
@@ -14,30 +14,38 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * Update primitive for the fn:put() function.
+ * Fn:put operation primitive.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
-public final class Put extends UpdatePrimitive {
+public final class Put extends BasicOperation {
   /** Target paths. The same node can be stored in multiple locations. */
   private final StringList paths = new StringList(1);
+  /** Node id of the target node. Target nodes are identified via their ID, as structural
+   *  changes (delete/insert) during the snapshot lead to PRE value shifts on disk.
+   *  In addition, deleted/replaced nodes will not be serialized by fn:put as the
+   *  identity of these nodes is gone - which is easier to track operating on IDs. */
+  public final int nodeid;
 
   /**
    * Constructor.
    * @param i input info
-   * @param p pre
-   * @param d data
-   * @param u uri
+   * @param id target node id
+   * @param d target data reference
+   * @param u location path URI
    */
-  public Put(final InputInfo i, final int p, final Data d, final String u) {
-    super(PrimitiveType.PUT, p, d, i);
+  public Put(final InputInfo i, final int id, final Data d, final String u) {
+    super(BasicOperation.TYPE.FNPUT, d, i);
+    nodeid = id;
     paths.add(u);
   }
 
   @Override
   public void apply() throws QueryException {
     for(final String u : paths) {
+      final int pre = data.pre(nodeid);
+      if(pre == -1) return;
       final DBNode node = new DBNode(data, pre);
       try {
         final PrintOutput po = new PrintOutput(u);
@@ -58,8 +66,8 @@ public final class Put extends UpdatePrimitive {
   }
 
   @Override
-  public void merge(final UpdatePrimitive p) throws QueryException {
-    for(final String u : ((Put) p).paths) paths.add(u);
+  public void merge(final BasicOperation o) throws QueryException {
+    for(final String u : ((Put) o).paths) paths.add(u);
   }
 
   @Override
@@ -69,6 +77,14 @@ public final class Put extends UpdatePrimitive {
 
   @Override
   public String toString() {
-    return Util.name(this) + '[' + targetNode() + ", " + paths.get(0) + ']';
+    return Util.name(this) + '[' + getTargetNode() + ", " + paths.get(0) + ']';
+  }
+
+  @Override
+  public void prepare() throws QueryException { }
+
+  @Override
+  public DBNode getTargetNode() {
+    return new DBNode(data, data.pre(nodeid));
   }
 }

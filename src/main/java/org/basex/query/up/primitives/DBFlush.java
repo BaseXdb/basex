@@ -2,6 +2,7 @@ package org.basex.query.up.primitives;
 
 import org.basex.core.*;
 import org.basex.data.*;
+import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.util.*;
 
@@ -11,19 +12,18 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class DBFlush extends UpdatePrimitive {
+public final class DBFlush extends BasicOperation {
   /**
    * Constructor.
    * @param d data
    * @param ii input info
    */
   public DBFlush(final Data d, final InputInfo ii) {
-    super(PrimitiveType.DBFLUSH, -1, d, ii);
+    super(TYPE.DBFLUSH, d, ii);
   }
 
   @Override
-  public void merge(final UpdatePrimitive p) {
-  }
+  public void merge(final BasicOperation o) { }
 
   @Override
   public void apply() {
@@ -38,4 +38,7 @@ public final class DBFlush extends UpdatePrimitive {
   public int size() {
     return 1;
   }
+
+  @Override
+  public void prepare() throws QueryException { }
 }

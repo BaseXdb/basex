@@ -1,6 +1,9 @@
 package org.basex.query.up.primitives;
 
 import org.basex.data.*;
+import org.basex.data.atomic.*;
+import org.basex.query.*;
+import org.basex.query.up.*;
 import org.basex.query.util.*;
 import org.basex.util.*;
 
@@ -10,7 +13,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
-public final class InsertAfter extends InsertBase {
+public final class InsertAfter extends NodeCopy {
   /**
    * Constructor.
    * @param p pre
@@ -23,26 +26,24 @@ public final class InsertAfter extends InsertBase {
   }
 
   @Override
-  public void apply() {
-    super.apply();
-
-    final int k = data.kind(pre);
-    data.insert(pre + data.size(pre, k), data.parent(pre, k), md);
+  public void merge(final UpdatePrimitive p) throws QueryException {
+    final ANodeList newInsert = ((InsertAfter) p).insert;
+    for(int j = 0; j < newInsert.size(); j++)
+      insert.add(newInsert.get(j));
   }
 
   @Override
-  public boolean adjacentTexts(final int c) {
-    final int p = pre + c;
-    // size of og target node
-    final int ps = data.size(p, data.kind(p));
-    final int affectedPre = p + ps;
-    boolean merged = false;
-    final int mds = md.meta.size;
-    if(md.kind(0) == Data.TEXT)
-      merged = mergeTexts(data, affectedPre - 1, affectedPre);
-    if(!merged && md.kind(mds - 1) == Data.TEXT)
-      merged |= mergeTexts(data, affectedPre + mds - 1, affectedPre + mds);
-
-    return merged;
+  public void addAtomics(final AtomicUpdateList l) {
+    final int k = data.kind(targetPre);
+    final int s = data.size(targetPre, k);
+    l.addInsert(targetPre + s, data.parent(targetPre, k), insseq, false);
   }
+
+  @Override
+  public UpdatePrimitive[] substitute() {
+    return new UpdatePrimitive[] { this };
+  }
+
+  @Override
+  public void update(final NamePool pool) { }
 }

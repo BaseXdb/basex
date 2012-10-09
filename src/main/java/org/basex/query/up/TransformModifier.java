@@ -34,10 +34,10 @@ public final class TransformModifier extends ContextModifier {
   }
 
   @Override
-  void add(final UpdatePrimitive p, final QueryContext ctx) throws QueryException {
-    add(p);
+  void add(final Operation o, final QueryContext ctx) throws QueryException {
+    add(o);
     /* check if the target node of the given primitive has been copied in the
      * 'copy' statement of this transform expression. */
-    if(!refs.contains(p.data)) UPNOTCOPIED.thrw(p.info, p.targetNode());
+    if(!refs.contains(o.getData())) UPNOTCOPIED.thrw(o.getInfo(), o.getTargetNode());
   }
 }

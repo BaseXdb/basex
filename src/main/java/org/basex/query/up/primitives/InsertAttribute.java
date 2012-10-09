@@ -1,6 +1,8 @@
 package org.basex.query.up.primitives;
 
 import org.basex.data.*;
+import org.basex.data.atomic.*;
+import org.basex.query.*;
 import org.basex.query.up.*;
 import org.basex.query.util.*;
 import org.basex.util.*;
@@ -11,7 +13,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
-public final class InsertAttribute extends InsertBase {
+public final class InsertAttribute extends NodeCopy {
   /**
    * Constructor.
    * @param p pre
@@ -25,19 +27,25 @@ public final class InsertAttribute extends InsertBase {
   }
 
   @Override
-  public void apply() {
-    super.apply();
-    data.insertAttr(pre + 1, pre, md);
-  }
-
-  @Override
   public void update(final NamePool pool) {
-    if(md == null) return;
+    if(insseq == null) return;
     add(pool);
   }
 
   @Override
-  public boolean adjacentTexts(final int c) {
-    return false;
+  public void merge(final UpdatePrimitive p) throws QueryException {
+    final ANodeList newInsert = ((InsertAttribute) p).insert;
+    for(int j = 0; j < newInsert.size(); j++)
+      insert.add(newInsert.get(j));
+  }
+
+  @Override
+  public void addAtomics(final AtomicUpdateList l) {
+    l.addInsert(targetPre + 1, targetPre, insseq, true);
+  }
+
+  @Override
+  public UpdatePrimitive[] substitute() {
+    return new UpdatePrimitive[] { this };
   }
 }

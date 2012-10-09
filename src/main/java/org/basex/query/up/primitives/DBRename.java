@@ -17,25 +17,25 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class DBRename extends UpdatePrimitive {
+public final class DBRename extends BasicOperation {
   /** Source and target paths. */
   private final HashMap<String, String> map = new HashMap<String, String>();
 
   /**
    * Constructor.
-   * @param d data
+   * @param d target data
    * @param src source path
    * @param trg target path
    * @param ii input info
    */
   public DBRename(final Data d, final String src, final String trg, final InputInfo ii) {
-    super(PrimitiveType.DBRENAME, -1, d, ii);
+    super(TYPE.DBRENAME, d, ii);
     map.put(src, trg);
   }
 
   @Override
-  public void merge(final UpdatePrimitive p) throws QueryException {
-    for(final Entry<String, String> e : ((DBRename) p).map.entrySet()) {
+  public void merge(final BasicOperation o) throws QueryException {
+    for(final Entry<String, String> e : ((DBRename) o).map.entrySet()) {
       final String src = e.getKey();
       if(map.containsKey(src)) UPPATHREN.thrw(info, src);
       map.put(src, e.getValue());
@@ -55,4 +55,7 @@ public final class DBRename extends UpdatePrimitive {
   public int size() {
     return map.size();
   }
+
+  @Override
+  public void prepare() throws QueryException { }
 }

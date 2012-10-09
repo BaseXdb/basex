@@ -16,9 +16,10 @@ import org.basex.query.up.primitives.*;
  */
 final class DatabaseModifier extends ContextModifier {
   @Override
-  void add(final UpdatePrimitive p, final QueryContext ctx) throws QueryException {
-    add(p);
+  void add(final Operation o, final QueryContext ctx) throws QueryException {
+    add(o);
     // check permissions
-    if(!ctx.context.perm(Perm.WRITE, p.data.meta)) BASX_PERM.thrw(p.info, Perm.WRITE);
+    if(!ctx.context.perm(Perm.WRITE, o.getData().meta))
+      BASX_PERM.thrw(o.getInfo(), Perm.WRITE);
   }
 }

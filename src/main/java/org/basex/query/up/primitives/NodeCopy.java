@@ -1,7 +1,5 @@
 package org.basex.query.up.primitives;
 
-import java.util.*;
-
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.up.*;
@@ -17,18 +15,18 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
-public abstract class NodeCopy extends StructuralUpdate {
+public abstract class NodeCopy extends UpdatePrimitive {
   /** Nodes to be inserted. */
-  ArrayList<ANodeList> insert = new ArrayList<ANodeList>(1);
-  /** Final copy of insertion nodes. */
-  MemData md;
+  public ANodeList insert;
   /** Number of insert operations (initialized by {@link #prepare}). */
   int size;
+  /** Insertion sequence data instance. */
+  MemData insseq;
 
   /**
    * Constructor.
    * @param t type
-   * @param p pre
+   * @param p target node pre value
    * @param d data
    * @param i input info
    * @param n node copy
@@ -36,7 +34,7 @@ public abstract class NodeCopy extends StructuralUpdate {
   NodeCopy(final PrimitiveType t, final int p, final Data d, final InputInfo i,
       final ANodeList n) {
     super(t, p, d, i);
-    insert.add(n);
+    insert = n;
   }
 
   /**
@@ -47,21 +45,13 @@ public abstract class NodeCopy extends StructuralUpdate {
   @SuppressWarnings("unused")
   public void prepare() throws QueryException {
     // build main memory representation of nodes to be copied
-    md = new MemData(data);
-    final ANodeList seq = new ANodeList();
-    for(int i = 0; i < insert.size(); i++) {
-      final ANodeList nl = insert.get(i);
-      final int ns = nl.size();
-      for(int n = 0; n < ns; n++) seq.add(nl.get(n));
-      size += ns;
-      // clear entries to recover memory
-      insert.set(i, null);
-    }
-    insert = null;
+    insseq = new MemData(data);
 
-    // text nodes still need to be merged. two adjacent iterators may
-    // lead to two adjacent text nodes
-    new DataBuilder(md).build(mergeNodeCacheText(seq));
+    // text nodes still need to be merged. two adjacent iterators may lead to two
+    // adjacent text nodes
+    new DataBuilder(insseq).build(mergeNodeCacheText(insert));
+    size += insert.size();
+    insert = null;
   }
 
   /**
@@ -70,12 +60,12 @@ public abstract class NodeCopy extends StructuralUpdate {
    * @param pool name pool
    */
   final void add(final NamePool pool) {
-    for(int p = 0; p < md.meta.size; ++p) {
-      final int k = md.kind(p);
-      if(k != Data.ATTR && k != Data.ELEM || md.parent(p, k) > -1) continue;
-      final int u = md.uri(p, k);
-      final QNm qnm = new QNm(md.name(p, k));
-      if(u != 0) qnm.uri(md.nspaces.uri(u));
+    for(int p = 0; p < insseq.meta.size; ++p) {
+      final int k = insseq.kind(p);
+      if(k != Data.ATTR && k != Data.ELEM || insseq.parent(p, k) > -1) continue;
+      final int u = insseq.uri(p, k);
+      final QNm qnm = new QNm(insseq.name(p, k));
+      if(u != 0) qnm.uri(insseq.nspaces.uri(u));
       pool.add(qnm, ANode.type(k));
     }
   }
@@ -109,12 +99,12 @@ public abstract class NodeCopy extends StructuralUpdate {
   }
 
   @Override
-  public final int size() {
+  public int size() {
     return size;
   }
 
   @Override
   public String toString() {
-    return Util.name(this) + '[' + targetNode() + ", " + size() + " ops]";
+    return Util.name(this) + '[' + getTargetNode() + ", " + size() + " ops]";
   }
 }
