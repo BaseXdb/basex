@@ -64,9 +64,7 @@ public final class Replace extends Update {
       if(tp == NodeType.COM) FComm.parse(txt, info);
       if(tp == NodeType.PI) FPI.parse(txt, info);
 
-      ctx.updates.add(tp == NodeType.ELM ?
-          new ReplaceElementContent(dbn.pre, dbn.data, info, txt) :
-          new ReplaceValue(dbn.pre, dbn.data, info, txt), ctx);
+      ctx.updates.add(new ReplaceValue(dbn.pre, dbn.data, info, txt), ctx);
     } else {
       final ANode par = targ.parent();
       if(par == null) UPNOPAR.thrw(info, i);

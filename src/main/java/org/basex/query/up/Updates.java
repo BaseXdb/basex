@@ -1,6 +1,7 @@
 package org.basex.query.up;
 
 import org.basex.data.*;
+import org.basex.data.atomic.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.up.primitives.*;
@@ -21,17 +22,17 @@ import org.basex.util.hash.*;
  * The complete updating process is custom-tailored to the
  * sequential table encoding of BaseX. As a general rule, all updates are
  * collected and applied for each database from bottom to top, regarding the
- * PRE values of the corresponding target nodes. Updates on the highest pre
+ * PRE values of the corresponding target nodes. Updates on the highest PRE
  * values are applied first.
  *
  *
  * ***** Updates work like the following: *****
  *
  * 1. Each call of an updating expression creates an {@link UpdatePrimitive}
- * 2. All update primitives for a snapshot/query are collected here
+ * 2. All update primitives for a snapshot/query are collected here.
  * 3. Primitives are kept separately for each database that is addressed. This
  *    way we can operate on PRE values instead of node IDs, skip mapping
- *    overhead and further optimize the update process.
+ *    overhead and further optimize the process.
  *    {@link DatabaseUpdates}
  * 4. Primitives are further kept separately for each database node - each
  *    individual target PRE value. There's a specific container for this:
@@ -39,65 +40,15 @@ import org.basex.util.hash.*;
  * 5. Transform expressions are executed in an 'isolated' updating environment,
  *    see {@link TransformModifier}. All the other updates are executed by
  *    a {@link DatabaseModifier}.
- * 6. Fn:put statements are treated exactly like an update primitive. They are
- *    represented by an update primitive.
- * 7. After the query has been parsed and all update primitives have been added
+ * 6. After the query has been parsed and all update primitives have been added
  *    to the list, constraints, which cannot be taken care of on the fly, are
  *    checked. If no problems occur, updates are TO BE carried out.
+ * 7. Before applying the updates the {@link UpdatePrimitiveComparator} helps to order
+ *    {@link UpdatePrimitive} for execution. Each primitive then creates a sequence of
+ *    {@link BasicUpdate} which are passed to the {@link Data} layer via an
+ *    {@link AtomicUpdateList}. This list takes care of optimization and also text node
+ *    merging.
  *
- * 8. Updates are carried out separately for each database, the following
- *    way:
- *      1. Update primitives are sorted by the PRE value of their target node
- *         in a descending manner. Applying updates from the highest to the
- *         lowest PRE value ensures that updates, not-yet carried out, are not
- *         affected by PRE value shifts. PRE value shifts are a result of
- *         structural changes of the table - which occur each time a node is
- *         inserted or deleted, for more see {@link PrimitiveType}.
- *      2. For each specific target node, updates which are collected in a
- *         {@link NodeUpdates} container are executed in a specific
- *         order, depending on their type {@link PrimitiveType}. This order
- *         relates more or less to the XQUF specification, at least it leads to
- *         the same result.
- *
- *      3. Neighboring text nodes have to be merged together (see XQuery Data
- *         Model). Adjacent text nodes can only be a result of structural
- *         updates. With our approach this takes some extra effort, but can be
- *         carried out on-the-fly, applying the two following steps:
- *         1. An {@link NodeUpdates} container holds all update
- *            primitives for a specific database node N. If all updates with
- *            target N (all updates in the current container) are carried out,
- *            text node adjacency can only occur on the child axis, or the
- *            sibling axis of N.
- *
- *            Regarding adjacency on the child axis, this can be taken care off
- *            by first applying all updates on this axis and subsequently
- *            checking the affected PRE positions for adjacent text nodes.
- *
- *            The sibling axis of N can only be checked for adjacent text nodes
- *            after an eventual left sibling target container has executed its
- *            updates. Example: We have two siblings A(1) and B(2). A is a text
- *            node, B is an element. The numbers in brackets are their PRE
- *            values. If A is target of a delete primitive and B is target of
- *            an insert before primitive (text 'foo' is inserted) the following
- *            happens: insert before is executed on B, A is deleted, location
- *            around B is checked for adjacent text nodes. No merges occur. We
- *            repeat this for every target node and only apply text node merges
- *            if updates of the next container have been carried out.
- *
- *            If we would carry out text merges immediately, the following
- *            (which leads to inconsistency) happens: insert before
- *            is executed on B, 'foo' is adjacent to A and therefore the two
- *            nodes are merged together, A is finally deleted. As a result we
- *            loose the text node 'foo' during the process, as it is merged
- *            with A and subsequently deleted together with A (consider the pre
- *            value shifts!).
- *
- *
- * XQUF SPECIALTIES WITH BASEX
- *
- * Fn:put: the target node of an fn:put statement cannot be deleted, but it
- *  can be among the deleted nodes as a result of a 'replace element content'
- *  statement.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
@@ -105,10 +56,10 @@ import org.basex.util.hash.*;
 public final class Updates {
   /** Current context modifier. */
   public ContextModifier mod;
-  /** Set which contains all file paths which are targeted during a snapshot. */
+  /** All file paths that are targeted during a snapshot by an fn:put expression. */
   public final TokenSet putPaths = new TokenSet();
 
-  /** Mapping between fragment IDs and the temporary data instances created
+  /** Mapping between fragment IDs and the temporary data instances
    * to apply updates on the corresponding fragments. */
   private final IntMap<MemData> fragmentIDs = new IntMap<MemData>();
 
@@ -118,7 +69,7 @@ public final class Updates {
    * @param ctx query context
    * @throws QueryException query exception
    */
-  public void add(final UpdatePrimitive up, final QueryContext ctx)
+  public void add(final Operation up, final QueryContext ctx)
       throws QueryException {
 
     if(mod == null) mod = new DatabaseModifier();

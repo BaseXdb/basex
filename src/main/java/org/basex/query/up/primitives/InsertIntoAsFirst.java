@@ -1,7 +1,5 @@
 package org.basex.query.up.primitives;
 
-import static org.basex.query.util.Err.*;
-
 import org.basex.data.*;
 import org.basex.data.atomic.*;
 import org.basex.query.*;
@@ -10,42 +8,42 @@ import org.basex.query.util.*;
 import org.basex.util.*;
 
 /**
- * Replace node primitive.
+ * Insert into as first primitive.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
-public final class ReplaceNode extends NodeCopy {
+public final class InsertIntoAsFirst extends NodeCopy {
   /**
    * Constructor.
    * @param p target node pre value
-   * @param d target data instance
+   * @param d target data reference
    * @param i input info
-   * @param c node copy insertion sequence
+   * @param c insertion sequence node list
    */
-  public ReplaceNode(final int p, final Data d, final InputInfo i, final ANodeList c) {
-    super(PrimitiveType.REPLACENODE, p, d, i, c);
-  }
-
-  @Override
-  public void update(final NamePool pool) {
-    if(insseq == null) return;
-    add(pool);
-    pool.remove(getTargetNode());
+  public InsertIntoAsFirst(final int p, final Data d, final InputInfo i,
+      final ANodeList c) {
+    super(PrimitiveType.INSERTINTOFIRST, p, d, i, c);
   }
 
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
-    UPMULTREPL.thrw(info, getTargetNode());
+    final ANodeList newInsert = ((InsertIntoAsFirst) p).insert;
+    for(int j = 0; j < newInsert.size(); j++)
+      insert.add(newInsert.get(j));
   }
 
   @Override
   public void addAtomics(final AtomicUpdateList l) {
-    l.addReplace(targetPre, insseq);
+    l.addInsert(targetPre + data.attSize(targetPre, data.kind(targetPre)), targetPre,
+        insseq, false);
   }
 
   @Override
   public UpdatePrimitive[] substitute() {
     return new UpdatePrimitive[] { this };
   }
+
+  @Override
+  public void update(final NamePool pool) { }
 }

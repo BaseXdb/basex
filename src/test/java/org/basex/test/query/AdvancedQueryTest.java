@@ -46,6 +46,36 @@ public abstract class AdvancedQueryTest extends SandboxTest {
   }
 
   /**
+   * Creates a transform expression from a given input, modification and return clause.
+   *
+   * @param input input XML fragment, target of the updating expression
+   * @param modification updating expression, make sure to address all target nodes via
+   * the $input variable, i.e. delete node $input/a
+   * @param ret return clause
+   * @return the query formulated with a transform expression
+   */
+  protected static String transform(final String input, final String modification,
+      final String ret) {
+    final String q =
+        "copy $input := " + input + " " +
+        "modify (" + modification + ") " +
+        "return (" + (ret.length() == 0 ? "$input" : ret) + ")";
+    return q;
+  }
+
+  /**
+   * Creates a transform expression from a given input and modification clause.
+   *
+   * @param input input XML fragment, target of the updating expression
+   * @param modification updating expression, make sure to address all target nodes via
+   * the $input variable, i.e. delete node $input/a
+   * @return the query formulated with a transform expression
+   */
+  protected static String transform(final String input, final String modification) {
+    return transform(input, modification, "");
+  }
+
+  /**
    * Checks if a query yields the specified result.
    * @param query query string
    * @param result query result

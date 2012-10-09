@@ -26,17 +26,17 @@ public abstract class ContextModifier {
    * @param ctx query context
    * @throws QueryException query exception
    */
-  abstract void add(final UpdatePrimitive p, final QueryContext ctx)
+  abstract void add(final Operation p, final QueryContext ctx)
     throws QueryException;
 
   /**
    * Adds an update primitive to this context modifier.
-   * Will be called by {@link #add(UpdatePrimitive, QueryContext)}.
+   * Will be called by {@link #add(Operation, QueryContext)}.
    * @param p update primitive
    * @throws QueryException query exception
    */
-  final void add(final UpdatePrimitive p) throws QueryException {
-    final Data data = p.data;
+  final void add(final Operation p) throws QueryException {
+    final Data data = p.getData();
     DatabaseUpdates dbp = pendingUpdates.get(data);
     if(dbp == null) {
       dbp = new DatabaseUpdates(data);

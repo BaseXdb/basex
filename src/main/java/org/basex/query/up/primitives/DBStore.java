@@ -19,7 +19,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class DBStore extends UpdatePrimitive {
+public final class DBStore extends BasicOperation {
   /** Keys. */
   private final TokenObjMap<Item> map = new TokenObjMap<Item>();
 
@@ -31,13 +31,13 @@ public final class DBStore extends UpdatePrimitive {
    * @param ii input info
    */
   public DBStore(final Data d, final String path, final Item it, final InputInfo ii) {
-    super(PrimitiveType.DBSTORE, -1, d, ii);
+    super(TYPE.DBSTORE, d, ii);
     map.add(token(path), it);
   }
 
   @Override
-  public void merge(final UpdatePrimitive p) {
-    final DBStore put = (DBStore) p;
+  public void merge(final BasicOperation o) {
+    final DBStore put = (DBStore) o;
     for(final byte[] path : put.map) {
       map.add(path, put.map.get(path));
     }
@@ -62,4 +62,7 @@ public final class DBStore extends UpdatePrimitive {
   public int size() {
     return map.size();
   }
+
+  @Override
+  public void prepare() throws QueryException { }
 }

@@ -104,6 +104,8 @@ public abstract class Data {
   TableAccess table;
   /** ID->PRE mapping. */
   IdPreMap idmap;
+  /** States if distance caching is active. */
+  public boolean cache;
 
   /**
    * Closes the database.
@@ -295,7 +297,7 @@ public abstract class Data {
    * @param kind node kind
    * @return distance
    */
-  private int dist(final int pre, final int kind) {
+  public int dist(final int pre, final int kind) {
     switch(kind) {
       case ELEM:
         return table.read4(pre, 4);
@@ -576,7 +578,9 @@ public abstract class Data {
       size(p, k, size(p, k) + diff);
       p = parent(p, k);
     }
-    updateDist(rpre + dsize, diff);
+
+    if(!cache)
+      updateDist(rpre + dsize, diff);
 
     // adjust attribute size of parent if attributes inserted. attribute size
     // of parent cannot be reduced via a replace expression.
@@ -607,9 +611,6 @@ public abstract class Data {
     /// explicitly delete text or attribute value
     if(k != DOC && k != ELEM) delete(pre, k != ATTR);
 
-    // update namespaces
-    nspaces.delete(pre, s);
-
     // reduce size of ancestors
     int par = pre;
     // check if we are an attribute (different size counters)
@@ -638,7 +639,12 @@ public abstract class Data {
 
     // delete node from table structure and reduce document size
     table.delete(pre, s);
-    updateDist(p, -s);
+
+    if(!cache)
+      updateDist(p, -s);
+
+    // propagate PRE value shifts to namespaces
+    nspaces.delete(pre, s);
   }
 
   /**
@@ -806,7 +812,6 @@ public abstract class Data {
     // finalize and update namespace structure
     while(!preStack.isEmpty()) nspaces.close(preStack.pop());
     nspaces.setRoot(t);
-    if(ipar != -1) nspaces.insert(ipre, dsize, newNodes);
 
     if(bp != 0) insert(ipre + dpre - 1 - (dpre - 1) % buf);
     // reset buffer to old size
@@ -825,13 +830,18 @@ public abstract class Data {
       size(p, k, size(p, k) + dsize);
       p = parent(p, k);
     }
-    updateDist(ipre + dsize, dsize);
 
     if(meta.updindex) {
       // add the entries to the ID -> PRE mapping:
       idmap.insert(ipre, id(ipre), dsize);
       indexEnd();
     }
+
+    if(!cache)
+      updateDist(ipre + dsize, dsize);
+
+    // propagate PRE value shifts to namespaces
+    if(ipar != -1) nspaces.insert(ipre, dsize, newNodes);
   }
 
   /**
@@ -884,7 +894,7 @@ public abstract class Data {
    * @param kind node kind
    * @param value value
    */
-  private void dist(final int pre, final int kind, final int value) {
+  public void dist(final int pre, final int kind, final int value) {
     if(kind == ATTR) table.write1(pre, 0, value << 3 | ATTR);
     else if(kind != DOC) table.write4(pre, kind == ELEM ? 4 : 8, value);
   }

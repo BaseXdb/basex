@@ -50,6 +50,15 @@ public class IntSet {
   }
 
   /**
+   * Returns true if the given key is contained in this set.
+   * @param key key to look for
+   * @return true if key contained, else false
+   */
+  public boolean contains(final int key) {
+    return id(key) != 0;
+  }
+
+  /**
    * Returns the id of the specified key or -1 if key was not found.
    * @param key key to be found
    * @return id or 0 if nothing was found

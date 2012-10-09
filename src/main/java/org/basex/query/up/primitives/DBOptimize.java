@@ -16,7 +16,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Dimitar Popov
  */
-public final class DBOptimize extends UpdatePrimitive {
+public final class DBOptimize extends BasicOperation {
   /** Database context. */
   private final Context ctx;
   /** Flag to optimize all database structures. */
@@ -30,14 +30,14 @@ public final class DBOptimize extends UpdatePrimitive {
    * @param ii input info
    */
   public DBOptimize(final Data d, final Context c, final boolean a, final InputInfo ii) {
-    super(PrimitiveType.DBOPTIMIZE, -1, d, ii);
+    super(TYPE.DBOPTIMIZE, d, ii);
     ctx = c;
     all = a;
   }
 
   @Override
-  public void merge(final UpdatePrimitive p) {
-    all |= ((DBOptimize) p).all;
+  public void merge(final BasicOperation o) {
+    all |= ((DBOptimize) o).all;
   }
 
   @Override
@@ -54,4 +54,7 @@ public final class DBOptimize extends UpdatePrimitive {
   public int size() {
     return 1;
   }
+
+  @Override
+  public void prepare() throws QueryException { }
 }

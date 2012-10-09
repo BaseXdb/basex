@@ -2,6 +2,7 @@ package org.basex.query.up.primitives;
 
 import org.basex.core.cmd.*;
 import org.basex.data.*;
+import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -12,7 +13,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class DBDelete extends UpdatePrimitive {
+public final class DBDelete extends BasicOperation {
   /** Keys. */
   private final StringList paths = new StringList(1);
   /** Number of keys. */
@@ -25,15 +26,15 @@ public final class DBDelete extends UpdatePrimitive {
    * @param ii input info
    */
   public DBDelete(final Data d, final String p, final InputInfo ii) {
-    super(PrimitiveType.DBDELETE, -1, d, ii);
+    super(TYPE.DBDELETE, d, ii);
     paths.add(p);
     size = d.resources.binaries(p).size();
   }
 
   @Override
-  public void merge(final UpdatePrimitive p) {
-    for(final String path : ((DBDelete) p).paths) paths.add(path);
-    size += p.size();
+  public void merge(final BasicOperation o) {
+    for(final String path : ((DBDelete) o).paths) paths.add(path);
+    size += o.size();
   }
 
   @Override
@@ -45,4 +46,7 @@ public final class DBDelete extends UpdatePrimitive {
   public int size() {
     return size;
   }
+
+  @Override
+  public void prepare() throws QueryException { }
 }

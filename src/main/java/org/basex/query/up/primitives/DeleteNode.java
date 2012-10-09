@@ -1,6 +1,7 @@
 package org.basex.query.up.primitives;
 
 import org.basex.data.*;
+import org.basex.data.atomic.*;
 import org.basex.query.up.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -11,48 +12,63 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
-public final class DeleteNode extends StructuralUpdate {
+public final class DeleteNode extends UpdatePrimitive {
+  /** States if the deletion of the target node T is part of a replaceElementContent
+   * call on the parent of T, see {@link ReplaceValue}. */
+  public final boolean rec;
+
   /**
    * Constructor.
-   * @param p pre
-   * @param d data
+   * @param p target node PRE value
+   * @param d target data reference
    * @param i input info
    */
   public DeleteNode(final int p, final Data d, final InputInfo i) {
     super(PrimitiveType.DELETENODE, p, d, i);
+    rec = false;
+  }
+
+  /**
+   * Constructor for a delete primitive that is a product of a replaceElementContent
+   * substitution.
+   * @param p target node PRE value
+   * @param d target data reference
+   * @param i input info
+   * @param r this delete is a product of a replaceElementContent substitution
+   */
+  public DeleteNode(final int p, final Data d, final InputInfo i, final boolean r) {
+    super(PrimitiveType.DELETENODE, p, d, i);
+    rec = r;
   }
 
   @Override
   public void merge(final UpdatePrimitive p) {
     /* Multiple delete primitives can operate on the same
-     * target node. */
-  }
-
-  @Override
-  public void apply() {
-    shifts = -data.size(pre, data.kind(pre));
-    data.delete(pre);
-  }
-
-  @Override
-  public boolean adjacentTexts(final int c) {
-    // take pre value shifts into account
-    final int p = pre + c;
-    return mergeTexts(data, p - 1, p);
+     * target node, see XQUF. */
   }
 
   @Override
   public void update(final NamePool pool) {
-    pool.remove(new DBNode(data, pre));
+    pool.remove(new DBNode(data, targetPre));
   }
 
   @Override
   public String toString() {
-    return Util.name(this) + '[' + targetNode() + ']';
+    return Util.name(this) + '[' + getTargetNode() + ']';
   }
 
   @Override
   public int size() {
     return 1;
+  }
+
+  @Override
+  public UpdatePrimitive[] substitute() {
+    return new UpdatePrimitive[] { this };
+  }
+
+  @Override
+  public void addAtomics(final AtomicUpdateList l) {
+    l.addDelete(targetPre);
   }
 }

@@ -523,8 +523,8 @@ public final class NamespaceTest extends AdvancedQueryTest {
 
   /**
    * Checks namespace declarations.
-   * Note: xmlns='' is being erroneously added. Might have to to with
-   * Data.update(); see {@link RenameNode#apply()}.
+   * Note: xmlns='' is being erroneously added. Might have to do with
+   * Data.update(); see {@link RenameNode}.
    */
   @Test
   public void renameDuplNSCheck() {

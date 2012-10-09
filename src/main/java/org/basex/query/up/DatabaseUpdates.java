@@ -1,13 +1,15 @@
 package org.basex.query.up;
 
-import static org.basex.query.up.primitives.PrimitiveType.*;
 import static org.basex.query.util.Err.*;
 
 import java.io.*;
+import java.util.*;
+import java.util.List;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
+import org.basex.data.atomic.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.value.item.*;
@@ -16,11 +18,9 @@ import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * This class holds all updates for a specific database. Before applied,
- * updates are sorted in a descending manner regarding the pre value of their
- * target nodes. As a result, update operations are applied from bottom to
- * top and we can stick to pre values as primitive identifier as pre value
- * shifts won't have any effect on updates that have not yet been applied.
+ * This class 'caches' all updates, fn:put operations and other database related
+ * operations that are initiated within a snapshot. Regarding the XQUF specification it
+ * fulfills the purpose of a 'pending update list'.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
@@ -33,6 +33,11 @@ final class DatabaseUpdates {
   /** Mapping between pre values of the target nodes and all update primitives
    * which operate on this target. */
   private final IntMap<NodeUpdates> updatePrimitives = new IntMap<NodeUpdates>();
+  /** Database operations wich are applied after all updates have been executed. */
+  private final List<BasicOperation> dbops = new LinkedList<BasicOperation>();
+  /** Put operations which reflect all changes made during the snapshot, hence executed
+   * after updates have been carried out. */
+  private final Map<Integer, Put> puts = new HashMap<Integer, Put>();
 
   /**
    * Constructor.
@@ -44,17 +49,49 @@ final class DatabaseUpdates {
 
   /**
    * Adds an update primitive to the list.
-   * @param p update primitive
+   * @param o update primitive
    * @throws QueryException query exception
    */
-  void add(final UpdatePrimitive p) throws QueryException {
-    final int pre = p.pre;
-    NodeUpdates pc = updatePrimitives.get(pre);
-    if(pc == null) {
-      pc = new NodeUpdates();
-      updatePrimitives.add(pre, pc);
+  void add(final Operation o) throws QueryException {
+    if(o instanceof UpdatePrimitive) {
+      for(final UpdatePrimitive subp : ((UpdatePrimitive) o).substitute()) {
+        final int pre = subp.targetPre;
+        NodeUpdates pc = updatePrimitives.get(pre);
+        if(pc == null) {
+          pc = new NodeUpdates();
+          updatePrimitives.add(pre, pc);
+        }
+        pc.add(subp);
+      }
+
+    } else if(o instanceof Put) {
+      final Put p = (Put) o;
+      final int id = p.nodeid;
+      final Put old = puts.get(id);
+      if(old == null)
+        puts.put(id, p);
+      else
+        old.merge(p);
+
+    } else {
+      final BasicOperation oo = (BasicOperation) o;
+      final BasicOperation d = find(oo);
+      if(d == null) dbops.add(oo);
+      else d.merge(oo);
     }
-    pc.add(p);
+  }
+
+  /**
+   * Finds a {@link BasicOperation} of the same
+   * {@link org.basex.query.up.primitives.BasicOperation.TYPE} in the operations list if
+   * there is any.
+   * @param oo DBOperation of a specific type
+   * @return DBOperation of the same type, or null if there is none
+   */
+  private BasicOperation find(final BasicOperation oo) {
+    for(final BasicOperation o : dbops)
+      if(o.type == oo.type) return o;
+    return null;
   }
 
   /**
@@ -74,10 +111,6 @@ final class DatabaseUpdates {
       final NodeUpdates ups = updatePrimitives.get(nodes.get(i));
       for(final UpdatePrimitive p : ups.prim) {
         if(p instanceof NodeCopy) ((NodeCopy) p).prepare();
-        /* check if the identity of all target nodes of fn:put operations is
-           still available after the execution of updates. that includes parent
-           nodes as well */
-        if(p.type == PUT && ancestorDeleted(nodes.get(i))) UPFOTYPE.thrw(p.info, p);
       }
     }
 
@@ -137,34 +170,21 @@ final class DatabaseUpdates {
    * @throws QueryException query exception
    */
   void apply() throws QueryException {
-    optimize();
+    // execute database updates
+    createAtomicUpdates(preparePrimitives()).execute();
 
-    /*
-     * For each target node, the update primitives in the corresponding
-     * container are applied. Certain operations may lead to text node
-     * adjacency. As the updates in a container, including eventual text node
-     * merges, may not affect the preceding sibling axis (as there could be
-     * other update primitives with a target on this axis), we have to make
-     * sure that updates on the preceding sibling axis have been carried out.
-     *
-     * To achieve this we keep track of the most recently applied container
-     * and resolve text adjacency issues after the next container on the
-     * preceding axis has been executed.
-     */
-    NodeUpdates recent = null;
-    // apply updates from the highest to the lowest pre value
-    for(int i = nodes.size() - 1; i >= 0; i--) {
-      final NodeUpdates current = updatePrimitives.get(nodes.get(i));
-      // first run, no recent container
-      if(recent == null) {
-        current.makePrimitivesEffective();
-      } else {
-        recent.resolveExternalTextNodeAdjacency(current.makePrimitivesEffective());
-      }
-      recent = current;
+    // execute database operations
+    final BasicOperation[] dbo = new BasicOperation[dbops.size()];
+    dbops.toArray(dbo);
+    Arrays.sort(dbo);
+    for(final BasicOperation d : dbo) {
+      d.prepare();
+      d.apply();
     }
-    // resolve text adjacency issues of the last container
-    recent.resolveExternalTextNodeAdjacency(0);
+
+    // execute fn:put operations
+    final Put[] o = puts.values().toArray(new Put[puts.values().size()]);
+    for(final Put p : o) p.apply();
 
     if(data.meta.prop.is(Prop.WRITEBACK) && !data.meta.original.isEmpty()) {
       try {
@@ -173,6 +193,39 @@ final class DatabaseUpdates {
         UPPUTERR.thrw(null, data.meta.original);
       }
     }
+  }
+
+  /**
+   * Prepares the {@link UpdatePrimitive} for execution incl. ordering.
+   * @return ordered list of update primitives
+   */
+  private List<UpdatePrimitive> preparePrimitives() {
+    final List<UpdatePrimitive> upd = new ArrayList<UpdatePrimitive>();
+    for(int i = nodes.size() - 1; i >= 0; i--) {
+      final NodeUpdates n = updatePrimitives.get(nodes.get(i));
+      n.prepare();
+      for(final UpdatePrimitive p : n.prim) {
+        upd.add(p);
+      }
+    }
+    Collections.sort(upd, new UpdatePrimitiveComparator());
+    return upd;
+  }
+
+  /**
+   * Creates a list of atomic updates that can be applied to the database.
+   * @param l list of ordered {@link UpdatePrimitive}
+   * @return list of atomic updates ready for execution
+   */
+  private AtomicUpdateList createAtomicUpdates(final List<UpdatePrimitive> l) {
+    final AtomicUpdateList atomics = new AtomicUpdateList(data);
+    // from the highest to the lowest score
+    for(int i = l.size() - 1; i >= 0; i--) {
+      UpdatePrimitive u = l.get(i);
+      u.addAtomics(atomics);
+      l.set(i, null);
+    }
+    return atomics;
   }
 
   /**
@@ -187,19 +240,6 @@ final class DatabaseUpdates {
       }
     }
     return s;
-  }
-
-  /**
-   * Determines recursively whether an ancestor of a given node is deleted.
-   * @param n pre value
-   * @return true if ancestor deleted
-   */
-  private boolean ancestorDeleted(final int n) {
-    final NodeUpdates up = updatePrimitives.get(n);
-    if(up != null && up.updatesDestroyIdentity(n)) return true;
-
-    final int p = data.parent(n, data.kind(n));
-    return p != -1 && ancestorDeleted(p);
   }
 
   /**
@@ -237,44 +277,5 @@ final class DatabaseUpdates {
     }
     final QNm dup = pool.duplicate();
     if(dup != null) UPATTDUPL.thrw(null, dup);
-  }
-
-  /**
-   * Identifies unnecessary update operations and removes them from the pending
-   * update list.
-   */
-  private void optimize() {
-    /* Tree Aware Updates: Unnecessary updates on the descendant axis of a
-     * deleted or replaced node or of a node which is target of a replace
-     * element content expression are identified and removed from the pending
-     * update list. */
-    final int l = nodes.size();
-    int ni = 0;
-    int c = 0;
-    while(ni < l - 1) {
-      final int pre = nodes.get(ni++);
-      // If a node is deleted or replaced or affected by a replace element
-      // content expression ...
-      final int[] destroyed = updatePrimitives.get(pre).
-          destroyedNodeIdentities().toArray();
-      for(final int pd : destroyed) {
-        final int followingAxisPre = pd + data.size(pd, data.kind(pd));
-        // mark obsolete target nodes on the descendant axis.
-        while(ni < l && nodes.get(ni) < followingAxisPre) {
-          nodes.set(ni++, -1);
-          c++;
-        }
-      }
-    }
-    // return if nothing changed on the pending update list
-    if(c == 0) return;
-
-    // Create a new list that contains necessary targets only
-    final IntList newNodes = new IntList(nodes.size() - c);
-    for(int i = 0; i < nodes.size(); i++) {
-      final int pre = nodes.get(i);
-      if(pre != -1) newNodes.add(pre);
-    }
-    nodes = newNodes;
   }
 }

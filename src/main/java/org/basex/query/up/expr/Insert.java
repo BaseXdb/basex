@@ -92,7 +92,7 @@ public final class Insert extends Update {
       dbn = ctx.updates.determineDataRef(n, ctx);
       if(before) up = new InsertBefore(dbn.pre, dbn.data, info, cList);
       else if(after) up = new InsertAfter(dbn.pre, dbn.data, info, cList);
-      else if(first) up = new InsertIntoFirst(dbn.pre, dbn.data, info, cList);
+      else if(first) up = new InsertIntoAsFirst(dbn.pre, dbn.data, info, cList);
       else up = new InsertInto(dbn.pre, dbn.data, info, cList, last);
       ctx.updates.add(up, ctx);
     }

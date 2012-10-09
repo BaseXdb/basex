@@ -23,13 +23,17 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Dimitar Popov
  */
-public final class DBAdd extends InsertBase {
+public final class DBAdd extends BasicOperation {
   /** Documents to add. */
   private ArrayList<Item> docs = new ArrayList<Item>();
   /** Paths to which the new document(s) will be added. */
   private TokenList paths = new TokenList();
   /** Database context. */
   private final Context ctx;
+  /** Insertion sequence. */
+  private Data md;
+  /** Size. */
+  private int size;
 
   /**
    * Constructor.
@@ -41,21 +45,15 @@ public final class DBAdd extends InsertBase {
    */
   public DBAdd(final Data d, final Item it, final String p, final Context c,
       final InputInfo ii) {
-
-    super(PrimitiveType.INSERTAFTER, -1, d, ii, null);
+    super(TYPE.DBADD, d, ii);
     docs.add(it);
     paths.add(token(p));
     ctx = c;
   }
 
   @Override
-  public boolean adjacentTexts(final int c) {
-    return false;
-  }
-
-  @Override
-  public void merge(final UpdatePrimitive u) {
-    final DBAdd a = (DBAdd) u;
+  public void merge(final BasicOperation o) {
+    final DBAdd a = (DBAdd) o;
     final Iterator<Item> d = a.docs.iterator();
     final Iterator<byte[]> p = a.paths.iterator();
     while(d.hasNext()) {
@@ -66,7 +64,6 @@ public final class DBAdd extends InsertBase {
 
   @Override
   public void apply() {
-    super.apply();
     data.insert(data.meta.size, -1, md);
   }
 
@@ -149,5 +146,10 @@ public final class DBAdd extends InsertBase {
   @Override
   public String toString() {
     return Util.name(this) + '[' + docs.get(0) + ']';
+  }
+
+  @Override
+  public int size() {
+    return size;
   }
 }
