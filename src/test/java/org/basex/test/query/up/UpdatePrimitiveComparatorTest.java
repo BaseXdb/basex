@@ -488,7 +488,7 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
   private static Data data(final String s) {
     try {
       new CreateDB(NAME, s).execute(context);
-    } catch(BaseXException e) {
+    } catch(final BaseXException e) {
       fail(e.getMessage());
     }
     return context.data();
@@ -519,7 +519,7 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
       // ordered list must be traversed back-to-front as elements are sorted ascending
       final UpdatePrimitive p = l.get(s - i - 1);
       final UpdatePrimitive p2 = l2.get(s - i - 1);
-      if(!(p.equals(order[i])) || !(p2.equals(order[i])))
+      if(!p.equals(order[i]) || !p2.equals(order[i]))
         fail("Unexpected order of updates at position: " + i);
     }
   }

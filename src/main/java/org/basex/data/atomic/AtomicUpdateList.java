@@ -252,7 +252,7 @@ public class AtomicUpdateList {
     // traverse from lowest to highest PRE value
     int i = updStructural.size() - 1;
     while(i >= 0) {
-      BasicUpdate u = updStructural.get(i);
+      final BasicUpdate u = updStructural.get(i);
       // If this update can lead to superfluous updates ...
       if(u.destructive()) {
         // we determine the lowest and highest PRE values of a superfluous update

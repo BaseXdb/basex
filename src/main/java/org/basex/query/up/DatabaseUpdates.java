@@ -221,7 +221,7 @@ final class DatabaseUpdates {
     final AtomicUpdateList atomics = new AtomicUpdateList(data);
     // from the highest to the lowest score
     for(int i = l.size() - 1; i >= 0; i--) {
-      UpdatePrimitive u = l.get(i);
+      final UpdatePrimitive u = l.get(i);
       u.addAtomics(atomics);
       l.set(i, null);
     }

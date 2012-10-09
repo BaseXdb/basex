@@ -340,7 +340,7 @@ private void checkTextAdjacency(final Data data, final byte[][] texts) {
    i = -1;
    int t = 0;
    while(++i < data.meta.size) {
-     if(data.kind(i) == Data.TEXT && !(eq(data.text(i, true), texts[t++])))
+     if(data.kind(i) == Data.TEXT && !eq(data.text(i, true), texts[t++]))
        fail("Invalid text node at position " + i);
    }
 }
@@ -353,7 +353,7 @@ private void checkTextAdjacency(final Data data, final byte[][] texts) {
  private Data data(final String s) {
    try {
      return CreateDB.mainMem(new IOContent(s), context);
-    } catch(IOException e) {
+    } catch(final IOException e) {
       fail(e.getMessage());
       return null;
     }
