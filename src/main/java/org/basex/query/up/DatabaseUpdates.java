@@ -171,7 +171,7 @@ final class DatabaseUpdates {
    */
   void apply() throws QueryException {
     // execute database updates
-    createAtomicUpdates(preparePrimitives()).execute();
+    createAtomicUpdates(preparePrimitives()).execute(true);
 
     // execute database operations
     final BasicOperation[] dbo = new BasicOperation[dbops.size()];

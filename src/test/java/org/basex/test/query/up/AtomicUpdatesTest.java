@@ -258,7 +258,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
    l.addInsert(11, 10, insseq(l.data), false);
    l.addReplace(5, insseq(l.data));
    l.addDelete(3);
-   l.execute();
+   l.execute(true);
    checkDistances(l.data, new int[][] {
        new int[] {17, 1},
        new int[] {16, 15},
@@ -309,7 +309,7 @@ private void checkDistances(final Data d, final int[][] pairs) {
    l.addInsert(4, 2, data(l.data, "Tx01"), false);
    l.addDelete(3);
    l.addInsert(3, 2, data(l.data, "Tx0"), false);
-   l.execute();
+   l.execute(true);
    checkTextAdjacency(l.data, new byte[][] {
        token("Tx0Tx01"),
        token("T4T6new"),

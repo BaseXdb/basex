@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
+import org.basex.data.atomic.*;
 import org.basex.io.*;
 import org.basex.util.list.*;
 
@@ -30,9 +31,12 @@ public final class Delete extends ACreate {
     // start update
     if(!data.startUpdate()) return error(DB_PINNED_X, data.meta.name);
 
-    // delete all documents in reverse order (faster)
+    // delete all documents
     final IntList docs = data.resources.docs(target);
-    for(int d = docs.size() - 1; d >= 0; d--) data.delete(docs.get(d));
+    final AtomicUpdateList atomics = new AtomicUpdateList(data);
+    for(int d = docs.size() - 1; d >= 0; d--)
+      atomics.addDelete(docs.get(d));
+    atomics.execute(false);
     context.update();
 
     // delete binaries
