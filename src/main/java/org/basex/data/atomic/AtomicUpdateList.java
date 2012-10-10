@@ -286,16 +286,18 @@ public class AtomicUpdateList {
   }
 
   /**
-   * Executes the updates after checking constraints and optimizing the process.
+   * Executes the updates. Resolving text node adjacency can be skipped if adjacent text
+   * nodes are not to be expected.
+   * @param mergeTexts adjacent text nodes are to be expected and must be merged
    */
-  public void execute() {
+  public void execute(final boolean mergeTexts) {
     check();
     optimize();
     applyValueUpdates();
     if(cacheDistanceUpdates) data.cache = true;
     applyStructuralUpdates();
     updateDistances();
-    resolveTextAdjacency();
+    if(mergeTexts) resolveTextAdjacency();
     data.cache = false;
   }
 
