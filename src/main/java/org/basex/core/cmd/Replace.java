@@ -6,6 +6,7 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
+import org.basex.data.atomic.*;
 import org.basex.io.*;
 import org.basex.util.list.*;
 
@@ -67,7 +68,9 @@ public final class Replace extends ACreate {
         ok = add.run(context) || error(add.info());
         // delete old documents if addition was successful
         if(ok) {
-          for(int p = pre.size() - 1; p >= 0; p--) data.delete(pre.get(p));
+          final AtomicUpdateList atomics = new AtomicUpdateList(data);
+          for(int p = pre.size() - 1; p >= 0; p--) atomics.addDelete(pre.get(p));
+          atomics.execute(false);
         }
       }
       return ok && info(RES_REPLACED_X_X, 1, perf);
