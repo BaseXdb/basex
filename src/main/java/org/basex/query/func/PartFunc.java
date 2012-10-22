@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -48,6 +49,16 @@ public final class PartFunc extends UserFunc {
     compile(ctx, false);
     // defer creation of function item because of closure
     return new InlineFunc(info, ret, args, expr, ann, ctx).compile(ctx);
+  }
+
+  @Override
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+    return compile(ctx).item(ctx, ii);
+  }
+
+  @Override
+  public Value value(final QueryContext ctx) throws QueryException {
+    return item(ctx, info);
   }
 
   @Override
