@@ -99,4 +99,10 @@ public final class HigherOrderTest extends AdvancedQueryTest {
   public void wrongArityTest() {
     error("count(concat#2('1','2','3'))", Err.INVARITY);
   }
+
+  /** Tests using a partial function application as the context item (see GH-579). */
+  @Test
+  public void ctxItemTest() {
+    query("declare context item := contains(?, \"a\"); .(\"abc\")", "true");
+  }
 }
