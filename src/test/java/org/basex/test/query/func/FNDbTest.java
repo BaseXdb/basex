@@ -320,6 +320,10 @@ public final class FNDbTest extends AdvancedQueryTest {
     query(COUNT.args(COLLECTION.args(NAME + "/test")), 0);
     query(COUNT.args(COLLECTION.args(NAME + "/newtest")), NFLDR);
 
+    // rename paths
+    query(_DB_RENAME.args(NAME, "", "x"));
+    query(COUNT.args(COLLECTION.args(NAME + "/x/newtest")), NFLDR);
+
     // rename binary file
     query(_DB_STORE.args(NAME, "one", ""));
     query(_DB_RENAME.args(NAME, "one", "two"));

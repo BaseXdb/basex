@@ -1,5 +1,6 @@
 package org.basex.core.cmd;
 
+import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 
 import java.io.*;
@@ -94,6 +95,7 @@ public abstract class ACreate extends Command {
     }
     // update name if not given by the IO reference anyway
     if(io instanceof IOContent || io instanceof IOStream) {
+      if(name.endsWith("/")) throw new BaseXException(NAME_INVALID_X, name);
       io.name(name.isEmpty() ? "" : name + '.' + prop.get(Prop.PARSER));
     }
     return io;

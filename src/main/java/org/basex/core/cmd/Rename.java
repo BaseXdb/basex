@@ -82,7 +82,9 @@ public final class Rename extends ACreate {
     if(Prop.WIN ? path.equalsIgnoreCase(src) : path.equals(src)) return trg;
 
     // source references a directory: merge target path and file name
-    final String name = path.substring(src.length() + 1);
-    return !trg.isEmpty() ? trg + '/' + name : name;
+    final String name = src.isEmpty() ? path : path.substring(src.length() + 1);
+    if(trg.isEmpty()) return name;
+    if(trg.endsWith("/")) return trg + name;
+    return trg + '/' + name;
   }
 }

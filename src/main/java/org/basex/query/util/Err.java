@@ -75,7 +75,7 @@ public enum Err {
   /** BXDB0007. */
   BXDB_OPENED(BXDB, 7, "Database '%' is opened by another process."),
   /** BXDB0008. */
-  BXDB_EMPTY(BXDB, 8, "%: Database paths must not be empty."),
+  BXDB_EMPTY(BXDB, 8, "%: Invalid target path."),
   /** BXDB0009. */
   BXDB_RANGE(BXDB, 9, "%: value '%' is out of range."),
   /** BXDB0010. */
