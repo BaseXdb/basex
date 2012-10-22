@@ -244,6 +244,8 @@ public final class GUIConstants {
 
   // FONTS ====================================================================
 
+  /** Font of text area. */
+  public static final Font TFONT = UIManager.getFont("TextArea.font");
   /** Large font. */
   public static Font lfont;
   /** Font. */
@@ -320,8 +322,7 @@ public final class GUIConstants {
     mfont = new Font(prop.get(GUIProp.MONOFONT), type, size);
     bfont = new Font(f, Font.BOLD, size);
     lfont = new Font(f, type, size + 10);
-    dmfont = new Font(prop.get(GUIProp.MONOFONT), 0,
-        UIManager.getFont("TextArea.font").getSize() - 1);
+    dmfont = new Font(prop.get(GUIProp.MONOFONT), 0, TFONT.getSize() - 1);
 
     final Container comp = new Container();
     dwidth  = comp.getFontMetrics(dmfont).getWidths();
