@@ -428,24 +428,24 @@ public final class GUI extends AGUI {
           // adopt updated nodes as result set
           if(nodes == null) nodes = context.current();
         } else if(result != null) {
-          final Nodes nd = context.current();
-          Nodes marked = context.marked;
           // check if result has changed
           final boolean flt = gprop.is(GUIProp.FILTERRT);
+          final Nodes nd = context.current();
           if(flt || nd != null && !nd.sameAs(current)) {
             // refresh context if at least one node was found
             if(nodes != null) notify.context((Nodes) result, flt, null);
-          } else if(marked != null) {
+          } else if(context.marked != null) {
             // refresh highlight
+            Nodes m = context.marked;
             if(nodes != null) {
               // use query result
-              marked = nodes;
-            } else if(marked.size() != 0) {
+              m = nodes;
+            } else if(m.size() != 0) {
               // remove old highlight
-              marked = new Nodes(data);
+              m = new Nodes(data);
             }
             // refresh views
-            notify.mark(marked, null);
+            if(context.marked != m) notify.mark(m, null);
           }
         }
 
