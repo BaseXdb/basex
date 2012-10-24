@@ -553,6 +553,7 @@ public final class EditorView extends View {
       edit.file(file);
       refreshHistory(file);
       refreshControls(true);
+      edit.release(Action.PARSE);
     } catch(final IOException ex) {
       BaseXDialog.error(gui, FILE_NOT_SAVED);
     }

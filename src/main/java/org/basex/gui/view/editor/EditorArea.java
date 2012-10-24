@@ -161,6 +161,9 @@ final class EditorArea extends Editor {
       } catch(final Exception ex) {
         view.info(ex.getMessage(), false, false);
       }
+    } else if(action != Action.CHECK) {
+      view.info(OK, true, false);
+      error(-1);
     }
   }
 
