@@ -226,6 +226,7 @@ public class RegExLexer implements TokenManager, RegExParserConstants {
     while(pos < input.length) {
       final byte b = input[pos];
       if(b < '0' || b > '9') break;
+      tb.add(b);
       pos++;
     }
     payload = Integer.parseInt(tb.toString());
