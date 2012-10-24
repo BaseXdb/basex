@@ -310,6 +310,7 @@ public final class BaseXHTTP {
     StopServer(final String host, final int port) throws IOException {
       final InetAddress addr = host.isEmpty() ? null : InetAddress.getByName(host);
       ss = new ServerSocket();
+      ss.setReuseAddress(!Prop.WIN);
       ss.bind(new InetSocketAddress(addr, port));
       stop = stopFile(port);
       setDaemon(true);
