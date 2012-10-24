@@ -66,22 +66,28 @@ public class ReplaceContext {
         final byte[] srch = token(sc.search);
         final byte[] rplc = token(replace);
         final int ss = srch.length;
+        boolean s = true;
         int s1 = start;
-        for(int s = start; s < end;) {
+        for(int o = start; o < end;) {
           int sp = 0;
-          if(s + ss <= end) {
+          if(o + ss <= end && s) {
             if(sc.mcase) {
-              while(sp < ss && txt[s + sp] == srch[sp]) sp++;
+              while(sp < ss && txt[o + sp] == srch[sp]) sp++;
             } else {
-              while(sp < ss && lc(cp(txt, s + sp)) == cp(srch, sp)) sp += cl(srch, sp);
+              while(sp < ss && lc(cp(txt, o + sp)) == cp(srch, sp)) sp += cl(srch, sp);
             }
           }
-          if(sp == ss) {
-            tb.add(txt, s1, s).add(rplc);
-            s += ss;
-            s1 = s;
+          if(sp == ss && (!sc.word || o + ss == os ||
+              !Character.isLetterOrDigit(cp(txt, o + ss)))) {
+            tb.add(txt, s1, o).add(rplc);
+            o += ss;
+            s1 = o;
+            s = !sc.word;
+          } else if(sc.word) {
+            s = !Character.isLetterOrDigit(cp(txt, o));
+            o += cl(txt, o);
           } else {
-            s++;
+            o++;
           }
         }
         tb.add(txt, s1, end);

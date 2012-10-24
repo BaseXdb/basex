@@ -360,6 +360,7 @@ value                = Value
 version              = Version
 view                 = View
 watching_event_%     = Watch event '%'.
+whole_word           = Whole Word
 ws_chopping          = Whitespace Chopping
 xml_format           = XML format
 xquery               = XQuery

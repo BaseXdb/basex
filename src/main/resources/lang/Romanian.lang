@@ -360,6 +360,7 @@ value                = Valoare
 version              = Versiune
 view                 = Vizualizare
 watching_event_%     = Uita-te la evenimentul '%'.
+whole_word           = Whole Word
 ws_chopping          = Tocare spatii albe
 xml_format           = XML format
 xquery               = XQuery

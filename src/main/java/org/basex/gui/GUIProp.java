@@ -178,6 +178,8 @@ public final class GUIProp extends AProp {
   public static final Object[] SR_REGEX = { "SR_REGEX", false };
   /** Match case. */
   public static final Object[] SR_CASE = { "SR_CASE", false };
+  /** Whole word. */
+  public static final Object[] SR_WORD = { "SR_WORD", false };
   /** Multi-line mode. */
   public static final Object[] SR_MULTI = { "SR_MULTI", false };
   /** Last searched strings. */

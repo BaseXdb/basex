@@ -361,6 +361,7 @@ value                = Хэмжээ
 version              = Хувилбар
 view                 = Харагдах байдал
 watching_event_%     = Үйл ажиллагаа(event) '%' хянах.
+whole_word           = Whole Word
 ws_chopping          = Сул зайг хасах
 xml_format           = XML формат
 xquery               = XQuery

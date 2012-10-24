@@ -360,6 +360,7 @@ value                = Waarde
 version              = Versie
 view                 = View
 watching_event_%     = Bekijk event '%'.
+whole_word           = Whole Word
 ws_chopping          = Whitespace afkappen
 xml_format           = XML formaat
 xquery               = XQuery

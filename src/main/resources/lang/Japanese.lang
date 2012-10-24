@@ -360,6 +360,7 @@ value                = 値
 version              = バージョン
 view                 = ビュー
 watching_event_%     = イベント '%' を監視しています.
+whole_word           = Whole Word
 ws_chopping          = 空白の除去
 xml_format           = XML フォーマット
 xquery               = XQuery

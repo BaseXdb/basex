@@ -31,6 +31,8 @@ public final class SearchPanel extends BaseXBack {
   final BaseXButton regex;
   /** Mode: match case. */
   final BaseXButton mcase;
+  /** Mode: whole word. */
+  final BaseXButton word;
   /** Mode: multi-line. */
   final BaseXButton multi;
   /** Action: replace text. */
@@ -61,10 +63,12 @@ public final class SearchPanel extends BaseXBack {
     replace.setPreferredSize(null);
     regex = onOffButton("s_regex", REGULAR_EXPR, GUIProp.SR_REGEX);
     mcase = onOffButton("s_case", MATCH_CASE, GUIProp.SR_CASE);
+    word = onOffButton("s_word", WHOLE_WORD, GUIProp.SR_WORD);
     multi = onOffButton("s_multi", MULTI_LINE, GUIProp.SR_MULTI);
     rplc  = new BaseXButton(main, "s_replace", REPLACE_ALL);
     cls = new BaseXButton(main, "s_close", CLOSE);
-    multi.setEnabled(regex.isEnabled());
+    multi.setEnabled(regex.isSelected());
+    word.setEnabled(!regex.isSelected());
 
     // add interaction to search field
     search.addFocusListener(new FocusAdapter() {
@@ -137,8 +141,9 @@ public final class SearchPanel extends BaseXBack {
     final boolean ed = e.isEditable();
     if(editor == null || ed != editor.isEditable()) {
       removeAll();
-      final BaseXBack wst = new BaseXBack(Fill.NONE).layout(new TableLayout(1, 3, 1, 0));
+      final BaseXBack wst = new BaseXBack(Fill.NONE).layout(new TableLayout(1, 4, 1, 0));
       wst.add(mcase);
+      wst.add(word);
       wst.add(regex);
       wst.add(multi);
 
@@ -255,7 +260,10 @@ public final class SearchPanel extends BaseXBack {
         final boolean sel = !b.isSelected();
         b.setSelected(sel);
         gui.gprop.set(option, sel);
-        if(b == regex) multi.setEnabled(sel);
+        if(b == regex) {
+          multi.setEnabled(sel);
+          word.setEnabled(!sel);
+        }
         search();
       }
     });

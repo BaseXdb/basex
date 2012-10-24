@@ -147,23 +147,21 @@ public final class Util {
   }
 
   /**
-   * Returns a better understandable error message for the specified exception.
+   * Returns a more user-friendly error message for the specified exception.
    * @param ex throwable reference
    * @return error message
    */
   public static String message(final Throwable ex) {
-    final String msg = ex.getMessage();
     if(ex instanceof BindException) return SRV_RUNNING;
-    else if(ex instanceof FileNotFoundException) return info(RES_NOT_FOUND_X, msg);
-    else if(ex instanceof LoginException) return ACCESS_DENIED;
-    else if(ex instanceof ConnectException) return CONNECTION_ERROR;
-    else if(ex instanceof SocketTimeoutException) return TIMEOUT_EXCEEDED;
-    else if(ex instanceof SocketException) return CONNECTION_ERROR;
-    else if(ex instanceof UnknownHostException) return info(UNKNOWN_HOST_X, msg);
-    else if(ex instanceof RuntimeException) {
-      return ex.getStackTrace()[0].getClassName() + ": " + ex;
-    }
-    return msg != null && !msg.isEmpty() ? msg : ex.toString();
+    if(ex instanceof LoginException) return ACCESS_DENIED;
+    if(ex instanceof ConnectException) return CONNECTION_ERROR;
+    if(ex instanceof SocketTimeoutException) return TIMEOUT_EXCEEDED;
+    if(ex instanceof SocketException) return CONNECTION_ERROR;
+    String msg = ex.getMessage();
+    if(msg == null || msg.isEmpty()) msg = ex.toString();
+    if(ex instanceof FileNotFoundException) return info(RES_NOT_FOUND_X, msg);
+    if(ex instanceof UnknownHostException) return info(UNKNOWN_HOST_X, msg);
+    return msg;
   }
 
   /**

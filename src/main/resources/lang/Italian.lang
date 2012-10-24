@@ -360,6 +360,7 @@ value                = Valore
 version              = Versione
 view                 = Visualizza
 watching_event_%     = Guarda l'evento '%'.
+whole_word           = Whole Word
 ws_chopping          = Rimozione spazi
 xml_format           = Formato XML
 xquery               = XQuery

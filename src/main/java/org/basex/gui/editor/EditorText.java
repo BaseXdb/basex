@@ -117,9 +117,12 @@ public final class EditorText {
    */
   void search(final SearchContext sc) {
     // skip search if criteria have not changed
-    if(sc.equals(search)) return;
-    spos = sc.search(text);
-    search = sc;
+    if(sc.equals(search)) {
+      sc.nr = search.nr;
+    } else {
+      spos = sc.search(text);
+      search = sc;
+    }
   }
 
   /**

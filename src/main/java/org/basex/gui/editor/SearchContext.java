@@ -1,5 +1,7 @@
 package org.basex.gui.editor;
 
+import static org.basex.util.Token.*;
+
 import java.util.*;
 import java.util.regex.*;
 
@@ -19,6 +21,8 @@ public final class SearchContext {
   final boolean regex;
   /** Mode: multi-line. */
   final boolean multi;
+  /** Mode: whole word. */
+  final boolean word;
   /** Search string. */
   final String search;
   /** Number of results. */
@@ -31,6 +35,7 @@ public final class SearchContext {
    */
   SearchContext(final SearchPanel panel, final String srch) {
     mcase = panel.mcase.isSelected();
+    word = panel.word.isSelected();
     regex = panel.regex.isSelected();
     multi = panel.multi.isSelected();
     String s = mcase ? srch : srch.toLowerCase(Locale.ENGLISH);
@@ -57,16 +62,16 @@ public final class SearchContext {
       final Pattern pattern = Pattern.compile(search, flags);
       if(multi) {
         int c = 0, p = 0;
-        final Matcher m = pattern.matcher(Token.string(text));
+        final Matcher m = pattern.matcher(string(text));
         while(m.find()) {
           final int s = m.start(), e = m.end();
           while(c < s) {
-            p += Token.cl(text, p);
+            p += cl(text, p);
             c++;
           }
           start.add(p);
           while(c < e) {
-            p += Token.cl(text, p);
+            p += cl(text, p);
             c++;
           }
           end.add(p);
@@ -77,16 +82,16 @@ public final class SearchContext {
         for(int t = 0, o = 0; o <= os; o++) {
           if(o < os ? text[o] == '\n' : o != t) {
             int c = 0, p = t;
-            final Matcher m = pattern.matcher(Token.string(text, t, o - t));
+            final Matcher m = pattern.matcher(string(text, t, o - t));
             while(m.find()) {
               final int s = m.start(), e = m.end();
               while(c < s) {
-                p += Token.cl(text, p);
+                p += cl(text, p);
                 c++;
               }
               start.add(p);
               while(c < e) {
-                p += Token.cl(text, p);
+                p += cl(text, p);
                 c++;
               }
               end.add(p);
@@ -97,22 +102,27 @@ public final class SearchContext {
         }
       }
     } else {
-      final byte[] srch = Token.token(search);
+      final byte[] srch = token(search);
       final int ss = srch.length, os = text.length;
+      boolean s = true;
       for(int o = 0; o < os;) {
         int sp = 0;
-        if(o + ss <= os) {
+        if(o + ss <= os && s) {
           if(mcase) {
-            for(; sp < ss && text[o + sp] == srch[sp]; sp++);
+            while(sp < ss && txt[o + sp] == srch[sp]) sp++;
           } else {
-            for(; sp < ss && Token.lc(Token.cp(text, o + sp)) == Token.cp(srch, sp);
-                sp += Token.cl(srch, sp));
+            while(sp < ss && lc(cp(txt, o + sp)) == cp(srch, sp)) sp += cl(srch, sp);
           }
         }
-        if(sp == ss) {
+        if(sp == ss && (!word || o + ss == os ||
+            !Character.isLetterOrDigit(cp(txt, o + ss)))) {
           start.add(o);
           end.add(o + ss);
           o += ss;
+          s = !word;
+        } else if(word) {
+          s = !Character.isLetterOrDigit(cp(txt, o));
+          o += cl(txt, o);
         } else {
           o++;
         }
@@ -156,8 +166,8 @@ public final class SearchContext {
   public boolean equals(final Object obj) {
     if(!(obj instanceof SearchContext)) return false;
     final SearchContext s = (SearchContext) obj;
-    return mcase == s.mcase && regex == s.regex && multi == s.multi &&
-        Token.eq(search, s.search);
+    return mcase == s.mcase && word == s.word && regex == s.regex && multi == s.multi &&
+        eq(search, s.search);
   }
 
   @Override

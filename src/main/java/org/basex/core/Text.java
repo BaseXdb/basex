@@ -764,6 +764,8 @@ public interface Text {
   String REPLACE_WITH = lang("replace_with");
   /** "Match case". */
   String MATCH_CASE = lang("match_case");
+  /** "Whole word". */
+  String WHOLE_WORD = lang("whole_word");
   /** "Multi-line mode". */
   String MULTI_LINE = lang("multi_line");
   /** "Regular expression". */
