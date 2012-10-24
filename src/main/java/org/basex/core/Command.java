@@ -146,11 +146,11 @@ public abstract class Command extends Progress {
 
   /**
    * Checks if the command has updated any data.
-   * If this method is called before command execution, it always returns {@code true}.
+   * @param ctx database context
    * @return result of check
    */
-  public boolean updated() {
-    return true;
+  public boolean updated(final Context ctx) {
+    return updating(ctx);
   }
 
   /**

@@ -419,10 +419,10 @@ public final class GUI extends AGUI {
         Nodes nodes = result instanceof Nodes && result.size() != 0 ?
           (Nodes) result : null;
 
-        if(context.data() != data) {
+       if(context.data() != data) {
           // database reference has changed - notify views
           notify.init();
-        } else if(cmd.updated()) {
+        } else if(cmd.updated(context)) {
           // update visualizations
           notify.update();
           // adopt updated nodes as result set

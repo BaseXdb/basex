@@ -173,13 +173,13 @@ abstract class AQuery extends Command {
   }
 
   @Override
-  protected boolean databases(final StringList db) {
-    return qp != null && qp.databases(db);
+  public boolean updated(final Context ctx) {
+    return qp != null && qp.updates() != 0;
   }
 
   @Override
-  public boolean updated() {
-    return qp == null || qp.updates() != 0;
+  protected boolean databases(final StringList db) {
+    return qp != null && qp.databases(db);
   }
 
   /**
