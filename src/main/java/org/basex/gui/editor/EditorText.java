@@ -690,7 +690,7 @@ public final class EditorText {
    * @return result of check
    */
   boolean erroneous() {
-    return es >= ps && es <= pe;
+    return es >= ps && es < pe;
   }
 
   /**
@@ -698,7 +698,7 @@ public final class EditorText {
    * @return result of check
    */
   boolean edited() {
-    return pc >= ps && pc <= pe;
+    return pc >= ps && pc < pe;
   }
 
   /**
@@ -707,6 +707,7 @@ public final class EditorText {
    */
   void setCursor(final int c) {
     pc = c;
+    ps = c;
   }
 
   /**

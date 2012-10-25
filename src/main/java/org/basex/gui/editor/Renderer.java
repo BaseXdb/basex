@@ -345,6 +345,7 @@ public final class Renderer extends BaseXBack {
 
       // show cursor
       if(cursor && text.edited()) {
+        System.out.println("!");
         xx = x;
         while(text.more()) {
           if(text.cursor() == text.pos()) {
