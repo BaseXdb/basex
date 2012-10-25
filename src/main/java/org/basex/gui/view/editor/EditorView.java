@@ -467,8 +467,11 @@ public final class EditorView extends View {
         c = 0;
       }
     }
+    if(errPos < ll && Character.isLetterOrDigit(cp(edit.last, errPos))) {
+      while(errPos > 0 && Character.isLetterOrDigit(cp(edit.last, errPos - 1))) errPos--;
+    }
     edit.error(errPos);
-    return errPos != -1;
+    return true;
   }
 
   /**

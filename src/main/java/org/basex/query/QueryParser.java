@@ -3429,7 +3429,10 @@ public class QueryParser extends InputParser {
       final byte[] uri = bracedURILiteral();
       final byte[] name = ncName(null);
       if(name.length != 0) {
-        if(def == URICHECK && uri.length == 0) error(NOURI, name);
+        if(def == URICHECK && uri.length == 0) {
+          ip = i;
+          error(NOURI, name);
+        }
         return new QNm(name, uri);
       }
       ip = i;
@@ -3442,8 +3445,14 @@ public class QueryParser extends InputParser {
     // create new EQName and set namespace
     final QNm name = new QNm(nm, ctx);
     if(!name.hasURI()) {
-      if(def == URICHECK) error(NSMISS, name);
-      if(name.hasPrefix()) error(NOURI, name);
+      if(def == URICHECK) {
+        ip = i;
+        error(NSMISS, name);
+      }
+      if(name.hasPrefix()) {
+        ip = i;
+        error(NOURI, name);
+      }
       name.uri(def);
     }
     return name;
