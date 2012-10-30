@@ -137,10 +137,15 @@ public abstract class StandardFunc extends Arr {
    */
   String encoding(final int i, final Err err, final QueryContext ctx)
       throws QueryException {
+
     if(i >= expr.length) return null;
     final String enc = string(checkStr(expr[i], ctx));
-    if(!Charset.isSupported(enc)) err.thrw(info, enc);
-    return normEncoding(enc);
+    try {
+      if(Charset.isSupported(enc)) return normEncoding(enc);
+    } catch(final IllegalArgumentException e) {
+      /* character set is invalid or unknown (e.g. empty string) */
+    }
+    throw err.thrw(info, enc);
   }
 
   /**
