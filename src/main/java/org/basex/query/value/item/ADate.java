@@ -36,6 +36,8 @@ public abstract class ADate extends Item {
       "([0-9]{2}):([0-9]{2}):([0-9]{2})(\\.([0-9]+))?" + ZONE);
   /** Data factory. */
   public static DatatypeFactory df;
+  /** Fix Xerces month representation (GH-587). */
+  public static boolean fixMonth;
 
   /** Calendar instance. */
   public XMLGregorianCalendar xc;
@@ -43,6 +45,7 @@ public abstract class ADate extends Item {
   static {
     try {
       df = DatatypeFactory.newInstance();
+      fixMonth = df.newXMLGregorianCalendar("--12").toXMLFormat().endsWith("--");
     } catch(final Exception ex) {
       Util.notexpected();
     }
@@ -71,6 +74,7 @@ public abstract class ADate extends Item {
 
     super(typ);
     try {
+      System.out.println(df.newXMLGregorianCalendar(Token.string(d).trim()).getClass());
       xc = df.newXMLGregorianCalendar(Token.string(d).trim());
       if(xc.getHour() == 24) xc.add(df.newDuration(0));
     } catch(final IllegalArgumentException ex) {
@@ -150,6 +154,7 @@ public abstract class ADate extends Item {
   @Override
   public final byte[] string(final InputInfo ii) {
     String str = xc.toXMLFormat();
+    if(fixMonth && str.endsWith("--")) str = str.substring(0, str.length() - 2);
     str = TOSTRING1.matcher(str).replaceAll("$1");
     str = TOSTRING2.matcher(str).replaceAll("$1$2");
     return Token.token(str);
