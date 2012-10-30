@@ -34,6 +34,10 @@ final class RestXqResponse {
   private static final QNm Q_NAME = new QNm(NAME);
   /** QName. */
   private static final QNm Q_VALUE = new QNm(VALUE);
+  /** QName. */
+  private static final QNm Q_REDIRECT = new QNm(REDIRECT, QueryText.RESTXQURI);
+  /** QName. */
+  private static final QNm Q_FORWARD = new QNm(FORWARD, QueryText.RESTXQURI);
 
   /** Serializer node test. */
   private static final ExtTest OUTPUT_SERIAL = new ExtTest(NodeType.ELM,
@@ -44,12 +48,6 @@ final class RestXqResponse {
   /** RESTXQ Response test. */
   private static final ExtTest RESTXQ_RESPONSE = new ExtTest(NodeType.ELM,
       new QNm(RESPONSE, QueryText.RESTXQURI));
-  /** RESTXQ Redirect test. */
-  private static final ExtTest RESTXQ_REDIRECT = new ExtTest(NodeType.ELM,
-      new QNm(REDIRECT, QueryText.RESTXQURI));
-  /** RESTXQ Forward test. */
-  private static final ExtTest RESTXQ_FORWARD = new ExtTest(NodeType.ELM,
-      new QNm(FORWARD, QueryText.RESTXQURI));
   /** HTTP Header test. */
   private static final ExtTest HTTP_HEADER = new ExtTest(NodeType.ELM,
       new QNm(HEADER, QueryText.HTTPURI));
@@ -109,20 +107,6 @@ final class RestXqResponse {
       ANode resp = null;
       if(item != null && item.type.isNode()) {
         final ANode node = (ANode) item;
-        // send redirect to browser
-        if(RESTXQ_REDIRECT.eq(node)) {
-          final ANode ch = node.children().next();
-          if(ch == null || ch.type != NodeType.TXT) function.error(NO_VALUE, node.name());
-          redirect = string(ch.string());
-          return;
-        }
-        // server-side forwarding
-        if(RESTXQ_FORWARD.eq(node)) {
-          final ANode ch = node.children().next();
-          if(ch == null || ch.type != NodeType.TXT) function.error(NO_VALUE, node.name());
-          forward = string(ch.string());
-          return;
-        }
         if(RESTXQ_RESPONSE.eq(node)) {
           resp = node;
           item = iter.next();
@@ -140,7 +124,15 @@ final class RestXqResponse {
       final Serializer ser = Serializer.get(http.res.getOutputStream(), sp);
       for(; item != null; item = iter.next()) ser.serialize(item);
       ser.close();
-
+    } catch(final QueryException ex) {
+      final QNm name = ex.qname();
+      if(name.eq(Q_REDIRECT)) {
+        redirect = ex.getLocalizedMessage();
+      } else if(name.eq(Q_FORWARD)) {
+        forward = ex.getLocalizedMessage();
+      } else {
+        throw ex;
+      }
     } finally {
       qc.close();
       qc.context.unregister(qc);
