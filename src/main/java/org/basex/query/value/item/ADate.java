@@ -74,7 +74,6 @@ public abstract class ADate extends Item {
 
     super(typ);
     try {
-      System.out.println(df.newXMLGregorianCalendar(Token.string(d).trim()).getClass());
       xc = df.newXMLGregorianCalendar(Token.string(d).trim());
       if(xc.getHour() == 24) xc.add(df.newDuration(0));
     } catch(final IllegalArgumentException ex) {
