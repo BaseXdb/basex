@@ -99,7 +99,7 @@ public class LocalSession extends Session {
   }
 
   @Override
-  public LocalQuery query(final String query) throws BaseXException {
+  public LocalQuery query(final String query) {
     return new LocalQuery(query, ctx, out);
   }
 
