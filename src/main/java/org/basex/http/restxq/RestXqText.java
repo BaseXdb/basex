@@ -35,6 +35,8 @@ interface RestXqText {
   byte[] STATUS = token("status");
   /** Token "reason". */
   byte[] REASON = token("reason");
+  /** Token "message". */
+  byte[] MESSAGE = token("message");
   /** Token "name". */
   byte[] NAME = token("name");
   /** Token "value". */
@@ -70,6 +72,8 @@ interface RestXqText {
   String VAR_UNDEFINED = "Variable $% is not assigned by the annotations.";
   /** Error message. */
   String UNKNOWN_SER = "Unknown serialization parameter \"%\".";
+  /** Error message. */
+  String UNEXP_NODE = "Unexpected node: %.";
   /** Error message. */
   String HEAD_METHOD = "HEAD method must only return one 'restxq:response' element.";
   /** Error message. */

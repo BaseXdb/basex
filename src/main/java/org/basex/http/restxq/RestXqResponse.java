@@ -24,6 +24,17 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 final class RestXqResponse {
+  /** QName. */
+  private static final QNm Q_STATUS = new QNm(STATUS);
+  /** QName. */
+  private static final QNm Q_REASON = new QNm(REASON);
+  /** QName. */
+  private static final QNm Q_MESSAGE = new QNm(MESSAGE);
+  /** QName. */
+  private static final QNm Q_NAME = new QNm(NAME);
+  /** QName. */
+  private static final QNm Q_VALUE = new QNm(VALUE);
+
   /** Serializer node test. */
   private static final ExtTest OUTPUT_SERIAL = new ExtTest(NodeType.ELM,
       FuncParams.Q_SPARAM);
@@ -103,6 +114,7 @@ final class RestXqResponse {
           final ANode ch = node.children().next();
           if(ch == null || ch.type != NodeType.TXT) function.error(NO_VALUE, node.name());
           redirect = string(ch.string());
+          return;
         }
         // server-side forwarding
         if(RESTXQ_FORWARD.eq(node)) {
@@ -151,20 +163,29 @@ final class RestXqResponse {
     SerializerProp sp = function.output;
 
     if(response != null) {
+      // don't allow attributes
+      for(final ANode a : response.attributes()) function.error(UNEXP_NODE, a);
+
       String cType = null;
       for(final ANode n : response.children()) {
         // process http:response element
         if(HTTP_RESPONSE.eq(n)) {
-          final byte[] sta = n.attribute(new QNm(STATUS));
-          if(sta != null) {
-            final byte[] msg = n.attribute(new QNm(REASON));
-            http.status(toInt(sta), msg != null ? string(msg) : null);
+          // check status and reason
+          byte[] sta = null;
+          byte[] msg = null;
+          for(final ANode a : n.attributes()) {
+            final QNm qnm = a.qname();
+            if(qnm.eq(Q_STATUS)) sta = a.string();
+            else if(qnm.eq(Q_REASON) || qnm.eq(Q_MESSAGE)) msg = a.string();
+            else function.error(UNEXP_NODE, a);
           }
+          if(sta != null) http.status(toInt(sta), msg != null ? string(msg) : null);
+
           for(final ANode c : n.children()) {
-            // process http:header element
+            // process http:header elements
             if(HTTP_HEADER.eq(c)) {
-              final byte[] nam = c.attribute(new QNm(NAME));
-              final byte[] val = c.attribute(new QNm(VALUE));
+              final byte[] nam = c.attribute(Q_NAME);
+              final byte[] val = c.attribute(Q_VALUE);
               if(nam != null && val != null) {
                 final String key = string(nam);
                 final String value = string(val);
@@ -174,11 +195,15 @@ final class RestXqResponse {
                   http.res.setHeader(key, value);
                 }
               }
+            } else {
+              function.error(UNEXP_NODE, c);
             }
           }
         } else if(OUTPUT_SERIAL.eq(n)) {
           // process output:serialization-parameters
           sp = FuncParams.serializerProp(n);
+        } else {
+          function.error(UNEXP_NODE, n);
         }
       }
       // set content type

@@ -227,6 +227,35 @@ public final class RestXqTest extends HTTPTest {
   }
 
   /**
+   * {@code <restxq:response/>} elements.
+   * @throws Exception exception
+   */
+  @Test public void response() throws Exception {
+    get("declare %R:path('') function m:f() { <R:response/>, 1 };", "", "1");
+    get("declare %R:path('') function m:f() { <R:R/> };", "",
+        "<R:R xmlns:R=\"http://exquery.org/ns/restxq\"/>");
+    get("declare %R:path('') function m:f() {" +
+        "<R:response><http:response/></R:response> };", "", "");
+    get("declare %R:path('') function m:f() {" +
+        "<R:response><http:response status='200'/></R:response> };", "", "");
+    get("declare %R:path('') function m:f() {" +
+        "<R:response><http:response status='200' message='OK'/></R:response>, 'OK'};",
+        "", "OKOK");
+
+    // wrong syntax
+    getE("declare %R:path('') function m:f() {" +
+        "<R:response abc='x'/> };", "");
+    getE("declare %R:path('') function m:f() {" +
+        "<R:response>X</R:response> };", "");
+    getE("declare %R:path('') function m:f() {" +
+        "<R:response><X/></R:response> };", "");
+    getE("declare %R:path('') function m:f() {" +
+        "<R:response><http:response stat='200'/></R:response> };", "");
+    getE("declare %R:path('') function m:f() {" +
+        "<R:response><http:response>X</http:response></R:response> };", "");
+  }
+
+  /**
    * Query parameters.
    * @throws Exception exception
    */
