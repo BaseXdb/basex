@@ -96,7 +96,7 @@ public interface Type {
    * Returns a type id to differentiate all types.
    * @return id
    */
-  byte id();
+  int id();
 
   @Override
   String toString();

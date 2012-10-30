@@ -771,7 +771,7 @@ public enum AtomType implements Type {
   }
 
   @Override
-  public byte id() {
+  public int id() {
     return id;
   }
 

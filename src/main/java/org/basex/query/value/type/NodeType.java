@@ -211,7 +211,7 @@ public enum NodeType implements Type {
   }
 
   @Override
-  public byte id() {
+  public int id() {
     return id;
   }
 
