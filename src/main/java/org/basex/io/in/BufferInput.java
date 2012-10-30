@@ -57,16 +57,17 @@ public class BufferInput extends InputStream {
    */
   public BufferInput(final InputStream is, final int bs) {
     buffer = new byte[bs];
+    length = -1;
     in = is;
   }
 
   /**
-   * Empty constructor.
-   * @param buf buffer
+   * Empty constructor with fixed input.
+   * @param array array input
    */
-  BufferInput(final byte[] buf) {
-    buffer = buf;
-    bsize = buf.length;
+  protected BufferInput(final byte[] array) {
+    buffer = array;
+    bsize = array.length;
     length = bsize;
     in = null;
   }
@@ -99,6 +100,7 @@ public class BufferInput extends InputStream {
   protected int next() throws IOException {
     final int blen = buffer.length;
     final byte[] buf = buffer;
+    // will not occur if {@link ArrayInput} is used
     if(bpos >= bsize) {
       if(bsize == 0 || bsize == blen) {
         // reset mark if buffer is full
@@ -182,7 +184,7 @@ public class BufferInput extends InputStream {
    */
   public byte[] content() throws IOException {
     try {
-      if(length > 0) {
+      if(length > -1) {
         // input length is known in advance
         final int sl = (int) Math.min(Integer.MAX_VALUE, length);
         final byte[] bytes = new byte[sl];
