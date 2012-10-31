@@ -73,6 +73,9 @@ final class EditorArea extends Editor {
             }
           } catch(final IOException ex) { /* ignored */ }
         }
+        // refresh query path and work directory
+        gui.context.prop.set(Prop.QUERYPATH, file.path());
+        gui.gprop.set(GUIProp.WORKPATH, file.dirPath());
       }
     });
   }
@@ -128,7 +131,6 @@ final class EditorArea extends Editor {
     if(eq && action == Action.CHECK) return;
     last = in;
 
-    gui.context.prop.set(Prop.QUERYPATH, file.path());
     script = file.hasSuffix(IO.BXSSUFFIX);
     xquery = !script && !opened() || file.hasSuffix(IO.XQSUFFIXES);
     String input = string(in);
