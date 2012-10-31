@@ -17,8 +17,8 @@ import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.GUIConstants.Msg;
-import org.basex.gui.editor.*;
 import org.basex.gui.editor.Editor.Action;
+import org.basex.gui.editor.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
 import org.basex.gui.layout.BaseXLayout.DropHandler;
@@ -210,7 +210,6 @@ public final class EditorView extends View {
         search.search();
         gui.refreshControls();
         posCode.invokeLater();
-        ea.release(Action.PARSE);
       }
     });
 
@@ -420,11 +419,18 @@ public final class EditorView extends View {
     ++threadID;
     errPos = -1;
     errFile = null;
-    info.setCursor(!ok && error(msg) ?
-        GUIConstants.CURSORHAND : GUIConstants.CURSORARROW);
+    getEditor().resetError();
+
     final String m = msg.replaceAll("^.*\r?\n\\[.*?\\]", "").
         replaceAll(".*" + LINE_X.replaceAll("%", ".*?") + COL, "");
-    info.setText(m, ok ? Msg.SUCCESS : Msg.ERROR).setToolTipText(ok ? null : msg);
+    if(ok) {
+      info.setCursor(GUIConstants.CURSORARROW);
+      info.setText(m, Msg.SUCCESS).setToolTipText(null);
+    } else {
+      info.setCursor(error(msg) ? GUIConstants.CURSORHAND : GUIConstants.CURSORARROW);
+      info.setText(m, Msg.ERROR).setToolTipText(msg);
+    }
+
     if(up) {
       stop.setEnabled(false);
       refreshMark();

@@ -63,6 +63,10 @@ final class EditorArea extends Editor {
     addFocusListener(new FocusAdapter() {
       @Override
       public void focusGained(final FocusEvent e) {
+        // refresh query path and work directory
+        gui.context.prop.set(Prop.QUERYPATH, file.path());
+        gui.gprop.set(GUIProp.WORKPATH, file.dirPath());
+
         if(opened() && !modified) {
           try {
             // reload file that has been modified
@@ -73,9 +77,7 @@ final class EditorArea extends Editor {
             }
           } catch(final IOException ex) { /* ignored */ }
         }
-        // refresh query path and work directory
-        gui.context.prop.set(Prop.QUERYPATH, file.path());
-        gui.gprop.set(GUIProp.WORKPATH, file.dirPath());
+        release(Action.PARSE);
       }
     });
   }
@@ -165,7 +167,6 @@ final class EditorArea extends Editor {
       }
     } else if(action != Action.CHECK) {
       view.info(OK, true, false);
-      resetError();
     }
   }
 
