@@ -180,7 +180,7 @@ public final class EditorText {
    * @return result of check
    */
   boolean more() {
-    return ps < pe;
+    return ps < pe && ps < text.length;
   }
 
   /**
