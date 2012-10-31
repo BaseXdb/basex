@@ -78,7 +78,9 @@ public final class Renderer extends BaseXBack {
     super.paintComponent(g);
     init(g, bar.pos());
     while(more(g)) write(g);
-    if(cursor && text.cursor() == text.size()) cursor(g, x);
+    final int s = text.size();
+    if(cursor && s == text.cursor()) drawCursor(g, x);
+    if(s == text.error()) drawError(g);
   }
 
   /**
@@ -314,16 +316,7 @@ public final class Renderer extends BaseXBack {
       }
       text.pos(cp);
 
-      // underline parsing error
-      if(text.erroneous()) {
-        final int s = Math.max(1, fontH / 8);
-        g.setColor(GUIConstants.LRED);
-        g.fillRect(x, y + 2, wordW, s);
-        g.setColor(GUIConstants.RED);
-        for(int xp = x; xp < x + wordW; xp++) {
-          if((xp & 1) == 0) g.drawLine(xp, y + 2, xp, y + s + 1);
-        }
-      }
+      if(text.erroneous()) drawError(g);
 
       // don't write whitespaces
       if(ch > ' ') {
@@ -348,7 +341,7 @@ public final class Renderer extends BaseXBack {
         xx = x;
         while(text.more()) {
           if(text.cursor() == text.pos()) {
-            cursor(g, xx);
+            drawCursor(g, xx);
             break;
           }
           xx += charW(g, text.next());
@@ -364,9 +357,24 @@ public final class Renderer extends BaseXBack {
    * @param g graphics reference
    * @param xx x position
    */
-  private void cursor(final Graphics g, final int xx) {
+  private void drawCursor(final Graphics g, final int xx) {
     g.setColor(GUIConstants.DGRAY);
     g.fillRect(xx, y - fontH * 4 / 5, 2, fontH);
+  }
+
+  /**
+   * Paints the error marker.
+   * @param g graphics reference
+   */
+  private void drawError(final Graphics g) {
+    final int ww = wordW != 0 ? wordW : charW(g, ' ');
+    final int s = Math.max(1, fontH / 8);
+    g.setColor(GUIConstants.LRED);
+    g.fillRect(x, y + 2, ww, s);
+    g.setColor(GUIConstants.RED);
+    for(int xp = x; xp < x + ww; xp++) {
+      if((xp & 1) == 0) g.drawLine(xp, y + 2, xp, y + s + 1);
+    }
   }
 
   /**

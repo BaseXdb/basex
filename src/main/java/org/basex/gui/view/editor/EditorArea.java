@@ -104,7 +104,7 @@ final class EditorArea extends Editor {
   public void keyPressed(final KeyEvent e) {
     final byte[] t = text.text();
     super.keyPressed(e);
-    if(t != text.text()) error(-1);
+    if(t != text.text()) resetError();
     view.posCode.invokeLater();
   }
 
@@ -112,7 +112,7 @@ final class EditorArea extends Editor {
   public void keyTyped(final KeyEvent e) {
     final byte[] t = text.text();
     super.keyTyped(e);
-    if(t != text.text()) error(-1);
+    if(t != text.text()) resetError();
   }
 
   @Override
@@ -165,7 +165,7 @@ final class EditorArea extends Editor {
       }
     } else if(action != Action.CHECK) {
       view.info(OK, true, false);
-      error(-1);
+      resetError();
     }
   }
 

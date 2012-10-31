@@ -610,6 +610,14 @@ public final class EditorText {
   // ERROR HIGHLIGHTING =================================================================
 
   /**
+   * Tests if the current token is erroneous.
+   * @return result of check
+   */
+  boolean erroneous() {
+    return es >= ps && es < pe;
+  }
+
+  /**
    * Returns the error position.
    * @return error position
    */
@@ -623,7 +631,6 @@ public final class EditorText {
    */
   public void error(final int s) {
     es = s;
-    if(es == text.length) es--;
   }
 
   // SEARCH HIGHLIGHTING ================================================================
@@ -684,14 +691,6 @@ public final class EditorText {
   }
 
   // CURSOR =============================================================================
-
-  /**
-   * Tests if the current token is erroneous.
-   * @return result of check
-   */
-  boolean erroneous() {
-    return es >= ps && es < pe;
-  }
 
   /**
    * Checks if the text cursor moves over the current token.

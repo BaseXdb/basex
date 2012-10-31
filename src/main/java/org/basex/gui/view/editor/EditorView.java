@@ -61,7 +61,7 @@ public final class EditorView extends View {
 
   /** File in which the most recent error occurred. */
   String errFile;
-  /** Most recent error position. */
+  /** Most recent error position; used for clicking on error message. */
   int errPos;
 
   /** Header string. */
@@ -456,10 +456,10 @@ public final class EditorView extends View {
 
     // find approximate error position
     final int ll = edit.last.length;
-    errPos = ll;
+    int ep = ll;
     for(int e = 1, l = 1, c = 1; e < ll; ++c, e += cl(edit.last, e)) {
       if(l > el || l == el && c == ec) {
-        errPos = e;
+        ep = e;
         break;
       }
       if(edit.last[e] == '\n') {
@@ -467,10 +467,11 @@ public final class EditorView extends View {
         c = 0;
       }
     }
-    if(errPos < ll && Character.isLetterOrDigit(cp(edit.last, errPos))) {
-      while(errPos > 0 && Character.isLetterOrDigit(cp(edit.last, errPos - 1))) errPos--;
+    if(ep < ll && Character.isLetterOrDigit(cp(edit.last, ep))) {
+      while(ep > 0 && Character.isLetterOrDigit(cp(edit.last, ep - 1))) ep--;
     }
-    edit.error(errPos);
+    edit.error(ep);
+    errPos = ep;
     return true;
   }
 

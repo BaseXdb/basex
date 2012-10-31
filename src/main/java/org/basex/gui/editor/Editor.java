@@ -143,7 +143,7 @@ public class Editor extends BaseXPanel {
    */
   public void setText(final byte[] t) {
     setText(t, t.length);
-    error(-1);
+    resetError();
   }
 
   /**
@@ -253,23 +253,28 @@ public class Editor extends BaseXPanel {
   int errorID;
 
   /**
-   * Moves the error marker. {@code -1} removes the marker.
+   * Removes the error marker.
+   */
+  public final void resetError() {
+    ++errorID;
+    text.error(-1);
+    rend.repaint();
+  }
+
+  /**
+   * Sets the error marker.
    * @param pos start of optional error mark
    */
   public final void error(final int pos) {
     final int eid = ++errorID;
     text.error(pos);
-    if(pos == -1) {
-      rend.repaint();
-    } else {
-      new Thread() {
-        @Override
-        public void run() {
-          Performance.sleep(ERROR_DELAY);
-          if(eid == errorID) rend.repaint();
-        }
-      }.start();
-    }
+    new Thread() {
+      @Override
+      public void run() {
+        Performance.sleep(ERROR_DELAY);
+        if(eid == errorID) rend.repaint();
+      }
+    }.start();
   }
 
   @Override
@@ -338,7 +343,6 @@ public class Editor extends BaseXPanel {
       }
       gui.status.setText(Util.info(STRINGS_REPLACED));
     } catch(final Exception ex) {
-      ex.printStackTrace();
       final String msg = Util.message(ex).replaceAll(Prop.NL + ".*", "");
       gui.status.setError(REGULAR_EXPR + COLS + msg);
     }
