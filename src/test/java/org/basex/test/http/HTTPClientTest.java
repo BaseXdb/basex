@@ -244,14 +244,13 @@ public class HTTPClientTest extends HTTPTest {
         + "<http:header name='hdr1' value='hdr1val'/>"
         + "<http:header name='hdr2' value='hdr2val'/>"
         + "<http:multipart media-type='multipart/mixed' boundary='xxxx'>"
-        + "<part>" + "<http:header name='p1hdr1' value='p1hdr1val'/>"
+        + "<http:header name='p1hdr1' value='p1hdr1val'/>"
         + "<http:header name='p1hdr2' value='p1hdr2val'/>"
         + "<http:body media-type='text/plain'>" + "Part1" + "</http:body>"
-        + "</part>" + "<part>"
         + "<http:header name='p2hdr1' value='p2hdr1val'/>"
         + "<http:body media-type='text/plain'>" + "Part2" + "</http:body>"
-        + "</part>" + "<part>" + "<http:body media-type='text/plain'>"
-        + "Part3" + "</http:body>" + "</part>" + "</http:multipart>"
+        + "<http:body media-type='text/plain'>"
+        + "Part3" + "</http:body>" + "</http:multipart>"
         + "</http:request>";
 
     final DBNode dbNode1 = new DBNode(new IOContent(multiReq), ctx.prop);
@@ -296,12 +295,12 @@ public class HTTPClientTest extends HTTPTest {
         + "<http:header name='hdr1' value='hdr1val'/>"
         + "<http:header name='hdr2' value='hdr2val'/>"
         + "<http:multipart media-type='multipart/mixed' boundary='xxxx'>"
-        + "<part>" + "<http:header name='p1hdr1' value='p1hdr1val'/>"
+        + "<http:header name='p1hdr1' value='p1hdr1val'/>"
         + "<http:header name='p1hdr2' value='p1hdr2val'/>"
-        + "<http:body media-type='text/plain'/>" + "</part>" + "<part>"
+        + "<http:body media-type='text/plain'/>"
         + "<http:header name='p2hdr1' value='p2hdr1val'/>"
-        + "<http:body media-type='text/plain'/>" + "</part>" + "<part>"
-        + "<http:body media-type='text/plain'/>" + "</part>"
+        + "<http:body media-type='text/plain'/>"
+        + "<http:body media-type='text/plain'/>"
         + "</http:multipart>" + "</http:request>";
 
     final DBNode dbNode1 = new DBNode(new IOContent(multiReq), ctx.prop);
@@ -385,10 +384,10 @@ public class HTTPClientTest extends HTTPTest {
     final byte[] falseReq6 = token("<http:request method='POST' "
         + "xmlns:http='http://expath.org/ns/http-client' "
         + "href='http://basex.org'>" + "<http:multipart boundary='xxx'>"
-        + "<part>" + "<http:header name='hdr1' value-='val1'/>"
+        + "<http:header name='hdr1' value-='val1'/>"
         + "<http:body media-type='text/plain'>" + "Part1" + "</http:body>"
-        + "</part>" + "<part>" + "<http:header name='hdr1' value-='val1'/>"
-        + "<http:body>" + "Part1" + "</http:body>" + "</part>"
+        + "<http:header name='hdr1' value-='val1'/>"
+        + "<http:body>" + "Part1" + "</http:body>"
         + "</http:multipart>" + "</http:request>");
     falseReqs.add(falseReq6);
 
@@ -690,15 +689,14 @@ public class HTTPClientTest extends HTTPTest {
         + "<http:header name='From' value='Nathaniel Borenstein "
         + "&lt;nsb@bellcore.com&gt;'/>"
         + "<http:multipart media-type='multipart/alternative' "
-        + "boundary='boundary42'>" + "<part>"
+        + "boundary='boundary42'>"
         + "<http:header name='Content-Type' "
         + "value='text/plain; charset=us-ascii'/>"
         + "<http:body media-type='text/plain; charset=us-ascii'/>"
-        + "</part>" + "<part>"
         + "<http:header name='Content-Type' value='text/richtext'/>"
-        + "<http:body media-type='text/richtext'/>" + "</part>" + "<part>"
+        + "<http:body media-type='text/richtext'/>"
         + "<http:header name='Content-Type' value='text/x-whatever'/>"
-        + "<http:body media-type='text/x-whatever'/>" + "</part>"
+        + "<http:body media-type='text/x-whatever'/>"
         + "</http:multipart>" + "</http:response> ";
 
     final DBNode dbNode = new DBNode(new IOContent(reqItem), ctx.prop);
@@ -782,12 +780,12 @@ public class HTTPClientTest extends HTTPTest {
         + "<http:header name='From' value='Nathaniel Borenstein "
         + "&lt;nsb@bellcore.com&gt;'/>"
         + "<http:multipart media-type='multipart/mixed' "
-        + "boundary='simple boundary'>" + "<part>"
-        + "<http:body media-type='text/plain'/>" + "</part>" + "<part>"
+        + "boundary='simple boundary'>"
+        + "<http:body media-type='text/plain'/>"
         + "<http:header name='Content-type' value='text/plain; "
         + "charset=us-ascii'/>"
         + "<http:body media-type='text/plain; charset=us-ascii'/>"
-        + "</part>" + "</http:multipart>" + "</http:response>";
+        + "</http:multipart>" + "</http:response>";
 
     final DBNode dbNode = new DBNode(new IOContent(reqItem), ctx.prop);
     resultIter.add(dbNode.children().next());
