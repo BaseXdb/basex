@@ -75,6 +75,7 @@ public final class FAttr extends FNode {
 
   @Override
   public String toString() {
-    return Util.info(" %=\"%\"", name.string(), val);
+    return Util.info(" %=\"%\"", name.string(),
+        Token.string(val).replaceAll("\"", "&quot;"));
   }
 }

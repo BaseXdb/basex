@@ -85,8 +85,6 @@ public interface HTTPText {
   QNm Q_NAME = new QNm("name");
   /** Header attribute: value. */
   QNm Q_VALUE = new QNm("value");
-  /** part element. */
-  QNm Q_PART = new QNm("part");
   /** Body attribute: media-type. */
   QNm Q_MEDIA_TYPE = new QNm(MEDIA_TYPE);
   /** boundary marker. */

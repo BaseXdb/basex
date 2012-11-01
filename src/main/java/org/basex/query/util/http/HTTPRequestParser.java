@@ -57,27 +57,11 @@ public final class HTTPRequestParser {
       final QNm pl = payload.qname();
       // single part request
       if(pl.eq(Q_HTTP_BODY)) {
-        Item it = null;
-        if(bodies != null) {
-          // $bodies must contain exactly one item
-          if(bodies.size() != 1) HC_REQ.thrw(info,
-              "Number of items with request body content differs " +
-              "from number of body descriptors.");
-          it = bodies.next();
-        }
+        final Item it = bodies != null ? bodies.next() : null;
         parseBody(payload, it, r.payloadAttrs, r.bodyContent);
         r.isMultipart = false;
         // multipart request
       } else if(pl.eq(Q_HTTP_MULTIPART)) {
-        int i = 0;
-        final AxisMoreIter ch = payload.children();
-        while(ch.next() != null)
-          i++;
-        // number of items in $bodies must be equal to number of body
-        // descriptors
-        if(bodies != null && bodies.size() != i) HC_REQ.thrw(info,
-            "Number of items with request body content differs " +
-            "from number of body descriptors.");
         parseMultipart(payload, bodies, r.payloadAttrs, r.parts);
         r.isMultipart = true;
       } else {
@@ -105,7 +89,7 @@ public final class HTTPRequestParser {
    * @param hdrs map for parsed headers
    * @return body or multipart
    */
-  private static ANode parseHdrs(final AxisMoreIter i, final TokenMap hdrs) {
+  private static ANode parseHdrs(final AxisIter i, final TokenMap hdrs) {
     ANode n;
     while(true) {
       n = i.next();
@@ -173,30 +157,16 @@ public final class HTTPRequestParser {
     if(attrs.get(MEDIA_TYPE) == null)
       HC_REQ.thrw(info, "Attribute media-type of http:multipart is mandatory");
 
-    final AxisMoreIter i = multipart.children();
-    if(contItems == null) {
-      // content is set from <http:body/> children of <http:part/> elements
-      for(ANode n; (n = i.next()) != null;)
-        parts.add(parsePart(n, null));
-    } else {
-      // content is set from $bodies parameter
-      for(ANode n; (n = i.next()) != null;)
-        parts.add(parsePart(n, contItems.next()));
+    final AxisIter prts = multipart.children();
+    while(true) {
+      final Part p = new Part();
+      final ANode partBody = parseHdrs(prts, p.headers);
+      if(partBody == null) break;
+      // content is set from <http:body/> children or from $bodies parameter
+      final Item ci = contItems == null ? null : contItems.next();
+      parseBody(partBody, ci, p.bodyAttrs, p.bodyContent);
+      parts.add(p);
     }
-  }
-
-  /**
-   * Parses a part from a <http:multipart/> element.
-   * @param part part element
-   * @param contItem content item
-   * @return structure representing the part
-   * @throws QueryException query exception
-   */
-  private Part parsePart(final ANode part, final Item contItem) throws QueryException {
-    final Part p = new Part();
-    final ANode partBody = parseHdrs(part.children(), p.headers);
-    parseBody(partBody, contItem, p.bodyAttrs, p.bodyContent);
-    return p;
   }
 
   /**

@@ -206,12 +206,8 @@ public final class HTTPResponse {
       if(next == null) HC_REQ.thrw(info, "No body specified for http:part");
 
       final byte[] end = concat(sep, token("--"));
-      FElem nextPart = extractNextPart(io, status, payloads, sep, end);
       final ANodeList p = new ANodeList();
-      while(nextPart != null) {
-        p.add(nextPart);
-        nextPart = extractNextPart(io, status, payloads, sep, end);
-      }
+      while(extractNextPart(io, status, payloads, sep, end, p));
       return p;
     } finally {
       io.close();
@@ -225,12 +221,13 @@ public final class HTTPResponse {
    * @param payloads item cache for part payloads
    * @param sep separation boundary
    * @param end closing boundary
+   * @param nl node list
    * @return part
    * @throws IOException I/O Exception
    */
-  private FElem extractNextPart(final InputStream io, final boolean status,
-      final ValueBuilder payloads, final byte[] sep, final byte[] end)
-          throws IOException {
+  private boolean extractNextPart(final InputStream io, final boolean status,
+      final ValueBuilder payloads, final byte[] sep, final byte[] end,
+      final ANodeList nl) throws IOException {
 
     // content type of part payload - if not defined by header 'Content-Type',
     // it is equal to 'text/plain' (RFC 1341)
@@ -238,11 +235,8 @@ public final class HTTPResponse {
     String charset = null;
     final byte[] firstLine = readLine(io);
     // last line is reached:
-    if(firstLine == null || eq(firstLine, end)) return null;
+    if(firstLine == null || eq(firstLine, end)) return false;
 
-    final FElem root = new FElem(Q_PART, new Atts(HTTP, HTTPURI));
-
-    //final NodeCache partCh = new NodeCache();
     if(firstLine.length == 0) {
       // part has no headers
       final byte[] p = extractPartPayload(io, sep, end, null);
@@ -261,25 +255,22 @@ public final class HTTPResponse {
           final byte[] name = substring(nextHdr, 0, pos);
           if(pos + 1 < nextHdr.length) {
             // parse value
-            final byte[] value = trim(substring(nextHdr, pos + 1,
-                nextHdr.length));
+            final byte[] value = trim(substring(nextHdr, pos + 1, nextHdr.length));
             // construct attributes
             final FElem hdr = new FElem(Q_HTTP_HEADER);
             hdr.add(Q_NAME, name);
             hdr.add(Q_VALUE, value);
-            root.add(hdr);
+            nl.add(hdr);
             if(eq(lc(name), CONTENT_TYPE_LC)) partCType = string(value);
           }
         }
         nextHdr = readLine(io);
       }
       final byte[] p = extractPartPayload(io, sep, end, charset);
-      if(!status) {
-        payloads.add(interpretPayload(p, partCType));
-      }
+      if(!status) payloads.add(interpretPayload(p, partCType));
     }
-    root.add(createBody(partCType));
-    return root;
+    nl.add(createBody(partCType));
+    return true;
   }
 
   /**
