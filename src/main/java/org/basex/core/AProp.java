@@ -352,8 +352,8 @@ public abstract class AProp implements Iterable<String> {
    * @param val value
    */
   public static void setSystem(final String key, final Object val) {
-    final String k = (key.indexOf('.') != -1 ? key : DBPREFIX + key).
-        toLowerCase(Locale.ENGLISH);
+    final String k = key.indexOf('.') != -1 ? key :
+      DBPREFIX + key.toLowerCase(Locale.ENGLISH);
     if(System.getProperty(k) == null) System.setProperty(k, val.toString());
   }
 
