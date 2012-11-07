@@ -12,7 +12,6 @@ import org.basex.io.*;
 import org.basex.query.util.*;
 import org.basex.test.query.*;
 import org.junit.*;
-import org.junit.rules.*;
 
 /**
  * This class tests the XQuery database functions prefixed with "db".
@@ -27,8 +26,6 @@ public final class FNDbTest extends AdvancedQueryTest {
   private static final String FLDR = "src/test/resources/dir/";
   /** Number of XML files for folder. */
   private static final int NFLDR;
-  /** Expected exception. */
-  @Rule public ExpectedException thrown = ExpectedException.none();
 
   static {
     int fc = 0;
@@ -340,9 +337,7 @@ public final class FNDbTest extends AdvancedQueryTest {
     query("doc('" + dbname + "')/root()", "<dummy/>");
 
     // try to create DB twice during same query
-    query(_DB_CREATE.args(dbname, "<dummy/>", "t1.xml") + "," +
-        _DB_CREATE.args(dbname, "<dummy/>", "t1.xml"));
-    query("doc('" + dbname + "')/root()", "<dummy/>");
+    error(_DB_CREATE.args(dbname) + "," + _DB_CREATE.args(dbname), Err.BXDB_CREATE);
 
     // create DB from file
     query(_DB_CREATE.args(dbname, FILE, "in/"));
@@ -352,17 +347,20 @@ public final class FNDbTest extends AdvancedQueryTest {
     query(_DB_CREATE.args(dbname, FLDR, "test/dir"));
     query(COUNT.args(COLLECTION.args(dbname + "/test/dir")), NFLDR);
 
+    // [LK] create more than one database
+    query("for $i in 1 to 5 return " + _DB_CREATE.args(" '" + dbname + "' || $i"));
+    query("for $i in 1 to 5 return " + _DB_DROP.args(" '" + dbname + "' || $i"));
+
+
     // [LK][CG] db:create within transform expression?
     //          TransformModifier -> getData() -> NPE ?
     // ...disallow db: functions inside transform expressions
 
-    query(_DB_CREATE.args(dbname, ""));
-    query(_DB_EXISTS.args(dbname), true);
-    query(_DB_LIST_DETAILS.args(dbname), "");
+    error(_DB_CREATE.args(dbname, ""), Err.WHICHRES);
 
     // [LK][CG] create DB with initial EMPTY content - how to fail?
     // ...the only case I get in mind:
-    error(_DB_CREATE.args(""));
+    error(_DB_CREATE.args(""), Err.BXDB_NAME);
   }
 
   /**
@@ -375,14 +373,11 @@ public final class FNDbTest extends AdvancedQueryTest {
 
     // drop existing DB
     query(_DB_CREATE.args(dbname, "<dummy/>", "doc.xml"));
-    query("doc('" + dbname + "')/root()", "<dummy/>");
     query(_DB_DROP.args(dbname));
     query(_DB_EXISTS.args(dbname), "false");
 
-    // [LK] try to drop non-existing DB
-    thrown.expect(Exception.class);
-    thrown.expectMessage("was not found");
-    query(_DB_DROP.args(dbname + "NonExisting"));
+    // try to drop non-existing DB
+    error(_DB_DROP.args(dbname), Err.BXDB_OPEN);
 
     // [LK] update a DB and drop it afterwards
 

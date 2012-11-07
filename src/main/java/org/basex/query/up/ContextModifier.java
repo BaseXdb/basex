@@ -89,7 +89,7 @@ public abstract class ContextModifier {
       }
       // check if addressed databases are already pinned
       for(final DBCreate c : creates)
-        if(ctx.context.pinned(c.name)) BXDB_OPENED.thrw(null, c.name);
+        if(ctx.context.pinned(c.name)) BXDB_OPENED.thrw(c.info, c.name);
 
       // apply updates
       for(final DatabaseUpdates c : updates) c.apply();

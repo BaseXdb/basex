@@ -154,7 +154,8 @@ final class DatabaseUpdates {
    * Locks the database for write operations.
    */
   void finishUpdate() {
-    data.finishUpdate();
+    // may have been invalidated by db:drop
+    if(data != null) data.finishUpdate();
   }
 
   /**

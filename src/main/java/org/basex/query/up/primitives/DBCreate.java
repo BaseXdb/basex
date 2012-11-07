@@ -35,7 +35,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
-public class DBCreate extends BasicOperation {
+public final class DBCreate extends BasicOperation {
   /** Name for created database. */
   public final String name;
   /** Documents to add. */
@@ -95,7 +95,11 @@ public class DBCreate extends BasicOperation {
     ctx.resource.addData(data);
 
     // add initial documents
-    if(md != null) data.insert(data.meta.size, -1, md);
+    if(md != null) {
+      if(!data.startUpdate()) BXDB_OPENED.thrw(null, data.meta.name);
+      data.insert(data.meta.size, -1, md);
+      data.finishUpdate();
+    }
   }
 
   @Override

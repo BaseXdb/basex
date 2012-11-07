@@ -39,7 +39,7 @@ public abstract class BasicOperation implements Comparable<BasicOperation>, Oper
   /** Target data reference. */
   Data data;
   /** Input info. */
-  final InputInfo info;
+  public final InputInfo info;
   /** Type of this operation. */
   public final TYPE type;
 
@@ -66,7 +66,7 @@ public abstract class BasicOperation implements Comparable<BasicOperation>, Oper
   }
 
   @Override
-  public InputInfo getInfo() {
+  public final InputInfo getInfo() {
     return info;
   }
 
@@ -103,8 +103,9 @@ public abstract class BasicOperation implements Comparable<BasicOperation>, Oper
    * @return database instance
    * @throws QueryException query exception
    */
-  Data docData(final Item doc, final byte[] pth, final Context ctx, final String dbname)
-      throws QueryException {
+  final Data docData(final Item doc, final byte[] pth, final Context ctx,
+      final String dbname) throws QueryException {
+
     if(doc instanceof AStr) return docData((AStr) doc, pth, ctx, dbname);
     if(doc instanceof ANode) return docData((ANode) doc, pth, ctx.prop);
     throw STRNODTYPE.thrw(info, this, doc.type);

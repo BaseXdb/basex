@@ -73,7 +73,7 @@ public final class QueryResources {
    */
   void close() {
     for(int d = ctx.nodes != null ? 1 : 0; d < datas; ++d) {
-     Close.close(data[d], ctx.context);
+      Close.close(data[d], ctx.context);
     }
     datas = 0;
   }
@@ -306,6 +306,19 @@ public final class QueryResources {
       data = tmp;
     }
     data[datas++] = d;
+  }
+
+  /**
+   * Removes a data reference from the global list.
+   * @param dt data reference to be removed
+   */
+  public void removeData(final Data dt) {
+    for(int d = 0; d < datas; d++) {
+      if(dt == data[d]) {
+        Array.move(data, d + 1, -1, --datas - d);
+        break;
+      }
+    }
   }
 
   /**

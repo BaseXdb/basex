@@ -1,6 +1,7 @@
 package org.basex.query.up.primitives;
 
-import org.basex.core.Text;
+import static org.basex.query.util.Err.*;
+
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.query.*;
@@ -23,7 +24,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
-public class DBDrop extends BasicOperation {
+public final class DBDrop extends BasicOperation {
   /** Query Context. */
   private final QueryContext ctx;
 
@@ -39,19 +40,29 @@ public class DBDrop extends BasicOperation {
   }
 
   @Override
-  public int size() {
-    return 1;
-  }
-
-  @Override
   public void merge(final BasicOperation o) throws QueryException { }
 
   @Override
+  public void prepare() throws QueryException { }
+
+  @Override
   public void apply() throws QueryException {
-    if(!DropDB.drop(data.meta.name, ctx.context))
-      Util.err(Text.DB_NOT_DROPPED_X, data.meta.name);
+    // trigger early removal of database locks
+    data.finishUpdate();
+    // close data instance and reference in query processor
+    Close.close(data, ctx.context);
+    ctx.resource.removeData(data);
+    // invalidate data instance to avoid repeated removal of locks
+    final String name = data.meta.name;
+    data = null;
+    // check if database is stilled pinned by another process
+    if(ctx.context.pinned(name)) BXDB_OPENED.thrw(info, name);
+    // check if database files can be safely removed
+    if(!DropDB.drop(name, ctx.context)) UPDBDROP.thrw(info, name);
   }
 
   @Override
-  public void prepare() throws QueryException { }
+  public int size() {
+    return 1;
+  }
 }
