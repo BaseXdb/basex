@@ -550,9 +550,13 @@ public enum Function {
   /** XQuery function. */
   _DB_OUTPUT(FNDb.class, "output(expression)", EMP, ITEM_ZM),
   /** XQuery function. */
-  _DB_ADD(FNDb.class, "add(database,input[,path])", EMP, 2, ITEM, DOC_ZM, STR),
+  _DB_ADD(FNDb.class, "add(database,input[,path])", EMP, 2, ITEM, NOD, STR),
   /** XQuery function. */
   _DB_DELETE(FNDb.class, "delete(database,path)", EMP, ITEM, STR),
+  /** XQuery function. */
+  _DB_CREATE(FNDb.class, "create(databasename[,input[,path]])", EMP, 1, STR, NOD, STR),
+  /** XQuery function. */
+  _DB_DROP(FNDb.class, "drop(database)", EMP, ITEM),
   /** XQuery function. */
   _DB_RENAME(FNDb.class, "rename(database,path,newpath)", EMP, ITEM, STR, STR),
   /** XQuery function. */
@@ -876,7 +880,7 @@ public enum Function {
   /** Updating functions. */
   static final Function[] UPDATING = {
     PUT, _DB_ADD, _DB_DELETE, _DB_RENAME, _DB_REPLACE, _DB_OPTIMIZE, _DB_STORE,
-    _DB_OUTPUT, _DB_FLUSH
+    _DB_OUTPUT, _DB_FLUSH, _DB_CREATE, _DB_DROP
   };
 
   /**

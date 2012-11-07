@@ -299,7 +299,7 @@ public final class QueryResources {
    * Adds a data reference to the global list.
    * @param d data reference to be added
    */
-  private void addData(final Data d) {
+  public void addData(final Data d) {
     if(datas == data.length) {
       final Data[] tmp = new Data[Array.newSize(datas)];
       System.arraycopy(data, 0, tmp, 0, datas);
