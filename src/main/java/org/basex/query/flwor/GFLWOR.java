@@ -125,7 +125,7 @@ public class GFLWOR extends ParseExpr {
     // check if return always yields an empty sequence
     if(ret == Empty.SEQ) {
       ctx.compInfo(OPTFLWOR);
-      return ret;
+      return Empty.SEQ;
     }
 
     // remove declarations of statically bound or unused variables
@@ -151,7 +151,7 @@ public class GFLWOR extends ParseExpr {
 
     // remove FLWOR expression if a FOR clause yields an empty sequence
     for(final ForLet f : fl) {
-      if(f instanceof For && f.size() == 0) {
+      if(f instanceof For && f.size() == 0 && !f.expr.uses(Use.NDT)) {
         ctx.compInfo(OPTFLWOR);
         return Empty.SEQ;
       }
