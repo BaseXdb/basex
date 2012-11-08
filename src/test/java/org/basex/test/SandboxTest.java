@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import static org.junit.Assert.*;
 
 import java.io.*;
+import java.util.concurrent.*;
 
 import org.basex.*;
 import org.basex.core.*;
@@ -119,5 +120,47 @@ public abstract class SandboxTest {
    */
   protected static IOFile sandbox() {
     return new IOFile(Prop.TMP, NAME);
+  }
+
+  /** Client. */
+  public static final class Client extends Thread {
+    /** Start signal. */
+    private final CountDownLatch startSignal;
+    /** Stop signal. */
+    private final CountDownLatch stopSignal;
+    /** Client session. */
+    private final ClientSession session;
+    /** Command string. */
+    private final String cmd;
+
+    /**
+     * Client constructor.
+     * @param c command string to execute
+     * @param start start signal
+     * @param stop stop signal
+     * @throws IOException I/O exception while establishing the session
+     */
+    public Client(final String c, final CountDownLatch start, final CountDownLatch stop)
+        throws IOException {
+
+      session = createClient();
+      cmd = c;
+      startSignal = start;
+      stopSignal = stop;
+      start();
+    }
+
+    @Override
+    public void run() {
+      try {
+        startSignal.await();
+        session.execute(cmd);
+        session.close();
+      } catch(final Exception ex) {
+        Util.stack(ex);
+      } finally {
+        stopSignal.countDown();
+      }
+    }
   }
 }
