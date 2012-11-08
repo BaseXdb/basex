@@ -3,13 +3,17 @@ package org.basex.test.query.func;
 import static org.basex.core.Text.*;
 import static org.basex.query.func.Function.*;
 
+import java.io.*;
 import java.util.*;
+import java.util.concurrent.*;
 
+import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.parse.*;
 import org.basex.io.*;
 import org.basex.query.util.*;
+import org.basex.server.*;
 import org.basex.test.query.*;
 import org.junit.*;
 
@@ -26,6 +30,8 @@ public final class FNDbTest extends AdvancedQueryTest {
   private static final String FLDR = "src/test/resources/dir/";
   /** Number of XML files for folder. */
   private static final int NFLDR;
+  /** Server reference. */
+  private static BaseXServer server;
 
   static {
     int fc = 0;
@@ -45,12 +51,22 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
+   * Starts the server.
+   * @throws IOException I/O exception
+   */
+  @BeforeClass
+  public static void start() throws IOException {
+    server = createServer();
+  }
+
+  /**
    * Finishes the test.
-   * @throws BaseXException database exception
+   * @throws IOException I/O exception
    */
   @AfterClass
-  public static void finish() throws BaseXException {
+  public static void finish() throws IOException {
     new DropDB(NAME).execute(context);
+    stopServer(server);
   }
 
   /**
@@ -381,7 +397,71 @@ public final class FNDbTest extends AdvancedQueryTest {
 
     // [LK] update a DB and drop it afterwards
 
-    // [LK] drop and transform?
+    // [LK] drop within transform
+  }
+
+  /**
+   * More complex db:create and db:drop tests.
+   */
+  @Test
+  public void complex() {
+    final String dbname = NAME + "DBCreate";
+    // [LK][CG] should fail because DB does not exist?
+    error(query(_DB_CREATE.args(dbname, FILE, "in/") +
+        ",insert node <dummy/> into doc('" + dbname + "')," +
+        _DB_DROP.args(dbname)), Err.WHICHRES);
+
+    // run update on existing DB then drop it and create a new one
+    query(_DB_CREATE.args(dbname));
+    query(_DB_CREATE.args(dbname, "<dummy/>", "t1.xml") +
+        ",insert node <dummy/> into doc('" + dbname + "')," +
+        _DB_DROP.args(dbname));
+    query("doc('" + dbname + "')/root()", "<dummy/>");
+  }
+
+  /**
+   * Tests client / server functionality of database functions.
+   * @throws IOException I/O exception
+   * @throws InterruptedException interrupted exception
+   */
+  @Test
+  public void clientServer() throws IOException, InterruptedException {
+    final ClientSession check = createClient();
+    // same DB name
+    final String dbname = NAME + "DBCreate";
+    runTwoClients(new XQuery(_DB_CREATE.args(dbname)).toString());
+    Assert.assertEquals("true", check.execute(new XQuery(_DB_EXISTS.args(dbname))));
+
+    // same DB name and files
+    runTwoClients(new XQuery(_DB_CREATE.args(dbname, FILE, "in/")).toString());
+    Assert.assertEquals("true", check.execute(new XQuery(_DB_EXISTS.args(dbname))));
+
+    // create, run query, drop
+    runTwoClients(
+        new XQuery(
+            _DB_CREATE.args(dbname, FILE, "in/") +
+            ",insert node <dummy/> into doc('" + dbname + "')," +
+            _DB_DROP.args(dbname)
+            ).toString());
+  }
+
+  /**
+   * Runs a number of clients in parallel that execute the same query.
+   * @param q query
+   * @throws IOException I/O exception
+   * @throws InterruptedException interrupted exception
+   */
+  private void runTwoClients(final String q)
+      throws IOException, InterruptedException {
+    final int n = 1;
+    final CountDownLatch start = new CountDownLatch(1);
+    final CountDownLatch stop = new CountDownLatch(n);
+    for(int i = 0; i < n; i++) {
+      new Client(q, start, stop);
+      new Client(q, start, stop);
+    }
+    start.countDown();
+    stop.await();
   }
 
   /**
