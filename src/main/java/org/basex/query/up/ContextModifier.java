@@ -1,7 +1,5 @@
 package org.basex.query.up;
 
-import static org.basex.query.util.Err.*;
-
 import java.util.*;
 
 import org.basex.data.*;
@@ -70,10 +68,9 @@ public abstract class ContextModifier {
   /**
    * Checks constraints and applies all update primitives to the databases if
    * no constraints are hurt.
-   * @param ctx query context
    * @throws QueryException query exception
    */
-  final void apply(final QueryContext ctx) throws QueryException {
+  final void apply() throws QueryException {
     // checked constraints
     final Collection<DatabaseUpdates> updates = pendingUpdates.values();
     final Collection<DBCreate> creates = dbCreates.values();
@@ -87,13 +84,8 @@ public abstract class ContextModifier {
         c.startUpdate();
         i++;
       }
-      // check if addressed databases are already pinned
-      for(final DBCreate c : creates)
-        if(ctx.context.pinned(c.name)) BXDB_OPENED.thrw(c.info, c.name);
-
       // apply updates
       for(final DatabaseUpdates c : updates) c.apply();
-      for(final DBCreate c : creates) c.apply();
     } finally {
       // remove write locks and updating files
       for(final DatabaseUpdates c : updates) {
@@ -101,6 +93,8 @@ public abstract class ContextModifier {
         c.finishUpdate();
       }
     }
+    // create databases
+    for(final DBCreate c : creates) c.apply();
   }
 
   /**

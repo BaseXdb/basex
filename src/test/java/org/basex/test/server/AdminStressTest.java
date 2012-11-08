@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.concurrent.*;
 
 import org.basex.*;
+import org.basex.core.cmd.*;
 import org.basex.server.*;
 import org.basex.test.*;
 import org.basex.util.*;
@@ -50,8 +51,8 @@ public final class AdminStressTest extends SandboxTest {
     final CountDownLatch stop = new CountDownLatch(NUM);
 
     for(int i = 0; i < NUM; ++i) {
-      new Client("create event " + NAME + i, start, stop);
-      new Client("show events", start, stop);
+      new Client(new CreateEvent(NAME + i), start, stop);
+      new Client(new ShowEvents(), start, stop);
     }
     start.countDown(); // start all clients
     stop.await();
@@ -71,7 +72,7 @@ public final class AdminStressTest extends SandboxTest {
   public void createAndListSessions() throws Exception {
     final CountDownLatch start = new CountDownLatch(1);
     final CountDownLatch stop = new CountDownLatch(NUM);
-    for(int i = 0; i < NUM; ++i) new Client("show sessions", start, stop);
+    for(int i = 0; i < NUM; ++i) new Client(new ShowSessions(), start, stop);
     start.countDown(); // start all clients
     stop.await();
   }

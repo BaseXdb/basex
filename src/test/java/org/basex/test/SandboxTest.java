@@ -131,7 +131,9 @@ public abstract class SandboxTest {
     /** Client session. */
     private final ClientSession session;
     /** Command string. */
-    private final String cmd;
+    private final Command cmd;
+    /** Fail flag. */
+    public String error;
 
     /**
      * Client constructor.
@@ -140,7 +142,7 @@ public abstract class SandboxTest {
      * @param stop stop signal
      * @throws IOException I/O exception while establishing the session
      */
-    public Client(final String c, final CountDownLatch start, final CountDownLatch stop)
+    public Client(final Command c, final CountDownLatch start, final CountDownLatch stop)
         throws IOException {
 
       session = createClient();
@@ -156,8 +158,9 @@ public abstract class SandboxTest {
         startSignal.await();
         session.execute(cmd);
         session.close();
-      } catch(final Exception ex) {
+      } catch(final Throwable ex) {
         Util.stack(ex);
+        error = "\n" + cmd + "\n" + ex;
       } finally {
         stopSignal.countDown();
       }

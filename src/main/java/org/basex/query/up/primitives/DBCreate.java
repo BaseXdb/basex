@@ -87,6 +87,11 @@ public final class DBCreate extends BasicOperation {
 
   @Override
   public void apply() throws QueryException {
+    // close data instance in query processor
+    ctx.resource.removeData(name);
+    // check if addressed databases are still pinned
+    if(ctx.context.pinned(name)) BXDB_OPENED.thrw(info, name);
+
     try {
       data = CreateDB.create(name, Parser.emptyParser(ctx.context.prop), ctx.context);
     } catch(IOException ex) {

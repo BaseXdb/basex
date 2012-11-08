@@ -33,7 +33,7 @@ final class DatabaseUpdates {
   /** Mapping between pre values of the target nodes and all update primitives
    * which operate on this target. */
   private final IntMap<NodeUpdates> updatePrimitives = new IntMap<NodeUpdates>();
-  /** Database operations wich are applied after all updates have been executed. */
+  /** Database operations which are applied after all updates have been executed. */
   private final List<BasicOperation> dbops = new LinkedList<BasicOperation>();
   /** Put operations which reflect all changes made during the snapshot, hence executed
    * after updates have been carried out. */

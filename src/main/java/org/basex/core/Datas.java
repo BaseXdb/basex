@@ -36,9 +36,10 @@ public final class Datas {
    * @return true if reference was removed from the pool
    */
   synchronized boolean unpin(final Data data) {
-    for(final Data d : list) {
-      if(d == data) {
-        final boolean close = --d.pins == 0;
+    for(int d = 0; d < list.size(); d++) {
+      final Data dt = list.get(d);
+      if(dt == data) {
+        final boolean close = --dt.pins == 0;
         if(close) list.remove(d);
         return close;
       }

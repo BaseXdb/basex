@@ -49,11 +49,10 @@ public final class DBDrop extends BasicOperation {
   public void apply() throws QueryException {
     // trigger early removal of database locks
     data.finishUpdate();
-    // close data instance and reference in query processor
-    Close.close(data, ctx.context);
-    ctx.resource.removeData(data);
-    // invalidate data instance to avoid repeated removal of locks
+    // close data instance in query processor
     final String name = data.meta.name;
+    ctx.resource.removeData(name);
+    // invalidate data instance to avoid repeated removal of locks
     data = null;
     // check if database is stilled pinned by another process
     if(ctx.context.pinned(name)) BXDB_OPENED.thrw(info, name);

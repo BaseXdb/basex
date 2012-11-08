@@ -82,7 +82,7 @@ public final class Transform extends Arr {
         pu.addData(i.data());
       }
       ctx.value(expr[0]);
-      ctx.updates.apply(ctx);
+      ctx.updates.apply();
       return ctx.value(expr[1]);
     } finally {
       ctx.vars.size(s);

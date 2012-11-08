@@ -270,7 +270,7 @@ public final class QueryContext extends Progress {
    */
   public Value update() throws QueryException {
     if(updating) {
-      updates.apply(this);
+      updates.apply();
       if(updates.size() != 0 && context.data() != null) context.update();
       if(output.size() != 0) return output.value();
     }
