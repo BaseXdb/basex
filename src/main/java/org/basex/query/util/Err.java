@@ -80,6 +80,10 @@ public enum Err {
   BXDB_RANGE(BXDB, 9, "%: value '%' is out of range."),
   /** BXDB0010. */
   BXDB_EVENT(BXDB, 10, "Event '%' is unknown."),
+  /** BXDB0011. */
+  BXDB_NAME(BXDB, 11, "Invalid database name: '%'."),
+  /** BXDB0012. */
+  BXDB_CREATE(BXDB, 12, "Database '%' can only be create once."),
 
   // Fulltext module
 
@@ -442,6 +446,8 @@ public enum Err {
   UPFOURI(FOUP, 2, "No valid URI: \"%\"."),
   /** FOUP0002. */
   UPPUTERR(FOUP, 2, "\"%\" could not be written."),
+  /** FOUP0002. */
+  UPDBDROP(FOUP, 2, "Database \"%\" could not be dropped."),
   /** FOUP0002. */
   UPDBPUTERR(FOUP, 2, "Resource \"%\" could not be written."),
   /** FOUP0002. */

@@ -82,7 +82,7 @@ public final class FNDb extends StandardFunc {
       case _DB_LIST:            return list(ctx);
       case _DB_LIST_DETAILS:    return listDetails(ctx);
       case _DB_NODE_ID:         return node(ctx, true);
-      case _DB_NODE_PRE   :     return node(ctx, false);
+      case _DB_NODE_PRE:        return node(ctx, false);
       default:                  return super.iter(ctx);
     }
   }
@@ -106,6 +106,8 @@ public final class FNDb extends StandardFunc {
       case _DB_INFO:         return info(ctx);
       case _DB_ADD:          return add(ctx);
       case _DB_DELETE:       return delete(ctx);
+      case _DB_CREATE:       return create(ctx);
+      case _DB_DROP:         return drop(ctx);
       case _DB_RENAME:       return rename(ctx);
       case _DB_REPLACE:      return replace(ctx);
       case _DB_OPTIMIZE:     return optimize(ctx);
@@ -235,7 +237,7 @@ public final class FNDb extends StandardFunc {
     final TokenList tl = new TokenList();
     final int el = expr.length;
     if(el == 0) {
-      for(final String s : ctx.context.databases().listDBs()) tl.add(s);
+      for(final String s : ctx.context.databases.listDBs()) tl.add(s);
     } else {
       final Data data = data(0, ctx);
       final String path = string(el == 1 ? Token.EMPTY : checkStr(expr[1], ctx));
@@ -343,7 +345,7 @@ public final class FNDb extends StandardFunc {
    * @return iterator
    */
   private Iter listDBs(final QueryContext ctx) {
-    final StringList sl = ctx.context.databases().listDBs();
+    final StringList sl = ctx.context.databases.listDBs();
     return new Iter() {
       int pos;
       @Override
@@ -580,6 +582,35 @@ public final class FNDb extends StandardFunc {
   }
 
   /**
+   * Performs the create function.
+   * @param ctx query context
+   * @return {@code null}
+   * @throws QueryException query exception
+   */
+  private Item create(final QueryContext ctx) throws QueryException {
+    final String name = string(checkStr(expr[0], ctx));
+    if(!MetaData.validName(name, false)) BXDB_NAME.thrw(info, name);
+    final Item it = expr.length > 1 ? checkItem(expr[1], ctx) : null;
+    final String path = expr.length > 2 ? path(2, ctx) : "";
+
+    ctx.updates.add(new DBCreate(info, name, it, path, ctx), ctx);
+    return null;
+  }
+
+  /**
+   * Performs the create function.
+   * @param ctx query context
+   * @return {@code null}
+   * @throws QueryException query exception
+   */
+  private Item drop(final QueryContext ctx) throws QueryException {
+    checkAdmin(ctx);
+    final Data data = checkWrite(data(0, ctx), ctx);
+    ctx.updates.add(new DBDrop(data, info, ctx), ctx);
+    return null;
+  }
+
+  /**
    * Performs the rename function.
    * @param ctx query context
    * @return {@code null}
@@ -728,7 +759,7 @@ public final class FNDb extends StandardFunc {
   @Override
   public boolean uses(final Use u) {
     final boolean up = oneOf(sig, _DB_ADD, _DB_DELETE, _DB_RENAME, _DB_REPLACE,
-        _DB_OPTIMIZE, _DB_STORE, _DB_OUTPUT, _DB_FLUSH);
+        _DB_OPTIMIZE, _DB_STORE, _DB_OUTPUT, _DB_FLUSH, _DB_CREATE, _DB_DROP);
     return
       // skip evaluation at compile time
       u == Use.NDT && (up || oneOf(sig, _DB_TEXT, _DB_ATTRIBUTE, _DB_TEXT_RANGE,

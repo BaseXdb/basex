@@ -34,7 +34,7 @@ public final class CreateBackup extends Command {
     if(!MetaData.validName(name, true)) return error(NAME_INVALID_X, name);
 
     // retrieve all databases
-    final StringList dbs = context.databases().listDBs(name);
+    final StringList dbs = context.databases.listDBs(name);
     if(dbs.size() == 0) return error(DB_NOT_FOUND_X, name);
 
     // loop through all databases
@@ -65,7 +65,6 @@ public final class CreateBackup extends Command {
 
     try {
       zip.zip(mprop.dbpath(db), Databases.FILES);
-      context.databases().add(db, true);
       return true;
     } catch(final IOException ex) {
       Util.debug(ex);

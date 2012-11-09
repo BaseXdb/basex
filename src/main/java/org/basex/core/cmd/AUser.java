@@ -65,7 +65,7 @@ abstract class AUser extends Command {
     // retrieve all databases
     StringList dbs = null;
     if(d != null) {
-      dbs = context.databases().listDBs(d);
+      dbs = context.databases.listDBs(d);
       if(dbs.size() == 0) return info(DB_NOT_FOUND_X, d) && opt;
     }
 

@@ -3,6 +3,7 @@ package org.basex.test.query.func;
 import static org.basex.core.Text.*;
 import static org.basex.query.func.Function.*;
 
+import java.io.*;
 import java.util.*;
 
 import org.basex.core.*;
@@ -46,10 +47,10 @@ public final class FNDbTest extends AdvancedQueryTest {
 
   /**
    * Finishes the test.
-   * @throws BaseXException database exception
+   * @throws IOException I/O exception
    */
   @AfterClass
-  public static void finish() throws BaseXException {
+  public static void finish() throws IOException {
     new DropDB(NAME).execute(context);
   }
 
@@ -304,6 +305,107 @@ public final class FNDbTest extends AdvancedQueryTest {
     new Add("test/docs", FLDR).execute(context);
     query(_DB_DELETE.args(NAME, "test"));
     query(COUNT.args(COLLECTION.args(NAME + "/test")), 0);
+  }
+
+  /**
+   * Test method.
+   */
+  @Test
+  public void create() {
+    // non-existing DB name
+    final String dbname = NAME + "DBCreate";
+
+    // create DB without initial content
+    query(_DB_CREATE.args(dbname));
+    query(_DB_EXISTS.args(dbname), true);
+
+    // create DB w/ initial content
+    query(_DB_CREATE.args(dbname, "<dummy/>", "t1.xml"));
+    query(_DB_OPEN.args(dbname) + "/root()", "<dummy/>");
+
+    // create DB w/ initial content via document constructor
+    query(_DB_CREATE.args(dbname, " document { <dummy/> }", "t2.xml"));
+    query(_DB_OPEN.args(dbname) + "/root()", "<dummy/>");
+
+    // create DB w/ initial content given as string
+    query(_DB_CREATE.args(dbname, "\"<dummy/>\"", "t1.xml"));
+    query(_DB_OPEN.args(dbname) + "/root()", "<dummy/>");
+
+    // create DB w/ initial content multiple times
+    query(_DB_CREATE.args(dbname, "<dummy/>", "t1.xml"));
+    query(_DB_CREATE.args(dbname, "<dummy/>", "t1.xml"));
+    query(_DB_OPEN.args(dbname) + "/root()", "<dummy/>");
+
+    // try to create DB twice during same query
+    error(_DB_CREATE.args(dbname) + "," + _DB_CREATE.args(dbname), Err.BXDB_CREATE);
+
+    // create DB from file
+    query(_DB_CREATE.args(dbname, FILE, "in/"));
+    query(COUNT.args(COLLECTION.args(dbname + "/in/input.xml") + "/html"), "1");
+
+    // create DB from folder
+    query(_DB_CREATE.args(dbname, FLDR, "test/dir"));
+    query(COUNT.args(COLLECTION.args(dbname + "/test/dir")), NFLDR);
+
+    // create and drop more than one database
+    query("for $i in 1 to 5 return " + _DB_CREATE.args(" '" + dbname + "' || $i"));
+    query("for $i in 1 to 5 return " + _DB_DROP.args(" '" + dbname + "' || $i"));
+
+    error(_DB_CREATE.args(dbname, ""), Err.WHICHRES);
+
+    // create DB with initial EMPTY content
+    error(_DB_CREATE.args(""), Err.BXDB_NAME);
+
+    // try to access non-existing DB (create is supposed to be called last)
+    query(_DB_DROP.args(dbname));
+    error(_DB_CREATE.args(dbname) + "," + _DB_DROP.args(dbname), Err.BXDB_OPEN);
+
+    // run update on existing DB then drop it and create a new one
+    query(_DB_CREATE.args(dbname, "<a/>", "a.xml"));
+    query("insert node <dummy/> into " + _DB_OPEN.args(dbname));
+    query(_DB_CREATE.args(dbname, "<dummy/>", "t1.xml") +
+        ", insert node <dummy/> into " + _DB_OPEN.args(dbname) + "," +
+        _DB_DROP.args(dbname));
+    query(_DB_OPEN.args(dbname) + "/root()", "<dummy/>");
+
+    // eventually drop database
+    query(_DB_DROP.args(dbname));
+
+    // [LK] Add error for db:create (and other db functions) within transform expression
+  }
+
+  /**
+   * Test method.
+   */
+  @Test
+  public void drop() {
+    // non-existing DB name
+    final String dbname = NAME + "DBCreate";
+
+    // drop existing DB
+    query(_DB_CREATE.args(dbname, "<dummy/>", "doc.xml"));
+    query(_DB_DROP.args(dbname));
+    query(_DB_EXISTS.args(dbname), "false");
+
+    // try to drop non-existing DB
+    error(_DB_DROP.args(dbname), Err.BXDB_OPEN);
+  }
+
+  /**
+   * Test method, using a mix of command and XQuery calls.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void createCommand() throws BaseXException {
+    final String dbname = NAME + "DBCreate";
+    query(_DB_CREATE.args(dbname));
+    new Open(dbname).execute(context);
+    error(_DB_CREATE.args(dbname), Err.BXDB_OPENED);
+    // close and try again
+    new Close().execute(context);
+    query(_DB_CREATE.args(dbname));
+    // eventually drop database
+    query(_DB_DROP.args(dbname));
   }
 
   /**

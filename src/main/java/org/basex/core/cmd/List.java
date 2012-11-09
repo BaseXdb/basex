@@ -75,7 +75,7 @@ public final class List extends Command {
     table.header.add(SIZE);
     if(create) table.header.add(INPUT_PATH);
 
-    for(final String name : context.databases().listDBs()) {
+    for(final String name : context.databases.listDBs()) {
       DataInput di = null;
       String file = null;
       long size = 0;

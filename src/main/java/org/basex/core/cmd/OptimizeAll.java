@@ -106,7 +106,6 @@ public final class OptimizeAll extends ACreate {
 
     // find unique temporary database name
     final String tname = ctx.mprop.random(m.name);
-    ctx.databases().add(tname);
 
     // adopt original meta data
     ctx.prop.set(Prop.CHOP, m.chop);

@@ -29,7 +29,7 @@ public final class DropDB extends ACreate {
     if(!MetaData.validName(args[0], true)) return error(NAME_INVALID_X, args[0]);
 
     // retrieve all databases; return true if no database is found (no error)
-    final StringList dbs = context.databases().listDBs(args[0]);
+    final StringList dbs = context.databases.listDBs(args[0]);
     if(dbs.size() == 0) return info(NO_DB_DROPPED, args[0]);
 
     // loop through all databases
@@ -60,7 +60,7 @@ public final class DropDB extends ACreate {
    */
   public static synchronized boolean drop(final String db, final Context ctx) {
     final IOFile dbpath = ctx.mprop.dbpath(db);
-    return dbpath.exists() && drop(dbpath) && ctx.databases().delete(db);
+    return dbpath.exists() && drop(dbpath);
   }
 
   /**

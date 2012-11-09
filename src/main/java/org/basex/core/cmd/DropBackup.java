@@ -30,7 +30,7 @@ public final class DropBackup extends Command {
     if(!MetaData.validName(name, true)) return error(NAME_INVALID_X, name);
 
     // retrieve all databases
-    final StringList dbs = context.databases().listDBs(name);
+    final StringList dbs = context.databases.listDBs(name);
     // loop through all databases and drop backups
     for(final String db : dbs) drop(db.contains("-") ? db : db + '-', context);
 
@@ -57,11 +57,7 @@ public final class DropBackup extends Command {
     int c = 0;
     for(final IOFile f : dir.children()) {
       final String n = f.name();
-      if(n.startsWith(db) && n.endsWith(IO.ZIPSUFFIX) && f.delete()) {
-        c++;
-        final int dl = db.length() - 1;
-        ctx.databases().delete(db.charAt(dl) == '-' ? db.substring(0, dl) : db, true);
-      }
+      if(n.startsWith(db) && n.endsWith(IO.ZIPSUFFIX) && f.delete()) c++;
     }
     return c;
   }

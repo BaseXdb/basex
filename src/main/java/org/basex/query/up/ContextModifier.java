@@ -19,6 +19,8 @@ public abstract class ContextModifier {
    * referenced during a snapshot. */
   private final Map<Data, DatabaseUpdates> pendingUpdates =
     new HashMap<Data, DatabaseUpdates>();
+  /** Holds DBCreate primitives which are not associated with a database. */
+  private final Map<String, DBCreate> dbCreates = new HashMap<String, DBCreate>();
 
   /**
    * Adds an update primitive to this context modifier.
@@ -36,6 +38,14 @@ public abstract class ContextModifier {
    * @throws QueryException query exception
    */
   final void add(final Operation p) throws QueryException {
+    if(p instanceof DBCreate) {
+      final DBCreate c = (DBCreate) p;
+      final DBCreate o = dbCreates.get(c.name);
+      if(o != null) o.merge(c);
+      dbCreates.put(c.name, c);
+      return;
+    }
+
     final Data data = p.getData();
     DatabaseUpdates dbp = pendingUpdates.get(data);
     if(dbp == null) {
@@ -50,9 +60,8 @@ public abstract class ContextModifier {
    * @param db databases
    */
   void databases(final StringList db) {
-    for(final DatabaseUpdates du : pendingUpdates.values()) {
-      db.add(du.data().meta.name);
-    }
+    for(final DatabaseUpdates du : pendingUpdates.values()) db.add(du.data().meta.name);
+    for(final DBCreate du : dbCreates.values()) db.add(du.name);
     db.sort(false, true).unique();
   }
 
@@ -64,7 +73,9 @@ public abstract class ContextModifier {
   final void apply() throws QueryException {
     // checked constraints
     final Collection<DatabaseUpdates> updates = pendingUpdates.values();
+    final Collection<DBCreate> creates = dbCreates.values();
     for(final DatabaseUpdates c : updates) c.check();
+    for(final DBCreate c : creates) c.prepare();
 
     int i = 0;
     try {
@@ -73,12 +84,8 @@ public abstract class ContextModifier {
         c.startUpdate();
         i++;
       }
-
       // apply updates
       for(final DatabaseUpdates c : updates) c.apply();
-
-    } catch(final QueryException ex) {
-      throw ex;
     } finally {
       // remove write locks and updating files
       for(final DatabaseUpdates c : updates) {
@@ -86,6 +93,8 @@ public abstract class ContextModifier {
         c.finishUpdate();
       }
     }
+    // create databases
+    for(final DBCreate c : creates) c.apply();
   }
 
   /**
@@ -95,6 +104,7 @@ public abstract class ContextModifier {
   final int size() {
     int s = 0;
     for(final DatabaseUpdates c : pendingUpdates.values()) s += c.size();
+    for(final DBCreate c : dbCreates.values()) s += c.size();
     return s;
   }
 }

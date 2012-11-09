@@ -43,7 +43,7 @@ public abstract class NodeCopy extends UpdatePrimitive {
    * @throws QueryException exception during preparation of data
    */
   @SuppressWarnings("unused")
-  public void prepare() throws QueryException {
+  public final void prepare() throws QueryException {
     // build main memory representation of nodes to be copied
     insseq = new MemData(data);
 
@@ -99,12 +99,12 @@ public abstract class NodeCopy extends UpdatePrimitive {
   }
 
   @Override
-  public int size() {
+  public final int size() {
     return size;
   }
 
   @Override
-  public String toString() {
+  public final String toString() {
     return Util.name(this) + '[' + getTargetNode() + ", " + size() + " ops]";
   }
 }

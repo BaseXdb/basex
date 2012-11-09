@@ -1,9 +1,12 @@
 package org.basex.test.server;
 
+import static org.junit.Assert.*;
+
 import java.io.*;
 import java.util.concurrent.*;
 
 import org.basex.*;
+import org.basex.core.cmd.*;
 import org.basex.server.*;
 import org.basex.test.*;
 import org.basex.util.*;
@@ -49,9 +52,11 @@ public final class AdminStressTest extends SandboxTest {
     final CountDownLatch start = new CountDownLatch(1);
     final CountDownLatch stop = new CountDownLatch(NUM);
 
+    final Client[] c1 = new Client[NUM];
+    final Client[] c2 = new Client[NUM];
     for(int i = 0; i < NUM; ++i) {
-      new Client("create event " + NAME + i, start, stop);
-      new Client("show events", start, stop);
+      c1[i] = new Client(new CreateEvent(NAME + i), start, stop);
+      c2[i] = new Client(new ShowEvents(), start, stop);
     }
     start.countDown(); // start all clients
     stop.await();
@@ -60,6 +65,9 @@ public final class AdminStressTest extends SandboxTest {
     final ClientSession cs = createClient();
     for(int i = 0; i < NUM; ++i) cs.execute("drop event " + NAME + i);
     cs.close();
+
+    for(final Client c : c1) if(c.error != null) fail(c.error);
+    for(final Client c : c2) if(c.error != null) fail(c.error);
   }
 
   /**
@@ -71,50 +79,10 @@ public final class AdminStressTest extends SandboxTest {
   public void createAndListSessions() throws Exception {
     final CountDownLatch start = new CountDownLatch(1);
     final CountDownLatch stop = new CountDownLatch(NUM);
-    for(int i = 0; i < NUM; ++i) new Client("show sessions", start, stop);
+    final Client[] clients = new Client[NUM];
+    for(int i = 0; i < NUM; ++i) clients[i] = new Client(new ShowSessions(), start, stop);
     start.countDown(); // start all clients
     stop.await();
-  }
-
-  /** Client. */
-  private static final class Client extends Thread {
-    /** Start signal. */
-    private final CountDownLatch startSignal;
-    /** Stop signal. */
-    private final CountDownLatch stopSignal;
-    /** Client session. */
-    private final ClientSession session;
-    /** Command string. */
-    private final String cmd;
-
-    /**
-     * Client constructor.
-     * @param c command string to execute
-     * @param start start signal
-     * @param stop stop signal
-     * @throws IOException I/O exception while establishing the session
-     */
-    public Client(final String c, final CountDownLatch start, final CountDownLatch stop)
-        throws IOException {
-
-      session = createClient();
-      cmd = c;
-      startSignal = start;
-      stopSignal = stop;
-      start();
-    }
-
-    @Override
-    public void run() {
-      try {
-        startSignal.await();
-        session.execute(cmd);
-        session.close();
-      } catch(final Exception ex) {
-        Util.stack(ex);
-      } finally {
-        stopSignal.countDown();
-      }
-    }
+    for(final Client c : clients) if(c.error != null) fail(c.error);
   }
 }

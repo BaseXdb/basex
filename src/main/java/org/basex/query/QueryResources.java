@@ -69,11 +69,11 @@ public final class QueryResources {
   }
 
   /**
-   * Closes the opened data references.
+   * Closes all opened data references that have not been added by the global context.
    */
   void close() {
-    for(int d = ctx.nodes != null ? 1 : 0; d < datas; ++d) {
-     Close.close(data[d], ctx.context);
+    for(int d = ctx.nodes != null ? 1 : 0; d < datas; d++) {
+      Close.close(data[d], ctx.context);
     }
     datas = 0;
   }
@@ -296,16 +296,31 @@ public final class QueryResources {
   }
 
   /**
-   * Adds a data reference to the global list.
+   * Adds a data reference.
    * @param d data reference to be added
    */
-  private void addData(final Data d) {
+  public void addData(final Data d) {
     if(datas == data.length) {
       final Data[] tmp = new Data[Array.newSize(datas)];
       System.arraycopy(data, 0, tmp, 0, datas);
       data = tmp;
     }
     data[datas++] = d;
+  }
+
+  /**
+   * Removes and closes a database if it has not been added by the global context.
+   * @param name name of database to be removed
+   */
+  public void removeData(final String name) {
+    for(int d = ctx.nodes != null ? 1 : 0; d < datas; d++) {
+      if(data[d].meta.name.equals(name)) {
+        Close.close(data[d], ctx.context);
+        Array.move(data, d + 1, -1, --datas - d);
+        data[datas] = null;
+        break;
+      }
+    }
   }
 
   /**
