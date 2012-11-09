@@ -125,8 +125,8 @@ final class XMLParser extends CmdParser {
       return new Kill(value(root, TARGET));
     if(e.equals(LIST) && check(root, NAME + "?", PATH + "?"))
       return new List(value(root, NAME), value(root, PATH));
-    if(e.equals(OPEN) && check(root, NAME, PATH + "?"))
-      return new Open(value(root, NAME), value(root, PATH));
+    if(e.equals(OPEN) && check(root, NAME))
+      return new Open(value(root, NAME));
     if(e.equals(OPTIMIZE) && check(root))
       return new Optimize();
     if(e.equals(OPTIMIZE_ALL) && check(root))

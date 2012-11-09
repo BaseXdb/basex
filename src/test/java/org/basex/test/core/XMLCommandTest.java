@@ -95,7 +95,6 @@ public class XMLCommandTest extends SandboxTest {
     ok("<list name='X' path='X'/>");
 
     ok("<open name='X'/>");
-    ok("<open name='X' path='X'/>");
 
     ok("<optimize/>");
 

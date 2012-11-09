@@ -21,16 +21,7 @@ public final class Open extends Command {
    * @param name name of database
    */
   public Open(final String name) {
-    this(name, null);
-  }
-
-  /**
-   * Default constructor.
-   * @param name name of database
-   * @param path database path
-   */
-  public Open(final String name, final String path) {
-    super(Perm.NONE, name, path);
+    super(Perm.NONE, name);
   }
 
   @Override
@@ -39,12 +30,11 @@ public final class Open extends Command {
     new Close().run(context);
 
     final String db = args[0];
-    final String path = args[1];
     if(!MetaData.validName(db, false)) return error(NAME_INVALID_X, db);
 
     try {
       final Data data = open(db, context);
-      context.openDB(data, path);
+      context.openDB(data);
       if(data.meta.oldindex()) info(H_INDEX_FORMAT);
       if(data.meta.corrupt)  info(DB_CORRUPT);
       return info(DB_OPENED_X, db, perf);

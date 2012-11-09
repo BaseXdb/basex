@@ -54,8 +54,6 @@ public final class Context {
   /** Focused node. */
   public int focused = -1;
 
-  /** Path to the documents in the database. */
-  private String docpath;
   /** Node context. */
   private Nodes current;
   /** Process locking. */
@@ -150,9 +148,8 @@ public final class Context {
   public Nodes current() {
     if(current == null && data != null) {
       final Resources res = data.resources;
-      current = new Nodes((docpath == null ? res.docs() :
-        res.docs(docpath)).toArray(), data);
-      current.root = docpath == null;
+      current = new Nodes(res.docs().toArray(), data);
+      current.root = true;
     }
     return current;
   }
@@ -170,18 +167,7 @@ public final class Context {
    * @param d data reference
    */
   public void openDB(final Data d) {
-    openDB(d, null);
-  }
-
-  /**
-   * Sets the specified data instance as current database and restricts
-   * the context nodes to the given path.
-   * @param d data reference
-   * @param p database path
-   */
-  public void openDB(final Data d, final String p) {
     data = d;
-    docpath = p;
     copied = null;
     set(null, new Nodes(d));
   }
