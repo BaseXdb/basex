@@ -148,7 +148,7 @@ public final class Functions extends TokenSet {
     // pre-defined functions
     final StandardFunc fun = Functions.get().get(name, args, ii);
     if(fun != null) {
-      if(!ctx.sc.xquery3 && fun.xquery3()) FEATURE30.thrw(ii);
+      if(!ctx.sc.xquery3() && fun.xquery3()) FEATURE30.thrw(ii);
       for(final Function f : Function.UPDATING) {
         if(fun.sig == f) {
           ctx.updating(true);

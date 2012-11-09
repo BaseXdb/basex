@@ -270,7 +270,7 @@ public class QueryParser extends InputParser {
       else error(XQUERYVER, ver);
     }
     // parse xquery encoding (ignored, as input always comes in as string)
-    if((version || ctx.sc.xquery3) && wsConsumeWs(ENCODING)) {
+    if((version || ctx.sc.xquery3()) && wsConsumeWs(ENCODING)) {
       final String enc = string(stringLiteral());
       if(!supported(enc)) error(XQUERYENC2, enc);
     } else if(!version) {
@@ -331,7 +331,7 @@ public class QueryParser extends InputParser {
       if(wsConsumeWs(DECLARE)) {
         if(wsConsumeWs(DEFAULT)) {
           if(!defaultNamespaceDecl() && !defaultCollationDecl() &&
-             !emptyOrderDecl() && !(ctx.sc.xquery3 && decimalFormatDecl(true)))
+             !emptyOrderDecl() && !(ctx.sc.xquery3() && decimalFormatDecl(true)))
             error(DECLINCOMPLETE);
         } else if(wsConsumeWs(BOUNDARY_SPACE)) {
           boundarySpaceDecl();
@@ -345,7 +345,7 @@ public class QueryParser extends InputParser {
           revalidationDecl();
         } else if(wsConsumeWs(COPY_NAMESPACES)) {
           copyNamespacesDecl();
-        } else if(ctx.sc.xquery3 && wsConsumeWs(DECIMAL_FORMAT)) {
+        } else if(ctx.sc.xquery3() && wsConsumeWs(DECIMAL_FORMAT)) {
           decimalFormatDecl(false);
         } else if(wsConsumeWs(NSPACE)) {
           namespaceDecl();
@@ -383,7 +383,7 @@ public class QueryParser extends InputParser {
       final int i = ip;
       if(!wsConsumeWs(DECLARE)) return;
 
-      if(ctx.sc.xquery3 && wsConsumeWs(CONTEXT)) {
+      if(ctx.sc.xquery3() && wsConsumeWs(CONTEXT)) {
         contextItemDecl();
       } else if(wsConsumeWs(OPTION)) {
         optionDecl();
@@ -394,7 +394,7 @@ public class QueryParser extends InputParser {
         while(true) {
           if(wsConsumeWs(UPDATING)) {
             addAnnotation(ann, Ann.Q_UPDATING, Empty.SEQ, false);
-          } else if(ctx.sc.xquery3 && consume('%')) {
+          } else if(ctx.sc.xquery3() && consume('%')) {
             annotation(ann, true);
           } else {
             break;
@@ -544,7 +544,7 @@ public class QueryParser extends InputParser {
     final QNm name = eQName(QNAMEINV, URICHECK);
     final byte[] val = stringLiteral();
 
-    if(ctx.sc.xquery3 && eq(name.prefix(), OUTPUT)) {
+    if(ctx.sc.xquery3() && eq(name.prefix(), OUTPUT)) {
       // output declaration
       final String key = string(name.local());
       if(module != null) error(MODOUT);
@@ -777,9 +777,7 @@ public class QueryParser extends InputParser {
     }
 
     final StaticContext sc = ctx.sc;
-    ctx.sc = new StaticContext();
-    ctx.sc.baseURI(io.path());
-    ctx.sc.xquery3 = sc.xquery3;
+    ctx.sc = new StaticContext(io.path(), sc.xquery3());
     new QueryParser(qu, ctx).parse(uri);
     ctx.sc = sc;
   }
@@ -820,7 +818,7 @@ public class QueryParser extends InputParser {
       // bind value with new type
       if(old != null && v.type != null) old.reset(v.type, ctx);
       // bind default value
-      if(ctx.sc.xquery3 && wsConsumeWs(ASSIGN)) {
+      if(ctx.sc.xquery3() && wsConsumeWs(ASSIGN)) {
         v.bind(check(single(), NOVARDECL), ctx);
       }
     } else {
@@ -1024,7 +1022,7 @@ public class QueryParser extends InputParser {
     }
 
     Group group = null;
-    if(ctx.sc.xquery3 && wsConsumeWs(GROUP)) {
+    if(ctx.sc.xquery3() && wsConsumeWs(GROUP)) {
       wsCheck(BY);
       ap = ip;
       GroupSpec[] grp = null;
@@ -1243,7 +1241,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr switchh() throws QueryException {
-    if(!ctx.sc.xquery3 || !wsConsumeWs(SWITCH, PAR1, TYPEPAR)) return null;
+    if(!ctx.sc.xquery3() || !wsConsumeWs(SWITCH, PAR1, TYPEPAR)) return null;
     wsCheck(PAR1);
     final Expr expr = check(expr(), NOSWITCH);
     SwitchCase[] exprs = { };
@@ -1842,7 +1840,7 @@ public class QueryParser extends InputParser {
       return new NameTest(new QNm(ncName(QNAMEINV)), NameTest.Mode.NAME, att);
     }
 
-    if(ctx.sc.xquery3 && consume(EQNAME)) {
+    if(ctx.sc.xquery3() && consume(EQNAME)) {
       // name test: Q{...}*
       final byte[] uri = bracedURILiteral();
       if(consume('*')) {
@@ -1946,7 +1944,7 @@ public class QueryParser extends InputParser {
     // direct constructor
     if(c == '<') return constructor();
     // function item
-    if(ctx.sc.xquery3) {
+    if(ctx.sc.xquery3()) {
       final Expr e = functionItem();
       if(e != null) return e;
     }
@@ -2004,7 +2002,7 @@ public class QueryParser extends InputParser {
     final int pos = ip;
 
     // parse annotations
-    final Ann ann = ctx.sc.xquery3 && curr('%') ? annotations() : null;
+    final Ann ann = ctx.sc.xquery3() && curr('%') ? annotations() : null;
     // inline function
     if(wsConsume(FUNCTION) && wsConsume(PAR1)) {
       final int s = ctx.vars.size();
@@ -2581,7 +2579,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compNamespace() throws QueryException {
-    if(!ctx.sc.xquery3) return null;
+    if(!ctx.sc.xquery3()) return null;
     skipWS();
 
     Expr name;
@@ -2704,7 +2702,7 @@ public class QueryParser extends InputParser {
     }
 
     // parse optional annotation and type name
-    final Ann ann = ctx.sc.xquery3 && curr('%') ? annotations() : null;
+    final Ann ann = ctx.sc.xquery3() && curr('%') ? annotations() : null;
     final QNm name = eQName(TYPEINVALID, null);
     skipWS();
     // check if name is followed by parentheses
@@ -2899,7 +2897,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr tryCatch() throws QueryException {
-    if(!ctx.sc.xquery3 || !wsConsumeWs(TRY)) return null;
+    if(!ctx.sc.xquery3() || !wsConsumeWs(TRY)) return null;
 
     final Expr tr = enclosed(NOENCLEXPR);
     wsCheck(CATCH);
@@ -3436,7 +3434,7 @@ public class QueryParser extends InputParser {
    */
   private QNm eQName(final Err err, final byte[] def) throws QueryException {
     final int i = ip;
-    if(ctx.sc.xquery3 && consume(EQNAME)) {
+    if(ctx.sc.xquery3() && consume(EQNAME)) {
       final byte[] uri = bracedURILiteral();
       final byte[] name = ncName(null);
       if(name.length != 0) {

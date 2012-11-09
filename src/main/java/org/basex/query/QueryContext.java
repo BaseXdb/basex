@@ -44,7 +44,7 @@ public final class QueryContext extends Progress {
       Pattern.compile("^((\"|')(.*?)\\2:|(\\{(.*?)\\}))(.+)$");
 
   /** Static context of an expression. */
-  public StaticContext sc = new StaticContext();
+  public StaticContext sc;
   /** Variables. */
   public final VarContext vars = new VarContext();
   /** Functions. */
@@ -150,10 +150,9 @@ public final class QueryContext extends Progress {
     nodes = ctx.current();
     inf = ctx.prop.is(Prop.QUERYINFO) || Prop.debug;
     final String path = ctx.prop.get(Prop.QUERYPATH);
-    if(!path.isEmpty()) sc.baseURI(path);
+    sc = new StaticContext(path, ctx.prop.is(Prop.XQUERY3));
     maxCalls = ctx.prop.num(Prop.TAILCALLS);
     modules = new ModuleLoader(ctx);
-    sc.xquery3 = ctx.prop.is(Prop.XQUERY3);
   }
 
   /**
