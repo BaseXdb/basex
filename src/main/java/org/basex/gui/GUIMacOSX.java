@@ -114,13 +114,15 @@ public final class GUIMacOSX {
        * The argument is an instance of the 'ApplicationEvent' class
        * (@see com.apple.eawt.ApplicationEvent)
        */
+      Object result;
       try {
-        GUIMacOSX.invoke(this, method.getName(), Object.class, obj);
+        result = GUIMacOSX.invoke(this, method.getName(), Object.class, obj);
       } catch(final NoSuchMethodException ex) {
-        GUIMacOSX.invoke(this, method.getName());
+        result = GUIMacOSX.invoke(this, method.getName());
       }
-      // mark the current event as 'handled'
-      GUIMacOSX.invoke(obj, "setHandled", true);
+      // mark the current event as 'handled' if handler doesn't return a false boolean
+      GUIMacOSX.invoke(obj, "setHandled",
+          null != result && Boolean.class.isInstance(result) ? (Boolean) result : true);
       return null;
     }
 
@@ -158,10 +160,20 @@ public final class GUIMacOSX {
      */
     public void handlePrintFile()  { /* NOT IMPLEMENTED */ }
 
-    /** Called when the application is sent the Quit event. */
-    public void handleQuit() {
+    /**
+     * Called when the application is sent the Quit event.
+     *
+     * Unlike other handles, quit mustn't set {@code setHandled} or OS X will quit the
+     * application.
+     *
+     * @see com.apple.eawt.ApplicationListener#handleQuit
+     * @return always false
+     */
+    @SuppressWarnings({ "javadoc", "restriction"}) // ApplicationListener is deprecated
+    public boolean handleQuit() {
       // explicit cast to circumvent Java compiler bug
       ((GUICommand) GUICommands.C_EXIT).execute(main);
+      return false;
     }
 
     /**
