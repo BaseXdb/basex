@@ -169,7 +169,7 @@ public final class GUIMacOSX {
      * @see com.apple.eawt.ApplicationListener#handleQuit
      * @return always false
      */
-    @SuppressWarnings({ "javadoc", "restriction"}) // ApplicationListener is deprecated
+    @SuppressWarnings({ "all" }) // ApplicationListener is deprecated
     public boolean handleQuit() {
       // explicit cast to circumvent Java compiler bug
       ((GUICommand) GUICommands.C_EXIT).execute(main);
