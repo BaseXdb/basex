@@ -61,7 +61,6 @@ public final class Copy extends Command {
     // return false if source cannot be opened, or target cannot be created
     final StringList files = src.descendants();
     tf = files.size();
-    boolean ok = true;
     try {
       for(final String file : files) {
         if(Databases.FILES.matcher(file).matches()) {
@@ -69,14 +68,13 @@ public final class Copy extends Command {
         }
         of++;
       }
+      return true;
     } catch(final IOException ex) {
+      // drop new database if error occurred
       Util.debug(ex);
-      ok = false;
+      DropDB.drop(target, context);
+      return false;
     }
-    // drop new database if error occurred
-    if(!ok) DropDB.drop(target, context);
-    else context.databases().add(target);
-    return ok;
   }
 
   @Override

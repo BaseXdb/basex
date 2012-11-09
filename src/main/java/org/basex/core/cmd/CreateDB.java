@@ -93,7 +93,6 @@ public final class CreateDB extends ACreate {
 
         // create disk-based instance
         progress(new DiskBuilder(name, parser, context)).build().close();
-        context.databases().add(name);
 
         // second step: open database and create index structures
         final Open open = new Open(name);
@@ -170,7 +169,6 @@ public final class CreateDB extends ACreate {
     } finally {
       builder.close();
     }
-    ctx.databases().add(name);
     return Open.open(name, ctx);
   }
 

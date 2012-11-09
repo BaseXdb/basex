@@ -237,7 +237,7 @@ public final class FNDb extends StandardFunc {
     final TokenList tl = new TokenList();
     final int el = expr.length;
     if(el == 0) {
-      for(final String s : ctx.context.databases().listDBs()) tl.add(s);
+      for(final String s : ctx.context.databases.listDBs()) tl.add(s);
     } else {
       final Data data = data(0, ctx);
       final String path = string(el == 1 ? Token.EMPTY : checkStr(expr[1], ctx));
@@ -345,7 +345,7 @@ public final class FNDb extends StandardFunc {
    * @return iterator
    */
   private Iter listDBs(final QueryContext ctx) {
-    final StringList sl = ctx.context.databases().listDBs();
+    final StringList sl = ctx.context.databases.listDBs();
     return new Iter() {
       int pos;
       @Override

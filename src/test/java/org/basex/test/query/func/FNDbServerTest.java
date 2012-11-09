@@ -20,6 +20,8 @@ import org.junit.*;
  * @author Christian Gruen
  */
 public final class FNDbServerTest extends AdvancedQueryTest {
+  /** Number of clients. */
+  private static final int NUM = 1;
   /** Test file. */
   private static final String FILE = "src/test/resources/input.xml";
   /** Server reference. */
@@ -75,7 +77,9 @@ public final class FNDbServerTest extends AdvancedQueryTest {
   public void concurrentClients() throws IOException, InterruptedException {
     final ClientSession check = createClient();
 
-    // same DB name
+    // same DB name, which is 2 x NUM times
+    runTwoClients(new XQuery(_DB_CREATE.args(NAME)));
+    Assert.assertEquals("true", check.execute(new XQuery(_DB_EXISTS.args(NAME))));
     runTwoClients(new XQuery(_DB_CREATE.args(NAME)));
     Assert.assertEquals("true", check.execute(new XQuery(_DB_EXISTS.args(NAME))));
 
@@ -83,11 +87,17 @@ public final class FNDbServerTest extends AdvancedQueryTest {
     runTwoClients(new XQuery(_DB_CREATE.args(NAME, FILE, "in/")));
     Assert.assertEquals("true", check.execute(new XQuery(_DB_EXISTS.args(NAME))));
 
-    // create, run query, drop
+    // drop, create
     runTwoClients(new XQuery(
-      _DB_CREATE.args(NAME, FILE, "in/") +
-      ",insert node <dummy/> into " + _DB_OPEN.args(NAME) + "," +
-      _DB_DROP.args(NAME)));
+      _DB_DROP.args(NAME) + "," +
+      _DB_CREATE.args(NAME, FILE, "in/")
+    ));
+
+    // add, drop, create
+    runTwoClients(new XQuery(
+      _DB_ADD.args(NAME, "<X/>", "x.xml") + "," +
+      _DB_DROP.args(NAME) + "," +
+      _DB_CREATE.args(NAME, FILE)));
 
     check.execute(new DropDB(NAME));
   }
@@ -101,17 +111,14 @@ public final class FNDbServerTest extends AdvancedQueryTest {
   private void runTwoClients(final Command cmd)
       throws IOException, InterruptedException {
 
-    final int n = 2;
     final CountDownLatch start = new CountDownLatch(1);
-    final CountDownLatch stop = new CountDownLatch(n);
-    final Client[] clients = new Client[n];
-    for(int i = 0; i < n; i++) {
+    final CountDownLatch stop = new CountDownLatch(NUM);
+    final Client[] clients = new Client[NUM];
+    for(int i = 0; i < NUM; i++) {
       clients[i] = new Client(cmd, start, stop);
     }
     start.countDown();
     stop.await();
-    for(final Client c : clients) {
-      if(c.error != null) fail(c.error);
-    }
+    for(final Client c : clients) if(c.error != null) fail(c.error);
   }
 }

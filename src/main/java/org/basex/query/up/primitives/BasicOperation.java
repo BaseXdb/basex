@@ -181,8 +181,9 @@ public abstract class BasicOperation implements Comparable<BasicOperation>, Oper
       // adopt name from document node
       name = nd.baseURI();
       final Data d = node.data();
-      // adopt path if node is part of database. otherwise, only adopt file name
-      int i = d == null || d.inMemory() ? lastIndexOf(name, '/') : indexOf(name, '/');
+      // adopt path if node is part of disk database. otherwise, only adopt file name
+      final int i = d == null || d.inMemory() ? lastIndexOf(name, '/') :
+        indexOf(name, '/');
       if(i != -1) name = substring(name, i + 1);
       if(name.length == 0) RESINV.thrw(info, name);
     }

@@ -51,7 +51,7 @@ public final class Restore extends Command {
     if(context.pinned(db)) return error(DB_PINNED_X, db);
 
     // try to restore database
-    return restore(file, db) && (!closed || new Open(db).run(context)) ?
+    return restore(file) && (!closed || new Open(db).run(context)) ?
         info(DB_RESTORED_X, file.name(), perf) : error(DB_NOT_RESTORED_X, db);
   }
 
@@ -64,13 +64,11 @@ public final class Restore extends Command {
   /**
    * Restores the specified database.
    * @param file file
-   * @param db name of the database
    * @return success flag
    */
-  private boolean restore(final IOFile file, final String db) {
+  private boolean restore(final IOFile file) {
     try {
       progress(new Zip(file)).unzip(mprop.dbpath());
-      context.databases().add(db);
       return true;
     } catch(final IOException ex) {
       Util.debug(ex);

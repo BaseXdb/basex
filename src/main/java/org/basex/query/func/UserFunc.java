@@ -189,7 +189,7 @@ public class UserFunc extends Single {
 
   @Override
   public final boolean isVacuous() {
-    return !uses(Use.UPD) && (ret != null && ret.eq(SeqType.EMP));
+    return !uses(Use.UPD) && ret != null && ret.eq(SeqType.EMP);
   }
 
   @Override

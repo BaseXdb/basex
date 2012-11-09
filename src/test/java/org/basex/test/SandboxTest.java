@@ -159,7 +159,6 @@ public abstract class SandboxTest {
         session.execute(cmd);
         session.close();
       } catch(final Throwable ex) {
-        Util.stack(ex);
         error = "\n" + cmd + "\n" + ex;
       } finally {
         stopSignal.countDown();

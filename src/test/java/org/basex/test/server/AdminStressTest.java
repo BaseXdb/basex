@@ -1,5 +1,7 @@
 package org.basex.test.server;
 
+import static org.junit.Assert.*;
+
 import java.io.*;
 import java.util.concurrent.*;
 
@@ -50,9 +52,11 @@ public final class AdminStressTest extends SandboxTest {
     final CountDownLatch start = new CountDownLatch(1);
     final CountDownLatch stop = new CountDownLatch(NUM);
 
+    final Client[] c1 = new Client[NUM];
+    final Client[] c2 = new Client[NUM];
     for(int i = 0; i < NUM; ++i) {
-      new Client(new CreateEvent(NAME + i), start, stop);
-      new Client(new ShowEvents(), start, stop);
+      c1[i] = new Client(new CreateEvent(NAME + i), start, stop);
+      c2[i] = new Client(new ShowEvents(), start, stop);
     }
     start.countDown(); // start all clients
     stop.await();
@@ -61,6 +65,9 @@ public final class AdminStressTest extends SandboxTest {
     final ClientSession cs = createClient();
     for(int i = 0; i < NUM; ++i) cs.execute("drop event " + NAME + i);
     cs.close();
+
+    for(final Client c : c1) if(c.error != null) fail(c.error);
+    for(final Client c : c2) if(c.error != null) fail(c.error);
   }
 
   /**
@@ -72,8 +79,10 @@ public final class AdminStressTest extends SandboxTest {
   public void createAndListSessions() throws Exception {
     final CountDownLatch start = new CountDownLatch(1);
     final CountDownLatch stop = new CountDownLatch(NUM);
-    for(int i = 0; i < NUM; ++i) new Client(new ShowSessions(), start, stop);
+    final Client[] clients = new Client[NUM];
+    for(int i = 0; i < NUM; ++i) clients[i] = new Client(new ShowSessions(), start, stop);
     start.countDown(); // start all clients
     stop.await();
+    for(final Client c : clients) if(c.error != null) fail(c.error);
   }
 }

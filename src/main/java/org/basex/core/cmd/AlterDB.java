@@ -65,12 +65,7 @@ public final class AlterDB extends ACreate {
    */
   public static synchronized boolean alter(final String source, final String target,
       final Context ctx) {
-
-    if(ctx.mprop.dbpath(source).rename(ctx.mprop.dbpath(target))) {
-      ctx.databases().alter(source, target);
-      return true;
-    }
-    return false;
+    return ctx.mprop.dbpath(source).rename(ctx.mprop.dbpath(target));
   }
 
   @Override

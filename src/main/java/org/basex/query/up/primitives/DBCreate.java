@@ -41,7 +41,7 @@ public final class DBCreate extends BasicOperation {
   /** Documents to add. */
   private Item docs;
   /** Path to which initial document(s) will be added. */
-  private byte[] path;
+  private final byte[] path;
   /** Insertion sequence. */
   private Data md;
   /** Query context. */
@@ -94,7 +94,7 @@ public final class DBCreate extends BasicOperation {
 
     try {
       data = CreateDB.create(name, Parser.emptyParser(ctx.context.prop), ctx.context);
-    } catch(IOException ex) {
+    } catch(final IOException ex) {
       UPDBOPTERR.thrw(info, ex);
     }
     ctx.resource.addData(data);

@@ -38,6 +38,8 @@ public final class Context {
   public final Users users;
   /** Package repository. */
   public final Repo repo;
+  /** Databases list. */
+  public final Databases databases;
 
   /** User reference. */
   public User user;
@@ -60,18 +62,16 @@ public final class Context {
   private final ILocking locks;
   /** Data reference. */
   private Data data;
-  /** Databases list. */
-  private Databases databases;
 
   /**
-   * Default constructor, which is only called once in a project.
+   * Default constructor, which is usually called once in the lifetime of a project.
    */
   public Context() {
     this(true);
   }
 
   /**
-   * Default constructor, which is only called once in a project.
+   * Default constructor, which is usually called once in the lifetime of a project.
    * @param file retrieve properties from disk
    */
   public Context(final boolean file) {
@@ -85,17 +85,17 @@ public final class Context {
    * @param cl client listener
    */
   public Context(final Context ctx, final ClientListener cl) {
+    listener = cl;
     mprop = ctx.mprop;
     datas = ctx.datas;
     events = ctx.events;
     sessions = ctx.sessions;
+    databases = ctx.databases;
     blocker = ctx.blocker;
     locks = ctx.locks;
     users = ctx.users;
     repo = ctx.repo;
-    databases = ctx.databases;
     log = ctx.log;
-    listener = cl;
   }
 
   /**
@@ -108,12 +108,12 @@ public final class Context {
     events = new Events();
     sessions = new Sessions();
     blocker = new ClientBlocker();
+    databases = new Databases(this);
     locks = mp.is(MainProp.DBLOCKING) ? new DBLocking(mp) : new ProcessLocking(this);
     users = new Users(true);
     repo = new Repo(this);
     log = new Log(this);
     user = users.get(ADMIN);
-    databases = databases();
     listener = null;
   }
 
@@ -124,14 +124,6 @@ public final class Context {
     while(!sessions.isEmpty()) sessions.get(0).quit();
     datas.close();
     log.close();
-  }
-
-  /**
-   * Returns {@code true} if the current context belongs to a client user.
-   * @return result of check
-   */
-  public boolean client() {
-    return listener != null;
   }
 
   /**
@@ -316,15 +308,5 @@ public final class Context {
     final User us = md == null || p == Perm.CREATE || p == Perm.ADMIN ? null :
       md.users.get(user.name);
     return (us == null ? user : us).has(p);
-  }
-
-  /**
-   * Returns a reference to currently available databases.
-   * @return available databases
-   */
-  public Databases databases() {
-    if(databases == null || !databases.dbpath.eq(mprop.dbpath()))
-      databases = new Databases(this);
-    return databases;
   }
 }
