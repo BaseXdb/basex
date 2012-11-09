@@ -66,14 +66,6 @@ public final class Datas {
   }
 
   /**
-   * Returns the number of opened databases.
-   * @return number of databases
-   */
-  public synchronized int size() {
-    return list.size();
-  }
-
-  /**
    * Closes all data references.
    */
   synchronized void close() {

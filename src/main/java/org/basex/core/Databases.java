@@ -17,7 +17,7 @@ public final class Databases {
   /** Pattern to exclude locking files from database transfer operations. */
   public static final Pattern FILES = Pattern.compile(".{3,5}" + IO.BASEXSUFFIX);
   /** Pattern to extract the database name from a backup file name. */
-  public static final Pattern ZIPPATTERN =
+  private static final Pattern ZIPPATTERN =
       Pattern.compile(DateTime.PATTERN + IO.ZIPSUFFIX + '$');
   /** Regex indicator. */
   private static final Pattern REGEX = Pattern.compile(".*[*?,].*");
