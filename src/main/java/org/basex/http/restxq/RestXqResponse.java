@@ -113,14 +113,14 @@ final class RestXqResponse {
         if(RESTXQ_REDIRECT.eq(node)) {
           final ANode ch = node.children().next();
           if(ch == null || ch.type != NodeType.TXT) function.error(NO_VALUE, node.name());
-          redirect = string(ch.string());
+          redirect = string(trim(ch.string()));
           return;
         }
         // server-side forwarding
         if(RESTXQ_FORWARD.eq(node)) {
           final ANode ch = node.children().next();
           if(ch == null || ch.type != NodeType.TXT) function.error(NO_VALUE, node.name());
-          forward = string(ch.string());
+          forward = string(trim(ch.string()));
           return;
         }
         if(RESTXQ_RESPONSE.eq(node)) {
