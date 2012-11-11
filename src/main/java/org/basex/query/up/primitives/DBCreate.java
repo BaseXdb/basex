@@ -103,7 +103,12 @@ public final class DBCreate extends BasicOperation {
     if(md != null) {
       if(!data.startUpdate()) BXDB_OPENED.thrw(null, data.meta.name);
       data.insert(data.meta.size, -1, md);
-      data.finishUpdate();
+      try {
+        Optimize.optimize(data, null);
+      } catch(final IOException ex) {
+        data.finishUpdate();
+        UPDBOPTERR.thrw(info, ex);
+      }
     }
   }
 
