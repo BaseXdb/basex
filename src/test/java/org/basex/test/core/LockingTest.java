@@ -281,7 +281,9 @@ public final class LockingTest extends SandboxTest {
     }
 
     /**
-     * Release all locks tester owns.
+     * Release all locks tester owns. [@code release} gets called by other threads, so it
+     * cannot release locks directly (the thread holding the lock must do this). Set flag
+     * in object that lock should be released and wake up all threads.
      */
     public synchronized void release() {
       requestRelease = true;
