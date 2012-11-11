@@ -2,7 +2,6 @@ package org.basex.gui.view.tree;
 
 import java.awt.*;
 
-import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.view.*;
@@ -16,32 +15,39 @@ import org.basex.gui.view.*;
 final class TreeRects implements TreeConstants {
   /** Saved rectangles. */
   private TreeRect[][][] rects;
+  /** View. */
+  View view;
+  /** Displayed nods. */
+  Nodes nodes;
+
+  /**
+   * Constructor.
+   * @param v view
+   */
+  TreeRects(final View v) {
+    view = v;
+  }
 
   /**
    * Create new rectangles and set subtree borders.
    * @param sub subtree
    * @param g graphics reference
-   * @param c context
    * @param ds draw start
    * @param dw draw width
    * @param slim slim to text
    * @return tree distance
    */
-  double generateRects(final TreeSubtree sub, final Graphics g,
-      final Context c, final int ds, final int dw, final boolean slim) {
-    final int[] roots = c.current().pres;
+  double generateRects(final TreeSubtree sub, final Graphics g, final int ds,
+      final int dw, final boolean slim) {
+
+    final int[] roots = nodes.pres;
     final int rl = roots.length;
     if(rl == 0) return 0;
     final double w = (dw - BORDER_PADDING - ds) / (double) rl;
-    if(w < 2) {
-      return -1;
-    }
+    if(w < 2) return -1;
 
     rects = new TreeRect[rl][][];
-
-    for(int i = 0; i < rl; ++i) {
-      generateRects(sub, c, g, i, ds, w, slim);
-    }
+    for(int i = 0; i < rl; ++i) generateRects(sub, g, i, ds, w, slim);
     return w;
   }
 
@@ -49,16 +55,14 @@ final class TreeRects implements TreeConstants {
    * Generates cached rectangles.
    *
    * @param sub subtree
-   * @param c context
    * @param g graphics reference
    * @param rn root number
    * @param ds draw start
    * @param dw draw width
    * @param slim slim to text
    */
-  private void generateRects(final TreeSubtree sub, final Context c,
-      final Graphics g, final int rn, final int ds, final double dw,
-      final boolean slim) {
+  private void generateRects(final TreeSubtree sub, final Graphics g, final int rn,
+      final int ds, final double dw, final boolean slim) {
 
     final int h = sub.subtreeHeight(rn);
     rects[rn] = new TreeRect[h][];
@@ -68,7 +72,7 @@ final class TreeRects implements TreeConstants {
       if(w < 2) {
         bigRectangle(rn, lv, ds, dw);
       } else {
-        normalRectangle(sub, c, g, rn, lv, ds, w, slim);
+        normalRectangle(sub, g, rn, lv, ds, w, slim);
       }
     }
   }
@@ -93,14 +97,12 @@ final class TreeRects implements TreeConstants {
    * @param g graphics reference
    * @param rn root
    * @param lv level
-   * @param c context
    * @param ds draw start
    * @param w width
    * @param slim slim to text
    */
-  private void normalRectangle(final TreeSubtree sub, final Context c,
-      final Graphics g, final int rn, final int lv, final int ds,
-      final double w, final boolean slim) {
+  private void normalRectangle(final TreeSubtree sub, final Graphics g, final int rn,
+      final int lv, final int ds, final double w, final boolean slim) {
 
     final int subSi = sub.levelSize(rn, lv);
     // new array, to be filled with the rectangles of the current level
@@ -113,7 +115,7 @@ final class TreeRects implements TreeConstants {
 
       if(slim) {
         final double boxMiddle = xx + ww / 2f;
-        final byte[] b = getText(c, rn, sub.prePerIndex(rn, lv, i));
+        final byte[] b = getText(sub.prePerIndex(rn, lv, i));
         int o = calcOptimalRectWidth(g, b) + 10;
         if(o < MIN_TXT_SPACE) o = MIN_TXT_SPACE;
         if(w > o) {
@@ -151,15 +153,11 @@ final class TreeRects implements TreeConstants {
 
   /**
    * Returns node text.
-   * @param c context
-   * @param rn root
    * @param pre pre
    * @return text
    */
-  static byte[] getText(final Context c, final int rn, final int pre) {
-    final Data d = c.data();
-    if(pre == c.current().pres[rn]) return ViewData.path(d, pre);
-    return ViewData.content(d, pre, false);
+  byte[] getText(final int pre) {
+    return ViewData.name(view.gui.gprop, nodes.data, pre);
   }
 
   /**
@@ -211,7 +209,6 @@ final class TreeRects implements TreeConstants {
       final int pre) {
 
     final int i = sub.searchPreArrayPos(rn, lv, pre);
-    return i < 0 ? null : bigRect(sub, rn, lv) ? rects[rn][lv][0]
-        : rects[rn][lv][i];
+    return i < 0 ? null : bigRect(sub, rn, lv) ? rects[rn][lv][0] : rects[rn][lv][i];
   }
 }

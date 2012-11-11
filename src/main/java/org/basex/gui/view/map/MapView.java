@@ -362,7 +362,7 @@ public final class MapView extends View implements Runnable {
       g.setFont(font);
       smooth(g);
       if(data.kind(f.pre) == Data.ELEM) {
-        String tt = Token.string(ViewData.tag(gprop, data, f.pre));
+        String tt = Token.string(ViewData.name(gprop, data, f.pre));
         if(tt.length() > 32) tt = tt.substring(0, 30) + DOTS;
         BaseXLayout.drawTooltip(g, tt, x, y, getWidth(), f.level + 5);
       }

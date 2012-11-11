@@ -96,20 +96,19 @@ public final class Nodes implements Result {
   }
 
   /**
-   * Checks if the node set contains all root nodes of the data instance,
-   * and sets the {@link #root} flag.
+   * Checks if the node set contains all root nodes of the data instance.
+   * If yes, returns {@code null}.
    * @return self reference
    */
   public Nodes checkRoot() {
     final IntList docs = data.resources.docs();
-    if(pres.length != docs.size()) {
-      root = false;
-    } else {
-      int c = -1;
-      while(++c < pres.length && pres[c] == docs.get(c));
-      root = c == pres.length;
-    }
-    return this;
+    final int[] ps = pres;
+    final int pl = ps.length;
+    if(pl != docs.size()) return this;
+
+    int c = -1;
+    while(++c < pl && ps[c] == docs.get(c));
+    return c < pl ? this : null;
   }
 
   /**

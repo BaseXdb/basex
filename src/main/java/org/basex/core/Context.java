@@ -3,7 +3,6 @@ package org.basex.core;
 import static org.basex.core.Text.*;
 
 import org.basex.data.*;
-import org.basex.index.resource.*;
 import org.basex.io.random.*;
 import org.basex.query.util.pkg.*;
 import org.basex.server.*;
@@ -54,7 +53,7 @@ public final class Context {
   /** Focused node. */
   public int focused = -1;
 
-  /** Node context. */
+  /** Node context. Set if it does not contain all documents of the current database. */
   private Nodes current;
   /** Process locking. */
   private final ILocking locks;
@@ -125,11 +124,12 @@ public final class Context {
   }
 
   /**
-   * Returns {@code true} if the current node set contains all documents.
+   * Returns {@code true} if a data reference exists and if the current node set contains
+   * all documents.
    * @return result of check
    */
   public boolean root() {
-    return current != null && current.root;
+    return data != null && current == null;
   }
 
 
@@ -146,20 +146,19 @@ public final class Context {
    * @return node set
    */
   public Nodes current() {
-    if(current == null && data != null) {
-      final Resources res = data.resources;
-      current = new Nodes(res.docs().toArray(), data);
-      current.root = true;
-    }
-    return current;
+    if(current != null || data == null) return current;
+    final Nodes n = new Nodes(data.resources.docs().toArray(), data);
+    n.root = true;
+    return n;
   }
 
   /**
-   * Sets the current node context.
+   * Sets the current node context. Discards the input if it contains all document
+   * nodes of the currently opened database.
    * @param curr node set
    */
   public void current(final Nodes curr) {
-    current = curr;
+    current = curr.checkRoot();
   }
 
   /**

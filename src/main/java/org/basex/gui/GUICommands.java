@@ -583,17 +583,18 @@ public enum GUICommands implements GUICommand {
 
       final Context ctx = gui.context;
       final boolean root = ctx.root();
+      final Data data = ctx.data();
       if(!rt) {
         if(!root) {
-          gui.notify.context(new Nodes(0, ctx.data()), true, null);
+          gui.notify.context(new Nodes(0, data), true, null);
           gui.notify.mark(ctx.current(), null);
         }
       } else {
         if(root) {
-          gui.notify.mark(new Nodes(ctx.data()), null);
+          gui.notify.mark(new Nodes(data), null);
         } else {
           final Nodes mark = ctx.marked;
-          ctx.marked = new Nodes(ctx.data());
+          ctx.marked = new Nodes(data);
           gui.notify.context(mark, true, null);
         }
       }

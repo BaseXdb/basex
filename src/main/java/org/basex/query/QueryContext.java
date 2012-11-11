@@ -477,7 +477,7 @@ public final class QueryContext extends Progress {
       final int ps = pre.size();
       if(it == null || ps == max) {
         // all nodes have been processed: return GUI-friendly nodeset
-        return ps == 0 ? vb : new Nodes(pre.toArray(), nodes.data, ftpos).checkRoot();
+        return ps == 0 ? vb : new Nodes(pre.toArray(), nodes.data, ftpos);
       }
 
       // otherwise, add nodes to standard iterator

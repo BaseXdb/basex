@@ -105,11 +105,13 @@ public final class ViewData {
    * @param pre pre value
    * @return name
    */
-  public static byte[] tag(final GUIProp prop, final Data data, final int pre) {
-    final int id = ViewData.nameID(data);
-    if(id != 0 && prop.is(GUIProp.SHOWNAME)) {
-      final byte[] att = data.attValue(id, pre);
-      if(att != null) return att;
+  public static byte[] name(final GUIProp prop, final Data data, final int pre) {
+    if(data.kind(pre) == Data.ELEM) {
+      final int id = ViewData.nameID(data);
+      if(id != 0 && prop.is(GUIProp.SHOWNAME)) {
+        final byte[] att = data.attValue(id, pre);
+        if(att != null) return att;
+      }
     }
     return content(data, pre, true);
   }

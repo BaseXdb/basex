@@ -2,7 +2,6 @@ package org.basex.gui.view.map;
 
 import java.awt.*;
 
-import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
@@ -32,7 +31,9 @@ final class MapDefault extends MapPainter {
     l.w = (int) scale * l.w; l.h = (int) scale * l.h;
     final int ww = view.getWidth();
     final int hh = view.getWidth();
+
     final Data data = view.gui.context.data();
+    final int fsz = prop.num(GUIProp.FONTSIZE);
 
     final int off = prop.num(GUIProp.MAPOFFSETS);
     final int rs = rects.size;
@@ -75,49 +76,30 @@ final class MapDefault extends MapPainter {
       }
 
       // skip drawing of string if there is no space
-      if(r.w > 3 && r.h >= prop.num(GUIProp.FONTSIZE)) drawRectangle(g, r);
-    }
-  }
+      if(r.w <= 3 || r.h < prop.num(GUIProp.FONTSIZE)) continue;
 
-  /**
-   * Draws a single rectangle.
-   *
-   * @param g graphics reference
-   * @param rect rectangle to be drawn
-   */
-  private void drawRectangle(final Graphics g, final MapRect rect) {
-    rect.x += 3;
-    rect.w -= 3;
+      r.x += 3;
+      r.w -= 3;
 
-    final int pre = rect.pre;
-    final Context context = view.gui.context;
-    final Data data = context.data();
-    final Nodes current = context.current();
-    final int kind = data.kind(pre);
-    final int fsz = prop.num(GUIProp.FONTSIZE);
-
-    if(kind == Data.ELEM || kind == Data.DOC) {
-      // show full path in top rectangle
-      final byte[] name = kind == Data.DOC ? ViewData.content(data, pre, true) :
-        current.size() == 1 && pre != 0 && pre == current.pres[0] ?
-            ViewData.path(data, pre) : ViewData.tag(prop, data, pre);
-
-      g.setColor(Color.black);
-      g.setFont(GUIConstants.font);
-      BaseXLayout.chopString(g, name, rect.x, rect.y, rect.w, fsz);
-    } else {
-      g.setColor(GUIConstants.color(rect.level * 2 + 8));
-      g.setFont(GUIConstants.mfont);
-      final byte[] text = ViewData.content(data, pre, false);
-
-      rect.thumb = MapRenderer.calcHeight(g, rect, text, fsz) >= rect.h;
-      if(rect.thumb) {
-        MapRenderer.drawThumbnails(g, rect, text, fsz);
+      final int kind = data.kind(pre);
+      if(kind == Data.ELEM || kind == Data.DOC) {
+        g.setColor(Color.black);
+        g.setFont(GUIConstants.font);
+        BaseXLayout.chopString(g, ViewData.name(prop, data, pre), r.x, r.y, r.w, fsz);
       } else {
-        MapRenderer.drawText(g, rect, text, fsz);
+        g.setColor(GUIConstants.color(r.level * 2 + 8));
+        g.setFont(GUIConstants.mfont);
+        final byte[] text = ViewData.content(data, pre, false);
+
+        r.thumb = MapRenderer.calcHeight(g, r, text, fsz) >= r.h;
+        if(r.thumb) {
+          MapRenderer.drawThumbnails(g, r, text, fsz);
+        } else {
+          MapRenderer.drawText(g, r, text, fsz);
+        }
       }
+      r.x -= 3;
+      r.w += 3;
     }
-    rect.x -= 3;
-    rect.w += 3;
   }
 }

@@ -1,6 +1,5 @@
 package org.basex.gui.view.tree;
 
-import org.basex.core.*;
 import org.basex.data.*;
 
 /**
@@ -26,11 +25,10 @@ final class TreeSubtree {
 
   /**
    * Generates subtree borders.
-   * @param ctx context
+   * @param d data reference
+   * @param roots root nodes
    */
-  void generateBorders(final Context ctx) {
-    final Data d = ctx.data();
-    final int[] roots = ctx.current().pres;
+  void generateBorders(final Data d, final int[] roots) {
     final int rl = roots.length;
     if(rl == 0) return;
     border = new TreeBorder[rl][];

@@ -160,36 +160,39 @@ public final class ViewNotifier {
 
   /**
    * Notifies all views of a context change.
-   * @param nodes new context set
+   * @param nodes new context set (may be {@code null} if root nodes are addressed)
    * @param quick quick switch
    * @param vw the calling view
    */
   public void context(final Nodes nodes, final boolean quick, final View vw) {
     final Context ctx = gui.context;
-    final Nodes n = new Nodes(new int[0], ctx.data(), ctx.marked.ftpos);
 
     // add new entry if current node set has not been cached yet
-    if(!cont[hist].sameAs(quick ? ctx.current() : ctx.marked)) {
+    final Nodes newn = nodes.checkRoot();
+    final Nodes empty = new Nodes(new int[0], ctx.data(), ctx.marked.ftpos);
+    final Nodes curr = quick ? ctx.current() : null;
+    final Nodes cmp = quick ? curr : ctx.marked;
+    if(cont[hist] == null ? cmp != null : cmp == null || !cont[hist].sameAs(cmp)) {
       checkHist();
       if(quick) {
         // store history entry
         queries[hist] = "";
         marked[hist] = new Nodes(ctx.data());
         // add current entry
-        cont[++hist] = ctx.current();
+        cont[++hist] = curr;
       } else {
         // store history entry
         final String in = gui.input.getText();
         queries[hist] = in;
         marked[hist] = ctx.marked;
         // add current entry
-        cont[++hist] = nodes;
+        cont[++hist] = newn;
         queries[hist] = in;
-        marked[hist] = n;
+        marked[hist] = empty;
       }
       histsize = hist;
     }
-    ctx.set(nodes, n);
+    ctx.set(newn, empty);
 
     for(final View v : view) if(v != vw && v.visible()) v.refreshContext(true, quick);
     gui.refreshControls();
@@ -255,7 +258,6 @@ public final class ViewNotifier {
     final Data data = ctx.data();
     if(data != null) {
       // new database opened
-      cont[0] = ctx.current();
       marked[0] = new Nodes(data);
       queries[0] = "";
     }

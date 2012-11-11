@@ -132,13 +132,13 @@ final class TableData {
   void context(final boolean create) {
     if(cols.length == 0) return;
 
-    final Nodes n = context.current();
-    if(!create && n.root && rootRows != null) {
+    final boolean rt = context.root();
+    if(!create && rt && rootRows != null) {
       rows = rootRows;
       sortCol = -1;
     } else {
       createRows();
-      if(n.root) rootRows = rows;
+      if(rt) rootRows = rows;
     }
     if(cols[0].width == 0 && cols[0].hwidth == 0) calcWidths();
   }
@@ -164,10 +164,8 @@ final class TableData {
    */
   private void createRows() {
     final Data data = context.data();
-    final int[] n = context.current().pres;
-
     rows = new IntList();
-    for(int p : n) {
+    for(int p : context.current().pres) {
       if(p >= data.meta.size) break;
       final int s = p + data.size(p, data.kind(p));
       // find first root tag

@@ -58,11 +58,12 @@ public final class QueryResources {
     if(!ctx.context.perm(Perm.READ, d.meta)) BASX_PERM.thrw(null, Perm.READ);
 
     // assign initial context value
-    ctx.value = DBNodeSeq.get(new IntList(nodes.pres), d, nodes.root, nodes.root);
+    final boolean root = nodes.root;
+    ctx.value = DBNodeSeq.get(new IntList(nodes.pres), d, root, root);
 
     // create default collection: use initial node set if it contains all
     // documents of the database. otherwise, create new node set
-    addCollection(nodes.root ? ctx.value :
+    addCollection(root ? ctx.value :
       DBNodeSeq.get(d.resources.docs(), d, true, true), d.meta.name);
 
     addData(d);

@@ -365,12 +365,11 @@ public final class GUI extends AGUI {
     try {
       final Performance perf = new Performance();
 
-      // reset current context if realtime filter is activated
       final Data data = context.data();
-      if(gprop.is(GUIProp.FILTERRT) && context.current() != null &&
-          !context.root()) context.update();
+      // reset current context if realtime filter is activated
+      if(gprop.is(GUIProp.FILTERRT) && data != null && !context.root()) context.update();
 
-      // cache some variables before executing the command
+      // remember current command and context nodes
       final Nodes current = context.current();
       command = cmd;
 
