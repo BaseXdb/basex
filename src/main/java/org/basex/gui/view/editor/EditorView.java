@@ -167,8 +167,14 @@ public final class EditorView extends View {
             open(new IOFile(ac.getActionCommand()));
           }
         };
+        final StringList sl = new StringList();
+        for(final EditorArea ea : editors()) sl.add(ea.file.path());
         final String[] files = gui.gprop.strings(GUIProp.EDITOR);
-        for(final String en : files) pm.add(new JMenuItem(en)).addActionListener(al);
+        for(final String en : files) {
+          final JMenuItem it = new JMenuItem(en);
+          it.setEnabled(!sl.contains(en));
+          pm.add(it).addActionListener(al);
+        }
         pm.show(hist, 0, hist.getHeight());
       }
     });
@@ -279,13 +285,22 @@ public final class EditorView extends View {
   }
 
   /**
+   * Reverts the contents of the currently opened editor.
+   */
+  public void reopen() {
+    final EditorArea edit = getEditor();
+    if(edit.opened() && BaseXDialog.confirm(gui,
+        Util.info(REOPEN_FILE_X, edit.file.name()))) edit.reopen();
+  }
+
+  /**
    * Saves the contents of the currently opened editor.
    * @return {@code false} if operation was canceled
    */
   public boolean save() {
     final EditorArea edit = getEditor();
     if(!edit.opened()) return saveAs();
-    save(edit.file());
+    save(edit.file);
     return true;
   }
 
@@ -297,7 +312,7 @@ public final class EditorView extends View {
     // open file chooser for XML creation
     final EditorArea edit = getEditor();
     final BaseXFileChooser fc = new BaseXFileChooser(
-        SAVE_AS, edit.file().path(), gui).filter(XQUERY_FILES, IO.XQSUFFIXES);
+        SAVE_AS, edit.file.path(), gui).filter(XQUERY_FILES, IO.XQSUFFIXES);
 
     final IOFile file = fc.select(Mode.FSAVE);
     if(file == null) return false;
@@ -491,13 +506,13 @@ public final class EditorView extends View {
   }
 
   /**
-   * Checks if the current text can be saved. The check returns {@code true}
-   * if the text has not been opened from disk, or if it has been modified.
+   * Checks if the current text can be saved or reverted.
+   * @param rev revert flag
    * @return result of check
    */
-  public boolean saveable() {
+  public boolean modified(final boolean rev) {
     final EditorArea edit = getEditor();
-    return !edit.opened() || edit.modified;
+    return edit.modified || !rev && !edit.opened();
   }
 
   /**
@@ -521,7 +536,7 @@ public final class EditorView extends View {
     if(edit.modified == oe && !force) return;
 
     // update tab title
-    String title = edit.file().name();
+    String title = edit.file.name();
     if(edit.modified) title += '*';
     edit.label.setText(title);
 
@@ -547,7 +562,7 @@ public final class EditorView extends View {
    */
   EditorArea find(final IO file, final boolean opened) {
     for(final EditorArea edit : editors()) {
-      if(edit.file().eq(file) && (!opened || edit.opened())) return edit;
+      if(edit.file.eq(file) && (!opened || edit.opened())) return edit;
     }
     return null;
   }
@@ -578,7 +593,7 @@ public final class EditorView extends View {
     final BoolList bl = new BoolList();
     for(final EditorArea edit : editors()) {
       if(edit.opened()) continue;
-      final String n = edit.file().name().substring(FILE.length());
+      final String n = edit.file.name().substring(FILE.length());
       bl.set(n.isEmpty() ? 1 : Integer.parseInt(n), true);
     }
     // find first free file number
@@ -650,7 +665,7 @@ public final class EditorView extends View {
   private boolean confirm(final EditorArea edit) {
     if(edit.modified && (edit.opened() || edit.getText().length != 0)) {
       final Boolean ok = BaseXDialog.yesNoCancel(gui,
-          Util.info(CLOSE_FILE_X, edit.file().name()));
+          Util.info(CLOSE_FILE_X, edit.file.name()));
       if(ok == null || ok && !save()) return false;
     }
     return true;

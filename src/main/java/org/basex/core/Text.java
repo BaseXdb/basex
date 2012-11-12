@@ -915,6 +915,8 @@ public interface Text {
   /** Command info. */
   String OPEN = lang("open");
   /** Command info. */
+  String REOPEN = lang("reopen");
+  /** Command info. */
   String SAVE = lang("save");
   /** Command info. */
   String SAVE_AS = lang("save_as");
@@ -1146,8 +1148,10 @@ public interface Text {
 
   /** Dialog title for deleting nodes. */
   String DELETE_NODES = lang("delete_nodes");
-  /** Dialog title for closing XQuery file. */
+  /** Dialog title for closing a file. */
   String CLOSE_FILE_X = lang("close_file_%");
+  /** Dialog title for reopening a file. */
+  String REOPEN_FILE_X = lang("reopen_file_%");
 
   /** Dialog title for exporting nodes. */
   String OUTPUT_DIR = lang("output_dir");
@@ -1357,6 +1361,8 @@ public interface Text {
   String H_NEW_FILE = lang("h_new_file");
   /** Command info. */
   String H_OPEN_FILE = lang("h_open_file");
+  /** Command info. */
+  String H_REOPEN_FILE = lang("h_reopen_file");
   /** Command info. */
   String H_REPLACE = lang("h_replace");
   /** Help string. */

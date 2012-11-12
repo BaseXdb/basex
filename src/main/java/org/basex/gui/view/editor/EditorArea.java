@@ -66,18 +66,9 @@ final class EditorArea extends Editor {
         // refresh query path and work directory
         gui.context.prop.set(Prop.QUERYPATH, file.path());
         gui.gprop.set(GUIProp.WORKPATH, file.dirPath());
-
-        if(opened() && !modified) {
-          try {
-            // reload file that has been modified
-            final long t = file.timeStamp();
-            if(file.timeStamp() != tstamp) {
-              setText(new IOFile(file.path()).read());
-              tstamp = t;
-              hist.save();
-            }
-          } catch(final IOException ex) { /* ignored */ }
-        }
+        // reload file if it has been changed
+        if(opened() && !modified && tstamp != file.timeStamp()) reopen();
+        // parse content
         release(Action.PARSE);
       }
     });
@@ -173,11 +164,13 @@ final class EditorArea extends Editor {
   }
 
   /**
-   * Returns the currently assigned file.
-   * @return file
+   * Reopens a file.
    */
-  IOFile file() {
-    return file;
+  void reopen() {
+    try {
+      setText(new IOFile(file.path()).read());
+      file(file);
+    } catch(final IOException ex) { /* ignored */ }
   }
 
   /**

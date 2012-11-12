@@ -133,13 +133,18 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Searches and replaces text.
-  C_EDITFIND(FINDREPLACE + DOTS, "% F", H_REPLACE, false, false) {
+  /** Reverts the current editor file. */
+  C_EDITREOPEN(REOPEN + DOTS, "% shift R", H_REOPEN_FILE, false, false) {
     @Override
     public void execute(final GUI gui) {
-      gui.editor.search.activate(true);
+      gui.editor.reopen();
     }
-  }, */
+
+    @Override
+    public void refresh(final GUI gui, final AbstractButton b) {
+      b.setEnabled(gui.editor != null && gui.editor.modified(true));
+    }
+  },
 
   /** Saves the current file in the editor. */
   C_EDITSAVE(SAVE, "% S", H_SAVE, false, false) {
@@ -150,7 +155,7 @@ public enum GUICommands implements GUICommand {
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
-      b.setEnabled(gui.editor != null && gui.editor.saveable());
+      b.setEnabled(gui.editor != null && gui.editor.modified(false));
     }
   },
 
