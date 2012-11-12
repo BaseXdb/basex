@@ -102,6 +102,7 @@ public class BaseX extends Main {
           // change output stream
           if(out != System.out) out.close();
           out = new PrintOutput(val);
+          session().setOutputStream(out);
         } else if(c == 'q') {
           // evaluate query
           final IO io = IO.get(val);
