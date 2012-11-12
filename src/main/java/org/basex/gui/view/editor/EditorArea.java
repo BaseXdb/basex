@@ -157,7 +157,8 @@ final class EditorArea extends Editor {
     } else if(action == Action.EXECUTE && script) {
       // execute query if forced, or if realtime execution is activated
       gui.execute(true, new Execute(input));
-    } else if(script || file.hasSuffix(IO.XMLSUFFIXES)) {
+    } else if(script || file.hasSuffix(IO.XMLSUFFIXES) ||
+        file.hasSuffix(IO.HTMLSUFFIXES)) {
       try {
         new EmptyBuilder(new IOContent(in), gui.context).build();
         if(script) new CommandParser(input, gui.context).parse();
