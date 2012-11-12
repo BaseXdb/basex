@@ -70,10 +70,11 @@ final class EditorArea extends Editor {
         if(opened() && !modified) {
           try {
             // reload file that has been modified
-            final long t = tstamp;
-            if(file.timeStamp() != t) {
+            final long t = file.timeStamp();
+            if(file.timeStamp() != tstamp) {
               setText(new IOFile(file.path()).read());
               tstamp = t;
+              hist.save();
             }
           } catch(final IOException ex) { /* ignored */ }
         }
