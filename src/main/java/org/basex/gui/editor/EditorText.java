@@ -686,6 +686,8 @@ public final class EditorText {
       pc = pos;
       ms = pos;
       me = spos[1].get(s);
+    } else {
+      pc = pos;
     }
     return pos;
   }
