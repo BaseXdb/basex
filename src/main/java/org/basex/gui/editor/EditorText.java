@@ -236,7 +236,7 @@ public final class EditorText {
   // POSITION ===========================================================================
 
   /**
-   * Moves to the beginning of the line.
+   * Moves to the first character or the beginning of the line.
    * @param select selection flag
    * @return number of moved characters
    */
@@ -266,14 +266,13 @@ public final class EditorText {
   }
 
   /**
-   * Moves one character back and returns the found character.
+   * Moves one character back and returns the found character. A newline character is
+   * returned if the cursor is placed at the beginning of the text.
    * @return character
    */
   int prev() {
     if(ps == 0) return '\n';
-    final int p = ps;
-    ps = Math.max(0, ps - 5);
-    while(ps < p && ps + cl(text, ps) < p) ++ps;
+    while(--ps > 0 && text[ps] < -64 && text[ps] >= -128);
     return curr();
   }
 
@@ -301,7 +300,11 @@ public final class EditorText {
       // ignore invalid characters
       int ch = str.charAt(c);
       if(ch == '\r') continue;
-      if(ch < ' ' && !ws(ch)) ch = '\n';
+      if(ch < ' ' && !ws(ch)) {
+        ch = '\n';
+      } else if(Character.isHighSurrogate((char) ch) && c + 1 < cl) {
+        ch = Character.toCodePoint((char) ch, str.charAt(++c));
+      }
       tb.add(ch);
     }
     final int tl = text.length;
