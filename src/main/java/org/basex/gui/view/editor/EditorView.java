@@ -375,6 +375,7 @@ public final class EditorView extends View {
       path = file.path();
       gui.gprop.set(GUIProp.WORKPATH, file.dirPath());
       sl.add(path);
+      tabs.setToolTipTextAt(tabs.getSelectedIndex(), path);
     }
     final String[] qu = gui.gprop.strings(GUIProp.EDITOR);
     for(int q = 0; q < qu.length && q < 11; q++) {

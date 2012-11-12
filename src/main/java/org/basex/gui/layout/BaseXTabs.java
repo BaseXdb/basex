@@ -25,9 +25,7 @@ public final class BaseXTabs extends JTabbedPane {
    * @param header tab header
    * @param index index
    */
-  public void add(final Component content, final Component header,
-      final int index) {
-
+  public void add(final Component content, final Component header, final int index) {
     add(content, index);
     setSelectedComponent(content);
     setTabComponentAt(getSelectedIndex(), header);
