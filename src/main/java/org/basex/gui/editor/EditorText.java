@@ -236,16 +236,30 @@ public final class EditorText {
   // POSITION ===========================================================================
 
   /**
-   * Moves to the first character or the beginning of the line.
+   * Moves to the beginning of the line.
    * @param select selection flag
-   * @return number of moved characters
+   * @return number of passed characters
    */
   int bol(final boolean select) {
-    int c = 0;
     if(ps == 0) return 0;
+    int c = 0;
     do c += curr() == '\t' ? TAB : 1; while(prev(select) != '\n');
     if(ps != 0 || curr() == '\n') next(select);
     return c;
+  }
+
+  /**
+   * Moves to the first character or the beginning of the line.
+   * @param select selection flag
+   */
+  void home(final boolean select) {
+    int p = ps;
+    boolean s = true;
+    // find beginning of line
+    while(prev(select) != '\n') s &= ws(curr());
+    if(ps != 0 || curr() == '\n') next(select);
+    // move to first non-whitespace character
+    if(p == ps || !s) while(ws(curr()) && curr() != '\n') next(select);
   }
 
   /**

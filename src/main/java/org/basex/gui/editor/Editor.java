@@ -510,7 +510,7 @@ public class Editor extends BaseXPanel {
       if(!marking) text.noSelect();
       text.pos(text.size());
     } else if(LINESTART.is(e)) {
-      text.bol(marking);
+      text.home(marking);
       down = false;
     } else if(LINEEND.is(e)) {
       text.eol(marking);
