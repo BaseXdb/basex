@@ -78,6 +78,7 @@ public final class Renderer extends BaseXBack {
     super.paintComponent(g);
     init(g, bar.pos());
     while(more(g)) write(g);
+    wordW = 0;
     final int s = text.size();
     if(cursor && s == text.cursor()) drawCursor(g, x);
     if(s == text.error()) drawError(g);
