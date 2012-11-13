@@ -627,7 +627,7 @@ public final class FNDb extends StandardFunc {
       final int pre = il.get(i);
       final String trg = Rename.target(data, pre, source, target);
       if(trg.isEmpty() || trg.endsWith("/") || trg.endsWith("."))
-        BXDB_EMPTY.thrw(info, this);
+        BXDB_RENAME.thrw(info, this);
       ctx.updates.add(new ReplaceValue(pre, data, info, token(trg)), ctx);
     }
     // rename files

@@ -70,12 +70,10 @@ public enum Err {
   BXDB_DBRETURN(BXDB, 5, "Query must yield database nodes."),
   /** BXDB0006. */
   BXDB_SINGLE(BXDB, 6, "Database path '%' must point to a single document."),
-  /** BXDB0006. */
-  BXDB_DOCS(BXDB, 6, "Database path '%' must point to documents."),
   /** BXDB0007. */
   BXDB_OPENED(BXDB, 7, "Database '%' is opened by another process."),
   /** BXDB0008. */
-  BXDB_EMPTY(BXDB, 8, "%: Invalid target path."),
+  BXDB_RENAME(BXDB, 8, "%: Invalid target path."),
   /** BXDB0009. */
   BXDB_RANGE(BXDB, 9, "%: value '%' is out of range."),
   /** BXDB0010. */

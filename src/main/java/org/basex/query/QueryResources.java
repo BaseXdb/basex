@@ -289,8 +289,6 @@ public final class QueryResources {
 
     // get all document nodes of the specified database
     final IntList docs = dt.resources.docs(qi.path);
-    // specified document was not found...
-    if(docs.isEmpty()) WHICHRES.thrw(info, qi.original);
     // ensure that a single document was filtered
     if(docs.size() != 1) BXDB_SINGLE.thrw(info, qi.original);
     return new DBNode(dt, docs.get(0), Data.DOC);
