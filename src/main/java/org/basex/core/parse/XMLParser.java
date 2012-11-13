@@ -39,7 +39,7 @@ final class XMLParser extends CmdParser {
   }
 
   @Override
-  void parse(final ArrayList<Command> list) throws QueryException {
+  void parse(final ArrayList<Command> cmds) throws QueryException {
     try {
       final DBNode node = new DBNode(IO.get(input), ctx.prop);
       String query = "/*";
@@ -49,7 +49,7 @@ final class XMLParser extends CmdParser {
           throw error(Text.SYNTAX_X, "<" + COMMANDS + "><...></" + COMMANDS + ">");
       }
       final QueryProcessor qa = new QueryProcessor(query, ctx).context(node);
-      for(final Item ia : qa.value()) list.add(command(ia));
+      for(final Item ia : qa.value()) cmds.add(command(ia));
     } catch(final IOException ex) {
       throw error(Text.STOPPED_AT + " %", ex);
     }

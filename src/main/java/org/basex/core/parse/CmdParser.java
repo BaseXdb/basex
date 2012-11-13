@@ -29,22 +29,22 @@ abstract class CmdParser {
 
   /**
    * Parses the input and returns a command list.
-   * @param list command list
+   * @param cmds container for created commands
    * @param sngl single command flag
    * @param sggst suggest flag
    * @throws QueryException query exception
    */
-  final void parse(final ArrayList<Command> list, final boolean sngl, final boolean sggst)
+  final void parse(final ArrayList<Command> cmds, final boolean sngl, final boolean sggst)
       throws QueryException {
 
     single = sngl;
     suggest = sggst;
-    parse(list);
+    parse(cmds);
   }
 
   /**
    * Parses the input and fills the command list.
-   * @param cmds command list
+   * @param cmds container for created commands
    * @throws QueryException query exception
    */
   abstract void parse(final ArrayList<Command> cmds) throws QueryException;

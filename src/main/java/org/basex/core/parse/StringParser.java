@@ -25,6 +25,8 @@ import org.basex.util.list.*;
  */
 final class StringParser extends CmdParser {
   /** Input lines. */
+  private final String input;
+  /** Input lines. */
   private final String[] lines;
   /** Context. */
   private final Context ctx;
@@ -38,24 +40,37 @@ final class StringParser extends CmdParser {
    * @param context context
    */
   StringParser(final String in, final Context context) {
-    final String input = in.indexOf('\r') != -1 ? in.replaceAll("\r\n?", "\n") : in;
+    input = (in.indexOf('\r') != -1 ? in.replaceAll("\r\n?", "\n") : in).trim();
     lines = input.indexOf('\n') == -1 ? new String[] { input } : input.split("\n");
     for(int l = 0; l < lines.length; l++) lines[l] = lines[l].trim();
     ctx = context;
   }
 
   @Override
-  void parse(final ArrayList<Command> list) throws QueryException {
-    for(final String line : lines) {
-      if(line.isEmpty() || line.startsWith("#")) continue;
-      parser = new InputParser(line);
-      while(true) {
-        final Cmd cmd = consume(Cmd.class, null);
-        list.add(parse(cmd));
-        if(!parser.more()) break;
-        if(!eoc()) throw help(null, cmd);
-        parser.consume();
+  void parse(final ArrayList<Command> cmds) throws QueryException {
+    if(single) {
+      parse(cmds, input);
+    } else {
+      for(final String line : lines) {
+        if(!line.isEmpty() && !line.startsWith("#")) parse(cmds, line);
       }
+    }
+  }
+
+  /**
+   * Constructor.
+   * @param cmds list with created commands
+   * @param in current input
+   * @throws QueryException query exception
+   */
+  void parse(final ArrayList<Command> cmds, final String in) throws QueryException {
+    parser = new InputParser(in);
+    while(true) {
+      final Cmd cmd = consume(Cmd.class, null);
+      cmds.add(parse(cmd));
+      if(!parser.more()) break;
+      if(!eoc()) throw help(null, cmd);
+      parser.consume();
     }
   }
 
