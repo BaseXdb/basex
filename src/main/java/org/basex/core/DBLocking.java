@@ -4,10 +4,8 @@ import static org.basex.core.Prop.*;
 
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.*;
 import java.util.concurrent.locks.*;
 
-import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -26,6 +24,19 @@ import org.basex.util.list.*;
  * @author Jens Erat
  */
 public final class DBLocking implements ILocking {
+  /** Lock for running thread counters. */
+  private final Object globalLock = new Object();
+  /** Number of running local writers. Guarded by {@code globalLock}. */
+  private int localWriters;
+  /** Number of running local writers. Guarded by {@code globalLock}. */
+  private int globalReaders;
+  /**
+   * Lock for global write locking.
+   *
+   * Exclusive lock - if globally writing
+   * Shared lock    - else
+   */
+  private final ReentrantReadWriteLock writeAll = new ReentrantReadWriteLock();
   /** Stores one lock for each object ever used for locking. */
   private final Map<String, ReentrantReadWriteLock> locks =
       new HashMap<String, ReentrantReadWriteLock>();
@@ -40,9 +51,18 @@ public final class DBLocking implements ILocking {
    * Used as monitor for waiting threads in queue.
    */
   private final Queue<Long> queue = new LinkedList<Long>();
-  /** Stores a list of objects each transaction has locked. */
-  private final ConcurrentMap<Long, String[]> locked
-      = new ConcurrentHashMap<Long, String[]>();
+  /**
+   * Stores a list of objects each transaction has write-locked.
+   * Null means lock everything, an empty array lock nothing.
+   */
+  private final ConcurrentMap<Long, String[]> writeLocked =
+      new ConcurrentHashMap<Long, String[]>();
+  /**
+   * Stores a list of objects each transaction has read-locked. Null means lock
+   * everything, an empty array lock nothing.
+   */
+  private final ConcurrentMap<Long, String[]> readLocked =
+      new ConcurrentHashMap<Long, String[]>();
   /** BaseX database context. */
   private final MainProp mprop;
 
@@ -56,11 +76,8 @@ public final class DBLocking implements ILocking {
 
   @Override
   public void acquire(final Progress pr, final StringList db) {
-    // No databases specified: lock globally
-    if(db == null) Util.notimplemented("Global locks in DBLocking not implemented yet.");
-
     final long thread = Thread.currentThread().getId();
-    if(locked.containsKey(thread))
+    if(writeLocked.containsKey(thread) || readLocked.containsKey(thread))
       throw new IllegalMonitorStateException("Thread already holds one or more locks.");
 
     // Wait in queue if necessary
@@ -79,11 +96,44 @@ public final class DBLocking implements ILocking {
         queue.remove(thread);
     }
 
+    // No databases specified: lock globally
+    if(db == null && pr.updating) writeAll.writeLock().lock();
+    else writeAll.readLock().lock();
+
+    synchronized(globalLock) {
+      // global read locking
+      if(db == null && !pr.updating) {
+        while (localWriters > 0) {
+          try {
+            globalLock.wait();
+          } catch(InterruptedException e) {
+            Thread.currentThread().interrupt();
+          }
+        }
+        globalReaders++;
+      } else
+        // local write locking
+        if (db != null && 0 != db.size() && pr.updating) {
+        while (globalReaders > 0) {
+          try {
+            globalLock.wait();
+          } catch(InterruptedException e) {
+            Thread.currentThread().interrupt();
+          }
+        }
+        localWriters++;
+      }
+    }
+
+    // Global locking, no local locking needed
+    if (null == db) return;
+
     // Sort entries and remove duplicates to prevent deadlocks
     final String[] objects = db.sort(true, true).unique().toArray();
 
     // Store for unlocking later
-    locked.put(thread, objects);
+    writeLocked.put(thread, pr.updating ? objects : new String[0]);
+    readLocked.put(thread, !pr.updating ? objects : new String[0]);
 
     // Finally lock objects
     for(final String object : objects) {
@@ -101,22 +151,35 @@ public final class DBLocking implements ILocking {
 
   @Override
   public void release(final Progress pr) {
-    final String[] objects = locked.remove(Thread.currentThread().getId());
-    if(null == objects)
-      throw new IllegalMonitorStateException("No locks held by current thread");
+    final String[] writeObjects = writeLocked.remove(Thread.currentThread().getId());
 
     // Unlock all locks, no matter if read or write lock
-    for(final String object : objects) {
+    if(null != writeObjects) for(final String object : writeObjects) {
       final ReentrantReadWriteLock lock = locks.get(object);
-      if(lock.isWriteLockedByCurrentThread()) {
-        assert 1 == lock.getWriteHoldCount() : "Unexpected write lock count: "
-            + lock.getWriteHoldCount();
-        lock.writeLock().unlock();
-      } else {
-        assert 1 == lock.getReadHoldCount() : "Unexpected read lock count: "
-            + lock.getReadHoldCount();
-        lock.readLock().unlock();
-      }
+      assert 1 == lock.getWriteHoldCount() : "Unexpected write lock count: "
+          + lock.getWriteHoldCount();
+      lock.writeLock().unlock();
+    }
+
+    final Object[] readObjects = readLocked.remove(Thread.currentThread().getId());
+
+    // Unlock all locks, no matter if read or write lock
+    if(null != readObjects) for(final Object object : readObjects) {
+      final ReentrantReadWriteLock lock = locks.get(object);
+      assert 1 == lock.getReadHoldCount() : "Unexpected read lock count: "
+          + lock.getReadHoldCount();
+      lock.readLock().unlock();
+    }
+
+    // Release global locks
+    (writeAll.isWriteLocked() ? writeAll.writeLock() : writeAll.readLock()).unlock();
+    if(null == readObjects) synchronized(globalLock) {
+      globalReaders--;
+      globalLock.notifyAll();
+    }
+    if(null != writeObjects && 0 != writeObjects.length) synchronized(globalLock) {
+      localWriters--;
+      globalLock.notifyAll();
     }
 
     // Allow another transaction to run
@@ -140,9 +203,12 @@ public final class DBLocking implements ILocking {
     sb.append(ind + "Held locks by object:" + NL);
     for(final Object object : locks.keySet())
       sb.append(ind + ind + object + " -> " + locks.get(object) + NL);
-    sb.append(ind + "Held locks by transaction:" + NL);
-    for(final Long thread : locked.keySet())
-      sb.append(ind + ind + thread + " -> " + locked.get(thread) + NL);
+    sb.append(ind + "Held write locks by transaction:" + NL);
+    for(final Long thread : writeLocked.keySet())
+      sb.append(ind + ind + thread + " -> " + writeLocked.get(thread) + NL);
+    sb.append(ind + "Held read locks by transaction:" + NL);
+    for(final Long thread : readLocked.keySet())
+      sb.append(ind + ind + thread + " -> " + readLocked.get(thread) + NL);
     return sb.toString();
   }
 
