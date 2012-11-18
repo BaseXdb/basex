@@ -60,7 +60,7 @@ public final class DialogPrefs extends BaseXDialog {
 
     // create checkboxes
     final BaseXBack pp = new BaseXBack(new TableLayout(12, 1));
-    pp.add(new BaseXLabel(DATABASE_PATH, true, true));
+    pp.add(new BaseXLabel(DATABASE_PATH + COL, true, true));
 
     BaseXBack p = new BaseXBack(new TableLayout(1, 2, 8, 0));
 
@@ -81,7 +81,7 @@ public final class DialogPrefs extends BaseXDialog {
     p.add(path);
     p.add(button);
     pp.add(p);
-    pp.add(new BaseXLabel(GUI_INTERACTIONS, true, true).border(12, 0, 6, 0));
+    pp.add(new BaseXLabel(GUI_INTERACTIONS + COL, true, true).border(12, 0, 6, 0));
 
     // checkbox for Java look and feel
     javalook = new BaseXCheckBox(JAVA_LF, gprop.is(GUIProp.JAVALOOK), this);
@@ -117,7 +117,7 @@ public final class DialogPrefs extends BaseXDialog {
     pp.add(p);
 
     // checkbox for simple file dialog
-    pp.add(new BaseXLabel(LANGUAGE_RESTART, true, true).border(16, 0, 6, 0));
+    pp.add(new BaseXLabel(LANGUAGE_RESTART + COL, true, true).border(16, 0, 6, 0));
     lang = new BaseXCombo(this, LANGS[0]);
     lang.setSelectedItem(mprop.get(MainProp.LANG));
     creds = new BaseXLabel(" ");

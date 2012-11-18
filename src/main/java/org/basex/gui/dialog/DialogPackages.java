@@ -77,13 +77,19 @@ public final class DialogPackages extends BaseXDialog {
     install = new BaseXButton(INSTALL + DOTS, this);
     delete = new BaseXButton(DELETE + DOTS, this);
 
-    final BaseXBack p = new BaseXBack(new BorderLayout());
+    BaseXBack p = new BaseXBack(new BorderLayout());
+    p.add(packages, BorderLayout.CENTER);
+    final BaseXBack ss = new BaseXBack(new TableLayout(1, 2, 8, 0)).border(8, 0, 0, 0);
+    ss.add(new BaseXLabel(PATH + COL, true, true), BorderLayout.NORTH);
+    ss.add(new BaseXLabel(main.context.mprop.get(MainProp.REPOPATH)));
+    p.add(ss, BorderLayout.SOUTH);
+    set(p, BorderLayout.CENTER);
+
+    p = new BaseXBack(new BorderLayout());
     p.add(title, BorderLayout.NORTH);
     p.add(table, BorderLayout.CENTER);
     p.add(newButtons(install, delete), BorderLayout.SOUTH);
     BaseXLayout.setWidth(p, 430);
-
-    set(packages, BorderLayout.CENTER);
     set(p, BorderLayout.EAST);
 
     refresh = true;
