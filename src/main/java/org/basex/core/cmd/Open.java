@@ -64,23 +64,20 @@ public final class Open extends Command {
    * @throws IOException I/O exception
    */
   public static Data open(final String name, final Context ctx) throws IOException {
-    Data data;
-    synchronized(ctx.datas) { // pin should be atomic
-      data = ctx.pin(name);
+    synchronized(ctx.dbs) { // pin should be atomic
+      Data data = ctx.dbs.pin(name);
       if(data == null) {
-        // check if document exists
+        // check if database exists
         if(!ctx.mprop.dbexists(name)) throw new BaseXException(DB_NOT_FOUND_X, name);
         data = new DiskData(name, ctx);
-        ctx.pin(data);
+        ctx.dbs.add(data);
       }
+      // check permissions
+      if(!ctx.perm(Perm.READ, data.meta)) {
+        Close.close(data, ctx);
+        throw new BaseXException(PERM_REQUIRED_X, Perm.READ);
+      }
+      return data;
     }
-
-    // check permissions
-    if(!ctx.perm(Perm.READ, data.meta)) {
-      Close.close(data, ctx);
-      throw new BaseXException(PERM_REQUIRED_X, Perm.READ);
-    }
-
-    return data;
   }
 }

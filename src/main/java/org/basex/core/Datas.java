@@ -20,7 +20,7 @@ public final class Datas {
    * @param db name of the database
    * @return data reference
    */
-  synchronized Data pin(final String db) {
+  public synchronized Data pin(final String db) {
     for(final Data d : list) {
       if(d.meta.name.equals(db)) {
         d.pins++;
@@ -35,7 +35,7 @@ public final class Datas {
    * @param data data reference
    * @return true if reference was removed from the pool
    */
-  synchronized boolean unpin(final Data data) {
+  public synchronized boolean unpin(final Data data) {
     for(int d = 0; d < list.size(); d++) {
       final Data dt = list.get(d);
       if(dt == data) {
@@ -48,6 +48,14 @@ public final class Datas {
   }
 
   /**
+   * Adds a data reference to the pool.
+   * @param d data reference
+   */
+  public synchronized void add(final Data d) {
+    list.add(d);
+  }
+
+  /**
    * Checks if the specified database is pinned.
    * @param db name of the database
    * @return result of check
@@ -55,14 +63,6 @@ public final class Datas {
   synchronized boolean pinned(final String db) {
     for(final Data d : list) if(d.meta.name.equals(db)) return true;
     return false;
-  }
-
-  /**
-   * Adds a data reference to the pool.
-   * @param d data reference
-   */
-  synchronized void add(final Data d) {
-    list.add(d);
   }
 
   /**

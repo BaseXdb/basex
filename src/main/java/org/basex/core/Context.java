@@ -31,8 +31,8 @@ public final class Context {
   public final Sessions sessions;
   /** Event pool. */
   public final Events events;
-  /** Database pool. */
-  public final Datas datas;
+  /** Opened databases. */
+  public final Datas dbs;
   /** Users. */
   public final Users users;
   /** Package repository. */
@@ -84,7 +84,7 @@ public final class Context {
   public Context(final Context ctx, final ClientListener cl) {
     listener = cl;
     mprop = ctx.mprop;
-    datas = ctx.datas;
+    dbs = ctx.dbs;
     events = ctx.events;
     sessions = ctx.sessions;
     databases = ctx.databases;
@@ -101,7 +101,7 @@ public final class Context {
    */
   private Context(final MainProp mp) {
     mprop = mp;
-    datas = new Datas();
+    dbs = new Datas();
     events = new Events();
     sessions = new Sessions();
     blocker = new ClientBlocker();
@@ -119,7 +119,7 @@ public final class Context {
    */
   public synchronized void close() {
     while(!sessions.isEmpty()) sessions.get(0).quit();
-    datas.close();
+    dbs.close();
     log.close();
   }
 
@@ -199,39 +199,12 @@ public final class Context {
   }
 
   /**
-   * Adds the specified data reference to the pool.
-   * @param d data reference
-   */
-  public void pin(final Data d) {
-    datas.add(d);
-  }
-
-  /**
-   * Pins and returns an existing data reference for the specified database, or
-   * returns {@code null}.
-   * @param name name of database
-   * @return data reference
-   */
-  public Data pin(final String name) {
-    return datas.pin(name);
-  }
-
-  /**
-   * Unpins a data reference.
-   * @param d data reference
-   * @return {@code true} if reference was removed from the pool
-   */
-  public boolean unpin(final Data d) {
-    return datas.unpin(d);
-  }
-
-  /**
    * Checks if the specified database is pinned.
    * @param db name of database
    * @return result of check
    */
   public boolean pinned(final String db) {
-    return datas.pinned(db) || TableDiskAccess.locked(db, this);
+    return dbs.pinned(db) || TableDiskAccess.locked(db, this);
   }
 
   /**

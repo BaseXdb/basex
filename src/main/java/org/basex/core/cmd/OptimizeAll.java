@@ -102,7 +102,7 @@ public final class OptimizeAll extends ACreate {
     if(cmd != null) cmd.size = m.size;
 
     // check if database is also pinned by other users
-    if(ctx.datas.pins(m.name) > 1) throw new BaseXException(DB_PINNED_X, m.name);
+    if(ctx.dbs.pins(m.name) > 1) throw new BaseXException(DB_PINNED_X, m.name);
 
     // find unique temporary database name
     final String tname = ctx.mprop.random(m.name);
