@@ -116,12 +116,14 @@ final class QueryListener extends Progress {
       final boolean full) throws IOException {
 
     check();
+    boolean init = false;
     try {
       // parses the query
       init();
       try {
         // registers the process
         ctx.register(qp);
+        init = true;
 
         // create serializer
         final Iter ir = qp.iter();
@@ -164,14 +166,13 @@ final class QueryListener extends Progress {
         throw new BaseXException(ex);
       } catch(final ProgressException ex) {
         throw new BaseXException(TIMEOUT_EXCEEDED);
-      } finally {
-        // unregisters the process
-        ctx.unregister(qp);
       }
     } finally {
       // close processor and stop monitoring
       qp.close();
       closed = true;
+      // unregisters the process
+      if(init) ctx.unregister(qp);
     }
   }
 
