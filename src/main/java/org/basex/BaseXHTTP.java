@@ -166,7 +166,7 @@ public final class BaseXHTTP {
     final boolean create = !trg.exists();
 
     // try to locate file from development branch
-    IO in = new IOFile("src/main/webapp/" + file);
+    final IO in = new IOFile("src/main/webapp/" + file);
     final byte[] data;
     if(in.exists()) {
       data = in.read();
@@ -183,7 +183,7 @@ public final class BaseXHTTP {
       }
     } else {
       // try to locate file from resource path
-      InputStream is = BaseXHTTP.class.getResourceAsStream('/' + file);
+      final InputStream is = BaseXHTTP.class.getResourceAsStream('/' + file);
       if(is == null && create) throw new BaseXException(in + " not found.");
       data = new IOStream(is).read();
     }
