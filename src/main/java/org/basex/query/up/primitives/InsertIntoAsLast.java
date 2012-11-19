@@ -2,7 +2,6 @@ package org.basex.query.up.primitives;
 
 import org.basex.data.*;
 import org.basex.data.atomic.*;
-import org.basex.query.*;
 import org.basex.query.up.*;
 import org.basex.query.util.*;
 import org.basex.util.*;
@@ -14,7 +13,6 @@ import org.basex.util.*;
  * @author Lukas Kircher
  */
 public class InsertIntoAsLast extends NodeCopy {
-
   /**
    * Constructor for an insertInto which is part of a replaceElementContent substitution.
    * @param p target pre value
@@ -28,7 +26,7 @@ public class InsertIntoAsLast extends NodeCopy {
   }
 
   @Override
-  public void merge(final UpdatePrimitive p) throws QueryException {
+  public void merge(final UpdatePrimitive p) {
     final ANodeList newInsert = ((NodeCopy) p).insert;
     for(int j = 0; j < newInsert.size(); j++)
       insert.add(newInsert.get(j));
@@ -46,5 +44,5 @@ public class InsertIntoAsLast extends NodeCopy {
   }
 
   @Override
-  public void update(NamePool pool) { }
+  public void update(final NamePool pool) { }
 }
