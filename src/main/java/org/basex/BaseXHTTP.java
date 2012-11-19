@@ -144,26 +144,55 @@ public final class BaseXHTTP {
   }
 
   /**
-   * Returns an input stream to the Jetty configuration file.
-   * @param root web root path
+   * Returns a reference to the Jetty configuration file.
+   * @param root target root directory
    * @return input stream
    * @throws IOException I/O exception
    */
   private static IOFile initJetty(final String root) throws IOException {
-    // try to locate file in HTTP path and development branch
-    final IOFile trg = new IOFile(root + '/' + JETTYCONF);
-    if(!trg.exists()) {
-      // try to copy WEB-INF files from development branch
-      final IOFile src = new IOFile("src/main/webapp/" + JETTYCONF);
-      if(!src.exists()) throw new BaseXException(trg + " not found.");
-      final IOFile trgDir = trg.dir();
-      for(final IOFile s : src.dir().children()) {
-        final IOFile t = new IOFile(trgDir, s.name());
-        if(!s.isDir() && !t.exists()) {
-          Util.errln("Copy " + s + " to " + trgDir);
-          s.copyTo(t);
+    locate(WEBCONF, root);
+    return locate(JETTYCONF, root);
+  }
+
+  /**
+   * Locates the specified configuration file.
+   * @param file file to be copied
+   * @param root target root directory
+   * @return reference to created file
+   * @throws IOException I/O exception
+   */
+  private static IOFile locate(final String file, final String root) throws IOException {
+    final IOFile trg = new IOFile(root + '/' + file);
+    final boolean create = !trg.exists();
+
+    // try to locate file from development branch
+    IO in = new IOFile("src/main/webapp/" + file);
+    final byte[] data;
+    if(in.exists()) {
+      data = in.read();
+      // check if resource path exists
+      IOFile res = new IOFile("src/main/resources/");
+      if(res.exists()) {
+        res = new IOFile(res, file);
+        // update file in resource path if it has changed
+        if(!res.exists() || !Token.eq(data, res.read())) {
+          Util.errln("Updating " +  res);
+          res.dir().md();
+          res.write(in.read());
         }
       }
+    } else {
+      // try to locate file from resource path
+      InputStream is = BaseXHTTP.class.getResourceAsStream('/' + file);
+      if(is == null && create) throw new BaseXException(in + " not found.");
+      data = new IOStream(is).read();
+    }
+
+    if(create) {
+      // create configuration file
+      Util.errln("Creating " +  trg);
+      trg.dir().md();
+      trg.write(data);
     }
     return trg;
   }

@@ -22,6 +22,8 @@ public interface HTTPText {
   String WEB_INF = "WEB-INF/";
   /** Path to jetty configuration file. */
   String JETTYCONF = WEB_INF + "jetty.xml";
+  /** Path to web configuration file. */
+  String WEBCONF = WEB_INF + "web.xml";
 
   /** Error: no password. */
   String NOPASSWD = "No username/password specified.";
