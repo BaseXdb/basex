@@ -1,8 +1,11 @@
 package org.basex.query.up.primitives;
 
+import org.basex.query.up.*;
+
 
 /**
- * {@link UpdatePrimitive} types.
+ * {@link UpdatePrimitive} types. Do not change the order as this affects
+ * {@link UpdatePrimitiveComparator} and will most likely lead to weird results.
  * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
@@ -23,6 +26,7 @@ public enum PrimitiveType {
   /** Replace value.           */ REPLACEVALUE,
   /** Insert attribute.        */ INSERTATTR,
   /** Insert into as first.    */ INSERTINTOFIRST,
-  /** Insert into.             */ INSERTINTO, // serves as 'into' and 'into as last'
+  /** Insert into.             */ INSERTINTO,
+  /** Insert into as last.     */ INSERTINTOLAST,
   /** Insert after.            */ INSERTAFTER,
 }

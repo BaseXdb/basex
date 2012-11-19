@@ -122,7 +122,7 @@ public final class ReplaceValue extends UpdatePrimitive {
         m.insert(0);
         // add the substituting insertInto statement to the list
         l.add(new InsertInto(targetPre, data, info, new ANodeList(new DBNode(m, 0)),
-            false, true));
+            true));
       }
       return l.toArray(new UpdatePrimitive[l.size()]);
     }
