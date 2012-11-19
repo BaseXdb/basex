@@ -130,8 +130,8 @@ final class NodeUpdates {
       for(final UpdatePrimitive p : prim) {
         /* Add only InsertIntos that are part of the substitution and make sure no
          * other primitive is added, that adds nodes to the child axis of T. */
-        if(p.type != INSERTINTOFIRST && p.type != INSERTINTO ||
-            p.type == INSERTINTO && ((InsertInto) p).rec)
+        if(p.type != INSERTINTOFIRST && p.type != INSERTINTO && p.type != INSERTINTOLAST
+            || p.type == INSERTINTO && ((InsertInto) p).rec)
           primnew.add(p);
       }
       prim = primnew.toArray(new UpdatePrimitive[primnew.size()]);

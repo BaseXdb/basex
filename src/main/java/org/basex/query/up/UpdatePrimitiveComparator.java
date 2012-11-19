@@ -86,8 +86,10 @@ public class UpdatePrimitiveComparator implements Comparator<UpdatePrimitive> {
      * - InsertIntoAsFirst, as this must be executed before anything on the attribute
      *   axis of T
      */
-    final boolean aIsInsertInto = a.type == INSERTINTO || a.type == INSERTAFTER;
-    final boolean bIsInsertInto = b.type == INSERTINTO || b.type == INSERTAFTER;
+    final boolean aIsInsertInto = a.type == INSERTINTO || a.type == INSERTINTOLAST ||
+        a.type == INSERTAFTER;
+    final boolean bIsInsertInto = b.type == INSERTINTO || b.type == INSERTINTOLAST ||
+        b.type == INSERTAFTER;
     final boolean aIsInsertIntoAsFirst = a.type == INSERTINTOFIRST;
     final boolean bIsInsertIntoAsFirst = b.type == INSERTINTOFIRST;
     final int aPre = a.targetPre;

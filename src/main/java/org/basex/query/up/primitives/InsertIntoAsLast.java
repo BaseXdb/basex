@@ -8,22 +8,23 @@ import org.basex.query.util.*;
 import org.basex.util.*;
 
 /**
- * Insert into as first primitive.
+ * Insert into as last primitive.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
-public final class InsertIntoAsFirst extends NodeCopy {
+public class InsertIntoAsLast extends NodeCopy {
+
   /**
-   * Constructor.
-   * @param p target node pre value
-   * @param d target data reference
+   * Constructor for an insertInto which is part of a replaceElementContent substitution.
+   * @param p target pre value
+   * @param d target data instance
    * @param i input info
-   * @param c insertion sequence node list
+   * @param n node copy insertion sequence
    */
-  public InsertIntoAsFirst(final int p, final Data d, final InputInfo i,
-      final ANodeList c) {
-    super(PrimitiveType.INSERTINTOFIRST, p, d, i, c);
+  public InsertIntoAsLast(final int p, final Data d, final InputInfo i,
+      final ANodeList n) {
+    super(PrimitiveType.INSERTINTOLAST, p, d, i, n);
   }
 
   @Override
@@ -35,8 +36,8 @@ public final class InsertIntoAsFirst extends NodeCopy {
 
   @Override
   public void addAtomics(final AtomicUpdateList l) {
-    l.addInsert(targetPre + data.attSize(targetPre, data.kind(targetPre)), targetPre,
-        insseq, false);
+    final int s = data.size(targetPre, data.kind(targetPre));
+    l.addInsert(targetPre + s, targetPre, insseq, false);
   }
 
   @Override
@@ -45,5 +46,5 @@ public final class InsertIntoAsFirst extends NodeCopy {
   }
 
   @Override
-  public void update(final NamePool pool) { }
+  public void update(NamePool pool) { }
 }
