@@ -28,7 +28,7 @@ public final class InsertIntoAsFirst extends NodeCopy {
 
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
-    final ANodeList newInsert = ((InsertIntoAsFirst) p).insert;
+    final ANodeList newInsert = ((NodeCopy) p).insert;
     for(int j = 0; j < newInsert.size(); j++)
       insert.add(newInsert.get(j));
   }
