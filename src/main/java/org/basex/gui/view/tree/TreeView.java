@@ -723,7 +723,7 @@ public final class TreeView extends View implements TreeConstants {
 
     g.setColor(color(8));
 
-    int fh = fontHeight;
+    final int fh = fontHeight;
     if(root) {
       g.fillRect(x, y + h, w + 2, fh + 2);
       g.setColor(color(6));

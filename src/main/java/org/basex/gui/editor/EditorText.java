@@ -253,7 +253,7 @@ public final class EditorText {
    * @param select selection flag
    */
   void home(final boolean select) {
-    int p = ps;
+    final int p = ps;
     boolean s = true;
     // find beginning of line
     while(prev(select) != '\n') s &= ws(curr());
