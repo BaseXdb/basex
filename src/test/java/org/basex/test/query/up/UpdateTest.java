@@ -104,6 +104,28 @@ public final class UpdateTest extends AdvancedQueryTest {
   }
 
   /**
+   * Tests if insertion sequences are merged in a consistent way.
+   */
+  @Test
+  public void insertSequenceMerging() {
+    query(transform("<n/>",
+        "insert node <e1/> into $input, insert node <e2/> into $input"),
+        "<n><e1/><e2/></n>");
+
+    query(transform("<n/>",
+        "insert node <e1/> as last into $input, insert node <e2/> as last into $input"),
+        "<n><e1/><e2/></n>");
+
+    query(transform("<n/>",
+        "insert node <e1/> into $input, insert node <e2/> as last into $input"),
+        "<n><e1/><e2/></n>");
+
+    query(transform("<n/>",
+        "insert node <e1/> as last into $input, insert node <e2/> into $input"),
+        "<n><e2/><e1/></n>");
+  }
+
+  /**
    * Delete last node of a data instance. Checks if table limits are crossed.
    */
   @Test
