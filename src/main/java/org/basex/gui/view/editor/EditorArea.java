@@ -27,7 +27,7 @@ import org.basex.query.*;
 final class EditorArea extends Editor {
   /** Pattern for detecting library modules. */
   private static final Pattern LIBMOD_PATTERN = Pattern.compile(
-    "^(xquery( version ['\"].*?['\"])?( encoding ['\"].*?['\"])?; ?)?module namespace.*");
+  "^(xquery( version ['\"].*?['\"])?( encoding ['\"].*?['\"])? ?; ?)?module namespace.*");
 
   /** File label. */
   final BaseXLabel label;
