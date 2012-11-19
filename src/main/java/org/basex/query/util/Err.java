@@ -735,7 +735,7 @@ public enum Err {
   INVPOS(XPTY, 4, "Illegal argument position for %: %."),
 
   /** XPTY0018. */
-  EVALNODESVALS(XPTY, 18, "Result yields both nodes and atomic values."),
+  EVALNODESVALS(XPTY, 18, "Path expression contains both nodes and atomic values."),
   /** XPTY0019. */
   NODESPATH(XPTY, 19, "Context node required for %; % found."),
 

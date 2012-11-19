@@ -71,11 +71,11 @@ public final class MixedPath extends Path {
         final Expr e = steps[ex];
         // map operator: don't remove duplicates and check for nodes
         final boolean path = !(e instanceof Bang);
-        final boolean last = ex + 1 == el;
+        //final boolean last = ex + 1 == el;
         final ValueBuilder vb = new ValueBuilder();
 
         // this flag indicates if the resulting items contain nodes
-        boolean nodes = false;
+        int nodes = 0;
         ctx.size = res.size();
         ctx.pos = 1;
 
@@ -87,18 +87,15 @@ public final class MixedPath extends Path {
           // loop through all resulting items
           final Iter ir = ctx.iter(e);
           for(Item i; (i = ir.next()) != null;) {
-            if(path) {
-              // set node flag
-              if(vb.size() == 0) nodes = i instanceof ANode;
-              // check if both nodes and atomic values occur in last result
-              else if(last && nodes != i instanceof ANode) EVALNODESVALS.thrw(info);
-            }
+            if(path && i instanceof ANode) nodes++;
             vb.add(i);
           }
           ctx.pos++;
         }
+        // check if both nodes and atomic values occur in last result
+        if(nodes > 0 && nodes < vb.size()) EVALNODESVALS.thrw(info);
 
-        if(nodes && path) {
+        if(nodes == vb.size() && path) {
           // remove potential duplicates from node sets
           final NodeSeqBuilder nc = new NodeSeqBuilder().check();
           for(Item it; (it = vb.next()) != null;) nc.add((ANode) it);

@@ -99,6 +99,8 @@ public final class SimpleTest extends QueryTest {
 
       { "Div 1", "xs:dayTimeDuration('PT0S') div xs:dayTimeDuration('PT0S')" },
       { "Div 2", "xs:yearMonthDuration('P0M') div xs:yearMonthDuration('P0M')" },
+
+      { "Mixed 1", "(<a/>,<b/>)/(if(name() = 'a') then <a/> else 2)/." }
     };
   }
 }
