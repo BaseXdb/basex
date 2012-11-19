@@ -129,17 +129,6 @@ public enum Err {
   /** BXRE0011. */
   BXRE_JARFAIL(BXRE, 11, "Reading JAR descriptor failed: %."),
 
-  // Session module
-
-  /** BXSE0001. */
-  BXSE_FITEM(BXSE, 1, "Function items cannot be stored in sessions."),
-  /** BXSE0002. */
-  BXSE_GET(BXSE, 2, "Stored attribute cannot be retrieved: %"),
-  /** BXSE0003. */
-  BXSE_SESS(BXSE, 3, "Servlet context required."),
-  /** BXSE0004. */
-  BXSE_WHICH(BXSE, 4, "Session not found: %"),
-
   // SQL module
 
   /** BXSQ0001. */
