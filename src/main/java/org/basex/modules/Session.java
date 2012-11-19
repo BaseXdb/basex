@@ -1,7 +1,5 @@
 package org.basex.modules;
 
-import static org.basex.query.util.Err.*;
-
 import java.util.*;
 
 import javax.servlet.http.*;
@@ -89,7 +87,7 @@ public final class Session extends QueryModule {
     final Object o = session().getAttribute(key.toJava());
     if(o == null) return def;
     if(o instanceof Item) return (Item) o;
-    throw BXSE_GET.thrw(null, Util.name(o));
+    throw SessionErrors.noAttribute(Util.name(o));
   }
 
   /**
@@ -106,7 +104,7 @@ public final class Session extends QueryModule {
       // convert database node to main memory data instance
       it = ((ANode) it).dbCopy(context.context.prop);
     } else if(it instanceof FItem) {
-      BXSE_FITEM.thrw(null);
+      throw SessionErrors.functionItem();
     }
     session().setAttribute(key.toJava(), it);
   }
@@ -136,7 +134,7 @@ public final class Session extends QueryModule {
    * @throws QueryException query exception
    */
   private HttpSession session() throws QueryException {
-    if(context.http == null) BXSE_SESS.thrw(null);
+    if(context.http == null) throw SessionErrors.noContext();
     return ((HTTPContext) context.http).req.getSession();
   }
 }
