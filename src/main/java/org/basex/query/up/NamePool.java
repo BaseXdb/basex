@@ -20,8 +20,10 @@ public final class NamePool {
   private QNm[] names = new QNm[1];
   /** Attribute/element flag. */
   private boolean[] attr = new boolean[1];
-  /** Number of occurrences. */
-  private int[] occ = new int[1];
+  /** Counts the number of times the name is added. */
+  private int[] add = new int[1];
+  /** States if the name is deleted. */
+  private boolean[] del = new boolean[1];
   /** Number of entries. */
   private int size;
 
@@ -33,7 +35,7 @@ public final class NamePool {
   public void add(final QNm name, final Type type) {
     if(type != NodeType.ATT && type != NodeType.ELM) return;
     final int i = index(name, type == NodeType.ATT);
-    occ[i]++;
+    add[i]++;
   }
 
   /**
@@ -43,7 +45,7 @@ public final class NamePool {
   public void remove(final ANode node) {
     if(node.type != NodeType.ATT && node.type != NodeType.ELM) return;
     final int i = index(node.qname(), node.type == NodeType.ATT);
-    occ[i]--;
+    del[i] = true;
   }
 
   /**
@@ -51,7 +53,8 @@ public final class NamePool {
    * @return duplicate attribute, or {@code null}
    */
   QNm duplicate() {
-    for(int i = 0; i < size; ++i) if(occ[i] > 1) return names[i];
+    // if node has been deleted, overall count for duplicates must be bigger 2
+    for(int i = 0; i < size; ++i) if(add[i] > (del[i] ? 2 : 1)) return names[i];
     return null;
   }
 
@@ -62,7 +65,7 @@ public final class NamePool {
   boolean nsOK() {
     final Atts at = new Atts();
     for(int i = 0; i < size; ++i) {
-      if(occ[i] <= 0) continue;
+      if(add[i] <= (del[i] ? 1 : 0)) continue;
       final QNm nm = names[i];
       final byte[] pref = nm.prefix();
       final byte[] uri = nm.uri();
@@ -87,7 +90,8 @@ public final class NamePool {
     if(size == names.length) {
       names = Arrays.copyOf(names, size << 1);
       attr = Arrays.copyOf(attr, size << 1);
-      occ = Arrays.copyOf(occ, size << 1);
+      add = Arrays.copyOf(add, size << 1);
+      del = Arrays.copyOf(del, size << 1);
     }
     names[size] = name;
     attr[size] = at;
