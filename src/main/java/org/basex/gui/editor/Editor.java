@@ -315,12 +315,13 @@ public class Editor extends BaseXPanel {
   /**
    * Performs a search.
    * @param sc search context
+   * @param jump jump to next hit
    */
-  final void search(final SearchContext sc) {
+  final void search(final SearchContext sc, final boolean jump) {
     try {
       rend.search(sc);
       gui.status.setText(sc.search.isEmpty() ? OK : Util.info(STRINGS_FOUND_X,  sc.nr()));
-      jump(SearchDir.CURRENT, false);
+      if(jump) jump(SearchDir.CURRENT, false);
     } catch(final Exception ex) {
       final String msg = Util.message(ex).replaceAll(Prop.NL + ".*", "");
       gui.status.setError(REGULAR_EXPR + COLS + msg);

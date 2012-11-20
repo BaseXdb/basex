@@ -144,9 +144,10 @@ public final class SearchPanel extends BaseXBack {
   /**
    * Sets the specified editor and updates the component layout.
    * @param e editor
+   * @param srch triggers a search in the specified editor
    * @return self reference
    */
-  public SearchPanel editor(final Editor e) {
+  public SearchPanel editor(final Editor e, final boolean srch) {
     final boolean ed = e.isEditable();
     if(editor == null || ed != editor.isEditable()) {
       removeAll();
@@ -172,6 +173,8 @@ public final class SearchPanel extends BaseXBack {
     editor = e;
     refreshLayout();
     e.setSearch(this);
+
+    if(srch) search(false);
     return this;
   }
 
@@ -243,10 +246,18 @@ public final class SearchPanel extends BaseXBack {
   /**
    * Searches text in the current editor.
    */
-  public void search() {
+  void search() {
+    search(true);
+  }
+
+  /**
+   * Searches text in the current editor.
+   * @param jump jump to next hit
+   */
+  void search(final boolean jump) {
     final String text = isVisible() ? search.getText() : "";
     rplc.setEnabled(!text.isEmpty());
-    editor.search(new SearchContext(this, text));
+    editor.search(new SearchContext(this, text), jump);
   }
 
   // PRIVATE METHODS ====================================================================

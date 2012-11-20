@@ -108,7 +108,7 @@ public final class EditorView extends View {
     add(se, BorderLayout.CENTER);
 
     // status and query pane
-    search.editor(addTab());
+    search.editor(addTab(), false);
 
     info = new BaseXLabel().setText(OK, Msg.SUCCESS);
     pos = new BaseXLabel(" ");
@@ -212,8 +212,7 @@ public final class EditorView extends View {
       public void stateChanged(final ChangeEvent e) {
         final EditorArea ea = getEditor();
         if(ea == null) return;
-        search.editor(ea);
-        search.search();
+        search.editor(ea, true);
         gui.refreshControls();
         posCode.invokeLater();
       }

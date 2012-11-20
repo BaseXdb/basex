@@ -39,7 +39,7 @@ public final class SearchEditor extends BaseXBack {
     layout(new BorderLayout(0, 2));
     add(center, BorderLayout.CENTER);
     add(search, BorderLayout.SOUTH);
-    if(editor != null) search.editor(editor);
+    if(editor != null) search.editor(editor, false);
   }
 
   /**
