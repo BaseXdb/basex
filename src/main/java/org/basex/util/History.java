@@ -101,7 +101,8 @@ public final class History {
 
     // merge consecutive character inputs without deletions
     int len = str.length;
-    if(pos > 0 && cur[pos] == oc && oc + 1 == nc && hist[pos - 1].length < len) {
+    if(pos > 0 && saved != pos && cur[pos] == oc && oc + 1 == nc &&
+        hist[pos - 1].length < len) {
       hist[pos] = str;
       cur[pos] = nc;
       return;

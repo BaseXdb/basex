@@ -299,9 +299,7 @@ public final class EditorView extends View {
    */
   public boolean save() {
     final EditorArea edit = getEditor();
-    if(!edit.opened()) return saveAs();
-    save(edit.file);
-    return true;
+    return edit.opened() ? save(edit.file) : saveAs();
   }
 
   /**
@@ -315,9 +313,7 @@ public final class EditorView extends View {
         SAVE_AS, edit.file.path(), gui).filter(XQUERY_FILES, IO.XQSUFFIXES);
 
     final IOFile file = fc.select(Mode.FSAVE);
-    if(file == null) return false;
-    save(file);
-    return true;
+    return file != null && save(file);
   }
 
   /**
@@ -571,8 +567,9 @@ public final class EditorView extends View {
   /**
    * Saves the specified editor contents.
    * @param file file to write
+   * @return {@code false} if confirmation was canceled
    */
-  private void save(final IOFile file) {
+  private boolean save(final IOFile file) {
     try {
       final EditorArea edit = getEditor();
       file.write(edit.getText());
@@ -580,8 +577,10 @@ public final class EditorView extends View {
       refreshHistory(file);
       refreshControls(true);
       edit.release(Action.PARSE);
+      return true;
     } catch(final IOException ex) {
       BaseXDialog.error(gui, FILE_NOT_SAVED);
+      return false;
     }
   }
 
