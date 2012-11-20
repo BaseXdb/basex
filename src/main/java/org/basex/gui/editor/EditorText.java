@@ -689,7 +689,7 @@ public final class EditorText {
       return -1;
     }
 
-    int s = spos[0].sortedIndexOf(pc);
+    int s = spos[0].sortedIndexOf(!select || selected() ? pc : pc - 1);
     switch(dir) {
       case CURRENT:  s = s < 0 ? -s - 1 : s;     break;
       case FORWARD:  s = s < 0 ? -s - 1 : s + 1; break;

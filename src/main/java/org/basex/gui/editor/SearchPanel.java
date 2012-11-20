@@ -136,6 +136,7 @@ public final class SearchPanel extends BaseXBack {
         search.store();
         replace.store();
         editor.replace(new ReplaceContext(replace.getText()));
+        deactivate(true);
       }
     });
   }
