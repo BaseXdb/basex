@@ -288,9 +288,7 @@ public final class EditorView extends View {
    * Reverts the contents of the currently opened editor.
    */
   public void reopen() {
-    final EditorArea edit = getEditor();
-    if(edit.opened() && BaseXDialog.confirm(gui,
-        Util.info(REOPEN_FILE_X, edit.file.name()))) edit.reopen();
+    getEditor().reopen(true);
   }
 
   /**
@@ -335,25 +333,17 @@ public final class EditorView extends View {
     EditorArea edit = find(file, true);
     try {
       if(edit != null) {
-        // switch to open file
+        // display open file
         tabs.setSelectedComponent(edit);
-        // check if file in memory was modified, and save it if necessary
-        if(!confirm(edit)) return edit;
-        edit.setText(file.read());
+        edit.reopen(true);
       } else {
         // get current editor
         edit = getEditor();
         // create new tab if current text is stored on disk or has been modified
         if(edit.opened() || edit.modified) edit = addTab();
-        edit.file(file);
         edit.initText(file.read());
+        edit.file(file);
       }
-
-      // update file history and refresh the file modification
-      refreshHistory(file);
-      refreshControls(true);
-      edit.release(Action.PARSE);
-
     } catch(final IOException ex) {
       BaseXDialog.error(gui, FILE_NOT_OPENED);
     }
@@ -364,7 +354,7 @@ public final class EditorView extends View {
    * Refreshes the list of recent query files and updates the query path.
    * @param file new file
    */
-  private void refreshHistory(final IOFile file) {
+  void refreshHistory(final IOFile file) {
     final StringList sl = new StringList();
     String path = null;
     if(file != null) {
@@ -574,9 +564,6 @@ public final class EditorView extends View {
       final EditorArea edit = getEditor();
       file.write(edit.getText());
       edit.file(file);
-      refreshHistory(file);
-      refreshControls(true);
-      edit.release(Action.PARSE);
       return true;
     } catch(final IOException ex) {
       BaseXDialog.error(gui, FILE_NOT_SAVED);

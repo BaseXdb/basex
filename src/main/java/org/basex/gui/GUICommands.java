@@ -142,7 +142,7 @@ public enum GUICommands implements GUICommand {
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
-      b.setEnabled(gui.editor != null && gui.editor.modified(true));
+      b.setEnabled(gui.editor != null);
     }
   },
 

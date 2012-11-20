@@ -17,6 +17,7 @@ import org.basex.gui.editor.*;
 import org.basex.gui.layout.*;
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.util.*;
 
 /**
  * This class extends the text editor by XQuery features.
@@ -67,7 +68,7 @@ final class EditorArea extends Editor {
         gui.context.prop.set(Prop.QUERYPATH, file.path());
         gui.gprop.set(GUIProp.WORKPATH, file.dirPath());
         // reload file if it has been changed
-        if(opened() && !modified && tstamp != file.timeStamp()) reopen();
+        reopen(false);
         // parse content
         release(Action.PARSE);
       }
@@ -164,17 +165,26 @@ final class EditorArea extends Editor {
   }
 
   /**
-   * Reopens a file.
+   * Reverts the contents of the currently opened editor.
+   * @param force enforce reload
    */
-  void reopen() {
-    try {
-      setText(new IOFile(file.path()).read());
-      file(file);
-    } catch(final IOException ex) { /* ignored */ }
+  public void reopen(final boolean force) {
+    if(!opened()) return;
+    final long ts = file.timeStamp();
+    if((tstamp != ts || force) &&
+        BaseXDialog.confirm(gui, Util.info(REOPEN_FILE_X, file.name()))) {
+      try {
+        setText(file.read());
+        file(file);
+      } catch(final IOException ex) {
+        BaseXDialog.error(gui, FILE_NOT_OPENED);
+      }
+    }
+    tstamp = ts;
   }
 
   /**
-   * Sets the file reference.
+   * Updates the file reference, timestamp and history.
    * @param f file
    */
   void file(final IOFile f) {
@@ -182,6 +192,9 @@ final class EditorArea extends Editor {
     tstamp = f.timeStamp();
     setSyntax(file, true);
     hist.save();
+    view.refreshHistory(file);
+    view.refreshControls(true);
+    release(Action.PARSE);
   }
 
   /**
