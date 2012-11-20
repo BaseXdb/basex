@@ -253,15 +253,22 @@ final class DatabaseUpdates {
     final NamePool pool = new NamePool();
     for(final int pre : pres) {
       final NodeUpdates ups = updatePrimitives.get(pre);
+      // add changes introduced by updates to check namespaces and duplicate attributes
       if(ups != null) for(final UpdatePrimitive up : ups.prim) up.update(pool);
     }
+    // check namespaces
     if(!pool.nsOK()) UPNSCONFL2.thrw(null);
 
-    // check for duplicate attributes
-    final IntList il = new IntList();
+    // add the already existing attributes to the name pool
+    final IntSet il = new IntSet();
     for(final int pre : pres) {
       // pre values consist exclusively of element and attribute nodes
       if(data.kind(pre) == Data.ATTR) {
+        final byte[] nm = data.name(pre, Data.ATTR);
+        final QNm name = new QNm(nm);
+        final byte[] uri = data.nspaces.uri(data.nspaces.uri(nm, pre));
+        if(uri != null) name.uri(uri);
+        pool.add(name, NodeType.ATT);
         il.add(pre);
       } else {
         final int ps = pre + data.attSize(pre, Data.ELEM);
