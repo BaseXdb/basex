@@ -19,6 +19,14 @@ import org.basex.gui.layout.BaseXLayout.DropHandler;
  * @author Christian Gruen
  */
 public final class SearchPanel extends BaseXBack {
+  /** Escape key listener. */
+  private final KeyAdapter escape = new KeyAdapter() {
+    @Override
+    public void keyPressed(final KeyEvent e) {
+      if(ESCAPE.is(e)) deactivate(true);
+    }
+  };
+
   /** GUI reference. */
   final GUI gui;
   /** Action: close panel. */
@@ -61,6 +69,7 @@ public final class SearchPanel extends BaseXBack {
     replace.history(gui, GUIProp.REPLACED);
     replace.setToolTipText(REPLACE_WITH);
     replace.setPreferredSize(null);
+
     regex = onOffButton("s_regex", REGULAR_EXPR, GUIProp.SR_REGEX);
     mcase = onOffButton("s_case", MATCH_CASE, GUIProp.SR_CASE);
     word = onOffButton("s_word", WHOLE_WORD, GUIProp.SR_WORD);
@@ -104,17 +113,15 @@ public final class SearchPanel extends BaseXBack {
       }
     });
 
+    replace.addKeyListener(escape);
     replace.addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyPressed(final KeyEvent e) {
-        if(ESCAPE.is(e)) deactivate(true);
-      }
       @Override
       public void keyReleased(final KeyEvent e) {
         main.gprop.set(GUIProp.SR_REPLACE, replace.getText());
       }
     });
 
+    cls.addKeyListener(escape);
     cls.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
@@ -122,6 +129,7 @@ public final class SearchPanel extends BaseXBack {
       }
     });
 
+    rplc.addKeyListener(escape);
     rplc.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
@@ -254,6 +262,7 @@ public final class SearchPanel extends BaseXBack {
 
     final BaseXButton b = new BaseXButton(gui, icon, help);
     b.setSelected(gui.gprop.is(option));
+    b.addKeyListener(escape);
     b.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
