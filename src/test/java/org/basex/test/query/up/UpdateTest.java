@@ -155,6 +155,30 @@ public final class UpdateTest extends AdvancedQueryTest {
   }
 
   /**
+   * Tests detection of duplicate attributes in insertion sequences and whether a
+   * combination of delete/insert/replace can lead to duplicate attributes.
+   */
+  @Test
+  public void duplicateAttribute() {
+    // check 'global' duplicate detection
+    String q = transform("<x/>",
+        "for $i in 1 to 2 return insert node attribute a { 'b' } into $input");
+    error(q, Err.UPATTDUPL);
+
+    // check if insertion sequence itself is duplicate free (which it is not)
+    q = transform("<x a='a'/>",
+        "delete node $input/@a," +
+        "for $i in 1 to 2 return insert node attribute a { 'b' } into $input");
+    error(q, Err.UPATTDUPL);
+
+    // replace with a + delete a + insert a
+    q = transform("<x a='a'/>",
+        "delete node $input/@a, replace node $input/@a with attribute a {'b'}," +
+        "insert node attribute a { 'b' } into $input");
+    error(q, Err.UPATTDUPL);
+  }
+
+  /**
    * Replace last node of a data instance. Checks if table limits are crossed.
    */
   @Test
