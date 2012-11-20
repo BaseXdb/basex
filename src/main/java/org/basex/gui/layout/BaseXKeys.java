@@ -68,8 +68,7 @@ public enum BaseXKeys {
 
   // Navigation
 
-  /** Jump to input bar.     */ INPUT1(SC, VK_L, true),
-  /** Jump to input bar.     */ INPUT2(MAC ? SC : 0, VK_F6, true),
+  /** Jump to input bar.     */ INPUTBAR(MAC ? SC : 0, VK_F6, true),
   /** Next panel.            */ NEXTTAB(CTRL, VK_TAB, true),
   /** Previous panel.        */ PREVTAB(CTRL | SHF, VK_TAB, true),
 

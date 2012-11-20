@@ -220,9 +220,7 @@ public final class BaseXLayout {
         }
 
         // jump to input bar
-        if(INPUT1.is(e) || INPUT2.is(e)) {
-          gui.input.requestFocusInWindow();
-        }
+        if(INPUTBAR.is(e)) gui.input.requestFocusInWindow();
 
         // change font size
         final int fs = gui.gprop.num(GUIProp.FONTSIZE);

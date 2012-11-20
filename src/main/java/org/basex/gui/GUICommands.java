@@ -175,6 +175,14 @@ public enum GUICommands implements GUICommand {
     }
   },
 
+  /** Jumps to a certain line. */
+  C_EDIT_GOTO(GO_TO_LINE + DOTS, "% L", H_GO_TO_LINE, false, false) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.gotoLine();
+    }
+  },
+
   /** Exits the application. */
   C_EXIT(EXIT, "% Q", H_EXIT, false, false) {
     @Override

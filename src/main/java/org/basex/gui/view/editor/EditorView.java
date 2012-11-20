@@ -17,6 +17,7 @@ import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.GUIConstants.Msg;
+import org.basex.gui.dialog.*;
 import org.basex.gui.editor.Editor.Action;
 import org.basex.gui.editor.*;
 import org.basex.gui.layout.*;
@@ -391,6 +392,25 @@ public final class EditorView extends View {
       // if necessary, activate last editor tab
       tabs.setSelectedIndex(i - 1);
     }
+  }
+
+  /**
+   * Jumps to a specific line.
+   */
+  public void gotoLine() {
+    final DialogLine dl = new DialogLine(gui);
+    if(!dl.ok()) return;
+    final EditorArea edit = getEditor();
+    final int el = dl.line();
+    final int ll = edit.last.length;
+    int p = 0;
+    for(int l = 1, e = 0; e < ll && l < el; e += cl(edit.last, e)) {
+      if(edit.last[e] != '\n') continue;
+      p = e + 1;
+      ++l;
+    }
+    edit.setCursor(p);
+    posCode.invokeLater();
   }
 
   /**

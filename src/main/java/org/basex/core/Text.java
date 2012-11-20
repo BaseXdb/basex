@@ -837,6 +837,8 @@ public interface Text {
   /** Command info. */
   String CLOSE = lang("close");
   /** Command info. */
+  String GO_TO_LINE = lang("go_to_line");
+  /** Command info. */
   String COLORS = lang("colors");
   /** Command info. */
   String CUT = lang("cut");
@@ -1122,6 +1124,8 @@ public interface Text {
   String DATABASES = lang("databases");
   /** Backups. */
   String BACKUPS = lang("backups");
+  /** Line number. */
+  String LINE_NUMBER = lang("line_number");
 
   /** Dialog title for renaming a database. */
   String RENAME_DB = lang("rename_db");
@@ -1367,6 +1371,8 @@ public interface Text {
   String H_REPLACE = lang("h_replace");
   /** Help string. */
   String H_CLOSE_FILE = lang("h_close_file");
+  /** Help string. */
+  String H_GO_TO_LINE = lang("h_go_to_line");
   /** Command info. */
   String H_SAVE = lang("h_save");
 
