@@ -147,18 +147,14 @@ public final class FNXslt extends StandardFunc {
 
     // create transformer
     final TransformerFactory tc = TransformerFactory.newInstance();
-    final Transformer tr =  tc.newTransformer(
-        new StreamSource(new ByteArrayInputStream(xsl.read())));
+    final Transformer tr =  tc.newTransformer(new StreamSource(xsl.inputStream()));
 
     // bind parameters
     for(final byte[] key : par) tr.setParameter(string(key), string(par.get(key)));
 
-    // create serializer
-    final ArrayOutput ao = new ArrayOutput();
-
     // do transformation and return result
-    tr.transform(new StreamSource(new ByteArrayInputStream(in.read())),
-        new StreamResult(ao));
+    final ArrayOutput ao = new ArrayOutput();
+    tr.transform(new StreamSource(in.inputStream()), new StreamResult(ao));
     return ao.toArray();
   }
 }
