@@ -292,7 +292,7 @@ public final class FNDate extends StandardFunc {
     } else {
       final DTd dtd = (DTd) checkType(zon, AtomType.DTD);
       tz = (int) (dtd.min() + dtd.hou() * 60);
-      if(dtd.sec().signum() != 0 || Math.abs(tz) > 840) {
+      if(dtd.sec().signum() != 0 || Math.abs(tz) > 840 || dtd.day() != 0) {
         INVALZONE.thrw(info, zon);
       }
     }
