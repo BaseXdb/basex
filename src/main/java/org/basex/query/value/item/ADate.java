@@ -161,19 +161,18 @@ public abstract class ADate extends Item {
 
   @Override
   public final boolean eq(final InputInfo ii, final Item it) throws QueryException {
-    final long d1 = days();
     final ADate d = (ADate) (it instanceof ADate ? it : type.cast(it, null, ii));
-    final long d2 = d.days();
-    return d1 == d2 && seconds().doubleValue() == d.seconds().doubleValue();
+    final double d1 = days() * Dur.DAYSECONDS + seconds().doubleValue();
+    final double d2 = d.days() * Dur.DAYSECONDS + d.seconds().doubleValue();
+    return d1 == d2;
   }
 
   @Override
   public int diff(final InputInfo ii, final Item it) throws QueryException {
-    final long d1 = days();
     final ADate d = (ADate) (it instanceof ADate ? it : type.cast(it, null, ii));
-    final long d2 = d.days();
-    if(d1 != d2) return (int) (d1 - d2);
-    return seconds().subtract(d.seconds()).signum();
+    final double d1 = days() * Dur.DAYSECONDS + seconds().doubleValue();
+    final double d2 = d.days() * Dur.DAYSECONDS + d.seconds().doubleValue();
+    return d1 < d2 ? -1 : d1 > d2 ? 0 : 0;
   }
 
   @Override
