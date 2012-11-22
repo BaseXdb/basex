@@ -1,7 +1,6 @@
 package org.basex.query.value.item;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.util.Token.*;
 
 import java.math.*;
 import java.util.regex.*;
@@ -81,14 +80,13 @@ public class Dur extends Item {
 
     final String val = Token.string(v).trim();
     final Matcher mt = DUR.matcher(val);
-    if(!mt.matches() || val.endsWith("P") || val.endsWith("T"))
-      dateErr(v, XDURR, ii);
-    final int y = mt.group(2) != null ? toInt(mt.group(3)) : 0;
-    final int m = mt.group(4) != null ? toInt(mt.group(5)) : 0;
-    final long d = mt.group(6) != null ? toInt(mt.group(7)) : 0;
-    final long h = mt.group(9) != null ? toInt(mt.group(10)) : 0;
-    final long n = mt.group(11) != null ? toInt(mt.group(12)) : 0;
-    final double s = mt.group(13) != null ? toDouble(token(mt.group(14))) : 0;
+    if(!mt.matches() || val.endsWith("P") || val.endsWith("T")) dateErr(v, XDURR, ii);
+    final int y = mt.group(2) != null ? toInt(mt.group(3), ii) : 0;
+    final int m = mt.group(4) != null ? toInt(mt.group(5), ii) : 0;
+    final long d = mt.group(6) != null ? toInt(mt.group(7), ii) : 0;
+    final long h = mt.group(9) != null ? toInt(mt.group(10), ii) : 0;
+    final long n = mt.group(11) != null ? toInt(mt.group(12), ii) : 0;
+    final double s = mt.group(13) != null ? toDouble(mt.group(14), ii) : 0;
 
     mon = y * 12 + m;
     sc = BigDecimal.valueOf(d * DAYSECONDS + h * 3600 + n * 60);
@@ -178,7 +176,7 @@ public class Dur extends Item {
    * @return seconds
    */
   final byte[] sc() {
-    return chopNumber(token(sec().abs().toPlainString()));
+    return Token.chopNumber(Token.token(sec().abs().toPlainString()));
   }
 
   @Override

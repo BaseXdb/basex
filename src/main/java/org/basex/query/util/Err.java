@@ -346,6 +346,8 @@ public enum Err {
   /** FORG0001. */
   TIMERANGE(FORG, 1, "%('%') out of range."),
   /** FORG0001. */
+  DURRANGE(FORG, 1, "%: '%' out of range."),
+  /** FORG0001. */
   FUNCAST(FORG, 1, "Invalid % cast: %."),
   /** FORG0001. */
   INVCAST(FORG, 1, "Invalid cast from % to %: %."),

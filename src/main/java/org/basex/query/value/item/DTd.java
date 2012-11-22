@@ -95,10 +95,10 @@ public final class DTd extends Dur {
     final String val = Token.string(v).trim();
     final Matcher mt = DUR.matcher(val);
     if(!mt.matches() || val.endsWith("P") || val.endsWith("T")) dateErr(v, XDTD, ii);
-    final long d = mt.group(2) != null ? Token.toInt(mt.group(3)) : 0;
-    final long h = mt.group(5) != null ? Token.toInt(mt.group(6)) : 0;
-    final long n = mt.group(7) != null ? Token.toInt(mt.group(8)) : 0;
-    final double s = mt.group(9) != null ? Token.toDouble(Token.token(mt.group(10))) : 0;
+    final long d = mt.group(2) != null ? toInt(mt.group(3), ii) : 0;
+    final long h = mt.group(5) != null ? toInt(mt.group(6), ii) : 0;
+    final long n = mt.group(7) != null ? toInt(mt.group(8), ii) : 0;
+    final double s = mt.group(9) != null ? toDouble(mt.group(10), ii) : 0;
 
     sc = BigDecimal.valueOf(d * DAYSECONDS + h * 3600 + n * 60);
     sc = sc.add(BigDecimal.valueOf(s));

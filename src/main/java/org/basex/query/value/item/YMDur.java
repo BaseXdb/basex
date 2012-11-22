@@ -71,8 +71,8 @@ public final class YMDur extends Dur {
     final Matcher mt = DUR.matcher(val);
     if(!mt.matches() || val.endsWith("P")) dateErr(v, XYMD, ii);
 
-    final int y = mt.group(2) != null ? Token.toInt(mt.group(3)) : 0;
-    final int m = mt.group(4) != null ? Token.toInt(mt.group(5)) : 0;
+    final int y = mt.group(2) != null ? toInt(mt.group(3), ii) : 0;
+    final int m = mt.group(4) != null ? toInt(mt.group(5), ii) : 0;
 
     mon = y * 12 + m;
     if(!mt.group(1).isEmpty()) mon = -mon;

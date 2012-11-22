@@ -251,6 +251,38 @@ public abstract class Item extends Value {
     throw DATEFORMAT.thrw(ii, type, i, ex);
   }
 
+  /**
+   * Converts the specified string to an integer. Returns an exception if the value
+   * is invalid.
+   * @param s string to be converted
+   * @param ii input info
+   * @return integer
+   * @throws QueryException query exception
+   */
+  int toInt(final String s, final InputInfo ii) throws QueryException {
+    try {
+      return Integer.parseInt(s);
+    } catch(final NumberFormatException ex) {
+      throw DURRANGE.thrw(ii, type, s);
+    }
+  }
+
+  /**
+   * Converts the specified string to a double. Returns an exception if the value
+   * is invalid.
+   * @param s string to be converted
+   * @param ii input info
+   * @return integer
+   * @throws QueryException query exception
+   */
+  double toDouble(final String s, final InputInfo ii) throws QueryException {
+    try {
+      return Double.parseDouble(s);
+    } catch(final NumberFormatException ex) {
+      throw DURRANGE.thrw(ii, type, s);
+    }
+  }
+
   @Override
   public String description() {
     return type.toString();

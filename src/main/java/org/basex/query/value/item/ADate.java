@@ -109,10 +109,10 @@ public abstract class ADate extends Item {
     final Matcher mt = TIM.matcher(Token.string(d).trim());
     if(!mt.matches()) dateErr(d, e, ii);
 
-    final int h = Token.toInt(mt.group(1));
-    final int s = Token.toInt(mt.group(3));
+    final int h = toInt(mt.group(1), ii);
+    final int s = toInt(mt.group(3), ii);
     if(s > 59) TIMERANGE.thrw(ii, type, d);
-    final double ms = mt.group(4) != null ? Double.parseDouble(mt.group(4)) : 0;
+    final double ms = mt.group(4) != null ? toDouble(mt.group(4), ii) : 0;
     if(h == 24 && ms > 0) dateErr(d, e, ii);
     zone(mt, 6, d, ii);
   }
@@ -172,7 +172,7 @@ public abstract class ADate extends Item {
     final ADate d = (ADate) (it instanceof ADate ? it : type.cast(it, null, ii));
     final double d1 = days() * Dur.DAYSECONDS + seconds().doubleValue();
     final double d2 = d.days() * Dur.DAYSECONDS + d.seconds().doubleValue();
-    return d1 < d2 ? -1 : d1 > d2 ? 0 : 0;
+    return d1 < d2 ? -1 : d1 > d2 ? 1 : 0;
   }
 
   @Override
