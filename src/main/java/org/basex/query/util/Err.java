@@ -408,7 +408,7 @@ public enum Err {
   /** FORX0001. */
   REGMOD(FORX, 1, "Invalid regular modifier: '%'."),
   /** FORX0002. */
-  REGPAT(FORX, 2, "Invalid pattern: '%'."),
+  REGPAT(FORX, 2, "Invalid pattern: %."),
   /** FORX0003. */
   REGROUP(FORX, 3, "Pattern matches empty string."),
   /** FORX0004. */

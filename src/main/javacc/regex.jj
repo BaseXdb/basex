@@ -182,11 +182,21 @@ PARSER_END(RegExParser)
   int[] quantity() : {
     final int[] qty = new int[2];
   } {
-    <NUMBER> { qty[0] = qty[1] = (Integer) token.getValue(); }
+    <NUMBER> {
+      try {
+        qty[0] = qty[1] = Integer.parseInt((String) token.getValue());
+      } catch(final NumberFormatException ex) {
+        throw new ParseException("Number in quantifier is too large");
+      }
+    }
     [
       <COMMA> { qty[1] = -1; }
       [ <NUMBER> {
-          qty[1] = (Integer) token.getValue();
+          try {
+            qty[1] = Integer.parseInt((String) token.getValue());
+          } catch(final NumberFormatException ex) {
+            throw new ParseException("Number in quantifier is too large");
+          }
           if(qty[0] > qty[1]) throw new ParseException("Illegal quantifier, " +
               "lower > upper bound: {" + qty[0] + "," + qty[1] + "}");
         }

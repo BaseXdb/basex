@@ -229,7 +229,7 @@ public class RegExLexer implements TokenManager, RegExParserConstants {
       tb.add(b);
       pos++;
     }
-    payload = Integer.parseInt(tb.toString());
+    payload = tb.toString();
     return NUMBER;
   }
 
