@@ -131,7 +131,7 @@ public final class Functions extends TokenSet {
         final Levenshtein ls = new Levenshtein();
         for(final AtomType t : AtomType.values()) {
           if(t.par != null && t != AtomType.NOT && t != AtomType.AAT &&
-              ls.similar(lc(ln), lc(t.string()), 0))
+              t != AtomType.BIN && ls.similar(lc(ln), lc(t.string()), 0))
             FUNSIMILAR.thrw(ii, name.string(), t.string());
         }
       }
