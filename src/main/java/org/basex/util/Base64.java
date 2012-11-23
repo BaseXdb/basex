@@ -13,6 +13,8 @@ import org.basex.util.list.*;
 public final class Base64 {
   /** Ending characters. */
   private static final byte[] ENDING = token("AQgw");
+  /** Ending characters. */
+  private static final byte[] ENDING2 = token("AEIMQUYcgkosw048");
 
   /** Hidden constructor. */
   private Base64() { }
@@ -91,35 +93,34 @@ public final class Base64 {
     final ByteList bl = new ByteList();
     for(final byte c : token) if(c < 0 || c > ' ') bl.add(c);
     final byte[] s = bl.toArray();
+    // input must be a multiple of four characters
     if((s.length & 3) != 0) error(s);
 
-    final int l = s.length;
-    final int g = l >>> 2;
+    final int l = s.length, g = l >>> 2;
     int m = 0, n = g;
     if(l != 0) {
       if(s[l - 1] == '=') {
         ++m;
         --n;
       }
-      if(s[l - 2] == '=') ++m;
-      if(m == 2 && !contains(ENDING, s[l - 3])) error(substring(s, l - 3));
+      if(s[l - 2] == '=') {
+        ++m;
+        if(!contains(ENDING, s[l - 3])) error(substring(s, l - 3));
+      }
+      if(m == 1 && !contains(ENDING2, s[l - 2])) error(substring(s, l - 4));
     }
 
     final byte[] val = new byte[3 * g - m];
     int c = 0, o = 0;
     for(int i = 0; i < n; ++i) {
-      final int c0 = b2h(s[c++]);
-      final int c1 = b2h(s[c++]);
-      final int c2 = b2h(s[c++]);
-      final int c3 = b2h(s[c++]);
+      final int c0 = b2h(s[c++]), c1 = b2h(s[c++]), c2 = b2h(s[c++]), c3 = b2h(s[c++]);
       val[o++] = (byte) (c0 << 2 | c1 >> 4);
       val[o++] = (byte) (c1 << 4 | c2 >> 2);
       val[o++] = (byte) (c2 << 6 | c3);
     }
 
     if(m != 0) {
-      final int c0 = b2h(s[c++]);
-      final int c1 = b2h(s[c++]);
+      final int c0 = b2h(s[c++]), c1 = b2h(s[c++]);
       val[o++] = (byte) (c0 << 2 | c1 >> 4);
       if(m == 1) val[o] = (byte) (c1 << 4 | b2h(s[c]) >> 2);
     }
