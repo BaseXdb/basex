@@ -49,8 +49,7 @@ public final class Range extends Arr {
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
     final long[] v = rng(ctx);
-    return v == null || v[0] > v[1] ? Empty.SEQ :
-      v[0] == v[1] ? Int.get(v[0]) : new RangeSeq(v[0], v[1] - v[0] + 1);
+    return v == null ? Empty.SEQ : RangeSeq.get(v[0], v[1]);
   }
 
   /**

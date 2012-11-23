@@ -335,13 +335,28 @@ public final class FNSeq extends StandardFunc {
     if(expr.length > 2) {
       final double dl = checkDbl(expr[2], ctx);
       if(Double.isNaN(dl)) return Empty.ITER;
-      l = s + StrictMath.round(dl);
+      if(dl == Double.POSITIVE_INFINITY) {
+        if(ds == Double.NEGATIVE_INFINITY) return Empty.ITER;
+      } else if(s + dl < l) {
+        l = StrictMath.round(s + dl);
+      }
     }
     final long e = l;
 
+    // optimization: return range iterator
+    if(expr[0] instanceof RangeSeq) {
+      final RangeSeq rs = (RangeSeq) expr[0];
+      final long os = rs.start;
+      final long oe = rs.size() == Long.MAX_VALUE ? rs.size() : os + rs.size();
+      final long ns = Math.max(os, s + os - 1);
+      final long ne = Math.min(oe, e == Long.MAX_VALUE ? e : e + os - 1);
+      return RangeSeq.get(ns, ne == Long.MIN_VALUE ? 0 : ne - 1).iter();
+    }
+
     final Iter iter = ctx.iter(expr[0]);
     final long max = iter.size();
-    return max != -1 ? new Iter() {
+    // return iterator with all supported functions if number of returned values is known
+    if(max != -1) return new Iter() {
       // directly access specified items
       final long m = Math.min(e, max + 1);
       long c = Math.max(1, s);
@@ -363,10 +378,11 @@ public final class FNSeq extends StandardFunc {
         c = Math.max(1, s);
         return true;
       }
-    } : new Iter() {
-      // run through all items
-      long c;
+    };
 
+    // return simple iterator if number of returned values is unknown
+    return new Iter() {
+      long c;
       @Override
       public Item next() throws QueryException {
         while(true) {

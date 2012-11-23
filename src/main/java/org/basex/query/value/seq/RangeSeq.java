@@ -5,6 +5,7 @@ import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -18,16 +19,27 @@ import org.basex.util.*;
  */
 public final class RangeSeq extends Seq {
   /** Start value. */
-  private final long start;
+  public final long start;
 
   /**
    * Constructor.
    * @param s start value
    * @param sz size
    */
-  public RangeSeq(final long s, final long sz) {
+  private RangeSeq(final long s, final long sz) {
     super(sz);
     start = s;
+  }
+
+  /**
+   * Returns a value representation of the specified items.
+   * @param min minimum value
+   * @param max maximum value
+   * @return resulting item or sequence
+   */
+  public static Value get(final long min, final long max) {
+    return min > max ? Empty.SEQ : min == max ? Int.get(min) :
+      new RangeSeq(min, max - min + 1);
   }
 
   @Override

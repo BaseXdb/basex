@@ -121,6 +121,13 @@ public final class FuncTest extends QueryTest {
       { "distinct-values 2", itr(2),
         "count(distinct-values(//line/text()))" },
 
+      { "subsequence 1", empty(),
+        "subsequence(1 to 9223372036854775807, xs:double('-INF'), 1)" },
+      { "subsequence 2", empty(),
+        "subsequence(1 to 9223372036854775806, xs:double('-INF'), 1)" },
+      { "subsequence 3", empty(),
+        "subsequence(1 to 9223372036854775807, xs:double('-INF'), xs:double('INF'))" },
+
       { "substring 1", str("bar"), "substring('foobar', 4)" },
       { "substring 2", str("foo"), "substring('foobar', 1, 3)" },
       { "substring 3", str(""), "substring('foobar', xs:double('NaN'), 3)" },
