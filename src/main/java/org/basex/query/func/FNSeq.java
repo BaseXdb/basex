@@ -208,11 +208,7 @@ public final class FNSeq extends StandardFunc {
    */
   private Iter tail(final QueryContext ctx) throws QueryException {
     final Expr e = expr[0];
-    if(e instanceof Seq) {
-      final Seq seq = (Seq) e;
-      final long rs = seq.size();
-      return rs < 2 ? Empty.ITER : seq.sub(1, rs - 1).iter();
-    }
+    if(e instanceof Seq) return ((Seq) e).sub(1, e.size() - 1).iter();
 
     if(e.type().zeroOrOne()) return Empty.ITER;
 
