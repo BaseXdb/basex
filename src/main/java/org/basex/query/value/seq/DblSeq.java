@@ -42,6 +42,22 @@ public final class DblSeq extends NativeSeq {
     return values;
   }
 
+  @Override
+  public Value sub(final long start, final long length) {
+    final int l = (int) length;
+    final double[] tmp = new double[l];
+    System.arraycopy(values, (int) start, tmp, 0, l);
+    return get(tmp);
+  }
+
+  @Override
+  public Value reverse() {
+    final int s = values.length;
+    final double[] t = new double[s];
+    for(int l = 0, r = s - 1; l < s; l++, r--) t[l] = values[r];
+    return get(t);
+  }
+
   // STATIC METHODS =====================================================================
 
   /**
@@ -61,8 +77,8 @@ public final class DblSeq extends NativeSeq {
    * @return value
    * @throws QueryException query exception
    */
-  public static Value get(final Value[] vals, final long size) throws QueryException {
-    final double[] tmp = new double[(int) size];
+  public static Value get(final Value[] vals, final int size) throws QueryException {
+    final double[] tmp = new double[size];
     int t = 0;
     for(final Value val : vals) {
       // speed up construction, depending on input

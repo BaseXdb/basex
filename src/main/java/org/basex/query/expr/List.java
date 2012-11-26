@@ -68,16 +68,17 @@ public final class List extends Arr {
 
     // return cached integer sequence, cached values or self reference
     Expr e = this;
-    if(val != null) {
-      if(type.type == AtomType.STR) e = StrSeq.get(val, size);
-      else if(type.type == AtomType.BLN) e = BlnSeq.get(val, size);
-      else if(type.type == AtomType.FLT) e = FltSeq.get(val, size);
-      else if(type.type == AtomType.DBL) e = DblSeq.get(val, size);
-      else if(type.type == AtomType.DEC) e = DecSeq.get(val, size);
-      else if(type.type == AtomType.BYT) e = BytSeq.get(val, size);
-      else if(type.type.instanceOf(AtomType.ITR)) e = IntSeq.get(val, size, type.type);
+    int s = (int) size;
+    if(val != null && size <= Integer.MAX_VALUE) {
+      if(type.type == AtomType.STR) e = StrSeq.get(val, s);
+      else if(type.type == AtomType.BLN) e = BlnSeq.get(val, s);
+      else if(type.type == AtomType.FLT) e = FltSeq.get(val, s);
+      else if(type.type == AtomType.DBL) e = DblSeq.get(val, s);
+      else if(type.type == AtomType.DEC) e = DecSeq.get(val, s);
+      else if(type.type == AtomType.BYT) e = BytSeq.get(val, s);
+      else if(type.type.instanceOf(AtomType.ITR)) e = IntSeq.get(val, s, type.type);
       else {
-        final ValueBuilder vb = new ValueBuilder((int) size);
+        final ValueBuilder vb = new ValueBuilder(s);
         for(final Value v : val) vb.add(v);
         e = vb.value();
       }

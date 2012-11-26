@@ -208,6 +208,12 @@ public final class FNSeq extends StandardFunc {
    */
   private Iter tail(final QueryContext ctx) throws QueryException {
     final Expr e = expr[0];
+    if(e instanceof Seq) {
+      final Seq seq = (Seq) e;
+      final long rs = seq.size();
+      return rs < 2 ? Empty.ITER : seq.sub(1, rs - 1).iter();
+    }
+
     if(e.type().zeroOrOne()) return Empty.ITER;
 
     final Iter ir = e.iter(ctx);
@@ -255,6 +261,7 @@ public final class FNSeq extends StandardFunc {
    */
   private Iter distinctValues(final QueryContext ctx) throws QueryException {
     if(expr.length == 2) checkColl(expr[1], ctx);
+    if(expr[0] instanceof RangeSeq) return expr[0].iter(ctx);
 
     return new Iter() {
       final ItemSet map = new ItemSet();
@@ -330,31 +337,31 @@ public final class FNSeq extends StandardFunc {
     final double ds = checkDbl(expr[1], ctx);
     if(Double.isNaN(ds)) return Empty.ITER;
     final long s = StrictMath.round(ds);
+    final boolean si = s == Long.MIN_VALUE;
 
     long l = Long.MAX_VALUE;
     if(expr.length > 2) {
       final double dl = checkDbl(expr[2], ctx);
       if(Double.isNaN(dl)) return Empty.ITER;
-      if(dl == Double.POSITIVE_INFINITY) {
-        if(ds == Double.NEGATIVE_INFINITY) return Empty.ITER;
-      } else if(s + dl < l) {
-        l = StrictMath.round(s + dl);
-      }
+      if(si && dl == Double.POSITIVE_INFINITY) return Empty.ITER;
+      l = StrictMath.round(dl);
     }
-    final long e = l;
+    final boolean li = l == Long.MAX_VALUE;
+    if(si) return li ? expr[0].iter(ctx) : Empty.ITER;
 
-    // optimization: return range iterator
-    if(expr[0] instanceof RangeSeq) {
-      final RangeSeq rs = (RangeSeq) expr[0];
-      final long os = rs.start;
-      final long oe = rs.size() == Long.MAX_VALUE ? rs.size() : os + rs.size();
-      final long ns = Math.max(os, s + os - 1);
-      final long ne = Math.min(oe, e == Long.MAX_VALUE ? e : e + os - 1);
-      return RangeSeq.get(ns, ne == Long.MIN_VALUE ? 0 : ne - 1).iter();
+    // optimization: return subsequence
+    if(expr[0] instanceof Seq) {
+      final Seq seq = (Seq) expr[0];
+      final long rs = seq.size();
+      final long from = Math.max(1, s) - 1;
+      final long len = Math.min(rs - from, l + Math.min(0, s - 1));
+      return from >= rs || len <= 0 ? Empty.ITER : seq.sub(from, len).iter();
     }
 
     final Iter iter = ctx.iter(expr[0]);
     final long max = iter.size();
+    final long e = li ? l : s + l;
+
     // return iterator with all supported functions if number of returned values is known
     if(max != -1) return new Iter() {
       // directly access specified items
@@ -401,6 +408,9 @@ public final class FNSeq extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter reverse(final QueryContext ctx) throws QueryException {
+    // optimization: reverse sequence
+    if(expr[0] instanceof Seq) return ((Seq) expr[0]).reverse().iter();
+
     // materialize value if number of results is unknown
     final Iter iter = ctx.iter(expr[0]);
     final long s = iter.size();

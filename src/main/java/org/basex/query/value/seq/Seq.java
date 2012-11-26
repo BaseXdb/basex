@@ -112,6 +112,20 @@ public abstract class Seq extends Value {
     return h;
   }
 
+  /**
+   * Returns a subsequence.
+   * @param start first value
+   * @param length length of sequence
+   * @return resulting item or sequence
+   */
+  public abstract Value sub(final long start, final long length);
+
+  /**
+   * Returns a sequence in reverse order.
+   * @return sequence
+   */
+  public abstract Value reverse();
+
   @Override
   public void plan(final FElem plan) {
     final FElem el = planElem(SIZE, size);

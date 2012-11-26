@@ -43,6 +43,22 @@ public final class DecSeq extends NativeSeq {
     return values;
   }
 
+  @Override
+  public Value sub(final long start, final long length) {
+    final int l = (int) length;
+    final BigDecimal[] tmp = new BigDecimal[l];
+    System.arraycopy(values, (int) start, tmp, 0, l);
+    return get(tmp);
+  }
+
+  @Override
+  public Value reverse() {
+    final int s = values.length;
+    final BigDecimal[] t = new BigDecimal[s];
+    for(int l = 0, r = s - 1; l < s; l++, r--) t[l] = values[r];
+    return get(t);
+  }
+
   // STATIC METHODS =====================================================================
 
   /**
@@ -62,8 +78,8 @@ public final class DecSeq extends NativeSeq {
    * @return value
    * @throws QueryException query exception
    */
-  public static Value get(final Value[] vals, final long size) throws QueryException {
-    final BigDecimal[] tmp = new BigDecimal[(int) size];
+  public static Value get(final Value[] vals, final int size) throws QueryException {
+    final BigDecimal[] tmp = new BigDecimal[size];
     int t = 0;
     for(final Value val : vals) {
       // speed up construction, depending on input

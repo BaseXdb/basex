@@ -46,6 +46,22 @@ public final class StrSeq extends NativeSeq {
     return tmp;
   }
 
+  @Override
+  public Value sub(final long start, final long length) {
+    final int l = (int) length;
+    final byte[][] tmp = new byte[l][];
+    System.arraycopy(values, (int) start, tmp, 0, l);
+    return get(tmp);
+  }
+
+  @Override
+  public Value reverse() {
+    final int s = values.length;
+    final byte[][] t = new byte[s][];
+    for(int l = 0, r = s - 1; l < s; l++, r--) t[l] = values[r];
+    return get(t);
+  }
+
   // STATIC METHODS =====================================================================
 
   /**
@@ -75,8 +91,8 @@ public final class StrSeq extends NativeSeq {
    * @return value
    * @throws QueryException query exception
    */
-  public static Value get(final Value[] vals, final long size) throws QueryException {
-    final byte[][] tmp = new byte[(int) size][];
+  public static Value get(final Value[] vals, final int size) throws QueryException {
+    final byte[][] tmp = new byte[size][];
     int t = 0;
     for(final Value val : vals) {
       // speed up construction, depending on input

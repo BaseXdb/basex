@@ -38,22 +38,6 @@ public final class DBNodeSeq extends NativeSeq {
     complete = c;
   }
 
-  /**
-   * Creates a node sequence with the given data reference and pre values.
-   * @param v pre values
-   * @param d data reference
-   * @param docs indicates if all values reference document nodes
-   * @param c indicates if values include all document nodes of a database
-   * @return resulting item or sequence
-   */
-  public static Value get(final IntList v, final Data d, final boolean docs,
-      final boolean c) {
-
-    final int s = v.size();
-    return s == 0 ? Empty.SEQ : s == 1 ? new DBNode(d, v.get(0)) :
-      new DBNodeSeq(v.toArray(), d, docs ? NodeType.DOC : NodeType.NOD, c);
-  }
-
   @Override
   public Data data() {
     return data;
@@ -79,5 +63,49 @@ public final class DBNodeSeq extends NativeSeq {
   @Override
   public DBNode itemAt(final long pos) {
     return new DBNode(data, pres[(int) pos]);
+  }
+
+  @Override
+  public Value sub(final long start, final long length) {
+    final int l = (int) length;
+    final double[] tmp = new double[l];
+    System.arraycopy(pres, (int) start, tmp, 0, l);
+    return get(pres, data, type, false);
+  }
+
+  @Override
+  public Value reverse() {
+    final int s = pres.length;
+    final int[] t = new int[s];
+    for(int l = 0, r = s - 1; l < s; l++, r--) t[l] = pres[r];
+    return get(pres, data, type, false);
+  }
+
+  // STATIC METHODS =====================================================================
+
+  /**
+   * Creates a node sequence with the given data reference and pre values.
+   * @param v pre values
+   * @param d data reference
+   * @param docs indicates if all values reference document nodes
+   * @param c indicates if values include all document nodes of a database
+   * @return resulting item or sequence
+   */
+  public static Value get(final IntList v, final Data d, final boolean docs,
+      final boolean c) {
+    return get(v.toArray(), d, docs ? NodeType.DOC : NodeType.NOD, c);
+  }
+
+  /**
+   * Creates a node sequence with the given data reference and pre values.
+   * @param v pre values
+   * @param d data reference
+   * @param t node type
+   * @param c indicates if values include all document nodes of a database
+   * @return resulting item or sequence
+   */
+  public static Value get(final int[] v, final Data d, final Type t, final boolean c) {
+    return v.length == 0 ? Empty.SEQ : v.length == 1 ? new DBNode(d, v[0]) :
+      new DBNodeSeq(v, d, t, c);
   }
 }

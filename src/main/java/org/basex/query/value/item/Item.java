@@ -37,7 +37,19 @@ public abstract class Item extends Value {
 
   @Override
   public final ValueIter iter() {
-    return new ItemIter(this);
+    return new ValueIter() {
+      private boolean req;
+      @Override
+      public Item next() { if(req) return null; req = true; return Item.this; }
+      @Override
+      public long size() { return 1; }
+      @Override
+      public Item get(final long i) { return Item.this; }
+      @Override
+      public boolean reset() { req = false; return true; }
+      @Override
+      public Value value() { return Item.this; }
+    };
   }
 
   @Override
@@ -329,32 +341,5 @@ public abstract class Item extends Value {
    */
   public int typeId() {
     return type.id();
-  }
-
-  /**
-   * Item iterator.
-   * @author BaseX Team 2005-12, BSD License
-   * @author Christian Gruen
-   */
-  private static final class ItemIter extends ValueIter {
-    /** Item. */
-    private final Item item;
-    /** Requested flag. */
-    private boolean req;
-    /**
-     * Constructor.
-     * @param it item
-     */
-    ItemIter(final Item it) { item = it; }
-    @Override
-    public Item next() { if(req) return null; req = true; return item; }
-    @Override
-    public long size() { return 1; }
-    @Override
-    public Item get(final long i) { return item; }
-    @Override
-    public boolean reset() { req = false; return true; }
-    @Override
-    public Value value() { return item; }
   }
 }

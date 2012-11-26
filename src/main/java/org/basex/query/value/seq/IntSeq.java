@@ -62,6 +62,22 @@ public final class IntSeq extends NativeSeq {
     }
   }
 
+  @Override
+  public Value sub(final long start, final long length) {
+    final int l = (int) length;
+    final long[] tmp = new long[l];
+    System.arraycopy(values, (int) start, tmp, 0, l);
+    return get(tmp, type);
+  }
+
+  @Override
+  public Value reverse() {
+    final int s = values.length;
+    final long[] t = new long[s];
+    for(int l = 0, r = s - 1; l < s; l++, r--) t[l] = values[r];
+    return get(t, type);
+  }
+
   // STATIC METHODS =====================================================================
 
   /**
@@ -83,10 +99,10 @@ public final class IntSeq extends NativeSeq {
    * @return value
    * @throws QueryException query exception
    */
-  public static Value get(final Value[] vals, final long size, final Type type)
+  public static Value get(final Value[] vals, final int size, final Type type)
       throws QueryException {
 
-    final long[] tmp = new long[(int) size];
+    final long[] tmp = new long[size];
     int t = 0;
     for(final Value val : vals) {
       // speed up construction, depending on input

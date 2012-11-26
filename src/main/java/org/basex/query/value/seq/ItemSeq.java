@@ -28,7 +28,7 @@ public final class ItemSeq extends Seq {
    * @param it items
    * @param s size
    */
-  ItemSeq(final Item[] it, final int s) {
+  private ItemSeq(final Item[] it, final int s) {
     super(s);
     item = it;
   }
@@ -104,5 +104,21 @@ public final class ItemSeq extends Seq {
   @Override
   public boolean homogeneous() {
     return ret != null && ret != AtomType.ITEM;
+  }
+
+  @Override
+  public Value sub(final long start, final long length) {
+    final int l = (int) length;
+    final Item[] tmp = new Item[l];
+    System.arraycopy(item, (int) start, tmp, 0, l);
+    return get(tmp, l, type);
+  }
+
+  @Override
+  public Value reverse() {
+    final int s = item.length;
+    final Item[] t = new Item[s];
+    for(int l = 0, r = s - 1; l < s; l++, r--) t[l] = item[r];
+    return get(t, s, type);
   }
 }
