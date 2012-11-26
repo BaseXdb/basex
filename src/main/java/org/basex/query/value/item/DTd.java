@@ -64,8 +64,20 @@ public final class DTd extends Dur {
 
     this(it);
     if(Double.isNaN(f)) DATECALC.thrw(ii, description(), f);
-    if(m ? f == 1 / 0d || f == -1 / 0d : f == 0) DATEZERO.thrw(ii, description());
-    sc = sc.multiply(BigDecimal.valueOf(m ? f : 1 / f));
+    if(m ? Double.isInfinite(f) : f == 0) DATEZERO.thrw(ii, description());
+    if(m ? f == 0 : Double.isInfinite(f)) {
+      sc = BigDecimal.valueOf(0);
+    } else {
+      BigDecimal d = BigDecimal.valueOf(f);
+      try {
+        sc = m ? sc.multiply(d) : sc.divide(d);
+      } catch(final ArithmeticException ex) {
+        // catching cases in which a division yields no exact result; eg:
+        // xs:dayTimeDuration("P1D") div xs:double("-1.7976931348623157E308")
+        d = BigDecimal.valueOf(1 / f);
+        sc = m ? sc.divide(d) : sc.multiply(d);
+      }
+    }
     if(Math.abs(sc.doubleValue()) < 1E-13) sc = BigDecimal.valueOf(0);
   }
 
