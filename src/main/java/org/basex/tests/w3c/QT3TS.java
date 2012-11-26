@@ -59,6 +59,8 @@ public final class QT3TS {
   private boolean verbose;
   /** Error code flag. */
   private boolean errors;
+  /** Slow queries flag. */
+  private boolean slow;
   /** Also print ignored files. */
   private boolean ignoring;
   /** All flag. */
@@ -249,6 +251,7 @@ public final class QT3TS {
       string = string(new IOFile(base, qfile).read());
     }
 
+    if(verbose) Util.outln(name);
     final XQuery query = new XQuery(string, ctx);
     if(b != null) query.baseURI(b);
 
@@ -310,8 +313,10 @@ public final class QT3TS {
       ex.printStackTrace();
     }
 
-    final long time = perf.time() / 1000000;
-    if(verbose && time > 100) Util.outln(name + ": " + time + " ms");
+    if(slow) {
+      final long time = perf.time() / 1000000;
+      if(time > 100) Util.outln(name + ": " + time + " ms");
+    }
 
     // revert to XQuery as default
     ctx.prop.set(Prop.XQUERY3, true);
@@ -775,6 +780,7 @@ public final class QT3TS {
         " -d  debugging mode" + NL +
         " -e  check error codes" + NL +
         " -i  also save ignored files" + NL +
+        " -s  print slow queries" + NL +
         " -v  verbose output",
         Util.info(Text.CONSOLE, Util.name(this)));
 
@@ -791,6 +797,8 @@ public final class QT3TS {
           ignoring = true;
         } else if(c == 'e') {
           errors = true;
+        } else if(c == 's') {
+          slow = true;
         } else {
           arg.usage();
         }
