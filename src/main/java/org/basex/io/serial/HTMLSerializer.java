@@ -18,6 +18,8 @@ import org.basex.util.list.*;
 public class HTMLSerializer extends OutputSerializer {
   /** (X)HTML: elements with an empty content model. */
   static final TokenList EMPTIES = new TokenList();
+  /** HTML5: elements with an empty content model. */
+  static final TokenList EMPTIES5 = new TokenList();
   /** (X)HTML: URI attributes. */
   static final TokenSet URIS = new TokenSet();
 
@@ -33,11 +35,11 @@ public class HTMLSerializer extends OutputSerializer {
    * @throws IOException I/O exception
    */
   HTMLSerializer(final OutputStream os, final SerializerProp p) throws IOException {
-    super(os, p, V40, V401);
+    super(os, p, V40, V401, V50);
   }
 
   @Override
-  public void attribute(final byte[] n, final byte[] v) throws IOException {
+  protected void attribute(final byte[] n, final byte[] v) throws IOException {
     // don't append value for boolean attributes
     final byte[] tagatt = concat(lc(elem), COLON, lc(n));
     if(BOOLEAN.contains(tagatt) && eq(n, v)) return;
@@ -64,7 +66,7 @@ public class HTMLSerializer extends OutputSerializer {
   }
 
   @Override
-  public void finishComment(final byte[] n) throws IOException {
+  protected void finishComment(final byte[] n) throws IOException {
     if(sep) indent();
     print(COMM_O);
     print(n);
@@ -72,7 +74,7 @@ public class HTMLSerializer extends OutputSerializer {
   }
 
   @Override
-  public void finishPi(final byte[] n, final byte[] v) throws IOException {
+  protected void finishPi(final byte[] n, final byte[] v) throws IOException {
     if(sep) indent();
     if(contains(v, '>')) SERPI.thrwSerial();
     print(PI_O);
@@ -85,7 +87,7 @@ public class HTMLSerializer extends OutputSerializer {
   @Override
   protected void code(final int ch) throws IOException {
     if(script) printChar(ch);
-    else if(ch > 0x7F && ch < 0xA0) SERILL.thrwSerial(Integer.toHexString(ch));
+    else if(ch > 0x7F && ch < 0xA0 && !html5) SERILL.thrwSerial(Integer.toHexString(ch));
     else if(ch == 0xA0) print(E_NBSP);
     else super.code(ch);
   }
@@ -111,7 +113,8 @@ public class HTMLSerializer extends OutputSerializer {
   protected void finishEmpty() throws IOException {
     if(ct(true, true)) return;
     print(ELEM_C);
-    if(EMPTIES.contains(lc(elem))) return;
+    if((html5 ? EMPTIES5 : EMPTIES).contains(lc(elem)))
+      return;
     sep = false;
     finishClose();
   }
@@ -120,6 +123,20 @@ public class HTMLSerializer extends OutputSerializer {
   protected void finishClose() throws IOException {
     super.finishClose();
     script = script && !SCRIPTS.contains(lc(elem));
+  }
+
+  @Override
+  protected boolean doctype(final byte[] dt) throws IOException {
+    if(level != 0) return false;
+    if(!super.doctype(dt) && html5) {
+      if(sep) indent();
+      print(DOCTYPE);
+      if(dt == null) print(M_HTML);
+      else print(dt);
+      print(ELEM_C);
+      print(nl);
+    }
+    return true;
   }
 
   // HTML Serializer: cache elements
@@ -166,6 +183,23 @@ public class HTMLSerializer extends OutputSerializer {
     EMPTIES.add(token("frame"));
     EMPTIES.add(token("isindex"));
     EMPTIES.add(token("param"));
+    // elements with an empty content model
+    EMPTIES5.add(token("area"));
+    EMPTIES5.add(token("base"));
+    EMPTIES5.add(token("br"));
+    EMPTIES5.add(token("col"));
+    EMPTIES5.add(token("command"));
+    EMPTIES5.add(token("embed"));
+    EMPTIES5.add(token("hr"));
+    EMPTIES5.add(token("img"));
+    EMPTIES5.add(token("input"));
+    EMPTIES5.add(token("keygen"));
+    EMPTIES5.add(token("link"));
+    EMPTIES5.add(token("meta"));
+    EMPTIES5.add(token("param"));
+    EMPTIES5.add(token("source"));
+    EMPTIES5.add(token("track"));
+    EMPTIES5.add(token("wbr"));
     // URI attributes
     URIS.add(token("a:href"));
     URIS.add(token("a:name"));

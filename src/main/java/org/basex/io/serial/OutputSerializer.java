@@ -35,9 +35,13 @@ public abstract class OutputSerializer extends Serializer {
   boolean sep;
   /** Item flag (used for formatting). */
   private boolean item;
+  /** Item separator flag (used for formatting). */
+  boolean isep;
   /** Script flag. */
   boolean script;
 
+  /** HTML5 flag. */
+  final boolean html5;
   /** URI escape flag. */
   final boolean escape;
   /** CData elements. */
@@ -53,7 +57,7 @@ public abstract class OutputSerializer extends Serializer {
   /** Charset. */
   private final Charset encoding;
   /** Item separator. */
-  private final byte[] separator;
+  private final byte[] itemsep;
   /** New line. */
   final byte[] nl;
   /** Output stream. */
@@ -87,8 +91,9 @@ public abstract class OutputSerializer extends Serializer {
       final String... versions) throws IOException {
 
     final SerializerProp p = props == null ? PROPS : props;
-    final String ver = versions.length == 0 ? "" :
-        p.get(S_VERSION).isEmpty() ? versions[0] : p.check(S_VERSION, versions);
+    final String ver = p.supported(S_VERSION, versions);
+    final String htmlver = p.supported(S_HTML_VERSION, new String[] { V40, V401, V50 });
+    html5 = htmlver.equals(V50) || ver.equals(V50);
 
     final boolean decl = !p.yes(S_OMIT_XML_DECLARATION);
     final boolean bom  = p.yes(S_BYTE_ORDER_MARK);
@@ -112,8 +117,9 @@ public abstract class OutputSerializer extends Serializer {
     wrap    = wPre.length != 0;
     final String eol = p.check(S_NEWLINE, S_NL, S_CR, S_CRNL);
     nl = utf8(token(eol.equals(S_NL) ? "\n" : eol.equals(S_CR) ? "\r" : "\r\n"), enc);
-    final String s = p.get(S_SEPARATOR);
-    separator = token(s.indexOf('\\') != -1 ?
+    String s = p.get(S_ITEM_SEPARATOR);
+    if(s.equals(UNDEFINED)) s = p.get(S_SEPARATOR);
+    itemsep = s.equals(UNDEFINED) ? null : token(s.indexOf('\\') != -1 ?
       s.replace("\\n", "\n").replace("\\r", "\r").replace("\\t", "\t") : s);
 
     docsys  = p.get(S_DOCTYPE_SYSTEM);
@@ -192,6 +198,7 @@ public abstract class OutputSerializer extends Serializer {
   public final void reset() {
     sep = false;
     item = false;
+    isep = false;
   }
 
   @Override
@@ -201,17 +208,38 @@ public abstract class OutputSerializer extends Serializer {
   }
 
   @Override
-  public void openResult() throws IOException {
+  public final boolean finished() {
+    return out.finished();
+  }
+
+  // PROTECTED METHODS ==================================================================
+
+  @Override
+  protected void openResult() throws IOException {
+    final byte[] sp = itemsep;
+    if(sp != null) {
+      if(isep) {
+        final int sl = sp.length;
+        if(sl == 1) {
+          printChar(sp[0]);
+        } else {
+          for(int s = 0; s < sl; s += cl(sp, s)) printChar(cp(sp, s));
+        }
+        sep = false;
+      } else {
+        isep = true;
+      }
+    }
     if(wrap) startElement(wPre.length != 0 ? concat(wPre, COLON, T_RESULT) : T_RESULT);
   }
 
   @Override
-  public void closeResult() throws IOException {
+  protected void closeResult() throws IOException {
     if(wrap) closeElement();
   }
 
   @Override
-  public void attribute(final byte[] n, final byte[] v) throws IOException {
+  protected void attribute(final byte[] n, final byte[] v) throws IOException {
     print(' ');
     print(n);
     print(ATT1);
@@ -231,7 +259,7 @@ public abstract class OutputSerializer extends Serializer {
   }
 
   @Override
-  public void finishText(final byte[] b) throws IOException {
+  protected void finishText(final byte[] b) throws IOException {
     if(cdata.isEmpty() || tags.isEmpty() || !cdata.contains(tags.peek())) {
       for(int k = 0; k < b.length; k += cl(b, k)) code(cp(b, k));
     } else {
@@ -256,7 +284,7 @@ public abstract class OutputSerializer extends Serializer {
   }
 
   @Override
-  public void finishText(final byte[] b, final FTPos ftp) throws IOException {
+  protected void finishText(final byte[] b, final FTPos ftp) throws IOException {
     final FTLexer lex = new FTLexer().sc().init(b);
     while(lex.hasNext()) {
       final FTSpan span = lex.next();
@@ -268,7 +296,7 @@ public abstract class OutputSerializer extends Serializer {
   }
 
   @Override
-  public void finishComment(final byte[] n) throws IOException {
+  protected void finishComment(final byte[] n) throws IOException {
     if(sep) indent();
     print(COMM_O);
     print(n);
@@ -277,7 +305,7 @@ public abstract class OutputSerializer extends Serializer {
   }
 
   @Override
-  public void finishPi(final byte[] n, final byte[] v) throws IOException {
+  protected void finishPi(final byte[] n, final byte[] v) throws IOException {
     if(sep) indent();
     print(PI_O);
     print(n);
@@ -288,16 +316,8 @@ public abstract class OutputSerializer extends Serializer {
   }
 
   @Override
-  public void atomic(final Item it) throws IOException {
-    if(sep && item) {
-      final byte[] sp = separator;
-      final int sl = sp.length;
-      if(sl == 1) {
-        printChar(sp[0]);
-      } else {
-        for(int s = 0; s < sl; s += cl(sp, s)) printChar(cp(sp, s));
-      }
-    }
+  protected void atomic(final Item it) throws IOException {
+    if(sep && item) print(' ');
 
     try {
       if(it instanceof StrStream) {
@@ -319,13 +339,8 @@ public abstract class OutputSerializer extends Serializer {
   }
 
   @Override
-  public void openDoc(final byte[] n) throws IOException {
+  protected void openDoc(final byte[] n) throws IOException {
     sep = false;
-  }
-
-  @Override
-  public final boolean finished() {
-    return out.finished();
   }
 
   @Override
@@ -380,10 +395,11 @@ public abstract class OutputSerializer extends Serializer {
   /**
    * Prints the document type declaration.
    * @param dt document type, or {@code null} for html type
+   * @return true if doctype was added
    * @throws IOException I/O exception
    */
-  protected void doctype(final byte[] dt) throws IOException {
-    if(level != 0 || docsys == null) return;
+  protected boolean doctype(final byte[] dt) throws IOException {
+    if(level != 0 || docsys == null) return false;
     if(sep) indent();
     print(DOCTYPE);
     if(dt == null) print(M_HTML);
@@ -397,6 +413,7 @@ public abstract class OutputSerializer extends Serializer {
     print(ELEM_C);
     docsys = null;
     sep = true;
+    return true;
   }
 
   /**

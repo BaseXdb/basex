@@ -472,8 +472,10 @@ public enum Err {
   SERSTAND(SEPM, 9, "Invalid combination of 'omit-xml-declaration'."),
   /** SEPM0010. */
   SERUNDECL(SEPM, 10, "XML 1.0: undeclaring prefixes not allowed."),
+  /** SESU0013. */
+  SERNOTSUPP(SESU, 13, "%."),
   /** SERE0014. */
-  SERILL(SERE, 14, "Illegal HTML character found: #x%."),
+  SERILL(SERE, 14, "Illegal HTML character found: #x%;."),
   /** SERE0015. */
   SERPI(SERE, 15, "Processing construction contains '>'."),
   /** SEPM0016. */

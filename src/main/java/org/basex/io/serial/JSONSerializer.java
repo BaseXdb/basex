@@ -58,7 +58,7 @@ public final class JSONSerializer extends OutputSerializer {
   }
 
   @Override
-  public void attribute(final byte[] name, final byte[] value) throws IOException {
+  protected void attribute(final byte[] name, final byte[] value) throws IOException {
     if(level == 0) {
       final int tl = typeCache.length;
       for(int t = 0; t < tl; t++) {
@@ -116,7 +116,7 @@ public final class JSONSerializer extends OutputSerializer {
   }
 
   @Override
-  public void finishText(final byte[] text) throws IOException {
+  protected void finishText(final byte[] text) throws IOException {
     final byte[] type = types.get(level - 1);
     if(eq(type, T_STRING)) {
       print('"');
@@ -172,17 +172,17 @@ public final class JSONSerializer extends OutputSerializer {
   }
 
   @Override
-  public void finishComment(final byte[] value) throws IOException {
+  protected void finishComment(final byte[] value) throws IOException {
     error("Comments cannot be serialized");
   }
 
   @Override
-  public void finishPi(final byte[] name, final byte[] value) throws IOException {
+  protected void finishPi(final byte[] name, final byte[] value) throws IOException {
     error("Processing instructions cannot be serialized");
   }
 
   @Override
-  public void atomic(final Item value) throws IOException {
+  protected void atomic(final Item value) throws IOException {
     error("Atomic values cannot be serialized");
   }
 

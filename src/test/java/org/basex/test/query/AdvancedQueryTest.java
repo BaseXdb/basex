@@ -2,6 +2,8 @@ package org.basex.test.query;
 
 import static org.junit.Assert.*;
 
+import org.basex.io.out.*;
+import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.test.*;
@@ -15,7 +17,7 @@ import org.basex.util.*;
  */
 public abstract class AdvancedQueryTest extends SandboxTest {
   /**
-   * Runs the specified query.
+   * Runs the specified query and normalizes newlines.
    * @param query query string
    * @return result
    */
@@ -23,8 +25,12 @@ public abstract class AdvancedQueryTest extends SandboxTest {
     final QueryProcessor qp = new QueryProcessor(query, context);
     qp.ctx.sc.baseURI(".");
     try {
-      return qp.execute().toString().replaceAll("(\\r|\\n)+ *", "");
-    } catch(final QueryException ex) {
+      final ArrayOutput ao = new ArrayOutput();
+      final Serializer ser = qp.getSerializer(ao);
+      qp.execute().serialize(ser);
+      ser.close();
+      return ao.toString().replaceAll("(\\r|\\n)+ *", "");
+    } catch(final Exception ex) {
       fail("Query failed:\n" + query + "\nMessage: " + ex.getMessage());
       return null;
     } finally {
@@ -96,9 +102,16 @@ public abstract class AdvancedQueryTest extends SandboxTest {
     final QueryProcessor qp = new QueryProcessor(query, context);
     qp.ctx.sc.baseURI(".");
     try {
-      final String res = qp.execute().toString().replaceAll("(\\r|\\n) *", "");
-      fail("Query did not fail:\n" + query + "\n[E] " + error[0] + "...\n[F] " + res);
-    } catch(final QueryException ex) {
+      final ArrayOutput ao = new ArrayOutput();
+      final Serializer ser = qp.getSerializer(ao);
+      qp.execute().serialize(ser);
+      ser.close();
+      final String res = ao.toString().replaceAll("(\\r|\\n)+ *", "");
+      final StringBuilder sb = new StringBuilder("Query did not fail:\n");
+      sb.append(query + "\n[E]");
+      for(final Err e : error) sb.append(" " + e);
+      fail(sb.append("\n[F] " + res).toString());
+    } catch(final Exception ex) {
       check(query, ex, error);
     } finally {
       qp.close();
@@ -111,8 +124,9 @@ public abstract class AdvancedQueryTest extends SandboxTest {
    * @param ex exception
    * @param error expected errors
    */
-  protected static void check(final String query, final QueryException ex,
+  protected static void check(final String query, final Exception ex,
       final Err... error) {
+
     if(error.length == 0) Util.notexpected("No error code specified");
     final byte[] msg = Token.token(ex.getMessage());
     boolean found = false;

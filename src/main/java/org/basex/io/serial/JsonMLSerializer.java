@@ -48,7 +48,7 @@ public final class JsonMLSerializer extends OutputSerializer {
   }
 
   @Override
-  public void attribute(final byte[] name, final byte[] value) throws IOException {
+  protected void attribute(final byte[] name, final byte[] value) throws IOException {
     print(", ");
     if(!att) {
       print("{");
@@ -62,7 +62,7 @@ public final class JsonMLSerializer extends OutputSerializer {
   }
 
   @Override
-  public void namespace(final byte[] n, final byte[] v) throws IOException {
+  protected void namespace(final byte[] n, final byte[] v) throws IOException {
   }
 
   @Override
@@ -71,7 +71,7 @@ public final class JsonMLSerializer extends OutputSerializer {
   }
 
   @Override
-  public void finishText(final byte[] text) throws IOException {
+  protected void finishText(final byte[] text) throws IOException {
     print(',');
     indent();
     print('"');
@@ -106,13 +106,13 @@ public final class JsonMLSerializer extends OutputSerializer {
   }
 
   @Override
-  public void finishComment(final byte[] value) throws IOException { }
+  protected void finishComment(final byte[] value) throws IOException { }
 
   @Override
-  public void finishPi(final byte[] name, final byte[] value) throws IOException { }
+  protected void finishPi(final byte[] name, final byte[] value) throws IOException { }
 
   @Override
-  public void atomic(final Item value) throws IOException {
+  protected void atomic(final Item value) throws IOException {
     error("Atomic values cannot be serialized");
   }
 

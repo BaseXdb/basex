@@ -26,7 +26,7 @@ public final class RawSerializer extends TextSerializer {
   }
 
   @Override
-  public void atomic(final Item it) throws IOException {
+  protected void atomic(final Item it) throws IOException {
     try {
       final InputStream is = it.input(null);
       try {

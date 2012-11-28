@@ -44,12 +44,18 @@ public final class DOTSerializer extends OutputSerializer {
   }
 
   @Override
+  public void close() throws IOException {
+    indent();
+    print(FOOTER);
+  }
+
+  @Override
   protected void startOpen(final byte[] t) {
     tb.reset();
   }
 
   @Override
-  public void attribute(final byte[] n, final byte[] v) {
+  protected void attribute(final byte[] n, final byte[] v) {
     tb.addExt(DOTATTR, n, v);
   }
 
@@ -80,33 +86,27 @@ public final class DOTSerializer extends OutputSerializer {
   }
 
   @Override
-  public void finishText(final byte[] t) throws IOException {
+  protected void finishText(final byte[] t) throws IOException {
     print(norm(t), DOTData.TEXT);
   }
 
   @Override
-  public void finishComment(final byte[] t) throws IOException {
+  protected void finishComment(final byte[] t) throws IOException {
     print(new TokenBuilder(COMM_O).add(norm(t)).add(COMM_C).finish(), DOTData.COMM);
   }
 
   @Override
-  public void finishPi(final byte[] n, final byte[] v) throws IOException {
+  protected void finishPi(final byte[] n, final byte[] v) throws IOException {
     print(new TokenBuilder(PI_O).add(n).add(SPACE).add(v).add(PI_C).finish(), DOTData.PI);
   }
 
   @Override
-  public void atomic(final Item it) throws IOException {
+  protected void atomic(final Item it) throws IOException {
     try {
       print(norm(it.string(null)), ITEM);
     } catch(final QueryException ex) {
       throw new SerializerException(ex);
     }
-  }
-
-  @Override
-  public void close() throws IOException {
-    indent();
-    print(FOOTER);
   }
 
   /**
@@ -134,12 +134,4 @@ public final class DOTSerializer extends OutputSerializer {
     while(i >= children.size()) children.add(new IntList());
     return children.get(i);
   }
-
-  /**
-  @Override
-  protected byte[] info(final ExprInfo expr) {
-    color = color(expr);
-    return token(name(expr));
-  }
-  */
 }

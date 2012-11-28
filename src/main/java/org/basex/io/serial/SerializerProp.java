@@ -14,6 +14,9 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class SerializerProp extends AProp {
+  /** Undefined flag. */
+  static final String UNDEFINED = "\u0001";
+
   /** Serialization parameter: yes/no. */
   public static final Object[] S_BYTE_ORDER_MARK = {
     "byte-order-mark", NO };
@@ -62,9 +65,15 @@ public final class SerializerProp extends AProp {
   /** Serialization parameter. */
   public static final Object[] S_USE_CHARACTER_MAPS = {
     "use-character-maps", "" };
+  /** Serialization parameter. */
+  public static final Object[] S_ITEM_SEPARATOR = {
+    "item-separator", UNDEFINED };
   /** Serialization parameter: 1.0/1.1. */
   public static final Object[] S_VERSION = {
     "version", "" };
+  /** Serialization parameter: 4.0/4.01/5.0. */
+  public static final Object[] S_HTML_VERSION = {
+    "html-version", "" };
 
   /** Specific serialization parameter: newline. */
   public static final Object[] S_NEWLINE = {
@@ -80,7 +89,7 @@ public final class SerializerProp extends AProp {
     "indents", "2" };
   /** Specific serialization parameter: item separator. */
   public static final Object[] S_SEPARATOR = {
-    "separator", " " };
+    "separator", UNDEFINED };
   /** Specific serialization parameter: prefix of result wrapper. */
   public static final Object[] S_WRAP_PREFIX = {
     "wrap-prefix", "" };
@@ -127,6 +136,22 @@ public final class SerializerProp extends AProp {
   }
 
   /**
+   * Retrieves a value from the specified property and checks for supported values.
+   * @param key property key
+   * @param allowed allowed values
+   * @return value
+   * @throws SerializerException serializer exception
+   */
+  public String supported(final Object[] key, final String... allowed)
+      throws SerializerException {
+
+    final String val = get(key);
+    if(val.isEmpty()) return allowed.length > 0 ? allowed[0] : val;
+    for(final String a : allowed) if(a.equals(val)) return val;
+    throw SERNOTSUPP.thrwSerial(allowed(key[0], val, allowed));
+  }
+
+  /**
    * Retrieves a value from the specified property and checks for its boolean
    * value.
    * @param key property key
@@ -154,11 +179,23 @@ public final class SerializerProp extends AProp {
    */
   public static SerializerException error(final Object key, final String found,
       final String... allowed) throws SerializerException {
+    throw SERANY.thrwSerial(allowed(key, found, allowed));
+  }
+
+  /**
+   * Returns a list of allowed keys.
+   * @param key property key
+   * @param found found value
+   * @param allowed allowed values
+   * @return exception
+   */
+  public static String allowed(final Object key, final String found,
+      final String... allowed) {
 
     final TokenBuilder tb = new TokenBuilder();
     tb.addExt(SERVAL, key, allowed[0]);
     for(int a = 1; a < allowed.length; ++a) tb.addExt(SERVAL2, allowed[a]);
     tb.addExt(SERVAL3, found);
-    throw SERANY.thrwSerial(tb);
+    return tb.toString();
   }
 }

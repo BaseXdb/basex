@@ -23,7 +23,7 @@ public class XHTMLSerializer extends OutputSerializer {
   }
 
   @Override
-  public void attribute(final byte[] n, final byte[] v) throws IOException {
+  protected void attribute(final byte[] n, final byte[] v) throws IOException {
     // escape URI attributes
     final byte[] tagatt = concat(lc(elem), COLON, lc(n));
     final byte[] val = escape && HTMLSerializer.URIS.contains(tagatt) ? escape(v) : v;
@@ -45,7 +45,7 @@ public class XHTMLSerializer extends OutputSerializer {
   @Override
   protected void finishEmpty() throws IOException {
     if(ct(true, false)) return;
-    if(HTMLSerializer.EMPTIES.contains(lc(elem))) {
+    if((html5 ? HTMLSerializer.EMPTIES5 : HTMLSerializer.EMPTIES).contains(lc(elem))) {
       print(' ');
       print(ELEM_SC);
     } else {
@@ -55,7 +55,17 @@ public class XHTMLSerializer extends OutputSerializer {
     }
   }
 
-  // HTML Serializer: cache elements
-  static {
+  @Override
+  protected boolean doctype(final byte[] dt) throws IOException {
+    if(level != 0) return false;
+    if(!super.doctype(dt) && html5) {
+      if(sep) indent();
+      print(DOCTYPE);
+      if(dt == null) print(M_HTML);
+      else print(dt);
+      print(ELEM_C);
+      print(nl);
+    }
+    return true;
   }
 }

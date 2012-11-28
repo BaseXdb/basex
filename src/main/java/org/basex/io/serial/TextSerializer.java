@@ -20,13 +20,13 @@ public class TextSerializer extends OutputSerializer {
   }
 
   @Override
-  public void attribute(final byte[] n, final byte[] v) throws IOException { }
+  protected void attribute(final byte[] n, final byte[] v) throws IOException { }
 
   @Override
-  public void finishComment(final byte[] n) throws IOException { }
+  protected void finishComment(final byte[] n) throws IOException { }
 
   @Override
-  public void finishPi(final byte[] n, final byte[] v) throws IOException { }
+  protected void finishPi(final byte[] n, final byte[] v) throws IOException { }
 
   @Override
   protected void startOpen(final byte[] t) throws IOException { }
@@ -35,12 +35,10 @@ public class TextSerializer extends OutputSerializer {
   protected void finishOpen() throws IOException { }
 
   @Override
-  protected void finishEmpty() throws IOException {
-  }
+  protected void finishEmpty() throws IOException { }
 
   @Override
-  protected void finishClose() throws IOException {
-  }
+  protected void finishClose() throws IOException { }
 
   @Override
   protected void code(final int ch) throws IOException {

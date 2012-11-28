@@ -126,6 +126,8 @@ public interface DataText {
   String V40 = "4.0";
   /** Version. */
   String V401 = "4.01";
+  /** Version. */
+  String V50 = "5.0";
 
   /** Method. */
   String M_CSV = "csv";
@@ -139,8 +141,6 @@ public interface DataText {
   /** Method. */
   String M_HTML = "html";
   /** Method. */
-  String M_HTML5 = "html5";
-  /** Method. */
   String M_TEXT = "text";
   /** Method. */
   String M_JSON = "json";
@@ -149,9 +149,7 @@ public interface DataText {
   /** Method. */
   String M_RAW = "raw";
   /** Methods. */
-  String[] METHODS = {
-    M_XML, M_XHTML, M_HTML, M_HTML5, M_TEXT, M_JSON, M_JSONML, M_RAW
-  };
+  String[] METHODS = { M_XML, M_XHTML, M_HTML, M_TEXT, M_JSON, M_JSONML, M_RAW };
 
   /** Normalization. */
   String NFC = "NFC";

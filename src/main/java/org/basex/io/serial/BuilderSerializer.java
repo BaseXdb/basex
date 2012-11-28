@@ -29,7 +29,7 @@ public class BuilderSerializer extends Serializer {
   }
 
   @Override
-  public final void finishText(final byte[] b) throws IOException {
+  protected final void finishText(final byte[] b) throws IOException {
     build.text(b);
   }
 
@@ -38,12 +38,12 @@ public class BuilderSerializer extends Serializer {
   }
 
   @Override
-  public final void finishPi(final byte[] n, final byte[] v) throws IOException {
+  protected final void finishPi(final byte[] n, final byte[] v) throws IOException {
     build.pi(concat(n, SPACE, v));
   }
 
   @Override
-  public final void atomic(final Item b) throws IOException {
+  protected final void atomic(final Item b) throws IOException {
     Util.notexpected();
   }
 
@@ -65,12 +65,12 @@ public class BuilderSerializer extends Serializer {
   }
 
   @Override
-  public final void finishComment(final byte[] b) throws IOException {
+  protected final void finishComment(final byte[] b) throws IOException {
     build.comment(b);
   }
 
   @Override
-  public final void attribute(final byte[] n, final byte[] v) throws IOException {
+  protected final void attribute(final byte[] n, final byte[] v) throws IOException {
     if(startsWith(n, XMLNS)) {
       if(n.length == 5) {
         build.startNS(EMPTY, v);
@@ -85,12 +85,12 @@ public class BuilderSerializer extends Serializer {
   }
 
   @Override
-  public void openDoc(final byte[] name) throws IOException {
+  protected void openDoc(final byte[] name) throws IOException {
     build.startDoc(name);
   }
 
   @Override
-  public final void closeDoc() throws IOException {
+  protected final void closeDoc() throws IOException {
     build.endDoc();
   }
 }
