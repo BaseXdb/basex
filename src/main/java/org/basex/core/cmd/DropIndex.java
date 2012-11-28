@@ -30,6 +30,7 @@ public final class DropIndex extends ACreate {
     if(data.inMemory()) return error(NO_MAINMEM);
 
     final CmdIndex ci = getOption(CmdIndex.class);
+    if(ci == null) return error(UNKNOWN_CMD_X, this);
     final IndexType it;
     switch(ci) {
       case TEXT:

@@ -34,6 +34,7 @@ public final class CreateIndex extends ACreate {
 
     final IndexType index;
     final CmdIndex ci = getOption(CmdIndex.class);
+    if(ci == null) return error(UNKNOWN_CMD_X, this);
     switch(ci) {
       case TEXT:
         data.meta.createtext = true;

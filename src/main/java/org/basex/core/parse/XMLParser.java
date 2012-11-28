@@ -82,7 +82,7 @@ final class XMLParser extends CmdParser {
     if(e.equals(CREATE_EVENT) && check(root, NAME + "?"))
       return new CreateEvent(value(root, NAME));
     if(e.equals(CREATE_INDEX) && check(root, TYPE))
-      return new Export(value(root, TYPE));
+      return new CreateIndex(value(root, TYPE));
     if(e.equals(CREATE_USER) && check(root, NAME, "#" + PASSWORD + "?"))
       return new CreateUser(value(root, NAME), password(root));
     if(e.equals(CS) && check(root, "#" + QUERY))
@@ -96,7 +96,7 @@ final class XMLParser extends CmdParser {
     if(e.equals(DROP_EVENT) && check(root, NAME))
       return new DropEvent(value(root, NAME));
     if(e.equals(DROP_INDEX) && check(root, TYPE))
-      return new Export(value(root, TYPE));
+      return new DropIndex(value(root, TYPE));
     if(e.equals(DROP_USER) && check(root, NAME, DATABASE + "?"))
       return new DropUser(value(root, NAME), value(root, DATABASE));
     if(e.equals(EXIT) && check(root))
