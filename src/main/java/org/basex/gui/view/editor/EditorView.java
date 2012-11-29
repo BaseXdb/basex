@@ -13,6 +13,7 @@ import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
@@ -364,11 +365,12 @@ public final class EditorView extends View {
       tabs.setToolTipTextAt(tabs.getSelectedIndex(), path);
     }
     final String[] qu = gui.gprop.strings(GUIProp.EDITOR);
-    for(int q = 0; q < qu.length && q < 11; q++) {
+    for(int q = 0; q < qu.length && q < 19; q++) {
       final String f = qu[q];
       if(!f.equalsIgnoreCase(path) && IO.get(f).exists()) sl.add(f);
     }
-    gui.gprop.set(GUIProp.EDITOR, sl.toArray());
+    // store sorted history
+    gui.gprop.set(GUIProp.EDITOR, sl.sort(!Prop.WIN, true).toArray());
     hist.setEnabled(!sl.isEmpty());
   }
 
