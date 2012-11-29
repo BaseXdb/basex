@@ -166,13 +166,13 @@ final class EditorArea extends Editor {
 
   /**
    * Reverts the contents of the currently opened editor.
-   * @param force enforce reload
+   * @param enforce enforce reload
    */
-  public void reopen(final boolean force) {
+  public void reopen(final boolean enforce) {
     if(!opened()) return;
     final long ts = file.timeStamp();
-    if((tstamp != ts || force) &&
-        BaseXDialog.confirm(gui, Util.info(REOPEN_FILE_X, file.name()))) {
+    if((tstamp != ts || enforce) && (!modified ||
+        BaseXDialog.confirm(gui, Util.info(REOPEN_FILE_X, file.name())))) {
       try {
         setText(file.read());
         file(file);
