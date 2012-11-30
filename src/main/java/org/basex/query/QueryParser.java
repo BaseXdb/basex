@@ -1838,13 +1838,14 @@ public class QueryParser extends InputParser {
     }
 
     if(ctx.sc.xquery3 && consume(EQNAME)) {
-      // name test: {...}*
+      // name test: Q{...}*
       final byte[] uri = bracedURILiteral();
       if(consume('*')) {
         final QNm nm = new QNm(COLON, uri);
         return new NameTest(nm, NameTest.Mode.NS, att);
       }
     }
+    ip = i;
 
     final QNm name = eQName(null, SKIPCHECK);
     if(name != null) {
