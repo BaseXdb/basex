@@ -173,11 +173,11 @@ public interface Commands {
     ADD(HELPADD), ALTER(HELPALTER), CHECK(HELPCHECK), CLOSE(HELPCLOSE), COPY(HELPCOPY),
     CREATE(HELPCREATE), CS(HELPCS), DELETE(HELPDELETE), DROP(HELPDROP), EXIT(HELPEXIT),
     EXPORT(HELPEXPORT), FIND(HELPFIND), FLUSH(HELPFLUSH), GET(HELPGET), GRANT(HELPGRANT),
-    HELP(HELPHELP), INFO(HELPINFO), KILL(HELPKILL), LIST(HELPLIST), OPEN(HELPOPEN),
-    OPTIMIZE(HELPOPTIMIZE), PASSWORD(HELPPASSWORD), RENAME(HELPRENAME),
+    HELP(HELPHELP), INFO(HELPINFO), INSPECT(HELPINSPECT), KILL(HELPKILL), LIST(HELPLIST),
+    OPEN(HELPOPEN), OPTIMIZE(HELPOPTIMIZE), PASSWORD(HELPPASSWORD), RENAME(HELPRENAME),
     REPLACE(HELPREPLACE), REPO(HELPREPO), RESTORE(HELPRESTORE), RETRIEVE(HELPRETRIEVE),
-    RUN(HELPRUN), EXECUTE(HELPEXECUTE), INSPECT(null), SET(HELPSET), SHOW(HELPSHOW),
-    STORE(HELPSTORE), XQUERY(HELPXQUERY);
+    RUN(HELPRUN), EXECUTE(HELPEXECUTE), SET(HELPSET), SHOW(HELPSHOW), STORE(HELPSTORE),
+    XQUERY(HELPXQUERY);
 
     /** Help texts. */
     private final String[] help;
@@ -198,10 +198,10 @@ public interface Commands {
     public final String help(final boolean detail) {
       final StringBuilder sb = new StringBuilder();
       if(help == null) {
-        if(detail) sb.append(NOHELP).append(NL);
+        if(detail) sb.append(NOHELP);
       } else {
         sb.append(this + " " + help[0] + NL + "  " + help[1] + NL);
-        if(detail) sb.append(NL + help[2] + NL);
+        if(detail) sb.append(NL + help[2]);
       }
       return sb.toString();
     }

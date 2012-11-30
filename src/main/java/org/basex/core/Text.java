@@ -391,6 +391,10 @@ public interface Text {
     "  " + lang("c_alterpw")
   };
   /** Command help. */
+  String[] HELPINSPECT = {
+    "", lang("c_inspect1"), lang("c_inspect2")
+  };
+  /** Command help. */
   String[] HELPSET = {
     "[option] ([value])",
     lang("c_set1", "info"),
