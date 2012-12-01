@@ -977,4 +977,16 @@ public final class UpdateTest extends AdvancedQueryTest {
    query("insert node <X/> into //B, delete node //C");
    query("/", "<A><B><X/></B><D/><E/></A>");
  }
+
+ /**
+  * Tests if side-effecting updates within transform expressions are rejected.
+  * Also includes db:output() and fn:put().
+  */
+ @Test
+ public void dbUpdateTransform() {
+   error("copy $c := <a/> modify db:output('x') return $c", Err.BASEX_DBTRANSFORM);
+   error("copy $c := <a/> modify db:add('" + NAME + "','<x/>','x.xml') return $c",
+       Err.BASEX_DBTRANSFORM);
+   error("copy $c := <a/> modify put(<a/>, 'x.txt') return $c", Err.BASEX_DBTRANSFORM);
+ }
 }

@@ -21,6 +21,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.path.*;
+import org.basex.query.up.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -743,6 +744,8 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item output(final QueryContext ctx) throws QueryException {
+    if(ctx.updates.mod instanceof TransformModifier) BASEX_DBTRANSFORM.thrw(info);
+
     final Iter ir = ctx.iter(expr[0]);
     for(Item it; (it = ir.next()) != null;) {
       final Data d = it.data();

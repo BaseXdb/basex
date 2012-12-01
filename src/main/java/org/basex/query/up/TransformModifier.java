@@ -35,6 +35,11 @@ public final class TransformModifier extends ContextModifier {
 
   @Override
   void add(final Operation o, final QueryContext ctx) throws QueryException {
+    /* Disallow side-effecting updates within transform expressions.
+     * Currently, also fn:put() is rejected
+     * (future discussion: https://www.w3.org/Bugs/Public/show_bug.cgi?id=13970). */
+    if(o instanceof BasicOperation) BASEX_DBTRANSFORM.thrw(o.getInfo());
+
     add(o);
     /* check if the target node of the given primitive has been copied in the
      * 'copy' statement of this transform expression. */
