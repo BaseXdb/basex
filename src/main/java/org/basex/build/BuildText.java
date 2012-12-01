@@ -61,7 +61,7 @@ public interface BuildText {
   /** Scanner error. */
   String DECLSTART = "Document declaration must start with 'version'.";
   /** Scanner error. */
-  String TEXTENC = "'encoding' expected in text declaration.";
+  String TEXTENC = "Encoding expected in text declaration.";
   /** Scanner error. */
   String DECLWRONG = "Invalid document declaration.";
   /** Scanner error. */

@@ -191,6 +191,8 @@ public enum Function {
   /** XQuery function. */
   PARSE_XML(FNGen.class, "parse-xml(string[,base])", DOC_O, 1, STR_ZO, STR),
   /** XQuery function. */
+  PARSE_XML_FRAGMENT(FNGen.class, "parse-xml-fragment(string)", DOC_ZO, STR_ZO),
+  /** XQuery function. */
   URI_COLLECTION(FNGen.class, "uri-collection([uri])", URI_ZM, 0, STR_ZO),
   /** XQuery function. */
   SERIALIZE(FNGen.class, "serialize(items[,params])", STR, 1, ITEM_ZM, ITEM),

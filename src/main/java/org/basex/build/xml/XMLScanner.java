@@ -57,6 +57,8 @@ final class XMLScanner extends Progress {
   private final boolean dtd;
   /** Chop whitespaces. */
   private final boolean chop;
+  /** Allow document fragment as input. */
+  private final boolean fragment;
 
   /** Current scanner state. */
   private State state = State.CONTENT;
@@ -75,10 +77,13 @@ final class XMLScanner extends Progress {
    * Initializes the scanner.
    * @param f input file
    * @param pr database properties
+   * @param frag allow parsing of document fragment
    * @throws IOException I/O exception
    */
-  XMLScanner(final IO f, final Prop pr) throws IOException {
+  XMLScanner(final IO f, final Prop pr, final boolean frag) throws IOException {
     input = new XMLInput(f);
+    fragment = frag;
+
     try {
       for(int e = 0; e < ENTITIES.length; e += 2) {
         ents.add(token(ENTITIES[e]), token(ENTITIES[e + 1]));
@@ -107,10 +112,12 @@ final class XMLScanner extends Progress {
       }
       encoding = enc == null ? UTF8 : enc;
 
-      final int n = consume();
-      if(!s(n)) {
-        if(n != '<') error(BEFOREROOT);
-        prev(1);
+      if(!fragment) {
+        final int n = consume();
+        if(!s(n)) {
+          if(n != '<') error(BEFOREROOT);
+          prev(1);
+        }
       }
     } catch(final IOException ex) {
       input.close();
@@ -148,7 +155,7 @@ final class XMLScanner extends Progress {
    */
   void close() throws IOException {
     input.close();
-    if(prolog) error(DOCEMPTY);
+    if(!fragment && prolog) error(DOCEMPTY);
   }
 
   /**
@@ -323,8 +330,10 @@ final class XMLScanner extends Progress {
       f = false;
     }
     // end of file
-    if(!ws(token.finish())) error(AFTERROOT);
-    type = Type.EOF;
+    if(!fragment) {
+      if(!ws(token.finish())) error(AFTERROOT);
+      type = Type.EOF;
+    }
   }
 
   /**
@@ -962,7 +971,10 @@ final class XMLScanner extends Progress {
    * @throws IOException I/O exception
    */
   private String encoding() throws IOException {
-    if(!consume(ENCOD)) return null;
+    if(!consume(ENCOD)) {
+      if(fragment) error(TEXTENC);
+      return null;
+    }
     s(); check('='); s();
     final TokenBuilder enc = new TokenBuilder();
     final int d = qu();
@@ -990,10 +1002,10 @@ final class XMLScanner extends Progress {
     if(!consume(STANDALONE)) return null;
     s(); check('='); s();
     final int d = qu();
-    byte[] sd = token(YES);
+    byte[] sd = token(NO);
     if(!consume(sd)) {
-      sd = token(NO);
-      if(!consume(sd)) error(DECLSTANDALONE);
+      sd = token(YES);
+      if(!consume(sd) || fragment) error(DECLSTANDALONE);
     }
     check((char) d);
     return sd;

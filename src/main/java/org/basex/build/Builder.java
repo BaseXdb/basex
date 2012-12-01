@@ -316,7 +316,7 @@ public abstract class Builder extends Progress {
    */
   private void limit(final int value, final int limit, final String msg)
       throws IOException {
-    if(value >= limit) error(msg, parser.detail(), limit);
+    if(value >= limit) throw new BuildException(msg, parser.detail(), limit);
   }
 
   /**
@@ -337,15 +337,5 @@ public abstract class Builder extends Progress {
 
     path.index(0, kind, l, value, meta);
     addText(value, l == 0 ? 1 : meta.size - pstack.get(l - 1), kind);
-  }
-
-  /**
-   * Throws an error message.
-   * @param msg message
-   * @param ext message extension
-   * @throws IOException I/O exception
-   */
-  private static void error(final String msg, final Object... ext) throws IOException {
-    throw new BuildException(msg, ext);
   }
 }

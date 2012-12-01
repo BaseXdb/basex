@@ -31,6 +31,8 @@ public enum Err {
   BASX_VALUE(BASX, 2, "Invalid value for database option: %."),
   /** BASX0003. */
   BASX_RESTXQ(BASX, 3, "%"),
+  /** BASEX0004. */
+  BASEX_DBTRANSFORM(BASX, 4, "No database updates allowed within transform expression."),
 
   // Client module
 
@@ -314,7 +316,7 @@ public enum Err {
   /** FODC0005. */
   INVDOC(FODC, 5, "Invalid document URI '%'."),
   /** FODC0006. */
-  SAXERR(FODC, 6, "SAX: %."),
+  SAXERR(FODC, 6, "SAX: %"),
   /** FODC0007. */
   BASEINV(FODC, 7, "Base URI % is invalid."),
   /** FODC0007. */
@@ -454,8 +456,8 @@ public enum Err {
   /** FORX0004. */
   FUNREPDOL(FORX, 4, "Replacement string: invalid dollar sign."),
 
-  /** FOTY0012. */
-  FIVALUE(FOTY, 12, "Item has no typed value: %."),
+  /** FOTY0013. */
+  FIVALUE(FOTY, 13, "Item has no typed value: %."),
   /** FOTY0013. */
   FIATOM(FOTY, 13, "Function items cannot be atomized: %."),
   /** FOTY0013. */

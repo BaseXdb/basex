@@ -27,6 +27,8 @@ public class XMLParser extends SingleParser {
   private final XMLScanner scanner;
   /** Names of opened elements. */
   private final TokenList tags = new TokenList();
+  /** Allow document fragment as input. */
+  private final boolean fragment;
   /** Closed root tag. */
   private boolean closed;
 
@@ -37,9 +39,23 @@ public class XMLParser extends SingleParser {
    * @throws IOException I/O exception
    */
   public XMLParser(final IO source, final Prop pr) throws IOException {
+    this(source, pr, false);
+  }
+
+  /**
+   * Constructor.
+   * @param source document source
+   * @param pr database properties
+   * @param frag allow parsing of document fragment
+   * @throws IOException I/O exception
+   */
+  public XMLParser(final IO source, final Prop pr, final boolean frag)
+      throws IOException {
+
     super(source, pr);
-    scanner = new XMLScanner(source, pr);
+    scanner = new XMLScanner(source, pr, frag);
     stripNS = pr.is(Prop.STRIPNS);
+    fragment = frag;
   }
 
   @Override
@@ -49,7 +65,8 @@ public class XMLParser extends SingleParser {
     while(true) {
       if(scanner.type == Type.TEXT) {
         final byte[] text = scanner.token.finish();
-        if(!tags.isEmpty() || !ws(text)) builder.text(scanner.token.finish());
+        if(!tags.isEmpty() || (fragment || !ws(text)))
+          builder.text(scanner.token.finish());
       } else if(scanner.type == Type.COMMENT) {
         builder.comment(scanner.token.finish());
       } else if(scanner.type == Type.PI) {
@@ -58,7 +75,7 @@ public class XMLParser extends SingleParser {
         break;
       } else if(scanner.type != Type.DTD) {
         // L_BR, L_BR_CLOSE
-        if(closed) throw new BuildException(MOREROOTS, det());
+        if(!fragment && closed) throw new BuildException(MOREROOTS, det());
         if(!parseTag()) break;
         continue;
       }

@@ -6,6 +6,8 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
+import org.basex.build.xml.*;
+import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
@@ -59,7 +61,8 @@ public final class FNGen extends StandardFunc {
       case UNPARSED_TEXT:           return unparsedText(ctx, false);
       case UNPARSED_TEXT_AVAILABLE: return unparsedText(ctx, true);
       case PUT:                     return put(ctx);
-      case PARSE_XML:               return parseXml(ctx);
+      case PARSE_XML:               return parseXml(ctx, false);
+      case PARSE_XML_FRAGMENT:      return parseXml(ctx, true);
       case SERIALIZE:               return serialize(ctx);
       default:                      return super.item(ctx, ii);
     }
@@ -274,12 +277,18 @@ public final class FNGen extends StandardFunc {
   }
 
   /**
-   * Performs the parse-xml function.
+   * Returns a document node for the parsed XML input.
    * @param ctx query context
+   * @param frag parse fragment
    * @return result
    * @throws QueryException query exception
    */
-  private ANode parseXml(final QueryContext ctx) throws QueryException {
+  private ANode parseXml(final QueryContext ctx, final boolean frag)
+      throws QueryException {
+
+    final Item item = expr[0].item(ctx, info);
+    if(item == null) return null;
+
     final byte[] cont = checkEStr(expr[0], ctx);
     Uri base = ctx.sc.baseURI();
     if(expr.length == 2) {
@@ -288,10 +297,15 @@ public final class FNGen extends StandardFunc {
     }
 
     final IO io = new IOContent(cont, string(base.string()));
+    final Prop prop = ctx.context.prop;
+    final boolean chop = prop.is(Prop.CHOP);
     try {
-      return new DBNode(io, ctx.context.prop);
+      prop.set(Prop.CHOP, false);
+      return new DBNode(new XMLParser(io, ctx.context.prop, frag));
     } catch(final IOException ex) {
       throw SAXERR.thrw(info, ex);
+    } finally {
+      prop.set(Prop.CHOP, chop);
     }
   }
 
