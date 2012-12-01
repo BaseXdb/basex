@@ -223,7 +223,7 @@ public enum Function {
   /** XQuery function. */
   DOCUMENT_URI(FNNode.class, "document-uri([node])", URI_ZO, 0, NOD_ZO),
   /** XQuery function. */
-  NILLED(FNNode.class, "nilled(node)", BLN_ZO, NOD_ZO),
+  NILLED(FNNode.class, "nilled([node])", BLN_ZO, 0, NOD_ZO),
   /** XQuery function. */
   NODE_NAME(FNNode.class, "node-name([node])", QNM_ZO, 0, NOD_ZO),
   /** XQuery function. */
