@@ -62,7 +62,7 @@ public final class FNFormat extends StandardFunc {
     if(expr[0].isEmpty()) return Str.ZERO;
     final long num = checkItr(expr[0], ctx);
 
-    if(pic.length == 0) WRONGINT.thrw(info, pic);
+    if(pic.length == 0) PICEMPTY.thrw(info, pic);
     final FormatParser fp = new FormatParser(pic, null, info);
     return Str.get(Formatter.get(string(lng)).formatInt(num, fp));
   }

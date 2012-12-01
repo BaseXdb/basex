@@ -52,9 +52,9 @@ public final class FormatParser extends FormatUtil {
       throws QueryException {
 
     info = ii;
-    pic = p.length != 0 ? p : df;
     ext = df != null;
     def = ext ? df : ONE;
+    pic = p.length != 0 ? p : def;
 
     byte[] pm = mod();
     if(ext) {

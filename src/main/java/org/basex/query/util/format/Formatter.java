@@ -210,10 +210,9 @@ public abstract class Formatter extends FormatUtil {
             pres = new byte[] { 'n' };
             break;
           default:
-            err = true;
-            break;
+            ERRDTM.thrw(ii, pic);
         }
-        if(err) PICCOMP.thrw(ii, pic);
+        if(err) PICINVCOMP.thrw(ii, pic);
 
         final FormatParser fp = new FormatParser(p, pres, ii);
         if(max) {

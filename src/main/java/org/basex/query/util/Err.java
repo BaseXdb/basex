@@ -325,7 +325,45 @@ public enum Err {
   /** FODF1280. */
   FORMNUM(FODF, 1280, "Unknown decimal format: %."),
   /** FODF1310. */
+  PICEMPTY(FODF, 1310, "The picture string may not be empty."),
+  /** FODF1310. */
   PICNUM(FODF, 1310, "Invalid picture string: '%'."),
+  /** FODF1310. */
+  OPTAFTER(FODF, 1310, "Optional digit follows mandatory digits: '%'."),
+  /** FODF1310. */
+  NOMAND(FODF, 1310, "No mandatory digit specified: '%'."),
+  /** FODF1310. */
+  GROUPEND(FODF, 1310, "Picture ends with grouping separator: '%'."),
+  /** FODF1310. */
+  GROUPADJ(FODF, 1310, "Adjacent grouping separators: '%'."),
+  /** FODF1310. */
+  PICCOMP(FODF, 1310, "Invalid component in string: '%'."),
+  /** FODF1310. */
+  DIFFMAND(FODF, 1310, "Mandatory digits must be of the same group: '%'."),
+  /** FODF1310. */
+  GROUPSTART(FODF, 1310, "Picture begins with grouping separator: '%'."),
+  /** FODF1310. */
+  PICDATE(FODF, 1310, "Invalid picture string: '%'."),
+  /** FODF1310. */
+  ORDCLOSED(FODF, 1310, "Ordinal is not closed: '%'."),
+
+  /** FOFD1340. */
+  ERRDTM(FOFD, 1340, "Invalid component in string: '%'."),
+  /** FOFD1350. */
+  PICINVCOMP(FOFD, 1350, "Invalid component in string: '%'."),
+
+  /** FOUT1170. */
+  RESNF(FOUT, 1170, "Resource '%' cannot be retrieved."),
+  /** FOUT1170. */
+  FRAGID(FOUT, 1170, "URI contains a fragment identifier: %"),
+  /** FOUT1170. */
+  INVURL(FOUT, 1170, "URI is invalid: %"),
+  /** FOUT1190. */
+  WHICHENC(FOUT, 1190, "Encoding '%' is not supported."),
+  /** FOUT1190. */
+  INVCHARS(FOUT, 1190, "%."),
+  /** FOUT1200. */
+  WHICHCHARS(FOUT, 1200, "Resource contains invalid input."),
 
   /** FODT0001. */
   DATERANGE(FODT, 1, "%('%') out of range."),
@@ -878,40 +916,6 @@ public enum Err {
   NONSALL(XQTY, 24, "Namespaces must follow the root element."),
   /** XQTY0105. */
   CONSFUNC(XQTY, 105, "Invalid content: %."),
-
-  /** FOFD1340. */
-  WRONGINT(FOFD, 1340, "Wrong integer format: '%'."),
-  /** FOFD1340. */
-  OPTAFTER(FOFD, 1340, "Optional digit follows mandatory digits: '%'."),
-  /** FOFD1340. */
-  DIFFMAND(FOFD, 1340, "Mandatory digits must be of the same group: '%'."),
-  /** FOFD1340. */
-  GROUPADJ(FOFD, 1340, "Adjacent grouping separators: '%'."),
-  /** FOFD1340. */
-  GROUPSTART(FOFD, 1340, "Picture begins with grouping separator: '%'."),
-  /** FOFD1340. */
-  GROUPEND(FOFD, 1340, "Picture ends with grouping separator: '%'."),
-  /** FOFD1340. */
-  NOMAND(FOFD, 1340, "No mandatory digit specified: '%'."),
-  /** FOFD1340. */
-  PICDATE(FOFD, 1340, "Invalid picture string: '%'."),
-  /** FOFD1340. */
-  ORDCLOSED(FOFD, 1340, "Ordinal is not closed: '%'."),
-  /** FOFD1350. */
-  PICCOMP(FOFD, 1350, "Invalid component in string: '%'."),
-
-  /** FOUT1170. */
-  RESNF(FOUT, 1170, "Resource '%' cannot be retrieved."),
-  /** FOUT1170. */
-  FRAGID(FOUT, 1170, "URI contains a fragment identifier: %"),
-  /** FOUT1170. */
-  INVURL(FOUT, 1170, "URI is invalid: %"),
-  /** FOUT1190. */
-  WHICHENC(FOUT, 1190, "Encoding '%' is not supported."),
-  /** FOUT1190. */
-  INVCHARS(FOUT, 1190, "%."),
-  /** FOUT1200. */
-  WHICHCHARS(FOUT, 1200, "Resource contains invalid input."),
 
   /** XUDY0009. */
   UPNOPAR(XUDY, 9, "Target % has no parent."),
