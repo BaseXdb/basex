@@ -8,7 +8,6 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.CmpV.OpV;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.item.ANum;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -84,13 +83,19 @@ public final class FNAggr extends StandardFunc {
 
     Item rs = it.type.isUntyped() ? Dbl.get(it.string(info), info) : it;
     final boolean n = rs instanceof ANum;
+    final boolean dtd = !n && rs.type == AtomType.DTD;
+    final boolean ymd = !n && !dtd && rs.type == AtomType.YMD;
     if(!n && (!(rs instanceof Dur) || rs.type == DUR)) SUMTYPE.thrw(info, this, rs.type);
 
     int c = 1;
     for(Item i; (i = iter.next()) != null;) {
-      final boolean un = i.type.isNumberOrUntyped();
-      if(n && !un) FUNNUM.thrw(info, this, i.type);
-      if(!n && un) FUNDUR.thrw(info, this, i.type);
+      if(i.type.isNumberOrUntyped()) {
+        if(!n) FUNDUR.thrw(info, this, i.type);
+      } else {
+        if(n) FUNNUM.thrw(info, this, i.type);
+        if(dtd && i.type != AtomType.DTD || ymd && i.type != AtomType.YMD)
+          FUNCMP.thrw(info, this, it.type, i.type);
+      }
       rs = Calc.PLUS.ev(info, rs, i);
       ++c;
     }

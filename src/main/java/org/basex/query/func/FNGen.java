@@ -237,7 +237,7 @@ public final class FNGen extends StandardFunc {
       if(check) return Bln.FALSE;
       if(ex instanceof EncodingException) INVCHARS.thrw(info, ex);
       if(ex instanceof InputException && enc == null) WHICHCHARS.thrw(info);
-      throw SERANY.thrw(info, ex);
+      throw RESNF.thrw(info, path);
     }
   }
 

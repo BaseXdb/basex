@@ -82,7 +82,7 @@ public final class FNPat extends StandardFunc {
    * @param val input value
    * @param ctx query context
    * @return function result
-   * @throws org.basex.query.QueryException query exception
+   * @throws QueryException query exception
    */
   private Item matches(final byte[] val, final QueryContext ctx) throws QueryException {
     final Pattern p = pattern(expr[1], expr.length == 3 ? expr[2] : null, ctx);
@@ -94,7 +94,7 @@ public final class FNPat extends StandardFunc {
    * @param val input value
    * @param ctx query context
    * @return function result
-   * @throws org.basex.query.QueryException query exception
+   * @throws QueryException query exception
    */
   private Item analyzeString(final byte[] val, final QueryContext ctx)
       throws QueryException {
@@ -160,7 +160,7 @@ public final class FNPat extends StandardFunc {
    * @param val input value
    * @param ctx query context
    * @return function result
-   * @throws org.basex.query.QueryException query exception
+   * @throws QueryException query exception
    */
   private Item replace(final byte[] val, final QueryContext ctx) throws QueryException {
     final byte[] rep = checkStr(expr[2], ctx);
@@ -193,7 +193,7 @@ public final class FNPat extends StandardFunc {
    * Evaluates the tokenize function.
    * @param ctx query context
    * @return function result
-   * @throws org.basex.query.QueryException query exception
+   * @throws QueryException query exception
    */
   private Value tokenize(final QueryContext ctx) throws QueryException {
     final byte[] val = checkEStr(expr[0], ctx);
@@ -220,7 +220,7 @@ public final class FNPat extends StandardFunc {
    * @param mod modifier item
    * @param ctx query context
    * @return modified pattern
-   * @throws org.basex.query.QueryException query exception
+   * @throws QueryException query exception
    */
   private Pattern pattern(final Expr pattern, final Expr mod, final QueryContext ctx)
       throws QueryException {
