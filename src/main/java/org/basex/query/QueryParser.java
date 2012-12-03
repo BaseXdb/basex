@@ -2558,7 +2558,7 @@ public class QueryParser extends InputParser {
       names.add(new QNmCheck(qn, false));
     } else {
       if(!wsConsume(BRACE1)) return null;
-      name = expr();
+      name = check(expr(), NOATTNAME);
       wsCheck(BRACE2);
     }
 
