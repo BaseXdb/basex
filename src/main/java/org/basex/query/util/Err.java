@@ -899,8 +899,6 @@ public enum Err {
   DUPLUPD(XQST, 106, "More than one updating annotation declared."),
   /** XQST0106. */
   DUPLVIS(XQST, 106, "More than one visibility annotation declared."),
-  /** XQST0107. */
-  CTXINIT(XQST, 107, "Context item depends on itself."),
   /** XQST0108. */
   MODOUT(XQST, 108, "No output declarations allowed in modules."),
   /** XPST0109. */
@@ -910,7 +908,7 @@ public enum Err {
   /** XPST0111. */
   DECDUPL(XQST, 111, "Duplicate decimal-format declaration."),
   /** XQST0113. */
-  DECITEM(XQST, 113, "Context item cannot be specified in module."),
+  DECITEM(XQST, 113, "No value can be assigned to context item in library module."),
   /** XPST0111. */
   DECDUPLPROP(XQST, 114, "Duplicate decimal-format property '%'."),
 

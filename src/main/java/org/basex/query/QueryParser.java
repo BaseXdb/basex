@@ -787,12 +787,12 @@ public class QueryParser extends InputParser {
     wsCheck(ITEMM);
     if(declItem) error(DUPLITEM);
     declItem = true;
-    if(module != null) error(DECITEM);
 
     ctx.sc.initType = wsConsumeWs(AS) ? itemType().type : null;
     if(!wsConsumeWs(EXTERNAL)) wsCheck(ASSIGN);
     else if(!wsConsumeWs(ASSIGN)) return;
     ctx.ctxItem = check(single(), NOVARDECL);
+    if(module != null) error(DECITEM);
     if(ctx.ctxItem.uses(Use.UPD)) UPCTX.thrw(info(), ctx.ctxItem);
   }
 
