@@ -109,6 +109,15 @@ public class TokenSet implements Iterable<byte[]> {
   }
 
   /**
+   * Adds a string.
+   * @param e element to be added
+   * @return offset of added key, negative offset otherwise
+   */
+  public int add(final String e) {
+    return add(token(e));
+  }
+
+  /**
    * Deletes the specified key.
    * <b>Warning</b>: After a deletion, the key array will have {@code null}
    * entries, and the total number of entries will not reflect the number

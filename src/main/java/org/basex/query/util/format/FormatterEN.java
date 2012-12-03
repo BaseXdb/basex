@@ -104,8 +104,8 @@ final class FormatterEN extends Formatter {
   }
 
   @Override
-  public byte[] era(final int year) {
-    return ERAS[year < 0 ? 0 : 1];
+  public byte[] era(final long year) {
+    return ERAS[year <= 0 ? 0 : 1];
   }
 
   // PRIVATE METHODS ==========================================================

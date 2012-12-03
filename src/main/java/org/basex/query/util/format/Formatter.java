@@ -3,9 +3,8 @@ package org.basex.query.util.format;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
+import java.math.*;
 import java.util.*;
-
-import javax.xml.datatype.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
@@ -100,7 +99,7 @@ public abstract class Formatter extends FormatUtil {
    * @param year year
    * @return era
    */
-  protected abstract byte[] era(final int year);
+  protected abstract byte[] era(final long year);
 
   /**
    * Formats the specified date.
@@ -136,83 +135,84 @@ public abstract class Formatter extends FormatUtil {
 
         final boolean dat = date.type == AtomType.DAT;
         final boolean tim = date.type == AtomType.TIM;
-        final XMLGregorianCalendar gc = date.xc;
         boolean err = false;
         switch(spec) {
           case 'Y':
-            num = Math.abs(gc.getYear());
+            num = Math.abs(date.yea());
             max = true;
             err = tim;
             break;
           case 'M':
-            num = gc.getMonth();
+            num = date.mon();
             err = tim;
             break;
           case 'D':
-            num = gc.getDay();
+            num = date.day();
             err = tim;
             break;
           case 'd':
-            num = ADate.days(0, gc.getMonth(), gc.getDay());
+            num = ADate.days(0, (int) date.mon(), (int) date.day() - 1).longValue();
             err = tim;
             break;
           case 'F':
-            num = gc.toGregorianCalendar().get(Calendar.DAY_OF_WEEK) - 1;
+            // [CG] DateTime: slow conversion (3x)
+            num = date.toJava().toGregorianCalendar().get(Calendar.DAY_OF_WEEK) - 1;
             pres = new byte[] { 'n' };
             err = tim;
             break;
           case 'W':
-            num = gc.toGregorianCalendar().get(Calendar.WEEK_OF_YEAR);
+            num = date.toJava().toGregorianCalendar().get(Calendar.WEEK_OF_YEAR);
             err = tim;
             break;
           case 'w':
-            num = gc.toGregorianCalendar().get(Calendar.WEEK_OF_MONTH);
+            num = date.toJava().toGregorianCalendar().get(Calendar.WEEK_OF_MONTH);
             err = tim;
             break;
           case 'H':
-            num = gc.getHour();
+            num = date.hou();
             err = dat;
             break;
           case 'h':
-            num = gc.getHour() % 12;
+            num = date.hou() % 12;
             if(num == 0) num = 12;
             err = dat;
             break;
           case 'P':
-            num = gc.getHour() / 12;
+            num = date.hou() / 12;
             pres = new byte[] { 'n' };
             err = dat;
             break;
           case 'm':
-            num = gc.getMinute();
+            num = date.min();
             pres = token("01");
             err = dat;
             break;
           case 's':
-            num = gc.getSecond();
+            num = date.sec().intValue();
             pres = token("01");
             err = dat;
             break;
           case 'f':
-            num = gc.getMillisecond();
+            num = date.sec().remainder(BigDecimal.ONE).movePointRight(3).intValue();
             err = dat;
             break;
           case 'Z':
           case 'z':
-            num = gc.getTimezone();
-            pres = token("01:01");
+            num = date.zon();
+            pres = num == Short.MAX_VALUE ? null : token("01:01");
             break;
           case 'C':
             pres = new byte[] { 'n' };
             break;
           case 'E':
-            num = gc.getYear();
+            num = date.yea();
             pres = new byte[] { 'n' };
             break;
           default:
             ERRDTM.thrw(ii, pic);
         }
         if(err) PICINVCOMP.thrw(ii, pic);
+        if(pres == null) continue;
 
         final FormatParser fp = new FormatParser(p, pres, ii);
         if(max) {

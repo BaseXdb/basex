@@ -1,6 +1,7 @@
 package org.basex.query.value.item;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 
 import java.math.*;
 import java.util.regex.*;
@@ -18,18 +19,16 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public class Dur extends Item {
-  /** Seconds per day. */
-  static final long DAYSECONDS = 86400;
+public class Dur extends ADateDur {
+  /** Pattern for one or more digits. */
+  protected static final String DP = "(\\d+)";
+
   /** Date pattern. */
-  private static final Pattern DUR = Pattern.compile(
-      "(-?)P(([0-9]+)Y)?(([0-9]+)M)?(([0-9]+)D)?" +
-      "(T(([0-9]+)H)?(([0-9]+)M)?(([0-9]+(\\.[0-9]+)?)?S)?)?");
+  private static final Pattern DUR = Pattern.compile("(-?)P(" + DP + "Y)?(" + DP +
+      "M)?(" + DP + "D)?(T(" + DP + "H)?(" + DP + "M)?((\\d+|\\d*\\.\\d+)?S)?)?");
 
   /** Number of months. */
-  int mon;
-  /** Number of seconds. */
-  BigDecimal sc;
+  long mon;
 
   /**
    * Constructor.
@@ -65,60 +64,99 @@ public class Dur extends Item {
   private Dur(final Dur d, final Type t) {
     this(t);
     mon = d.mon;
-    sc = d.sc == null ? BigDecimal.valueOf(0) : d.sc;
+    sec = d.sec == null ? BigDecimal.ZERO : d.sec;
   }
 
   /**
    * Constructor.
-   * @param v value
+   * @param vl value
    * @param t data type
    * @param ii input info
    * @throws QueryException query exception
    */
-  private Dur(final byte[] v, final Type t, final InputInfo ii) throws QueryException {
+  private Dur(final byte[] vl, final Type t, final InputInfo ii) throws QueryException {
     this(t);
 
-    final String val = Token.string(v).trim();
+    final String val = Token.string(vl).trim();
     final Matcher mt = DUR.matcher(val);
-    if(!mt.matches() || val.endsWith("P") || val.endsWith("T")) dateErr(v, XDURR, ii);
-    final int y = mt.group(2) != null ? toInt(mt.group(3), ii) : 0;
-    final int m = mt.group(4) != null ? toInt(mt.group(5), ii) : 0;
-    final long d = mt.group(6) != null ? toInt(mt.group(7), ii) : 0;
-    final long h = mt.group(9) != null ? toInt(mt.group(10), ii) : 0;
-    final long n = mt.group(11) != null ? toInt(mt.group(12), ii) : 0;
-    final double s = mt.group(13) != null ? toDouble(mt.group(14), ii) : 0;
-
-    mon = y * 12 + m;
-    sc = BigDecimal.valueOf(d * DAYSECONDS + h * 3600 + n * 60);
-    sc = sc.add(BigDecimal.valueOf(s));
-    if(!mt.group(1).isEmpty()) {
-      mon = -mon;
-      sc = sc.negate();
-    }
+    if(!mt.matches() || val.endsWith("P") || val.endsWith("T")) dateErr(vl, XDURR, ii);
+    yearMonth(vl, mt, ii);
+    dayTime(vl, mt, 6, ii);
   }
 
   /**
-   * Returns the years.
-   * @return year
+   * Initializes the yearMonth component.
+   * @param vl value
+   * @param mt matcher
+   * @param ii input info
+   * @throws QueryException query exception
    */
-  public final int yea() {
+  protected void yearMonth(final byte[] vl, final Matcher mt, final InputInfo ii)
+      throws QueryException {
+
+    final long y = mt.group(2) != null ? toLong(mt.group(3), true, ii) : 0;
+    final long m = mt.group(4) != null ? toLong(mt.group(5), true, ii) : 0;
+    mon = y * 12 + m;
+    double v = y * 12d + m;
+    if(!mt.group(1).isEmpty()) {
+      mon = -mon;
+      v = -v;
+    }
+    if(v <= Long.MIN_VALUE || v >= Long.MAX_VALUE) DURRANGE.thrw(ii, type, vl);
+  }
+
+  /**
+   * Initializes the dayTime component.
+   * @param vl value
+   * @param mt matcher
+   * @param p first matching position
+   * @param ii input info
+   * @throws QueryException query exception
+   */
+  protected void dayTime(final byte[] vl, final Matcher mt, final int p,
+      final InputInfo ii) throws QueryException {
+
+    final long d = mt.group(p) != null ? toLong(mt.group(p + 1), true, ii) : 0;
+    final long h = mt.group(p + 3) != null ? toLong(mt.group(p + 4), true, ii) : 0;
+    final long m = mt.group(p + 5) != null ? toLong(mt.group(p + 6), true, ii) : 0;
+    final BigDecimal s = mt.group(p + 7) != null ? toDecimal(mt.group(p + 8), true, ii) :
+      BigDecimal.ZERO;
+    sec = s.add(BigDecimal.valueOf(d).multiply(DAYSECONDS)).
+        add(BigDecimal.valueOf(h).multiply(BD3600)).
+        add(BigDecimal.valueOf(m).multiply(BD60));
+    if(!mt.group(1).isEmpty()) sec = sec.negate();
+    final double v = sec.doubleValue();
+    if(v <= Long.MIN_VALUE || v >= Long.MAX_VALUE) DURRANGE.thrw(ii, type, vl);
+  }
+
+  @Override
+  public final long yea() {
     return mon / 12;
   }
 
-  /**
-   * Returns the months.
-   * @return year
-   */
-  public final int mon() {
+  @Override
+  public final long mon() {
     return mon % 12;
   }
 
-  /**
-   * Returns the days.
-   * @return day
-   */
+  @Override
   public final long day() {
-    return sc.longValue() / DAYSECONDS;
+    return sec.divideToIntegralValue(DAYSECONDS).longValue();
+  }
+
+  @Override
+  public final long hou() {
+    return tim() / 3600;
+  }
+
+  @Override
+  public final long min() {
+    return tim() % 3600 / 60;
+  }
+
+  @Override
+  public final BigDecimal sec() {
+    return sec.remainder(BD60);
   }
 
   /**
@@ -126,64 +164,55 @@ public class Dur extends Item {
    * @return time
    */
   private long tim() {
-    return sc.longValue() % DAYSECONDS;
-  }
-
-  /**
-   * Returns the hours.
-   * @return day
-   */
-  public final long hou() {
-    return tim() / 3600;
-  }
-
-  /**
-   * Returns the minutes.
-   * @return day
-   */
-  public final long min() {
-    return tim() % 3600 / 60;
-  }
-
-  /**
-   * Returns the seconds.
-   * @return day
-   */
-  public final BigDecimal sec() {
-    return sc.remainder(BigDecimal.valueOf(60));
+    return sec.remainder(DAYSECONDS).longValue();
   }
 
   @Override
   public byte[] string(final InputInfo ii) {
     final TokenBuilder tb = new TokenBuilder();
-    if(mon < 0 || sc.signum() < 0) tb.add('-');
-    tb.add('P');
-    if(yea() != 0) { tb.addLong(Math.abs(yea())); tb.add('Y'); }
-    if(mon() != 0) { tb.addLong(Math.abs(mon())); tb.add('M'); }
-    if(day() != 0) { tb.addLong(Math.abs(day())); tb.add('D'); }
-    if(sc.remainder(BigDecimal.valueOf(DAYSECONDS)).signum() != 0) {
-      tb.add('T');
-      if(hou() != 0) { tb.addLong(Math.abs(hou())); tb.add('H'); }
-      if(min() != 0) { tb.addLong(Math.abs(min())); tb.add('M'); }
-      if(sec().signum() != 0) { tb.add(sc()); tb.add('S'); }
-    }
-    if(mon == 0 && sc.signum() == 0) tb.add("T0S");
+    final int ss = sec.signum();
+    if(mon < 0 || ss < 0) tb.add('-');
+    date(tb);
+    time(tb);
+    if(mon == 0 && ss == 0) tb.add("T0S");
     return tb.finish();
   }
 
   /**
-   * Returns the seconds in a token.
-   * @return seconds
+   * Adds the date to the specified token builder.
+   * @param tb token builder
    */
-  final byte[] sc() {
-    return Token.chopNumber(Token.token(sec().abs().toPlainString()));
+  protected final void date(final TokenBuilder tb) {
+    tb.add('P');
+    final long y = yea();
+    if(y != 0) { tb.addLong(Math.abs(y)); tb.add('Y'); }
+    final long m = mon();
+    if(m != 0) { tb.addLong(Math.abs(m)); tb.add('M'); }
+    final long d = day();
+    if(d != 0) { tb.addLong(Math.abs(d)); tb.add('D'); }
+  }
+
+  /**
+   * Adds the time to the specified token builder.
+   * @param tb token builder
+   */
+  protected final void time(final TokenBuilder tb) {
+    if(sec.remainder(DAYSECONDS).signum() == 0) return;
+    tb.add('T');
+    final long h = hou();
+    if(h != 0) { tb.addLong(Math.abs(h)); tb.add('H'); }
+    final long m = min();
+    if(m != 0) { tb.addLong(Math.abs(m)); tb.add('M'); }
+    final BigDecimal sc = sec();
+    if(sc.signum() == 0) return;
+    tb.add(Token.chopNumber(Token.token(sc.abs().toPlainString()))).add('S');
   }
 
   @Override
   public final boolean eq(final InputInfo ii, final Item it) throws QueryException {
     final Dur d = (Dur) (it instanceof Dur ? it : type.cast(it, null, ii));
-    final double s1 = sc == null ? 0 : sc.doubleValue();
-    final double s2 = d.sc == null ? 0 : d.sc.doubleValue();
+    final double s1 = sec == null ? 0 : sec.doubleValue();
+    final double s2 = d.sec == null ? 0 : d.sec.doubleValue();
     return mon == d.mon && s1 == s2;
   }
 
@@ -199,7 +228,7 @@ public class Dur extends Item {
 
   @Override
   public final int hash(final InputInfo ii) {
-    return (int) (31 * mon + (sc == null ? 0 : sc.doubleValue()));
+    return (int) (31 * mon + (sec == null ? 0 : sec.doubleValue()));
   }
 
   @Override

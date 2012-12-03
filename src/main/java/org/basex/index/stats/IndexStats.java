@@ -109,7 +109,7 @@ public final class IndexStats {
       if(txt[o].length == 0) continue;
       tb.add("  ").add(txt[o]);
       for(int j = 0; j < len - txt[o].length; ++j) tb.add(' ');
-      tb.addLong(ocs[o]).add('x').add(NL);
+      tb.addInt(ocs[o]).add('x').add(NL);
     }
   }
 }

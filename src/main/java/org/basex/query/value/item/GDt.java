@@ -24,11 +24,11 @@ public final class GDt extends ADate {
   };
   /** Date patterns. */
   private static final Pattern[] PATTERNS = {
-    Pattern.compile("(-?)([0-9]{4})" + ZONE),
-    Pattern.compile("(-?)([0-9]{4})-([0-9]{2})" + ZONE),
-    Pattern.compile("--([0-9]{2})" + ZONE),
-    Pattern.compile("--([0-9]{2})-([0-9]{2})" + ZONE),
-    Pattern.compile("---([0-9]{2})" + ZONE)
+    Pattern.compile(YEAR + ZONE),
+    Pattern.compile(YEAR + '-' + DD + ZONE),
+    Pattern.compile("--" + DD + ZONE),
+    Pattern.compile("--" + DD + '-' + DD + ZONE),
+    Pattern.compile("---" + DD + ZONE)
   };
   /** Date pattern. */
   private static final String[] EXAMPLES = { XYEA, XYMO, XMON, XMDA, XDAY };
@@ -42,11 +42,12 @@ public final class GDt extends ADate {
    */
   public GDt(final ADate d, final Type t) {
     super(t, d);
-    if(t != AtomType.YEA && t != AtomType.YMO) xc.setYear(UNDEF);
-    if(t != AtomType.MON && t != AtomType.YMO && t != AtomType.MDA) xc.setMonth(UNDEF);
-    if(t != AtomType.DAY && t != AtomType.MDA) xc.setDay(UNDEF);
-    xc.setTime(UNDEF, UNDEF, UNDEF);
-    xc.setMillisecond(UNDEF);
+    if(t != AtomType.YEA && t != AtomType.YMO) yea = Long.MAX_VALUE;
+    if(t != AtomType.MON && t != AtomType.YMO && t != AtomType.MDA) mon = -1;
+    if(t != AtomType.DAY && t != AtomType.MDA) day = -1;
+    hou = -1;
+    min = -1;
+    sec = null;
   }
 
   /**
@@ -57,17 +58,29 @@ public final class GDt extends ADate {
    * @throws QueryException query exception
    */
   public GDt(final byte[] d, final Type t, final InputInfo ii) throws QueryException {
-    super(t, d, EXAMPLES[type(t)], ii);
+    super(t);
 
+    final String dt = Token.string(d).trim();
     final int i = type(t);
-    final Matcher mt = PATTERNS[i].matcher(Token.string(d).trim());
+    final Matcher mt = PATTERNS[i].matcher(dt);
     if(!mt.matches()) dateErr(d, EXAMPLES[i], ii);
-    zone(mt, ZONES[i], d, ii);
 
-    if(t == AtomType.MDA) {
-      final int m = xc.getMonth() - 1;
-      if(xc.getDay() > DAYS[m] + (m == 1 ? 1 : 0)) TIMERANGE.thrw(ii, type, d);
+    if(i < 2) {
+      yea = toLong(mt.group(1), false, ii);
+      // +1 is added to BC values to simplify computations
+      if(yea < 0) yea++;
+      if(yea < MIN_YEAR || yea >= MAX_YEAR) DATERANGE.thrw(ii, type, d);
     }
+    if(i > 0 && i < 4) {
+      mon = (byte) (Token.toLong(mt.group(i == 1 ? 3 : 1)) - 1);
+      if(mon < 0 || mon > 11) dateErr(d, EXAMPLES[i], ii);
+    }
+    if(i > 2) {
+      day = (byte) (Token.toLong(mt.group(i == 3 ? 2 : 1)) - 1);
+      final int m = Math.max(mon, 0);
+      if(day < 0 || day >= DAYS[m] + (m == 1 ? 1 : 0)) dateErr(d, EXAMPLES[i], ii);
+    }
+    zone(mt, ZONES[i], d, ii);
   }
 
   /**
@@ -81,7 +94,31 @@ public final class GDt extends ADate {
   }
 
   @Override
+  public void timeZone(final DTDur tz, final boolean d, final InputInfo ii)
+      throws QueryException {
+    Util.notexpected();
+  }
+
+  @Override
   public int diff(final InputInfo ii, final Item it) throws QueryException {
     throw Err.diff(ii, it, this);
+  }
+
+  @Override
+  public byte[] string(final InputInfo ii) {
+    final TokenBuilder tb = new TokenBuilder();
+    if(yea != Long.MAX_VALUE) {
+      if(yea <= 0) tb.add('-');
+      prefix(tb, Math.abs(yea()), 4);
+    } else {
+      tb.add('-');
+    }
+    if(mon >= 0 || day >= 0) tb.add('-');
+    if(mon >= 0) prefix(tb, mon + 1, 2);
+    if(day >= 0) tb.add('-');
+    if(day >= 0) prefix(tb, day + 1, 2);
+
+    zone(tb);
+    return tb.finish();
   }
 }

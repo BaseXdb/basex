@@ -80,7 +80,7 @@ public final class FTBitapSearchTest {
       needles = new FTTokens();
       for(final String[] s : n) {
         final TokenList needle = new TokenList(s.length);
-        for(final String t : s) needle.add(token(t));
+        for(final String t : s) needle.add(t);
         needles.add(needle);
       }
     }

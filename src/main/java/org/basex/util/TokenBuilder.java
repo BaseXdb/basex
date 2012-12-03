@@ -237,12 +237,21 @@ public final class TokenBuilder {
   }
 
   /**
-   * Adds a number to the token.
-   * @param i the integer to be added
+   * Adds an integer value to the token.
+   * @param i value to be added
    * @return self reference
    */
-  public TokenBuilder addLong(final long i) {
+  public TokenBuilder addInt(final int i) {
     return add(token(i));
+  }
+
+  /**
+   * Adds a number to the token.
+   * @param l value to be added
+   * @return self reference
+   */
+  public TokenBuilder addLong(final long l) {
+    return add(token(l));
   }
 
   /**

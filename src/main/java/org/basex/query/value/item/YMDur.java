@@ -19,7 +19,8 @@ import org.basex.util.*;
  */
 public final class YMDur extends Dur {
   /** YearMonth pattern. */
-  private static final Pattern DUR = Pattern.compile("(-?)P(([0-9]+)Y)?(([0-9]+)M)?");
+  private static final Pattern DUR =
+      Pattern.compile("(-?)P(" + DP + "Y)?(" + DP + "M)?");
 
   /**
    * Constructor.
@@ -28,7 +29,7 @@ public final class YMDur extends Dur {
   public YMDur(final Dur it) {
     super(AtomType.YMD);
     mon = it.mon;
-    sc = BigDecimal.valueOf(0);
+    sec = BigDecimal.ZERO;
   }
 
   /**
@@ -36,9 +37,15 @@ public final class YMDur extends Dur {
    * @param it duration item
    * @param a duration to be added/subtracted
    * @param p plus/minus flag
+   * @param ii input info
+   * @throws QueryException query exception
    */
-  public YMDur(final YMDur it, final YMDur a, final boolean p) {
+  public YMDur(final YMDur it, final YMDur a, final boolean p,
+      final InputInfo ii) throws QueryException {
+
     this(it);
+    final double d = (double) mon + (p ? a.mon : -a.mon);
+    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) DURADDRANGE.thrw(ii, type);
     mon += p ? a.mon : -a.mon;
   }
 
@@ -56,34 +63,31 @@ public final class YMDur extends Dur {
     this(it);
     if(Double.isNaN(f)) DATECALC.thrw(ii, description(), f);
     if(m ? f == 1 / 0d || f == -1 / 0d : f == 0) DATEZERO.thrw(ii, description());
-    mon = (int) StrictMath.round(m ? mon * f : mon / f);
+    final double d = m ? mon * f : mon / f;
+    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) DURADDRANGE.thrw(ii, type);
+    mon = StrictMath.round(d);
   }
 
   /**
    * Constructor.
-   * @param v value
+   * @param vl value
    * @param ii input info
    * @throws QueryException query exception
    */
-  public YMDur(final byte[] v, final InputInfo ii) throws QueryException {
+  public YMDur(final byte[] vl, final InputInfo ii) throws QueryException {
     super(AtomType.YMD);
-    final String val = Token.string(v).trim();
+    final String val = Token.string(vl).trim();
     final Matcher mt = DUR.matcher(val);
-    if(!mt.matches() || val.endsWith("P")) dateErr(v, XYMD, ii);
-
-    final int y = mt.group(2) != null ? toInt(mt.group(3), ii) : 0;
-    final int m = mt.group(4) != null ? toInt(mt.group(5), ii) : 0;
-
-    mon = y * 12 + m;
-    if(!mt.group(1).isEmpty()) mon = -mon;
-    sc = BigDecimal.valueOf(0);
+    if(!mt.matches() || val.endsWith("P")) dateErr(vl, XYMD, ii);
+    yearMonth(vl, mt, ii);
+    sec = BigDecimal.ZERO;
   }
 
   /**
    * Returns the years and months.
    * @return year
    */
-  public int ymd() {
+  public long ymd() {
     return mon;
   }
 
@@ -91,9 +95,7 @@ public final class YMDur extends Dur {
   public byte[] string(final InputInfo ii) {
     final TokenBuilder tb = new TokenBuilder();
     if(mon < 0) tb.add('-');
-    tb.add('P');
-    if(yea() != 0) { tb.addLong(Math.abs(yea())); tb.add('Y'); }
-    if(mon() != 0) { tb.addLong(Math.abs(mon())); tb.add('M'); }
+    date(tb);
     if(mon == 0) tb.add("0M");
     return tb.finish();
   }
@@ -101,6 +103,7 @@ public final class YMDur extends Dur {
   @Override
   public int diff(final InputInfo ii, final Item it) throws QueryException {
     if(it.type != type) Err.diff(ii, it, this);
-    return mon - ((Dur) it).mon;
+    final long m = mon - ((Dur) it).mon;
+    return m < 0 ? -1 : m > 0 ? 1 : 0;
   }
 }

@@ -349,34 +349,28 @@ public enum Err {
   /** FODF1310. */
   ORDCLOSED(FODF, 1310, "Ordinal is not closed: '%'."),
 
-  /** FOFD1340. */
-  ERRDTM(FOFD, 1340, "Invalid component in string: '%'."),
-  /** FOFD1350. */
-  PICINVCOMP(FOFD, 1350, "Invalid component in string: '%'."),
-
-  /** FOUT1170. */
-  RESNF(FOUT, 1170, "Resource '%' cannot be retrieved."),
-  /** FOUT1170. */
-  FRAGID(FOUT, 1170, "URI contains a fragment identifier: %"),
-  /** FOUT1170. */
-  INVURL(FOUT, 1170, "URI is invalid: %"),
-  /** FOUT1190. */
-  WHICHENC(FOUT, 1190, "Encoding '%' is not supported."),
-  /** FOUT1190. */
-  INVCHARS(FOUT, 1190, "%."),
-  /** FOUT1200. */
-  WHICHCHARS(FOUT, 1200, "Resource contains invalid input."),
-
   /** FODT0001. */
-  DATERANGE(FODT, 1, "%('%') out of range."),
+  DATERANGE(FODT, 1, "%: '%' out of range."),
+  /** FODT0001. */
+  DATEADDRANGE(FODT, 1, "%: out of range."),
+  /** FODT0002. */
+  DURRANGE(FODT, 2, "%: '%' out of range."),
+  /** FODT0002. */
+  DURADDRANGE(FODT, 2, "%: out of range."),
   /** FODT0002. */
   DATEZERO(FODT, 2, "Invalid % calculation: infinity/zero."),
   /** FODT0003. */
-  INVALZONE(FODT, 3, "Invalid timezone: %."),
+  INVALZONE(FODT, 3, "Timezone out of range (-14:00 to +14:00): %."),
+  /** FODT0003. */
+  ZONESEC(FODT, 3, "No seconds allowed in timezone: %."),
 
   /** FOER0000. */
   FUNERR1(FOER, 0, "Halted on error()."),
 
+  /** FOFD1340. */
+  ERRDTM(FOFD, 1340, "Invalid component in string: '%'."),
+  /** FOFD1350. */
+  PICINVCOMP(FOFD, 1350, "Invalid component in string: '%'."),
 
   /** FONS0004. */
   NSDECL(FONS, 4, "No namespace declared for prefix '%'."),
@@ -384,15 +378,11 @@ public enum Err {
   /** FORG0001. */
   INVALIDZONE(FORG, 1, "Invalid timezone: %."),
   /** FORG0001. */
-  TIMERANGE(FORG, 1, "%('%') out of range."),
-  /** FORG0001. */
-  DURRANGE(FORG, 1, "%: '%' out of range."),
-  /** FORG0001. */
   FUNCAST(FORG, 1, "Invalid % cast: %."),
   /** FORG0001. */
   INVCAST(FORG, 1, "Invalid cast from % to %: %."),
   /** FORG0001. */
-  DATEFORMAT(FORG, 1, "Wrong % format: '%' (try: '%')."),
+  DATEFORMAT(FORG, 1, "Wrong % format: '%' (try e.g. '%')."),
   /** FORG0002. */
   URIINV(FORG, 2, "Invalid URI: %."),
   /** FORG0002. */
@@ -444,7 +434,6 @@ public enum Err {
   /** FORG0008. */
   FUNZONE(FORG, 8, "% and % have different timezones."),
 
-
   /** FORX0001. */
   REGMOD(FORX, 1, "Invalid regular modifier: '%'."),
   /** FORX0002. */
@@ -485,6 +474,19 @@ public enum Err {
   UPDBRENAMEERR(FOUP, 2, "Resource \"%\" could not be renamed."),
   /** FOUP0002. */
   UPDBOPTERR(FOUP, 2, "%"),
+
+  /** FOUT1170. */
+  RESNF(FOUT, 1170, "Resource '%' cannot be retrieved."),
+  /** FOUT1170. */
+  FRAGID(FOUT, 1170, "URI contains a fragment identifier: %"),
+  /** FOUT1170. */
+  INVURL(FOUT, 1170, "URI is invalid: %"),
+  /** FOUT1190. */
+  WHICHENC(FOUT, 1190, "Encoding '%' is not supported."),
+  /** FOUT1190. */
+  INVCHARS(FOUT, 1190, "%."),
+  /** FOUT1200. */
+  WHICHCHARS(FOUT, 1200, "Resource contains invalid input."),
 
   /** FTDY0016. */
   FTWEIGHT(FTDY, 16, "Weight value out of range: %."),

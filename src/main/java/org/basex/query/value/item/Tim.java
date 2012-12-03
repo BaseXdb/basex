@@ -15,37 +15,50 @@ import org.basex.util.*;
 public final class Tim extends ADate {
   /**
    * Constructor.
-   * @param d date
+   * @param time time
    */
-  public Tim(final ADate d) {
-    super(AtomType.TIM, d);
-    xc.setYear(UNDEF);
-    xc.setMonth(UNDEF);
-    xc.setDay(UNDEF);
+  public Tim(final ADate time) {
+    super(AtomType.TIM, time);
+    clean();
   }
 
   /**
    * Constructor.
-   * @param d date
-   * @param a duration to be added/subtracted
-   * @param p plus/minus flag
+   * @param time time
    * @param ii input info
    * @throws QueryException query exception
    */
-  public Tim(final Tim d, final DTd a, final boolean p, final InputInfo ii)
+  public Tim(final byte[] time, final InputInfo ii) throws QueryException {
+    super(AtomType.TIM);
+    time(time, XTIME, ii);
+    clean();
+  }
+
+  /**
+   * Constructor.
+   * @param time time
+   * @param dur duration to be added/subtracted
+   * @param plus plus/minus flag
+   */
+  public Tim(final Tim time, final DTDur dur, final boolean plus) {
+    super(AtomType.TIM, time);
+    calc(dur, plus);
+    clean();
+  }
+
+  @Override
+  public void timeZone(final DTDur tz, final boolean spec, final InputInfo ii)
       throws QueryException {
-    this(d);
-    calc(a, p, ii);
+    tz(tz, spec, ii);
+    clean();
   }
 
   /**
-   * Constructor.
-   * @param tim time
-   * @param ii input info
-   * @throws QueryException query exception
+   * Cleans the item and removes invalid components.
    */
-  public Tim(final byte[] tim, final InputInfo ii) throws QueryException {
-    super(AtomType.TIM, tim, XTIME, ii);
-    time(tim, XTIME, ii);
+  private void clean() {
+    yea = Long.MAX_VALUE;
+    mon = -1;
+    day = -1;
   }
 }

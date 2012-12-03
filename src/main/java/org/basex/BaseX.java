@@ -97,7 +97,7 @@ public class BaseX extends Main {
           // toggle newline separators
           newline ^= true;
           execute(new Set(Prop.SERIALIZER, newline ?
-            SerializerProp.S_SEPARATOR[0] + "=\\n" : ""), false);
+            SerializerProp.S_ITEM_SEPARATOR[0] + "=\\n" : ""), false);
         } else if(c == 'o') {
           // change output stream
           if(out != System.out) out.close();

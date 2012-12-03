@@ -1,6 +1,7 @@
 package org.basex.query.value.item;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
 import org.basex.query.value.type.*;
@@ -15,36 +16,58 @@ import org.basex.util.*;
 public final class Dat extends ADate {
   /**
    * Constructor.
-   * @param d date
+   * @param date date
    */
-  public Dat(final ADate d) {
-    super(AtomType.DAT, d);
-    xc.setTime(UNDEF, UNDEF, UNDEF);
-    xc.setMillisecond(UNDEF);
+  public Dat(final ADate date) {
+    super(AtomType.DAT, date);
+    clean();
   }
 
   /**
    * Constructor.
-   * @param d date
-   * @param a duration
-   * @param p plus/minus flag
+   * @param date date
    * @param ii input info
    * @throws QueryException query exception
    */
-  public Dat(final ADate d, final Dur a, final boolean p, final InputInfo ii)
+  public Dat(final byte[] date, final InputInfo ii) throws QueryException {
+    super(AtomType.DAT);
+    date(date, XDATE, ii);
+  }
+
+  /**
+   * Constructor.
+   * @param date date
+   * @param dur duration
+   * @param plus plus/minus flag
+   * @param ii input info
+   * @throws QueryException query exception
+   */
+  public Dat(final Dat date, final Dur dur, final boolean plus, final InputInfo ii)
       throws QueryException {
-    this(d);
-    calc(a, p, ii);
+
+    this(date);
+    if(dur instanceof DTDur) {
+      calc((DTDur) dur, plus);
+      if(yea <= MIN_YEAR || yea > MAX_YEAR) DATEADDRANGE.thrw(ii, this);
+    } else {
+      calc((YMDur) dur, plus, ii);
+    }
+    clean();
+  }
+
+  @Override
+  public void timeZone(final DTDur tz, final boolean spec, final InputInfo ii)
+      throws QueryException {
+    tz(tz, spec, ii);
+    clean();
   }
 
   /**
-   * Constructor.
-   * @param d date
-   * @param ii input info
-   * @throws QueryException query exception
+   * Cleans the item and removes invalid components.
    */
-  public Dat(final byte[] d, final InputInfo ii) throws QueryException {
-    super(AtomType.DAT, d, XDATE, ii);
-    date(d, XDATE, ii);
+  private void clean() {
+    hou = -1;
+    min = -1;
+    sec = null;
   }
 }

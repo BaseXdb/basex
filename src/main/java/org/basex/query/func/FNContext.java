@@ -102,9 +102,9 @@ public final class FNContext extends StandardFunc {
     final String ymd = DateTime.format(d, DateTime.DATE);
     final String hms = DateTime.format(d, DateTime.TIME);
     final String zone = zon.substring(0, 3) + ':' + zon.substring(3);
-    ctx.time = new Tim(token(hms + zone), info);
-    ctx.date = new Dat(token(ymd + zone), info);
-    ctx.dtm = new Dtm(token(ymd + 'T' + hms + zone), info);
-    ctx.zone = new DTd(toInt(zon.substring(0, 3)) * 60 + toInt(zon.substring(3)));
+    ctx.time = new Tim(Token.token(hms + zone), info);
+    ctx.date = new Dat(Token.token(ymd + zone), info);
+    ctx.dtm = new Dtm(Token.token(ymd + 'T' + hms + zone), info);
+    ctx.zone = new DTDur(toInt(zon.substring(0, 3)) * 60 + toInt(zon.substring(3)));
   }
 }

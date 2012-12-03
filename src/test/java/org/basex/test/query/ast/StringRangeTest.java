@@ -30,7 +30,7 @@ public final class StringRangeTest extends QueryPlanTest {
     tb.add("<xml>");
     for(int i = 100; i < 1000; i++) {
       // add numeric value
-      tb.add("<n>").add(Token.token(i)).add("</n>");
+      tb.add("<n>").addInt(i).add("</n>");
       // add random value
       final int s = rnd.nextInt(8);
       for(int j = 0; j <= s; j++) r.add('A' + rnd.nextInt(26));

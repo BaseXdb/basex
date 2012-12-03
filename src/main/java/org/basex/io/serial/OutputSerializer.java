@@ -155,7 +155,7 @@ public abstract class OutputSerializer extends Serializer {
     final String supp = p.get(S_SUPPRESS_INDENTATION);
     if(!supp.isEmpty()) {
       for(final String c : supp.split("\\s+")) {
-        if(!c.isEmpty()) suppress.add(token(c));
+        if(!c.isEmpty()) suppress.add(c);
       }
     }
 
@@ -164,7 +164,7 @@ public abstract class OutputSerializer extends Serializer {
       final String cdse = p.get(S_CDATA_SECTION_ELEMENTS);
       if(!cdse.isEmpty()) {
         for(final String c : cdse.split("\\s+")) {
-          if(!c.isEmpty()) cdata.add(token(c));
+          if(!c.isEmpty()) cdata.add(c);
         }
       }
 

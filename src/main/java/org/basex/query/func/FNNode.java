@@ -77,7 +77,7 @@ public final class FNNode extends StandardFunc {
         return n;
       case GENERATE_ID:
         return it == null ? Str.ZERO : Str.get(new TokenBuilder(
-            QueryText.ID).addLong(checkNode(it).id).finish());
+            QueryText.ID).addInt(checkNode(it).id).finish());
       case HAS_CHILDREN:
         return Bln.get(it != null && checkNode(it).hasChildren());
       case PATH:

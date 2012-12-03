@@ -394,7 +394,7 @@ public final class Token {
   /**
    * Creates a byte array representation from the specified long value,
    * using Java's standard method.
-   * @param integer int value to be converted
+   * @param integer value to be converted
    * @return byte array
    */
   public static byte[] token(final long integer) {

@@ -1,10 +1,5 @@
 package org.basex.query.func;
 
-import static org.basex.query.util.Err.*;
-
-import java.math.*;
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
@@ -31,49 +26,46 @@ public final class FNDate extends StandardFunc {
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    // functions have 1 or 2 arguments...
     final Item it = expr[0].item(ctx, info);
     if(it == null) return null;
-    final boolean d = expr.length == 2;
-    final Item zon = d ? expr[1].item(ctx, info) : null;
 
     switch(sig) {
       case YEARS_FROM_DURATION:
-        return yea(checkDur(it));
+        return Int.get(checkDur(it).yea());
       case YEAR_FROM_DATETIME:
-        return yea(checkDate(it, AtomType.DTM, ctx));
+        return Int.get(checkDate(it, AtomType.DTM, ctx).yea());
       case YEAR_FROM_DATE:
-        return yea(checkDate(it, AtomType.DAT, ctx));
+        return Int.get(checkDate(it, AtomType.DAT, ctx).yea());
       case MONTHS_FROM_DURATION:
-        return mon(checkDur(it));
+        return Int.get(checkDur(it).mon());
       case MONTH_FROM_DATETIME:
-        return mon(checkDate(it, AtomType.DTM, ctx));
+        return Int.get(checkDate(it, AtomType.DTM, ctx).mon());
       case MONTH_FROM_DATE:
-        return mon(checkDate(it, AtomType.DAT, ctx));
+        return Int.get(checkDate(it, AtomType.DAT, ctx).mon());
       case DAYS_FROM_DURATION:
-        return day(checkDur(it));
+        return Int.get(checkDur(it).day());
       case DAY_FROM_DATETIME:
-        return day(checkDate(it, AtomType.DTM, ctx));
+        return Int.get(checkDate(it, AtomType.DTM, ctx).day());
       case DAY_FROM_DATE:
-        return day(checkDate(it, AtomType.DAT, ctx));
+        return Int.get(checkDate(it, AtomType.DAT, ctx).day());
       case HOURS_FROM_DURATION:
-        return hou(checkDur(it));
+        return Int.get(checkDur(it).hou());
       case HOURS_FROM_DATETIME:
-        return hou(checkDate(it, AtomType.DTM, ctx));
+        return Int.get(checkDate(it, AtomType.DTM, ctx).hou());
       case HOURS_FROM_TIME:
-        return hou(checkDate(it, AtomType.TIM, ctx));
+        return Int.get(checkDate(it, AtomType.TIM, ctx).hou());
       case MINUTES_FROM_DURATION:
-        return min(checkDur(it));
+        return Int.get(checkDur(it).min());
       case MINUTES_FROM_DATETIME:
-        return min(checkDate(it, AtomType.DTM, ctx));
+        return Int.get(checkDate(it, AtomType.DTM, ctx).min());
       case MINUTES_FROM_TIME:
-        return min(checkDate(it, AtomType.TIM, ctx));
+        return Int.get(checkDate(it, AtomType.TIM, ctx).min());
       case SECONDS_FROM_DURATION:
-        return sec(checkDur(it));
+        return Dec.get(checkDur(it).sec());
       case SECONDS_FROM_DATETIME:
-        return sec(checkDate(it, AtomType.DTM, ctx));
+        return Dec.get(checkDate(it, AtomType.DTM, ctx).sec());
       case SECONDS_FROM_TIME:
-        return sec(checkDate(it, AtomType.TIM, ctx));
+        return Dec.get(checkDate(it, AtomType.TIM, ctx).sec());
       case TIMEZONE_FROM_DATETIME:
         return zon(checkDate(it, AtomType.DTM, ctx));
       case TIMEZONE_FROM_DATE:
@@ -81,78 +73,16 @@ public final class FNDate extends StandardFunc {
       case TIMEZONE_FROM_TIME:
         return zon(checkDate(it, AtomType.TIM, ctx));
       case ADJUST_DATE_TO_TIMEZONE:
-        return datzon(it, zon, d);
+        return adjust(it, AtomType.DAT, ctx);
       case ADJUST_DATETIME_TO_TIMEZONE:
-        return dtmzon(it, zon, d);
+        return adjust(it, AtomType.DTM, ctx);
       case ADJUST_TIME_TO_TIMEZONE:
-        return timzon(it, zon, d);
+        return adjust(it, AtomType.TIM, ctx);
       case DATETIME:
-        return dattim(it, zon);
+        return dateTime(it, ctx);
       default:
         return super.item(ctx, ii);
     }
-  }
-
-  /**
-   * Returns the years of the specified date.
-   * @param it date
-   * @return years
-   */
-  private static Item yea(final Item it) {
-    return Int.get(it instanceof Dur ? ((Dur) it).yea() :
-      ((ADate) it).xc.getYear());
-  }
-
-  /**
-   * Returns the months of the specified date.
-   * @param it date
-   * @return months
-   */
-  private static Item mon(final Item it) {
-    return Int.get(it instanceof Dur ? ((Dur) it).mon() :
-      ((ADate) it).xc.getMonth());
-  }
-
-  /**
-   * Returns the days of the specified date.
-   * @param it date
-   * @return days
-   */
-  private static Item day(final Item it) {
-    return Int.get(it instanceof Dur ? (int) ((Dur) it).day() :
-      ((ADate) it).xc.getDay());
-  }
-
-  /**
-   * Returns the hours of the specified date.
-   * @param it date
-   * @return hours
-   */
-  private static Item hou(final Item it) {
-    return Int.get(it instanceof Dur ? (int) ((Dur) it).hou() :
-      ((ADate) it).xc.getHour());
-  }
-
-  /**
-   * Returns the minutes of the specified date.
-   * @param it date
-   * @return minutes
-   */
-  private static Item min(final Item it) {
-    return Int.get(it instanceof Dur ? ((Dur) it).min() :
-      ((ADate) it).xc.getMinute());
-  }
-
-  /**
-   * Returns the seconds of the specified date.
-   * @param it date
-   * @return seconds
-   */
-  private static Item sec(final Item it) {
-    if(it instanceof Dur) return Dec.get(((Dur) it).sec().doubleValue());
-    final int s = ((ADate) it).xc.getSecond();
-    final BigDecimal d = ((ADate) it).xc.getFractionalSecond();
-    return Dec.get(s + (d != null ? d.doubleValue() : 0));
   }
 
   /**
@@ -160,144 +90,77 @@ public final class FNDate extends StandardFunc {
    * @param it input item
    * @return timezone
    */
-  private static Item zon(final Item it) {
-    final int z = ((ADate) it).xc.getTimezone();
-    return z == Item.UNDEF ? null : new DTd(z);
+  private static DTDur zon(final ADate it) {
+    final int tz = it.zon();
+    return tz == Short.MAX_VALUE ? null : new DTDur(tz);
   }
 
   /**
-   * Checks if the specified item has the specified type.
-   * If it's an untyped item, the specified type is returned.
+   * Checks if the specified item has the specified Date type.
+   * If it is item, the specified Date is returned.
    * @param it item to be checked
    * @param t target type
    * @param ctx query context
    * @return date
    * @throws QueryException query exception
    */
-  private Item checkDate(final Item it, final Type t, final QueryContext ctx)
+  private ADate checkDate(final Item it, final Type t, final QueryContext ctx)
       throws QueryException {
-    return it.type.isUntyped() ? t.cast(it, ctx, info) : checkType(it, t);
+    return (ADate) (it.type.isUntyped() ? t.cast(it, ctx, info) : checkType(it, t));
   }
 
   /**
-   * Checks if the specified item is a duration. If it's an untyped item,
+   * Checks if the specified item is a Duration item. If it is untyped,
    * a duration is returned.
    * @param it item to be checked
    * @return duration
    * @throws QueryException query exception
    */
-  private Item checkDur(final Item it) throws QueryException {
-    if(it instanceof Dur) return it;
+  private Dur checkDur(final Item it) throws QueryException {
+    if(it instanceof Dur) return (Dur) it;
     if(it.type.isUntyped()) return new Dur(it.string(info), info);
     throw Err.type(this, AtomType.DUR, it);
   }
 
   /**
-   * Adjusts the Date to the time zone.
-   * @param it item to be checked
-   * @param zon timezone
-   * @param d zone was defined
-   * @return duration
-   * @throws QueryException query exception
-   */
-  private Item datzon(final Item it, final Item zon, final boolean d)
-      throws QueryException {
-
-    final Item i = it.type.isUntyped() ? new Dat(it.string(info), info) :
-      new Dat((ADate) checkType(it, AtomType.DAT));
-    return adjust((ADate) i, zon, d);
-  }
-
-  /**
-   * Adjusts the DateTime to the time zone.
-   * @param it item to be checked
-   * @param zon timezone
-   * @param d zone was defined
-   * @return duration
-   * @throws QueryException query exception
-   */
-  private Item dtmzon(final Item it, final Item zon, final boolean d)
-      throws QueryException {
-
-    final Item i = it.type.isUntyped() ? new Dtm(it.string(info), info) :
-      new Dtm((ADate) checkType(it, AtomType.DTM));
-    return adjust((ADate) i, zon, d);
-  }
-
-  /**
-   * Adjusts the Time to the time zone.
-   * @param it item to be checked
-   * @param zon timezone
-   * @param d zone was defined
-   * @return duration
-   * @throws QueryException query exception
-   */
-  private Item timzon(final Item it, final Item zon, final boolean d)
-      throws QueryException {
-
-    final Item i = it.type.isUntyped() ? new Tim(it.string(info), info) :
-      new Tim((ADate) checkType(it, AtomType.TIM));
-    return adjust((ADate) i, zon, d);
-  }
-
-  /**
-   * Returns a DateTime.
+   * Returns a DateTime item.
    * @param date item to be checked
-   * @param tm time zone
+   * @param ctx query context
    * @return duration
    * @throws QueryException query exception
    */
-  private Item dattim(final Item date, final Item tm) throws QueryException {
-    if(tm == null) return null;
-
-    final Item d = date.type.isUntyped() ? new Dat(date.string(info), info) : date;
-    final Item t = tm.type.isUntyped() ? new Tim(tm.string(info), info) : tm;
-
-    final Dtm dtm = new Dtm((Dat) checkType(d, AtomType.DAT));
-    final Tim tim = (Tim) checkType(t, AtomType.TIM);
-
-    dtm.xc.setTime(tim.xc.getHour(), tim.xc.getMinute(), tim.xc.getSecond(),
-        tim.xc.getMillisecond());
-
-    final int zone = tim.xc.getTimezone();
-    if(dtm.xc.getTimezone() == Item.UNDEF) {
-      dtm.xc.setTimezone(zone);
-    } else if(dtm.xc.getTimezone() != zone && zone != Item.UNDEF) {
-      FUNZONE.thrw(info, dtm, tim);
-    }
-    return dtm;
+  private ADate dateTime(final Item date, final QueryContext ctx) throws QueryException {
+    final Item zon = expr.length == 2 ? expr[1].item(ctx, info) : null;
+    if(zon == null) return null;
+    final Dat d = date.type.isUntyped() ? new Dat(date.string(info), info) :
+      (Dat) checkType(date, AtomType.DAT);
+    final Tim t = zon.type.isUntyped() ? new Tim(zon.string(info), info) :
+      (Tim) checkType(zon, AtomType.TIM);
+    return new Dtm(d, t, info);
   }
 
   /**
-   * Adjusts the timezone.
-   * @param date input date
-   * @param zon timezone
-   * @param d zone was specified
-   * @return adjusted date
+   * Adjusts a Time item to the specified time zone.
+   * @param it item
+   * @param t target type
+   * @param ctx query context
+   * @return duration
    * @throws QueryException query exception
    */
-  private ADate adjust(final ADate date, final Item zon, final boolean d)
+  private ADate adjust(final Item it, final Type t, final QueryContext ctx)
       throws QueryException {
 
-    if(d && zon == null) {
-      date.xc.setTimezone(Item.UNDEF);
-      return date;
-    }
-
-    final int zn = date.xc.getTimezone();
-    final int tz;
-    if(zon == null) {
-      final Calendar c = Calendar.getInstance();
-      tz = (c.get(Calendar.ZONE_OFFSET) + c.get(Calendar.DST_OFFSET)) / 60000;
+    final ADate ad;
+    if(it.type.isUntyped()) {
+      ad = (ADate) t.cast(it, ctx, info);
     } else {
-      final DTd dtd = (DTd) checkType(zon, AtomType.DTD);
-      tz = (int) (dtd.min() + dtd.hou() * 60);
-      if(dtd.sec().signum() != 0 || Math.abs(tz) > 840 || dtd.day() != 0) {
-        INVALZONE.thrw(info, zon);
-      }
+      // clone item
+      final ADate a = (ADate) checkType(it, t);
+      ad = t == AtomType.TIM ? new Tim(a) : t == AtomType.DAT ? new Dat(a) : new Dtm(a);
     }
-    if(zn != Item.UNDEF) date.xc.add(ADate.df.newDuration(-60000L * (zn - tz)));
-    date.xc.setTimezone(tz);
-    return date;
+    final boolean spec = expr.length == 2;
+    final Item zon = spec ? expr[1].item(ctx, info) : null;
+    ad.timeZone(zon == null ? null : (DTDur) checkType(zon, AtomType.DTD), spec, info);
+    return ad;
   }
 }

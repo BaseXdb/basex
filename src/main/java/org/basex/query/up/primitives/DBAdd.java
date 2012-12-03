@@ -1,7 +1,5 @@
 package org.basex.query.up.primitives;
 
-import static org.basex.util.Token.*;
-
 import java.util.*;
 
 import org.basex.core.*;
@@ -42,7 +40,7 @@ public final class DBAdd extends BasicOperation {
 
     super(TYPE.DBADD, d, ii);
     docs.add(it);
-    paths.add(token(p));
+    paths.add(p);
     ctx = c;
   }
 

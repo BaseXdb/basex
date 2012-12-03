@@ -44,15 +44,15 @@ public enum Calc {
       // dates or durations
       if(ta == tb) {
         if(!(a instanceof Dur)) errNum(ii, !t1 ? a : b);
-        if(ta == YMD) return new YMDur((YMDur) a, (YMDur) b, true);
-        if(ta == DTD) return new DTd((DTd) a, (DTd) b, true);
+        if(ta == YMD) return new YMDur((YMDur) a, (YMDur) b, true, ii);
+        if(ta == DTD) return new DTDur((DTDur) a, (DTDur) b, true, ii);
       }
-      if(ta == DTM) return new Dtm((ADate) a, checkDur(ii, b), true, ii);
-      if(tb == DTM) return new Dtm((ADate) b, checkDur(ii, a), true, ii);
-      if(ta == DAT) return new Dat((ADate) a, checkDur(ii, b), true, ii);
-      if(tb == DAT) return new Dat((ADate) b, checkDur(ii, a), true, ii);
-      if(ta == TIM && tb == DTD) return new Tim((Tim) a, (DTd) b, true, ii);
-      if(tb == TIM && ta == DTD) return new Tim((Tim) b, (DTd) a, true, ii);
+      if(ta == DTM) return new Dtm((Dtm) a, checkDur(ii, b), true, ii);
+      if(tb == DTM) return new Dtm((Dtm) b, checkDur(ii, a), true, ii);
+      if(ta == DAT) return new Dat((Dat) a, checkDur(ii, b), true, ii);
+      if(tb == DAT) return new Dat((Dat) b, checkDur(ii, a), true, ii);
+      if(ta == TIM && tb == DTD) return new Tim((Tim) a, (DTDur) b, true);
+      if(tb == TIM && ta == DTD) return new Tim((Tim) b, (DTDur) a, true);
       throw errType(ii, ta, tb);
     }
   },
@@ -82,14 +82,15 @@ public enum Calc {
 
       // dates or durations
       if(ta == tb) {
-        if(ta == DTM || ta == DAT || ta == TIM) return new DTd((ADate) a, (ADate) b);
-        if(ta == YMD) return new YMDur((YMDur) a, (YMDur) b, false);
-        if(ta == DTD) return new DTd((DTd) a, (DTd) b, false);
+        if(ta == DTM || ta == DAT || ta == TIM)
+          return new DTDur((ADate) a, (ADate) b, ii);
+        if(ta == YMD) return new YMDur((YMDur) a, (YMDur) b, false, ii);
+        if(ta == DTD) return new DTDur((DTDur) a, (DTDur) b, false, ii);
         errNum(ii, !t1 ? a : b);
       }
-      if(ta == DTM) return new Dtm((ADate) a, checkDur(ii, b), false, ii);
-      if(ta == DAT) return new Dat((ADate) a, checkDur(ii, b), false, ii);
-      if(ta == TIM && tb == DTD) return new Tim((Tim) a, (DTd) b, false, ii);
+      if(ta == DTM) return new Dtm((Dtm) a, checkDur(ii, b), false, ii);
+      if(ta == DAT) return new Dat((Dat) a, checkDur(ii, b), false, ii);
+      if(ta == TIM && tb == DTD) return new Tim((Tim) a, (DTDur) b, false);
       throw errType(ii, ta, tb);
     }
   },
@@ -108,11 +109,11 @@ public enum Calc {
         errNum(ii, a);
       }
       if(ta == DTD) {
-        if(b instanceof ANum) return new DTd((Dur) a, b.dbl(ii), true, ii);
+        if(b instanceof ANum) return new DTDur((Dur) a, b.dbl(ii), true, ii);
         errNum(ii, b);
       }
       if(tb == DTD) {
-        if(a instanceof ANum) return new DTd((Dur) b, a.dbl(ii), true, ii);
+        if(a instanceof ANum) return new DTDur((Dur) b, a.dbl(ii), true, ii);
         errNum(ii, a);
       }
 
@@ -148,9 +149,9 @@ public enum Calc {
               bd, 20, BigDecimal.ROUND_HALF_EVEN));
         }
         if(ta == DTD) {
-          final BigDecimal bd = ((DTd) b).dtd();
+          final BigDecimal bd = ((DTDur) b).dtd();
           if(bd.doubleValue() == 0.0) DIVZERO.thrw(ii, a);
-          return Dec.get(((DTd) a).dtd().divide(bd, 20,
+          return Dec.get(((DTDur) a).dtd().divide(bd, 20,
               BigDecimal.ROUND_HALF_EVEN));
         }
       }
@@ -159,7 +160,7 @@ public enum Calc {
         errNum(ii, b);
       }
       if(ta == DTD) {
-        if(b instanceof ANum) return new DTd((Dur) a, b.dbl(ii), false, ii);
+        if(b instanceof ANum) return new DTDur((Dur) a, b.dbl(ii), false, ii);
         errNum(ii, b);
       }
 

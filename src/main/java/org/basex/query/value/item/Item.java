@@ -245,54 +245,9 @@ public abstract class Item extends Value {
    * @return never
    * @throws QueryException query exception
    */
-  final QueryException castErr(final Object val, final InputInfo ii)
+  protected final QueryException castErr(final Object val, final InputInfo ii)
       throws QueryException {
     return FUNCAST.thrw(ii, type, val);
-  }
-
-  /**
-   * Throws a date format exception.
-   * @param i input
-   * @param ex example format
-   * @param ii input info
-   * @return never
-   * @throws QueryException query exception
-   */
-  final QueryException dateErr(final byte[] i, final String ex, final InputInfo ii)
-      throws QueryException {
-    throw DATEFORMAT.thrw(ii, type, i, ex);
-  }
-
-  /**
-   * Converts the specified string to an integer. Returns an exception if the value
-   * is invalid.
-   * @param s string to be converted
-   * @param ii input info
-   * @return integer
-   * @throws QueryException query exception
-   */
-  int toInt(final String s, final InputInfo ii) throws QueryException {
-    try {
-      return Integer.parseInt(s);
-    } catch(final NumberFormatException ex) {
-      throw DURRANGE.thrw(ii, type, s);
-    }
-  }
-
-  /**
-   * Converts the specified string to a double. Returns an exception if the value
-   * is invalid.
-   * @param s string to be converted
-   * @param ii input info
-   * @return integer
-   * @throws QueryException query exception
-   */
-  double toDouble(final String s, final InputInfo ii) throws QueryException {
-    try {
-      return Double.parseDouble(s);
-    } catch(final NumberFormatException ex) {
-      throw DURRANGE.thrw(ii, type, s);
-    }
   }
 
   @Override

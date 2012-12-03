@@ -262,8 +262,7 @@ public final class FNStr extends StandardFunc {
     final Iter iter = ctx.iter(expr[0]);
     int c = 0;
     for(Item i; (i = iter.next()) != null;) {
-      tb.add(checkEStr(i));
-      tb.add(sep);
+      tb.add(checkEStr(i)).add(sep);
       ++c;
     }
     final byte[] v = tb.finish();

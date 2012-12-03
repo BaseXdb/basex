@@ -444,8 +444,8 @@ public enum AtomType implements Type {
     @Override
     public Item cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
-      return it instanceof Dur ? new DTd((Dur) it) : str(it) ?
-          new DTd(it.string(ii), ii) : invCast(it, ii);
+      return it instanceof Dur ? new DTDur((Dur) it) : str(it) ?
+          new DTDur(it.string(ii), ii) : invCast(it, ii);
     }
     @Override
     public Item cast(final Object o, final InputInfo ii) throws QueryException {
@@ -458,8 +458,8 @@ public enum AtomType implements Type {
     @Override
     public Item cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
-      return it.type == DAT ? new Dtm((ADate) it) : str(it) ? new Dtm(it.string(ii), ii) :
-        invCast(it, ii);
+      return it.type == DAT ? new Dtm((Dat) it) : str(it) ?
+        new Dtm(it.string(ii), ii) : invCast(it, ii);
     }
     @Override
     public Item cast(final Object o, final InputInfo ii) throws QueryException {
@@ -475,7 +475,7 @@ public enum AtomType implements Type {
     @Override
     public Item cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
-      return it.type == DTM ? new Dat((ADate) it) : str(it) ?
+      return it.type == DTM ? new Dat((Dtm) it) : str(it) ?
           new Dat(it.string(ii), ii) : invCast(it, ii);
     }
     @Override
@@ -489,7 +489,7 @@ public enum AtomType implements Type {
     @Override
     public Item cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
-      return it.type == DTM ? new Tim((ADate) it) : str(it) ?
+      return it.type == DTM ? new Tim((Dtm) it) : str(it) ?
           new Tim(it.string(ii), ii) : invCast(it, ii);
     }
     @Override
