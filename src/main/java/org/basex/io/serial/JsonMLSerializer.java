@@ -117,6 +117,18 @@ public final class JsonMLSerializer extends OutputSerializer {
   }
 
   /**
+   * Prints some indentation.
+   * @param lvl level
+   * @throws IOException I/O exception
+   */
+  void indent(final int lvl) throws IOException {
+    if(!indent) return;
+    print(nl);
+    final int ls = lvl * indents;
+    for(int l = 0; l < ls; ++l) print(tab);
+  }
+
+  /**
    * Raises an error with the specified message.
    * @param msg error message
    * @param ext error details
