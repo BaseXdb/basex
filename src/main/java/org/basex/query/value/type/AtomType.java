@@ -644,7 +644,7 @@ public enum AtomType implements Type {
 
       // argument must be of type string and a valid QName
       if(it.type != STR) invCast(it, ii);
-      final byte[] nm = it.string(ii);
+      final byte[] nm = trim(it.string(ii));
       if(nm.length == 0 || !XMLToken.isQName(nm)) FUNCAST.thrw(ii, this, it);
       final QNm qn = new QNm(nm, ctx);
       if(!qn.hasURI() && qn.hasPrefix()) NSDECL.thrw(ii, qn.prefix());

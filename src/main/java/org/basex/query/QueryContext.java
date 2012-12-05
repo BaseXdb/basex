@@ -192,7 +192,9 @@ public final class QueryContext extends Progress {
       try {
         value = ctxItem.value(this);
       } catch(final QueryException ex) {
-        throw ex;
+        if(ex.err() != XPNOCTX) throw ex;
+        // only {@link ParseExpr} instances may cause this error
+        CIRCCTX.thrw(((ParseExpr) ctxItem).info);
       }
     } else if(nodes != null) {
       // add full-text container reference
@@ -226,7 +228,7 @@ public final class QueryContext extends Progress {
       if(root != null) root = root.compile(this);
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
-      XPSTACK.thrw(null);
+      CIRCLDECL.thrw(null);
     }
   }
 
@@ -241,7 +243,7 @@ public final class QueryContext extends Progress {
       return updating ? value().iter() : iter(root);
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
-      throw XPSTACK.thrw(null);
+      throw CIRCLDECL.thrw(null);
     }
   }
 
@@ -257,7 +259,7 @@ public final class QueryContext extends Progress {
       return u != null ? u : v;
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
-      throw XPSTACK.thrw(null);
+      throw CIRCLDECL.thrw(null);
     }
   }
 

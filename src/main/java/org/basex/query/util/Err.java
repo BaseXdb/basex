@@ -784,6 +784,10 @@ public enum Err {
   CAXML(XQDY, 44, "XML prefix and namespace cannot be rebound."),
   /** XQDY0044. */
   CAINV(XQDY, 44, "Invalid attribute prefix/namespace '%'."),
+  /** XQDY0054. */
+  CIRCLDECL(XQDY, 54, "Stack Overflow: circular variable declaration?"),
+  /** XQDY0054. */
+  CIRCCTX(XQDY, 54, "Circular declaration of context item."),
   /** XQDY0064. */
   CPIXML(XQDY, 64, "Processing instruction has illegal name: '%'."),
   /** XQDY0072. */
@@ -835,8 +839,6 @@ public enum Err {
   MODNS(XQST, 48, "Declaration % does not match the module namespace."),
   /** XQST0049. */
   VARDEFINE(XQST, 49, "Duplicate declaration of %."),
-  /** XQST0054. */
-  XPSTACK(XQST, 54, "Stack Overflow: circular variable declaration?"),
   /** XQST0055. */
   DUPLCOPYNS(XQST, 55, "Duplicate 'copy-namespace' declaration."),
   /** XQST0057. */

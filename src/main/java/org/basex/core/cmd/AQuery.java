@@ -128,7 +128,7 @@ abstract class AQuery extends Command {
         throw ex;
       } catch(final StackOverflowError ex) {
         Util.debug(ex);
-        err = XPSTACK.desc;
+        err = CIRCLDECL.desc;
       } finally {
         // close processor after exceptions
         if(qp != null) qp.close();
