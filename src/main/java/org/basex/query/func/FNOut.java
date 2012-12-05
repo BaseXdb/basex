@@ -33,10 +33,10 @@ public final class FNOut extends StandardFunc {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
-      case _OUT_NL:         return NL;
-      case _OUT_TAB:        return TAB;
-      case _OUT_FORMAT:     return format(ctx);
-      default:               return super.item(ctx, ii);
+      case _OUT_NL:     return NL;
+      case _OUT_TAB:    return TAB;
+      case _OUT_FORMAT: return format(ctx);
+      default:          return super.item(ctx, ii);
     }
   }
 
@@ -50,7 +50,8 @@ public final class FNOut extends StandardFunc {
     final String form = string(checkStr(expr[0], ctx));
     final Object[] args = new Object[expr.length - 1];
     for(int e = 1; e < expr.length; e++) {
-      args[e - 1] = expr[e].item(ctx, info).toJava();
+      final Item it = expr[e].item(ctx, info);
+      args[e - 1] = it.type.isUntyped() ? string(it.string(info)) : it.toJava();
     }
     try {
       return Str.get(String.format(form, args));
