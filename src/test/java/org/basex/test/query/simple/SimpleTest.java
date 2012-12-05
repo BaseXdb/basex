@@ -96,6 +96,7 @@ public final class SimpleTest extends QueryTest {
 
       { "Cast 1", itr(1), "xs:integer('+1')" },
       { "Cast 2", "xs:integer('++1')" },
+      { "Cast 3", bool(false), "string('/') castable as xs:QName" },
 
       { "Div 1", "xs:dayTimeDuration('PT0S') div xs:dayTimeDuration('PT0S')" },
       { "Div 2", "xs:yearMonthDuration('P0M') div xs:yearMonthDuration('P0M')" },
