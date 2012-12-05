@@ -56,7 +56,7 @@ public final class FNNum extends StandardFunc {
   private Item rnd(final Item it, final double d, final boolean h2e,
       final QueryContext ctx) throws QueryException {
 
-    final int p = expr.length == 1 ? 0 : (int) checkItr(expr[1], ctx);
+    final long p = expr.length == 1 ? 0 : checkItr(expr[1], ctx);
     return round(it, d, p, h2e, info);
   }
 
@@ -95,7 +95,7 @@ public final class FNNum extends StandardFunc {
    * @return absolute item
    * @throws QueryException query exception
    */
-  public static Item round(final Item it, final double d, final int prec,
+  public static Item round(final Item it, final double d, final long prec,
       final boolean h2e, final InputInfo ii) throws QueryException {
 
     // take care of untyped items
@@ -105,16 +105,16 @@ public final class FNNum extends StandardFunc {
       final BigDecimal bd = num.dec(ii);
       final int m = h2e ? BigDecimal.ROUND_HALF_EVEN : bd.signum() > 0 ?
           BigDecimal.ROUND_HALF_UP : BigDecimal.ROUND_HALF_DOWN;
-      return Dec.get(bd.setScale(prec, m));
+      return Dec.get(prec > Integer.MAX_VALUE ? bd : bd.setScale((int) prec, m));
     }
 
-    // calculate precision factor
-    double p = 1;
-    for(long i = prec; i > 0; --i) p *= 10;
-    for(long i = prec; i < 0; ++i) p /= 10;
-
     double c = d;
-    if(!Double.isNaN(c) && !Double.isInfinite(c)) {
+    if(!Double.isNaN(c) && !Double.isInfinite(c) && prec < 32) {
+      // calculate precision factor
+      double p = 1;
+      for(long i = prec; i > 0; --i) p *= 10;
+      for(long i = prec; i < 0; ++i) p /= 10;
+
       if(h2e) {
         c *= p;
         if(d < 0) c = -c;
