@@ -61,7 +61,6 @@ final class RestXqModules {
         for(final RestXqFunction rxf : list) {
           if(first.compareTo(rxf) != 0) break;
           tb.add(Prop.NL).add(rxf.function.info.toString());
-          tb.add(" (module: ").add(Text.LI + rxf.module.file.name()).add(")");
         }
         first.error(PATH_CONFLICT, first.path, tb);
       }
