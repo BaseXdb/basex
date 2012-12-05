@@ -175,6 +175,8 @@ public final class FNPat extends StandardFunc {
     }
 
     final Pattern p = pattern(expr[1], expr.length == 4 ? expr[3] : null, ctx);
+    if(p.pattern().isEmpty()) REGROUP.thrw(info);
+
     String r = string(rep);
     if((p.flags() & Pattern.LITERAL) != 0) {
       r = SLASH.matcher(BSLASH.matcher(r).replaceAll("\\\\\\\\")).replaceAll("\\\\\\$");
