@@ -61,10 +61,14 @@ public class BaseXTextField extends JTextField {
     BaseXLayout.setWidth(this, DWIDTH);
     BaseXLayout.addInteraction(this, win);
 
-    if(txt != null) {
-      setText(txt);
-      selectAll();
-    }
+    if(txt != null) setText(txt);
+
+    addFocusListener(new FocusAdapter() {
+      @Override
+      public void focusGained(final FocusEvent e) {
+        selectAll();
+      }
+    });
 
     addKeyListener(new KeyAdapter() {
       @Override

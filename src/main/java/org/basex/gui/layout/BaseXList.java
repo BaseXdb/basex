@@ -62,12 +62,6 @@ public final class BaseXList extends BaseXBack {
 
     layout(new TableLayout(2, 1));
     text = new BaseXTextField(d);
-    text.addFocusListener(new FocusAdapter() {
-      @Override
-      public void focusGained(final FocusEvent e) {
-        text.selectAll();
-      }
-    });
     text.addKeyListener(new KeyAdapter() {
       boolean multi, typed;
       String old = "";

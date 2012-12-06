@@ -80,12 +80,6 @@ public final class SearchPanel extends BaseXBack {
     word.setEnabled(!regex.isSelected());
 
     // add interaction to search field
-    search.addFocusListener(new FocusAdapter() {
-      @Override
-      public void focusGained(final FocusEvent e) {
-        search.selectAll();
-      }
-    });
     search.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
