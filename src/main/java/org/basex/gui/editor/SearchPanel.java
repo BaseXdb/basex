@@ -135,7 +135,8 @@ public final class SearchPanel extends BaseXBack {
       public void actionPerformed(final ActionEvent e) {
         search.store();
         replace.store();
-        editor.replace(new ReplaceContext(replace.getText()));
+        final String in = replace.getText();
+        editor.replace(new ReplaceContext(regex.isSelected() ? decode(in) : in));
         deactivate(true);
       }
     });
@@ -289,5 +290,35 @@ public final class SearchPanel extends BaseXBack {
       }
     });
     return b;
+  }
+
+  /**
+   * Decodes the specified string and replaces backslashed n's and t's with
+   * newlines and tab characters.
+   * @param in input
+   * @return decoded string
+   */
+  String decode(final String in) {
+    final StringBuilder sb = new StringBuilder();
+    boolean bs = false;
+    for(int i = 0; i < in.length(); i++) {
+      final char ch = in.charAt(i);
+      if(bs) {
+        if(ch == 'n') {
+          sb.append('\n');
+        } else if(ch == 't') {
+          sb.append('\t');
+        } else {
+          sb.append('\\');
+          if(ch != '\\') sb.append(ch);
+        }
+        bs = false;
+      } else {
+        if(ch == '\\') bs = true;
+        else sb.append(ch);
+      }
+    }
+    if(bs) sb.append('\\');
+    return sb.toString();
   }
 }
