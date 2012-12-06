@@ -171,8 +171,8 @@ public final class EditorView extends View {
         };
         final StringList sl = new StringList();
         for(final EditorArea ea : editors()) sl.add(ea.file.path());
-        final String[] files = gui.gprop.strings(GUIProp.EDITOR);
-        for(final String en : files) {
+        for(final String en : new StringList().add(
+            gui.gprop.strings(GUIProp.EDITOR)).sort(!Prop.WIN, true)) {
           final JMenuItem it = new JMenuItem(en);
           it.setEnabled(!sl.contains(en));
           pm.add(it).addActionListener(al);
@@ -370,7 +370,7 @@ public final class EditorView extends View {
       if(!f.equalsIgnoreCase(path) && IO.get(f).exists()) sl.add(f);
     }
     // store sorted history
-    gui.gprop.set(GUIProp.EDITOR, sl.sort(!Prop.WIN, true).toArray());
+    gui.gprop.set(GUIProp.EDITOR, sl.toArray());
     hist.setEnabled(!sl.isEmpty());
   }
 
