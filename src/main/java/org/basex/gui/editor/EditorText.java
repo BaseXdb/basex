@@ -617,13 +617,6 @@ public final class EditorText {
     finishSelect();
   }
 
-  /**
-   * Selects the whole text.
-   */
-  void selectAll() {
-    select(0, size());
-  }
-
   // ERROR HIGHLIGHTING =================================================================
 
   /**

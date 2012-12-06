@@ -289,8 +289,9 @@ public class Editor extends BaseXPanel {
    * Selects the whole text.
    */
   final void selectAll() {
-    text.selectAll();
-    text.setCursor();
+    final int s = text.size();
+    text.select(0, s);
+    text.setCursor(s);
     rend.repaint();
   }
 
