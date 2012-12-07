@@ -214,6 +214,11 @@ public class UserFunc extends Single {
   }
 
   @Override
+  public SeqType type() {
+    return updating ? SeqType.EMP : super.type();
+  }
+
+  @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder(DECLARE).add(' ').addExt(ann);
     if(updating) tb.add(UPDATING).add(' ');
