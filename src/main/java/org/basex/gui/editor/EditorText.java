@@ -590,7 +590,7 @@ public final class EditorText {
    * Selects the word at the cursor position.
    */
   void selectWord() {
-    pos(cursor());
+    pos(getCaret());
     final boolean ch = ftChar(prev(true));
     while(pos() > 0) {
       final int c = prev(true);
@@ -610,7 +610,7 @@ public final class EditorText {
    * Selects the word at the cursor position.
    */
   void selectLine() {
-    pos(cursor());
+    pos(getCaret());
     bol(true);
     startSelect();
     eol(true);
@@ -716,7 +716,7 @@ public final class EditorText {
    * Sets the text cursor to the specified position.
    * @param c cursor position
    */
-  void setCursor(final int c) {
+  void setCaret(final int c) {
     pc = c;
     ps = c;
   }
@@ -724,7 +724,7 @@ public final class EditorText {
   /**
    * Sets the text cursor to the current position.
    */
-  void setCursor() {
+  void setCaret() {
     pc = ps;
   }
 
@@ -732,7 +732,7 @@ public final class EditorText {
    * Returns the position of the text cursor.
    * @return cursor position
    */
-  int cursor() {
+  int getCaret() {
     return pc;
   }
 

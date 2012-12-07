@@ -400,18 +400,24 @@ public final class EditorView extends View {
    * Jumps to a specific line.
    */
   public void gotoLine() {
-    final DialogLine dl = new DialogLine(gui);
-    if(!dl.ok()) return;
     final EditorArea edit = getEditor();
-    final int el = dl.line();
     final int ll = edit.last.length;
+    final int cr = edit.getCaret();
+    int l = 1;
+    for(int e = 0; e < ll && e < cr; e += cl(edit.last, e)) {
+      if(edit.last[e] == '\n') ++l;
+    }
+    final DialogLine dl = new DialogLine(gui, l);
+    if(!dl.ok()) return;
+    final int el = dl.line();
     int p = 0;
-    for(int l = 1, e = 0; e < ll && l < el; e += cl(edit.last, e)) {
+    l = 1;
+    for(int e = 0; e < ll && l < el; e += cl(edit.last, e)) {
       if(edit.last[e] != '\n') continue;
       p = e + 1;
       ++l;
     }
-    edit.setCursor(p);
+    edit.setCaret(p);
     posCode.invokeLater();
   }
 

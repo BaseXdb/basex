@@ -203,7 +203,7 @@ final class EditorArea extends Editor {
    */
   void jumpError(final int pos) {
     requestFocusInWindow();
-    setCursor(pos);
+    setCaret(pos);
   }
 
   /**

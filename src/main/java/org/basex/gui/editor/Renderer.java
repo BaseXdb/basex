@@ -88,7 +88,7 @@ public final class Renderer extends BaseXBack {
     while(more(g)) write(g);
     wordW = 0;
     final int s = text.size();
-    if(cursor && s == text.cursor()) drawCursor(g, x);
+    if(cursor && s == text.getCaret()) drawCursor(g, x);
     if(s == text.error()) drawError(g);
   }
 
@@ -142,7 +142,7 @@ public final class Renderer extends BaseXBack {
     while(more(g)) {
       final int p = text.pos();
       while(text.more()) {
-        more = text.pos() < text.cursor();
+        more = text.pos() < text.getCaret();
         if(!more) break;
         text.next();
         col++;
@@ -297,7 +297,7 @@ public final class Renderer extends BaseXBack {
 
     final int ch = text.curr();
     final int cp = text.pos();
-    final int cc = text.cursor();
+    final int cc = text.getCaret();
     if(y > 0 && y < h) {
       if(ch == TokenBuilder.MARK) {
         color = GUIConstants.GREEN;
@@ -461,7 +461,7 @@ public final class Renderer extends BaseXBack {
 
       if(!finish) text.startSelect();
       else text.extendSelect();
-      text.setCursor();
+      text.setCaret();
     }
     repaint();
   }

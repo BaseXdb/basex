@@ -162,7 +162,7 @@ public class Editor extends BaseXPanel {
   public final void setText(final byte[] t, final int s) {
     // remove invalid characters and compare old with new string
     int ns = 0;
-    final int pc = text.cursor();
+    final int pc = text.getCaret();
     final int ts = text.size();
     final byte[] old = text.text();
     boolean eq = true;
@@ -210,13 +210,21 @@ public class Editor extends BaseXPanel {
   }
 
   /**
-   * Sets a new cursor position.
+   * Sets a new text cursor position.
    * @param p cursor position
    */
-  public final void setCursor(final int p) {
-    text.setCursor(p);
+  public final void setCaret(final int p) {
+    text.setCaret(p);
     showCursor(1);
     cursor(true);
+  }
+
+  /**
+   * Returns the current text cursor.
+   * @return cursor position
+   */
+  public final int getCaret() {
+    return text.getCaret();
   }
 
   /**
@@ -226,7 +234,7 @@ public class Editor extends BaseXPanel {
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
-        text.setCursor(text.size());
+        text.setCaret(text.size());
         showCursor(2);
       }
     });
@@ -291,7 +299,7 @@ public class Editor extends BaseXPanel {
   final void selectAll() {
     final int s = text.size();
     text.select(0, s);
-    text.setCursor(s);
+    text.setCaret(s);
     rend.repaint();
   }
 
@@ -340,7 +348,7 @@ public class Editor extends BaseXPanel {
         final boolean sel = text.selected();
         setText(rc.text);
         if(sel) text.select(select[0], select[1]);
-        text.setCursor(select[0]);
+        text.setCaret(select[0]);
         release(Action.CHECK);
       }
       gui.status.setText(Util.info(STRINGS_REPLACED));
@@ -479,7 +487,7 @@ public class Editor extends BaseXPanel {
     }
 
     // set cursor position and reset last column
-    final int pc = text.cursor();
+    final int pc = text.getCaret();
     text.pos(pc);
     if(!PREVLINE.is(e) && !NEXTLINE.is(e)) lastCol = -1;
 
@@ -533,7 +541,7 @@ public class Editor extends BaseXPanel {
       down(1, marking);
     } else if(FINDERROR.is(e)) {
       final int p = text.error();
-      if(p != -1) setCursor(p);
+      if(p != -1) setCaret(p);
     } else {
       consumed = false;
     }
@@ -602,10 +610,10 @@ public class Editor extends BaseXPanel {
     }
     if(consumed) e.consume();
 
-    text.setCursor();
+    text.setCaret();
     final byte[] tmp = text.text();
     if(txt != tmp) {
-      hist.store(tmp, pc, text.cursor());
+      hist.store(tmp, pc, text.getCaret());
       calcCode.invokeLater(down);
     } else {
       showCursor(down ? 2 : 0);
@@ -692,7 +700,7 @@ public class Editor extends BaseXPanel {
       return;
 
     final byte[] txt = text.text();
-    final int pc = text.cursor();
+    final int pc = text.getCaret();
     text.pos(pc);
 
     // remember if marked text is to be deleted
@@ -744,8 +752,8 @@ public class Editor extends BaseXPanel {
     }
 
     if(ch != null) text.add(ch);
-    text.setCursor();
-    hist.store(text.text(), pc, text.cursor());
+    text.setCaret();
+    hist.store(text.text(), pc, text.getCaret());
     calcCode.invokeLater(true);
     e.consume();
   }
@@ -795,8 +803,8 @@ public class Editor extends BaseXPanel {
    * @param old old cursor position; store entry to history if position != -1
    */
   void finish(final int old) {
-    text.setCursor();
-    if(old != -1) hist.store(text.text(), old, text.cursor());
+    text.setCaret();
+    if(old != -1) hist.store(text.text(), old, text.getCaret());
     calcCode.invokeLater(true);
     release(Action.CHECK);
   }
@@ -906,11 +914,11 @@ public class Editor extends BaseXPanel {
     @Override
     public void execute(final GUI main) {
       if(!hist.active()) return;
-      final int tc = text.cursor();
+      final int tc = text.getCaret();
       text.pos(tc);
       if(!copy()) return;
       text.delete();
-      text.setCursor();
+      text.setCaret();
       finish(tc);
     }
     @Override
@@ -944,7 +952,7 @@ public class Editor extends BaseXPanel {
     @Override
     public void execute(final GUI main) {
       if(!hist.active()) return;
-      final int tc = text.cursor();
+      final int tc = text.getCaret();
       text.pos(tc);
       final String txt = clip();
       if(txt == null) return;
@@ -967,7 +975,7 @@ public class Editor extends BaseXPanel {
     @Override
     public void execute(final GUI main) {
       if(!hist.active()) return;
-      final int tc = text.cursor();
+      final int tc = text.getCaret();
       text.pos(tc);
       text.delete();
       finish(tc);
