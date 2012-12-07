@@ -509,7 +509,10 @@ public final class EditorView extends View {
    * @return {@code false} if confirmation was canceled
    */
   public boolean confirm() {
-    for(final EditorArea edit : editors()) if(!confirm(edit)) return false;
+    for(final EditorArea edit : editors()) {
+      tabs.setSelectedComponent(edit);
+      close(edit);
+    }
     return true;
   }
 
