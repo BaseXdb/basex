@@ -99,7 +99,7 @@ public class Editor extends BaseXPanel {
       @Override
       public void focusLost(final FocusEvent e) {
         cursor(false);
-        rend.cursor(false);
+        rend.cursor(false, false);
         rend.repaint();
       }
     });
@@ -805,20 +805,19 @@ public class Editor extends BaseXPanel {
   private final Timer cursor = new Timer(500, new ActionListener() {
     @Override
     public void actionPerformed(final ActionEvent e) {
-      rend.cursor(!rend.cursor());
+      rend.cursor(!rend.cursor(), true);
       rend.repaint();
     }
   });
 
   /**
-   * Handles the cursor thread; interrupts the old thread as soon as
-   * new one has been started.
+   * Stops an old cursor thread and, if requested, starts a new one.
    * @param start start/stop flag
    */
   final void cursor(final boolean start) {
     cursor.stop();
     if(start) cursor.start();
-    rend.cursor(start);
+    rend.cursor(start, true);
     rend.repaint();
   }
 

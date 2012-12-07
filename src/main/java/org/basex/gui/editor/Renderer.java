@@ -7,6 +7,7 @@ import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.editor.Editor.SearchDir;
 import org.basex.gui.layout.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Efficient Text Editor and Renderer, supporting syntax highlighting and
@@ -48,12 +49,17 @@ public final class Renderer extends BaseXBack {
   /** Current height. */
   private int h;
 
+  /** Current brackets. */
+  private final IntList pars = new IntList();
+
   /** Text array to be written. */
   private final EditorText text;
   /** Vertical start position. */
   private transient Syntax syntax = Syntax.SIMPLE;
   /** Visibility of cursor. */
   private boolean cursor;
+  /** Focused. */
+  private boolean focused;
 
   /**
    * Constructor.
@@ -76,6 +82,8 @@ public final class Renderer extends BaseXBack {
   @Override
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
+
+    pars.reset();
     init(g, bar.pos());
     while(more(g)) write(g);
     wordW = 0;
@@ -288,6 +296,8 @@ public final class Renderer extends BaseXBack {
     }
 
     final int ch = text.curr();
+    final int cp = text.pos();
+    final int cc = text.cursor();
     if(y > 0 && y < h) {
       if(ch == TokenBuilder.MARK) {
         color = GUIConstants.GREEN;
@@ -295,7 +305,6 @@ public final class Renderer extends BaseXBack {
       }
 
       // mark selected text
-      final int cp = text.pos();
       if(text.selectStart()) {
         int xx = x, cw = 0;
         while(!text.inSelect() && text.more()) xx += charW(g, text.next());
@@ -341,13 +350,37 @@ public final class Renderer extends BaseXBack {
       if(cursor && text.edited()) {
         xx = x;
         while(text.more()) {
-          if(text.cursor() == text.pos()) {
+          if(cc == text.pos()) {
             drawCursor(g, xx);
             break;
           }
           xx += charW(g, text.next());
         }
         text.pos(cp);
+      }
+    }
+
+    // handle matching parentheses
+    if(focused) {
+      if(ch == '(' || ch == '[' || ch == '{' || ch == '<') {
+        pars.add(x);
+        pars.add(y);
+        pars.add(cp);
+        pars.add(ch);
+      }
+      if((ch == ')' || ch == ']' || ch == '}' || ch == '>') && !pars.isEmpty()) {
+        final int open = ch == ')' ? '(' : ch == ']' ? '[' : ch == '}' ? '{' : '<';
+        if(pars.peek() == open) {
+          pars.pop();
+          final int cr = pars.pop();
+          final int yy = pars.pop();
+          final int xx = pars.pop();
+          if(cc == cp || cc == cr) {
+            g.setColor(GUIConstants.color3);
+            g.drawRect(xx, yy - fontH * 4 / 5, charW(g, open), fontH);
+            g.drawRect(x, y - fontH * 4 / 5, charW(g, ch), fontH);
+          }
+        }
       }
     }
     next();
@@ -456,9 +489,11 @@ public final class Renderer extends BaseXBack {
   /**
    * Sets the cursor flag.
    * @param c cursor flag
+   * @param f focused flag
    */
-  void cursor(final boolean c) {
+  void cursor(final boolean c, final boolean f) {
     cursor = c;
+    focused = f;
   }
 
   /**
