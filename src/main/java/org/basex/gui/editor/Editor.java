@@ -698,59 +698,23 @@ public class Editor extends BaseXPanel {
     if(!hist.active() || control(e) || DELNEXT.is(e) || DELPREV.is(e) || ESCAPE.is(e))
       return;
 
-    final byte[] txt = text.text();
     final int pc = text.getCaret();
     text.pos(pc);
 
     // remember if marked text is to be deleted
-    String ch = String.valueOf(e.getKeyChar());
-    boolean indent = false;
-    if(TAB.is(e)) {
-      if(text.selected()) {
-        // check if lines are to be indented
-        final int s = Math.min(text.pos(), text.start());
-        final int l = Math.max(text.pos(), text.start()) - 1;
-        int p = s;
-        for(; p <= l && p < txt.length; p++) indent |= txt[p] != '\n';
-        indent |= p == txt.length;
-        if(indent) {
-          text.indent(s, l, e.isShiftDown());
-          ch = null;
-        }
-      } else {
-        boolean c = true;
-        for(int p = text.pos() - 1; p >= 0 && c; p--) {
-          final byte b = txt[p];
-          c = ws(b);
-          if(b == '\n') break;
-        }
-        if(c) ch = "  ";
-      }
-    }
+    final StringBuilder sb = new StringBuilder(1).append(e.getKeyChar());
+    boolean indent = TAB.is(e) && text.indent(sb, e.isShiftDown());
 
     // delete marked text
     if(text.selected() && !indent) text.delete();
 
     if(ENTER.is(e)) {
-      // adopt indentation from previous line
-      final StringBuilder sb = new StringBuilder(1).append(e.getKeyChar());
-      int s = 0;
-      for(int p = text.pos() - 1; p >= 0; p--) {
-        final byte b = txt[p];
-        if(b == '\n') break;
-        if(b == '\t') {
-          s += 2;
-        } else if(b == ' ') {
-          s++;
-        } else {
-          s = 0;
-        }
-      }
-      for(int p = 0; p < s; p++) sb.append(' ');
-      ch = sb.toString();
+      text.open(sb);
+    } else if(sb.length() != 0 && "}])".indexOf(sb.toString()) != -1) {
+      text.close();
     }
 
-    if(ch != null) text.add(ch);
+    if(sb.length() != 0) text.add(sb.toString());
     text.setCaret();
     hist.store(text.text(), pc, text.getCaret());
     calcCode.invokeLater(true);

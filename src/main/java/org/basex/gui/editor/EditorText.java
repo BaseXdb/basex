@@ -31,7 +31,7 @@ public final class EditorText {
   private int pe;
   /** Start position of a text selection. */
   private int ms = -1;
-  /** End position of a text selection. */
+  /** End position of a text selection (+1). */
   private int me = -1;
   /** Start position of an error highlighting. */
   private int es = -1;
@@ -392,7 +392,6 @@ public final class EditorText {
     me = ps;
   }
 
-
   /**
    * (Un)comments highlighted text or line.
    * @param syntax syntax highlighter
@@ -434,6 +433,82 @@ public final class EditorText {
       me = max + st.length + en.length;
       ps = me;
     }
+  }
+
+  /**
+   * Indents the current line or text.
+   * @param sb typed in string
+   * @param shift shift key
+   * @return indentation flag
+   */
+  boolean indent(final StringBuilder sb, final boolean shift) {
+    boolean i = false;
+    if(selected()) {
+      // check if lines are to be indented
+      final int s = Math.min(ps, start());
+      final int l = Math.max(ps, start()) - 1;
+      int p = s;
+      for(; p <= l && p < text.length; p++) i |= text[p] != '\n';
+      i |= p == text.length;
+      if(i) {
+        indent(s, l, shift);
+        sb.setLength(0);
+      }
+    } else {
+      boolean c = true;
+      for(int p = ps - 1; p >= 0 && c; p--) {
+        final byte b = text[p];
+        c = ws(b);
+        if(b == '\n') break;
+      }
+      if(c) {
+        sb.setLength(0);
+        sb.append("  ");
+      }
+    }
+    return i;
+  }
+
+  /**
+   * Processes the enter key.
+   * @param sb typed in string
+   */
+  void open(final StringBuilder sb) {
+    // adopt indentation from previous line
+    int s = 0;
+    for(int p = ps - 1; p >= 0; p--) {
+      final byte b = text[p];
+      if(b == '\n') break;
+      if(b == '\t') {
+        s += EditorText.TAB;
+      } else if(b == ' ') {
+        s++;
+      } else {
+        s = 0;
+      }
+    }
+    for(int p = 0; p < s; p++) sb.append(' ');
+    // indent after opening bracket
+    final int l = ps > 0 ? text[ps - 1] : 0;
+    if(l == '(' || l == '{' || l == '{') {
+      for(int p = 0; p < EditorText.TAB; p++) sb.append(' ');
+    }
+  }
+
+  /**
+   * Closes a bracket.
+   */
+  void close() {
+    int p = ps - 1;
+    for(; p >= 0; p--) {
+      final byte b = text[p];
+      if(b == '\n') break;
+      if(!ws(b)) return;
+    }
+    if(++p >= ps) return;
+    ms = Math.max(ps - TAB, p);
+    me = Math.max(ps, p);
+    if(ms != me) delete();
   }
 
   /**
