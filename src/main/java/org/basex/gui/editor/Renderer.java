@@ -58,8 +58,6 @@ public final class Renderer extends BaseXBack {
   private transient Syntax syntax = Syntax.SIMPLE;
   /** Visibility of cursor. */
   private boolean cursor;
-  /** Focused. */
-  private boolean focused;
 
   /**
    * Constructor.
@@ -361,25 +359,22 @@ public final class Renderer extends BaseXBack {
     }
 
     // handle matching parentheses
-    if(focused) {
-      if(ch == '(' || ch == '[' || ch == '{' || ch == '<') {
-        pars.add(x);
-        pars.add(y);
-        pars.add(cp);
-        pars.add(ch);
-      }
-      if((ch == ')' || ch == ']' || ch == '}' || ch == '>') && !pars.isEmpty()) {
-        final int open = ch == ')' ? '(' : ch == ']' ? '[' : ch == '}' ? '{' : '<';
-        if(pars.peek() == open) {
-          pars.pop();
-          final int cr = pars.pop();
-          final int yy = pars.pop();
-          final int xx = pars.pop();
-          if(cc == cp || cc == cr) {
-            g.setColor(GUIConstants.color3);
-            g.drawRect(xx, yy - fontH * 4 / 5, charW(g, open), fontH);
-            g.drawRect(x, y - fontH * 4 / 5, charW(g, ch), fontH);
-          }
+    if(ch == '(' || ch == '[' || ch == '{') {
+      pars.add(x);
+      pars.add(y);
+      pars.add(cp);
+      pars.add(ch);
+    } else if((ch == ')' || ch == ']' || ch == '}') && !pars.isEmpty()) {
+      final int open = ch == ')' ? '(' : ch == ']' ? '[' : '{';
+      if(pars.peek() == open) {
+        pars.pop();
+        final int cr = pars.pop();
+        final int yy = pars.pop();
+        final int xx = pars.pop();
+        if(cc == cp || cc == cr) {
+          g.setColor(GUIConstants.color3);
+          g.drawRect(xx, yy - fontH * 4 / 5, charW(g, open), fontH);
+          g.drawRect(x, y - fontH * 4 / 5, charW(g, ch), fontH);
         }
       }
     }
@@ -487,13 +482,12 @@ public final class Renderer extends BaseXBack {
   }
 
   /**
-   * Sets the cursor flag.
+   * Sets the cursor flag and repaints the panel.
    * @param c cursor flag
-   * @param f focused flag
    */
-  void cursor(final boolean c, final boolean f) {
+  void cursor(final boolean c) {
     cursor = c;
-    focused = f;
+    repaint();
   }
 
   /**

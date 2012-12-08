@@ -28,6 +28,8 @@ public enum BaseXKeys {
   /** Down.                  */ NEXTLINE(VK_DOWN),
   /** Page up.               */ PREVPAGE(VK_PAGE_UP),
   /** Page down.             */ NEXTPAGE(VK_PAGE_DOWN),
+  /** Page up (read-only).   */ PREVPAGE_RO(SHF, VK_SPACE),
+  /** Page down (read-only). */ NEXTPAGE_RO(VK_SPACE),
   /** Beginning of text.     */ TEXTSTART(SC, MAC ? VK_UP : VK_HOME),
   /** End of text.           */ TEXTEND(SC, MAC ? VK_DOWN : VK_END),
   /** Scroll up.             */ SCROLLUP(MAC ? ALT : SC, VK_UP, true),

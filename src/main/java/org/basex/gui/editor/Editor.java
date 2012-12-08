@@ -99,8 +99,7 @@ public class Editor extends BaseXPanel {
       @Override
       public void focusLost(final FocusEvent e) {
         cursor(false);
-        rend.cursor(false, false);
-        rend.repaint();
+        rend.cursor(false);
       }
     });
 
@@ -499,7 +498,7 @@ public class Editor extends BaseXPanel {
     // necessary on Macs as the shift button is pressed for REDO
     final boolean marking = e.isShiftDown() &&
       !DELNEXT.is(e) && !DELPREV.is(e) && !PASTE2.is(e) && !COMMENT.is(e) &&
-      !DELLINE.is(e) && !REDOSTEP.is(e);
+      !DELLINE.is(e) && !REDOSTEP.is(e) && !PREVPAGE_RO.is(e);
     final boolean nomark = !text.selecting();
     if(marking && nomark) text.startSelect();
     boolean down = true;
@@ -524,11 +523,11 @@ public class Editor extends BaseXPanel {
       down = false;
     } else if(LINEEND.is(e)) {
       text.eol(marking);
-    } else if(NEXTPAGE.is(e)) {
-      down(getHeight() / fh, marking);
-    } else if(PREVPAGE.is(e)) {
+    } else if(PREVPAGE.is(e) || !hist.active() && PREVPAGE_RO.is(e)) {
       up(getHeight() / fh, marking);
       down = false;
+    } else if(NEXTPAGE.is(e) || !hist.active() && NEXTPAGE_RO.is(e)) {
+      down(getHeight() / fh, marking);
     } else if(NEXT.is(e)) {
       text.next(marking);
     } else if(PREV.is(e)) {
@@ -813,8 +812,7 @@ public class Editor extends BaseXPanel {
   private final Timer cursor = new Timer(500, new ActionListener() {
     @Override
     public void actionPerformed(final ActionEvent e) {
-      rend.cursor(!rend.cursor(), true);
-      rend.repaint();
+      rend.cursor(!rend.cursor());
     }
   });
 
@@ -825,8 +823,7 @@ public class Editor extends BaseXPanel {
   final void cursor(final boolean start) {
     cursor.stop();
     if(start) cursor.start();
-    rend.cursor(start, true);
-    rend.repaint();
+    rend.cursor(start);
   }
 
   @Override
