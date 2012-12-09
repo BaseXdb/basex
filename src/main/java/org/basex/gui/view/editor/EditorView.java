@@ -378,11 +378,11 @@ public final class EditorView extends View {
    * Closes an editor.
    * @param edit editor to be closed. {@code null} closes the currently
    * opened editor.
-   * opened editor is to be closed
+   * @return {@code true} if editor was closed
    */
-  public void close(final EditorArea edit) {
+  public boolean close(final EditorArea edit) {
     final EditorArea ea = edit != null ? edit : getEditor();
-    if(!confirm(ea)) return;
+    if(!confirm(ea)) return false;
 
     tabs.remove(ea);
     final int t = tabs.getTabCount();
@@ -394,6 +394,7 @@ public final class EditorView extends View {
       // if necessary, activate last editor tab
       tabs.setSelectedIndex(i - 1);
     }
+    return true;
   }
 
   /**
@@ -517,7 +518,7 @@ public final class EditorView extends View {
   public boolean confirm() {
     for(final EditorArea edit : editors()) {
       tabs.setSelectedComponent(edit);
-      close(edit);
+      if(!close(edit)) return false;
     }
     return true;
   }
