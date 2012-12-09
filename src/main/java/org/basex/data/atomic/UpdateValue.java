@@ -10,7 +10,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
-class UpdateValue extends BasicUpdate {
+final class UpdateValue extends BasicUpdate {
   /** Target node kind. */
   final int targetkind;
   /** New value for target node. */

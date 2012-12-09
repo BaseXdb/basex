@@ -8,7 +8,7 @@ import org.basex.data.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
-class Replace extends BasicUpdate {
+final class Replace extends BasicUpdate {
   /** Insertion sequence. */
   final Data insseq;
 

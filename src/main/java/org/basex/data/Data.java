@@ -494,11 +494,10 @@ public abstract class Data {
    * @param value value to be updated (tag name, text, comment, pi)
    */
   public final void update(final int pre, final int kind, final byte[] value) {
+    final byte[] v = kind == PI ? trim(concat(name(pre, kind), SPACE, value)) : value;
+    if(eq(v, text(pre, kind != ATTR))) return;
     meta.update();
-
-    updateText(pre, kind == PI ? trim(concat(name(pre, kind), SPACE, value)) :
-      value, kind);
-
+    updateText(pre, v, kind);
     if(kind == DOC) resources.rename(pre, value);
   }
 
@@ -885,8 +884,7 @@ public abstract class Data {
    * @param value content
    * @param kind node kind
    */
-  protected abstract void updateText(final int pre, final byte[] value,
-      final int kind);
+  protected abstract void updateText(final int pre, final byte[] value, final int kind);
 
   /**
    * Sets the distance.

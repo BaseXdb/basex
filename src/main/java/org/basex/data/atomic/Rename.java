@@ -9,7 +9,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
-class Rename extends BasicUpdate {
+final class Rename extends BasicUpdate {
   /** Kind of updated node. */
   final int targetkind;
   /** The new name of the node. */

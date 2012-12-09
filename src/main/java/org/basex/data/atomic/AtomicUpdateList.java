@@ -38,8 +38,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
-public class AtomicUpdateList {
-
+public final class AtomicUpdateList {
   /** List of structural updates (nodes are inserted to / deleted from the table. */
   private final List<BasicUpdate> updStructural;
   /** List of value updates. */
@@ -52,8 +51,6 @@ public class AtomicUpdateList {
   private boolean opt;
   /** States if this list has been merged, hence accumulations are invalid. */
   private boolean dirty;
-  /** Cache distance updates and carry them out after updates. */
-  private final boolean cacheDistanceUpdates = true;
 
   /**
    * Constructor.
@@ -294,7 +291,7 @@ public class AtomicUpdateList {
     check();
     optimize();
     applyValueUpdates();
-    if(cacheDistanceUpdates) data.cache = true;
+    data.cache = true;
     applyStructuralUpdates();
     updateDistances();
     if(mergeTexts) resolveTextAdjacency();

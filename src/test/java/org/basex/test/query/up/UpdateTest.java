@@ -155,6 +155,25 @@ public final class UpdateTest extends AdvancedQueryTest {
   }
 
   /**
+   * Replacement of an identical value.
+   */
+  @Test
+  public void replaceIdenticalValue() {
+    query(transform("<a>A</a>",
+        "replace value of node $input/text() with 'A'"), "<a>A</a>");
+    query(transform("<a a='a'/>",
+        "replace value of node $input/@a with 'a'"), "<a a=\"a\"/>");
+    query(transform("<?a a?>",
+        "replace value of node $input with 'a'"), "<?a a?>");
+    query(transform("<!--a-->",
+        "replace value of node $input with 'a'"), "<!--a-->");
+    query(transform("text { 'A' }",
+        "replace value of node $input with 'A'"), "A");
+    query(transform("document { 'A' }",
+        "replace value of node $input/text() with 'A'"), "A");
+  }
+
+  /**
    * Tests detection of duplicate attributes in insertion sequences and whether a
    * combination of delete/insert/replace can lead to duplicate attributes.
    */

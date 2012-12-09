@@ -8,7 +8,7 @@ import org.basex.data.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
-class InsertAttr extends BasicUpdate {
+final class InsertAttr extends BasicUpdate {
   /** Parent PRE of inserted nodes. */
   final int parent;
   /** Insertion sequence. */
