@@ -23,7 +23,9 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
-public abstract class BasicOperation implements Comparable<BasicOperation>, Operation {
+public abstract class BasicOperation extends Operation
+    implements Comparable<BasicOperation>  {
+
   /** Basic Operation types. Carried out in the given order. */
   public static enum TYPE {
     /** DBAdd.      */ DBADD,
@@ -36,10 +38,7 @@ public abstract class BasicOperation implements Comparable<BasicOperation>, Oper
     /** DBDrop.     */ DBDROP,
     /** DBCreate.   */ DBCREATE,
   };
-  /** Target data reference. */
-  Data data;
-  /** Input info. */
-  public final InputInfo info;
+
   /** Type of this operation. */
   public final TYPE type;
 
@@ -50,9 +49,8 @@ public abstract class BasicOperation implements Comparable<BasicOperation>, Oper
    * @param ii input info
    */
   public BasicOperation(final TYPE t, final Data d, final InputInfo ii) {
+    super(d, ii);
     type = t;
-    info = ii;
-    data = d;
   }
 
   @Override

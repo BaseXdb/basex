@@ -13,15 +13,11 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
-public abstract class UpdatePrimitive implements Operation {
-  /** Primitive Type. */
-  public final PrimitiveType type;
+public abstract class UpdatePrimitive extends Operation {
   /** Target node pre value. */
   public final int targetPre;
-  /** Target data reference. */
-  public final Data data;
-  /** Input info. */
-  public final InputInfo info;
+  /** Primitive Type. */
+  public final PrimitiveType type;
 
   /**
    * Constructor.
@@ -31,9 +27,8 @@ public abstract class UpdatePrimitive implements Operation {
    * @param ii input info
    */
   UpdatePrimitive(final PrimitiveType t, final int p, final Data d, final InputInfo ii) {
+    super(d, ii);
     targetPre = p;
-    data = d;
-    info = ii;
     type = t;
   }
 

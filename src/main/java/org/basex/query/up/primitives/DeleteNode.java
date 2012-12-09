@@ -24,8 +24,7 @@ public final class DeleteNode extends UpdatePrimitive {
    * @param i input info
    */
   public DeleteNode(final int p, final Data d, final InputInfo i) {
-    super(PrimitiveType.DELETENODE, p, d, i);
-    rec = false;
+    this(p, d, i, false);
   }
 
   /**

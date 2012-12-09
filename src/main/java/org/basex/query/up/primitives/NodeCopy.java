@@ -19,7 +19,7 @@ public abstract class NodeCopy extends UpdatePrimitive {
   /** Nodes to be inserted. */
   public ANodeList insert;
   /** Number of insert operations (initialized by {@link #prepare}). */
-  int size;
+  private int size;
   /** Insertion sequence data instance. */
   MemData insseq;
 
