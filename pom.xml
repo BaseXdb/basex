@@ -11,7 +11,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.lib.directory>lib</project.lib.directory>
-    <jettyVersion>8.1.6.v20120903</jettyVersion>
+    <jettyVersion>8.1.8.v20121106</jettyVersion>
   </properties>
   <licenses>
     <license>
@@ -180,7 +180,7 @@
           <jettyXml>${basedir}/src/main/webapp/WEB-INF/jetty.xml</jettyXml>
           <!-- Key and port for stopping Jetty
           <stopKey>keyToStopJetty</stopKey> 
-          <stopPort>8983</stopPort> -->
+          <stopPort>8985</stopPort> -->
         </configuration>
       </plugin>
       <plugin>
