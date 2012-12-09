@@ -206,11 +206,13 @@ public final class FNGen extends StandardFunc {
 
     checkCreate(ctx);
     final byte[] path = checkStr(expr[0], ctx);
-    final String enc = encoding(1, WHICHENC, ctx);
     final IO base = ctx.sc.baseIO();
     if(base == null) throw STBASEURI.thrw(info);
 
+    String enc = null;
     try {
+      enc = encoding(1, WHICHENC, ctx);
+
       final String p = string(path);
       if(p.indexOf('#') != -1) FRAGID.thrw(info, p);
       if(!Uri.uri(p).isValid()) INVURL.thrw(info, p);
@@ -231,7 +233,7 @@ public final class FNGen extends StandardFunc {
         is.close();
       }
     } catch(final QueryException ex) {
-      if(check) return Bln.FALSE;
+      if(check && ex.err().type != ErrType.XPTY) return Bln.FALSE;
       throw ex;
     } catch(final IOException ex) {
       if(check) return Bln.FALSE;

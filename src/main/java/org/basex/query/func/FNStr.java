@@ -135,7 +135,7 @@ public final class FNStr extends StandardFunc {
    * @return iterator
    * @throws QueryException query exception
    */
-  private Item cp2str(final Iter iter) throws QueryException {
+  private Str cp2str(final Iter iter) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
     for(Item i; (i = iter.next()) != null;) {
       final long n = checkItr(i);
@@ -161,7 +161,7 @@ public final class FNStr extends StandardFunc {
       int l;
       @Override
       public Item next() {
-        if(l == s.length) return null;
+        if(l >= s.length) return null;
         final int i = cp(s, l);
         l += cl(s, l);
         return Int.get(i);
@@ -175,7 +175,7 @@ public final class FNStr extends StandardFunc {
    * @return iterator
    * @throws QueryException query exception
    */
-  private Item substr(final QueryContext ctx) throws QueryException {
+  private Str substr(final QueryContext ctx) throws QueryException {
     // normalize positions
     final byte[] str = checkEStr(expr[0], ctx);
 
@@ -231,7 +231,7 @@ public final class FNStr extends StandardFunc {
    * @return string
    * @throws QueryException query exception
    */
-  private Item trans(final QueryContext ctx) throws QueryException {
+  private Str trans(final QueryContext ctx) throws QueryException {
     final int[] tok =  cps(checkEStr(expr[0], ctx));
     final int[] srch = cps(checkStr(expr[1], ctx));
     final int[] rep =  cps(checkStr(expr[2], ctx));
@@ -256,7 +256,7 @@ public final class FNStr extends StandardFunc {
    * @return iterator
    * @throws QueryException query exception
    */
-  private Item strjoin(final QueryContext ctx) throws QueryException {
+  private Str strjoin(final QueryContext ctx) throws QueryException {
     final byte[] sep = expr.length == 2 ? checkStr(expr[1], ctx) : EMPTY;
     final TokenBuilder tb = new TokenBuilder();
     final Iter iter = ctx.iter(expr[0]);
@@ -275,14 +275,13 @@ public final class FNStr extends StandardFunc {
    * @return string
    * @throws QueryException query exception
    */
-  private Item normuni(final QueryContext ctx) throws QueryException {
+  private Str normuni(final QueryContext ctx) throws QueryException {
     final byte[] str = checkEStr(expr[0], ctx);
 
     Form form = Form.NFC;
     if(expr.length == 2) {
       final byte[] n = uc(trim(checkStr(expr[1], ctx)));
       if(n.length == 0) return Str.get(str);
-
       try {
         form = Form.valueOf(string(n));
       } catch(final IllegalArgumentException ex) {
@@ -298,7 +297,7 @@ public final class FNStr extends StandardFunc {
    * @return resulting item
    * @throws QueryException query exception
    */
-  private Item concat(final QueryContext ctx) throws QueryException {
+  private Str concat(final QueryContext ctx) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
     for(final Expr a : expr) {
       final Item it = a.item(ctx, info);
