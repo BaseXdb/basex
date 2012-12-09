@@ -16,6 +16,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -25,6 +26,9 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class FNPat extends StandardFunc {
+  /** Pattern cache. */
+  private final TokenObjMap<Pattern> patterns = new TokenObjMap<Pattern>();
+
   /** Slash pattern. */
   private static final Pattern SLASH = Pattern.compile("\\$");
   /** Slash pattern. */
@@ -219,15 +223,25 @@ public final class FNPat extends StandardFunc {
   /**
    * Returns a regular expression pattern.
    * @param pattern input pattern
-   * @param mod modifier item
+   * @param modifier modifier item
    * @param ctx query context
-   * @return modified pattern
+   * @return pattern modifier
    * @throws QueryException query exception
    */
-  private Pattern pattern(final Expr pattern, final Expr mod, final QueryContext ctx)
-      throws QueryException {
-    return RegExParser.parse(checkStr(pattern, ctx),
-        mod != null ? checkStr(mod, ctx) : null, ctx.sc.xquery3, info);
+  private Pattern pattern(final Expr pattern, final Expr modifier,
+      final QueryContext ctx) throws QueryException {
+
+    final byte[] pat = checkStr(pattern, ctx);
+    final byte[] mod = modifier != null ? checkStr(modifier, ctx) : null;
+    final TokenBuilder tb = new TokenBuilder(pat);
+    if(mod != null) tb.add(0).add(mod);
+    final byte[] key = tb.finish();
+    Pattern p = patterns.get(key);
+    if(p == null) {
+      p = RegExParser.parse(pat, mod, ctx.sc.xquery3, info);
+      patterns.add(key, p);
+    }
+    return p;
   }
 
   @Override
