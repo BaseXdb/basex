@@ -396,9 +396,9 @@ public class QueryParser extends InputParser {
         final Ann ann = new Ann();
         while(true) {
           if(wsConsumeWs(UPDATING)) {
-            addAnnotation(ann, Ann.Q_UPDATING, Empty.SEQ);
+            addAnnotation(ann, Ann.Q_UPDATING, Empty.SEQ, false);
           } else if(ctx.sc.xquery3 && consume('%')) {
-            annotation(ann);
+            annotation(ann, true);
           } else {
             break;
           }
@@ -428,7 +428,7 @@ public class QueryParser extends InputParser {
    */
   private Ann annotations() throws QueryException {
     final Ann ann = new Ann();
-    while(wsConsume("%")) annotation(ann);
+    while(wsConsume("%")) annotation(ann, false);
     skipWS();
     return ann;
   }
@@ -436,9 +436,10 @@ public class QueryParser extends InputParser {
   /**
    * Parses a single annotation.
    * @param ann annotations
+   * @param var variable flag
    * @throws QueryException query exception
    */
-  private void annotation(final Ann ann) throws QueryException {
+  private void annotation(final Ann ann, final boolean var) throws QueryException {
     final QNm name = eQName(QNAMEINV, ctx.sc.nsFunc);
     final ValueBuilder vb = new ValueBuilder();
     if(wsConsumeWs(PAR1)) {
@@ -450,7 +451,7 @@ public class QueryParser extends InputParser {
       wsCheck(PAR2);
     }
     skipWS();
-    addAnnotation(ann, name, vb.value());
+    addAnnotation(ann, name, vb.value(), var);
   }
 
   /**
@@ -458,16 +459,18 @@ public class QueryParser extends InputParser {
    * @param ann annotations
    * @param name name
    * @param value value
+   * @param var variable flag
    * @throws QueryException query exception
    */
-  private void addAnnotation(final Ann ann, final QNm name, final Value value)
-      throws QueryException {
+  private void addAnnotation(final Ann ann, final QNm name, final Value value,
+      final boolean var) throws QueryException {
 
     if(name.eq(Ann.Q_UPDATING)) {
       if(ann.contains(Ann.Q_UPDATING)) error(DUPLUPD);
     } else if(name.eq(Ann.Q_PUBLIC) || name.eq(Ann.Q_PRIVATE)) {
       // only one visibility modifier allowed
-      if(ann.contains(Ann.Q_PUBLIC) || ann.contains(Ann.Q_PRIVATE)) error(DUPLVIS);
+      if(ann.contains(Ann.Q_PUBLIC) || ann.contains(Ann.Q_PRIVATE))
+        error(var ? DUPLVARVIS : DUPLVIS);
     } else if(NSGlobal.reserved(name.uri())) {
       // no global namespaces allowed
       error(ANNRES, name);
@@ -686,10 +689,14 @@ public class QueryParser extends InputParser {
       wsCheck(ELEMENT);
       wsCheck(NSPACE);
     }
-    final byte[] ns = stringLiteral();
+    byte[] ns = stringLiteral();
     if(ns.length == 0) error(NSEMPTY);
+    if(!Uri.uri(ns).isValid()) error(INVURI, ns);
     if(wsConsumeWs(AT)) {
-      do stringLiteral(); while(wsConsumeWs(COMMA));
+      do {
+        ns = stringLiteral();
+        if(!Uri.uri(ns).isValid()) error(INVURI, ns);
+      } while(wsConsumeWs(COMMA));
     }
     error(IMPLSCHEMA);
   }
@@ -707,6 +714,7 @@ public class QueryParser extends InputParser {
 
     final byte[] uri = trim(stringLiteral());
     if(uri.length == 0) error(NSMODURI);
+    if(!Uri.uri(uri).isValid()) error(INVURI, uri);
     if(modules.contains(uri)) error(DUPLMODULE, uri);
     modules.add(uri);
 
@@ -1155,7 +1163,7 @@ public class QueryParser extends InputParser {
     }
     if(wsConsumeWs(COLLATION)) {
       final byte[] coll = stringLiteral();
-      if(!eq(URLCOLL, coll)) error(WHICHCOLL, coll);
+      if(!eq(URLCOLL, coll)) error(Uri.uri(coll).isValid() ? WHICHCOLL : INVURI, coll);
     }
     if(e.isEmpty()) return order;
     final OrderBy ord = new OrderByExpr(info(), e, desc, least);
@@ -2005,8 +2013,9 @@ public class QueryParser extends InputParser {
       final int s = ctx.vars.size();
       final Var[] args = paramList();
       wsCheck(PAR2);
-
       final SeqType type = optAsType();
+      if(ann != null && (ann.contains(Ann.Q_PRIVATE) || ann.contains(Ann.Q_PUBLIC)))
+        error(INVISIBLE);
       final Expr body = enclosed(NOFUNBODY);
       ctx.vars.size(s);
       return new InlineFunc(info(), type, args, body, ann, ctx);
@@ -2306,12 +2315,12 @@ public class QueryParser extends InputParser {
       if(pr || eq(atn, XMLNS)) {
         if(!simple) error(NSCONS);
         final byte[] pref = pr ? local(atn) : EMPTY;
-        final byte[] uri = attv.isEmpty() ? EMPTY :
-          ((Str) attv.get(0)).string();
+        final byte[] uri = attv.isEmpty() ? EMPTY : ((Str) attv.get(0)).string();
         if(eq(pref, XML) && eq(uri, XMLURI)) {
           if(xmlDecl) error(DUPLNSDEF, XML);
           xmlDecl = true;
         } else {
+          if(!Uri.uri(uri).isValid()) error(INVURI, uri);
           if(pr) {
             if(uri.length == 0) error(NSEMPTYURI);
             if(eq(pref, XML, XMLNS)) error(BINDXML, pref);
@@ -2319,6 +2328,7 @@ public class QueryParser extends InputParser {
             if(eq(uri, XMLNSURI)) error(BINDXMLURI, uri, XMLNS);
             ctx.sc.ns.add(pref, uri);
           } else {
+            if(eq(uri, XMLURI)) error(XMLNSDEF, uri);
             ctx.sc.nsElem = uri;
           }
           if(ns.get(pref) != -1) error(DUPLNSDEF, pref);

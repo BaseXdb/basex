@@ -593,8 +593,6 @@ public enum Err {
   /** XPST0003. */
   NOVARDECL(XPST, 3, "Expecting variable declaration."),
   /** XPST0003. */
-  TAGWRONG(XPST, 3, "Start and end tag are different: <%>...</%>."),
-  /** XPST0003. */
   PIWRONG(XPST, 3, "Expecting name of processing-instruction."),
   /** XPST0003. */
   NSWRONG(XPST, 3, "Expecting namespace prefix."),
@@ -833,6 +831,8 @@ public enum Err {
   NAMERES(XQST, 45, "Function %(...) uses reserved namespace."),
   /** XQST0045. */
   ANNRES(XQST, 45, "Annotation % uses reserved namespace."),
+  /** XQST0046. */
+  INVURI(XQST, 46, "URI \"%\" is invalid."),
   /** XQST0047. */
   DUPLMODULE(XQST, 47, "Module is declared twice: '%'."),
   /** XQST0047. */
@@ -867,6 +867,8 @@ public enum Err {
   DUPLORDEMP(XQST, 69, "Duplicate 'order empty' declaration."),
   /** XQST0070. */
   BINDXML(XQST, 70, "Prefix '%' cannot be rebound."),
+  /** XQST0070. */
+  XMLNSDEF(XQST, 70, "'%' cannot be default namespace."),
   /** XQST0070. */
   BINDXMLURI(XQST, 70, "'%' can only be bound to '%'."),
   /** XQST0071. */
@@ -913,6 +915,12 @@ public enum Err {
   DECITEM(XQST, 113, "No value can be assigned to context item in library module."),
   /** XPST0111. */
   DECDUPLPROP(XQST, 114, "Duplicate decimal-format property '%'."),
+  /** XQST0116. */
+  DUPLVARVIS(XQST, 116, "More than one visibility annotation declared."),
+  /** XQST0118. */
+  TAGWRONG(XQST, 118, "Start and end tag are different: <%>...</%>."),
+  /** XPST0125. */
+  INVISIBLE(XQST, 125, "No visibility annotation allowed in inline function."),
 
   /** XQTY0024. */
   NOATTALL(XQTY, 24, "Attribute must follow the root element."),

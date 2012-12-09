@@ -363,7 +363,12 @@ public final class SeqType {
     // check first item
     Item n = val.itemAt(0);
     final boolean in = instance(n, ii);
-    if(!in) n = type.cast(n, ctx, ii);
+    if(!in) {
+      if(n.type == NodeType.COM || n.type == NodeType.PI) {
+        if(!instance(Str.ZERO, ii)) Err.treat(ii, this, n);
+      }
+      n = type.cast(n, ctx, ii);
+    }
     boolean ins = checkKind(n);
 
     // return original sequence if no casting is necessary

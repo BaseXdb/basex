@@ -23,8 +23,8 @@ public abstract class ADate extends ADateDur {
   static final long MAX_YEAR = (long) (Long.MAX_VALUE / 365.2425) - 2;
   /** Minimum year value. */
   static final long MIN_YEAR = -MAX_YEAR;
-  /** Constant for counting negative years. */
-  private static final long ADD_NEG = MAX_YEAR / 8 - MAX_YEAR / 8 % 400;
+  /** Constant for counting negative years (divisible by 400). */
+  private static final long ADD_NEG = (MAX_YEAR / 400 + 1) * 400;
 
   /** Pattern for two digits. */
   protected static final String DD = "(\\d{2})";

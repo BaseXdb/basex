@@ -186,7 +186,8 @@ public enum Calc {
       final double d2 = b.dbl(ii);
       if(d2 == 0) DIVZERO.thrw(ii, a);
       final double d = d1 / d2;
-      if(Double.isNaN(d) || Double.isInfinite(d)) DIVFLOW.thrw(ii, d1, d2);
+      if(Double.isNaN(d) || Double.isInfinite(d) || d > Long.MAX_VALUE)
+        DIVFLOW.thrw(ii, d1, d2);
       return Int.get(type(a.type, b.type) == ITR ? a.itr(ii) / b.itr(ii) : (long) d);
     }
   },
