@@ -76,7 +76,7 @@ public final class DBCreate extends BasicOperation {
   }
 
   @Override
-  public void prepare() throws QueryException {
+  public void prepare(final MemData tmp) throws QueryException {
     if(docs == null) return;
     // build data with all documents, to prevent dirty reads
     md = new MemData(ctx.context.prop);

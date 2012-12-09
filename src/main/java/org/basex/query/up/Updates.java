@@ -69,9 +69,7 @@ public final class Updates {
    * @param ctx query context
    * @throws QueryException query exception
    */
-  public void add(final Operation up, final QueryContext ctx)
-      throws QueryException {
-
+  public void add(final Operation up, final QueryContext ctx) throws QueryException {
     if(mod == null) mod = new DatabaseModifier();
     mod.add(up, ctx);
   }

@@ -21,6 +21,8 @@ public abstract class ContextModifier {
     new HashMap<Data, DatabaseUpdates>();
   /** Holds DBCreate primitives which are not associated with a database. */
   private final Map<String, DBCreate> dbCreates = new HashMap<String, DBCreate>();
+  /** Temporary data reference, containing global . */
+  MemData tmp;
 
   /**
    * Adds an update primitive to this context modifier.
@@ -52,7 +54,10 @@ public abstract class ContextModifier {
       dbp = new DatabaseUpdates(data);
       pendingUpdates.put(data, dbp);
     }
-    dbp.add(p);
+
+    // create temporary mem data instance if not available yet
+    if(tmp == null) tmp = new MemData(data.meta.prop);
+    dbp.add(p, tmp);
   }
 
   /**
@@ -74,8 +79,17 @@ public abstract class ContextModifier {
     // checked constraints
     final Collection<DatabaseUpdates> updates = pendingUpdates.values();
     final Collection<DBCreate> creates = dbCreates.values();
-    for(final DatabaseUpdates c : updates) c.check();
-    for(final DBCreate c : creates) c.prepare();
+
+    // create temporary mem data instance if not available yet
+    if(tmp == null) {
+      for(final DatabaseUpdates c : updates) {
+        tmp = new MemData(c.data().meta.prop);
+        break;
+      }
+    }
+
+    for(final DatabaseUpdates c : updates) c.check(tmp);
+    for(final DBCreate c : creates) c.prepare(null);
 
     int i = 0;
     try {
@@ -85,7 +99,7 @@ public abstract class ContextModifier {
         i++;
       }
       // apply updates
-      for(final DatabaseUpdates c : updates) c.apply();
+      for(final DatabaseUpdates c : updates) c.apply(tmp);
     } finally {
       // remove write locks and updating files
       for(final DatabaseUpdates c : updates) {

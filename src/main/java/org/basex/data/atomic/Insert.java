@@ -12,7 +12,7 @@ class Insert extends BasicUpdate {
   /** Parent PRE of inserted nodes. */
   final int parent;
   /** Insertion sequence. */
-  Data insseq;
+  final Data insseq;
 
   /**
    * Constructor.

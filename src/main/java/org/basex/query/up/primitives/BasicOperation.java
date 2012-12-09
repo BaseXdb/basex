@@ -90,9 +90,10 @@ public abstract class BasicOperation implements Comparable<BasicOperation>, Oper
 
   /**
    * Prepares this operation.
+   * @param tmp temporary mem data
    * @throws QueryException exception
    */
-  public abstract void prepare() throws QueryException;
+  public abstract void prepare(final MemData tmp) throws QueryException;
 
   /**
    * Creates a {@link Data} instance for the specified document.

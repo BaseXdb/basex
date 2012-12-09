@@ -44,8 +44,7 @@ public final class ReplaceValue extends UpdatePrimitive {
    * @param i input info
    * @param v new value
    */
-  public ReplaceValue(final int p, final Data d, final InputInfo i,
-      final byte[] v) {
+  public ReplaceValue(final int p, final Data d, final InputInfo i, final byte[] v) {
     super(PrimitiveType.REPLACEVALUE, p, d, i);
     value = v;
     rec = d.kind(targetPre) == Data.ELEM;
@@ -95,7 +94,7 @@ public final class ReplaceValue extends UpdatePrimitive {
   }
 
   @Override
-  public UpdatePrimitive[] substitute() {
+  public UpdatePrimitive[] substitute(final MemData tmp) {
     final int k = data.kind(targetPre);
     // else substitute if target is an element
     if(rec) {
@@ -117,7 +116,7 @@ public final class ReplaceValue extends UpdatePrimitive {
       // insertIntoAsFirst primitive on the same target
       if(value.length > 0) {
         // create Data instance for insertion sequence
-        final MemData m = new MemData(data);
+        final MemData m = new MemData(tmp);
         m.text(0, 1, value, Data.TEXT);
         m.insert(0);
         // add the substituting insertInto statement to the list

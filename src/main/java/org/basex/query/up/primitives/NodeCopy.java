@@ -40,12 +40,13 @@ public abstract class NodeCopy extends UpdatePrimitive {
   /**
    * Prepares this update primitive before execution. This includes i.e. the
    * preparation of insertion sequences.
+   * @param tmp temporary database
    * @throws QueryException exception during preparation of data
    */
   @SuppressWarnings("unused")
-  public final void prepare() throws QueryException {
+  public final void prepare(final Data tmp) throws QueryException {
     // build main memory representation of nodes to be copied
-    insseq = new MemData(data);
+    insseq = new MemData(tmp);
 
     // text nodes still need to be merged. two adjacent iterators may lead to two
     // adjacent text nodes

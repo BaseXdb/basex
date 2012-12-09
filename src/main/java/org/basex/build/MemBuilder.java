@@ -61,7 +61,7 @@ public final class MemBuilder extends Builder {
    * Initializes the builder.
    */
   public void init() {
-    data = new MemData(null, null, path, ns, parser.prop);
+    data = new MemData(path, ns, parser.prop);
 
     final MetaData md = data.meta;
     md.name = name;

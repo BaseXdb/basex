@@ -68,7 +68,7 @@ public final class List extends Arr {
 
     // return cached integer sequence, cached values or self reference
     Expr e = this;
-    int s = (int) size;
+    final int s = (int) size;
     if(val != null && size <= Integer.MAX_VALUE) {
       if(type.type == AtomType.STR) e = StrSeq.get(val, s);
       else if(type.type == AtomType.BLN) e = BlnSeq.get(val, s);

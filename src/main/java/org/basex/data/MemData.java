@@ -19,24 +19,36 @@ import org.basex.util.*;
 public final class MemData extends Data {
   /**
    * Constructor.
+   * @param ps path summary
+   * @param ns namespaces
+   * @param pr database properties
+   */
+  public MemData(final PathSummary ps, final Namespaces ns, final Prop pr) {
+    this(null, null, ps, ns, pr, null, null);
+  }
+
+  /**
+   * Constructor.
    * @param tag tag index
    * @param att attribute name index
    * @param ps path summary
    * @param ns namespaces
    * @param pr database properties
+   * @param txt text index
+   * @param atv attribute value index
    */
   public MemData(final Names tag, final Names att, final PathSummary ps,
-      final Namespaces ns, final Prop pr) {
+      final Namespaces ns, final Prop pr, final Index txt, final Index atv) {
 
     meta = new MetaData(pr);
     table = new TableMemAccess(meta);
-    if(meta.updindex) {
+    if(meta.updindex && (txt == null || atv == null)) {
       idmap = new IdPreMap(meta.lastid);
       txtindex = new UpdatableMemValues(this);
       atvindex = new UpdatableMemValues(this);
     } else {
-      txtindex = new MemValues(this);
-      atvindex = new MemValues(this);
+      txtindex = txt == null ? new MemValues(this) : txt;
+      atvindex = atv == null ? new MemValues(this) : atv;
     }
     tagindex = tag == null ? new Names(meta) : tag;
     atnindex = att == null ? new Names(meta) : att;
@@ -49,7 +61,8 @@ public final class MemData extends Data {
    * @param data data reference
    */
   public MemData(final Data data) {
-    this(data.tagindex, data.atnindex, data.paths, null, data.meta.prop);
+    this(data.tagindex, data.atnindex, data.paths, null, data.meta.prop,
+        data.txtindex, data.atvindex);
   }
 
   /**
@@ -57,7 +70,7 @@ public final class MemData extends Data {
    * @param pr property reference
    */
   public MemData(final Prop pr) {
-    this(null, null, null, null, pr);
+    this(null, null, pr);
   }
 
   @Override

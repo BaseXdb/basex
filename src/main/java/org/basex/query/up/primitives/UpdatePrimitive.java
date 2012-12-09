@@ -88,8 +88,9 @@ public abstract class UpdatePrimitive implements Operation {
    * These update primitives don't produce atomic updates, hence this won't affect the
    * database.
    *
+   * @param tmp temporary mem data
    * @return An array that contains the substituting primitives or this update primitive
    * if no substitution is necessary.
    */
-  public abstract UpdatePrimitive[] substitute();
+  public abstract UpdatePrimitive[] substitute(final MemData tmp);
 }

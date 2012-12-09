@@ -40,5 +40,5 @@ public final class DBFlush extends BasicOperation {
   }
 
   @Override
-  public void prepare() throws QueryException { }
+  public void prepare(final MemData tmp) throws QueryException { }
 }

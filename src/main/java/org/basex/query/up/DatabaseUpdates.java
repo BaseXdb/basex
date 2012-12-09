@@ -50,11 +50,12 @@ final class DatabaseUpdates {
   /**
    * Adds an update primitive to the list.
    * @param o update primitive
+   * @param tmp temporary mem data
    * @throws QueryException query exception
    */
-  void add(final Operation o) throws QueryException {
+  void add(final Operation o, final MemData tmp) throws QueryException {
     if(o instanceof UpdatePrimitive) {
-      for(final UpdatePrimitive subp : ((UpdatePrimitive) o).substitute()) {
+      for(final UpdatePrimitive subp : ((UpdatePrimitive) o).substitute(tmp)) {
         final int pre = subp.targetPre;
         NodeUpdates pc = updatePrimitives.get(pre);
         if(pc == null) {
@@ -97,9 +98,10 @@ final class DatabaseUpdates {
   /**
    * Checks updates for violations. If a violation is found the complete update
    * process is aborted.
+   * @param tmp temporary mem data
    * @throws QueryException query exception
    */
-  void check() throws QueryException {
+  void check(final MemData tmp) throws QueryException {
     // get and sort keys (pre/id values)
     final int s = updatePrimitives.size();
     nodes = new IntList(s);
@@ -110,7 +112,7 @@ final class DatabaseUpdates {
     for(int i = 0; i < s; ++i) {
       final NodeUpdates ups = updatePrimitives.get(nodes.get(i));
       for(final UpdatePrimitive p : ups.prim) {
-        if(p instanceof NodeCopy) ((NodeCopy) p).prepare();
+        if(p instanceof NodeCopy) ((NodeCopy) p).prepare(tmp);
       }
     }
 
@@ -168,9 +170,10 @@ final class DatabaseUpdates {
 
   /**
    * Applies all updates for this specific database.
+   * @param tmp temporary mem data
    * @throws QueryException query exception
    */
-  void apply() throws QueryException {
+  void apply(final MemData tmp) throws QueryException {
     // execute database updates
     createAtomicUpdates(preparePrimitives()).execute(true);
 
@@ -179,7 +182,7 @@ final class DatabaseUpdates {
     dbops.toArray(dbo);
     Arrays.sort(dbo);
     for(final BasicOperation d : dbo) {
-      d.prepare();
+      d.prepare(tmp);
       d.apply();
     }
 

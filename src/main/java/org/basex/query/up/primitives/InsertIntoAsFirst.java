@@ -40,7 +40,7 @@ public final class InsertIntoAsFirst extends NodeCopy {
   }
 
   @Override
-  public UpdatePrimitive[] substitute() {
+  public UpdatePrimitive[] substitute(final MemData tmp) {
     return new UpdatePrimitive[] { this };
   }
 

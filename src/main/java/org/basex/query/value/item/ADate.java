@@ -452,7 +452,7 @@ public abstract class ADate extends ADateDur {
     t = d.add(BD366).multiply(BD4).divideToIntegralValue(BD1461).subtract(BigDecimal.ONE);
     y = y.add(t);
     d = d.subtract(BD365.multiply(t).add(t.divideToIntegralValue(BD4)));
-    BigDecimal m = BD5.multiply(d).add(BD2).divideToIntegralValue(BD153);
+    final BigDecimal m = BD5.multiply(d).add(BD2).divideToIntegralValue(BD153);
     d = d.subtract(BD153.multiply(m).add(BD2).divideToIntegralValue(BD5));
     long mm = m.longValue();
     if(mm > 9) { mm -= 12; y = y.add(BigDecimal.ONE); }

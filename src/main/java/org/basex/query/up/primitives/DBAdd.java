@@ -61,9 +61,9 @@ public final class DBAdd extends BasicOperation {
   }
 
   @Override
-  public void prepare() throws QueryException {
+  public void prepare(final MemData tmp) throws QueryException {
     // build data with all documents, to prevent dirty reads
-    md = new MemData(data);
+    md = new MemData(tmp);
     for(int i = 0; i < docs.size(); i++) {
       md.insert(md.meta.size, -1, docData(
           docs.get(i), paths.get(i), ctx, data.meta.name));

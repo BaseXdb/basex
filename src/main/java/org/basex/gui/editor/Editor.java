@@ -703,7 +703,7 @@ public class Editor extends BaseXPanel {
 
     // remember if marked text is to be deleted
     final StringBuilder sb = new StringBuilder(1).append(e.getKeyChar());
-    boolean indent = TAB.is(e) && text.indent(sb, e.isShiftDown());
+    final boolean indent = TAB.is(e) && text.indent(sb, e.isShiftDown());
 
     // delete marked text
     if(text.selected() && !indent) text.delete();

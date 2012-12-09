@@ -43,7 +43,7 @@ public final class DBDrop extends BasicOperation {
   public void merge(final BasicOperation o) throws QueryException { }
 
   @Override
-  public void prepare() throws QueryException { }
+  public void prepare(final MemData tmp) throws QueryException { }
 
   @Override
   public void apply() throws QueryException {
