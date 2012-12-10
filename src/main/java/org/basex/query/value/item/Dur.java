@@ -211,9 +211,9 @@ public class Dur extends ADateDur {
   @Override
   public final boolean eq(final InputInfo ii, final Item it) throws QueryException {
     final Dur d = (Dur) (it instanceof Dur ? it : type.cast(it, null, ii));
-    final double s1 = sec == null ? 0 : sec.doubleValue();
-    final double s2 = d.sec == null ? 0 : d.sec.doubleValue();
-    return mon == d.mon && s1 == s2;
+    final BigDecimal s1 = sec == null ? BigDecimal.ZERO : sec;
+    final BigDecimal s2 = d.sec == null ? BigDecimal.ZERO : d.sec;
+    return mon == d.mon && s1.compareTo(s2) == 0;
   }
 
   @Override

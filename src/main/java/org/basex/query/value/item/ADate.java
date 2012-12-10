@@ -371,7 +371,7 @@ public abstract class ADate extends ADateDur {
     final ADate d = (ADate) (it instanceof ADate ? it : type.cast(it, null, ii));
     final BigDecimal d1 = seconds().add(days().multiply(DAYSECONDS));
     final BigDecimal d2 = d.seconds().add(d.days().multiply(DAYSECONDS));
-    return d1.equals(d2);
+    return d1.compareTo(d2) == 0;
   }
 
   @Override

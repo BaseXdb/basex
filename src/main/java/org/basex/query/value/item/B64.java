@@ -40,7 +40,7 @@ public class B64 extends Bin {
 
   /**
    * Constructor.
-   * @param b binary item
+   * @param b base64 input
    * @param ii input info
    * @throws QueryException query exception
    */
