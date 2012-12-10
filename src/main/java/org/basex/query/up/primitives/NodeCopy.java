@@ -47,12 +47,12 @@ public abstract class NodeCopy extends UpdatePrimitive {
     // text nodes still need to be merged. two adjacent iterators may lead to two
     // adjacent text nodes
 
-    // works...
+    // Variant 1: create a DataClip for each update (obsolete as soon as Variant 2 works)
     final MemData md = new MemData(tmp);
     new DataBuilder(md).build(mergeNodeCacheText(insert));
     insseq = new DataClip(md);
 
-    /* [LK] XQuery Update with single database: work in progress...
+    /* Variant 2: copy all new nodes into a single database instance (work in progress)
     final int s = tmp.meta.size;
     new DataBuilder(tmp).build(mergeNodeCacheText(insert));
     insseq = new DataBox(tmp, s, tmp.meta.size);

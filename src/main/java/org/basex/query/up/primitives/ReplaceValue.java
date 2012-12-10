@@ -116,6 +116,7 @@ public final class ReplaceValue extends UpdatePrimitive {
       // insertIntoAsFirst primitive on the same target
       if(value.length > 0) {
         // create Data instance for insertion sequence
+        // copy all nodes into a single database instance
         final int pre = tmp.meta.size;
         tmp.text(pre, 1, value, Data.TEXT);
         tmp.insert(pre);
