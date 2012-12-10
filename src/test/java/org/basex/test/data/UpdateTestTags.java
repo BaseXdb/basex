@@ -3,6 +3,7 @@ package org.basex.test.data;
 import static org.junit.Assert.*;
 
 import org.basex.data.*;
+import org.basex.data.atomic.*;
 import org.basex.util.*;
 import org.junit.*;
 
@@ -210,7 +211,7 @@ public final class UpdateTestTags extends UpdateTest {
     md.elem(1, data.tagindex.index(name, null, false), 1, 1, 0, false);
     md.insert(0);
     data.startUpdate();
-    data.insert(root, par, md);
+    data.insert(root, par, new DataClip(md));
     data.finishUpdate();
   }
 }

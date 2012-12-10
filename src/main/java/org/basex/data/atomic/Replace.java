@@ -10,18 +10,18 @@ import org.basex.data.*;
  */
 final class Replace extends BasicUpdate {
   /** Insertion sequence. */
-  final Data insseq;
+  final DataClip insseq;
 
   /**
    * Constructor.
    * @param l PRE value of the target node location
-   * @param d insertion sequence data instance
+   * @param c insertion sequence data clip
    * @param s PRE value shifts introduced by update
    * @param f PRE value of the first node which distance has to be updated
    */
-  Replace(final int l, final int s, final int f, final Data d) {
+  Replace(final int l, final int s, final int f, final DataClip c) {
     super(l, s, f);
-    insseq = d;
+    insseq = c;
   }
 
   @Override
@@ -47,12 +47,12 @@ final class Replace extends BasicUpdate {
    * @return true if fast replace possible
    */
   private boolean fastReplace(final Data d) {
-    return d.nspaces.size() == 0 && insseq.nspaces.size() == 0 &&
+    return d.nspaces.size() == 0 && insseq.data.nspaces.size() == 0 &&
         d.kind(location) != Data.ATTR;
   }
 
   @Override
-  Data getInsertionData() {
+  DataClip getInsertionData() {
     return insseq;
   }
 

@@ -31,7 +31,8 @@ public abstract class AdvancedQueryTest extends SandboxTest {
       ser.close();
       return ao.toString().replaceAll("(\\r|\\n)+ *", "");
     } catch(final Exception ex) {
-      fail("Query failed:\n" + query + "\nMessage: " + ex.getMessage());
+      ex.printStackTrace();
+      fail("Query failed:\n" + query + "\nMessage: " + ex);
       return null;
     } finally {
       qp.close();

@@ -1,7 +1,7 @@
 package org.basex.query.up.primitives;
 
 import org.basex.data.*;
-import org.basex.query.*;
+import org.basex.data.atomic.*;
 import org.basex.query.up.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
@@ -20,8 +20,8 @@ public abstract class NodeCopy extends UpdatePrimitive {
   public ANodeList insert;
   /** Number of insert operations (initialized by {@link #prepare}). */
   private int size;
-  /** Insertion sequence data instance. */
-  MemData insseq;
+  /** Insertion sequence data clip. */
+  DataClip insseq;
 
   /**
    * Constructor.
@@ -38,19 +38,26 @@ public abstract class NodeCopy extends UpdatePrimitive {
   }
 
   /**
-   * Prepares this update primitive before execution. This includes i.e. the
+   * Prepares this update primitive before execution. This includes e.g. the
    * preparation of insertion sequences.
    * @param tmp temporary database
-   * @throws QueryException exception during preparation of data
    */
-  @SuppressWarnings("unused")
-  public final void prepare(final Data tmp) throws QueryException {
+  public final void prepare(final MemData tmp) {
     // build main memory representation of nodes to be copied
-    insseq = new MemData(tmp);
-
     // text nodes still need to be merged. two adjacent iterators may lead to two
     // adjacent text nodes
-    new DataBuilder(insseq).build(mergeNodeCacheText(insert));
+
+    // works...
+    final MemData md = new MemData(tmp);
+    new DataBuilder(md).build(mergeNodeCacheText(insert));
+    insseq = new DataClip(md);
+
+    /* [LK] XQuery Update with single database: work in progress...
+    final int s = tmp.meta.size;
+    new DataBuilder(tmp).build(mergeNodeCacheText(insert));
+    insseq = new DataBox(tmp, s, tmp.meta.size);
+    */
+
     size += insert.size();
     insert = null;
   }
@@ -61,12 +68,14 @@ public abstract class NodeCopy extends UpdatePrimitive {
    * @param pool name pool
    */
   final void add(final NamePool pool) {
-    for(int p = 0; p < insseq.meta.size; ++p) {
-      final int k = insseq.kind(p);
-      if(k != Data.ATTR && k != Data.ELEM || insseq.parent(p, k) > -1) continue;
-      final int u = insseq.uri(p, k);
-      final QNm qnm = new QNm(insseq.name(p, k));
-      if(u != 0) qnm.uri(insseq.nspaces.uri(u));
+    final Data d = insseq.data;
+    final int ps = insseq.start;
+    for(int p = ps; p < insseq.end; ++p) {
+      final int k = d.kind(p);
+      if(k != Data.ATTR && k != Data.ELEM || d.parent(p, k) >= ps) continue;
+      final int u = d.uri(p, k);
+      final QNm qnm = new QNm(d.name(p, k));
+      if(u != 0) qnm.uri(d.nspaces.uri(u));
       pool.add(qnm, ANode.type(k));
     }
   }
@@ -78,9 +87,8 @@ public abstract class NodeCopy extends UpdatePrimitive {
    */
   private static ANodeList mergeNodeCacheText(final ANodeList nl) {
     final int ns = nl.size();
+    if(ns == 0) return nl;
     final ANodeList s = new ANodeList(ns);
-    if(ns == 0) return s;
-
     ANode n = nl.get(0);
     for(int c = 0; c < ns;) {
       if(n.type == NodeType.TXT) {

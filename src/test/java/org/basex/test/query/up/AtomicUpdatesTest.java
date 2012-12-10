@@ -34,7 +34,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
             "<n2 att3='0'><n4/><n5><n6/></n5></n2>" +
         "</n1>";
     final AtomicUpdateList l = atomics(doc);
-    final Data ins = data("<d/>");
+    final DataClip ins = data("<d/>");
     l.addInsert(7, 6, ins, false);
     l.addReplace(6, ins);
     l.addInsert(6, 5, ins, false);
@@ -350,9 +350,9 @@ private void checkTextAdjacency(final Data data, final byte[][] texts) {
  * @param s XML fragment string
  * @return data instance or null in case of error
  */
- private Data data(final String s) {
+ private DataClip data(final String s) {
    try {
-     return CreateDB.mainMem(new IOContent(s), context);
+     return new DataClip(CreateDB.mainMem(new IOContent(s), context));
     } catch(final IOException e) {
       fail(e.getMessage());
       return null;
@@ -365,11 +365,11 @@ private void checkTextAdjacency(final Data data, final byte[][] texts) {
  * @param text for text node
  * @return data instance with text node
  */
-private Data data(final Data d, final String text) {
+private DataClip data(final Data d, final String text) {
    final MemData m = new MemData(d);
    m.text(0, 1, token(text), Data.TEXT);
    m.insert(0);
-   return m;
+   return new DataClip(m);
  }
 
 /**
@@ -377,13 +377,13 @@ private Data data(final Data d, final String text) {
  * @param d parent data instance
  * @return insertion sequence data instance
  */
-private Data insseq(final Data d) {
+private DataClip insseq(final Data d) {
   final MemData m = new MemData(d);
   m.elem(1, m.tagindex.index(token("dummy"), null, false), 1, 2, 0, false);
   m.insert(0);
   m.elem(1, m.tagindex.index(token("dummy"), null, false), 1, 1, 0, false);
   m.insert(1);
-  return m;
+  return new DataClip(m);
 }
 
  /**
@@ -392,7 +392,7 @@ private Data insseq(final Data d) {
  * @return atomic update list
  */
  private AtomicUpdateList atomics(final String doc) {
-   return new AtomicUpdateList(data(doc));
+   return new AtomicUpdateList(data(doc).data);
  }
 
 /**

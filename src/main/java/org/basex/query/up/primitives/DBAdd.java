@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
+import org.basex.data.atomic.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -57,7 +58,7 @@ public final class DBAdd extends BasicOperation {
 
   @Override
   public void apply() {
-    data.insert(data.meta.size, -1, md);
+    data.insert(data.meta.size, -1, new DataClip(md));
   }
 
   @Override
@@ -65,8 +66,8 @@ public final class DBAdd extends BasicOperation {
     // build data with all documents, to prevent dirty reads
     md = new MemData(tmp);
     for(int i = 0; i < docs.size(); i++) {
-      md.insert(md.meta.size, -1, docData(
-          docs.get(i), paths.get(i), ctx, data.meta.name));
+      md.insert(md.meta.size, -1, new DataClip(docData(
+          docs.get(i), paths.get(i), ctx, data.meta.name)));
       // clear entries to recover memory
       docs.set(i, null);
       paths.set(i, null);

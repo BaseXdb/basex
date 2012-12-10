@@ -47,8 +47,7 @@ public final class FDoc extends FNode {
     children = ch;
     base = b;
     // update parent references
-    final long ns = ch.size();
-    for(int n = 0; n < ns; ++n) ch.get(n).parent(this);
+    for(final ANode n : ch) n.parent(this);
   }
 
   /**

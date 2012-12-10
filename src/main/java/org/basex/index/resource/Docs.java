@@ -6,6 +6,7 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
+import org.basex.data.atomic.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.util.*;
@@ -124,16 +125,15 @@ final class Docs {
   /**
    * Adds entries to the index and updates subsequent nodes.
    * @param pre insertion position
-   * @param d data reference to be inserted
+   * @param clip data clip
    */
-  void insert(final int pre, final Data d) {
+  void insert(final int pre, final DataClip clip) {
     // find all document nodes in the given data instance
-    final int dsize = d.meta.size;
     final IntList pres = new IntList();
-    for(int dpre = 0; dpre < dsize;) {
-      final int k = d.kind(dpre);
+    for(int dpre = clip.start; dpre < clip.end;) {
+      final int k = clip.data.kind(dpre);
       if(k == Data.DOC) pres.add(pre + dpre);
-      dpre += d.size(dpre, k);
+      dpre += clip.data.size(dpre, k);
     }
 
     // insert DOC nodes and move pre values of following DOC nodes
@@ -144,12 +144,12 @@ final class Docs {
     int i = docs.sortedIndexOf(pre);
     if(i < 0) i = -i - 1;
     docs.insert(i, presA);
-    docs.move(dsize, i + pres.size());
+    docs.move(clip.size(), i + pres.size());
 
     final byte[][] t = new byte[presA.length][];
     for(int j = 0; j < t.length; j++) {
       // subtract pre to retrieve paths from given data instance
-      t[j] = normalize(d.text(presA[j] - pre, true));
+      t[j] = normalize(clip.data.text(presA[j] - pre, true));
     }
     paths.insert(i, t);
     pathOrder = null;
@@ -191,11 +191,11 @@ final class Docs {
    * Replaces entries in the index.
    * @param pre insertion position
    * @param size number of deleted nodes
-   * @param d data reference to be copied
+   * @param clip data clip
    */
-  void replace(final int pre, final int size, final Data d) {
+  void replace(final int pre, final int size, final DataClip clip) {
     delete(pre, size);
-    insert(pre, d);
+    insert(pre, clip);
   }
 
   /**

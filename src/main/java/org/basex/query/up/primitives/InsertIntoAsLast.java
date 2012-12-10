@@ -4,6 +4,7 @@ import org.basex.data.*;
 import org.basex.data.atomic.*;
 import org.basex.query.up.*;
 import org.basex.query.util.*;
+import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**
@@ -28,8 +29,7 @@ public class InsertIntoAsLast extends NodeCopy {
   @Override
   public void merge(final UpdatePrimitive p) {
     final ANodeList newInsert = ((NodeCopy) p).insert;
-    for(int j = 0; j < newInsert.size(); j++)
-      insert.add(newInsert.get(j));
+    for(final ANode n : newInsert) insert.add(n);
   }
 
   @Override

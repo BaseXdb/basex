@@ -5,6 +5,7 @@ import org.basex.data.atomic.*;
 import org.basex.query.*;
 import org.basex.query.up.*;
 import org.basex.query.util.*;
+import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**
@@ -29,8 +30,7 @@ public final class InsertBefore extends NodeCopy {
   public void merge(final UpdatePrimitive p) throws QueryException {
     final InsertBefore newOne = (InsertBefore) p;
     final ANodeList newInsert = newOne.insert;
-    for(int j = 0; j < newInsert.size(); j++)
-      insert.add(newInsert.get(j));
+    for(final ANode n : newInsert) insert.add(n);
   }
 
   @Override

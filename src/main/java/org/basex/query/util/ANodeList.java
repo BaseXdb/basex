@@ -1,5 +1,7 @@
 package org.basex.query.util;
 
+import java.util.*;
+
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -12,11 +14,11 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class ANodeList {
+public final class ANodeList implements Iterable<ANode> {
   /** Element container. */
-  private ANode[] list;
+  ANode[] list;
   /** Number of elements. */
-  private int size;
+  int size;
 
   /**
    * Constructor.
@@ -97,5 +99,18 @@ public final class ANodeList {
     final ANode[] tmp = new ANode[s];
     System.arraycopy(list, 0, tmp, 0, size);
     list = tmp;
+  }
+
+  @Override
+  public Iterator<ANode> iterator() {
+    return new Iterator<ANode>() {
+      private int c;
+      @Override
+      public boolean hasNext() { return c < size; }
+      @Override
+      public ANode next() { return list[c++]; }
+      @Override
+      public void remove() { Util.notexpected(); }
+    };
   }
 }

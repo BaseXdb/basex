@@ -99,7 +99,7 @@ public final class ReplaceValue extends UpdatePrimitive {
     // else substitute if target is an element
     if(rec) {
       final List<UpdatePrimitive> l = new LinkedList<UpdatePrimitive>();
-      // add the og primitive to catch forbidden primitive merges (same target node)
+      // add the primitive to catch forbidden primitive merges (same target node)
       l.add(this);
       // add the delete primitives for the child nodes of the target
       // ... child axis boundaries
@@ -116,11 +116,11 @@ public final class ReplaceValue extends UpdatePrimitive {
       // insertIntoAsFirst primitive on the same target
       if(value.length > 0) {
         // create Data instance for insertion sequence
-        final MemData m = new MemData(tmp);
-        m.text(0, 1, value, Data.TEXT);
-        m.insert(0);
+        final int pre = tmp.meta.size;
+        tmp.text(pre, 1, value, Data.TEXT);
+        tmp.insert(pre);
         // add the substituting insertInto statement to the list
-        l.add(new InsertInto(targetPre, data, info, new ANodeList(new DBNode(m, 0)),
+        l.add(new InsertInto(targetPre, data, info, new ANodeList(new DBNode(tmp, pre)),
             true));
       }
       return l.toArray(new UpdatePrimitive[l.size()]);
