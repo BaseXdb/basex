@@ -703,6 +703,19 @@ public final class UpdateTest extends AdvancedQueryTest {
           "<n><b/><n><b/><n/><b/></n><b/><n/><b/></n>");
   }
 
+  //[CG] DataClip / Builder problem
+  /**
+   * Tests if the common data instance for all insert sequences is built correctly.
+   * [LK][CG] maybe we should add some more low-level TCs ...
+   */
+  @Test
+  public void dataClipBuildFail() {
+    query("copy $c := <n><a/><a/></n> " +
+        "modify for $a in $c//a return replace node $a with <b/> " +
+        "return $c",
+        "<n><b/><b/></n>");
+  }
+
   /**
    * Distance caching tested for inserts at different levels.
    * @throws BaseXException excp

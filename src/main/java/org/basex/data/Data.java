@@ -530,7 +530,11 @@ public abstract class Data {
     for(int dpre = clip.start; dpre < clip.end; ++dpre) {
       final int dkind = data.kind(dpre);
       final int dpar = data.parent(dpre, dkind);
-      final int pre = rpre + dpre;
+      /* [CG] DataClip / Builder problem
+       * - dpre does no longer start with 0 but clip.start -> pre calculation not correct
+       * - fix: substract clip.start to get correct pre position
+       */
+      final int pre = rpre + dpre - clip.start;
       final int dis = dpar >= 0 ? dpre - dpar : pre - parent(rpre, rkind);
 
       switch(dkind) {

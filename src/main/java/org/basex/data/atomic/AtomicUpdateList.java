@@ -302,7 +302,8 @@ public final class AtomicUpdateList {
    */
   public void applyStructuralUpdates() {
     accumulatePreValueShifts();
-    for(final BasicUpdate t : updStructural) t.apply(data);
+    for(final BasicUpdate t : updStructural)
+      t.apply(data);
   }
 
   /**
