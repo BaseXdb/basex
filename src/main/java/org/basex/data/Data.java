@@ -535,7 +535,7 @@ public abstract class Data {
        * - fix: substract clip.start to get correct pre position
        */
       final int pre = rpre + dpre - clip.start;
-      final int dis = dpar >= 0 ? dpre - dpar : pre - parent(rpre, rkind);
+      final int dis = dpar >= 0 ? dpre - dpar : pre - rpar;
 
       switch(dkind) {
         case DOC:
@@ -711,7 +711,7 @@ public abstract class Data {
       final int pre = ipre + c;
       final int dkind = data.kind(dpre);
       final int dpar = data.parent(dpre, dkind);
-      final int dis = dpar >= clip.start ? dpre - dpar : ipar >= 0 ? pre - ipar : 0;
+      final int dis = dpar >= 0 ? dpre - dpar : ipar >= 0 ? pre - ipar : 0;
       final int par = dis == 0 ? -1 : pre - dis;
 
       // find nearest namespace node on the ancestor axis of the insert
