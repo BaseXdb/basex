@@ -17,10 +17,10 @@ import org.basex.util.*;
 public final class InsertAfter extends NodeCopy {
   /**
    * Constructor.
-   * @param p pre
-   * @param d data
+   * @param p target pre value
+   * @param d target data instance
    * @param i input info
-   * @param c insert copy
+   * @param c node copy insertion sequence
    */
   public InsertAfter(final int p, final Data d, final InputInfo i, final ANodeList c) {
     super(PrimitiveType.INSERTAFTER, p, d, i, c);

@@ -370,8 +370,6 @@ public final class FNDbTest extends AdvancedQueryTest {
 
     // eventually drop database
     query(_DB_DROP.args(dbname));
-
-    // [LK] Add error for db:create (and other db functions) within transform expression
   }
 
   /**

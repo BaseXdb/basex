@@ -51,7 +51,7 @@ public final class VarRef extends ParseExpr {
      * optimizations (index access, count, ...). On the other hand, repeated
      * evaluation of the same expression is avoided.
      *
-     * [CG][LW] Variables are currently pre-evaluated if...
+     * [CG][LW] XQuery: Variables are currently pre-evaluated if...
      * - they are global (mandatory)
      * - they are given a type
      * - they contain an element constructor (mandatory)

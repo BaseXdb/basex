@@ -60,14 +60,7 @@ public final class DataBuilder {
    */
   public void build(final ANodeList nl) {
     int pre = data.meta.size;
-    /* [CG] DataClip / Builder problem
-     * - fix: set parent to -1
-     * - for empty dbs: pre - 1 = -1 anyway 
-     * - for node sequences: all nodes that are added have to refer to the parent -1.
-     * Otherwise there will be incorrect parent relationships in DataClip.data object.
-     */
-    final int par = -1;
-    for(final ANode n : nl) pre = addNode(n, pre, par, null);
+    for(final ANode n : nl) pre = addNode(n, pre, -1, null);
   }
 
   /**

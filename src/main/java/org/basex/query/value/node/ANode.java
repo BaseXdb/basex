@@ -22,9 +22,8 @@ public abstract class ANode extends Item {
     NodeType.DOC, NodeType.ELM, NodeType.TXT, NodeType.ATT, NodeType.COM, NodeType.PI
   };
   /** Static node counter. */
-  // [CG] XQuery/ID:
-  // - move to query context to reduce chance of overflow
-  // - move to FNode to reduce memory usage of DBNode instances
+  // [CG] XQuery, node id: move to query context to reduce chance of overflow, or
+  // move to FNode to reduce memory usage of DBNode instances
   private static int sid;
   /** Unique node id. */
   public final int id = ++sid;

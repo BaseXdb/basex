@@ -106,7 +106,7 @@ public final class TableDiskAccess extends TableAccess {
     } catch(final ClosedChannelException ex) {
       return false;
     } catch(final IOException ex) {
-      return true; // [CG] why do we return true when IO error occurs?
+      return true;
     }
   }
 
@@ -387,7 +387,6 @@ public final class TableDiskAccess extends TableAccess {
     }
 
     // append old entries at the end of the new entries
-    // [DP] Storage: the following can be optimized to avoid copying arrays
     final byte[] all = new byte[nnew + moved];
     System.arraycopy(entries, 0, all, 0, nnew);
     System.arraycopy(bf.data, split, all, nnew, moved);

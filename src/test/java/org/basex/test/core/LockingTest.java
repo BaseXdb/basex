@@ -97,12 +97,6 @@ public final class LockingTest extends SandboxTest {
 
   /**
    * Fetch read lock, then write lock.
-   * [JE] ignore annotation added; sometimes yields an IllegalMonitorStateException:
-   *   ReentrantReadWriteLock$Sync.tryReleaseShared(ReentrantReadWriteLock.java:363)
-   *   AbstractQueuedSynchronizer.releaseShared(AbstractQueuedSynchronizer.java:1317)
-   *   ReentrantReadWriteLock$ReadLock.unlock(ReentrantReadWriteLock.java:745)
-   *   DBLocking.release(DBLocking.java:124)
-   *   LockingTest$LockTester.run(LockingTest.java:264)
    * @throws InterruptedException Got interrupted.
    */
   @Test
@@ -270,8 +264,6 @@ public final class LockingTest extends SandboxTest {
      */
     public synchronized void release() {
       requestRelease = true;
-      // [JE] notify() -> notifyAll() is probably what you want? see e.g.:
-      // http://stackoverflow.com/questions/37026/java-notify-vs-notifyall-all-over-again
       notifyAll();
     }
   }

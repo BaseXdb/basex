@@ -14,22 +14,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
-/*
- * [LK]
- * CREATE permissions (checked in DatabaseModifier)
- * pinning in ContextModifier.apply
- * multiple DBCreate on same target allowed? NO
- * overwrites existing DBs YES
- * initial document path? YES
- * multiple initial documents YES
- *
- * CreateDB.run()
- * Strings -> IO.get()
- * Nodes -> IO.get(node.serialize())
- * empty -> Parser.emptyParser(context.prop)
- * document path -> ?
- */
-
 /**
  * Update primitive for the {@link Function#_DB_CREATE} function.
  *

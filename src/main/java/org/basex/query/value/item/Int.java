@@ -48,6 +48,7 @@ public final class Int extends ANum {
    * @param d date time
    */
   public Int(final ADate d) {
+    // [CG] XQuery, DateTime: slow conversion. Add support for Durations?
     this(d.toJava().toGregorianCalendar().getTimeInMillis(), AtomType.ITR);
   }
 

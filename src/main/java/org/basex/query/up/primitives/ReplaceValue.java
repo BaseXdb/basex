@@ -15,7 +15,6 @@ import org.basex.util.*;
 /**
  * ReplaceValue primitive. Replaces the value of a node.
  *
- *
  * If the target T is an element node this primitive represents a replaceElementContent
  * expression (see XQUF). The children of T are deleted and a single (optional) text node
  * is inserted as the only child of T. The primitive for replaceElementContent is
@@ -121,8 +120,8 @@ public final class ReplaceValue extends UpdatePrimitive {
         tmp.text(pre, 1, value, Data.TEXT);
         tmp.insert(pre);
         // add the substituting insertInto statement to the list
-        l.add(new InsertInto(targetPre, data, info, new ANodeList(new DBNode(tmp, pre)),
-            true));
+        final ANodeList nl = new ANodeList(new DBNode(tmp, pre));
+        l.add(new ReplaceContent(targetPre, data, info, nl));
       }
       return l.toArray(new UpdatePrimitive[l.size()]);
     }

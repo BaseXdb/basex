@@ -155,7 +155,7 @@ public abstract class Formatter extends FormatUtil {
             err = tim;
             break;
           case 'F':
-            // [CG] DateTime: slow conversion (3x)
+            // [CG] XQuery, DateTime: slow conversion (3x)
             num = date.toJava().toGregorianCalendar().get(Calendar.DAY_OF_WEEK) - 1;
             pres = new byte[] { 'n' };
             err = tim;

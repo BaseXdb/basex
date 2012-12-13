@@ -530,10 +530,6 @@ public abstract class Data {
     for(int dpre = clip.start; dpre < clip.end; ++dpre) {
       final int dkind = data.kind(dpre);
       final int dpar = data.parent(dpre, dkind);
-      /* [CG] DataClip / Builder problem
-       * - dpre does no longer start with 0 but clip.start -> pre calculation not correct
-       * - fix: substract clip.start to get correct pre position
-       */
       final int pre = rpre + dpre - clip.start;
       final int dis = dpar >= 0 ? dpre - dpar : pre - rpar;
 
@@ -711,6 +707,7 @@ public abstract class Data {
       final int pre = ipre + c;
       final int dkind = data.kind(dpre);
       final int dpar = data.parent(dpre, dkind);
+      // ipar < 0 if document nodes on top level are added
       final int dis = dpar >= 0 ? dpre - dpar : ipar >= 0 ? pre - ipar : 0;
       final int par = dis == 0 ? -1 : pre - dis;
 

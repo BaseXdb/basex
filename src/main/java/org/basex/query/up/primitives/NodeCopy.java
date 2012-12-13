@@ -17,9 +17,7 @@ import org.basex.util.*;
  */
 public abstract class NodeCopy extends UpdatePrimitive {
   /** Nodes to be inserted. */
-  public ANodeList insert;
-  /** Number of insert operations (initialized by {@link #prepare}). */
-  private int size;
+  ANodeList insert;
   /** Insertion sequence data clip. */
   DataClip insseq;
 
@@ -46,19 +44,10 @@ public abstract class NodeCopy extends UpdatePrimitive {
     // build main memory representation of nodes to be copied
     // text nodes still need to be merged. two adjacent iterators may lead to two
     // adjacent text nodes
-
-    /* Variant 1: create a DataClip for each update (obsolete as soon as Variant 2 works)
-    final MemData md = new MemData(tmp);
-    new DataBuilder(md).build(mergeNodeCacheText(insert));
-    insseq = new DataClip(md);
-    */
-
-    // Variant 2: copy all new nodes into a single database instance (work in progress)
-    final int s = tmp.meta.size;
+    final int start = tmp.meta.size;
     new DataBuilder(tmp).build(mergeNodeCacheText(insert));
-    insseq = new DataClip(tmp, s, tmp.meta.size);
-
-    size += insert.size();
+    insseq = new DataClip(tmp, start, tmp.meta.size);
+    insseq.fragments = insert.size();
     insert = null;
   }
 
@@ -109,7 +98,7 @@ public abstract class NodeCopy extends UpdatePrimitive {
 
   @Override
   public final int size() {
-    return size;
+    return insseq.fragments;
   }
 
   @Override

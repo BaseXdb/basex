@@ -15,6 +15,8 @@ public final class DataClip {
   public final int start;
   /** End value (+1). */
   public final int end;
+  /** Number of contained fragments. */
+  public int fragments;
 
   /**
    * Constructor.

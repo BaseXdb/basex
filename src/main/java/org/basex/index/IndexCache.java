@@ -121,7 +121,6 @@ public final class IndexCache {
 
   /**
    * Purges stale entries from the cache.
-   * [DP] add a minimal load, after which the buckets array should be shrunk
    */
   private void purge() {
     for(Object x; (x = queue.poll()) != null;) {
@@ -166,7 +165,6 @@ public final class IndexCache {
 
   /**
    * Deletes a cached entry from the buckets with the specified index.
-   * [DP] add a minimal load, after which the buckets array should be shrunk
    * @param i buckets index
    * @param e cached entry to delete
    * @param p previous cache entry

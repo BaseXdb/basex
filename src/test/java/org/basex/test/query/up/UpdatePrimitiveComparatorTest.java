@@ -111,8 +111,8 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
     final Data d = data(doc);
     compare(
         new UpdatePrimitive[] {
-        new InsertInto(1, d, null, null, false),
-        new InsertInto(2, d, null, null, false),
+        new InsertInto(1, d, null, null),
+        new InsertInto(2, d, null, null),
     });
     query(transform(doc,
         "insert node <smallerpre/> into $input/b, insert node <largerpre/> into $input"),
@@ -130,7 +130,7 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
     final Data d = data(doc);
     compare(
         new UpdatePrimitive[] {
-        new InsertInto(1, d, null, null, false),
+        new InsertInto(1, d, null, null),
         new InsertAfter(2, d, null, null),
     });
     query(transform(doc,
@@ -152,7 +152,7 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
     compare(
         new UpdatePrimitive[] {
         new InsertAfter(2, d, null, null),
-        new InsertInto(2, d, null, null, false),
+        new InsertInto(2, d, null, null),
     });
     query(transform(doc,
         "insert node <smallerpre/> into $input/b," +
@@ -219,22 +219,22 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
     });
     //(A=B, A>B, A>B, A=B)
     compare(new UpdatePrimitive[] {
-        new InsertInto(2, d, null, null, false),
-        new InsertInto(3, d, null, null, false),
+        new InsertInto(2, d, null, null),
+        new InsertInto(3, d, null, null),
     });
     //(A=B, A>B, A=B, A>B, A<B)
     compare(new UpdatePrimitive[] {
-        new InsertInto(2, d, null, null, false),
+        new InsertInto(2, d, null, null),
         new InsertAfter(3, d, null, null),
     });
     //(A=B, A>B, A>B, A>B)
     compare(new UpdatePrimitive[] {
         new InsertAfter(2, d, null, null),
-        new InsertInto(3, d, null, null, false),
+        new InsertInto(3, d, null, null),
     });
     //(A>B, A>B, A>B, A<B)
     compare(new UpdatePrimitive[] {
-        new InsertInto(2, d, null, null, false),
+        new InsertInto(2, d, null, null),
         new InsertAfter(3, d, null, null),
     });
 
@@ -246,30 +246,30 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
     });
     //(A=B, A=B, A>B, A=B)
     compare(new UpdatePrimitive[] {
-        new InsertInto(4, d, null, null, false),
-        new InsertInto(5, d, null, null, false),
+        new InsertInto(4, d, null, null),
+        new InsertInto(5, d, null, null),
     });
     //(A=B, A=B, A>B, A<B)
     compare(new UpdatePrimitive[] {
-        new InsertInto(4, d, null, null, false),
+        new InsertInto(4, d, null, null),
         new InsertAfter(5, d, null, null),
     });
     //(A=B, A=B, A>B, A>B)
     compare(new UpdatePrimitive[] {
         new InsertAfter(4, d, null, null),
-        new InsertInto(5, d, null, null, false),
+        new InsertInto(5, d, null, null),
     });
 
     // ***** Tests on neighboring target nodes
     //(A=B, A=B, A=B, A>B)
     compare(new UpdatePrimitive[] {
         new InsertAfter(7, d, null, null),
-        new InsertInto(7, d, null, null, false),
+        new InsertInto(7, d, null, null),
     });
     //(A=B, A>B, A=B, A=B)
     compare(new UpdatePrimitive[] {
-        new InsertInto(7, d, null, null, false),
-        new InsertInto(4, d, null, null, false),
+        new InsertInto(7, d, null, null),
+        new InsertInto(4, d, null, null),
     });
     //(A>B, A=B, A=B, A=B)
     compare(new UpdatePrimitive[] {
@@ -298,7 +298,7 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
     final Data d = data(testDocument);
     compare(new UpdatePrimitive[] {
         new InsertAfter(10, d, null, null),
-        new InsertInto(10, d, null, null, false),
+        new InsertInto(10, d, null, null),
         new InsertIntoAsFirst(10, d, null, null),
         new InsertAttribute(10, d, null, null),
         new ReplaceValue(10, d, null, new byte[] {' '}),
@@ -317,7 +317,7 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
     final Data d = data(testDocument);
     compare(new UpdatePrimitive[] {
         new InsertAfter(8, d, null, null),
-        new InsertInto(8, d, null, null, false),
+        new InsertInto(8, d, null, null),
         new InsertIntoAsFirst(8, d, null, null),
         new InsertAttribute(8, d, null, null),
         new ReplaceValue(8, d, null, new byte[] {' '}),
@@ -326,7 +326,7 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
         new DeleteNode(8, d, null),
         new InsertBefore(8, d, null, null),
         new InsertAfter(7, d, null, null),
-        new InsertInto(7, d, null, null, false),
+        new InsertInto(7, d, null, null),
         new InsertIntoAsFirst(7, d, null, null),
         new InsertAttribute(7, d, null, null),
         new ReplaceValue(7, d, null, new byte[] {' '}),
@@ -346,11 +346,11 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
     compare(new UpdatePrimitive[] {
         // 25
         new InsertAfter(18, d, null, null),
-        new InsertInto(18, d, null, null, false),
+        new InsertInto(18, d, null, null),
         new InsertAfter(24, d, null, null),
-        new InsertInto(24, d, null, null, false),
+        new InsertInto(24, d, null, null),
         new InsertAfter(25, d, null, null),
-        new InsertInto(25, d, null, null, false),
+        new InsertInto(25, d, null, null),
         new InsertIntoAsFirst(25, d, null, null),
         new InsertAttribute(25, d, null, null),
         new ReplaceValue(25, d, null, new byte[] {' '}),
@@ -368,9 +368,9 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
         new InsertBefore(24, d, null, null),
      // 23
         new InsertAfter(21, d, null, null),
-        new InsertInto(21, d, null, null, false),
+        new InsertInto(21, d, null, null),
         new InsertAfter(22, d, null, null),
-        new InsertInto(22, d, null, null, false),
+        new InsertInto(22, d, null, null),
         new InsertIntoAsFirst(22, d, null, null),
         new ReplaceValue(23, d, null, new byte[] {' '}),
         new RenameNode(23, d, null, null),
@@ -422,7 +422,7 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
     compare(new UpdatePrimitive[] {
         // node 28
         new InsertAfter(28, d, null, null),
-        new InsertInto(28, d, null, null, false),
+        new InsertInto(28, d, null, null),
         new InsertIntoAsFirst(28, d, null, null),
         new InsertAttribute(28, d, null, null),
         new ReplaceValue(28, d, null, new byte[] {' '}),
@@ -432,7 +432,7 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
         new InsertBefore(28, d, null, null),
         // node 26
         new InsertAfter(26, d, null, null),
-        new InsertInto(26, d, null, null, false),
+        new InsertInto(26, d, null, null),
         new InsertIntoAsFirst(26, d, null, null),
         new InsertAttribute(26, d, null, null),
         new ReplaceValue(26, d, null, new byte[] {' '}),
@@ -451,21 +451,21 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
   public void compareSiblingsSimple() {
     final Data d = data(testDocument);
     compare(new UpdatePrimitive[] {
-        new InsertInto(28, d, null, null, false),
-        new InsertInto(26, d, null, null, false),
+        new InsertInto(28, d, null, null),
+        new InsertInto(26, d, null, null),
     });
     compare(new UpdatePrimitive[] {
-        new InsertInto(31, d, null, null, false),
-        new InsertInto(29, d, null, null, false),
+        new InsertInto(31, d, null, null),
+        new InsertInto(29, d, null, null),
     });
     compare(new UpdatePrimitive[] {
         new DeleteNode(28, d, null),
-        new InsertInto(26, d, null, null, false),
+        new InsertInto(26, d, null, null),
     });
     // two empty siblings
     compare(new UpdatePrimitive[] {
-        new InsertInto(8, d, null, null, false),
-        new InsertInto(7, d, null, null, false),
+        new InsertInto(8, d, null, null),
+        new InsertInto(7, d, null, null),
     });
     // first sibling has attribute, second one is empty
     compare(new UpdatePrimitive[] {
@@ -476,7 +476,7 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
     // two empty siblings
     compare(new UpdatePrimitive[] {
         new DeleteNode(8, d, null),
-        new InsertInto(7, d, null, null, false),
+        new InsertInto(7, d, null, null),
     });
   }
 

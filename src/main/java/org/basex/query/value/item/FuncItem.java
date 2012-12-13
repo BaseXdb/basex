@@ -114,7 +114,7 @@ public final class FuncItem extends FItem {
   public Iter invIter(final QueryContext ctx, final InputInfo ii,
       final Value... args) throws QueryException {
 
-    // [LW] make result streamable
+    // [LW] XQuery: make result streamable
     return invValue(ctx, ii, args).iter();
   }
 

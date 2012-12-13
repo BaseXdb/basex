@@ -402,7 +402,7 @@ public abstract class ADate extends ADateDur {
   final BigDecimal seconds() {
     int z = zon;
     if(z == Short.MAX_VALUE) {
-      // [CG] DateTime: may be removed
+      // [CG] XQuery, DateTime: may be removed
       final long n = System.currentTimeMillis();
       z = Calendar.getInstance().getTimeZone().getOffset(n) / 60000;
     }

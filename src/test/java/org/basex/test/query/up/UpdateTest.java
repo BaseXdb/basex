@@ -703,10 +703,9 @@ public final class UpdateTest extends AdvancedQueryTest {
           "<n><b/><n><b/><n/><b/></n><b/><n/><b/></n>");
   }
 
-  //[CG] DataClip / Builder problem
   /**
    * Tests if the common data instance for all insert sequences is built correctly.
-   * [LK][CG] maybe we should add some more low-level TCs ...
+   * [LK][CG] Updates: maybe we should add some more low-level TCs ...
    */
   @Test
   public void dataClipBuildFail() {

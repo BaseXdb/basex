@@ -30,8 +30,7 @@ public abstract class ContextModifier {
    * @param ctx query context
    * @throws QueryException query exception
    */
-  abstract void add(final Operation p, final QueryContext ctx)
-    throws QueryException;
+  abstract void add(final Operation p, final QueryContext ctx) throws QueryException;
 
   /**
    * Adds an update primitive to this context modifier.

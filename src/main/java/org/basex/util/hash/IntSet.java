@@ -118,7 +118,7 @@ public class IntSet {
    * @param key key
    * @return deleted key or 0
    */
-  public final int delete(final int key) {
+  public int delete(final int key) {
     final int p = key & bucket.length - 1;
     for(int id = bucket[p]; id != 0; id = next[id]) {
       if(key == keys[id]) {

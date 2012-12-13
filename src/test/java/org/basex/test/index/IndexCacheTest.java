@@ -80,7 +80,6 @@ public final class IndexCacheTest {
   /**
    * Test that new records can be continuously added without hitting
    * {@link OutOfMemoryError}.
-   * [DP] assert progress, i.e. that the loop is not stuck.
    */
   @Test
   @Ignore("Start this test with a small heap size (e.g. -Xmx64m)")
