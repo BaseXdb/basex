@@ -167,7 +167,7 @@ sub more {
   if(!@cache) {
     $session->send(chr(4).$id.chr(0));
     push(@cache, $session->_receive()) while $session->_read();
-    die $session->{info} if !$session->ok();
+    die $session->_receive() if !$session->ok();
   }
   return $pos < @cache;
 }
