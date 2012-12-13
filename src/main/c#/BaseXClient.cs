@@ -30,7 +30,6 @@ namespace BaseXClient
     private NetworkStream estream;
     private Dictionary<string, EventNotification> en;
 
-    /** see readme.txt */
     public Session(string host, int port, string username, string pw)
     {
       socket = new TcpClient(host, port);
@@ -45,7 +44,6 @@ namespace BaseXClient
       }
     }
 
-    /** see readme.txt */
     public void Execute(string com, Stream ms)
     {
       Send(com);
@@ -58,7 +56,6 @@ namespace BaseXClient
       }
     }
 
-    /** see readme.txt */
     public String Execute(string com)
     {
       MemoryStream ms = new MemoryStream();
@@ -66,13 +63,11 @@ namespace BaseXClient
       return System.Text.Encoding.UTF8.GetString(ms.ToArray());
     }
 
-    /** see readme.txt */
     public Query Query(string q)
     {
       return new Query(this, q);
     }
 
-    /** see readme.txt */
     public void Create(string name, Stream s)
     {
       stream.WriteByte(8);
@@ -80,7 +75,6 @@ namespace BaseXClient
       Send(s);
     }
     
-    /** see readme.txt */
     public void Add(string path, Stream s)
     {
       stream.WriteByte(9);
@@ -88,7 +82,6 @@ namespace BaseXClient
       Send(s);
     }
     
-    /** see readme.txt */
     public void Replace(string path, Stream s)
     {
       stream.WriteByte(12);
@@ -96,7 +89,6 @@ namespace BaseXClient
       Send(s);
     }
     
-    /** see readme.txt */
     public void Store(string path, Stream s)
     {
       stream.WriteByte(13);
@@ -130,7 +122,7 @@ namespace BaseXClient
       en.Add(name, notify);
     }
     
-    /** Listens to event socket */
+  
     private void Listen() 
     {
       while (true)
@@ -141,7 +133,6 @@ namespace BaseXClient
       }
     }
     
-    /** Returns event message */
     private string readS() 
     {
       MemoryStream ms = new MemoryStream();
@@ -167,7 +158,6 @@ namespace BaseXClient
       en.Remove(name);
     }
 
-    /** see readme.txt */
     public string Info
     {
       get
@@ -176,7 +166,6 @@ namespace BaseXClient
       }
     }
 
-    /** see readme.txt */
     public void Close()
     {
       Send("exit");
@@ -187,14 +176,12 @@ namespace BaseXClient
       socket.Close();
     }
 
-    /** Initializes the byte transfer. */
     private void Init()
     {
       bpos = 0;
       bsize = 0;
     }
 
-    /** Returns a single byte from the socket. */
     public byte Read()
     {
       if (bpos == bsize)
@@ -205,7 +192,6 @@ namespace BaseXClient
       return cache[bpos++];
     }
 
-    /** Receives a string from the socket. */
     private void Receive(Stream ms)
     {
       while (true)
@@ -216,7 +202,6 @@ namespace BaseXClient
       }
     }
 
-    /** Receives a string from the socket. */
     public string Receive()
     {
       MemoryStream ms = new MemoryStream();
@@ -224,7 +209,6 @@ namespace BaseXClient
       return System.Text.Encoding.UTF8.GetString(ms.ToArray());
     }
 
-    /** Sends strings to server. */
     public void Send(string message)
     {
       byte[] msg = System.Text.Encoding.UTF8.GetBytes(message);
@@ -232,7 +216,6 @@ namespace BaseXClient
       stream.WriteByte(0);
     }
 
-    /** see readme.txt */
     private void Send(Stream s)
     {
       while (true)
@@ -251,13 +234,11 @@ namespace BaseXClient
     }
     
 
-    /** Returns success check. */
     public bool Ok()
     {
       return Read() == 0;
     }
 
-    /** Returns the md5 hash of a string. */
     private string MD5(string input)
     {
       MD5CryptoServiceProvider MD5 = new MD5CryptoServiceProvider();
@@ -279,7 +260,6 @@ namespace BaseXClient
     private ArrayList cache;
     private int pos;
 
-    /** see readme.txt */
     public Query(Session s, string query)
     {
       pos = 0;
@@ -287,31 +267,26 @@ namespace BaseXClient
       id = Exec(0, query);
     }
 
-    /** see readme.txt */
     public void Bind(string name, string value)
     {
       Bind(name, value, "");
     }
 
-    /** see readme.txt */
     public void Bind(string name, string value, string type)
     {
       Exec(3, id + '\0' + name + '\0' + value + '\0' + type);
     }
 
-    /** see readme.txt */
     public void Context(string value)
     {
       Context(value, "");
     }
 
-    /** see readme.txt */
     public void Context(string value, string type)
     {
       Exec(14, id + '\0' + value + '\0' + type);
     }
 
-    /** see readme.txt */
     public bool More()
     {
       if(cache == null) 
@@ -331,7 +306,6 @@ namespace BaseXClient
       return pos < cache.Count;
     }
 
-    /** see readme.txt */
     public string Next()
     {
       if(More()) 
@@ -344,31 +318,26 @@ namespace BaseXClient
       }
     }
 
-    /** see readme.txt */
     public string Execute()
     {
       return Exec(5, id);
     }
 
-    /** see readme.txt */
     public string Info()
     {
       return Exec(6, id);
     }
 
-    /** see readme.txt */
     public string Options()
     {
       return Exec(7, id);
     }
 
-    /** see readme.txt */
     public void Close()
     {
       Exec(2, id);
     }
 
-    /** see readme.txt */
     private string Exec(byte cmd, string arg)
     {
       session.stream.WriteByte(cmd);

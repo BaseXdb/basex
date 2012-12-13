@@ -59,7 +59,6 @@ class SocketInputReader(object):
         return ''.join(strings)
 
 class Session(object):
-    # see readme.txt
     def __init__(self, host, port, user, pw):
 
         self.__info = None
@@ -89,7 +88,6 @@ class Session(object):
         if self.__s.recv(1) != chr(0):
             raise IOError('Access Denied.')
 
-    # see readme.txt
     def execute(self, com):
         # send command to server
         self.send(com)
@@ -101,31 +99,24 @@ class Session(object):
             raise IOError(self.__info)
         return result
 
-    # see readme.txt
     def query(self, q):
         return Query(self, q)
 
-    # see readme.txt
     def create(self, name, content):
         self.sendInput(8, name, content)
 
-    # see readme.txt
     def add(self, path, content):
         self.sendInput(9, path, content)
 
-    # see readme.txt
     def replace(self, path, content):
         self.sendInput(12, path, content)
 
-    # see readme.txt
     def store(self, path, content):
         self.sendInput(13, path, content)
 
-    # see readme.txt
     def info(self):
         return self.__info
 
-    # see readme.txt
     def close(self):
         self.send('exit')
         self.__s.close()
@@ -197,7 +188,6 @@ class Session(object):
         """Send the defined string"""
         self.__s.sendall(value + chr(0))
 
-    # see readme.txt
     def sendInput(self, code, arg, content):
         self.__s.sendall(chr(code) + arg + chr(0) + content + chr(0))
         self.__info = self.readString()
@@ -225,41 +215,32 @@ class Session(object):
             
 
 class Query():
-    # see readme.txt
     def __init__(self, session, q):
         self.__session = session
         self.__id = self.exc(chr(0), q)
 
-    # see readme.txt  
     def bind(self, name, value, datatype=''):
         self.exc(chr(3), self.__id + chr(0) + name + chr(0) + value + chr(0) + datatype)
 
-    # see readme.txt  
     def context(self, value, datatype=''):
         self.exc(chr(14), self.__id + chr(0) + value + chr(0) + datatype)
         
-    # see readme.txt  
     def iter(self):
         self.__session.send(chr(4) + self.__id)
         return self.__session.iter_receive()
 
-    # see readme.txt  
     def execute(self):
         return self.exc(chr(5), self.__id)
 
-    # see readme.txt  
     def info(self):
         return self.exc(chr(6), self.__id)
 
-    # see readme.txt  
     def options(self):
         return self.exc(chr(7), self.__id)
 
-    # see readme.txt  
     def close(self):
         self.exc(chr(2), self.__id)
 
-    # see readme.txt  
     def exc(self, cmd, arg):
         self.__session.send(cmd + arg)
         s = self.__session.receive()

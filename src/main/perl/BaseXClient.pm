@@ -12,7 +12,6 @@ use strict;
 
 package Session;
 
-# see readme.txt
 sub new {
   my $class = shift;
   my $host = shift;
@@ -38,7 +37,6 @@ sub new {
   return $self if !$self->_read() or die "Access denied.";
 }
 
-# see readme.txt
 sub execute {
   my $self = shift;
   my $cmd = shift;
@@ -51,37 +49,30 @@ sub execute {
   return $self->{result};
 }
 
-# see readme.txt
 sub query {
   return Query->new(shift, shift);
 }
 
-# see readme.txt
 sub create {
   shift->sendInput(8, shift, shift);
 }
 
-# see readme.txt
 sub add {
   shift->sendInput(9, shift, shift);
 }
 
-# see readme.txt
 sub replace {
   shift->sendInput(12, shift, shift);
 }
 
-# see readme.txt
 sub store {
   shift->sendInput(13, shift, shift);
 }
 
-# see readme.txt
 sub info {
   return shift->{info};
 }
 
-# see readme.txt
 sub close {
   my $self = shift;
   $self->send("exit");
@@ -144,7 +135,6 @@ our @cache;
 our $pos = 0;
 our $id;
 
-# see readme.txt
 sub new {
   my $class = shift;
   $session = shift;
@@ -154,7 +144,6 @@ sub new {
   return $self;
 }
 
-# see readme.txt
 sub bind {
   shift;
   my $name = shift;
@@ -163,7 +152,6 @@ sub bind {
   exc(chr(3), $id.chr(0).$name.chr(0).$value.chr(0).$type);
 }
 
-# see readme.txt
 sub context {
   shift;
   my $value = shift;
@@ -171,12 +159,10 @@ sub context {
   exc(chr(14), $id.chr(0).$value.chr(0).$type);
 }
 
-# see readme.txt
 sub execute {
   return exc(chr(5), $id);
 }
 
-# see readme.txt
 sub more {
   if(!@cache) {
     $session->send(chr(4).$id.chr(0));
@@ -186,27 +172,22 @@ sub more {
   return $pos < @cache;
 }
 
-# see readme.txt
 sub next {
   return more() && $cache[$pos++];
 }
 
-# see readme.txt
 sub info {
   return exc(chr(6), $id);
 }
 
-# see readme.txt
 sub options {
   return exc(chr(7), $id);
 }
 
-# see readme.txt
 sub close {
   exc(chr(2), $id);
 }
 
-# see readme.txt
 sub exc {
   my $cmd = shift;
   my $arg = shift;

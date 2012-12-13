@@ -22,7 +22,6 @@ Module BaseXClient
     Private bpos As Integer
     Private bsize As Integer
     
-    ' see readme.txt
     Public Sub New(host As String, port As Integer, username As String, pw As String)
       socket = New TcpClient(host, port)
       stream = socket.GetStream()
@@ -35,7 +34,6 @@ Module BaseXClient
       End If	
     End Sub
     
-    ' see readme.txt
     Public Sub Execute(com As String, ms As Stream)
       Send(com)
       Init()
@@ -46,14 +44,12 @@ Module BaseXClient
       End If
     End Sub
 
-    ' see readme.txt
     Public Function Execute(com As String) As [String]
       Dim ms As New MemoryStream()
       Execute(com, ms)
       Return System.Text.Encoding.UTF8.GetString(ms.ToArray())
     End Function
     
-    ' see readme.txt
     Public Sub Create(name As String, ms As Stream)
       stream.WriteByte(8)
       Send(name)
@@ -71,7 +67,6 @@ Module BaseXClient
       End If
     End Sub
     
-    ' see readme.txt
     Public Sub Create(name As String, target As String, ms As Stream)
       stream.WriteByte(9)
       Send(name)
@@ -90,19 +85,16 @@ Module BaseXClient
       End If
     End Sub
 
-    ' see readme.txt
     Public Function Query(q As String) As Query
       Return New Query(Me, q)
     End Function
 
-    ' see readme.txt
     Public ReadOnly Property Info() As String
       Get
         Return m_info
       End Get
     End Property
 
-    ' see readme.txt 
     Public Sub Close()
       Send("exit")
       socket.Close()
@@ -178,18 +170,15 @@ End Class
     Private session As Session
     Private id As String
 
-    ' see readme.txt
     Public Sub New(s As Session, query As String)
       session = s
       id = Exec(0, query)
     End Sub
       
-    ' see readme.txt
     Public Sub Bind(name As String, value As String)
       Bind(name, value, "")
     End Sub
 
-    ' see readme.txt
     Public Sub Bind(name As String, value As String, type As String)
       session.stream.WriteByte(3)
       session.Send(id)
@@ -202,12 +191,10 @@ End Class
       End If  
     End Sub
 
-    ' see readme.txt
     Public Sub Context(value As String)
       Context(value, "")
     End Sub
 
-    ' see readme.txt
     Public Sub Context(value As String, type As String)
       session.stream.WriteByte(14)
       session.Send(id)
@@ -219,23 +206,18 @@ End Class
       End If  
     End Sub
 
-    ' see readme.txt 
     Public Function Execute() As String
       Return Exec(5, id)
     End Function
 
-    ' see readme.txt 
     Public Function Info() As String
       Return Exec(6, id)
     End Function
 
-    ' see readme.txt 
     Public Function Close()
       Exec(2, id)
     End Function
     
-    
-    ' see readme.txt
     Public Function Exec(cmd As Integer, arg As String) As String
       session.stream.WriteByte(cmd)
       session.Send(arg)
