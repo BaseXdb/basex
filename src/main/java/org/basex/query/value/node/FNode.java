@@ -161,8 +161,7 @@ public abstract class FNode extends ANode {
   final byte[] string(final ANodeList iter) {
     if(val == null) {
       final TokenBuilder tb = new TokenBuilder();
-      for(int c = 0; c < iter.size(); ++c) {
-        final ANode nc = iter.get(c);
+      for(final ANode nc : iter) {
         if(nc.type == NodeType.ELM || nc.type == NodeType.TXT) tb.add(nc.string());
       }
       val = tb.finish();

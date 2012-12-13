@@ -41,7 +41,7 @@ final class Rename extends BasicUpdate {
   }
 
   @Override
-  Data getInsertionData() {
+  DataClip getInsertionData() {
     Util.notexpected("No insertion sequence needed for atomic rename operation.");
     return null;
   }

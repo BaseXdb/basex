@@ -76,24 +76,23 @@ public final class AtomicUpdateList {
    * Adds an insert atomic to the list.
    * @param pre PRE value of the target node/update location
    * @param par new parent of the inserted nodes
-   * @param d insertion sequence data reference
+   * @param clip insertion sequence data clip
    * @param attr insert attribute if true or a node of any other kind if false
    */
-  public void addInsert(final int pre, final int par, final Data d, final boolean attr) {
-    final int s = d.meta.size;
-    if(attr) add(new InsertAttr(pre, s, pre, par, d), true);
-    else add(new Insert(pre, s, pre, par, d), true);
+  public void addInsert(final int pre, final int par, final DataClip clip,
+      final boolean attr) {
+    add(attr ? new InsertAttr(pre, par, clip) : new Insert(pre, par, clip), true);
   }
 
   /**
    * Adds a replace atomic to the list.
    * @param pre PRE value of the target node/update location
-   * @param d insertion sequence data reference
+   * @param clip insertion sequence data clip
    */
-  public void addReplace(final int pre, final Data d) {
+  public void addReplace(final int pre, final DataClip clip) {
     final int oldsize = data.size(pre, data.kind(pre));
-    final int newsize = d.meta.size;
-    add(new Replace(pre, newsize - oldsize, pre + oldsize, d), true);
+    final int newsize = clip.size();
+    add(new Replace(pre, newsize - oldsize, pre + oldsize, clip), true);
   }
 
   /**
@@ -336,9 +335,8 @@ public final class AtomicUpdateList {
    * invalidates parent-child relationships. Distances are only updated after all
    * structural updates have been carried out to make sure each node (that has to be
    * updated) is only touched once.
-   *
    */
-  public void updateDistances() {
+  private void updateDistances() {
     accumulatePreValueShifts();
     final IntSet alreadyUpdatedNodes = new IntSet();
 
@@ -477,9 +475,8 @@ public final class AtomicUpdateList {
     // keep track of the visited locations to avoid superfluous checks
     final IntSet s = new IntSet();
     // Text nodes have to be merged from the highest to the lowest pre value
-    for(int i = 0; i < updStructural.size(); i++) {
-      final BasicUpdate u = updStructural.get(i);
-      final Data insseq = u.getInsertionData();
+    for(final BasicUpdate u : updStructural) {
+      final DataClip insseq = u.getInsertionData();
       // calculate the new location of the update, here we have to check for adjacency
       final int newLocation = u.location + u.accumulatedShifts - u.shifts;
       final int beforeNewLocation = newLocation - 1;
@@ -488,22 +485,20 @@ public final class AtomicUpdateList {
       // ... for insert/replace ...
       if(insseq != null) {
         // calculate the current following node
-        final int followingNode = newLocation + insseq.meta.size;
+        final int followingNode = newLocation + insseq.size();
         final int beforeFollowingNode = followingNode - 1;
         // check the nodes at the end of/after the insertion sequence
         if(!s.contains(beforeFollowingNode)) {
-          final AtomicUpdateList merges =
-              necessaryMerges(beforeFollowingNode, allMerges.data);
-          mergeNodes(merges);
+          final AtomicUpdateList merges = necessaryMerges(beforeFollowingNode);
+          merges.mergeNodes();
           allMerges.merge(merges);
           s.add(beforeFollowingNode);
         }
       }
       // check nodes for delete and for insert before the updated location
       if(!s.contains(beforeNewLocation)) {
-        final AtomicUpdateList merges =
-            necessaryMerges(beforeNewLocation, allMerges.data);
-        mergeNodes(merges);
+        final AtomicUpdateList merges = necessaryMerges(beforeNewLocation);
+        merges.mergeNodes();
         allMerges.merge(merges);
         s.add(beforeNewLocation);
       }
@@ -514,36 +509,34 @@ public final class AtomicUpdateList {
   }
 
   /**
-   * Applies text node merges of the given list.
-   * @param mergeTexts list of atomic text node merging operations
+   * Applies text node merges.
    */
-  private void mergeNodes(final AtomicUpdateList mergeTexts) {
-    mergeTexts.check();
-    mergeTexts.applyValueUpdates();
-    mergeTexts.applyStructuralUpdates();
+  private void mergeNodes() {
+    check();
+    applyValueUpdates();
+    applyStructuralUpdates();
   }
 
   /**
    * Returns atomic text node merging operations if necessary for the given node PRE and
    * its right neighbor PRE+1.
    * @param a node PRE value
-   * @param d target data reference
    * @return list of text merging operations
    */
-  private AtomicUpdateList necessaryMerges(final int a, final Data d) {
-    final AtomicUpdateList mergeTwoNodes = new AtomicUpdateList(d);
-    final int s = d.meta.size;
+  private AtomicUpdateList necessaryMerges(final int a) {
+    final AtomicUpdateList mergeTwoNodes = new AtomicUpdateList(data);
+    final int s = data.meta.size;
     final int b = a + 1;
     // don't leave table
     if(a >= s || b >= s || a < 0 || b < 0) return mergeTwoNodes;
     // only merge texts
-    if(d.kind(a) != Data.TEXT || d.kind(b) != Data.TEXT) return mergeTwoNodes;
+    if(data.kind(a) != Data.TEXT || data.kind(b) != Data.TEXT) return mergeTwoNodes;
     // only merge neighboring texts
-    if(d.parent(a, Data.TEXT) != d.parent(b, Data.TEXT)) return mergeTwoNodes;
+    if(data.parent(a, Data.TEXT) != data.parent(b, Data.TEXT)) return mergeTwoNodes;
 
     mergeTwoNodes.addDelete(b);
     mergeTwoNodes.addUpdateValue(a, Data.TEXT,
-        Token.concat(d.text(a, true), d.text(b, true)));
+        Token.concat(data.text(a, true), data.text(b, true)));
 
     return mergeTwoNodes;
   }

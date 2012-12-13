@@ -94,7 +94,7 @@ public final class Insert extends Update {
       else if(after) up = new InsertAfter(dbn.pre, dbn.data, info, cList);
       else if(first) up = new InsertIntoAsFirst(dbn.pre, dbn.data, info, cList);
       else if(last) up = new InsertIntoAsLast(dbn.pre, dbn.data, info, cList);
-      else up = new InsertInto(dbn.pre, dbn.data, info, cList, false);
+      else up = new InsertInto(dbn.pre, dbn.data, info, cList);
       ctx.updates.add(up, ctx);
     }
     return null;

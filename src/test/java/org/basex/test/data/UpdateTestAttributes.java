@@ -3,6 +3,7 @@ package org.basex.test.data;
 import static org.junit.Assert.*;
 
 import org.basex.data.*;
+import org.basex.data.atomic.*;
 import org.basex.util.*;
 import org.junit.*;
 
@@ -61,7 +62,7 @@ public final class UpdateTestAttributes extends UpdateTest {
     md.attr(0, 1, data.atnindex.index(T_FOO, null, false), T_JUNIT, 0, false);
     md.insert(0);
     data.startUpdate();
-    data.insertAttr(9, 6, md);
+    data.insertAttr(9, 6, new DataClip(md));
     data.finishUpdate();
     assertEquals(size + 1, data.meta.size);
     assertEquals(size + 1, data.size(0, Data.DOC));

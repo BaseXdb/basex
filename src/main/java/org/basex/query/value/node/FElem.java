@@ -77,14 +77,8 @@ public final class FElem extends FNode {
     ns = nsp;
 
     // update parent references
-    if(ch != null) {
-      final long nl = ch.size();
-      for(int n = 0; n < nl; ++n) ch.get(n).parent(this);
-    }
-    if(at != null) {
-      final long al = at.size();
-      for(int a = 0; a < al; ++a) at.get(a).parent(this);
-    }
+    if(ch != null) for(final ANode n : ch) n.parent(this);
+    if(at != null) for(final ANode n : at) n.parent(this);
   }
 
   /**
@@ -312,10 +306,10 @@ public final class FElem extends FNode {
       for(int n = 0; n < ns.size(); ++n) node.ns.add(ns.name(n), ns.string(n));
     }
     if(atts != null) {
-      for(int a = 0; a < atts.size(); ++a) node.add(atts.get(a).copy());
+      for(final ANode n : atts) node.add(n.copy());
     }
     if(children != null) {
-      for(int c = 0; c < children.size(); ++c) node.add(children.get(c).copy());
+      for(final ANode n : children) node.add(n.copy());
     }
     return node.parent(par);
   }
@@ -334,7 +328,7 @@ public final class FElem extends FNode {
       }
     }
     if(atts != null) {
-      for(int a = 0; a < atts.size(); a++) tb.add(atts.get(a).toString());
+      for(final ANode n : atts) tb.add(n.toString());
     }
     if(hasChildren()) tb.add(">...</").add(name.string());
     else tb.add("/");

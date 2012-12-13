@@ -55,7 +55,7 @@ public abstract class BasicOperation extends Operation
 
   @Override
   public final int compareTo(final BasicOperation o) {
-    return this.type.ordinal() - o.type.ordinal();
+    return type.ordinal() - o.type.ordinal();
   }
 
   @Override

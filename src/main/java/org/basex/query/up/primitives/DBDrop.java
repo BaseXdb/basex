@@ -8,16 +8,6 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.util.*;
 
-/* [LK]
- * ADMIN permissions (checked in FNDb)
- * check if db exists - FNDb.drop
- * pinning - ContextModifier.apply
- * close db - ?
- * drop in apply
- * error - db not dropped?
- * multiple DBDrop on same target allowed
- */
-
 /**
  * Update primitive for the {@link Function#_DB_DROP} function.
  *

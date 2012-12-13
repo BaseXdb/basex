@@ -26,8 +26,8 @@ public final class InfoStorage extends AQuery {
    * @param arg optional arguments
    */
   public InfoStorage(final String... arg) {
-    super(Perm.READ, true, arg.length > 0 ? arg[0] : null,
-      arg.length >  1 ? arg[1] : null);
+    super(Perm.READ, true, arg.length > 0 && arg[0] != null && !arg[0].isEmpty() ?
+      arg[0] : null, arg.length >  1 ? arg[1] : null);
   }
 
   @Override

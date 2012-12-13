@@ -123,7 +123,6 @@ public class UpdatePrimitiveComparator implements Comparator<UpdatePrimitive> {
     if(a.type.ordinal() > b.type.ordinal()) return 1;
     if(b.type.ordinal() > a.type.ordinal()) return -1;
 
-
     // Two UpdatePrimitives cannot be equal!
     Util.notexpected("Ambiguous order of UpdatePrimitives: " + a + ", " + b);
 

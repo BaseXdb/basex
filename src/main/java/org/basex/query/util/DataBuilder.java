@@ -59,9 +59,8 @@ public final class DataBuilder {
    * @param nl node list
    */
   public void build(final ANodeList nl) {
-    int pre = 1;
-    final int ns = nl.size();
-    for(int n = 0; n < ns; n++) pre = addNode(nl.get(n), pre, 0, null);
+    int pre = data.meta.size;
+    for(final ANode n : nl) pre = addNode(n, pre, -1, null);
   }
 
   /**
@@ -70,8 +69,8 @@ public final class DataBuilder {
    * @param nd node to be added
    * @param pre node position
    * @param par node parent
-   * @return pre value of next node
    * @param ndPar parent of node to be added
+   * @return pre value of next node
    */
   private int addNode(final ANode nd, final int pre, final int par, final ANode ndPar) {
     switch(nd.nodeType()) {
@@ -115,7 +114,7 @@ public final class DataBuilder {
     int u = 0;
     final boolean ne = uri.length != 0;
     if(ne) {
-      if(par == 0) data.nspaces.add(ms, pre - par, q.prefix(), uri);
+      if(par == -1) data.nspaces.add(ms, pre - par, q.prefix(), uri);
       u = data.nspaces.addURI(uri);
     }
     final int n = data.atnindex.index(q.string(), null, false);

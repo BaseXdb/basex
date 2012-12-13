@@ -122,11 +122,11 @@ public class IntList extends ElementList {
 
   /**
    * Adds a difference to all elements starting from the specified index.
-   * @param e difference
+   * @param d difference
    * @param i index
    */
-  public final void move(final int e, final int i) {
-    for(int a = i; a < size; a++) list[a] += e;
+  public final void move(final int d, final int i) {
+    for(int a = i; a < size; a++) list[a] += d;
   }
 
   /**

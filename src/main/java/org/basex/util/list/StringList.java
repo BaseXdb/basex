@@ -119,19 +119,6 @@ public class StringList extends ElementList implements Iterable<String> {
     return this;
   }
 
-  @Override
-  public final Iterator<String> iterator() {
-    return new Iterator<String>() {
-      private int c;
-      @Override
-      public boolean hasNext() { return c < size; }
-      @Override
-      public String next() { return list[c++]; }
-      @Override
-      public void remove() { Util.notexpected(); }
-    };
-  }
-
   /**
    * Returns a new list without duplicates. The existing list must be sorted.
    * @return unique sorted list
@@ -144,5 +131,18 @@ public class StringList extends ElementList implements Iterable<String> {
       if(!l.equals(list[s - 1])) sl.add(l);
     }
     return sl;
+  }
+
+  @Override
+  public final Iterator<String> iterator() {
+    return new Iterator<String>() {
+      private int c;
+      @Override
+      public boolean hasNext() { return c < size; }
+      @Override
+      public String next() { return list[c++]; }
+      @Override
+      public void remove() { Util.notexpected(); }
+    };
   }
 }

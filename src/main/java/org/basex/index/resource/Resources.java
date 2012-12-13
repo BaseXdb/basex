@@ -3,6 +3,7 @@ package org.basex.index.resource;
 import java.io.*;
 
 import org.basex.data.*;
+import org.basex.data.atomic.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.io.in.DataInput;
@@ -66,10 +67,10 @@ public final class Resources implements Index {
   /**
    * Adds entries to the index and updates subsequent nodes.
    * @param pre insertion position
-   * @param d data reference to be inserted
+   * @param clip data clip
    */
-  public void insert(final int pre, final Data d) {
-    docs.insert(pre, d);
+  public void insert(final int pre, final DataClip clip) {
+    docs.insert(pre, clip);
   }
 
   /**
@@ -94,10 +95,10 @@ public final class Resources implements Index {
    * Replaces entries in the index.
    * @param pre insertion position
    * @param size number of deleted nodes
-   * @param d data reference to be copied
+   * @param clip data clip
    */
-  public void replace(final int pre, final int size, final Data d) {
-    docs.replace(pre, size, d);
+  public void replace(final int pre, final int size, final DataClip clip) {
+    docs.replace(pre, size, clip);
   }
 
   /**

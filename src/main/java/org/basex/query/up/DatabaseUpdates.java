@@ -32,12 +32,14 @@ final class DatabaseUpdates {
   private IntList nodes = new IntList(0);
   /** Mapping between pre values of the target nodes and all update primitives
    * which operate on this target. */
-  private final IntMap<NodeUpdates> updatePrimitives = new IntMap<NodeUpdates>();
+  private IntMap<NodeUpdates> updatePrimitives = new IntMap<NodeUpdates>();
   /** Database operations which are applied after all updates have been executed. */
   private final List<BasicOperation> dbops = new LinkedList<BasicOperation>();
   /** Put operations which reflect all changes made during the snapshot, hence executed
    * after updates have been carried out. */
-  private final Map<Integer, Put> puts = new HashMap<Integer, Put>();
+  private final IntMap<Put> puts = new IntMap<Put>();
+  /** Number of updates. */
+  private int size;
 
   /**
    * Constructor.
@@ -70,7 +72,7 @@ final class DatabaseUpdates {
       final int id = p.nodeid;
       final Put old = puts.get(id);
       if(old == null)
-        puts.put(id, p);
+        puts.add(id, p);
       else
         old.merge(p);
 
@@ -105,7 +107,7 @@ final class DatabaseUpdates {
     // get and sort keys (pre/id values)
     final int s = updatePrimitives.size();
     nodes = new IntList(s);
-    for(int i = 1; i <= updatePrimitives.size(); i++)
+    for(int i = 1; i <= s; i++)
       nodes.add(updatePrimitives.key(i));
     nodes.sort();
 
@@ -178,17 +180,15 @@ final class DatabaseUpdates {
     createAtomicUpdates(preparePrimitives()).execute(true);
 
     // execute database operations
-    final BasicOperation[] dbo = new BasicOperation[dbops.size()];
-    dbops.toArray(dbo);
-    Arrays.sort(dbo);
-    for(final BasicOperation d : dbo) {
+    Collections.sort(dbops);
+    for(final BasicOperation d : dbops) {
       d.prepare(tmp);
       d.apply();
     }
 
     // execute fn:put operations
-    final Put[] o = puts.values().toArray(new Put[puts.values().size()]);
-    for(final Put p : o) p.apply();
+    final int s = puts.size();
+    for(int i = 1; i <= s; i++) puts.value(i).apply();
 
     if(data.meta.prop.is(Prop.WRITEBACK) && !data.meta.original.isEmpty()) {
       try {
@@ -200,18 +200,23 @@ final class DatabaseUpdates {
   }
 
   /**
-   * Prepares the {@link UpdatePrimitive} for execution incl. ordering.
+   * Prepares the {@link UpdatePrimitive} for execution incl. ordering,
+   * and removes the update primitive references to save memory.
    * @return ordered list of update primitives
    */
   private List<UpdatePrimitive> preparePrimitives() {
     final List<UpdatePrimitive> upd = new ArrayList<UpdatePrimitive>();
     for(int i = nodes.size() - 1; i >= 0; i--) {
-      final NodeUpdates n = updatePrimitives.get(nodes.get(i));
-      n.prepare();
-      for(final UpdatePrimitive p : n.prim) {
+      final int pre = nodes.get(i);
+      final NodeUpdates n = updatePrimitives.get(pre);
+      for(final UpdatePrimitive p : n.finish()) {
         upd.add(p);
+        size += p.size();
       }
+      updatePrimitives.delete(pre);
     }
+    updatePrimitives = null;
+    nodes = null;
     Collections.sort(upd, new UpdatePrimitiveComparator());
     return upd;
   }
@@ -237,13 +242,7 @@ final class DatabaseUpdates {
    * @return number of updates
    */
   int size() {
-    int s = 0;
-    for(int i = nodes.size() - 1; i >= 0; i--) {
-      for(final UpdatePrimitive up : updatePrimitives.get(nodes.get(i)).prim) {
-        s += up.size();
-      }
-    }
-    return s;
+    return size;
   }
 
   /**

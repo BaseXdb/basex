@@ -36,8 +36,7 @@ public final class FastReplaceTest extends AdvancedQueryTest {
    */
   @Test
   public void replaceEqualBlocks() {
-    query("for $i in //item/location/text() " +
-      "return replace node $i with $i");
+    query("for $i in //item/location/text() return replace node $i with $i");
     query("count(//item)", "186");
   }
 

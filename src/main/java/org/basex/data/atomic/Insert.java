@@ -12,20 +12,18 @@ final class Insert extends BasicUpdate {
   /** Parent PRE of inserted nodes. */
   final int parent;
   /** Insertion sequence. */
-  final Data insseq;
+  final DataClip insseq;
 
   /**
    * Constructor.
    * @param l PRE value of the target node location
    * @param par parent PRE value for the inserted nodes
-   * @param d insertion sequence data instance
-   * @param s PRE value shifts introduced by update
-   * @param f PRE value of the first node which distance has to be updated
+   * @param c insertion sequence data clip
    */
-  Insert(final int l, final int s, final int f, final int par, final Data d) {
-    super(l, s, f);
+  Insert(final int l, final int par, final DataClip c) {
+    super(l, c.size(), l);
     parent = par;
-    insseq = d;
+    insseq = c;
   }
 
   @Override
@@ -34,7 +32,7 @@ final class Insert extends BasicUpdate {
   }
 
   @Override
-  Data getInsertionData() {
+  DataClip getInsertionData() {
     return insseq;
   }
 

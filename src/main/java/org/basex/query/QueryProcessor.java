@@ -202,13 +202,11 @@ public final class QueryProcessor extends Progress {
    */
   public Nodes queryNodes() throws QueryException {
     final Result res = execute();
-    if(!(res instanceof Nodes)) {
-      // convert empty result to node set
-      if(res.size() == 0) return new Nodes(ctx.nodes.data);
-      // otherwise, throw error
-      BXDB_DBRETURN.thrw(null);
-    }
-    return (Nodes) res;
+    if(res instanceof Nodes) return (Nodes) res;
+    // throw error
+    if(res.size() != 0) BXDB_DBRETURN.thrw(null);
+    // return empty result set
+    return new Nodes(ctx.nodes.data);
   }
 
   /**

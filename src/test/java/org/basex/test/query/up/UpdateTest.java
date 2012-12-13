@@ -704,6 +704,18 @@ public final class UpdateTest extends AdvancedQueryTest {
   }
 
   /**
+   * Tests if the common data instance for all insert sequences is built correctly.
+   * [LK][CG] Updates: maybe we should add some more low-level TCs ...
+   */
+  @Test
+  public void dataClipBuildFail() {
+    query("copy $c := <n><a/><a/></n> " +
+        "modify for $a in $c//a return replace node $a with <b/> " +
+        "return $c",
+        "<n><b/><b/></n>");
+  }
+
+  /**
    * Distance caching tested for inserts at different levels.
    * @throws BaseXException excp
    */

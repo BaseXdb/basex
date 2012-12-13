@@ -7,27 +7,12 @@ import java.io.*;
 import org.basex.build.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
+import org.basex.data.atomic.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
-
-/*
- * [LK]
- * CREATE permissions (checked in DatabaseModifier)
- * pinning in ContextModifier.apply
- * multiple DBCreate on same target allowed? NO
- * overwrites existing DBs YES
- * initial document path? YES
- * multiple initial documents YES
- *
- * CreateDB.run()
- * Strings -> IO.get()
- * Nodes -> IO.get(node.serialize())
- * empty -> Parser.emptyParser(context.prop)
- * document path -> ?
- */
 
 /**
  * Update primitive for the {@link Function#_DB_CREATE} function.
@@ -80,7 +65,7 @@ public final class DBCreate extends BasicOperation {
     if(docs == null) return;
     // build data with all documents, to prevent dirty reads
     md = new MemData(ctx.context.prop);
-    md.insert(md.meta.size, -1, docData(docs, path, ctx.context, name));
+    md.insert(md.meta.size, -1, new DataClip(docData(docs, path, ctx.context, name)));
     // clear entries to recover memory
     docs = null;
   }
@@ -102,7 +87,7 @@ public final class DBCreate extends BasicOperation {
     // add initial documents
     if(md != null) {
       if(!data.startUpdate()) BXDB_OPENED.thrw(null, data.meta.name);
-      data.insert(data.meta.size, -1, md);
+      data.insert(data.meta.size, -1, new DataClip(md));
       try {
         Optimize.optimize(data, null);
       } catch(final IOException ex) {

@@ -2,7 +2,6 @@ package org.basex.data.atomic;
 
 import org.basex.data.*;
 
-
 /**
  * Abstract atomic update.
  *
@@ -29,7 +28,7 @@ public abstract class BasicUpdate {
    * Constructor.
    * @param l target node location PRE
    * @param s PRE value shifts introduced by update
-   * @param f PRE value of the first node which distance has to be updated
+   * @param f PRE value of the first node the distance of which has to be updated
    */
   BasicUpdate(final int l, final int s, final int f) {
     location = l;
@@ -47,7 +46,7 @@ public abstract class BasicUpdate {
    * Returns the data to be inserted (for inserts,...).
    * @return Insertion sequence data instance
    */
-  abstract Data getInsertionData();
+  abstract DataClip getInsertionData();
 
   /**
    * Returns the parent of the update location, mostly important for inserts.

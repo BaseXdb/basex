@@ -77,7 +77,7 @@ public final class BaseFuncCall extends UserFuncCall {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    // [LW] make result streamable
+    // [LW] XQuery: make result streamable
     return value(ctx).iter();
   }
 

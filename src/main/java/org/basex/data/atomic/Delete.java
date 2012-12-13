@@ -25,7 +25,7 @@ final class Delete extends BasicUpdate {
   }
 
   @Override
-  Data getInsertionData() {
+  DataClip getInsertionData() {
     return null;
   }
 

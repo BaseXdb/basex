@@ -8,6 +8,7 @@ import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.data.*;
+import org.basex.data.atomic.*;
 import org.basex.io.*;
 import org.basex.util.*;
 
@@ -115,7 +116,7 @@ public final class Add extends ACreate {
       // skip update if fragment is empty
       if(tmp.meta.size > 1) {
         if(lock && !data.startUpdate()) return error(DB_PINNED_X, data.meta.name);
-        data.insert(data.meta.size, -1, tmp);
+        data.insert(data.meta.size, -1, new DataClip(tmp));
         context.update();
         if(lock) data.finishUpdate();
       }

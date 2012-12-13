@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.io.*;
 
 import org.basex.data.*;
+import org.basex.data.atomic.*;
 import org.junit.*;
 
 /**
@@ -250,7 +251,7 @@ public final class UpdateTestText extends UpdateTest {
     md.text(0, pre - par, val, kind);
     md.insert(0);
     data.startUpdate();
-    data.insert(pre, par, md);
+    data.insert(pre, par, new DataClip(md));
     data.finishUpdate();
   }
 }

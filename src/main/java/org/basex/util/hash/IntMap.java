@@ -36,11 +36,28 @@ public final class IntMap<E> extends IntSet {
   public E get(final int key) {
     return (E) values[id(key)];
   }
+  /**
+   * Returns the specified value.
+   * @param p value index
+   * @return value
+   */
+  @SuppressWarnings("unchecked")
+  public E value(final int p) {
+    return (E) values[p];
+  }
+
 
   @Override
   protected void rehash() {
     super.rehash();
     values = Arrays.copyOf(values, size << 1);
+  }
+
+  @Override
+  public int delete(final int key) {
+    int i = super.delete(key);
+    if(i != 0) values[i] = null;
+    return i;
   }
 
   @Override

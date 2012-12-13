@@ -37,7 +37,7 @@ final class UpdateValue extends BasicUpdate {
   }
 
   @Override
-  Data getInsertionData() {
+  DataClip getInsertionData() {
     Util.notexpected("No insertion sequence needed for atomic value update operation.");
     return null;
   }

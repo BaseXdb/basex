@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.List;
 
 import org.basex.core.cmd.*;
+import org.basex.data.atomic.*;
 import org.basex.index.*;
 import org.basex.index.name.*;
 import org.basex.index.path.*;
@@ -496,6 +497,7 @@ public abstract class Data {
   public final void update(final int pre, final int kind, final byte[] value) {
     final byte[] v = kind == PI ? trim(concat(name(pre, kind), SPACE, value)) : value;
     if(eq(v, text(pre, kind != ATTR))) return;
+
     meta.update();
     updateText(pre, v, kind);
     if(kind == DOC) resources.rename(pre, value);
@@ -504,18 +506,20 @@ public abstract class Data {
   /**
    * Replaces parts of the database with the specified data instance.
    * @param rpre pre value to be replaced
-   * @param data replace data
+   * @param clip data clip
    */
-  public final void replace(final int rpre, final Data data) {
+  public final void replace(final int rpre, final DataClip clip) {
     meta.update();
 
-    final int dsize = data.meta.size;
+    final int dsize = clip.size();
+    final Data data = clip.data;
+
     final int rkind = kind(rpre);
     final int rsize = size(rpre, rkind);
     final int rpar = parent(rpre, rkind);
     final int diff = dsize - rsize;
     buffer(dsize);
-    resources.replace(rpre, rsize, data);
+    resources.replace(rpre, rsize, clip);
 
     if(meta.updindex) {
       // update index
@@ -523,11 +527,11 @@ public abstract class Data {
       indexBegin();
     }
 
-    for(int dpre = 0; dpre < dsize; dpre++) {
+    for(int dpre = clip.start; dpre < clip.end; ++dpre) {
       final int dkind = data.kind(dpre);
       final int dpar = data.parent(dpre, dkind);
-      final int pre = rpre + dpre;
-      final int dis = dpar >= 0 ? dpre - dpar : pre - parent(rpre, rkind);
+      final int pre = rpre + dpre - clip.start;
+      final int dis = dpar >= 0 ? dpre - dpar : pre - rpar;
 
       switch(dkind) {
         case DOC:
@@ -583,9 +587,10 @@ public abstract class Data {
 
     // adjust attribute size of parent if attributes inserted. attribute size
     // of parent cannot be reduced via a replace expression.
-    if(data.kind(0) == ATTR) {
-      int d = 0, i = 0;
-      while(i < dsize && data.kind(i++) == ATTR) d++;
+    int dpre = clip.start;
+    if(data.kind(dpre) == ATTR) {
+      int d = 0;
+      while(dpre < clip.end && data.kind(dpre++) == ATTR) d++;
       if(d > 1) attSize(rpar, kind(rpar), d + 1);
     }
   }
@@ -650,11 +655,11 @@ public abstract class Data {
    * Inserts attributes.
    * @param pre pre value
    * @param par parent of node
-   * @param data data instance to copy from
+   * @param clip data clip
    */
-  public final void insertAttr(final int pre, final int par, final Data data) {
-    insert(pre, par, data);
-    attSize(par, ELEM, attSize(par, ELEM) + data.meta.size);
+  public final void insertAttr(final int pre, final int par, final DataClip clip) {
+    insert(pre, par, clip);
+    attSize(par, ELEM, attSize(par, ELEM) + clip.size());
   }
 
   /**
@@ -662,18 +667,16 @@ public abstract class Data {
    * Note that the specified data instance must differ from this instance.
    * @param ipre value at which to insert new data
    * @param ipar parent pre value of node
-   * @param data data instance to copy from
+   * @param clip data clip
    */
-  public final void insert(final int ipre, final int ipar, final Data data) {
+  public final void insert(final int ipre, final int ipar, final DataClip clip) {
     meta.update();
 
     // update value and document indexes
     if(meta.updindex) indexBegin();
-    resources.insert(ipre, data);
+    resources.insert(ipre, clip);
 
-    // indicates if database only contains a dummy node
-    final int dsize = data.meta.size;
-
+    final int dsize = clip.size();
     final int buf = Math.min(dsize, IO.BLOCKSIZE >> IO.NODEPOWER);
     // resize buffer to cache more entries
     buffer(buf);
@@ -691,17 +694,20 @@ public abstract class Data {
 
     // loop through all entries
     final IntList preStack = new IntList();
-    int dpre = -1;
     final NSNode t = nspaces.current;
     final HashSet<NSNode> newNodes = new HashSet<NSNode>();
     final IntList flagPres = new IntList();
 
-    while(++dpre != dsize) {
-      if(dpre != 0 && dpre % buf == 0) insert(ipre + dpre - buf);
+    // indicates if database only contains a dummy node
+    final Data data = clip.data;
+    int c = 0;
+    for(int dpre = clip.start; dpre < clip.end; ++dpre, ++c) {
+      if(c != 0 && c % buf == 0) insert(ipre + c - buf);
 
-      final int pre = ipre + dpre;
+      final int pre = ipre + c;
       final int dkind = data.kind(dpre);
       final int dpar = data.parent(dpre, dkind);
+      // ipar < 0 if document nodes on top level are added
       final int dis = dpar >= 0 ? dpre - dpar : ipar >= 0 ? pre - ipar : 0;
       final int par = dis == 0 ? -1 : pre - dis;
 
@@ -709,7 +715,7 @@ public abstract class Data {
       // location. possible candidates for this node are collected and
       // the match with the highest pre value between ancestors and candidates
       // is determined.
-      if(dpre == 0) {
+      if(c == 0) {
         // collect possible candidates for namespace root
         final List<NSNode> cand = new LinkedList<NSNode>();
         NSNode cn = nspaces.root;
@@ -812,7 +818,7 @@ public abstract class Data {
     while(!preStack.isEmpty()) nspaces.close(preStack.pop());
     nspaces.setRoot(t);
 
-    if(bp != 0) insert(ipre + dpre - 1 - (dpre - 1) % buf);
+    if(bp != 0) insert(ipre + c - 1 - (c - 1) % buf);
     // reset buffer to old size
     buffer(1);
 
