@@ -140,7 +140,7 @@ module BaseXClient
           @cache << @session.receive
         end
         if !@session.ok
-          raise receive
+          raise @session.receive
         end
       end
       return @pos < @cache.length
