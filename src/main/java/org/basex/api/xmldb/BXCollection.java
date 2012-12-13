@@ -10,6 +10,7 @@ import org.basex.build.xml.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
+import org.basex.data.atomic.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -184,7 +185,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
 
     final Data data = ctx.data();
     if(!data.startUpdate()) throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_LOCK);
-    data.insert(data.meta.size, -1, md);
+    data.insert(data.meta.size, -1, new DataClip(md));
     ctx.update();
     data.finishUpdate();
   }
