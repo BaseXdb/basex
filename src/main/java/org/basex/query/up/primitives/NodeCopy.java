@@ -41,14 +41,15 @@ public abstract class NodeCopy extends UpdatePrimitive {
    * @param tmp temporary database
    */
   public final void prepare(final MemData tmp) {
-    // build main memory representation of nodes to be copied
-    // text nodes still need to be merged. two adjacent iterators may lead to two
-    // adjacent text nodes
-    final int start = tmp.meta.size;
-    new DataBuilder(tmp).build(mergeNodeCacheText(insert));
-    insseq = new DataClip(tmp, start, tmp.meta.size);
-    insseq.fragments = insert.size();
+    // merge texts. after that, text nodes still need to be merged,
+    // as two adjacent iterators may lead to two adjacent text nodes
+    final ANodeList list = mergeNodeCacheText(insert);
     insert = null;
+    // build main memory representation of nodes to be copied
+    final int start = tmp.meta.size;
+    new DataBuilder(tmp).build(list);
+    insseq = new DataClip(tmp, start, tmp.meta.size);
+    insseq.fragments = list.size();
   }
 
   /**
