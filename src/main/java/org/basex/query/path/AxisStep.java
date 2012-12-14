@@ -76,34 +76,35 @@ public class AxisStep extends Preds {
     if(!test.compile(ctx)) return Empty.SEQ;
 
     // leaf flag indicates that a context node can be replaced by a text() step
-    final Data data = ctx.data();
-    ctx.leaf = data != null &&
-      test.mode == Mode.NAME && test.type != NodeType.ATT && axis.down &&
-      data.meta.uptodate && data.nspaces.size() == 0;
-    if(ctx.leaf) {
-      final Stats s = data.tagindex.stat(data.tagindex.id(((NameTest) test).ln));
-      ctx.leaf = s != null && s.isLeaf();
-    }
-
-    // as predicates will not necessarily start from the document node,
-    // the context item type is temporarily generalized
     final Type ct = ctx.value != null ? ctx.value.type : null;
-    if(ct == NodeType.DOC) ctx.value.type = NodeType.NOD;
-    final Expr e = super.compile(ctx);
-    if(ct == NodeType.DOC) ctx.value.type = ct;
+    final boolean leaf = ctx.leaf;
     ctx.leaf = false;
+    try {
+      final Data data = ctx.data();
+      if(data != null && test.mode == Mode.NAME && test.type != NodeType.ATT &&
+          axis.down && data.meta.uptodate && data.nspaces.size() == 0) {
+        final Stats s = data.tagindex.stat(data.tagindex.id(((NameTest) test).ln));
+        ctx.leaf = s != null && s.isLeaf();
+      }
 
-    // return optimized step / don't re-optimize step
-    if(e != this || e instanceof IterStep) return e;
+      // as predicates will not necessarily start from the document node,
+      // the context item type is temporarily generalized
+      if(ct == NodeType.DOC) ctx.value.type = NodeType.NOD;
+      final Expr e = super.compile(ctx);
+
+      // return optimized step / don't re-optimize step
+      if(e != this || e instanceof IterStep) return e;
+
+    } finally {
+      if(ct == NodeType.DOC) ctx.value.type = ct;
+      ctx.leaf = leaf;
+    }
 
     // no numeric predicates.. use simple iterator
     if(!uses(Use.POS)) return new IterStep(info, axis, test, preds);
 
-    // don't re-optimize step
-    if(this instanceof IterPosStep) return this;
-
     // use iterator for simple numeric predicate
-    return useIterator() ? new IterPosStep(this) : this;
+    return this instanceof IterPosStep || !useIterator() ? this : new IterPosStep(this);
   }
 
   @Override

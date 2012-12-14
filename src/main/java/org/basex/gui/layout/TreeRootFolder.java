@@ -2,7 +2,6 @@ package org.basex.gui.layout;
 
 import org.basex.data.*;
 
-
 /**
  * JTree node which represents the root folder. The root folder carries
  * the name of the database and has basically an artificial path ('/')

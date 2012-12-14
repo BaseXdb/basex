@@ -1,6 +1,5 @@
 package org.basex.query.func;
 
-
 import java.util.*;
 
 import org.basex.query.*;

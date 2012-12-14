@@ -224,7 +224,6 @@ public final class DataOutput extends OutputStream {
     for(final byte b : bytes) write(b);
   }
 
-
   /**
    * Returns the number of written bytes.
    * This is not necessarily e.g. the file size.

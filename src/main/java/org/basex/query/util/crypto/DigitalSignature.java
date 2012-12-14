@@ -221,7 +221,6 @@ public final class DigitalSignature {
       final Document inputNode = toDOMNode(node);
       final List<Transform> tfList;
 
-
       // validating a given XPath expression to get nodes to be signed
       if(expr.length > 0) {
         final XPathFactory xpf = XPathFactory.newInstance();
@@ -241,7 +240,6 @@ public final class DigitalSignature {
             Transform.ENVELOPED, (TransformParameterSpec) null));
       }
 
-
       // creating reference element
       final Reference ref = fac.newReference("",
           fac.newDigestMethod(digest, null), tfList, null, null);
@@ -251,7 +249,6 @@ public final class DigitalSignature {
           canonicalization, (C14NMethodParameterSpec) null),
               fac.newSignatureMethod(signature, null),
               Collections.singletonList(ref));
-
 
       // prepare document signature
       final DOMSignContext signContext;
@@ -280,7 +277,6 @@ public final class DigitalSignature {
         xmlSig = fac.newXMLSignature(si, ki, Collections.singletonList(obj), null, null);
         signContext = new DOMSignContext(pk, inputNode);
       }
-
 
       // set Signature element namespace prefix, if given
       if(ns.length > 0) signContext.setDefaultNamespacePrefix(string(ns));

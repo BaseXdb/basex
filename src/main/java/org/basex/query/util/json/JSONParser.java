@@ -189,7 +189,6 @@ final class JSONParser extends InputParser {
     return FALSE;
   }
 
-
   /**
    * Consumes digits.
    * @throws QueryException query exception

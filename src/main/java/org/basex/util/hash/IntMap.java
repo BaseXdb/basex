@@ -46,7 +46,6 @@ public final class IntMap<E> extends IntSet {
     return (E) values[p];
   }
 
-
   @Override
   protected void rehash() {
     super.rehash();

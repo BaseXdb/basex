@@ -339,7 +339,6 @@ public final class FNDb extends StandardFunc {
     };
   }
 
-
   /**
    * Performs the list-details for databases function.
    * @param ctx query context

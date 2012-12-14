@@ -113,7 +113,6 @@ public final class RepoManager {
     return t.sort();
   }
 
-
   /**
    * Adds a single table entry.
    * @param name package name

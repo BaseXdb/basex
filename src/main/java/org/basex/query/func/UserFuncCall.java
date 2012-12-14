@@ -101,8 +101,12 @@ public abstract class UserFuncCall extends Arr {
 
   @Override
   public boolean uses(final Use u) {
-    // function has not parsed yet: return true if state is still unknown
-    return func == null || (u == Use.UPD ? func.updating : func.uses(u) || super.uses(u));
+    // check arguments, which will be evaluated before running the function code
+    if(super.uses(u)) return true;
+    // function code: position or context references will have no effect on calling code
+    if(u == Use.POS || u == Use.CTX) return false;
+    // pass on check to function code
+    return func == null || (u == Use.UPD ? func.updating : func.uses(u));
   }
 
   @Override
@@ -120,6 +124,7 @@ public abstract class UserFuncCall extends Arr {
     return new TokenBuilder(name.string()).add(PAR1).add(
         toString(SEP)).add(PAR2).toString();
   }
+
   /**
    * A continuation that's thrown to free stack frames.
    * @author Leo Woerteler

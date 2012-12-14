@@ -277,7 +277,6 @@ public final class QueryContext extends Progress {
     return null;
   }
 
-
   /**
    * Evaluates the specified expression and returns an iterator.
    * @param e expression to be evaluated
@@ -447,7 +446,6 @@ public final class QueryContext extends Progress {
   }
 
   // CLASS METHODS ======================================================================
-
 
   /**
    * Evaluates the expression with the specified context set.

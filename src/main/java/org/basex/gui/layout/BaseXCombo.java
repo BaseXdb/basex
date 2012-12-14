@@ -5,7 +5,6 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
-
 /**
  * Project specific ComboBox implementation.
  *

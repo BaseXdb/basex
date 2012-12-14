@@ -11,8 +11,8 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.path.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.item.ANum;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -135,7 +135,23 @@ public final class CmpG extends Cmp {
       op = op.swap();
       ctx.compInfo(OPTSWAP, this);
     }
-    for(int e = 0; e != expr.length; ++e) expr[e] = expr[e].addText(ctx);
+    // add text() step for equality expressions that may be rewritten to index requests
+    if(op == OpG.EQ) {
+      // do not add text() step if one of the strings to be compared is empty
+      // example: //x[y == ''], //x[y == ('','a')]
+      // [CG] XQuery, optimizations: do not add text() step for arguments that yield
+      // empty strings. example: //x[y == $x/X]  with $x/X = ''
+      boolean add = true;
+      if(expr[1].isValue()) {
+        final Value v = (Value) expr[1];
+        add = v.type.isStringOrUntyped();
+        final ValueIter ir = v.iter(ctx);
+        for(Item it; add && (it = ir.next()) != null;) {
+          add = it.string(info).length != 0;
+        }
+      }
+      if(add) for(int e = 0; e != expr.length; ++e) expr[e] = expr[e].addText(ctx);
+    }
 
     final Expr e1 = expr[0];
     final Expr e2 = expr[1];

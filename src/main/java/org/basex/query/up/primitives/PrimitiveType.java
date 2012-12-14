@@ -2,7 +2,6 @@ package org.basex.query.up.primitives;
 
 import org.basex.query.up.*;
 
-
 /**
  * {@link UpdatePrimitive} types. Do not change the order as this affects
  * {@link UpdatePrimitiveComparator} and will most likely lead to weird results.

@@ -1,6 +1,5 @@
 package org.basex.query.ft;
 
-
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;

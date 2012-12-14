@@ -57,7 +57,6 @@ public class ParseException extends Exception {
     super(message);
   }
 
-
   /**
    * This is the last token that has been consumed successfully.  If
    * this object has been created due to a parse error, the token

@@ -197,7 +197,6 @@ public final class GUIProp extends AProp {
   /** Last XQuery inputs. */
   public static final Object[] XQUERY = { "XQUERY", new String[0] };
 
-
   /**
    * Constructor.
    */

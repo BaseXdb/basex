@@ -132,7 +132,6 @@ public final class Context {
     return data != null && current == null;
   }
 
-
   /**
    * Returns the current data reference.
    * @return data reference

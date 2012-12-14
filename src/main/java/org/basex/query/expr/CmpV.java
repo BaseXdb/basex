@@ -157,12 +157,11 @@ public final class CmpV extends Cmp {
   public Expr compile(final QueryContext ctx) throws QueryException {
     super.compile(ctx);
 
-    // swap expressions; add text() to location paths to simplify optimizations
+    // swap expressions
     if(swap()) {
       op = op.swap();
       ctx.compInfo(OPTSWAP, this);
     }
-    for(int e = 0; e != expr.length; ++e) expr[e] = expr[e].addText(ctx);
 
     final Expr e1 = expr[0];
     final Expr e2 = expr[1];

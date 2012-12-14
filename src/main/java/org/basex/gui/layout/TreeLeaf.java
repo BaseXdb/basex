@@ -2,7 +2,6 @@ package org.basex.gui.layout;
 
 import org.basex.data.*;
 
-
 /**
  * JTree node which represents a leaf (which represents either a raw file
  * or a document).
