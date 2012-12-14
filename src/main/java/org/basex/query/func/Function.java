@@ -509,9 +509,15 @@ public enum Function {
   _CONVERT_STRING_TO_HEX(FNConvert.class, "string-to-hex(string[,encoding])",
       HEX, 1, STR, STR),
   /** XQuery function. */
-  _CONVERT_MS_TO_DATETIME(FNConvert.class, "ms-to-dateTime(number)", DTM, ITR),
+  _CONVERT_INTEGER_TO_DATETIME(FNConvert.class, "integer-to-dateTime(ms)", DTM, ITR),
   /** XQuery function. */
-  _CONVERT_DATETIME_TO_MS(FNConvert.class, "dateTime-to-ms(date)", ITR, DTM),
+  _CONVERT_DATETIME_TO_INTEGER(FNConvert.class, "dateTime-to-integer(date)", ITR, DTM),
+  /** XQuery function. */
+  _CONVERT_INTEGER_TO_DAYTIME(FNConvert.class, "integer-to-dayTime(ms)",
+      DTD, ITR),
+  /** XQuery function. */
+  _CONVERT_DAYTIME_TO_INTEGER(FNConvert.class, "dayTime-to-integer(duration)",
+      ITR, DTD),
 
   /* FNDb functions. */
 
@@ -556,7 +562,7 @@ public enum Function {
   /** XQuery function. */
   _DB_DELETE(FNDb.class, "delete(database,path)", EMP, ITEM, STR),
   /** XQuery function. */
-  _DB_CREATE(FNDb.class, "create(databasename[,input[,path]])", EMP, 1, STR, NOD, STR),
+  _DB_CREATE(FNDb.class, "create(name[,input[,path]])", EMP, 1, STR, NOD, STR),
   /** XQuery function. */
   _DB_DROP(FNDb.class, "drop(database)", EMP, ITEM),
   /** XQuery function. */

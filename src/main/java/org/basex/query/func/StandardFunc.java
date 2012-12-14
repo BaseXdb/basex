@@ -149,6 +149,19 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
+   * Converts the specified dateTime to milliseconds.
+   * @param e expression
+   * @param ctx query context
+   * @return resulting value
+   * @throws QueryException query exception
+   */
+  long dateTimeToMs(final Expr e, final QueryContext ctx) throws QueryException {
+    final Dtm dtm = (Dtm) checkType(checkItem(e, ctx), AtomType.DTM);
+    if(dtm.yea() > 292278993) INTRANGE.thrw(info, dtm);
+    return dtm.toJava().toGregorianCalendar().getTimeInMillis();
+  }
+
+  /**
    * Returns all keys and values of the specified binding argument.
    * @param i index of argument
    * @param ctx query context

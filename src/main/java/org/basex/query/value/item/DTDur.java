@@ -33,11 +33,21 @@ public final class DTDur extends Dur {
 
   /**
    * Timezone constructor.
-   * @param shift shift value
+   * @param h hours
+   * @param m minutes
    */
-  public DTDur(final int shift) {
+  public DTDur(final long h, final long m) {
     super(AtomType.DTD);
-    sec = BigDecimal.valueOf(shift * 60L);
+    sec = BigDecimal.valueOf(h).multiply(BD60).add(BigDecimal.valueOf(m).multiply(BD60));
+  }
+
+  /**
+   * Timezone constructor.
+   * @param ms milliseconds
+   */
+  public DTDur(final long ms) {
+    super(AtomType.DTD);
+    sec = BigDecimal.valueOf(ms).divide(BD1000);
   }
 
   /**

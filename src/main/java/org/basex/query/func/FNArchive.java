@@ -136,7 +136,7 @@ public class FNArchive extends StandardFunc {
         if(en == null || cn == null) break;
         if(out instanceof GZIPOut && c > 0)
           ARCH_ONE.thrw(info, format.toUpperCase(Locale.ENGLISH));
-        add(checkElmStr(en), cn, out, level);
+        add(checkElmStr(en), cn, out, level, ctx);
         e++;
         c++;
       }
@@ -289,7 +289,7 @@ public class FNArchive extends StandardFunc {
       for(final byte[] h : hm) {
         if(h == null) continue;
         final Item[] it = hm.get(h);
-        add(it[0], it[1], out, ZipEntry.DEFLATED);
+        add(it[0], it[1], out, ZipEntry.DEFLATED, ctx);
       }
     } catch(final IOException ex) {
       Util.debug(ex);
@@ -373,11 +373,12 @@ public class FNArchive extends StandardFunc {
    * @param con contents
    * @param out output archive
    * @param level default compression level
+   * @param ctx query context
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
   private void add(final Item entry, final Item con, final ArchiveOut out,
-      final int level) throws QueryException, IOException {
+      final int level, final QueryContext ctx) throws QueryException, IOException {
 
     // create new zip entry
     final String name = string(entry.string(info));
@@ -395,7 +396,7 @@ public class FNArchive extends StandardFunc {
       final byte[] mod = el.attribute(Q_LAST_MOD);
       if(mod != null) {
         try {
-          ze.setTime(new Int(new Dtm(mod, info)).itr());
+          ze.setTime(dateTimeToMs(new Dtm(mod, info), ctx));
         } catch(final QueryException qe) {
           ARCH_DATETIME.thrw(info, mod);
         }

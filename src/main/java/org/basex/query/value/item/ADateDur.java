@@ -14,7 +14,9 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-abstract class ADateDur extends Item {
+public abstract class ADateDur extends Item {
+  /** Maximum long value. */
+  public static final BigDecimal BDMAXLONG = BigDecimal.valueOf(Long.MAX_VALUE);
   /** Seconds per day. */
   protected static final BigDecimal DAYSECONDS = BigDecimal.valueOf(86400);
   /** BigDecimal: 146097. */
@@ -27,6 +29,8 @@ abstract class ADateDur extends Item {
   protected static final BigDecimal BD3600 = BigDecimal.valueOf(3600);
   /** BigDecimal: 1461. */
   protected static final BigDecimal BD1461 = BigDecimal.valueOf(1461);
+  /** BigDecimal: 1000. */
+  protected static final BigDecimal BD1000 = BigDecimal.valueOf(1000);
   /** BigDecimal: 366. */
   protected static final BigDecimal BD366 = BigDecimal.valueOf(366);
   /** BigDecimal: 365. */
@@ -45,7 +49,7 @@ abstract class ADateDur extends Item {
   protected static final BigDecimal BD2 = BigDecimal.valueOf(2);
 
   /** Seconds and milliseconds ({@code 0-59.\d+}). {@code -1}: undefined. */
-  protected BigDecimal sec;
+  public BigDecimal sec;
 
   /**
    * Constructor.

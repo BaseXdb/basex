@@ -105,6 +105,6 @@ public final class FNContext extends StandardFunc {
     ctx.time = new Tim(Token.token(hms + zone), info);
     ctx.date = new Dat(Token.token(ymd + zone), info);
     ctx.dtm = new Dtm(Token.token(ymd + 'T' + hms + zone), info);
-    ctx.zone = new DTDur(toInt(zon.substring(0, 3)) * 60 + toInt(zon.substring(3)));
+    ctx.zone = new DTDur(toInt(zon.substring(0, 3)), toInt(zon.substring(3)));
   }
 }

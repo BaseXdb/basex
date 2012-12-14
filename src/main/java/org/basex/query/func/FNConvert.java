@@ -55,16 +55,18 @@ public final class FNConvert extends StandardFunc {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
-      case _CONVERT_INTEGER_FROM_BASE: return integerFromBase(ctx, ii);
-      case _CONVERT_INTEGER_TO_BASE:   return integerToBase(ctx, ii);
-      case _CONVERT_BINARY_TO_STRING:  return toString(ctx);
-      case _CONVERT_STRING_TO_BASE64:  return new B64(stringToBinary(ctx));
-      case _CONVERT_BYTES_TO_BASE64:   return new B64(bytesToBinary(ctx));
-      case _CONVERT_STRING_TO_HEX:     return new Hex(stringToBinary(ctx));
-      case _CONVERT_BYTES_TO_HEX:      return new Hex(bytesToBinary(ctx));
-      case _CONVERT_DATETIME_TO_MS:    return dateTimeToMs(ctx);
-      case _CONVERT_MS_TO_DATETIME:    return msToDateTime(ctx);
-      default:                         return super.item(ctx, ii);
+      case _CONVERT_INTEGER_FROM_BASE:   return integerFromBase(ctx, ii);
+      case _CONVERT_INTEGER_TO_BASE:     return integerToBase(ctx, ii);
+      case _CONVERT_BINARY_TO_STRING:    return toString(ctx);
+      case _CONVERT_STRING_TO_BASE64:    return new B64(stringToBinary(ctx));
+      case _CONVERT_BYTES_TO_BASE64:     return new B64(bytesToBinary(ctx));
+      case _CONVERT_STRING_TO_HEX:       return new Hex(stringToBinary(ctx));
+      case _CONVERT_BYTES_TO_HEX:        return new Hex(bytesToBinary(ctx));
+      case _CONVERT_DATETIME_TO_INTEGER: return dateTimeToInteger(ctx);
+      case _CONVERT_INTEGER_TO_DATETIME: return integerToDateTime(ctx);
+      case _CONVERT_DAYTIME_TO_INTEGER:  return dayTimeToInteger(ctx);
+      case _CONVERT_INTEGER_TO_DAYTIME:  return integerToDayTime(ctx);
+      default:                           return super.item(ctx, ii);
     }
   }
 
@@ -184,7 +186,7 @@ public final class FNConvert extends StandardFunc {
    * @return resulting value
    * @throws QueryException query exception
    */
-  private Dtm msToDateTime(final QueryContext ctx) throws QueryException {
+  private Dtm integerToDateTime(final QueryContext ctx) throws QueryException {
     return new Dtm(checkItr(expr[0], ctx), info);
   }
 
@@ -194,8 +196,31 @@ public final class FNConvert extends StandardFunc {
    * @return resulting value
    * @throws QueryException query exception
    */
-  private Int dateTimeToMs(final QueryContext ctx) throws QueryException {
-    return new Int((Dtm) checkType(checkItem(expr[0], ctx), AtomType.DTM));
+  private Int dateTimeToInteger(final QueryContext ctx) throws QueryException {
+    return Int.get(dateTimeToMs(expr[0], ctx));
+  }
+
+  /**
+   * Converts the specified integer to a dayTimeDuration item.
+   * @param ctx query context
+   * @return resulting value
+   * @throws QueryException query exception
+   */
+  private DTDur integerToDayTime(final QueryContext ctx) throws QueryException {
+    return new DTDur(checkItr(expr[0], ctx));
+  }
+
+  /**
+   * Converts the specified dayTimeDuration to milliseconds.
+   * @param ctx query context
+   * @return resulting value
+   * @throws QueryException query exception
+   */
+  private Int dayTimeToInteger(final QueryContext ctx) throws QueryException {
+    final DTDur dur = (DTDur) checkType(checkItem(expr[0], ctx), AtomType.DTD);
+    final BigDecimal ms = dur.sec.multiply(BigDecimal.valueOf(1000));
+    if(ms.compareTo(ADateDur.BDMAXLONG) > 0) INTRANGE.thrw(info, dur);
+    return Int.get(ms.longValue());
   }
 
   /**
