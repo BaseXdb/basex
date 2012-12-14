@@ -6,7 +6,6 @@ import org.basex.util.*;
 
 import com.bradmcevoy.http.exceptions.*;
 
-
 /**
  * Code container.
  * @param <E> return type

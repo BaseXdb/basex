@@ -123,7 +123,6 @@ public class XMLResourceTest extends XMLDBBaseTest {
     final XMLResource doc3 = (XMLResource) coll.createResource(DOC3,
         XMLResource.RESOURCE_TYPE);
 
-
     final XMLReader reader2 = XMLReaderFactory.createXMLReader();
     reader2.setContentHandler(doc2.setContentAsSAX());
     reader2.parse(new InputSource(DOCPATH + DOC2));
