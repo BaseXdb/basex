@@ -8,6 +8,7 @@ import java.lang.reflect.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.Type;
 import org.basex.util.*;
@@ -47,7 +48,10 @@ public final class JavaFunc extends JavaMapping {
       final Throwable cause = ex.getCause();
       throw cause instanceof QueryException ? ((QueryException) cause).info(info) :
         JAVAERR.thrw(info, cause);
+    } catch(final QueryException ex) {
+      throw ex;
     } catch(final Throwable ex) {
+      ex.printStackTrace();
       throw JAVAFUN.thrw(info, name(), foundArgs(args));
     }
   }
@@ -63,7 +67,7 @@ public final class JavaFunc extends JavaMapping {
       final Object[] arg = args(con.getParameterTypes(), ar, true);
       if(arg != null) return con.newInstance(arg);
     }
-    throw new Exception();
+    throw JAVACON.thrw(info, name(), foundArgs(ar));
   }
 
   /**
@@ -96,7 +100,7 @@ public final class JavaFunc extends JavaMapping {
         return meth.invoke(inst, arg);
       }
     }
-    throw new Exception();
+    throw JAVAMTH.thrw(info, name(), foundArgs(ar));
   }
 
   /**
@@ -130,17 +134,25 @@ public final class JavaFunc extends JavaMapping {
     int a = 0;
 
     for(final Class<?> par : params) {
+      // check original type
       final Value arg = args[s + a];
-      final Object next;
       if(par.isInstance(arg)) {
-        next = arg;
-      } else {
-        final Type jtype = type(par);
-        if(jtype == null || !arg.type.instanceOf(jtype) && !jtype.instanceOf(arg.type))
-          return null;
-        next = arg.toJava();
+        val[a++] = arg;
+        continue;
       }
-      val[a++] = next;
+      // check Java type
+      if(arg instanceof Jav) {
+        final Object jav = ((Jav) arg).toJava();
+        if(par.isInstance(jav)) {
+          val[a++] = jav;
+          continue;
+        }
+      }
+      // check XQuery type
+      final Type jtype = type(par);
+      if(jtype == null || !arg.type.instanceOf(jtype) && !jtype.instanceOf(arg.type))
+        return null;
+      val[a++] = arg.toJava();
     }
     return val;
   }

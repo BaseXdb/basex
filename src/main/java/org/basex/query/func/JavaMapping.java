@@ -283,12 +283,13 @@ public abstract class JavaMapping extends Arr {
    */
   protected static String foundArgs(final Value[] args) {
     // compose found arguments
-    final StringBuilder found = new StringBuilder();
-    for(final Value a : args) {
-      if(found.length() != 0) found.append(", ");
-      found.append(a.type());
+    final StringBuilder sb = new StringBuilder();
+    for(final Value v : args) {
+      if(sb.length() != 0) sb.append(", ");
+      sb.append(v instanceof Jav ? ((Jav) v).toJava().getClass().getSimpleName() :
+        v.type());
     }
-    return found.toString();
+    return sb.toString();
   }
 
   @Override

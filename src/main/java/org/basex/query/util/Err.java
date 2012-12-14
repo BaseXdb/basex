@@ -407,6 +407,10 @@ public enum Err {
   /** FORG0006. */
   TYPECMP(FORG, 6, "% is not comparable."),
   /** FORG0006. */
+  JAVACON(FORG, 6, "Unknown constructor: %(%)."),
+  /** FORG0006. */
+  JAVAMTH(FORG, 6, "Unknown method: %(%)."),
+  /** FORG0006. */
   JAVAFUN(FORG, 6, "Invalid call of Java function: %(%)."),
   /** FORG0006. */
   JAVAMOD(FORG, 6, "Invalid arguments: % expected, % found."),
