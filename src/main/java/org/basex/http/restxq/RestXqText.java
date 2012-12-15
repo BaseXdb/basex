@@ -24,9 +24,6 @@ interface RestXqText {
   /** Token "cookie-param". */
   byte[] COOKIE_PARAM = token("cookie-param");
 
-  /** Token "query-params". */
-  byte[] QUERY_PARAMS = token("query-params");
-
   /** Token "header". */
   byte[] HEADER = token("header");
   /** Token "response". */
@@ -41,8 +38,6 @@ interface RestXqText {
   byte[] NAME = token("name");
   /** Token "value". */
   byte[] VALUE = token("value");
-  /** Token "location". */
-  byte[] LOCATION = token("location");
   /** Token "redirect". */
   byte[] REDIRECT = token("redirect");
   /** Token "forward". */
