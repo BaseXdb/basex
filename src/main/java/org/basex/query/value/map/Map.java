@@ -259,7 +259,8 @@ public final class Map extends FItem {
     final FElem el = planElem(SIZE, s);
     final Value ks = keys();
     try {
-      for(long i = 0, max = Math.min(s, 5); i < max; i++) {
+      final long max = Math.min(s, 5);
+      for(long i = 0; i < max; i++) {
         final Item key = ks.itemAt(i);
         final Value val = get(key, null);
         key.plan(el);

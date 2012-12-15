@@ -16,13 +16,13 @@ public final class FNXsltTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void processor() {
-    assertTrue(!query(_XSLT_PROCESSOR.args()).isEmpty());
+    assertFalse(query(_XSLT_PROCESSOR.args()).isEmpty());
   }
 
   /** Test method. */
   @Test
   public void version() {
-    assertTrue(!query(_XSLT_VERSION.args()).isEmpty());
+    assertFalse(query(_XSLT_VERSION.args()).isEmpty());
   }
 
   /** Test method. */

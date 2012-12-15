@@ -74,7 +74,7 @@ public final class IdPreMapBulkTest extends IdPreMapBulkTestBase {
       }
       check();
 
-      for(; n > 0;) {
+      while(n > 0) {
         final int pre = RANDOM.nextInt(n);
         // we don't want to delete more records than already exist:
         final int c = -Math.min(n - pre, RANDOM.nextInt(BULK) + 1);

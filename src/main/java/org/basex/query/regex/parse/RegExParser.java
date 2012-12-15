@@ -44,7 +44,7 @@ public class RegExParser implements RegExParserConstants {
   public static Pattern parse(final byte[] regex, final byte[] mod, final boolean ext,
       final InputInfo ii) throws QueryException {
     // process modifiers
-    int m = UNIX_LINES;
+    int m = 0;
     boolean strip = false;
     if(mod != null) {
       for(final byte b : mod) {
@@ -798,7 +798,7 @@ public class RegExParser implements RegExParserConstants {
   }
 
   static private final class LookaheadSuccess extends java.lang.Error { }
-  final private LookaheadSuccess jj_ls = new LookaheadSuccess();
+  final private static LookaheadSuccess jj_ls = new LookaheadSuccess();
   private boolean jj_scan_token(final int kind) {
     if (jj_scanpos == jj_lastpos) {
       jj_la--;

@@ -165,11 +165,12 @@ public final class FElem extends FNode {
   private static void nsScope(final Node elem, final TokenMap nss) {
     Node n = elem;
     // only elements can declare namespaces
-    while(n != null && n instanceof Element) {
+    while(n instanceof Element) {
       final NamedNodeMap atts = n.getAttributes();
       final byte[] pref = token(n.getPrefix());
       if(nss.get(pref) != null) nss.add(pref, token(n.getNamespaceURI()));
-      for(int i = 0, len = atts.getLength(); i < len; ++i) {
+      final int len = atts.getLength();
+      for(int i = 0; i < len; ++i) {
         final Attr a = (Attr) atts.item(i);
         final byte[] name = token(a.getName()), val = token(a.getValue());
         if(Token.eq(name, XMLNS)) {

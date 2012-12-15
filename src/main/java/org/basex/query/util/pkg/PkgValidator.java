@@ -70,7 +70,7 @@ public final class PkgValidator {
       // dependencies
       if(dep.processor != null) procs.add(dep);
     }
-    if(procs.size() != 0) checkProcs(procs);
+    if(!procs.isEmpty()) checkProcs(procs);
   }
 
   /**

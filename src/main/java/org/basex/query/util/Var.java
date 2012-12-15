@@ -103,7 +103,7 @@ public final class Var extends ParseExpr {
    */
   public void reset(final SeqType t, final QueryContext ctx) throws QueryException {
     type = t;
-    if(value != null && !value.type.instanceOf(t.type) && value instanceof Item) {
+    if(value instanceof Item && !value.type.instanceOf(t.type)) {
       value = type.type.cast((Item) value, ctx, info);
     }
   }

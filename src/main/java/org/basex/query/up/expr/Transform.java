@@ -73,7 +73,7 @@ public final class Transform extends Arr {
       for(final Let fo : copies) {
         final Iter ir = ctx.iter(fo.expr);
         Item i = ir.next();
-        if(i == null || !(i instanceof ANode) || ir.next() != null) UPCOPYMULT.thrw(info);
+        if(!(i instanceof ANode) || ir.next() != null) UPCOPYMULT.thrw(info);
 
         // copy node to main memory data instance
         i = ((ANode) i).dbCopy(ctx.context.prop);

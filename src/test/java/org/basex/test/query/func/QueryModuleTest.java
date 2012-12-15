@@ -25,8 +25,7 @@ public class QueryModuleTest extends QueryModule {
   @Deterministic
   public String convenient(final int fruit) {
     final int i = fruit;
-    final String f = FRUITS[i % FRUITS.length];
-    return f;
+    return FRUITS[i % FRUITS.length];
   }
 
   /**

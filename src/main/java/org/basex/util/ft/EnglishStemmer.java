@@ -124,8 +124,8 @@ final class EnglishStemmer extends InternalStemmer {
         final int c = l(te - 1);
         if(c == l(te - 2) && c != 'l' && c != 's' && c != 'z') {
           --te;
-        } else if(m() == 1) {
-          if(c(te)) a((byte) 'e');
+        } else if(m() == 1 && c(te)) {
+          a((byte) 'e');
         }
       }
     }

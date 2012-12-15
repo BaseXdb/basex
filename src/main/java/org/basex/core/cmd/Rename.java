@@ -39,7 +39,8 @@ public final class Rename extends ACreate {
     boolean ok = true;
     int c = 0;
     final IntList docs = data.resources.docs(src);
-    for(int i = 0, ds = docs.size(); i < ds; i++) {
+    final int ds = docs.size();
+    for(int i = 0; i < ds; i++) {
       final int pre = docs.get(i);
       final String target = target(data, pre, src, trg);
       if(target.isEmpty()) {

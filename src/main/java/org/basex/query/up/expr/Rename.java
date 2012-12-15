@@ -59,7 +59,8 @@ public final class Rename extends Update {
       final byte[] rp = rename.prefix();
       final byte[] ru = rename.uri();
       final Atts at = targ.nsScope();
-      for(int a = 0, as = at.size(); a < as; a++) {
+      final int as = at.size();
+      for(int a = 0; a < as; a++) {
         if(eq(at.name(a), rp) && !eq(at.string(a), ru)) UPNSCONFL.thrw(info);
       }
     }

@@ -189,9 +189,8 @@ public final class FNPat extends StandardFunc {
     try {
       return Str.get(p.matcher(string(val)).replaceAll(r));
     } catch(final Exception ex) {
-      final String m = ex.getMessage();
-      if(m.contains("No group")) REGROUP.thrw(info);
-      throw REGPAT.thrw(info, m);
+      if(ex.getMessage().contains("No group")) REGROUP.thrw(info);
+      throw REGPAT.thrw(info, ex);
     }
   }
 

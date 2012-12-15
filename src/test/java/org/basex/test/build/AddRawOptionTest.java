@@ -77,7 +77,7 @@ public class AddRawOptionTest extends SandboxTest {
       session.close();
     }
 
-    assertTrue("No files were imported", !files.isEmpty());
+    assertFalse("No files were imported", files.isEmpty());
     for(final File f : FILES) {
       final String fname = f.getName();
       assertTrue("File " + fname + " is not imported", files.contains(fname));

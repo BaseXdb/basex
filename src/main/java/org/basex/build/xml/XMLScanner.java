@@ -374,11 +374,9 @@ final class XMLScanner extends Progress {
   private void comment() throws IOException {
     do {
       final int ch = nextChar();
-      if(ch == '-') {
-        if(consume('-')) {
-          check('>');
-          return;
-        }
+      if(ch == '-' && consume('-')) {
+        check('>');
+        return;
       }
       token.add(ch);
     } while(true);

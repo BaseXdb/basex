@@ -62,7 +62,7 @@ public class FNRepoTest extends AdvancedQueryTest {
     query(_REPO_INSTALL.args(REPO + "pkg3.xar"));
     // delete by name and version
     query(_REPO_DELETE.args(PKG3ID));
-    assertTrue(!dir(dir));
+    assertFalse(dir(dir));
   }
 
   /** Test method. */

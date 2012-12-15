@@ -92,7 +92,8 @@ public final class Export extends Command {
     }
 
     // XML documents
-    for(int i = 0, is = il.size(); i < is; i++) {
+    final int is = il.size();
+    for(int i = 0; i < is; i++) {
       final int pre = il.get(i);
       // create file path
       final IO f = root.merge(Token.string(data.text(pre, true)));

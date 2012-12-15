@@ -364,8 +364,8 @@ public final class SeqType {
     Item n = val.itemAt(0);
     final boolean in = instance(n, ii);
     if(!in) {
-      if(n.type == NodeType.COM || n.type == NodeType.PI) {
-        if(!instance(Str.ZERO, ii)) Err.treat(ii, this, n);
+      if((n.type == NodeType.COM || n.type == NodeType.PI) && !instance(Str.ZERO, ii)) {
+        Err.treat(ii, this, n);
       }
       n = type.cast(n, ctx, ii);
     }

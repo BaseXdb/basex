@@ -90,13 +90,9 @@ public class Filter extends Preds {
     // no numeric predicates.. use simple iterator
     if(!super.uses(Use.POS)) return new IterFilter(this);
 
-    // one single position() or last() function specified:
-    if(preds.length == 1 && (last || pos != null)) {
-      // return single value
-      if(root.isValue() && t.one() && (last || pos.min == 1 && pos.max == 1)) {
-        return optPre(root, ctx);
-      }
-    }
+    // one single position() or last() function specified: return single value
+    if(preds.length == 1 && (last || pos != null) && root.isValue() && t.one() &&
+        (last || pos.min == 1 && pos.max == 1)) return optPre(root, ctx);
 
     // only choose deterministic and context-independent offsets; e.g., skip:
     // (1 to 10)[random:integer(10)]  or  (1 to 10)[.]

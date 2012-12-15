@@ -51,7 +51,7 @@ public final class JavaFunc extends JavaMapping {
     } catch(final QueryException ex) {
       throw ex;
     } catch(final Throwable ex) {
-      ex.printStackTrace();
+      Util.debug(ex);
       throw JAVAFUN.thrw(info, name(), foundArgs(args));
     }
   }

@@ -194,9 +194,8 @@ public final class OptimizeAll extends ACreate {
       };
 
       final IntList il = data.resources.docs();
-      for(int i = 0, is = il.size(); i < is; i++) {
-        ser.serialize(new DBNode(data, il.get(i)));
-      }
+      final int is = il.size();
+      for(int i = 0; i < is; i++) ser.serialize(new DBNode(data, il.get(i)));
     }
   }
 }

@@ -147,20 +147,18 @@ final class TableContent extends BaseXBack {
       }
 
       // highlight focused entry
-      if(rf || fcol != -1) {
-        if(focusStr != null) {
-          final int sw = BaseXLayout.width(g, focusStr) + 8;
-          if(fx > w - sw - 2) fx = w - sw - 2;
-          g.setColor(GUIConstants.color(col + 2));
-          g.fillRect(fx - 2, posY, sw, rowH - 1);
-          g.setColor(Color.black);
-          BaseXLayout.chopString(g, focusStr, fx + 1, posY + 2, sw, fsz);
+      if((rf || fcol != -1)  && focusStr != null) {
+        final int sw = BaseXLayout.width(g, focusStr) + 8;
+        if(fx > w - sw - 2) fx = w - sw - 2;
+        g.setColor(GUIConstants.color(col + 2));
+        g.fillRect(fx - 2, posY, sw, rowH - 1);
+        g.setColor(Color.black);
+        BaseXLayout.chopString(g, focusStr, fx + 1, posY + 2, sw, fsz);
 
-          // cache focused string
-          focusedString = string(focusStr);
-          final int i = focusedString.indexOf("; ");
-          if(i != -1) focusedString = focusedString.substring(0, i);
-        }
+        // cache focused string
+        focusedString = string(focusStr);
+        final int i = focusedString.indexOf("; ");
+        if(i != -1) focusedString = focusedString.substring(0, i);
       }
     }
     gui.painting = false;

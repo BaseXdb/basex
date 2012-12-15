@@ -37,7 +37,7 @@ final class SplitAlgo extends MapAlgo {
     // increment pivot until left rectangle contains more or equal
     // than half the weight or leave with just setting it to ne - 1
     double w = 0;
-    for(; ni < ne;) {
+    while(ni < ne) {
       w += ml.weight[++ni];
       if(w >= sw / 2 || ni == ne - 1) break;
     }

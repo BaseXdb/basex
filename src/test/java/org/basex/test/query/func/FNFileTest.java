@@ -42,13 +42,13 @@ public final class FNFileTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void dirSeparator() {
-    assertTrue(!query(_FILE_DIR_SEPARATOR.args()).isEmpty());
+    assertFalse(query(_FILE_DIR_SEPARATOR.args()).isEmpty());
   }
 
   /** Test method. */
   @Test
   public void pathSeparator() {
-    assertTrue(!query(_FILE_PATH_SEPARATOR.args()).isEmpty());
+    assertFalse(query(_FILE_PATH_SEPARATOR.args()).isEmpty());
   }
 
   /** Test method. */
@@ -94,7 +94,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void lastModified() {
-    assertTrue(!query(_FILE_LAST_MODIFIED.args(PATH)).isEmpty());
+    assertFalse(query(_FILE_LAST_MODIFIED.args(PATH)).isEmpty());
   }
 
   /** Test method. */

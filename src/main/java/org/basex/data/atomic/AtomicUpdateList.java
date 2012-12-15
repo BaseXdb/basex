@@ -193,11 +193,10 @@ public final class AtomicUpdateList {
       if(current.location < next.location)
         Util.notexpected("Invalid order at location " + current.location);
 
-      if(current.location == next.location) {
-        // check multiple {@link Delete}, {@link Replace}
-        if(current.destructive() && next.destructive())
-          Util.notexpected("Multiple deletes/replaces on node " + current.location);
-      }
+      // check multiple {@link Delete}, {@link Replace}
+      if(current.location == next.location &&
+          current.destructive() && next.destructive())
+        Util.notexpected("Multiple deletes/replaces on node " + current.location);
     }
 
     i = 0;

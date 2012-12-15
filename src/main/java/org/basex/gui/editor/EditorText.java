@@ -290,7 +290,8 @@ public final class EditorText {
   void forward(final int p, final boolean select) {
     int nc = 0;
     while(curr() != '\n') {
-      if((nc += curr() == '\t' ? TAB : 1) >= p) return;
+      nc += curr() == '\t' ? TAB : 1;
+      if(nc >= p) return;
       next(select);
     }
   }

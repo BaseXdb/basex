@@ -318,9 +318,7 @@ public class GreekStemmer extends InternalStemmer {
       rem = true;
     }
 
-    if(rem) {
-      if(ev(s, len) || c(EXC6, s, len)) len += 2; // add back -\u03b9\u03ba
-    }
+    if(rem && (ev(s, len) || c(EXC6, s, len))) len += 2; // add back -\u03b9\u03ba
     return len;
   }
 

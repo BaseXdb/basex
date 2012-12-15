@@ -158,17 +158,15 @@ public final class FTIndex implements Index {
 
       @Override
       public synchronized byte[] next() {
-        if(inner) {
+        if(inner && i < e) {
           // loop through all entries with the same character length
-          if(i < e) {
-            final byte[] entry = inY.readBytes(i, ti);
-            if(startsWith(entry, prefix)) {
-              final long poi = inY.read5();
-              nr = inY.read4();
-              if(prefix.length != 0) cache.add(entry, nr, poi);
-              i += ti + ENTRY;
-              return entry;
-            }
+          final byte[] entry = inY.readBytes(i, ti);
+          if(startsWith(entry, prefix)) {
+            final long poi = inY.read5();
+            nr = inY.read4();
+            if(prefix.length != 0) cache.add(entry, nr, poi);
+            i += ti + ENTRY;
+            return entry;
           }
         }
         // find next available entry group

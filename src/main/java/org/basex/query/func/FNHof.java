@@ -102,7 +102,7 @@ public final class FNHof extends StandardFunc {
     final ValueBuilder vb = v.cache();
     try {
       Arrays.sort(vb.item, 0, (int) vb.size(), cmp);
-    } catch(final QueryError err) {
+    } catch(final QueryRTException err) {
       throw err.wrapped();
     }
     return vb.value();
@@ -143,7 +143,7 @@ public final class FNHof extends StandardFunc {
         try {
           return CmpV.OpV.LT.eval(info, it1, it2) ? -1 : 1;
         } catch(final QueryException qe) {
-          throw new QueryError(qe);
+          throw new QueryRTException(qe);
         }
       }
     });
@@ -153,7 +153,7 @@ public final class FNHof extends StandardFunc {
         heap.insert(checkNoEmpty(getKey.invItem(ctx, info, it)), it);
         if(heap.size() > k) heap.removeMin();
       }
-    } catch(final QueryError e) { throw e.wrapped(); }
+    } catch(final QueryRTException e) { throw e.wrapped(); }
 
     final Item[] arr = new Item[heap.size()];
     for(int i = arr.length; --i >= 0;) arr[i] = heap.removeMin();
@@ -179,7 +179,7 @@ public final class FNHof extends StandardFunc {
         heap.insert(it, it);
         if(heap.size() > k) heap.removeMin();
       }
-    } catch(final QueryError e) { throw e.wrapped(); }
+    } catch(final QueryRTException e) { throw e.wrapped(); }
 
     final Item[] arr = new Item[heap.size()];
     for(int i = arr.length; --i >= 0;) arr[i] = heap.removeMin();
@@ -188,8 +188,8 @@ public final class FNHof extends StandardFunc {
 
   /**
    * Gets a comparator from a less-than predicate as function item.
-   * The {@link Comparator#compare(Object, Object)} method throws a {@link QueryError}
-   * if the comparison throws a {@link QueryException}.
+   * The {@link Comparator#compare(Object, Object)} method throws a
+   * {@link QueryRTException} if the comparison throws a {@link QueryException}.
    * @param pos argument position of the predicate
    * @param ctx query context
    * @return comparator
@@ -205,7 +205,7 @@ public final class FNHof extends StandardFunc {
           return checkType(lt.invItem(ctx, info, a == null ? Empty.SEQ : a,
               b == null ? Empty.SEQ : b), AtomType.BLN).bool(info) ? -1 : 1;
         } catch(final QueryException qe) {
-          throw new QueryError(qe);
+          throw new QueryRTException(qe);
         }
       }
     };

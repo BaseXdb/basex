@@ -49,9 +49,8 @@ public enum GUICommands implements GUICommand {
   C_OPEN_MANAGE(OPEN_MANAGE + DOTS, "% O", H_OPEN_MANAGE, false, false) {
     @Override
     public void execute(final GUI gui) {
-      if(new DialogManage(gui).nodb()) {
-        if(BaseXDialog.confirm(gui, NEW_DB_QUESTION)) C_CREATE.execute(gui);
-      }
+      if(new DialogManage(gui).nodb() && BaseXDialog.confirm(gui, NEW_DB_QUESTION))
+        C_CREATE.execute(gui);
     }
   },
 
@@ -78,7 +77,8 @@ public enum GUICommands implements GUICommand {
         boolean overwrite = false;
         final Data d = gui.context.data();
         final IntList il = d.resources.docs();
-        for(int i = 0, is = il.size(); i < is; i++) {
+        final int is = il.size();
+        for(int i = 0; i < is; i++) {
           file = root.merge(Token.string(d.text(il.get(i), true)));
           if(file.exists()) {
             if(overwrite) {

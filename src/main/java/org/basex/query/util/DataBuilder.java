@@ -213,8 +213,9 @@ public final class DataBuilder {
 
     // add new namespaces
     final Atts ns = nd.nsScope();
-    final boolean ne = ns.size() > 0;
-    for(int a = 0, as = ns.size(); a < as; a++)
+    final int as = ns.size();
+    final boolean ne = as > 0;
+    for(int a = 0; a < as; a++)
       data.nspaces.add(ns.name(a), ns.string(a), ms);
 
     final QNm q = nd.qname();

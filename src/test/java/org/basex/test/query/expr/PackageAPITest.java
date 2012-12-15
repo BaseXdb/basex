@@ -343,13 +343,13 @@ public final class PackageAPITest extends AdvancedQueryTest {
     assertFalse(context.repo.pkgDict().contains(token(PKG4ID)));
 
     // check if pkg4 directory was deleted
-    assertTrue(!dir(pkg4Dir));
+    assertFalse(dir(pkg4Dir));
     // try to delete pkg3 (use package dir)
     new RepoDelete(PKG3ID, null).execute(context);
     // check if pkg3 is unregistered from the repo
     assertFalse(context.repo.pkgDict().contains(token(PKG3ID)));
     // check if pkg3 directory was deleted
-    assertTrue(!dir(pkg3Dir));
+    assertFalse(dir(pkg3Dir));
   }
 
   // PRIVATE METHODS ==========================================================

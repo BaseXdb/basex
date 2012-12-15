@@ -66,7 +66,8 @@ public final class GUIMacOSX {
 
       final Class<?> alc = Class.forName(C_APPLICATION_LISTENER);
       final Object listener = Proxy.newProxyInstance(
-          getClass().getClassLoader(), new Class[] { alc}, new AppInvocationHandler());
+          Thread.currentThread().getContextClassLoader(),
+          new Class[] { alc}, new AppInvocationHandler());
       invoke(appObj, "addApplicationListener", alc, listener);
     }
   }

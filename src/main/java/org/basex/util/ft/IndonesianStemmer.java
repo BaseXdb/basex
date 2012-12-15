@@ -89,12 +89,10 @@ final class IndonesianStemmer extends InternalStemmer {
         remSuffix(tb);
         s = tb.size();
       }
-      if(n != s) {
-        // a rule is fired again
-        if(numSyllables > 2) {
-          remSecondPrefix(tb);
-          return tb.finish();
-        }
+      // a rule is fired again
+      if(n != s && numSyllables > 2) {
+        remSecondPrefix(tb);
+        return tb.finish();
       }
       return tb.finish();
     }

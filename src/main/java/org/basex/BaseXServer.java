@@ -307,9 +307,11 @@ public final class BaseXServer extends Main implements Runnable {
       // connect server with invalid login data
       new ClientSession(host, port, "", "");
       return false;
-    } catch(final IOException ex) {
+    } catch(final LoginException ex) {
       // if login was checked, server is running
-      return ex instanceof LoginException;
+      return true;
+    } catch(final IOException ex) {
+      return false;
     }
   }
 

@@ -440,7 +440,7 @@ public final class FNSql extends StandardFunc {
       throws QueryException {
     final int id = (int) checkItr(expr[0].item(ctx, info));
     final Object obj = ctx.jdbc().get(id);
-    if(obj == null || !(obj instanceof Connection)) BXSQ_CONN.thrw(info, id);
+    if(!(obj instanceof Connection)) BXSQ_CONN.thrw(info, id);
     if(del) ctx.jdbc().remove(id);
     return (Connection) obj;
   }

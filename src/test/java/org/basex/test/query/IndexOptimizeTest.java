@@ -221,8 +221,8 @@ public final class IndexOptimizeTest extends SandboxTest {
           "[self::" + Util.name(ValueAccess.class) +
           "|self::" + Util.name(FTIndexAccess.class) + "]",
           context).execute().serialize();
-      assertTrue("No index used:\nQuery: " + query + "\nInfo: " + info +
-          "\nPlan: " + plan, !ao.toString().isEmpty());
+      assertFalse("No index used:\nQuery: " + query + "\nInfo: " + info +
+          "\nPlan: " + plan, ao.toString().isEmpty());
     } catch(final QueryException ex) {
       fail(Util.message(ex) + "\nQuery: " + query + "\nPlan: " + plan);
     } catch(final IOException ex) {

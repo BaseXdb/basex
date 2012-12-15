@@ -71,18 +71,12 @@ public final class Except extends Set {
           if(item[i] == null) continue;
           final int d = item[0].diff(item[i]);
 
-          if(d < 0) {
-            if(i + 1 == item.length) {
-              break;
-            }
-          }
+          if(d < 0 && i + 1 == item.length) break;
           if(d == 0) {
             next(0);
             i = 0;
           }
-          if(d > 0) {
-            next(i--);
-          }
+          if(d > 0) next(i--);
         }
         final ANode temp = item[0];
         next(0);

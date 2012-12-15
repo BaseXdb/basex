@@ -373,7 +373,7 @@ public abstract class Path extends ParseExpr {
           al.add(pn);
         }
       }
-      if(al.size() == 0) return null;
+      if(al.isEmpty()) return null;
       in = al;
     }
     return in;

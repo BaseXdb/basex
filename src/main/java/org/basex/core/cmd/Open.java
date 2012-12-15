@@ -64,7 +64,7 @@ public final class Open extends Command {
    * @throws IOException I/O exception
    */
   public static Data open(final String name, final Context ctx) throws IOException {
-    synchronized(ctx.dbs) { // pin should be atomic
+    synchronized(ctx.dbs) {
       Data data = ctx.dbs.pin(name);
       if(data == null) {
         // check if database exists

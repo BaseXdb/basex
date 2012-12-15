@@ -232,7 +232,8 @@ public abstract class Data {
     // find pre value in table
     for(int p = Math.max(0, id); p < meta.size; ++p)
       if(id == id(p)) return p;
-    for(int p = 0, ps = Math.min(meta.size, id); p < ps; ++p)
+    final int ps = Math.min(meta.size, id);
+    for(int p = 0; p < ps; ++p)
       if(id == id(p)) return p;
 
     // id not found

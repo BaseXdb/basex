@@ -414,7 +414,7 @@ public class CommandTest extends SandboxTest {
     // create and replace binary file
     ok(new XQuery("db:store('" + NAME + "', 'a', 'a')"));
     ok(new Replace("a", "<b/>"));
-    assertTrue(!ok(new XQuery("db:open('" + NAME + "')")).isEmpty());
+    assertFalse(ok(new XQuery("db:open('" + NAME + "')")).isEmpty());
     ok(new XQuery("db:retrieve('" + NAME + "', 'a')"));
     // a failing replace should not remove existing documents
     no(new Replace(FN, "<a>"));

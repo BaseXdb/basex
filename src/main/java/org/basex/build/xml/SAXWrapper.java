@@ -98,14 +98,15 @@ public final class SAXWrapper extends SingleParser {
       ioe.setStackTrace(ex.getStackTrace());
       throw ioe;
     } finally {
-      if(is == null) return;
-      try {
-        final Reader r = is.getCharacterStream();
-        if(r != null) r.close();
-        final InputStream ist = is.getByteStream();
-        if(ist != null) ist.close();
-      } catch(final IOException ex) {
-        Util.debug(ex);
+      if(is != null) {
+        try {
+          final Reader r = is.getCharacterStream();
+          if(r != null) r.close();
+          final InputStream ist = is.getByteStream();
+          if(ist != null) ist.close();
+        } catch(final IOException ex) {
+          Util.debug(ex);
+        }
       }
     }
   }

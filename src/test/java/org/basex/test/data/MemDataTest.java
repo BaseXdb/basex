@@ -53,7 +53,7 @@ public class MemDataTest extends SandboxTest {
     final String o = new XQuery("/a/b[text() = 'test']").execute(context);
     assertTrue("Old node found", o.isEmpty());
     final String n = new XQuery("/a/b[text() = 'test2']").execute(context);
-    assertTrue("New node not found", !n.isEmpty());
+    assertFalse("New node not found", n.isEmpty());
   }
 
   /**
@@ -66,7 +66,7 @@ public class MemDataTest extends SandboxTest {
     final String o = new XQuery("/a/b").execute(context);
     assertTrue("Old node found", o.isEmpty());
     final String n = new XQuery("//d[@f = 'test2']").execute(context);
-    assertTrue("New node not found", !n.isEmpty());
+    assertFalse("New node not found", n.isEmpty());
   }
 
   /**
@@ -77,7 +77,7 @@ public class MemDataTest extends SandboxTest {
   public void insertNode() throws BaseXException {
     new XQuery("insert node <d>test2</d> as first into /a").execute(context);
     final String r = new XQuery("//d[text() = 'test2']").execute(context);
-    assertTrue("Node not found", !r.isEmpty());
+    assertFalse("Node not found", r.isEmpty());
     new XQuery("insert node <d>test2</d> as first into /a").execute(context);
     final String c = new XQuery("count(//d[text() = 'test2'])").execute(context);
     assertEquals("Second node not found", 2, Integer.parseInt(c));
@@ -92,7 +92,7 @@ public class MemDataTest extends SandboxTest {
   public void insertDuplicateNode() throws BaseXException {
     new XQuery("insert node <d>test</d> as first into /a").execute(context);
     final String r = new XQuery("//d[text() = 'test']").execute(context);
-    assertTrue("Node not found", !r.isEmpty());
+    assertFalse("Node not found", r.isEmpty());
     final String c = new XQuery("count(//*[text() = 'test'])").execute(context);
     assertEquals("Second node not found", 2, Integer.parseInt(c));
   }

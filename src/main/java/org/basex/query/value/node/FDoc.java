@@ -70,7 +70,7 @@ public final class FDoc extends FNode {
   public FDoc(final DocumentFragment doc, final byte[] b) {
     this(b);
     final Node elem = doc.getFirstChild();
-    if(elem != null && elem instanceof Element)
+    if(elem instanceof Element)
       children.add(new FElem((Element) elem, this, new TokenMap()));
     // [LW] DOM: DocumentFragment != Document, possibly multiple roots
   }

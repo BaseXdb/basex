@@ -56,8 +56,8 @@ public final class XdmInfoTest extends SandboxTest {
       if(t.length < 2) continue;
       final TestQuery tq = session.query(t[1].toString());
       final TestItem ti = tq.iter();
-      assertTrue("Types are different.\nExpected: " + t[0] +
-          "\nFound: " + TYPES[ti.type][0], t == TYPES[ti.type]);
+      assertSame("Types are different.\nExpected: " + t[0] +
+          "\nFound: " + TYPES[ti.type][0], t, TYPES[ti.type]);
       assertEquals(Token.string(ti.result), TYPES[ti.type][2]);
       tq.close();
     }
@@ -73,8 +73,8 @@ public final class XdmInfoTest extends SandboxTest {
       if(t.length < 2) continue;
       final TestQuery tq = session.query(t[1].toString());
       final TestItem ti = tq.full();
-      assertTrue("Types are different.\nExpected: " + t[0] +
-          "\nFound: " + TYPES[ti.type][0], t == TYPES[ti.type]);
+      assertSame("Types are different.\nExpected: " + t[0] +
+          "\nFound: " + TYPES[ti.type][0], t, TYPES[ti.type]);
       assertEquals(Token.string(ti.result), TYPES[ti.type][2]);
       if(t.length > 3) assertEquals(Token.string(ti.uri), TYPES[ti.type][3]);
       tq.close();

@@ -179,10 +179,9 @@ public final class ModuleLoader {
       path = path.replace('.', '/');
       // add slash or path
       tb.add(path.isEmpty() ? "/" : path);
-      String pth = tb.toString();
+      final String pth = tb.toString();
       // add "index" string
-      if(pth.endsWith("/")) pth += "index";
-      return pth;
+      return pth.endsWith("/") ? pth + "index" : pth;
     } catch(final URISyntaxException ex) {
       Util.debug(ex);
       return null;

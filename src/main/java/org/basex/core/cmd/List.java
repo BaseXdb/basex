@@ -133,7 +133,8 @@ public final class List extends Command {
       final Data data = Open.open(db, context);
       final Resources res = data.resources;
       final IntList il = res.docs(path);
-      for(int i = 0, ds = il.size(); i < ds; i++) {
+      final int ds = il.size();
+      for(int i = 0; i < ds; i++) {
         final int pre = il.get(i);
         final TokenList tl = new TokenList(3);
         final byte[] file = data.text(pre, true);

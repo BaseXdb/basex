@@ -569,7 +569,8 @@ public final class FNDb extends StandardFunc {
 
     // delete XML resources
     final IntList docs = data.resources.docs(path);
-    for(int i = 0, is = docs.size(); i < is; i++) {
+    final int is = docs.size();
+    for(int i = 0; i < is; i++) {
       ctx.updates.add(new DeleteNode(docs.get(i), data, info), ctx);
     }
     // delete raw resources
@@ -623,7 +624,8 @@ public final class FNDb extends StandardFunc {
 
     // the first step of the path should be the database name
     final IntList il = data.resources.docs(source);
-    for(int i = 0, is = il.size(); i < is; i++) {
+    final int is = il.size();
+    for(int i = 0; i < is; i++) {
       final int pre = il.get(i);
       final String trg = Rename.target(data, pre, source, target);
       if(trg.isEmpty() || trg.endsWith("/") || trg.endsWith("."))
