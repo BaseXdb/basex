@@ -31,11 +31,10 @@ public class RegExParser implements RegExParserConstants {
   private boolean dotAll;
   /** Multi-line matching mode, {@code ^} and {@code $} match on line bounds. */
   private boolean multiLine;
-  /** Case-insensitive match. */
-  private boolean noCase;
 
   /**
    * Compiles this regular expression to a {@link Pattern}.
+   * @param regex regular expression to parse
    * @param mod modifiers
    * @param ext XQuery 3.0 syntax
    * @param ii input info
@@ -45,9 +44,8 @@ public class RegExParser implements RegExParserConstants {
   public static Pattern parse(final byte[] regex, final byte[] mod, final boolean ext,
       final InputInfo ii) throws QueryException {
     // process modifiers
-    int m = Pattern.UNIX_LINES;
+    int m = UNIX_LINES;
     boolean strip = false;
-    final boolean dotAll = false, multi = false;
     if(mod != null) {
       for(final byte b : mod) {
         if(b == 'i') m |= CASE_INSENSITIVE | UNICODE_CASE;
@@ -64,7 +62,7 @@ public class RegExParser implements RegExParserConstants {
 
     try {
       final RegExParser parser = new RegExParser(regex, strip, (m & DOTALL) != 0,
-          (m & MULTILINE) != 0, (m & CASE_INSENSITIVE) != 0);
+          (m & MULTILINE) != 0);
       return Pattern.compile(parser.parse().toString(), m);
     } catch(final ParseException pe) {
       throw Err.REGPAT.thrw(ii, pe.getMessage());
@@ -78,17 +76,20 @@ public class RegExParser implements RegExParserConstants {
    * @param regex regular expression to parse
    * @param strip strip whitespace while lexing
    * @param all dot matches all
-   * @param ci case insensitivity
+   * @param multi multi line search
    */
   public RegExParser(final byte[] regex, final boolean strip, final boolean all,
-      final boolean multi, final boolean ci) {
+      final boolean multi) {
     this(new RegExLexer(regex, strip));
     dotAll = all;
     multiLine = multi;
-    noCase = ci;
   }
 
-  /** Root production. */
+  /**
+   * Root production.
+   * @return expression
+   * @throws ParseException parsing exception
+   */
   final public RegExp parse() throws ParseException {
     RegExp regex;
     regex = regExp();
@@ -99,6 +100,8 @@ public class RegExParser implements RegExParserConstants {
 
   /**
    * Parses the "regExp" rule.
+   * @return expression
+   * @throws ParseException parsing exception
    */
   final public RegExp regExp() throws ParseException {
     RegExp nd;
@@ -129,6 +132,8 @@ public class RegExParser implements RegExParserConstants {
   /**
    * Parses the "branch" rule.
    * Parses the "piece" rule.
+   * @return expression
+   * @throws ParseException parsing exception
    */
   final public RegExp branch() throws ParseException {
     RegExp atom;
@@ -179,6 +184,8 @@ public class RegExParser implements RegExParserConstants {
 
   /**
    * Parses the "quantifier" rule.
+   * @return expression
+   * @throws ParseException parsing exception
    */
   final public Quantifier quantifier() throws ParseException {
     int min = 0, max = 0;
@@ -226,6 +233,8 @@ public class RegExParser implements RegExParserConstants {
    * Parses the "quantRange" rule.
    * Parses the "quantMin" rule.
    * Parses the "quantExact" rule.
+   * @return quantity
+   * @throws ParseException parsing exception
    */
   final public int[] quantity() throws ParseException {
     final int[] qty = new int[2];
@@ -265,6 +274,8 @@ public class RegExParser implements RegExParserConstants {
 
   /**
    * Parses the "atom" rule.
+   * @return expression
+   * @throws ParseException parsing exception
    */
   final public RegExp atom() throws ParseException {
     RegExp nd = null;
@@ -310,6 +321,8 @@ public class RegExParser implements RegExParserConstants {
 
   /**
    * Parses the "Char" rule.
+   * @return expression
+   * @throws ParseException parsing exception
    */
   final public Literal Char() throws ParseException {
     switch (jj_ntk==-1?jj_ntk():jj_ntk) {
@@ -330,6 +343,8 @@ public class RegExParser implements RegExParserConstants {
 
   /**
    * Parses the "backReference" rule.
+   * @return expression
+   * @throws ParseException parsing exception
    */
   final public BackRef backReference() throws ParseException {
     Token tok;
@@ -353,6 +368,8 @@ public class RegExParser implements RegExParserConstants {
 
   /**
    * Parses the "charClass" rule.
+   * @return expression
+   * @throws ParseException parsing exception
    */
   final public RegExp charClass() throws ParseException {
     RegExp nd = null;
@@ -388,6 +405,8 @@ public class RegExParser implements RegExParserConstants {
 
   /**
    * Parses the "charClassEsc" rule.
+   * @return expression
+   * @throws ParseException parsing exception
    */
   final public RegExp charClassEsc() throws ParseException {
     switch (jj_ntk==-1?jj_ntk():jj_ntk) {
@@ -414,6 +433,8 @@ public class RegExParser implements RegExParserConstants {
   /**
    * Parses the "charClassExpr" rule.
    * Parses the "charClassSub" rule.
+   * @return character class
+   * @throws ParseException parsing exception
    */
   final public CharClass charClassExpr() throws ParseException {
     CharGroup group = null;
@@ -450,6 +471,8 @@ public class RegExParser implements RegExParserConstants {
 
   /**
    * Parses the "posCharGroup" rule.
+   * @return character group
+   * @throws ParseException parsing exception
    */
   final public CharGroup posCharGroup() throws ParseException {
     final ArrayList<RegExp> cg = new ArrayList<RegExp>();
@@ -499,6 +522,8 @@ public class RegExParser implements RegExParserConstants {
 
   /**
    * Parses the "charRange" rule.
+   * @return expression
+   * @throws ParseException parsing exception
    */
   final public RegExp charRange() throws ParseException {
     int a = -1, b = -1;
@@ -526,6 +551,8 @@ public class RegExParser implements RegExParserConstants {
 
   /**
    * Parses the "charOrEsc" rule.
+   * @return character
+   * @throws ParseException parsing exception
    */
   final public int charOrEsc() throws ParseException {
     int cp = -1;
@@ -547,6 +574,11 @@ public class RegExParser implements RegExParserConstants {
     throw new Error("Missing return statement in function");
   }
 
+  /**
+   * Parses the "XmlChar" rule.
+   * @return character
+   * @throws ParseException parsing exception
+   */
   final public int XmlChar() throws ParseException {
     switch (jj_ntk==-1?jj_ntk():jj_ntk) {
     case CHAR:
@@ -592,23 +624,6 @@ public class RegExParser implements RegExParserConstants {
     finally { jj_save(3, xla); }
   }
 
-  private boolean jj_3R_11() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(12)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(13)) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3R_8() {
-    if (jj_3R_10()) return true;
-    if (jj_scan_token(CHAR)) return true;
-    if (jj_3R_10()) return true;
-    return false;
-  }
-
   private boolean jj_3R_6() {
     Token xsp;
     xsp = jj_scanpos;
@@ -627,11 +642,6 @@ public class RegExParser implements RegExParserConstants {
     return false;
   }
 
-  private boolean jj_3_2() {
-    if (jj_3R_5()) return true;
-    return false;
-  }
-
   private boolean jj_3R_12() {
     if (jj_3R_11()) return true;
     return false;
@@ -647,8 +657,18 @@ public class RegExParser implements RegExParserConstants {
     return false;
   }
 
-  private boolean jj_3_1() {
-    if (jj_scan_token(DIGIT)) return true;
+  private boolean jj_3_2() {
+    if (jj_3R_5()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_11() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(12)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(13)) return true;
+    }
     return false;
   }
 
@@ -680,6 +700,11 @@ public class RegExParser implements RegExParserConstants {
     return false;
   }
 
+  private boolean jj_3R_9() {
+    if (jj_3R_11()) return true;
+    return false;
+  }
+
   private boolean jj_3R_5() {
     Token xsp;
     if (jj_3_4()) return true;
@@ -690,8 +715,15 @@ public class RegExParser implements RegExParserConstants {
     return false;
   }
 
-  private boolean jj_3R_9() {
-    if (jj_3R_11()) return true;
+  private boolean jj_3R_8() {
+    if (jj_3R_10()) return true;
+    if (jj_scan_token(CHAR)) return true;
+    if (jj_3R_10()) return true;
+    return false;
+  }
+
+  private boolean jj_3_1() {
+    if (jj_scan_token(DIGIT)) return true;
     return false;
   }
 
@@ -766,7 +798,7 @@ public class RegExParser implements RegExParserConstants {
   }
 
   static private final class LookaheadSuccess extends java.lang.Error { }
-  static final private LookaheadSuccess jj_ls = new LookaheadSuccess();
+  final private LookaheadSuccess jj_ls = new LookaheadSuccess();
   private boolean jj_scan_token(final int kind) {
     if (jj_scanpos == jj_lastpos) {
       jj_la--;

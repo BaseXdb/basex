@@ -40,11 +40,10 @@ public class RegExParser {
   private boolean dotAll;
   /** Multi-line matching mode, {@code ^} and {@code $} match on line bounds. */
   private boolean multiLine;
-  /** Case-insensitive match. */
-  private boolean noCase;
 
   /**
    * Compiles this regular expression to a {@link Pattern}.
+   * @param regex regular expression to parse
    * @param mod modifiers
    * @param ext XQuery 3.0 syntax
    * @param ii input info
@@ -54,8 +53,8 @@ public class RegExParser {
   public static Pattern parse(final byte[] regex, final byte[] mod, final boolean ext,
       final InputInfo ii) throws QueryException {
     // process modifiers
-    int m = Pattern.UNIX_LINES;
-    boolean strip = false, dotAll = false, multi = false;
+    int m = UNIX_LINES;
+    boolean strip = false;
     if(mod != null) {
       for(final byte b : mod) {
         if(b == 'i') m |= CASE_INSENSITIVE | UNICODE_CASE;
@@ -72,7 +71,7 @@ public class RegExParser {
 
     try {
       final RegExParser parser = new RegExParser(regex, strip, (m & DOTALL) != 0,
-          (m & MULTILINE) != 0, (m & CASE_INSENSITIVE) != 0);
+          (m & MULTILINE) != 0);
       return Pattern.compile(parser.parse().toString(), m);
     } catch(final ParseException pe) {
       throw Err.REGPAT.thrw(ii, pe.getMessage());
@@ -86,20 +85,23 @@ public class RegExParser {
    * @param regex regular expression to parse
    * @param strip strip whitespace while lexing
    * @param all dot matches all
-   * @param ci case insensitivity
+   * @param multi multi line search
    */
   public RegExParser(final byte[] regex, final boolean strip, final boolean all,
-      final boolean multi, final boolean ci) {
+      final boolean multi) {
     this(new RegExLexer(regex, strip));
     dotAll = all;
     multiLine = multi;
-    noCase = ci;
   }
 }
 
 PARSER_END(RegExParser)
 
-  /** Root production. */
+  /**
+   * Root production.
+   * @return expression
+   * @throws ParseException parsing exception
+   */
   RegExp parse() : {
     RegExp regex;
   } {
@@ -110,6 +112,8 @@ PARSER_END(RegExParser)
 
   /**
    * Parses the "regExp" rule.
+   * @return expression
+   * @throws ParseException parsing exception
    */
   RegExp regExp() : {
     RegExp nd;
@@ -135,6 +139,8 @@ PARSER_END(RegExParser)
   /**
    * Parses the "branch" rule.
    * Parses the "piece" rule.
+   * @return expression
+   * @throws ParseException parsing exception
    */
   RegExp branch() : {
     RegExp atom;
@@ -156,6 +162,8 @@ PARSER_END(RegExParser)
 
   /**
    * Parses the "quantifier" rule.
+   * @return expression
+   * @throws ParseException parsing exception
    */
   Quantifier quantifier() : {
     int min = 0, max = 0;
@@ -178,6 +186,8 @@ PARSER_END(RegExParser)
    * Parses the "quantRange" rule.
    * Parses the "quantMin" rule.
    * Parses the "quantExact" rule.
+   * @return quantity
+   * @throws ParseException parsing exception
    */
   int[] quantity() : {
     final int[] qty = new int[2];
@@ -208,6 +218,8 @@ PARSER_END(RegExParser)
 
   /**
    * Parses the "atom" rule.
+   * @return expression
+   * @throws ParseException parsing exception
    */
   RegExp atom() : {
     RegExp nd = null;
@@ -231,6 +243,8 @@ PARSER_END(RegExParser)
 
   /**
    * Parses the "Char" rule.
+   * @return expression
+   * @throws ParseException parsing exception
    */
   Literal Char() : {
   } {
@@ -242,6 +256,8 @@ PARSER_END(RegExParser)
 
   /**
    * Parses the "backReference" rule.
+   * @return expression
+   * @throws ParseException parsing exception
    */
   BackRef backReference() : {
     Token tok;
@@ -263,6 +279,8 @@ PARSER_END(RegExParser)
 
   /**
    * Parses the "charClass" rule.
+   * @return expression
+   * @throws ParseException parsing exception
    */
   RegExp charClass() : {
     RegExp nd = null;
@@ -279,6 +297,8 @@ PARSER_END(RegExParser)
 
   /**
    * Parses the "charClassEsc" rule.
+   * @return expression
+   * @throws ParseException parsing exception
    */
   RegExp charClassEsc() : { } {
     ( <SINGLE_ESC>
@@ -294,6 +314,8 @@ PARSER_END(RegExParser)
   /**
    * Parses the "charClassExpr" rule.
    * Parses the "charClassSub" rule.
+   * @return character class
+   * @throws ParseException parsing exception
    */
   CharClass charClassExpr() : {
     CharGroup group = null;
@@ -313,6 +335,8 @@ PARSER_END(RegExParser)
 
   /**
    * Parses the "posCharGroup" rule.
+   * @return character group
+   * @throws ParseException parsing exception
    */
   CharGroup posCharGroup() : {
     final ArrayList<RegExp> cg = new ArrayList<RegExp>();
@@ -329,6 +353,8 @@ PARSER_END(RegExParser)
 
   /**
    * Parses the "charRange" rule.
+   * @return expression
+   * @throws ParseException parsing exception
    */
   RegExp charRange() : {
     int a = -1, b = -1;
@@ -346,6 +372,8 @@ PARSER_END(RegExParser)
 
   /**
    * Parses the "charOrEsc" rule.
+   * @return character
+   * @throws ParseException parsing exception
    */
   int charOrEsc() : {
     int cp = -1;
@@ -357,6 +385,11 @@ PARSER_END(RegExParser)
     }
   }
 
+  /**
+   * Parses the "XmlChar" rule.
+   * @return character
+   * @throws ParseException parsing exception
+   */
   int XmlChar() :  {} {
     ( <CHAR>
     | <DIGIT>
