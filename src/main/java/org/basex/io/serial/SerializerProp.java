@@ -96,9 +96,6 @@ public final class SerializerProp extends AProp {
   /** Specific serialization parameter: URI of result wrapper. */
   public static final Object[] S_WRAP_URI = {
     "wrap-uri", "" };
-  /** Specific serialization parameter: web template. */
-  public static final Object[] S_TEMPLATE = {
-    "template", "" };
 
   /**
    * Constructor.
