@@ -92,7 +92,7 @@ public final class FNDate extends StandardFunc {
    */
   private static DTDur zon(final ADate it) {
     final int tz = it.zon();
-    return tz == Short.MAX_VALUE ? null : new DTDur(tz);
+    return tz == Short.MAX_VALUE ? null : new DTDur(0, tz);
   }
 
   /**

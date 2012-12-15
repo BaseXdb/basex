@@ -130,7 +130,7 @@ public final class FNPat extends StandardFunc {
   private static int[] match(final Matcher m, final String str, final FElem par,
       final int g) {
 
-    final FElem nd = new FElem(g == 0 ? Q_MATCH : Q_MGROUP);
+    final FElem nd = new FElem(g == 0 ? Q_MATCH : Q_MGROUP, new Atts(FN, FNURI));
     if(g > 0) nd.add(Q_NR, token(g));
 
     final int start = m.start(g), end = m.end(g), gc = m.groupCount();
@@ -156,7 +156,7 @@ public final class FNPat extends StandardFunc {
    * @param par root node
    */
   private static void nonmatch(final String text, final FElem par) {
-    par.add(new FElem(Q_NONMATCH).add(text));
+    par.add(new FElem(Q_NONMATCH, new Atts(FN, FNURI)).add(text));
   }
 
   /**

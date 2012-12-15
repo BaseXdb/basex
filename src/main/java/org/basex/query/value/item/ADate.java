@@ -306,7 +306,7 @@ public abstract class ADate extends ADateDur {
   }
 
   /**
-   * Returns the timezone.
+   * Returns the timezone in minutes.
    * @return time zone
    */
   public final int zon() {
