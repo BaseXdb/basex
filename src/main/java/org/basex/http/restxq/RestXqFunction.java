@@ -102,7 +102,8 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     // parse all annotations
     final EnumSet<HTTPMethod> mth = EnumSet.noneOf(HTTPMethod.class);
     boolean found = false;
-    for(int a = 0, as = function.ann.size(); a < as; a++) {
+    final int as = function.ann.size();
+    for(int a = 0; a < as; a++) {
       final QNm name = function.ann.names[a];
       final Value value = function.ann.values[a];
       final byte[] local = name.local();
@@ -213,7 +214,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     for(final RestXqParam rxp : queryParams) bind(rxp, params.get(rxp.key));
 
     // bind form parameters
-    if(formParams.size() != 0) {
+    if(!formParams.isEmpty()) {
       if(MimeTypes.APP_FORM.equals(ct)) {
         // convert parameters encoded in a form
         body = cache(http, body);

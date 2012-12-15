@@ -112,9 +112,8 @@ public final class BXCollection implements Collection, BXXMLDBText {
     final StringList sl = new StringList();
     final Data data = ctx.data();
     final IntList il = data.resources.docs();
-    for(int i = 0, is = il.size(); i < is; i++) {
-      sl.add(Token.string(data.text(il.get(i), true)));
-    }
+    final int is = il.size();
+    for(int i = 0; i < is; i++) sl.add(Token.string(data.text(il.get(i), true)));
     return sl.toArray();
   }
 

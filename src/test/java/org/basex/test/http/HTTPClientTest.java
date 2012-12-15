@@ -175,8 +175,7 @@ public class HTTPClientTest extends HTTPTest {
     try {
       new XQuery("http:send-request(<http:request/>)").execute(ctx);
     } catch(final BaseXException ex) {
-      assertTrue(indexOf(token(ex.getMessage()),
-          token(ErrType.HC.toString())) != -1);
+      assertTrue(contains(token(ex.getMessage()), token(ErrType.HC.toString())));
     }
   }
 
@@ -189,8 +188,7 @@ public class HTTPClientTest extends HTTPTest {
     try {
       c.execute(ctx);
     } catch(final BaseXException ex) {
-      assertTrue(indexOf(token(ex.getMessage()),
-          token(ErrType.HC.toString())) != -1);
+      assertTrue(contains(token(ex.getMessage()), token(ErrType.HC.toString())));
     }
   }
 
@@ -413,7 +411,7 @@ public class HTTPClientTest extends HTTPTest {
         rp.parse(dbNode.children().next(), null);
         fail("Exception not thrown");
       } catch(final QueryException ex) {
-        assertTrue(indexOf(token(ex.getMessage()), token(ErrType.HC.toString())) != -1);
+        assertTrue(contains(token(ex.getMessage()), token(ErrType.HC.toString())));
       }
     }
 
