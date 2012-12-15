@@ -282,7 +282,7 @@ public abstract class AProp implements Iterable<String> {
    * All properties starting with {@Code org.basex.} will be assigned as properties
    * and removed from the global system properties.
    */
-  public void setSystem() {
+  public final void setSystem() {
     // collect parameters that start with "org.basex."
     final StringList sl = new StringList();
     final Properties pr = System.getProperties();

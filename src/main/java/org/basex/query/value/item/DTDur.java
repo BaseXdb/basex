@@ -38,7 +38,7 @@ public final class DTDur extends Dur {
    */
   public DTDur(final long h, final long m) {
     super(AtomType.DTD);
-    sec = BigDecimal.valueOf(h).multiply(BD60).add(BigDecimal.valueOf(m).multiply(BD60));
+    sec = BigDecimal.valueOf(h).multiply(BD60).add(BigDecimal.valueOf(m)).multiply(BD60);
   }
 
   /**

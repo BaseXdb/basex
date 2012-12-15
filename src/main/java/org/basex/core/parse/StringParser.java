@@ -52,7 +52,7 @@ final class StringParser extends CmdParser {
       parse(cmds, input);
     } else {
       for(final String line : lines) {
-        if(!line.isEmpty() && !line.startsWith("#")) parse(cmds, line);
+        if(!line.isEmpty() && line.charAt(0) != '#') parse(cmds, line);
       }
     }
   }
