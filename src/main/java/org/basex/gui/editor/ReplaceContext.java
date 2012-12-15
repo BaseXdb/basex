@@ -12,7 +12,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public class ReplaceContext {
+final class ReplaceContext {
   /** Search context. */
   SearchContext search;
   /** Replace string. */

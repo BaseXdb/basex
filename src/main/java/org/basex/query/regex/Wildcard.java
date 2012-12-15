@@ -8,9 +8,9 @@ package org.basex.query.regex;
  */
 public final class Wildcard extends RegExp {
   /** Instance for the dot matching all characters. */
-  private static Wildcard all;
+  private static final Wildcard ALL = new Wildcard(true);
   /** Instance for the dot matching everything except new-lines. */
-  private static Wildcard noLf;
+  private static final Wildcard NOLF  = new Wildcard(true);
 
   /** If the {@code \n} character is matched. */
   private final boolean nl;
@@ -29,12 +29,7 @@ public final class Wildcard extends RegExp {
    * @return the instance
    */
   public static Wildcard get(final boolean dotAll) {
-    if(dotAll) {
-      if(all == null) all = new Wildcard(true);
-      return all;
-    }
-    if(noLf == null) noLf = new Wildcard(false);
-    return noLf;
+    return dotAll ? ALL : NOLF;
   }
 
   @Override

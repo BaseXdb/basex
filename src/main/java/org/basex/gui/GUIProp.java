@@ -98,8 +98,6 @@ public final class GUIProp extends AProp {
   public static final Object[] FONTSLOC = { "FONTSLOC", new int[] { 10, 530 } };
   /** Dialog location. */
   public static final Object[] COLORSLOC = { "COLORSLOC", new int[] { 530, 620 } };
-  /** Dialog location. */
-  public static final Object[] REPLACELOC = { "REPLACELOC", new int[] { 530, 230 } };
 
   /** Flag for Java look and feel. */
   public static final Object[] JAVALOOK = { "JAVALOOK", false };

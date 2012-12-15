@@ -16,7 +16,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class Renderer extends BaseXBack {
+final class Renderer extends BaseXBack {
   /** Vertical start position. */
   private final BaseXBar bar;
 
@@ -404,13 +404,6 @@ public final class Renderer extends BaseXBack {
     for(int xp = x; xp < x + ww; xp++) {
       if((xp & 1) == 0) g.drawLine(xp, y + 2, xp, y + s + 1);
     }
-  }
-
-  /**
-   * Finishes the selection.
-   */
-  void stopSelect() {
-    text.checkSelect();
   }
 
   /**

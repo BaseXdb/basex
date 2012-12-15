@@ -125,14 +125,6 @@ public final class AtomicUpdateList {
   }
 
   /**
-   * Returns the number of value updates.
-   * @return number of value updates
-   */
-  public int valueUpdatesSize() {
-    return updValue.size();
-  }
-
-  /**
    * Resets the list.
    */
   public void clear() {

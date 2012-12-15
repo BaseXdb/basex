@@ -758,7 +758,7 @@ public class Editor extends BaseXPanel {
     if(tr != null) {
       for(final Object o : BaseXLayout.contents(tr)) return o.toString();
     }
-    return "";
+    return null;
   }
 
   /**
@@ -915,10 +915,10 @@ public class Editor extends BaseXPanel {
       if(!hist.active()) return;
       final int tc = text.getCaret();
       text.pos(tc);
-      final String txt = clip();
-      if(txt == null) return;
+      final String clip = clip();
+      if(clip == null) return;
       if(text.selected()) text.delete();
-      text.add(txt);
+      text.add(clip);
       finish(tc);
     }
     @Override

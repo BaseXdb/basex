@@ -1056,7 +1056,6 @@ public enum Err {
     /** BXJS Error type. */ BXJS(QueryText.BXERR, QueryText.BXERRORS),
     /** BXPR Error type. */ BXPR(QueryText.BXERR, QueryText.BXERRORS),
     /** BXRE Error type. */ BXRE(QueryText.BXERR, QueryText.BXERRORS),
-    /** BXSE Error type. */ BXSE(QueryText.BXERR, QueryText.BXERRORS),
     /** BXSQ Error type. */ BXSQ(QueryText.BXERR, QueryText.BXERRORS),
     /** BXVA Error type. */ BXVA(QueryText.BXERR, QueryText.BXERRORS),
     /** BXFT Error type. */ BXXQ(QueryText.BXERR, QueryText.BXERRORS),

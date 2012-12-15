@@ -653,8 +653,6 @@ public interface Text {
 
   // ADMIN COMMANDS ==========================================================
 
-  /** Show databases. */
-  String OPENED_DB_X = lang("opened_db_%");
   /** Show sessions. */
   String SESSIONS_X = lang("sessions_%");
   /** Show events. */
@@ -812,8 +810,6 @@ public interface Text {
   String CHOPPED = " (" + lang("chopped") + ')';
   /** "(% entries)". */
   String ENTRIES = '(' + lang("entries_%") + ')';
-  /** "Directory". */
-  String DIRECTORY = lang("directory");
   /** "Error". */
   String ERROR = lang("error");
   /** "Error:". */

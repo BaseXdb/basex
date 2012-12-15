@@ -210,14 +210,6 @@ public final class EditorText {
   }
 
   /**
-   * Moves the given number of bytes forward.
-   * @param b bytes
-   */
-  void forward(final int b) {
-    ps += b;
-  }
-
-  /**
    * Sets the iterator position.
    * @param p iterator position
    */
@@ -490,7 +482,7 @@ public final class EditorText {
     for(int p = 0; p < s; p++) sb.append(' ');
     // indent after opening bracket
     final int l = ps > 0 ? text[ps - 1] : 0;
-    if(l == '(' || l == '{' || l == '{') {
+    if(l == '(' || l == '{' || l == '[') {
       for(int p = 0; p < EditorText.TAB; p++) sb.append(' ');
     }
   }

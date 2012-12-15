@@ -54,7 +54,7 @@ public final class IntMap<E> extends IntSet {
 
   @Override
   public int delete(final int key) {
-    int i = super.delete(key);
+    final int i = super.delete(key);
     if(i != 0) values[i] = null;
     return i;
   }

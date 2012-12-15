@@ -14,7 +14,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class SearchContext {
+final class SearchContext {
   /** Mode: match case. */
   final boolean mcase;
   /** Mode: regular expression. */
