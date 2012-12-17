@@ -32,9 +32,7 @@ public final class DBLocking implements ILocking {
       new HashMap<String, ReentrantReadWriteLock>();
   /**
    * Currently running transactions.
-   *
-   * Used as monitor for atomizing access to
-   * {@link DBLocking#transactions} and {@link DBLocking#queue}
+   * Used as monitor for atomizing access to {@link #queue}.
    */
   private final AtomicInteger transactions = new AtomicInteger(0);
   /**
@@ -44,8 +42,8 @@ public final class DBLocking implements ILocking {
    */
   private final ConcurrentLinkedQueue<Thread> queue = new ConcurrentLinkedQueue<Thread>();
   /** Stores a list of objects each transaction has locked. */
-  private final ConcurrentMap<Thread, Object[]> locked
-      = new ConcurrentHashMap<Thread, Object[]>();
+  private final ConcurrentMap<Thread, String[]> locked
+      = new ConcurrentHashMap<Thread, String[]>();
   /** BaseX database context. */
   private final MainProp mprop;
 
@@ -111,12 +109,12 @@ public final class DBLocking implements ILocking {
 
   @Override
   public void release(final Progress pr) {
-    final Object[] objects = locked.remove(Thread.currentThread());
+    final String[] objects = locked.remove(Thread.currentThread());
     if(null == objects)
       throw new IllegalMonitorStateException("No locks held by current thread");
 
     // Unlock all locks, no matter if read or write lock
-    for(final Object object : objects) {
+    for(final String object : objects) {
       final ReentrantReadWriteLock lock = locks.get(object);
       if(lock.isWriteLockedByCurrentThread())
         lock.writeLock().unlock();

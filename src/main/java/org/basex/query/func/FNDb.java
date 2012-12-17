@@ -364,7 +364,7 @@ public final class FNDb extends StandardFunc {
         } catch(final IOException ex) {
           BXDB_OPEN.thrw(info, ex);
         } finally {
-          if(di != null) try { di.close(); } catch(final IOException ex) { }
+          if(di != null) try { di.close(); } catch(final IOException ignored) { }
         }
         return res;
       }

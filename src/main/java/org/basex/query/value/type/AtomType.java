@@ -816,7 +816,7 @@ public enum AtomType implements Type {
     final Type ip = it.type;
     if(ip == DBL || ip == FLT) {
       final double d = it.dbl(ii);
-      if(Double.isNaN(d) || d == 1 / 0d || d == -1 / 0d) value(ii, this, it);
+      if(Double.isNaN(d) || Double.isInfinite(d)) value(ii, this, it);
       if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) INTRANGE.thrw(ii, d);
       if(min != max && (d < min || d > max)) FUNCAST.thrw(ii, this, it);
       return (long) d;

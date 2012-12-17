@@ -24,7 +24,7 @@ import org.basex.util.list.*;
  */
 public final class QueryResources {
   /** Resources. */
-  public HashMap<String, String> resources = new HashMap<String, String>();
+  public final HashMap<String, String> resources = new HashMap<String, String>();
 
   /** Database context. */
   private final QueryContext ctx;
@@ -284,7 +284,7 @@ public final class QueryResources {
    * @return document node
    * @throws QueryException query exception
    */
-  private DBNode doc(final Data dt, final QueryInput qi, final InputInfo info)
+  private static DBNode doc(final Data dt, final QueryInput qi, final InputInfo info)
       throws QueryException {
 
     // get all document nodes of the specified database

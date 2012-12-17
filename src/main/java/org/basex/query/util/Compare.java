@@ -43,11 +43,9 @@ public final class Compare {
   /**
    * Sets the specified flag.
    * @param f flag
-   * @return self reference
    */
-  public Compare set(final Flag f) {
+  public void set(final Flag f) {
     flags.add(f);
-    return this;
   }
 
   /**

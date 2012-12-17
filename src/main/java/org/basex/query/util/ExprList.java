@@ -41,12 +41,10 @@ public final class ExprList extends ElementList {
   /**
    * Adds an element to the array.
    * @param e element to be added
-   * @return self reference
    */
-  public ExprList add(final Expr e) {
+  public void add(final Expr e) {
     if(size == list.length) resize(newSize());
     list[size++] = e;
-    return this;
   }
 
   /**

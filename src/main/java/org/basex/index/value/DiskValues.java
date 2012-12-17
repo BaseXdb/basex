@@ -41,7 +41,7 @@ public class DiskValues implements Index {
   /** Synchronization object. */
   protected final Object monitor = new Object();
   /** Number of current index entries. */
-  protected AtomicInteger size = new AtomicInteger();
+  protected final AtomicInteger size = new AtomicInteger();
 
   /**
    * Constructor, initializing the index structure.
@@ -64,8 +64,8 @@ public class DiskValues implements Index {
       throws IOException {
     data = d;
     text = txt;
-    idxl = new DataAccess(d.meta.dbfile(pref + "l"));
-    idxr = new DataAccess(d.meta.dbfile(pref + "r"));
+    idxl = new DataAccess(d.meta.dbfile(pref + 'l'));
+    idxr = new DataAccess(d.meta.dbfile(pref + 'r'));
     size.set(idxl.read4());
   }
 

@@ -143,7 +143,7 @@ public final class Escape extends RegExp {
    */
   private static int[][] merge(final int[][]... rss) {
     final ArrayList<int[]> ranges = new ArrayList<int[]>();
-    for(final int[][] rs : rss) for(final int[] r : rs) ranges.add(r);
+    for(final int[][] rs : rss) Collections.addAll(ranges, rs);
     Collections.sort(ranges, CMP);
     for(int i = 0; i < ranges.size(); i++) {
       final int[] rng = ranges.get(i);
@@ -278,7 +278,7 @@ public final class Escape extends RegExp {
         "\u0EBB\u0EBC\u0EC8\u0ECD\u0F18\u0F19\u0F35\u0F35\u0F37\u0F37\u0F39\u0F39\u0F3E" +
         "\u0F3E\u0F3F\u0F3F\u0F71\u0F84\u0F86\u0F8B\u0F90\u0F95\u0F97\u0F97\u0F99\u0FAD" +
         "\u0FB1\u0FB7\u0FB9\u0FB9\u20D0\u20DC\u20E1\u20E1\u302A\u302F\u3099\u3099\u309A" +
-        "\u309A");
+      '\u309A');
 
     final int[][] digit = read("\u0030\u0039\u0660\u0669\u06F0\u06F9\u0966\u096F\u09E6" +
         "\u09EF\u0A66\u0A6F\u0AE6\u0AEF\u0B66\u0B6F\u0BE7\u0BEF\u0C66\u0C6F\u0CE6\u0CEF" +
@@ -286,7 +286,7 @@ public final class Escape extends RegExp {
 
     final int[][] extender = read("\u00B7\u00B7\u02D0\u02D0\u02D1\u02D1\u0387\u0387" +
         "\u0640\u0640\u0E46\u0E46\u0EC6\u0EC6\u3005\u3005\u3031\u3035\u309D\u309E\u30FC" +
-        "\u30FE");
+      '\u30FE');
 
     final int[][] word = read("\u0024\u0024\u002b\u002b\u0030\u0039\u003c\u003e\u0041" +
         "\u005a\u005e\u005e\u0060\u007a\u007c\u007c\u007e\u007e\u00a2\u00aa\u00ac\u00ac" +
@@ -642,12 +642,12 @@ public final class Escape extends RegExp {
       final int[][] v = e.getValue();
       final CharRange[] rs = new CharRange[v.length];
       for(int i = 0; i < v.length; i++) rs[i] = new CharRange(v[i][0], v[i][1]);
-      MAP.put("\\p{Is" + e.getKey() + "}", rs);
+      MAP.put("\\p{Is" + e.getKey() + '}', rs);
 
       final int[][] not = invert(v);
       final CharRange[] nrs = new CharRange[not.length];
       for(int i = 0; i < not.length; i++) nrs[i] = new CharRange(not[i][0], not[i][1]);
-      MAP.put("\\P{Is" + e.getKey() + "}", nrs);
+      MAP.put("\\P{Is" + e.getKey() + '}', nrs);
     }
   }
 }

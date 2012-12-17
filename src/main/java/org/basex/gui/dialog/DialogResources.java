@@ -218,8 +218,7 @@ public class DialogResources extends BaseXBack {
       }
     }
 
-    refreshFolder(n instanceof TreeFolder ? (TreeFolder) n :
-      (TreeFolder) n.getParent());
+    refreshFolder(n instanceof TreeFolder ? (TreeFolder) n : (TreeFolder) n.getParent());
   }
 
   /**

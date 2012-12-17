@@ -38,7 +38,7 @@ public final class Events extends HashMap<String, Sessions> {
     } catch(final IOException ex) {
       Util.errln(ex);
     } finally {
-      if(in != null) try { in.close(); } catch(final IOException ex) { }
+      if(in != null) try { in.close(); } catch(final IOException ignored) { }
     }
   }
 

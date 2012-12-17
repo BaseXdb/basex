@@ -268,7 +268,7 @@ abstract class AQuery extends Command {
     } catch(final Exception ex) {
       Util.stack(ex);
     } finally {
-      if(bo != null) try { bo.close(); } catch(final IOException ex) { }
+      if(bo != null) try { bo.close(); } catch(final IOException ignored) { }
     }
   }
 

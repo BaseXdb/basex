@@ -23,7 +23,7 @@ public final class InfoDB extends AInfo {
    * Default constructor.
    */
   public InfoDB() {
-    super(Perm.READ, true);
+    super(true);
   }
 
   @Override

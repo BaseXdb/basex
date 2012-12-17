@@ -329,7 +329,7 @@ public final class IOFile extends IO {
       boolean suf = false;
       final String gl = g.trim();
       if(sb.length() != 0) {
-        if(!suf) sb.append(".*");
+        if(suf) sb.append(".*");
         suf = false;
         sb.append('|');
       }

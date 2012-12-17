@@ -188,7 +188,7 @@ public final class DialogProps extends BaseXDialog {
         public void run() {
           infos[idx].setText(val[idx] ? data.info(TYPES[idx]) : Token.token(HELP[idx]));
           updated.delete(idx);
-        };
+        }
       }.start();
     }
   }

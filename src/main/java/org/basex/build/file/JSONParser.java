@@ -65,7 +65,7 @@ public final class JSONParser extends XMLParser {
    * @return parser
    * @throws IOException I/O exception
    */
-  public static IO toXML(final IO io, final String options) throws IOException {
+  private static IO toXML(final IO io, final String options) throws IOException {
     // set parser properties
     final ParserProp props = new ParserProp(options);
     final boolean jsonml = props.is(ParserProp.JSONML);

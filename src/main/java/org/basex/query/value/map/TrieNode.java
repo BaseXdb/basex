@@ -68,7 +68,7 @@ abstract class TrieNode {
    * @param s size
    */
   TrieNode(final int s) {
-    assert s != 0 || EMPTY == null;
+    assert s != 0;
     size = s;
   }
 

@@ -355,7 +355,7 @@ public abstract class Command extends Progress {
       return error(Util.bug(ex) + NL + info.toString());
     } finally {
       // flushes the output
-      try { if(out != null) out.flush(); } catch(final IOException ex) { }
+      try { if(out != null) out.flush(); } catch(final IOException ignored) { }
     }
   }
 }

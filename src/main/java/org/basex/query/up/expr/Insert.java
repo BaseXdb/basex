@@ -54,7 +54,7 @@ public final class Insert extends Update {
     final ANodeList cList = c.children;
     final ANodeList aList = c.atts;
     if(c.errAtt) UPNOATTRPER.thrw(info);
-    if(c.duplAtt != null) UPATTDUPL.thrw(info, c.duplAtt);
+    if(c.duplAtt != null) UPATTDUPL.thrw(info, new QNm(c.duplAtt));
 
     // check target constraints
     final Iter t = ctx.iter(expr[0]);

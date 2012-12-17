@@ -103,7 +103,7 @@ public abstract class ConsoleReader {
     /** Command history file. */
     private static final String HISTORY_FILE = IO.BASEXSUFFIX + "history";
     /** Password echo character. */
-    private static final Character PASSWORD_ECHO = Character.valueOf((char) 0);
+    private static final Character PASSWORD_ECHO = (char) 0;
 
     /** JLine console reader class. */
     private final Class<?> consoleReaderClass;

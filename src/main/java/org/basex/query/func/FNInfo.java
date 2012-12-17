@@ -111,7 +111,7 @@ public final class FNInfo extends StandardFunc {
    * Returns all environment variables.
    * @return iterator
    */
-  private ValueIter avlEnvVars() {
+  private static ValueIter avlEnvVars() {
     final ValueBuilder vb = new ValueBuilder();
     for(final Object k : System.getenv().keySet().toArray()) vb.add(Str.get(k));
     return vb;

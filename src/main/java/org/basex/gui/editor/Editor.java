@@ -48,8 +48,8 @@ public class Editor extends BaseXPanel {
     /** Enforce parsing of input. */
     PARSE,
     /** Enforce execution of input. */
-    EXECUTE;
-  };
+    EXECUTE
+  }
 
   /** Text array to be written. */
   protected final transient EditorText text = new EditorText(EMPTY);
@@ -60,7 +60,7 @@ public class Editor extends BaseXPanel {
   /** Scrollbar reference. */
   final BaseXBar scroll;
   /** Editable flag. */
-  boolean editable;
+  final boolean editable;
   /** Search field. */
   private SearchPanel search;
 
@@ -637,7 +637,7 @@ public class Editor extends BaseXPanel {
       final int y = rend.cursorY();
       final int m = y + rend.fontH() * 3 - getHeight();
       if(p < m || p > y) {
-        final int align = ((Integer) arg).intValue();
+        final int align = (Integer) arg;
         scroll.pos(align == 0 ? y : align == 1 ? y - getHeight() / 2 : m);
         rend.repaint();
       }

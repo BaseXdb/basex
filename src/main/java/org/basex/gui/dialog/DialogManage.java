@@ -140,7 +140,6 @@ public final class DialogManage extends BaseXDialog {
     final StringList dbs = choice.getValues();
     final String db = choice.getValue();
     final ArrayList<Command> cmds = new ArrayList<Command>();
-    boolean active = dbs.size() > 0;
 
     if(cmp == open) {
       close();
@@ -192,7 +191,7 @@ public final class DialogManage extends BaseXDialog {
       doc1.setText(title);
       doc2.setText(BACKUPS + COLS + title);
 
-      active = ctx.mprop.dbexists(db);
+      boolean active = ctx.mprop.dbexists(db);
       if(active) {
         // refresh info view
         DataInput in = null;
@@ -204,7 +203,7 @@ public final class DialogManage extends BaseXDialog {
         } catch(final IOException ex) {
           detail.setText(Token.token(ex.getMessage()));
         } finally {
-          if(in != null) try { in.close(); } catch(final IOException ex) { }
+          if(in != null) try { in.close(); } catch(final IOException ignored) { }
         }
       } else {
         detail.setText(dbs.size() == 1 ? Token.token(ONLY_BACKUP) : Token.EMPTY);

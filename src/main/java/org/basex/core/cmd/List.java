@@ -5,7 +5,6 @@ import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.util.regex.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
@@ -22,10 +21,6 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class List extends Command {
-  /** Pattern to extract the database name from a backup file name. */
-  private static final Pattern PA =
-      Pattern.compile(DateTime.PATTERN + IO.ZIPSUFFIX + '$');
-
   /**
    * Default constructor.
    */
@@ -90,7 +85,7 @@ public final class List extends Command {
       } catch(final IOException ex) {
         file = ERROR;
       } finally {
-        if(di != null) try { di.close(); } catch(final IOException ex) { }
+        if(di != null) try { di.close(); } catch(final IOException ignored) { }
       }
 
       // count number of raw files
@@ -170,35 +165,11 @@ public final class List extends Command {
    * @return list of databases
    */
   public static StringList list(final Context ctx) {
-    return list(ctx, false);
-  }
-
-  /**
-   * Returns a list of all databases and (optionally) backed up databases.
-   * @param ctx database context
-   * @param backups include backups in the list
-   * @return list of databases
-   */
-  public static StringList list(final Context ctx, final boolean backups) {
     final StringList db = new StringList();
     for(final IOFile f : ctx.mprop.dbpath().children()) {
-      String name = f.name();
-      if(backups && name.endsWith(IO.ZIPSUFFIX)) {
-        name = dbname(name);
-        if(!db.contains(name)) db.add(name);
-      } else if(f.isDir() && !name.startsWith(".")) {
-        db.add(name);
-      }
+      final String name = f.name();
+      if(f.isDir() && !name.startsWith(".")) db.add(name);
     }
     return db.sort(false, true);
-  }
-
-  /**
-   * Extracts the name of a database from its backup file.
-   * @param s name of backup file
-   * @return name of database
-   */
-  private static String dbname(final String s) {
-    return PA.split(s)[0];
   }
 }

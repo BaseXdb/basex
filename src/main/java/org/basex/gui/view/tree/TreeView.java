@@ -1121,11 +1121,9 @@ public final class TreeView extends View implements TreeConstants {
 
   @Override
   public void mousePressed(final MouseEvent e) {
-    final boolean left = SwingUtilities.isLeftMouseButton(e);
-    final boolean right = !left;
-    if(!inFocus || !right && !left || frect == null) return;
+    if(!inFocus || frect == null) return;
 
-    if(left) {
+    if(SwingUtilities.isLeftMouseButton(e)) {
       if(flv >= sub.subtreeHeight(frn)) return;
 
       if(tr.bigRect(sub, frn, flv)) {

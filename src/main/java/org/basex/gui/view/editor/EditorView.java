@@ -475,7 +475,7 @@ public final class EditorView extends View {
   private boolean error(final String msg) {
     final String line = msg.replaceAll("[\\r\\n].*", "");
     Matcher m = XQERROR.matcher(line);
-    int el = 0, ec = 2;
+    int el, ec = 2;
     if(!m.matches()) {
       m = XMLERROR.matcher(line);
       if(!m.matches()) return true;

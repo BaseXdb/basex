@@ -288,8 +288,8 @@ public abstract class Path extends ParseExpr {
         QNm nm = new QNm(data.tagindex.key(pn.get(0).name));
         // skip children with prefixes
         if(nm.hasPrefix()) return this;
-        for(int j = 0; j < pn.size(); ++j) {
-          if(pn.get(0).name != pn.get(j).name) nm = null;
+        for(final PathNode p : pn) {
+          if(pn.get(0).name != p.name) nm = null;
         }
         qnm.add(nm);
         pn = PathSummary.parent(pn);

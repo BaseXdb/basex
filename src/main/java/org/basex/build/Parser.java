@@ -32,7 +32,7 @@ public abstract class Parser extends Progress {
   /** Database properties. */
   protected final Prop prop;
   /** Target path (empty, or suffixed with a single slash). */
-  protected String target = "";
+  String target = "";
 
   /**
    * Constructor.

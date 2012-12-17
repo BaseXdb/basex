@@ -10,7 +10,7 @@ import org.basex.data.*;
  */
 public final class DataClip {
   /** Data reference. */
-  public Data data;
+  public final Data data;
   /** Start value. */
   public final int start;
   /** End value (+1). */

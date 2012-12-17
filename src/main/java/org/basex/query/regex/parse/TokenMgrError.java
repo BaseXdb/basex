@@ -108,8 +108,8 @@ public class TokenMgrError extends Error {
   protected static String lexicalError(final boolean eof, final int state, final int line,
       final int col, final String after, final char curr) {
     return "Lexical error at line " + line + ", column " + col + ".  Encountered: " +
-      (eof ? "<EOF> " : "\"" + addEscapes(String.valueOf(curr)) + "\"" +
-        " (" + (int) curr + "), ") + "after : \"" + addEscapes(after) + "\"";
+      (eof ? "<EOF> " : '"' + addEscapes(String.valueOf(curr)) + '"' +
+        " (" + (int) curr + "), ") + "after : \"" + addEscapes(after) + '"';
   }
 
   /**

@@ -183,8 +183,7 @@ public final class HTTPRequestParser {
     if(sendAuth != null && Boolean.parseBoolean(string(sendAuth))) {
       final byte[] un = r.attrs.get(USERNAME);
       final byte[] pw = r.attrs.get(PASSWORD);
-      if(un == null && pw != null || un != null && pw == null || un == null && pw == null)
-        HC_REQ.thrw(info, "Provided credentials are invalid");
+      if(un == null || pw == null) HC_REQ.thrw(info, "Provided credentials are invalid");
     }
   }
 

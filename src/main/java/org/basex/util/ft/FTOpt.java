@@ -66,11 +66,9 @@ public final class FTOpt extends ExprInfo {
    * Sets the specified flag.
    * @param f flag to be set
    * @param v value
-   * @return self reference
    */
-  public FTOpt set(final FTFlag f, final boolean v) {
+  public void set(final FTFlag f, final boolean v) {
     map.put(f, v);
-    return this;
   }
 
   /**

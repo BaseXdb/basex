@@ -101,7 +101,7 @@ public final class Performance {
    * @param ms time in milliseconds to wait
    */
   public static void sleep(final long ms) {
-    try { Thread.sleep(Math.max(0, ms)); } catch(final InterruptedException ex) { }
+    try { Thread.sleep(Math.max(0, ms)); } catch(final InterruptedException ignored) { }
   }
 
   /**

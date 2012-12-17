@@ -111,11 +111,10 @@ public abstract class Main {
   /**
    * Parses and executes the input string.
    * @param in input commands
-   * @return {@code false} if the exit command was sent
    * @throws IOException database exception
    */
-  protected final boolean execute(final String in) throws IOException {
-    return execute(new CommandParser(in, context).pwReader(pwReader));
+  protected final void execute(final String in) throws IOException {
+    execute(new CommandParser(in, context).pwReader(pwReader));
   }
 
   /**

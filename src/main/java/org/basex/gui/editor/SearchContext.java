@@ -41,7 +41,7 @@ final class SearchContext {
     String s = mcase ? srch : srch.toLowerCase(Locale.ENGLISH);
     // speed up regular expressions starting with wildcards
     if(regex && (s.startsWith(".*") || s.startsWith("(.*") ||
-        s.startsWith(".+") || s.startsWith("(.+"))) s = "^" + s;
+        s.startsWith(".+") || s.startsWith("(.+"))) s = '^' + s;
     search = s;
   }
 

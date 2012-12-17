@@ -73,9 +73,9 @@ public final class IntSeq extends NativeSeq {
   @Override
   public Value reverse() {
     final int s = values.length;
-    final long[] t = new long[s];
-    for(int l = 0, r = s - 1; l < s; l++, r--) t[l] = values[r];
-    return get(t, type);
+    final long[] tmp = new long[s];
+    for(int l = 0, r = s - 1; l < s; l++, r--) tmp[l] = values[r];
+    return get(tmp, type);
   }
 
   // STATIC METHODS =====================================================================

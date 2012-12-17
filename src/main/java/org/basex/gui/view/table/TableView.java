@@ -253,15 +253,13 @@ public final class TableView extends View implements Runnable {
         gui.notify.context(nodes, false, null);
       }
     } else {
-      if(pre != -1) {
-        final TableIterator it = new TableIterator(data, tdata);
-        final int c = tdata.column(getWidth() - BaseXBar.SIZE, e.getX());
-        it.init(pre);
-        while(it.more()) {
-          if(it.col == c) {
-            gui.notify.mark(new Nodes(it.pre, data), null);
-            return;
-          }
+      final TableIterator it = new TableIterator(data, tdata);
+      final int c = tdata.column(getWidth() - BaseXBar.SIZE, e.getX());
+      it.init(pre);
+      while(it.more()) {
+        if(it.col == c) {
+          gui.notify.mark(new Nodes(it.pre, data), null);
+          return;
         }
       }
     }

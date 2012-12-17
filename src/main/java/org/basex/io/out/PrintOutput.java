@@ -53,8 +53,7 @@ public class PrintOutput extends OutputStream {
       new PrintOutput(
           out instanceof ByteArrayOutputStream ||
           out instanceof BufferedOutputStream ||
-          out instanceof BufferOutput ||
-          out instanceof ArrayOutput ? out : new BufferOutput(out));
+          out instanceof BufferOutput ? out : new BufferOutput(out));
   }
 
   @Override

@@ -37,7 +37,7 @@ public abstract class BasicOperation extends Operation
     /** FnPut.      */ FNPUT,
     /** DBDrop.     */ DBDROP,
     /** DBCreate.   */ DBCREATE,
-  };
+  }
 
   /** Type of this operation. */
   public final TYPE type;

@@ -160,9 +160,8 @@ public final class FNIndex extends StandardFunc {
       @Override
       public ANode next() {
         final byte[] token = ei.next();
-        if(token == null) return null;
-        final FElem elem = new FElem(Q_ENTRY).add(Q_COUNT, token(ei.count())).add(token);
-        return elem;
+        return token == null ? null :
+          new FElem(Q_ENTRY).add(Q_COUNT, token(ei.count())).add(token);
       }
     };
   }

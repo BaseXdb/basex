@@ -57,9 +57,9 @@ public final class StrSeq extends NativeSeq {
   @Override
   public Value reverse() {
     final int s = values.length;
-    final byte[][] t = new byte[s][];
-    for(int l = 0, r = s - 1; l < s; l++, r--) t[l] = values[r];
-    return get(t);
+    final byte[][] tmp = new byte[s][];
+    for(int l = 0, r = s - 1; l < s; l++, r--) tmp[l] = values[r];
+    return get(tmp);
   }
 
   // STATIC METHODS =====================================================================

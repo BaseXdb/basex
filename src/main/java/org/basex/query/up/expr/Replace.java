@@ -41,7 +41,7 @@ public final class Replace extends Update {
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final Constr c = new Constr(ii, ctx).add(expr[1]);
     if(c.errAtt) UPNOATTRPER.thrw(info);
-    if(c.duplAtt != null) UPATTDUPL.thrw(info, c.duplAtt);
+    if(c.duplAtt != null) UPATTDUPL.thrw(info, new QNm(c.duplAtt));
 
     final Iter t = ctx.iter(expr[0]);
     final Item i = t.next();

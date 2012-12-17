@@ -78,7 +78,7 @@ public class GreekStemmer extends InternalStemmer {
    * @param l length
    * @return new length
    */
-  private int rule0(final char[] s, final int l) {
+  private static int rule0(final char[] s, final int l) {
     if(l > 9 && (
       e(s, l, "\u03ba\u03b1\u03b8\u03b5\u03c3\u03c4\u03c9\u03c4\u03bf\u03c3") ||
       e(s, l, "\u03ba\u03b1\u03b8\u03b5\u03c3\u03c4\u03c9\u03c4\u03c9\u03bd")))
@@ -157,7 +157,7 @@ public class GreekStemmer extends InternalStemmer {
    * @param l length
    * @return new length
    */
-  private int rule1(final char[] s, final int l) {
+  private static int rule1(final char[] s, final int l) {
     int len = l;
     if(len > 4 && (
         e(s, len, "\u03b1\u03b4\u03b5\u03c3") ||
@@ -184,7 +184,7 @@ public class GreekStemmer extends InternalStemmer {
    * @param l length
    * @return new length
    */
-  private int rule2(final char[] s, final int l) {
+  private static int rule2(final char[] s, final int l) {
     int len = l;
     if(len > 4 && (
         e(s, len, "\u03b5\u03b4\u03b5\u03c3") ||
@@ -209,7 +209,7 @@ public class GreekStemmer extends InternalStemmer {
    * @param l length
    * @return new length
    */
-  private int rule3(final char[] s, final int l) {
+  private static int rule3(final char[] s, final int l) {
     int len = l;
     if(len > 5 && (
         e(s, len, "\u03bf\u03c5\u03b4\u03b5\u03c3") ||
@@ -246,7 +246,7 @@ public class GreekStemmer extends InternalStemmer {
    * @param l length
    * @return new length
    */
-  private int rule4(final char[] s, final int l) {
+  private static int rule4(final char[] s, final int l) {
     int len = l;
     if(len > 3 && (
         e(s, len, "\u03b5\u03c9\u03c3") ||
@@ -263,7 +263,7 @@ public class GreekStemmer extends InternalStemmer {
    * @param l length
    * @return new length
    */
-  private int rule5(final char[] s, final int l) {
+  private static int rule5(final char[] s, final int l) {
     int len = l;
     if(len > 2 && e(s, len, "\u03b9\u03b1")) {
       len -= 2;
@@ -303,7 +303,7 @@ public class GreekStemmer extends InternalStemmer {
    * @param l length
    * @return new length
    */
-  private int rule6(final char[] s, final int l) {
+  private static int rule6(final char[] s, final int l) {
     int len = l;
     boolean rem = false;
     if(len > 3 && (
@@ -336,7 +336,7 @@ public class GreekStemmer extends InternalStemmer {
    * @param l length
    * @return new length
    */
-  private int rule7(final char[] s, final int l) {
+  private static int rule7(final char[] s, final int l) {
     int len = l;
     if(len == 5 && e(s, len, "\u03b1\u03b3\u03b1\u03bc\u03b5")) return len - 1;
 
@@ -416,7 +416,7 @@ public class GreekStemmer extends InternalStemmer {
    * @param l length
    * @return new length
    */
-  private int rule8(final char[] s, final int l) {
+  private static int rule8(final char[] s, final int l) {
     boolean rem = false;
 
     int len = l;
@@ -481,7 +481,7 @@ public class GreekStemmer extends InternalStemmer {
    * @param l length
    * @return new length
    */
-  private int rule9(final char[] s, final int l) {
+  private static int rule9(final char[] s, final int l) {
     int len = l;
     if(len > 5 && e(s, len, "\u03b7\u03c3\u03b5\u03c4\u03b5")) len -= 5;
 
@@ -532,7 +532,7 @@ public class GreekStemmer extends InternalStemmer {
    * @param l length
    * @return new length
    */
-  private int rule10(final char[] s, final int l) {
+  private static int rule10(final char[] s, final int l) {
     int len = l;
     if(len > 5 && (
         e(s, len, "\u03bf\u03bd\u03c4\u03b1\u03c3") ||
@@ -557,7 +557,7 @@ public class GreekStemmer extends InternalStemmer {
    * @param l length
    * @return new length
    */
-  private int rule11(final char[] s, final int l) {
+  private static int rule11(final char[] s, final int l) {
     int len = l;
     if(len > 6 && e(s, len, "\u03bf\u03bc\u03b1\u03c3\u03c4\u03b5")) {
       len -= 6;
@@ -598,7 +598,7 @@ public class GreekStemmer extends InternalStemmer {
    * @param l length
    * @return new length
    */
-  private int rule12(final char[] s, final int l) {
+  private static int rule12(final char[] s, final int l) {
     int len = l;
     if(len > 5 && e(s, len, "\u03b9\u03b5\u03c3\u03c4\u03b5")) {
       len -= 5;
@@ -626,7 +626,7 @@ public class GreekStemmer extends InternalStemmer {
    * @param l length
    * @return new length
    */
-  private int rule13(final char[] s, final int l) {
+  private static int rule13(final char[] s, final int l) {
     int len = l;
     if(len > 6 && e(s, len, "\u03b7\u03b8\u03b7\u03ba\u03b5\u03c3")) {
       len -= 6;
@@ -681,7 +681,7 @@ public class GreekStemmer extends InternalStemmer {
    * @param l length
    * @return new length
    */
-  private int rule14(final char[] s, final int l) {
+  private static int rule14(final char[] s, final int l) {
     int len = l;
     boolean rem = false;
 
@@ -748,7 +748,7 @@ public class GreekStemmer extends InternalStemmer {
    * @param l length
    * @return new length
    */
-  private int rule15(final char[] s, final int l) {
+  private static int rule15(final char[] s, final int l) {
     int len = l;
     boolean rem = false;
     if(len > 4 && e(s, len, "\u03b1\u03b3\u03b5\u03c3")) {
@@ -796,7 +796,7 @@ public class GreekStemmer extends InternalStemmer {
    * @param l length
    * @return new length
    */
-  private int rule16(final char[] s, final int l) {
+  private static int rule16(final char[] s, final int l) {
     int len = l;
     boolean rem = false;
     if(len > 4 && e(s, len, "\u03b7\u03c3\u03bf\u03c5")) {
@@ -828,7 +828,7 @@ public class GreekStemmer extends InternalStemmer {
    * @param l length
    * @return new length
    */
-  private int rule17(final char[] s, final int l) {
+  private static int rule17(final char[] s, final int l) {
     int len = l;
     if(len > 4 && e(s, len, "\u03b7\u03c3\u03c4\u03b5")) {
       len -= 4;
@@ -851,7 +851,7 @@ public class GreekStemmer extends InternalStemmer {
    * @param l length
    * @return new length
    */
-  private int rule18(final char[] s, final int l) {
+  private static int rule18(final char[] s, final int l) {
     boolean rem = false;
 
     int len = l;
@@ -887,7 +887,7 @@ public class GreekStemmer extends InternalStemmer {
    * @param l length
    * @return new length
    */
-  private int rule19(final char[] s, final int l) {
+  private static int rule19(final char[] s, final int l) {
     int len = l;
     boolean rem = false;
 
@@ -916,7 +916,7 @@ public class GreekStemmer extends InternalStemmer {
    * @param l length
    * @return new length
    */
-  private int rule20(final char[] s, final int l) {
+  private static int rule20(final char[] s, final int l) {
     int len = l;
     if(len > 5 && (
       e(s, len, "\u03bc\u03b1\u03c4\u03c9\u03bd") ||
@@ -931,7 +931,7 @@ public class GreekStemmer extends InternalStemmer {
    * @param l length
    * @return new length
    */
-  private int rule21(final char[] s, final int l) {
+  private static int rule21(final char[] s, final int l) {
     if(l > 9 && e(s, l, "\u03b9\u03bf\u03bd\u03c4\u03bf\u03c5\u03c3\u03b1\u03bd"))
       return l - 9;
 
@@ -1036,7 +1036,7 @@ public class GreekStemmer extends InternalStemmer {
    * @param l length
    * @return new length
    */
-  private int rule22(final char[] s, final int l) {
+  private static int rule22(final char[] s, final int l) {
     if(e(s, l, "\u03b5\u03c3\u03c4\u03b5\u03c1") ||
        e(s, l, "\u03b5\u03c3\u03c4\u03b1\u03c4")) return l - 5;
     if(e(s, l, "\u03bf\u03c4\u03b5\u03c1") ||
@@ -1055,7 +1055,7 @@ public class GreekStemmer extends InternalStemmer {
    * @param suf suffix
    * @return result of check
    */
-  private boolean e(final char[] s, final int l, final String suf) {
+  private static boolean e(final char[] s, final int l, final String suf) {
     final int sl = suf.length();
     if(sl > l) return false;
     for(int i = sl - 1; i >= 0; i--) {
@@ -1070,7 +1070,7 @@ public class GreekStemmer extends InternalStemmer {
    * @param l length
    * @return result of check
    */
-  private boolean ev(final char[] s, final int l) {
+  private static boolean ev(final char[] s, final int l) {
     if(l == 0) return false;
     switch(s[l - 1]) {
       case '\u03b1':
@@ -1092,7 +1092,7 @@ public class GreekStemmer extends InternalStemmer {
    * @param l length
    * @return result of check
    */
-  private boolean ey(final char[] s, final int l) {
+  private static boolean ey(final char[] s, final int l) {
     if(l == 0) return false;
     switch(s[l - 1]) {
       case '\u03b1':
@@ -1114,7 +1114,7 @@ public class GreekStemmer extends InternalStemmer {
    * @param l length of characters
    * @return result of check
    */
-  private boolean c(final String[] strings, final char[] s, final int l) {
+  private static boolean c(final String[] strings, final char[] s, final int l) {
     for(final String e : strings) {
       final int el = e.length();
       if(l != el) continue;

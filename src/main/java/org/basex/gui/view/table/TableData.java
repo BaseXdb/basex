@@ -222,17 +222,16 @@ final class TableData {
   void setWidths(final boolean force) {
     // calculate width of each column
     double sum = 0;
-    final int cs = cols.length;
-    for(int c = 0; c < cs; ++c) sum += cols[c].width;
+    for(final TableCol col : cols) sum += col.width;
     // avoid too small columns
     final double min = force ? 0.0 : 0.5;
-    for(int c = 0; c < cs; ++c)
-      cols[c].width = Math.max(min / cs, cols[c].width / sum);
+    final int cs = cols.length;
+    for(final TableCol col : cols) col.width = Math.max(min / cs, col.width / sum);
     // recalculate column widths
     sum = 0;
-    for(int c = 0; c < cs; ++c) sum += cols[c].width;
+    for(final TableCol col : cols) sum += col.width;
     // normalize widths
-    for(int c = 0; c < cs; ++c) cols[c].width /= sum;
+    for(final TableCol col : cols) col.width /= sum;
   }
 
   /**

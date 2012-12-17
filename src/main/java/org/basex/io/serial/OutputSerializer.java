@@ -92,7 +92,7 @@ public abstract class OutputSerializer extends Serializer {
 
     final SerializerProp p = props == null ? PROPS : props;
     final String ver = p.supported(S_VERSION, versions);
-    final String htmlver = p.supported(S_HTML_VERSION, new String[] { V40, V401, V50 });
+    final String htmlver = p.supported(S_HTML_VERSION, V40, V401, V50);
     html5 = htmlver.equals(V50) || ver.equals(V50);
 
     final boolean decl = !p.yes(S_OMIT_XML_DECLARATION);

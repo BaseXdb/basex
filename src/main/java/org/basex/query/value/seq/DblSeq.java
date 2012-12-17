@@ -53,9 +53,9 @@ public final class DblSeq extends NativeSeq {
   @Override
   public Value reverse() {
     final int s = values.length;
-    final double[] t = new double[s];
-    for(int l = 0, r = s - 1; l < s; l++, r--) t[l] = values[r];
-    return get(t);
+    final double[] tmp = new double[s];
+    for(int l = 0, r = s - 1; l < s; l++, r--) tmp[l] = values[r];
+    return get(tmp);
   }
 
   // STATIC METHODS =====================================================================

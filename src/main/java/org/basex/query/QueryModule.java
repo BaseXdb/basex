@@ -53,7 +53,7 @@ public abstract class QueryModule {
     /** Read permissions. */
     READ,
     /** No permissions. */
-    NONE;
+    NONE
   }
 
   /**

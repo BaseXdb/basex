@@ -114,14 +114,14 @@ public class ParseException extends Exception {
         retval += img[0];
         break;
       }
-      retval += " " + img[tok.kind];
+      retval += ' ' + img[tok.kind];
       retval += " \"";
       retval += addEscapes(tok.image);
       retval += " \"";
       tok = tok.next;
     }
     retval += "\" at line " + curr.next.beginLine + ", column " + curr.next.beginColumn;
-    retval += "." + eol;
+    retval += '.' + eol;
     if (exps.length == 1) {
       retval += "Was expecting:" + eol + "    ";
     } else {

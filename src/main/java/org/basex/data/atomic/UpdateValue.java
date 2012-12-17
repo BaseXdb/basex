@@ -18,15 +18,12 @@ final class UpdateValue extends BasicUpdate {
 
   /**
    * Constructor.
-   *
    * @param l PRE value of the target node location
    * @param k node kind of the target node
    * @param v new value which is assigned to the target node
-   * @param s PRE value shifts introduced by update
-   * @param f PRE value of the first node which distance has to be updated
    */
-  UpdateValue(final int l, final int s, final int f, final int k, final byte[] v) {
-    super(l, s, f);
+  UpdateValue(final int l, final int k, final byte[] v) {
+    super(l, 0, -1);
     targetkind = k;
     value = v;
   }

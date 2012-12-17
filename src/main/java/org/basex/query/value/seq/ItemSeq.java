@@ -117,8 +117,8 @@ public final class ItemSeq extends Seq {
   @Override
   public Value reverse() {
     final int s = item.length;
-    final Item[] t = new Item[s];
-    for(int l = 0, r = s - 1; l < s; l++, r--) t[l] = item[r];
-    return get(t, s, type);
+    final Item[] tmp = new Item[s];
+    for(int l = 0, r = s - 1; l < s; l++, r--) tmp[l] = item[r];
+    return get(tmp, s, type);
   }
 }

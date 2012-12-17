@@ -160,13 +160,14 @@ public final class Stats {
     final StringBuilder sb = new StringBuilder(count + "x");
     switch(type) {
       case CATEGORY:
-        sb.append(", " + cats.size() + " values");
+        sb.append(", ").append(cats.size()).append(" values");
         break;
       case DOUBLE:
-        sb.append(", numeric(" + min + " - " + max + ')');
+        sb.append(", numeric(").append(min).append(" - ").append(max).append(')');
         break;
       case INTEGER:
-        sb.append(", numeric(" + (int) min + " - " + (int) max + ')');
+        sb.append(", numeric(").append((int) min).append(" - ").append((int) max).
+          append(')');
         break;
       case TEXT:
         sb.append(", strings");

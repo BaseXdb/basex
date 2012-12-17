@@ -33,9 +33,8 @@ public final class Ann extends ElementList {
    * Adds a QName/value pair.
    * @param name QName
    * @param value value
-   * @return success flag
    */
-  public boolean add(final QNm name, final Value value) {
+  public void add(final QNm name, final Value value) {
     // create new entry
     if(size == names.length) {
       final int s = newSize();
@@ -45,7 +44,6 @@ public final class Ann extends ElementList {
     names[size] = name;
     values[size] = value;
     size++;
-    return true;
   }
 
   /**

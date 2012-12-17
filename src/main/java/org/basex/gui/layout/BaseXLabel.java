@@ -39,7 +39,7 @@ public class BaseXLabel extends JLabel {
   public BaseXLabel(final String txt, final boolean dist, final boolean bold) {
     super(txt);
     if(dist) border(0, 0, 6, 0);
-    setFont(getFont().deriveFont(bold ? 1 : 0));
+    setFont(getFont().deriveFont(bold ? Font.BOLD : Font.PLAIN));
   }
 
   /**

@@ -145,7 +145,7 @@ public final class FNZip extends StandardFunc {
     } catch(final IOException ex) {
       throw ZIP_FAIL.thrw(info, ex);
     } finally {
-      if(zf != null) try { zf.close(); } catch(final IOException e) { }
+      if(zf != null) try { zf.close(); } catch(final IOException ignored) { }
     }
   }
 
@@ -234,7 +234,7 @@ public final class FNZip extends StandardFunc {
       ZIP_FAIL.thrw(info, ex);
     } finally {
       if(fos != null) {
-        try { fos.close(); } catch(final IOException ex) { }
+        try { fos.close(); } catch(final IOException ignored) { }
         if(!ok) new IOFile(file).delete();
       }
     }
@@ -291,7 +291,7 @@ public final class FNZip extends StandardFunc {
             bis = new BufferedInputStream(new FileInputStream(src));
             for(int c; (c = bis.read(data)) != -1;) zos.write(data, 0, c);
           } finally {
-            if(bis != null) try { bis.close(); } catch(final IOException e) { }
+            if(bis != null) try { bis.close(); } catch(final IOException ignored) { }
           }
         } else {
           // no source reference: the child nodes are treated as file contents
@@ -393,12 +393,12 @@ public final class FNZip extends StandardFunc {
         ok = false;
         ZIP_FAIL.thrw(info, ex);
       } finally {
-        if(fos != null) try { fos.close(); } catch(final IOException ex) { }
+        if(fos != null) try { fos.close(); } catch(final IOException ignored) { }
       }
     } catch(final IOException ex) {
       throw ZIP_FAIL.thrw(info, ex);
     } finally {
-      if(zf != null) try { zf.close(); } catch(final IOException e) { }
+      if(zf != null) try { zf.close(); } catch(final IOException ignored) { }
       if(ok) {
         // rename temporary file to final target
         target.delete();

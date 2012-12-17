@@ -47,11 +47,11 @@ import org.basex.util.list.*;
 public final class CSVParser extends SingleParser {
   /** Separators. */
   public static final String[] SEPARATORS = { "comma", "semicolon", "tab", "space" };
-  /** Separator mappings. */
-  public static final char[] SEPMAPPINGS = { ',', ';', '\t', ' ' };
   /** Formats. */
   public static final String[] FORMATS = { "simple", "verbose" };
 
+  /** Separator mappings. */
+  private static final char[] SEPMAPPINGS = { ',', ';', '\t', ' ' };
   /** CSV root element. */
   private static final byte[] CSV = token("csv");
   /** CSV header element. */

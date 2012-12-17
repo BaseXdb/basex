@@ -134,7 +134,7 @@ public final class MinHeap<K, V> {
     if(2 * i + 1 < size) {
       final int left = 2 * i + 1, right = 2 * (i + 1);
       if(compare(i, left) > 0 || right < size && compare(i, right) > 0)
-        throw new IllegalStateException("Heap invariant doesn'T hold at node " + i + ".");
+        throw new IllegalStateException("Heap invariant doesn'T hold at node " + i + '.');
       verify(left);
       verify(right);
     }

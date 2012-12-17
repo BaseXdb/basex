@@ -25,9 +25,7 @@ public final class Kill extends AUser {
 
   @Override
   protected boolean run() {
-    boolean ok = run(0, false);
-    if(!ok || count == 0) {
-      ok = true;
+    if(!run(0, false) || count == 0) {
       error("");
 
       // kill all sessions with the specified IP (and optional port)
@@ -46,7 +44,7 @@ public final class Kill extends AUser {
         }
       }
     }
-    return ok && info(SESSIONS_KILLED_X, count);
+    return info(SESSIONS_KILLED_X, count);
   }
 
   @Override

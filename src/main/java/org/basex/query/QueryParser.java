@@ -233,20 +233,17 @@ public class QueryParser extends InputParser {
    */
   public final Expr module(final byte[] u) throws QueryException {
     try {
-      Expr expr = null;
       versionDecl();
-      if(u == null) {
-        final int i = ip;
-        if(wsConsumeWs(MODULE, NSPACE, null)) error(MAINMOD);
-        ip = i;
+      if(u != null) return moduleDecl(u);
 
-        expr = mainModule();
-        if(expr == null) {
-          if(alter != null) error();
-          else error(EXPREMPTY);
-        }
-      } else {
-        expr = moduleDecl(u);
+      final int i = ip;
+      if(wsConsumeWs(MODULE, NSPACE, null)) error(MAINMOD);
+      ip = i;
+
+      final Expr expr = mainModule();
+      if(expr == null) {
+        if(alter != null) error();
+        else error(EXPREMPTY);
       }
       return expr;
     } catch(final QueryException ex) {

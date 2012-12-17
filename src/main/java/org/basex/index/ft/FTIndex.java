@@ -451,11 +451,11 @@ public final class FTIndex implements Index {
    */
   static final class FTCache {
     /** Order. */
-    int[] order;
+    final int[] order;
     /** Pre values. */
-    IntList pre;
+    final IntList pre;
     /** Pos values. */
-    IntList pos;
+    final IntList pos;
 
     /**
      * Constructor.

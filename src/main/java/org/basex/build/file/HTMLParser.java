@@ -92,7 +92,7 @@ public final class HTMLParser extends XMLParser {
 
       // set TagSoup options
       final HTMLProp props = new HTMLProp(options);
-      String p = "";
+      String p;
       if(props.is(HTMLProp.HTML)) {
         reader.setFeature("http://xml.org/sax/features/namespaces", false);
         opt("method", "html");

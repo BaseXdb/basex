@@ -705,7 +705,7 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Tests if the common data instance for all insert sequences is built correctly.
-   * [LK][CG] Updates: maybe we should add some more low-level TCs ...
+   * [LK][CG] XQUF: maybe we should add some more low-level TCs ...
    */
   @Test
   public void dataClipBuildFail() {

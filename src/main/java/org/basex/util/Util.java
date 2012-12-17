@@ -165,17 +165,15 @@ public final class Util {
   }
 
   /**
-   * Prints the exception stack trace if the {@link #debug} flag is set.
+   * Prints the exception stack trace if the {@link Prop#debug} flag is set.
    * @param ex exception
-   * @return always false
    */
-  public static boolean debug(final Throwable ex) {
+  public static void debug(final Throwable ex) {
     if(Prop.debug && ex != null) stack(ex);
-    return false;
   }
 
   /**
-   * Prints a string to standard error if the {@link #debug} flag is set.
+   * Prints a string to standard error if the {@link Prop#debug} flag is set.
    * @param str debug string
    * @param ext text optional extensions
    */
@@ -184,7 +182,7 @@ public final class Util {
   }
 
   /**
-   * Prints performance information if the {@link #debug} flag is set.
+   * Prints performance information if the {@link Prop#debug} flag is set.
    * @param perf performance reference
    */
   public static void memory(final Performance perf) {

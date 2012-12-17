@@ -342,8 +342,7 @@ public final class EditorText {
 
     // decide if to use tab or spaces
     boolean tab = false;
-    final int pl = text.length;
-    for(int p = 0; p < pl; ++p) tab |= text[p] == '\t';
+    for(final byte t : text) tab |= t == '\t';
     byte[] add = { '\t' };
     if(!tab) {
       add = new byte[TAB];
@@ -353,6 +352,7 @@ public final class EditorText {
     // build new text
     final TokenBuilder tb = new TokenBuilder();
     tb.add(text, 0, ms);
+    final int pl = text.length;
     for(int p = ms; p < ps; p += cl(text, p)) {
       if(p == 0 || text[p - 1] == '\n') {
         if(sh) {

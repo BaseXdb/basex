@@ -75,10 +75,7 @@ public final class ValueAccess extends IndexAccess {
 
       @Override
       public ANode next() {
-        while(ii.more()) {
-          return new DBNode(data, ii.next(), kind);
-        }
-        return null;
+        return ii.more() ? new DBNode(data, ii.next(), kind) : null;
       }
     };
   }

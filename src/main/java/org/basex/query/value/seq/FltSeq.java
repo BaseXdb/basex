@@ -53,9 +53,9 @@ public final class FltSeq extends NativeSeq {
   @Override
   public Value reverse() {
     final int s = values.length;
-    final float[] t = new float[s];
-    for(int l = 0, r = s - 1; l < s; l++, r--) t[l] = values[r];
-    return get(t);
+    final float[] tmp = new float[s];
+    for(int l = 0, r = s - 1; l < s; l++, r--) tmp[l] = values[r];
+    return get(tmp);
   }
 
   // STATIC METHODS =====================================================================

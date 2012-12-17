@@ -10,7 +10,7 @@ import org.basex.core.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class HTMLProp extends AProp {
+final class HTMLProp extends AProp {
   /** TagSoup option: html. */
   public static final Object[] HTML = { "html", false };
   /** TagSoup option: omit-xml-declaration. */

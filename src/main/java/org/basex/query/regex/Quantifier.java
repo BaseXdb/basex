@@ -39,6 +39,6 @@ public class Quantifier extends RegExp {
       if(max == 1) return "?";
       if(max == -1) return "*";
     } else if(min == 1 && max == -1) return "+";
-    return "{" + min + (min == max ? "" : "," + (max == -1 ? "" : max)) + "}";
+    return "{" + min + (min == max ? "" : "," + (max == -1 ? "" : max)) + '}';
   }
 }

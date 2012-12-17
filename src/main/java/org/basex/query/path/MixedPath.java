@@ -66,9 +66,7 @@ public final class MixedPath extends Path {
     final long cp = ctx.pos;
     try {
       // loop through all expressions
-      final int el = steps.length;
-      for(int ex = 0; ex < el; ex++) {
-        final Expr e = steps[ex];
+      for(final Expr e : steps) {
         // map operator: don't remove duplicates and check for nodes
         final boolean path = !(e instanceof Bang);
         //final boolean last = ex + 1 == el;

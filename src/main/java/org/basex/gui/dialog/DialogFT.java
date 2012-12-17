@@ -38,9 +38,7 @@ final class DialogFT extends BaseXBack {
   private final BaseXDialog dialog;
   /** Full-text indexing. */
   private final BaseXCheckBox[] check = new BaseXCheckBox[FLAGS];
-  /** Full-text labels. */
-  private final BaseXLabel[] labels = new BaseXLabel[FLAGS];
-  /** Full-text language. */
+    /** Full-text language. */
   private final BaseXCombo language;
   /** Path for Full-text stopword list. */
   private final BaseXTextField swpath;
@@ -66,6 +64,7 @@ final class DialogFT extends BaseXBack {
     final boolean[] val = { !prop.get(Prop.LANGUAGE).isEmpty(), prop.is(Prop.STEMMING),
         prop.is(Prop.CASESENS), prop.is(Prop.DIACRITICS), !sw.isEmpty() };
 
+    final BaseXLabel[] labels = new BaseXLabel[FLAGS];
     for(int f = 0; f < check.length; ++f) {
       check[f] = new BaseXCheckBox(cb[f], val[f], create ? 1 : 0, d);
       if(!create) {

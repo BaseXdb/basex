@@ -12,6 +12,6 @@ public final class EncodingException extends InputException {
    * @param cp code points
    */
   public EncodingException(final int cp) {
-    super("Invalid XML character (#" + cp + ")");
+    super("Invalid XML character (#" + cp + ')');
   }
 }

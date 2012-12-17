@@ -98,7 +98,7 @@ public final class QueryContext extends Progress {
   /** Pending updates. */
   public Updates updates;
   /** Pending output. */
-  public ValueBuilder output = new ValueBuilder();
+  public final ValueBuilder output = new ValueBuilder();
 
   /** Compilation flag: current node has leaves. */
   public boolean leaf;
@@ -122,7 +122,7 @@ public final class QueryContext extends Progress {
   /** Initial context value. */
   public Expr ctxItem;
   /** Module loader. */
-  public ModuleLoader modules;
+  public final ModuleLoader modules;
   /** Opened connections to relational databases. */
   JDBCConnections jdbc;
   /** Opened connections to relational databases. */
@@ -460,7 +460,7 @@ public final class QueryContext extends Progress {
     // evaluates the query
     final Iter ir = iter();
     final ValueBuilder vb = new ValueBuilder();
-    Item it = null;
+    Item it;
 
     // check if all results belong to the database of the input context
     if(serProp == null && nodes != null) {

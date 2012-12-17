@@ -10,13 +10,13 @@ import org.basex.data.*;
  */
 public final class QueryInput {
   /** Original input string. */
-  public String original = "";
+  public final String original;
+  /** Input reference. */
+  public final IO io;
   /** Optional database path. */
   public String path = "";
   /** Optional database name. */
   public String db;
-  /** Input reference. */
-  public IO io;
 
   /**
    * Constructor.

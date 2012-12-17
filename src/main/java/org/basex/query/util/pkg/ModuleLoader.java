@@ -209,8 +209,8 @@ public final class ModuleLoader {
    * @return {@code true} if file exists and was successfully parsed
    * @throws QueryException query exception
    */
-  private boolean addModule(final IOFile file, final byte[] uri, final QueryParser qp)
-      throws QueryException {
+  private static boolean addModule(final IOFile file, final byte[] uri,
+      final QueryParser qp) throws QueryException {
 
     if(!file.exists()) return false;
     qp.module(token(file.path()), uri);

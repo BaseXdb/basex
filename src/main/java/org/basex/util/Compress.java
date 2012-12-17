@@ -48,8 +48,8 @@ public final class Compress {
     push(lc >= 0 ? 1 : 0, 1);
 
     // compress all characters
-    for(int t = 0; t < tl; t++) {
-      int b = txt[t];
+    for(final byte t : txt) {
+      int b = t;
       if(b >= 0) b = pack[b];
       if(b >= 0x00 && b < 0x08) { // 1 xxx
         push(1 | b << 1, 4);

@@ -20,9 +20,11 @@ import org.basex.util.hash.*;
 public final class StaticContext {
   /** Decimal formats. */
   public final TokenObjMap<DecFormatter> decFormats = new TokenObjMap<DecFormatter>();
-
   /** Static and dynamic namespaces. */
-  public NSContext ns = new NSContext();
+  public final NSContext ns = new NSContext();
+  /** Default collation. */
+  public final Uri collation = Uri.uri(URLCOLL, false);
+
   /** Default element/type namespace. */
   public byte[] nsElem;
   /** Default function namespace. */
@@ -42,8 +44,6 @@ public final class StaticContext {
   public boolean nsPreserve = true;
   /** Copy-namespaces mode: (no-)inherit. */
   public boolean nsInherit = true;
-  /** Default collation. */
-  public Uri collation = Uri.uri(URLCOLL, false);
   /** XQuery version flag. */
   public boolean xquery3;
 

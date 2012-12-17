@@ -47,12 +47,10 @@ public final class ANodeList implements Iterable<ANode> {
   /**
    * Adds an element to the array.
    * @param e element to be added
-   * @return self reference
    */
-  public ANodeList add(final ANode e) {
+  public void add(final ANode e) {
     if(size == list.length) resize(Array.newSize(size));
     list[size++] = e;
-    return this;
   }
 
   /**

@@ -140,9 +140,8 @@ public final class SearchPanel extends BaseXBack {
    * Sets the specified editor and updates the component layout.
    * @param e editor
    * @param srch triggers a search in the specified editor
-   * @return self reference
    */
-  public SearchPanel editor(final Editor e, final boolean srch) {
+  public void editor(final Editor e, final boolean srch) {
     final boolean ed = e.isEditable();
     if(editor == null || ed != editor.isEditable()) {
       removeAll();
@@ -170,7 +169,6 @@ public final class SearchPanel extends BaseXBack {
     e.setSearch(this);
 
     if(srch) search(false);
-    return this;
   }
 
   /**
@@ -202,9 +200,8 @@ public final class SearchPanel extends BaseXBack {
   /**
    * Activates the search panel.
    * @param string search string; triggers new search if different than old string
-   * @return {@code true} if panel was opened
    */
-  public boolean activate(final String string) {
+  public void activate(final String string) {
     boolean action = !isVisible();
     if(action) {
       setVisible(true);
@@ -220,7 +217,6 @@ public final class SearchPanel extends BaseXBack {
     }
     // search if string has changed, or if panel was hidden
     if(action) search();
-    return action;
   }
 
   /**
@@ -292,7 +288,7 @@ public final class SearchPanel extends BaseXBack {
    * @param in input
    * @return decoded string
    */
-  String decode(final String in) {
+  static String decode(final String in) {
     final StringBuilder sb = new StringBuilder();
     boolean bs = false;
     for(int i = 0; i < in.length(); i++) {

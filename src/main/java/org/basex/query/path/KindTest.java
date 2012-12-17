@@ -25,6 +25,6 @@ class KindTest extends Test {
 
   @Override
   public String toString() {
-    return new StringBuilder().append(type).toString();
+    return String.valueOf(type);
   }
 }

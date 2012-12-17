@@ -111,8 +111,9 @@ public final class Dec extends ANum {
   @Override
   public int diff(final InputInfo ii, final Item it) throws QueryException {
     final double d = it.dbl(ii);
-    return d == 1 / 0.0 ? -1 : d == -1 / 0.0 ? 1 :
-      Double.isNaN(d) ? UNDEF : val.compareTo(it.dec(ii));
+    return d == Double.NEGATIVE_INFINITY ? -1 :
+           d == Double.POSITIVE_INFINITY ? 1 :
+           Double.isNaN(d) ? UNDEF : val.compareTo(it.dec(ii));
   }
 
   @Override
@@ -129,8 +130,7 @@ public final class Dec extends ANum {
    */
   public static BigDecimal parse(final double val, final InputInfo ii)
       throws QueryException {
-    if(Double.isNaN(val) || val == 1 / 0d || val == -1 / 0d)
-      Err.value(ii, AtomType.DEC, val);
+    if(Double.isNaN(val) || Double.isInfinite(val)) Err.value(ii, AtomType.DEC, val);
     return BigDecimal.valueOf(val);
   }
 

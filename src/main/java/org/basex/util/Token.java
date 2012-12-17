@@ -458,8 +458,8 @@ public final class Token {
    * @return byte array or zero, or {@code null}
    */
   private static byte[] tok(final double dbl) {
-    if(dbl == 1 / 0d) return INF;
-    if(dbl == -1 / 0d) return NINF;
+    if(dbl == Double.POSITIVE_INFINITY) return INF;
+    if(dbl == Double.NEGATIVE_INFINITY) return NINF;
     if(dbl == 0) return 1 / dbl > 0 ? ZERO : MZERO;
     if(Double.isNaN(dbl)) return NAN;
     final double a = Math.abs(dbl);
@@ -629,8 +629,7 @@ public final class Token {
     if(token[0] == '0') return te == 1 ? 0 : Integer.MIN_VALUE;
 
     int v = 0;
-    for(int ts = 0; ts < te; ++ts) {
-      final byte c = token[ts];
+    for(final byte c : token) {
       if(c < '0' || c > '9') return Integer.MIN_VALUE;
       v = (v << 3) + (v << 1) + c - '0';
     }
@@ -951,8 +950,7 @@ public final class Token {
    * @return true if all characters are whitespaces
    */
   public static boolean ws(final byte[] token) {
-    final int tl = token.length;
-    for(int i = 0; i < tl; ++i) if(token[i] < 0 || token[i] > ' ') return false;
+    for(final byte t : token) if(t < 0 || t > ' ') return false;
     return true;
   }
 
@@ -1067,10 +1065,10 @@ public final class Token {
     final byte[] tmp = new byte[l];
     int c = 0;
     boolean ws1 = true;
-    for(int i = 0; i < l; ++i) {
-      final boolean ws2 = ws(token[i]);
+    for(final byte t : token) {
+      final boolean ws2 = ws(t);
       if(ws2 && ws1) continue;
-      tmp[c++] = ws2 ? (byte) ' ' : token[i];
+      tmp[c++] = ws2 ? (byte) ' ' : t;
       ws1 = ws2;
     }
     if(c > 0 && ws(tmp[c - 1])) --c;
@@ -1211,12 +1209,10 @@ public final class Token {
    * @return encoded token
    */
   public static byte[] uri(final byte[] token, final boolean iri) {
-    final int tl = token.length;
     final TokenBuilder tb = new TokenBuilder();
-    for(int t = 0; t < tl; ++t) {
-      final byte b = token[t];
-      if(letterOrDigit(b) || contains(iri ? IRIRES : RES, b)) tb.addByte(b);
-      else hex(tb, b);
+    for(final byte t : token) {
+      if(letterOrDigit(t) || contains(iri ? IRIRES : RES, t)) tb.addByte(t);
+      else hex(tb, t);
     }
     return tb.finish();
   }
@@ -1227,12 +1223,10 @@ public final class Token {
    * @return escaped token
    */
   public static byte[] escape(final byte[] token) {
-    final int tl = token.length;
     final TokenBuilder tb = new TokenBuilder();
-    for(int t = 0; t < tl; ++t) {
-      final byte b = token[t];
-      if(b >= 0x20 && b <= 0x7e) tb.addByte(b);
-      else hex(tb, b);
+    for(final byte t : token) {
+      if(t >= 0x20 && t <= 0x7e) tb.addByte(t);
+      else hex(tb, t);
     }
     return tb.finish();
   }

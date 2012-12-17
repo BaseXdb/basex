@@ -16,10 +16,12 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class Flt extends ANum {
-  /** Invalid value. */
+  /** Value "NaN". */
   public static final Flt NAN = new Flt(Float.NaN);
-  /** Zero value. */
+  /** Value "0". */
   private static final Flt ZERO = new Flt(0);
+  /** Value "1". */
+  private static final Flt ONE = new Flt(1);
   /** Data. */
   private final float val;
 
@@ -38,7 +40,8 @@ public final class Flt extends ANum {
    * @return instance
    */
   public static Flt get(final float f) {
-    return f == 0 && f == 1 / 0f ? ZERO : isNaN(f) ? NAN : new Flt(f);
+    return f == 0 && Float.floatToRawIntBits(f) == 0 ? ZERO : f == 1 ? ONE :
+      isNaN(f) ? NAN : new Flt(f);
   }
 
   @Override

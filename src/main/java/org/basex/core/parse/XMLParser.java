@@ -46,7 +46,7 @@ final class XMLParser extends CmdParser {
       if(!execute(COMMANDS, node).isEmpty()) {
         query = COMMANDS + query;
         if(execute(COMMANDS + "[not(text())]", node).isEmpty())
-          throw error(Text.SYNTAX_X, "<" + COMMANDS + "><...></" + COMMANDS + ">");
+          throw error(Text.SYNTAX_X, '<' + COMMANDS + "><...></" + COMMANDS + '>');
       }
       final QueryProcessor qa = new QueryProcessor(query, ctx).context(node);
       for(final Item ia : qa.value()) cmds.add(command(ia));
@@ -63,11 +63,11 @@ final class XMLParser extends CmdParser {
    */
   private Command command(final Item root) throws QueryException {
     final String e = ((ANode) root).qname().toJava().toString();
-    if(e.equals(ADD) && check(root, PATH + "?", "<" + INPUT))
+    if(e.equals(ADD) && check(root, PATH + '?', '<' + INPUT))
       return new Add(value(root, PATH), xml(root));
     if(e.equals(ALTER_DB) && check(root, NAME, NEWNAME))
       return new AlterDB(value(root, NAME), value(root, NEWNAME));
-    if(e.equals(ALTER_USER) && check(root, NAME, "#" + PASSWORD + "?"))
+    if(e.equals(ALTER_USER) && check(root, NAME, '#' + PASSWORD + '?'))
       return new AlterUser(value(root, NAME), password(root));
     if(e.equals(CHECK) && check(root, INPUT))
       return new Check(value(root, INPUT));
@@ -77,15 +77,15 @@ final class XMLParser extends CmdParser {
       return new Copy(value(root, NAME), value(root, NEWNAME));
     if(e.equals(CREATE_BACKUP) && check(root, NAME))
       return new CreateBackup(value(root, NAME));
-    if(e.equals(CREATE_DB) && check(root, NAME, "<" + INPUT + "?"))
+    if(e.equals(CREATE_DB) && check(root, NAME, '<' + INPUT + '?'))
       return new CreateDB(value(root, NAME), xml(root));
-    if(e.equals(CREATE_EVENT) && check(root, NAME + "?"))
+    if(e.equals(CREATE_EVENT) && check(root, NAME + '?'))
       return new CreateEvent(value(root, NAME));
     if(e.equals(CREATE_INDEX) && check(root, TYPE))
       return new CreateIndex(value(root, TYPE));
-    if(e.equals(CREATE_USER) && check(root, NAME, "#" + PASSWORD + "?"))
+    if(e.equals(CREATE_USER) && check(root, NAME, '#' + PASSWORD + '?'))
       return new CreateUser(value(root, NAME), password(root));
-    if(e.equals(CS) && check(root, "#" + QUERY))
+    if(e.equals(CS) && check(root, '#' + QUERY))
       return new Cs(value(root));
     if(e.equals(DELETE) && check(root, PATH))
       return new Delete(value(root, PATH));
@@ -97,33 +97,33 @@ final class XMLParser extends CmdParser {
       return new DropEvent(value(root, NAME));
     if(e.equals(DROP_INDEX) && check(root, TYPE))
       return new DropIndex(value(root, TYPE));
-    if(e.equals(DROP_USER) && check(root, NAME, DATABASE + "?"))
+    if(e.equals(DROP_USER) && check(root, NAME, DATABASE + '?'))
       return new DropUser(value(root, NAME), value(root, DATABASE));
     if(e.equals(EXIT) && check(root))
       return new Exit();
     if(e.equals(EXPORT) && check(root, PATH))
       return new Export(value(root, PATH));
-    if(e.equals(FIND) && check(root, "#" + QUERY))
+    if(e.equals(FIND) && check(root, '#' + QUERY))
       return new Find(value(root));
     if(e.equals(FLUSH) && check(root))
       return new Flush();
     if(e.equals(GET) && check(root, OPTION))
       return new Get(value(root, OPTION));
-    if(e.equals(GRANT) && check(root, NAME, PERMISSION, DATABASE + "?"))
+    if(e.equals(GRANT) && check(root, NAME, PERMISSION, DATABASE + '?'))
       return new Grant(value(root, PERMISSION), value(root, NAME), value(root, DATABASE));
-    if(e.equals(HELP) && check(root, "#" + COMMAND + "?"))
+    if(e.equals(HELP) && check(root, '#' + COMMAND + '?'))
       return new Help(value(root));
     if(e.equals(INFO) && check(root))
       return new Info();
     if(e.equals(INFO_DB) && check(root))
       return new InfoDB();
-    if(e.equals(INFO_INDEX) && check(root, TYPE + "?"))
+    if(e.equals(INFO_INDEX) && check(root, TYPE + '?'))
       return new InfoIndex(value(root, TYPE));
-    if(e.equals(INFO_STORAGE) && check(root, "#" + QUERY + "?"))
+    if(e.equals(INFO_STORAGE) && check(root, '#' + QUERY + '?'))
       return new InfoStorage(value(root));
-    if(e.equals(KILL) && check(root, TARGET + "?"))
+    if(e.equals(KILL) && check(root, TARGET + '?'))
       return new Kill(value(root, TARGET));
-    if(e.equals(LIST) && check(root, NAME + "?", PATH + "?"))
+    if(e.equals(LIST) && check(root, NAME + '?', PATH + '?'))
       return new List(value(root, NAME), value(root, PATH));
     if(e.equals(OPEN) && check(root, NAME))
       return new Open(value(root, NAME));
@@ -131,11 +131,11 @@ final class XMLParser extends CmdParser {
       return new Optimize();
     if(e.equals(OPTIMIZE_ALL) && check(root))
       return new OptimizeAll();
-    if(e.equals(PASSWORD) && check(root, "#" + PASSWORD + "?"))
+    if(e.equals(PASSWORD) && check(root, '#' + PASSWORD + '?'))
       return new Password(password(root));
     if(e.equals(RENAME) && check(root, PATH, NEWPATH))
       return new Rename(value(root, PATH), value(root, NEWPATH));
-    if(e.equals(REPLACE) && check(root, PATH, "<" + INPUT))
+    if(e.equals(REPLACE) && check(root, PATH, '<' + INPUT))
       return new Replace(value(root, PATH), xml(root));
     if(e.equals(REPO_DELETE) && check(root, NAME))
       return new RepoDelete(value(root, NAME), null);
@@ -149,11 +149,11 @@ final class XMLParser extends CmdParser {
       return new Retrieve(value(root, PATH));
     if(e.equals(RUN) && check(root, FILE))
       return new Run(value(root, FILE));
-    if(e.equals(EXECUTE) && check(root, "<" + INPUT))
+    if(e.equals(EXECUTE) && check(root, '<' + INPUT))
       return new Execute(xml(root));
     if(e.equals(INSPECT) && check(root))
       return new Inspect();
-    if(e.equals(SET) && check(root, OPTION, "#" + VALUE + "?"))
+    if(e.equals(SET) && check(root, OPTION, '#' + VALUE + '?'))
       return new Set(value(root, OPTION), value(root));
     if(e.equals(SHOW_BACKUPS) && check(root))
       return new ShowBackups();
@@ -161,13 +161,13 @@ final class XMLParser extends CmdParser {
       return new ShowEvents();
     if(e.equals(SHOW_SESSIONS) && check(root))
       return new ShowSessions();
-    if(e.equals(SHOW_USERS) && check(root, DATABASE + "?"))
+    if(e.equals(SHOW_USERS) && check(root, DATABASE + '?'))
       return new ShowUsers(value(root, DATABASE));
-    if(e.equals(STORE) && check(root, PATH + "?", "<" + INPUT))
+    if(e.equals(STORE) && check(root, PATH + '?', '<' + INPUT))
       return new Store(value(root, PATH), xml(root));
-    if(e.equals(XQUERY) && check(root, "#" + QUERY))
+    if(e.equals(XQUERY) && check(root, '#' + QUERY))
       return new XQuery(value(root));
-    throw error(Text.UNKNOWN_CMD_X, "<" + e + "/>");
+    throw error(Text.UNKNOWN_CMD_X, '<' + e + "/>");
   }
 
   /**
@@ -178,7 +178,7 @@ final class XMLParser extends CmdParser {
    * @throws QueryException query exception
    */
   private String value(final Item root, final String att) throws QueryException {
-    return execute("string(@" + att + ")", root);
+    return execute("string(@" + att + ')', root);
   }
 
   /**
@@ -318,7 +318,7 @@ final class XMLParser extends CmdParser {
    * @param ext message extension
    * @return query exception
    */
-  private QueryException error(final String msg, final Object... ext) {
+  private static QueryException error(final String msg, final Object... ext) {
     return new QueryException(null, new QNm(), msg, ext);
   }
 }

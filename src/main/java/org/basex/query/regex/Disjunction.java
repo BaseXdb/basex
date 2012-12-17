@@ -21,7 +21,7 @@ public class Disjunction extends RegExp {
   @Override
   StringBuilder toRegEx(final StringBuilder sb) {
     branches[0].toRegEx(sb);
-    for(int i = 1; i < branches.length; i++) branches[i].toRegEx(sb.append("|"));
+    for(int i = 1; i < branches.length; i++) branches[i].toRegEx(sb.append('|'));
     return sb;
   }
 }

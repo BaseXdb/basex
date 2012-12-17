@@ -139,11 +139,8 @@ public final class FNId extends StandardFunc {
    * @param ids ids to be found
    * @param nc node cache
    * @param node node
-   * @throws QueryException query exception
    */
-  private static void add(final byte[][] ids, final NodeSeqBuilder nc,
-      final ANode node) throws QueryException {
-
+  private static void add(final byte[][] ids, final NodeSeqBuilder nc, final ANode node) {
     AxisIter ai = node.attributes();
     for(ANode at; (at = ai.next()) != null;) {
       final byte[] val = at.string();
@@ -163,10 +160,9 @@ public final class FNId extends StandardFunc {
    * @param ids ids to be found
    * @param nc node cache
    * @param node node
-   * @throws QueryException query exception
    */
   private static void addRef(final byte[][] ids, final NodeSeqBuilder nc,
-      final ANode node) throws QueryException {
+      final ANode node) {
 
     AxisIter ai = node.attributes();
     for(ANode at; (at = ai.next()) != null;) {

@@ -16,7 +16,7 @@ final class TreeRects implements TreeConstants {
   /** Saved rectangles. */
   private TreeRect[][][] rects;
   /** View. */
-  View view;
+  final View view;
   /** Displayed nods. */
   Nodes nodes;
 

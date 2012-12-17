@@ -44,7 +44,7 @@ public final class Users {
       } catch(final IOException ex) {
         Util.errln(ex);
       } finally {
-        if(in != null) try { in.close(); } catch(final IOException ex) { }
+        if(in != null) try { in.close(); } catch(final IOException ignored) { }
       }
     }
   }

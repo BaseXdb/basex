@@ -103,7 +103,7 @@ public final class AtomicUpdateList {
    * @param u new uri for the target node
    */
   public void addRename(final int pre, final int k, final byte[] n, final byte[] u) {
-    add(new Rename(pre, 0, -1, k, n, u), false);
+    add(new Rename(pre, k, n, u), false);
   }
 
   /**
@@ -113,7 +113,7 @@ public final class AtomicUpdateList {
    * @param v new value for the target node
    */
   public void addUpdateValue(final int pre, final int k, final byte[] v) {
-    add(new UpdateValue(pre, 0, -1, k, v), false);
+    add(new UpdateValue(pre, k, v), false);
   }
 
   /**
@@ -432,7 +432,7 @@ public final class AtomicUpdateList {
    * @return update with the lowest index that invalidates the distance of the same node
    * as the given one
    */
-  private int refine(final List<BasicUpdate> l, final int index,
+  private static int refine(final List<BasicUpdate> l, final int index,
       final boolean beforeUpdates) {
     int i = index;
     final int value = c(l, i--, beforeUpdates);
@@ -448,7 +448,7 @@ public final class AtomicUpdateList {
    * @param beforeUpdates calculate PRE value before or after updates
    * @return PRE value
    */
-  private int c(final List<BasicUpdate> l, final int index,
+  private static int c(final List<BasicUpdate> l, final int index,
       final boolean beforeUpdates) {
     final BasicUpdate u = l.get(index);
     return u.preOfAffectedNode + (beforeUpdates ? u.accumulatedShifts : 0);

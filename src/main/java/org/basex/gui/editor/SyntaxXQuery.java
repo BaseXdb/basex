@@ -83,7 +83,7 @@ public final class SyntaxXQuery extends Syntax {
     if(comment != 0) return KEY;
 
     // quotes
-    if(quote == 0 && (ch == '"' || ch == '\'')) {
+    if(ch == '"' || ch == '\'') {
       quote = ch;
       return GUIConstants.RED;
     }

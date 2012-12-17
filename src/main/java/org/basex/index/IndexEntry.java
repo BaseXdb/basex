@@ -8,7 +8,7 @@ package org.basex.index;
  */
 public final class IndexEntry {
   /** Entry key. */
-  public byte[] key;
+  public final byte[] key;
   /** Number of index hits for the key. */
   public int size;
   /** Pointer to the id list for the key. */

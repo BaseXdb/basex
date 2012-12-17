@@ -242,7 +242,7 @@ public final class FTBuilder extends IndexBuilder {
    * @return written size
    * @throws IOException I/O exception
    */
-  private int merge(final DataOutput out, final IntList il, final FTList[] v)
+  private static int merge(final DataOutput out, final IntList il, final FTList[] v)
       throws IOException {
 
     int s = 0;
@@ -277,8 +277,8 @@ public final class FTBuilder extends IndexBuilder {
    * @param vpos compressed pos values
    * @throws IOException IOException
    */
-  private void writeFTData(final DataOutput out, final byte[] vpre,
-      final byte[] vpos) throws IOException {
+  private static void writeFTData(final DataOutput out, final byte[] vpre,
+                                  final byte[] vpos) throws IOException {
 
     int np = 4, pp = 4;
     final int ns = Num.size(vpre);

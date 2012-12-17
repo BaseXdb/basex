@@ -13,10 +13,10 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 final class ReplaceContext {
+  /** Replace string. */
+  final String replace;
   /** Search context. */
   SearchContext search;
-  /** Replace string. */
-  String replace;
   /** Text. */
   byte[] text;
 

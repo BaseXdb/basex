@@ -93,7 +93,7 @@ public abstract class AProp implements Iterable<String> {
       Util.errln("% could not be written.", file);
       Util.debug(ex);
     } finally {
-      if(bw != null) try { bw.close(); } catch(final IOException e) { }
+      if(bw != null) try { bw.close(); } catch(final IOException ignored) { }
     }
   }
 
@@ -279,7 +279,7 @@ public abstract class AProp implements Iterable<String> {
 
   /**
    * Scans the system properties and initializes the project properties.
-   * All properties starting with {@Code org.basex.} will be assigned as properties
+   * All properties starting with {@code org.basex.} will be assigned as properties
    * and removed from the global system properties.
    */
   public final void setSystem() {
@@ -325,7 +325,7 @@ public abstract class AProp implements Iterable<String> {
 
   /**
    * Returns a system property. If necessary, the key will
-   * be converted to lower-case and prefixed with {@link #DBPREFIX}.
+   * be converted to lower-case and prefixed with {@link Prop#DBPREFIX}.
    * @param key {@link Prop} key
    * @return value, or empty string
    */
@@ -347,7 +347,7 @@ public abstract class AProp implements Iterable<String> {
 
   /**
    * Sets a system property if it has not been set before. If necessary, the key will
-   * be converted to lower-case and prefixed with {@link #DBPREFIX}.
+   * be converted to lower-case and prefixed with {@link Prop#DBPREFIX}.
    * @param key key
    * @param val value
    */
@@ -445,7 +445,7 @@ public abstract class AProp implements Iterable<String> {
         err.addExt("% could not be parsed." + NL, file);
         Util.debug(ex);
       } finally {
-        if(br != null) try { br.close(); } catch(final IOException ex) { }
+        if(br != null) try { br.close(); } catch(final IOException ignored) { }
       }
     }
 

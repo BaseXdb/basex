@@ -217,7 +217,7 @@ public final class TextView extends View {
     } catch(final IOException ex) {
       BaseXDialog.error(gui, FILE_NOT_SAVED);
     } finally {
-      if(out != null) try { out.close(); } catch(final IOException ex) { }
+      if(out != null) try { out.close(); } catch(final IOException ignored) { }
       prop.set(Prop.MAXHITS, mh);
       prop.set(Prop.CACHEQUERY, true);
       gui.cursor(CURSORARROW, true);

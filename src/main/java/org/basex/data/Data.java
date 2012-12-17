@@ -634,8 +634,7 @@ public abstract class Data {
     }
 
     // preserve empty root node
-    final int p = pre;
-    if(kind(p) == DOC) --meta.ndocs;
+    if(kind(pre) == DOC) --meta.ndocs;
 
     if(meta.updindex) {
       // delete node and descendants from ID -> PRE map:
@@ -645,8 +644,7 @@ public abstract class Data {
     // delete node from table structure and reduce document size
     table.delete(pre, s);
 
-    if(!cache)
-      updateDist(p, -s);
+    if(!cache) updateDist(pre, -s);
 
     // propagate PRE value shifts to namespaces
     nspaces.delete(pre, s);

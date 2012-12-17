@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 
 import java.io.*;
 
-import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.*;
 import org.basex.data.*;
@@ -32,8 +31,7 @@ public final class InfoIndex extends AInfo {
    * @param type optional index type, defined in {@link CmdIndexInfo}
    */
   public InfoIndex(final Object type) {
-    super(Perm.READ, true, type != null && type != CmdIndexInfo.NULL ?
-        type.toString() : null);
+    super(true, type != null && type != CmdIndexInfo.NULL ? type.toString() : null);
   }
 
   @Override

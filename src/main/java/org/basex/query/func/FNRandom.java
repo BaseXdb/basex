@@ -70,9 +70,9 @@ public final class FNRandom extends StandardFunc {
   private Iter randomSeededInt(final QueryContext ctx) throws QueryException {
     return new Iter() {
       int count;
-      long seed = checkItr(expr[0], ctx);
-      int num = (int) checkItr(expr[1], ctx);
-      Random r = new Random(seed);
+      final long seed = checkItr(expr[0], ctx);
+      final int num = (int) checkItr(expr[1], ctx);
+      final Random r = new Random(seed);
 
       @Override
       public Item next() throws QueryException {
@@ -91,7 +91,7 @@ public final class FNRandom extends StandardFunc {
    * Returns a random double between 0.0 (inclusive) and 1.0 (exclusive).
    * @return random double
    */
-  private double randomDouble() {
+  private static double randomDouble() {
     return RND.nextDouble();
   }
 
@@ -105,9 +105,9 @@ public final class FNRandom extends StandardFunc {
   private Iter randomSeededDouble(final QueryContext ctx) throws QueryException {
     return new Iter() {
       int count;
-      long seed = checkItr(expr[0], ctx);
-      int num = (int) checkItr(expr[1], ctx);
-      Random r = new Random(seed);
+      final long seed = checkItr(expr[0], ctx);
+      final int num = (int) checkItr(expr[1], ctx);
+      final Random r = new Random(seed);
 
       @Override
       public Item next() throws QueryException {
@@ -126,8 +126,8 @@ public final class FNRandom extends StandardFunc {
    */
   private Iter randomGaussian(final QueryContext ctx) throws QueryException {
     return new Iter() {
+      final int num = (int) checkItr(expr[0], ctx);
       int count;
-      int num = (int) checkItr(expr[0], ctx);
       @Override
       public Item next() throws QueryException {
         return ++count <= num ? Dbl.get(RND.nextGaussian()) : null;

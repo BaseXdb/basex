@@ -65,7 +65,7 @@ public final class Log {
     final Object[] tmp = new Object[str.length + 2];
     tmp[0] = SERVER;
     tmp[1] = Text.ADMIN;
-    for(int s = 0; s < str.length; s++) tmp[s + 2] = str[s];
+    System.arraycopy(str, 0, tmp, 2, str.length);
     write(tmp);
   }
 
@@ -135,7 +135,7 @@ public final class Log {
    */
   public synchronized IOFile dir() {
     // log suffix, plural
-    return mprop.dbpath(IO.LOGSUFFIX + "s");
+    return mprop.dbpath(IO.LOGSUFFIX + 's');
   }
 
   /**

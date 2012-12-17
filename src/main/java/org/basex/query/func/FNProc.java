@@ -91,7 +91,7 @@ public final class FNProc extends StandardFunc {
    * @param cs charset
    * @return result
    */
-  private FElem execute(final String[] args, final Charset cs) {
+  private static FElem execute(final String[] args, final Charset cs) {
     final Result result = exec(args, cs);
     final FElem root = new FElem(E_RESULT);
     root.add(new FElem(E_OUTPUT).add(norm(result.output)));
@@ -106,7 +106,7 @@ public final class FNProc extends StandardFunc {
    * @param cs charset
    * @return result
    */
-  private Result exec(final String[] args, final Charset cs) {
+  private static Result exec(final String[] args, final Charset cs) {
     final Result result = new Result();
     final Process proc;
     try {
@@ -139,7 +139,8 @@ public final class FNProc extends StandardFunc {
    * @param cs charset
    * @return result
    */
-  private Thread reader(final InputStream in, final TokenBuilder tb, final Charset cs) {
+  private static Thread reader(final InputStream in, final TokenBuilder tb,
+      final Charset cs) {
     final InputStreamReader isr = new InputStreamReader(in, cs);
     final BufferedReader br = new BufferedReader(isr);
     return new Thread() {
@@ -150,7 +151,7 @@ public final class FNProc extends StandardFunc {
         } catch(final IOException ex) {
           Util.stack(ex);
         }
-      };
+      }
     };
   }
 
@@ -159,7 +160,7 @@ public final class FNProc extends StandardFunc {
    * @param tb token builder
    * @return output
    */
-  private byte[] norm(final TokenBuilder tb) {
+  private static byte[] norm(final TokenBuilder tb) {
     return delete(tb.finish(), '\r');
   }
 

@@ -139,7 +139,7 @@ public final class FNAdmin extends StandardFunc {
    * @param ctx query context
    * @return users
    */
-  private Iter sessions(final QueryContext ctx) {
+  private static Iter sessions(final QueryContext ctx) {
     final ValueBuilder vb = new ValueBuilder();
     synchronized(ctx.context.sessions) {
       for(final ClientListener sp : ctx.context.sessions) {

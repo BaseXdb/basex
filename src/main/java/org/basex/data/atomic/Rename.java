@@ -23,12 +23,9 @@ final class Rename extends BasicUpdate {
    * @param k target node kind
    * @param n new name for the target node
    * @param u new name uri for the target node
-   * @param s PRE value shifts introduced by update
-   * @param f PRE value of the first node which distance has to be updated
    */
-  Rename(final int l, final int s, final int f, final int k, final byte[] n,
-      final byte[] u) {
-    super(l, s, f);
+  Rename(final int l, final int k, final byte[] n, final byte[] u) {
+    super(l, 0, -1);
     if(n.length == 0) Util.notexpected("New name must not be empty.");
     targetkind = k;
     name = n;

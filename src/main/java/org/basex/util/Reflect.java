@@ -74,7 +74,7 @@ public final class Reflect {
     try {
       if(!accessible(c)) return null;
       CLASSES.put(name, c);
-    } catch(final Throwable ex) { }
+    } catch(final Throwable ignored) { }
     return c;
   }
 
@@ -91,7 +91,7 @@ public final class Reflect {
       try {
         f = clazz.getField(name);
         FIELDS.put(key, f);
-      } catch(final Throwable ex) { }
+      } catch(final Throwable ignored) { }
     }
     return f;
   }

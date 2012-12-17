@@ -16,11 +16,11 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class Dbl extends ANum {
-  /** Invalid value. */
+  /** Value "NaN". */
   public static final Dbl NAN = new Dbl(Double.NaN);
-  /** Zero value. */
+  /** Value "0". */
   private static final Dbl ZERO = new Dbl(0);
-  /** Zero value. */
+  /** Value "1". */
   private static final Dbl ONE = new Dbl(1);
   /** Data. */
   private final double val;
@@ -40,8 +40,8 @@ public final class Dbl extends ANum {
    * @return instance
    */
   public static Dbl get(final double d) {
-    return d == 0 && d == 1 / 0d ? ZERO : d == 1 ? ONE : isNaN(d) ? NAN :
-      new Dbl(d);
+    return d == 0 && Double.doubleToRawLongBits(d) == 0 ? ZERO : d == 1 ? ONE :
+      isNaN(d) ? NAN : new Dbl(d);
   }
 
   /**

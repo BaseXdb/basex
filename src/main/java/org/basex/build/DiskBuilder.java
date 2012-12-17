@@ -42,7 +42,7 @@ public final class DiskBuilder extends Builder {
   private DataOutput sout;
 
   /** Database context. */
-  final Context context;
+  private final Context context;
   /** Debug counter. */
   private int c;
 

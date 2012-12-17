@@ -59,7 +59,7 @@ public final class CreateDB extends ACreate {
     if(!MetaData.validName(name, false)) return error(NAME_INVALID_X, name);
 
     // choose parser and input
-    IO io = null;
+    IO io;
     try {
       io = sourceToIO(name);
       if(in != null) {

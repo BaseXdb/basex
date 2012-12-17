@@ -37,7 +37,7 @@ final class NodeUpdates {
         // if the new primitive substitutes, than replace the old one with the new one
         if(nprim instanceof ReplaceContent) {
           prim.set(typeIndex, nprim);
-        } else if(!(oprim instanceof ReplaceContent || nprim instanceof ReplaceContent)) {
+        } else if(!(oprim instanceof ReplaceContent)) {
           // if neither substitutes, merge them.
           up.merge(p);
         }

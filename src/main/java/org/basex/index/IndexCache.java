@@ -158,7 +158,7 @@ public final class IndexCache {
    * @param sz new size
    * @param poi new pointer
    */
-  private void update(final IndexEntry entry, final int sz, final long poi) {
+  private static void update(final IndexEntry entry, final int sz, final long poi) {
     entry.size = sz;
     entry.pointer = poi;
   }

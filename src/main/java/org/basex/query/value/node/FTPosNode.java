@@ -10,7 +10,7 @@ import org.basex.data.*;
  */
 public final class FTPosNode extends DBNode {
   /** Full-text positions. */
-  public FTPosData ft;
+  public final FTPosData ft;
 
   /**
    * Constructor, called by the sequential variant.

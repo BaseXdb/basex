@@ -95,9 +95,8 @@ public class IntSet {
     final int s = size << 1;
     final int[] tmp = new int[s];
 
-    final int l = bucket.length;
-    for(int i = 0; i != l; ++i) {
-      int id = bucket[i];
+    for(final int b : bucket) {
+      int id = b;
       while(id != 0) {
         final int p = keys[id] & s - 1;
         final int nx = next[id];

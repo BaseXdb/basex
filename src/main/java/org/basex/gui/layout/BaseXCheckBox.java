@@ -35,7 +35,7 @@ public final class BaseXCheckBox extends JCheckBox {
     super(label, sel);
     setOpaque(false);
     setMargin(new Insets(0, 0, dist, 0));
-    if(dist == 0) setFont(getFont().deriveFont(1));
+    if(dist == 0) setFont(getFont().deriveFont(Font.BOLD));
     BaseXLayout.addInteraction(this, win);
     if(!(win instanceof BaseXDialog)) return;
 

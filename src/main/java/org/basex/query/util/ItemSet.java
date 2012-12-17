@@ -70,20 +70,18 @@ public class ItemSet implements Iterable<Item> {
    */
   protected void rehash() {
     final int s = size << 1;
-    final int[] b = new int[s];
-
-    final int l = bucket.length;
-    for(int i = 0; i < l; ++i) {
-      int id = bucket[i];
+    final int[] tmp = new int[s];
+    for(final int b : bucket) {
+      int id = b;
       while(id != 0) {
         final int p = hash[id] & s - 1;
         final int nx = next[id];
-        next[id] = b[p];
-        b[p] = id;
+        next[id] = tmp[p];
+        tmp[p] = id;
         id = nx;
       }
     }
-    bucket = b;
+    bucket = tmp;
     next = Arrays.copyOf(next, s);
     hash = Arrays.copyOf(hash, s);
     final Item[] i = new Item[s];

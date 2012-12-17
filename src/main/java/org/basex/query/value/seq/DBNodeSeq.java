@@ -68,17 +68,17 @@ public final class DBNodeSeq extends NativeSeq {
   @Override
   public Value sub(final long start, final long length) {
     final int l = (int) length;
-    final double[] tmp = new double[l];
+    final int[] tmp = new int[l];
     System.arraycopy(pres, (int) start, tmp, 0, l);
-    return get(pres, data, type, false);
+    return get(tmp, data, type, false);
   }
 
   @Override
   public Value reverse() {
     final int s = pres.length;
-    final int[] t = new int[s];
-    for(int l = 0, r = s - 1; l < s; l++, r--) t[l] = pres[r];
-    return get(pres, data, type, false);
+    final int[] tmp = new int[s];
+    for(int l = 0, r = s - 1; l < s; l++, r--) tmp[l] = pres[r];
+    return get(tmp, data, type, false);
   }
 
   // STATIC METHODS =====================================================================

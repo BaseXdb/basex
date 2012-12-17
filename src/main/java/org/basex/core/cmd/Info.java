@@ -19,7 +19,7 @@ public final class Info extends AInfo {
    * Default constructor.
    */
   public Info() {
-    super(Perm.READ, false);
+    super(false);
   }
 
   @Override

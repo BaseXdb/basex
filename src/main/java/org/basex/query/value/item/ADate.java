@@ -187,8 +187,7 @@ public abstract class ADate extends ADateDur {
     final long m = p ? dur.mon : -dur.mon;
     final long mn = mon + m;
     mon = (byte) mod(mn, 12);
-    final long ye = yea + div(mn, 12);
-    yea = ye;
+    yea = yea + div(mn, 12);
     day = (byte) Math.min(dpm(yea, mon) - 1, day);
 
     if(yea <= MIN_YEAR || yea > MAX_YEAR) DATEADDRANGE.thrw(ii, this);
@@ -222,7 +221,7 @@ public abstract class ADate extends ADateDur {
    * @param m modulo
    * @return result
    */
-  private long mod(final long i, final int m) {
+  private static long mod(final long i, final int m) {
     return i > 0 ? i % m : (Long.MAX_VALUE / m * m + i) % m;
   }
 
@@ -232,7 +231,7 @@ public abstract class ADate extends ADateDur {
    * @param d divisor
    * @return result
    */
-  private long div(final long i, final int d) {
+  private static long div(final long i, final int d) {
     return i < 0 ? (i + 1) / d - 1 : i / d;
   }
 

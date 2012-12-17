@@ -69,8 +69,7 @@ public class Execute extends Command {
   protected boolean init(final Context ctx) {
     if(list.isEmpty() && error == null) {
       try {
-        // interpret at commands if input starts with < or ends with command script suffix
-        for(final Command c : new CommandParser(args[0], ctx).parse()) list.add(c);
+        Collections.addAll(list, new CommandParser(args[0], ctx).parse());
       } catch(final QueryException ex) {
         error = ex.getMessage();
         return false;

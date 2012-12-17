@@ -62,7 +62,7 @@ public final class YMDur extends Dur {
 
     this(it);
     if(Double.isNaN(f)) DATECALC.thrw(ii, description(), f);
-    if(m ? f == 1 / 0d || f == -1 / 0d : f == 0) DATEZERO.thrw(ii, description());
+    if(m ? Double.isInfinite(f) : f == 0) DATEZERO.thrw(ii, description());
     final double d = m ? mon * f : mon / f;
     if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) DURADDRANGE.thrw(ii, type);
     mon = StrictMath.round(d);

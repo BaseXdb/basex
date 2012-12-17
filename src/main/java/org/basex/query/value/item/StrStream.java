@@ -62,7 +62,7 @@ public final class StrStream extends AStr {
       nli.encoding(encoding).valid(true);
       return nli;
     } catch(final IOException ex) {
-      if(nli != null) try { nli.close(); } catch(final IOException e) { }
+      if(nli != null) try { nli.close(); } catch(final IOException ignored) { }
       throw error.thrw(ii, input);
     }
   }

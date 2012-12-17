@@ -6,6 +6,7 @@ import static org.basex.query.value.type.SeqType.*;
 import java.util.*;
 import java.util.regex.*;
 
+import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.type.*;
@@ -556,7 +557,7 @@ public enum Function {
   /** XQuery function. */
   _DB_EVENT(FNDb.class, "event(name,query)", EMP, STR, ITEM_ZM),
   /** XQuery function. */
-  _DB_OUTPUT(FNDb.class, "output(expression)", EMP, ITEM_ZM),
+  _DB_OUTPUT(FNDb.class, "output(result)", EMP, ITEM_ZM),
   /** XQuery function. */
   _DB_ADD(FNDb.class, "add(database,input[,path])", EMP, 2, ITEM, NOD, STR),
   /** XQuery function. */
@@ -893,7 +894,7 @@ public enum Function {
 
   /**
    * Mapping between function classes and namespace URIs.
-   * If no mapping exists, {@link #FNURI} will be assumed as default mapping.
+   * If no mapping exists, {@link QueryText#FNURI} will be assumed as default mapping.
    */
   public static final HashMap<Class<? extends StandardFunc>, byte[]> URIS =
     new HashMap<Class<? extends StandardFunc>, byte[]>();

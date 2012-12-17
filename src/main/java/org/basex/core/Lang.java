@@ -159,18 +159,18 @@ public final class Lang {
 
     final IOFile[] files = new IOFile("src/main/resources/lang").children();
     for(final IOFile f : files) {
-      final String lang = f.name().replace("." + SUFFIX, "");
+      final String lang = f.name().replace('.' + SUFFIX, "");
       if(lang.equals("English")) continue;
       read(lang);
       for(final Object o : set.toArray()) {
-        if(TEXTS.remove(o) == null) sb.append("- " + o + "\n");
+        if(TEXTS.remove(o) == null) sb.append("- ").append(o).append('\n');
       }
       if(sb.length() != 0) {
         Util.err("Missing in %.lang:\n%", lang, sb);
         sb.setLength(0);
       }
       for(final String s : TEXTS.keySet()) {
-        sb.append("- " + s + "\n");
+        sb.append("- ").append(s).append('\n');
       }
       if(sb.length() != 0) {
         Util.err("Not defined in %.lang:\n%", lang, sb);

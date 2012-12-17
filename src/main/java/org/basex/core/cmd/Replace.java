@@ -53,7 +53,7 @@ public final class Replace extends ACreate {
 
     if(!data.startUpdate()) return error(DB_PINNED_X, data.meta.name);
     try {
-      boolean ok = true;
+      final boolean ok;
       final IOFile file = data.meta.binary(path);
       if(file != null && file.exists()) {
         // replace binary file if it already exists

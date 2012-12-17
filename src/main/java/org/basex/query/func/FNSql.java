@@ -216,7 +216,7 @@ public final class FNSql extends StandardFunc {
     } catch(final SQLException ex) {
       throw BXSQ_ERROR.thrw(info, ex);
     } finally {
-      if(stmt != null) try { stmt.close(); } catch(final SQLException ex) { }
+      if(stmt != null) try { stmt.close(); } catch(final SQLException ignored) { }
     }
   }
 

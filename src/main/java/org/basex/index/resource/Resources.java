@@ -126,19 +126,7 @@ public final class Resources implements Index {
    * @return pre value
    */
   public int doc(final String path) {
-    return doc(path, true);
-  }
-
-  /**
-   * Returns the pre value of the document node matching the specified path.
-   * Exact match! Document paths can be sorted for faster future access or
-   * sorting can be disabled as it slows down bulk inserts/deletes/replaces.
-   * @param path input path
-   * @param sort sort paths before access
-   * @return root nodes
-   */
-  public synchronized int doc(final String path, final boolean sort) {
-    return docs.doc(path, sort);
+    return docs.doc(path, true);
   }
 
   /**

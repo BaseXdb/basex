@@ -77,8 +77,8 @@ public final class ClientListener extends Thread {
   public void run() {
     if(!authenticate()) return;
 
-    ServerCmd sc = null;
-    String cmd = null;
+    ServerCmd sc;
+    String cmd;
     try {
       while(running) {
         command = null;
@@ -298,8 +298,7 @@ public final class ClientListener extends Thread {
    * @return string representation
    */
   public String address() {
-    return new StringBuilder(socket.getInetAddress().getHostAddress()).
-        append(':').append(socket.getPort()).toString();
+    return socket.getInetAddress().getHostAddress() + ':' + socket.getPort();
   }
 
   @Override
@@ -477,7 +476,7 @@ public final class ClientListener extends Thread {
           final String val = in.readString();
           final String typ = in.readString();
           qp.bind(key, val, typ);
-          info.append(key).append("=").append(val);
+          info.append(key).append('=').append(val);
           if(!typ.isEmpty()) info.append(" as ").append(typ);
         } else if(sc == ServerCmd.CONTEXT) {
           final String val = in.readString();
@@ -508,13 +507,13 @@ public final class ClientListener extends Thread {
       // send 0 as success flag
       out.write(0);
       // write log file
-      log(new StringBuilder(sc.toString()).append("[").
+      log(new StringBuilder(sc.toString()).append('[').
           append(arg).append("] ").append(info), true);
 
     } catch(final Throwable ex) {
       // log exception (static or runtime)
       err = Util.message(ex);
-      log(sc + "[" + arg + "]", null);
+      log(sc + "[" + arg + ']', null);
       log(err, false);
       queries.remove(arg);
     }

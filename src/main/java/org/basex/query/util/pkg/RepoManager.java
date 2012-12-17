@@ -121,8 +121,8 @@ public final class RepoManager {
    * @param path package path
    * @return new entry
    */
-  private TokenList entry(final String name, final String version,
-      final String type, final String path) {
+  private static TokenList entry(final String name, final String version,
+                                 final String type, final String path) {
 
     final TokenList tl = new TokenList();
     tl.add(name);
@@ -268,7 +268,7 @@ public final class RepoManager {
    * @param path file path
    * @return {@code true} if a package already existed
    */
-  private boolean md(final IOFile rp, final String path) {
+  private static boolean md(final IOFile rp, final String path) {
     final IOFile target = new IOFile(rp, path);
     final IOFile dir = target.dir();
     dir.md();

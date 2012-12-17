@@ -100,7 +100,7 @@ public final class GUIConstants {
 
   /**
    * Two-dimensional menu entries, containing the menu item commands.
-   * {@link #EMPTY} references serve as menu separators.
+   * {@link GUICommand#EMPTY} references serve as menu separators.
    */
   static final GUICommand[][] MENUITEMS = { {
     C_CREATE, C_OPEN_MANAGE, EMPTY,
