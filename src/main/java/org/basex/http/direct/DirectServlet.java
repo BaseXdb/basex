@@ -65,7 +65,7 @@ public final class DirectServlet extends BaseXServlet {
     final ArrayList<Command> list = new ArrayList<Command>();
     if(io.hasSuffix(IO.BXSSUFFIX)) {
       // interpret at commands if input starts with < or ends with command script suffix
-      for(final Command c : new CommandParser(io.string(), ctx).parse()) list.add(c);
+      Collections.addAll(list, new CommandParser(io.string(), ctx).parse());
     } else if(io.hasSuffix(IO.XQSUFFIXES)) {
       list.add(new XQuery(io.string()));
     } else {
@@ -145,18 +145,6 @@ public final class DirectServlet extends BaseXServlet {
   }
 
   /**
-   * Creates a parameter string.
-   * @param name variable name
-   * @param value value
-   * @param uri existing uri
-   * @return input element string
-   */
-  private String createParam(final String name, final Object value, final String uri) {
-    return name == null ? "" : (uri.indexOf('?') != -1 ? '&' : '?') + name + '=' +
-        Token.string(Token.uri(Token.token(value.toString()), false));
-  }
-
-  /**
    * Creates a POST redirect form.
    * @param http http context
    * @param os output stream
@@ -184,12 +172,25 @@ public final class DirectServlet extends BaseXServlet {
   }
 
   /**
+   * Creates a parameter string.
+   * @param name variable name
+   * @param value value
+   * @param uri existing uri
+   * @return input element string
+   */
+  private static String createParam(final String name, final Object value,
+      final String uri) {
+    return name == null ? "" : (uri.indexOf('?') != -1 ? '&' : '?') + name + '=' +
+        Token.string(Token.uri(Token.token(value.toString()), false));
+  }
+
+  /**
    * Creates an input element.
    * @param name variable name
    * @param value value
    * @return input element string
    */
-  private String createInput(final String name, final Object value) {
+  private static String createInput(final String name, final Object value) {
     return name == null ? "" : "<input type='hidden' name='" + name + "' value='" +
       value.toString().replace("'", "&apos;") + "'/>";
   }

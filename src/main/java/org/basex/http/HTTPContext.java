@@ -73,7 +73,7 @@ public final class HTTPContext {
     final StringBuilder uri = new StringBuilder(req.getRequestURL());
     final String qs = req.getQueryString();
     if(qs != null) uri.append('?').append(qs);
-    log("[" + mth + "] " + uri, null);
+    log('[' + mth + "] " + uri, null);
 
     // set UTF8 as default encoding (can be overwritten)
     res.setCharacterEncoding(UTF8);
@@ -174,7 +174,12 @@ public final class HTTPContext {
    * @return path depth
    */
   public String dbpath() {
-    return join(1);
+    final TokenBuilder tb = new TokenBuilder();
+    for(int p = 1; p < segments.length; p++) {
+      if(!tb.isEmpty()) tb.add('/');
+      tb.add(segments[p]);
+    }
+    return tb.toString();
   }
 
   /**
@@ -321,7 +326,7 @@ public final class HTTPContext {
       k = k.toLowerCase(Locale.ENGLISH);
       if(!k.equals(key) || !v.equals(val)) {
         Util.errln("Warning! Outdated property: " +
-          key + "=" + val + " => " + k + "=" + v);
+          key + '=' + val + " => " + k + '=' + v);
       }
 
       // prefix relative paths with absolute servlet path
@@ -371,25 +376,10 @@ public final class HTTPContext {
   // PRIVATE METHODS ====================================================================
 
   /**
-   * Joins the path.
-   * @param s segment to start with
-   * @return joined path
-   */
-  private String join(final int s) {
-    final TokenBuilder tb = new TokenBuilder();
-    for(int p = s; p < segments.length; p++) {
-      if(!tb.isEmpty()) tb.add('/');
-      tb.add(segments[p]);
-    }
-    return tb.toString();
-  }
-
-  /**
    * Returns a string with the remote user address.
    * @return user address
    */
   private String address() {
-    return new StringBuilder(req.getRemoteAddr()).append(':').
-        append(req.getRemotePort()).toString();
+    return req.getRemoteAddr() + ':' + req.getRemotePort();
   }
 }

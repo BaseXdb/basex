@@ -22,7 +22,7 @@ import com.bradmcevoy.http.Request.Method;
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-public abstract class BXResource implements Resource {
+public class BXResource implements Resource {
   /** Time string. */
   static final String TIME =
       Text.TIMESTAMP.replaceAll(" |-", "").toLowerCase(Locale.ENGLISH);
@@ -38,16 +38,6 @@ public abstract class BXResource implements Resource {
   protected final HTTPContext http;
   /** Last modified date. */
   protected final Date mdate;
-
-  /**
-   * Constructor.
-   * @param d database name
-   * @param p resource path
-   * @param h http context
-   */
-  protected BXResource(final String d, final String p, final HTTPContext h) {
-    this(d, p, -1, h);
-  }
 
   /**
    * Constructor.

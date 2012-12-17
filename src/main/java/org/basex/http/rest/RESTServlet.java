@@ -20,7 +20,7 @@ public final class RESTServlet extends BaseXServlet {
    * @return code
    * @throws HTTPException HTTP exception
    */
-  private RESTCode code(final HTTPContext http) throws HTTPException {
+  private static RESTCode code(final HTTPContext http) throws HTTPException {
     final HTTPMethod mth = http.method;
     if(mth == HTTPMethod.GET)    return new RESTGet();
     if(mth == HTTPMethod.POST)   return new RESTPost();

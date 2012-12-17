@@ -19,7 +19,7 @@ public final class BXNotAuthorizedResource extends BXResource implements FolderR
 
   /** Constructor. */
   private BXNotAuthorizedResource() {
-    super(null, null, null);
+    super(null, null, -1, null);
   }
 
   @Override

@@ -165,7 +165,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
       final boolean xml = ti.read() == '<';
       try {
         bi.reset();
-      } catch(final IOException e) {
+      } catch(final IOException ignore) {
       }
 
       if(xml) {
