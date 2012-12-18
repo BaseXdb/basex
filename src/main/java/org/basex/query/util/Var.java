@@ -243,7 +243,7 @@ public final class Var extends ParseExpr {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(NAM, this, ID, id), expr);
+    addPlan(plan, planElem(NAM, this, ID, id));
   }
 
   @Override
