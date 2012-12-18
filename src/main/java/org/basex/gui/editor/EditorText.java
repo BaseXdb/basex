@@ -480,12 +480,17 @@ public final class EditorText {
         s = 0;
       }
     }
-    for(int p = 0; p < s; p++) sb.append(' ');
     // indent after opening bracket
-    final int l = ps > 0 ? text[ps - 1] : 0;
-    if(l == '(' || l == '{' || l == '[') {
-      for(int p = 0; p < EditorText.TAB; p++) sb.append(' ');
+    if(ps > 0) {
+      final int l = text[ps - 1];
+      if(l == '(' || l == '{' || l == '[') s += EditorText.TAB;
     }
+    // unindent before closing bracket
+    if(ps < text.length) {
+      final int l = text[ps];
+      if(l == ')' || l == '}' || l == ']') s -= EditorText.TAB;
+    }
+    for(int p = 0; p < s; p++) sb.append(' ');
   }
 
   /**
