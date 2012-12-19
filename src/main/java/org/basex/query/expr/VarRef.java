@@ -20,7 +20,7 @@ import org.basex.util.list.*;
  */
 public final class VarRef extends ParseExpr {
   /** Variable name. */
-  public Var var;
+  public final Var var;
 
   /**
    * Constructor.
@@ -29,7 +29,7 @@ public final class VarRef extends ParseExpr {
    */
   public VarRef(final InputInfo ii, final Var v) {
     super(ii);
-    var = v;
+    var = v.copy();
   }
 
   @Override
@@ -38,12 +38,12 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public Expr compile(final QueryContext ctx) throws QueryException {
-    var = ctx.vars.get(var);
-    type = var.type();
-    size = var.size();
+    final Var v = ctx.vars.get(var);
+    type = v.type();
+    size = v.size();
 
     // return if variable expression has not yet been assigned
-    Expr e = var.expr();
+    Expr e = v.expr();
     if(e == null) return this;
 
     /* Choose expressions to be pre-evaluated.
@@ -57,28 +57,25 @@ public final class VarRef extends ParseExpr {
      * - they contain an element constructor (mandatory)
      * - they contain a function call
      */
-    if(var.global || var.type != null || e.uses(Use.CNS) || e instanceof UserFuncCall) {
-      e = var.value(ctx);
+    if(v.global || v.type != null || e.uses(Use.CNS) || e instanceof UserFuncCall) {
+      e = v.value(ctx);
     }
     return e;
   }
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    var = ctx.vars.get(var);
-    return var.item(ctx, ii);
+    return ctx.vars.get(var).item(ctx, ii);
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    var = ctx.vars.get(var);
-    return ctx.iter(var);
+    return ctx.iter(ctx.vars.get(var));
   }
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    var = ctx.vars.get(var);
-    return ctx.value(var);
+    return ctx.value(ctx.vars.get(var));
   }
 
   @Override

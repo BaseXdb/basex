@@ -11,7 +11,6 @@ import org.junit.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-@Ignore("Suppress query plan tests until we have found a generic solution.")
 public final class FuncItemTest extends QueryPlanTest {
   /** Checks if the identity function is pre-compiled. */
   @Test
@@ -93,6 +92,60 @@ public final class FuncItemTest extends QueryPlanTest {
     check("declare function local:a() { local:b() };" +
         "declare function local:b() { 42 };" +
         "local:a#0()",
+        "42",
+        "exists(//" + Util.name(FuncItem.class) + ")"
+    );
+  }
+
+  /** Checks for circular references leading to stack overflows. */
+  @Test
+  public void noLoopTest() {
+    check("declare function local:Y($f) { $f(function() { $f }) };" +
+        "let $f := local:Y(function($x) { $x() }) return $f[2]",
+        "",
+        "exists(//" + Util.name(FuncItem.class) + ")"
+    );
+  }
+
+  /** Checks for circular references leading to stack overflows. */
+  @Test
+  public void noLoopTest2() {
+    check("declare function local:Y($f) { $f(function() { $f }) };" +
+        "map(local:Y#1, function($x) { $x() })[2]",
+        "",
+        "exists(//" + Util.name(FuncItem.class) + ")"
+    );
+  }
+
+  /** Checks for circular references leading to stack overflows. */
+  @Test
+  public void noLoopTest3() {
+    check("declare function local:Y($f) { $f(function() { $f }) };" +
+        "let $f := map(local:Y#1, function($x) { $x() }) return $f[2]",
+        "",
+        "exists(//" + Util.name(FuncItem.class) + ")"
+    );
+  }
+
+  /** Checks for circular references leading to stack overflows. */
+  @Test
+  public void noLoopTest4() {
+    check("declare function local:foo($x) { function($f) { $f($x) } };" +
+        "declare function local:bar($f) { $f(function($_) { $f }) };" +
+        "let $a := local:foo(local:foo(function($e) { $e() })) " +
+        "let $b := local:bar($a) " +
+        "return $b[2]",
+        "",
+        "exists(//" + Util.name(FuncItem.class) + ")"
+    );
+  }
+
+  /** Checks for circular references leading to stack overflows. */
+  @Test
+  public void noLoopTest5() {
+    check("declare function local:foo($f) { $f($f) };" +
+        "let $id := local:foo(function($g) { $g })" +
+        "return $id(42)",
         "42",
         "exists(//" + Util.name(FuncItem.class) + ")"
     );
