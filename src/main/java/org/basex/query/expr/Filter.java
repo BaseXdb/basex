@@ -110,29 +110,45 @@ public class Filter extends Preds {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final Iter iter = ctx.iter(root);
+    Value val = root.value(ctx);
     final Value cv = ctx.value;
     final long cs = ctx.size;
     final long cp = ctx.pos;
 
     try {
-      // cache results to support last() function
+      // evaluate first predicate, based on incoming value
       final ValueBuilder vb = new ValueBuilder();
-      for(Item i; (i = iter.next()) != null;) vb.add(i);
+      Expr p = preds[0];
+      long is = val.size();
+      ctx.size = is;
+      ctx.pos = 1;
+      for(int s = 0; s < is; ++s) {
+        final Item it = val.itemAt(s);
+        ctx.value = it;
+        if(p.test(ctx, info) != null) vb.add(it);
+        ctx.pos++;
+      }
+      // save memory
+      val = null;
 
-      // evaluate predicates
-      for(final Expr p : preds) {
-        final long is = vb.size();
+      // evaluate remaining predicates, based on value builder
+      final int pl = preds.length;
+      for(int i = 1; i < pl; i++) {
+        is = vb.size();
+        p = preds[i];
         ctx.size = is;
         ctx.pos = 1;
         int c = 0;
         for(int s = 0; s < is; ++s) {
-          ctx.value = vb.get(s);
-          if(p.test(ctx, info) != null) vb.set(vb.get(s), c++);
+          final Item it = vb.get(s);
+          ctx.value = it;
+          if(p.test(ctx, info) != null) vb.set(it, c++);
           ctx.pos++;
         }
         vb.size(c);
       }
+
+      // return resulting values
       return vb;
     } finally {
       ctx.value = cv;
