@@ -45,4 +45,9 @@ public final class Check extends Command {
     db.add("").add(new QueryInput(args[0]).io.dbname());
     return true;
   }
+
+  @Override
+  public boolean newData(final Context ctx) {
+    return new Close().run(ctx);
+  }
 }
