@@ -3,6 +3,34 @@
  Welcome to the changelog. This file contains all code changes since
  BaseX 6.5:
 
+VERSION 7.5 (December 21, 2012) ----------------------------------------
+
+  XQUERY UPDATE
+  - bulk updates are now much faster than before
+  - insert and replace operations take much less memory
+  - databases can now be created via XQuery and db:create()
+
+  GUI TEXT EDITOR
+  - a fast and flexible search/replace panel has been added
+  - error highlighting has been extended to XML files
+  - the editor was improved for editing arbitrary text files
+
+  XQUERY 3.0
+  - the code has been aligned with latest changes in the specs
+  - HTML5 support has been updated
+
+  WEB APPLICATIONS
+  - new modules have been added: Request, Session, Sessions
+  - logging has been revised and extended to HTTP requests
+  - SSL support added, switched to Jetty 8
+  - all operation modes have been unified and simplified
+  - RESTXQ elements added to simplify forwarding and redirects
+
+  CORE FEATURES
+  - improved stability of concurrent read/write operations
+  - the INSPECT command performs database sanity checks
+  - EXECUTE triggers the execution of command scripts
+
 VERSION 7.3 (June 18, 2012) --------------------------------------------
 
   - Many new internal XQuery Modules have been added, and existing
