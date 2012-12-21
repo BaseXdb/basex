@@ -1,3 +1,8 @@
+(:~
+ : Direct evalutation of XQuery files.
+ : The DirectServlet needs to be activated
+ : to evaluate this file server-side.
+ :)
 declare option output:method 'xhtml';
 declare option output:omit-xml-declaration 'no';
 

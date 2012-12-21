@@ -1,5 +1,6 @@
-<!-- This is an example for a BaseX command script. It allows
-  developers to execute several commands by a single call. -->
+<!-- Direct evalutation of BaseX command scripts.
+ The DirectServlet needs to be activated to
+ evaluate this file server-side. -->
 <commands>
   <!-- creates a database -->
   <create-db name='test'/>
