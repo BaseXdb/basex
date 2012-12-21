@@ -104,7 +104,8 @@
     <load-on-startup>1</load-on-startup>
   </servlet-mapping>
 
-  <!-- Direct association to queries and scripts -->
+  <!-- Direct invocation of query and script files
+    (undocumented; can be activated by removing this comment)
   <servlet>
     <servlet-name>Direct</servlet-name>
     <servlet-class>org.basex.http.direct.DirectServlet</servlet-class>
@@ -119,5 +120,6 @@
     <url-pattern>*.xquery</url-pattern>
     <url-pattern>*.bxs</url-pattern>
   </servlet-mapping>
+  -->
 
 </web-app>
