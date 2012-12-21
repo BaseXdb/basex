@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.basex</groupId>
   <artifactId>basex</artifactId>
-  <version>7.5</version>
+  <version>7.5.1-SNAPSHOT</version>
   <name>BaseX</name>
   <properties>
     <compileSource>1.6</compileSource>
@@ -213,7 +213,10 @@
           </execution>
         </executions>
       </plugin>-->
-      <!--<plugin>
+      <!-- Required for openSUSE builds:
+         - rename basex...-src.tar.gz to basex....tar.gz
+         - remove other -src files
+      <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <executions>
           <execution>
@@ -226,10 +229,7 @@
         </executions>
         <configuration>
           <descriptorRefs>
-            <!- OpenSUSE, ...build sources
-            <descriptorRef>src</descriptorRef> ->
-            <!- JAR with all dependencies 
-            <descriptorRef>jar-with-dependencies</descriptorRef> ->
+            <descriptorRef>src</descriptorRef>
           </descriptorRefs>
           <archive>
             <manifest>
