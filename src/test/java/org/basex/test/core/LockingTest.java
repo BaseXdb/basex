@@ -3,11 +3,15 @@ package org.basex.test.core;
 import static org.junit.Assert.*;
 
 import java.lang.reflect.Array;
+import java.util.*;
 import java.util.concurrent.*;
 import org.basex.core.*;
 import org.basex.test.*;
 import org.basex.util.list.*;
 import org.junit.*;
+import org.junit.runner.*;
+import org.junit.runners.*;
+import org.junit.runners.Parameterized.*;
 
 /**
  * Tests for {@link org.basex.core.DBLocking}.
@@ -15,7 +19,24 @@ import org.junit.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Jens Erat
  */
+@RunWith(Parameterized.class)
 public final class LockingTest extends SandboxTest {
+  /** How often should tests be repeated? */
+  private static final int REPEAT = 1;
+
+  /**
+   * Enable repeated running of test to track down synchronization issues.
+   * @return Collection of empty object arrays
+   */
+  @Parameters
+  public static Collection<Object[]> generateParams() {
+    List<Object[]> params = new ArrayList<Object[]>();
+    for(int i = 1; i <= REPEAT; i++) {
+      params.add(new Object[0]);
+    }
+    return params;
+  }
+
   /** How many milliseconds to wait for threads to finish. */
   private static final long WAIT = 100L;
   /** Main properties, used to read parallel transactions limit. */
