@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import static org.basex.query.util.Err.*;
 
 import java.io.*;
+import java.util.*;
 
 import org.basex.core.*;
 import org.basex.core.parse.*;
@@ -232,6 +233,16 @@ abstract class AQuery extends Command {
     info(EVALUATING_CC + Performance.getTime(eval, runs));
     info(PRINTING_CC + Performance.getTime(prnt, runs));
     info(TOTAL_TIME_CC + Performance.getTime(total, runs) + NL);
+    if (context.mprop.is(MainProp.DBLOCKING)) {
+      String locked;
+      if (null == context.locked)
+        locked = ALL;
+      else if(context.locked.isEmpty())
+        locked = NONE;
+      else
+        locked = Arrays.toString(context.locked.toArray());
+      info(LOCKED_DBS_CC + locked);
+    }
     info(HITS_X_CC + hits + ' ' + (hits == 1 ? ITEM : ITEMS));
     info(UPDATED_CC + updates + ' ' + (updates == 1 ? ITEM : ITEMS));
     info(PRINTED_CC + Performance.format(out.size()));

@@ -626,6 +626,8 @@ public interface Text {
   String PRINTING_CC = lang("printing") + COLS;
   /** "Total time: ". */
   String TOTAL_TIME_CC = lang("total_time") + COLS;
+  /** "Locked Databases: ". */
+  String LOCKED_DBS_CC = lang("locked_dbs") + COLS;
   /** "Hit(s): ". */
   String HITS_X_CC = lang("hit_s") + COLS;
   /** "Updated: ". */
@@ -733,6 +735,8 @@ public interface Text {
 
   /** "Name". */
   String ALL = lang("all");
+  /** "Name". */
+  String NONE = lang("none");
   /** "Name". */
   String NAME = lang("name");
   /** "Size". */

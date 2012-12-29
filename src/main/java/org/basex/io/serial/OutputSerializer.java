@@ -98,7 +98,7 @@ public abstract class OutputSerializer extends Serializer {
     final boolean decl = !p.yes(S_OMIT_XML_DECLARATION);
     final boolean bom  = p.yes(S_BYTE_ORDER_MARK);
     final String sa = p.check(S_STANDALONE, YES, NO, OMIT);
-    p.check(S_NORMALIZATION_FORM, NFC, NONE);
+    p.check(S_NORMALIZATION_FORM, NFC, DataText.NONE);
 
     final String maps = p.get(S_USE_CHARACTER_MAPS);
     final String enc = normEncoding(p.get(S_ENCODING));

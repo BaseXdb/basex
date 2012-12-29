@@ -57,6 +57,8 @@ public final class Context {
   private Nodes current;
   /** Process locking. */
   private final ILocking locks;
+  /** Locked databases. */
+  public StringList locked;
   /** Data reference. */
   private Data data;
 
@@ -227,6 +229,7 @@ public final class Context {
         if(sl.get(d).isEmpty()) sl.set(d, data.meta.name);
       }
     }
+    locked = sl;
     locks.acquire(pr, sl);
   }
 
