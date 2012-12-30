@@ -120,17 +120,18 @@ public class StringList extends ElementList implements Iterable<String> {
   }
 
   /**
-   * Returns a new list without duplicates. The existing list must be sorted.
-   * @return unique sorted list
+   * Removes duplicates from the list.
+   * @return self reference
    */
   public StringList unique() {
-    final StringList sl = new StringList(size);
-    if(size != 0) sl.add(list[0]);
-    for(int s = 1; s < size(); s++) {
-      final String l = list[s];
-      if(!l.equals(list[s - 1])) sl.add(l);
+    if(size != 0) {
+      int s = 0;
+      for(int l = 1; l < size; l++) {
+        if(!list[l].equals(list[s])) list[++s] = list[l];
+      }
+      size = s + 1;
     }
-    return sl;
+    return this;
   }
 
   @Override

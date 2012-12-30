@@ -91,9 +91,9 @@ public final class DBLocking implements ILocking {
           Thread.currentThread().interrupt();
         }
       }
-        final int t = transactions++;
-        assert t <= Math.max(mprop.num(MainProp.PARALLEL), 1);
-        queue.remove(thread);
+      final int t = transactions++;
+      assert t <= Math.max(mprop.num(MainProp.PARALLEL), 1);
+      queue.remove(thread);
     }
 
     // No databases specified: lock globally

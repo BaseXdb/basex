@@ -184,6 +184,7 @@ license              = BSD License
 line                 = Regel
 line_%               = regel %
 line_number          = Regelnummer
+locking              = Locking
 main_options         = Hoofdopties
 manage_db            = Beheer databases
 map                  = Map

@@ -57,8 +57,6 @@ public final class Context {
   private Nodes current;
   /** Process locking. */
   private final ILocking locks;
-  /** Locked databases. */
-  public StringList locked;
   /** Data reference. */
   private Data data;
 
@@ -219,8 +217,6 @@ public final class Context {
     // get touched databases
     StringList sl = new StringList();
     if(!pr.databases(sl)) {
-      // old: databases cannot be determined... pass on all existing databases
-      //sl = databases.listDBs();
       // databases cannot be determined... pass null reference
       sl = null;
     } else if(data != null) {
@@ -229,7 +225,6 @@ public final class Context {
         if(sl.get(d).isEmpty()) sl.set(d, data.meta.name);
       }
     }
-    locked = sl;
     locks.acquire(pr, sl);
   }
 

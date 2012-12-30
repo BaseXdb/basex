@@ -185,6 +185,7 @@ license              = BSD лиценз
 line                 = Мөр
 line_%               = мөр %
 line_number          = Line number
+locking              = Locking
 main_options         = Үндсэн тохиргоонууд
 manage_db            = Өгөгдлийн санг удирдах
 map                  = Газрын зураг

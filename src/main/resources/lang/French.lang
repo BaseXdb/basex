@@ -184,6 +184,7 @@ license              = License BSD
 line                 = Ligne
 line_%               = ligne %
 line_number          = Zeilennummer
+locking              = Locking
 main_options         = Main Options
 manage_db            = Manage Databases
 map                  = Carte

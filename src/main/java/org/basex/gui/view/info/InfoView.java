@@ -172,8 +172,8 @@ public final class InfoView extends View {
       } else if(!ok) {
         err += line + NL;
       } else if(line.startsWith(HITS_X_CC) || line.startsWith(UPDATED_CC) ||
-          line.startsWith(PRINTED_CC) || line.startsWith(LOCKED_DBS_CC)) {
-          stats.add("- " + line);
+          line.startsWith(PRINTED_CC) || line.startsWith(LOCKING_CC)) {
+        stats.add(LI + line);
       }
     }
 

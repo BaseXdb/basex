@@ -27,6 +27,8 @@ import org.basex.util.list.*;
 abstract class AQuery extends Command {
   /** Query result. */
   Result result;
+  /** Locked databases. */
+  StringList locked;
 
   /** Query processor. */
   private QueryProcessor qp;
@@ -180,7 +182,9 @@ abstract class AQuery extends Command {
 
   @Override
   protected boolean databases(final StringList db) {
-    return qp != null && qp.databases(db);
+    final boolean ok = qp != null && qp.databases(db);
+    if(ok) locked = db;
+    return ok;
   }
 
   /**
@@ -233,15 +237,9 @@ abstract class AQuery extends Command {
     info(EVALUATING_CC + Performance.getTime(eval, runs));
     info(PRINTING_CC + Performance.getTime(prnt, runs));
     info(TOTAL_TIME_CC + Performance.getTime(total, runs) + NL);
-    if (context.mprop.is(MainProp.DBLOCKING)) {
-      String locked;
-      if (null == context.locked)
-        locked = ALL;
-      else if(context.locked.isEmpty())
-        locked = NONE;
-      else
-        locked = Arrays.toString(context.locked.toArray());
-      info(LOCKED_DBS_CC + locked);
+    if(context.mprop.is(MainProp.DBLOCKING)) {
+      info(LOCKING_CC + (locked == null ? "global" :
+        ("local " + (locked.isEmpty() ? "" : Arrays.toString(locked.toArray())))));
     }
     info(HITS_X_CC + hits + ' ' + (hits == 1 ? ITEM : ITEMS));
     info(UPDATED_CC + updates + ' ' + (updates == 1 ? ITEM : ITEMS));

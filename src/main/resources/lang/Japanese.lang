@@ -184,6 +184,7 @@ license              = BSD ライセンス
 line                 = 行
 line_%               = % 行
 line_number          = 行番号
+locking              = Locking
 main_options         = メインオプション
 manage_db            = データベースの管理
 map                  = マップ

@@ -184,6 +184,7 @@ license              = Licenţă BSD
 line                 = Linie
 line_%               = linia %
 line_number          = Line number
+locking              = Locking
 main_options         = Opţiuni principale
 manage_db            = Administrare baze de date
 map                  = Hartă
