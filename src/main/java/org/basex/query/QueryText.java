@@ -444,6 +444,8 @@ public interface QueryText {
   byte[] DB = token("db");
   /** Index token. */
   byte[] INDEX = token("index");
+  /** FETCH token. */
+  byte[] FETCH = token("fetch");
   /** FT token. */
   byte[] FT = token("ft");
   /** XS token. */
@@ -561,6 +563,8 @@ public interface QueryText {
   byte[] ADMINURI = token(BXMODULES + "admin");
   /** Database module URI. */
   byte[] DBURI = token(BXMODULES + "db");
+  /** Fetch module URI. */
+  byte[] FETCHURI = token(BXMODULES + "fetch");
   /** Full-text module URI. */
   byte[] FTURI = token(BXMODULES + "ft");
   /** Higher-order module URI. */

@@ -600,6 +600,13 @@ public enum Function {
       EMP, 2, STR, STR, STR),
   */
 
+  /* FNFetch functions. */
+
+  /** XQuery function. */
+  _FETCH_CONTENT(FNFetch.class, "content(uri[,encoding)", STR, 1, STR, STR),
+  /** XQuery function. */
+  _FETCH_CONTENT_BINARY(FNFetch.class, "content-binary(uri)", STR, 1, STR),
+
   /* FNIndex functions. */
 
   /** XQuery function. */
@@ -911,11 +918,12 @@ public enum Function {
     URIS.put(FNZip.class,    ZIPURI);
     URIS.put(FNRepo.class,   REPOURI);
     // internal functions
+    URIS.put(FNAdmin.class,    ADMINURI);
     URIS.put(FNArchive.class,  ARCHIVEURI);
     URIS.put(FNClient.class,   CLIENTURI);
     URIS.put(FNConvert.class,  CONVERTURI);
     URIS.put(FNDb.class,       DBURI);
-    URIS.put(FNAdmin.class,    ADMINURI);
+    URIS.put(FNFetch.class,    FETCHURI);
     URIS.put(FNFt.class,       FTURI);
     URIS.put(FNHof.class,      HOFURI);
     URIS.put(FNHash.class,     HASHURI);

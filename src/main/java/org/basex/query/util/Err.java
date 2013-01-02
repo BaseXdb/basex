@@ -85,6 +85,13 @@ public enum Err {
   /** BXDB0012. */
   BXDB_CREATE(BXDB, 12, "Database '%' can only be create once."),
 
+  // Fetch module
+
+  /** BXFE0001. */
+  BXFE_IO(BXFE, 1, "%"),
+  /** BXFE0002. */
+  BXFE_ENCODING(BXFE, 2, "Encoding not supported: '%'."),
+
   // Fulltext module
 
   /** BXFT0001. */
@@ -99,7 +106,7 @@ public enum Err {
   /** BXJS0002. */
   BXJS_SER(BXJS, 1, "JSON serialization: %."),
 
-  /// Process module
+  // Process module
 
   /** BXPR9999. */
   BXPR_ENC(BXPR, 9999, "Encoding not supported: '%'."),
@@ -1054,6 +1061,7 @@ public enum Err {
     /** BXCL Error type. */ BXCL(QueryText.BXERR, QueryText.BXERRORS),
     /** BXCO Error type. */ BXCO(QueryText.BXERR, QueryText.BXERRORS),
     /** BXDB Error type. */ BXDB(QueryText.BXERR, QueryText.BXERRORS),
+    /** BXFE Error type. */ BXFE(QueryText.BXERR, QueryText.BXERRORS),
     /** BXFT Error type. */ BXFT(QueryText.BXERR, QueryText.BXERRORS),
     /** BXJS Error type. */ BXJS(QueryText.BXERR, QueryText.BXERRORS),
     /** BXPR Error type. */ BXPR(QueryText.BXERR, QueryText.BXERRORS),
