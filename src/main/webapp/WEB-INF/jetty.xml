@@ -7,7 +7,7 @@
   <Call name="addConnector">
     <Arg>
       <New class="org.eclipse.jetty.server.nio.SelectChannelConnector">
-        <Set name="host"><SystemProperty name="org.basex.serverhost" default=""/></Set>
+        <Set name="host"><SystemProperty name="org.basex.serverhost" default="0.0.0.0"/></Set>
         <Set name="port"><SystemProperty name="org.basex.serverport" default="8984"/></Set>
         <Set name="maxIdleTime">60000</Set>
         <Set name="reuseAddress">false</Set>
