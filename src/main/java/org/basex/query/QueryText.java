@@ -472,6 +472,8 @@ public interface QueryText {
   byte[] ZIP = token("zip");
   /** HOF token. */
   byte[] HOF = token("hof");
+  /** HTML token. */
+  byte[] HTML = token("html");
   /** JSON token. */
   byte[] JSON = token(JSONSTR);
   /** MAP token. */
@@ -569,6 +571,8 @@ public interface QueryText {
   byte[] FTURI = token(BXMODULES + "ft");
   /** Higher-order module URI. */
   byte[] HOFURI = token(BXMODULES + "hof");
+  /** Html module URI. */
+  byte[] HTMLURI = token(BXMODULES + "html");
   /** Index module URI. */
   byte[] INDEXURI = token(BXMODULES + "index");
   /** JSON module URI. */

@@ -605,7 +605,14 @@ public enum Function {
   /** XQuery function. */
   _FETCH_CONTENT(FNFetch.class, "content(uri[,encoding)", STR, 1, STR, STR),
   /** XQuery function. */
-  _FETCH_CONTENT_BINARY(FNFetch.class, "content-binary(uri)", STR, 1, STR),
+  _FETCH_CONTENT_BINARY(FNFetch.class, "content-binary(uri)", STR, STR),
+
+  /* FNHTML functions. */
+
+  /** XQuery function. */
+  _HTML_PARSER(FNHtml.class, "parser()", STR),
+  /** XQuery function. */
+  _HTML_PARSE(FNHtml.class, "parse(input[,options)", DOC_O, 1, STR, ITEM),
 
   /* FNIndex functions. */
 
@@ -925,8 +932,9 @@ public enum Function {
     URIS.put(FNDb.class,       DBURI);
     URIS.put(FNFetch.class,    FETCHURI);
     URIS.put(FNFt.class,       FTURI);
-    URIS.put(FNHof.class,      HOFURI);
     URIS.put(FNHash.class,     HASHURI);
+    URIS.put(FNHof.class,      HOFURI);
+    URIS.put(FNHtml.class,     HTMLURI);
     URIS.put(FNIndex.class,    INDEXURI);
     URIS.put(FNJson.class,     JSONURI);
     URIS.put(FNOut.class,      OUTURI);

@@ -97,6 +97,11 @@ public enum Err {
   /** BXFT0001. */
   BXFT_MATCH(BXFT, 1, "Either wildcards or fuzzy search supported."),
 
+  // HTML module
+
+  /** BXHL0001. */
+  BXHL_IO(BXHL, 1, "%"),
+
   // JSON module
 
   /** BXJS0001. */
@@ -1063,6 +1068,7 @@ public enum Err {
     /** BXDB Error type. */ BXDB(QueryText.BXERR, QueryText.BXERRORS),
     /** BXFE Error type. */ BXFE(QueryText.BXERR, QueryText.BXERRORS),
     /** BXFT Error type. */ BXFT(QueryText.BXERR, QueryText.BXERRORS),
+    /** BXHL Error type. */ BXHL(QueryText.BXERR, QueryText.BXERRORS),
     /** BXJS Error type. */ BXJS(QueryText.BXERR, QueryText.BXERRORS),
     /** BXPR Error type. */ BXPR(QueryText.BXERR, QueryText.BXERRORS),
     /** BXRE Error type. */ BXRE(QueryText.BXERR, QueryText.BXERRORS),

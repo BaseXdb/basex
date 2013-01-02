@@ -23,6 +23,8 @@ import org.xml.sax.*;
  * @author Christian Gruen
  */
 public final class HTMLParser extends XMLParser {
+  /** Name of HTML Parser. */
+  public static final String NAME = "TagSoup";
   /** TagSoup URL. */
   private static final String FEATURES = "http://www.ccil.org/~cowan/tagsoup/features/";
 
@@ -45,13 +47,33 @@ public final class HTMLParser extends XMLParser {
   }
 
   /**
+   * Returns the name of the parser, or an empty string.
+   * @return name of parser
+   */
+  public static String parser() {
+    return available() ? NAME : "";
+  }
+
+  /**
    * Constructor.
    * @param source document source
    * @param pr database properties
    * @throws IOException I/O exception
    */
   public HTMLParser(final IO source, final Prop pr) throws IOException {
-    super(toXML(source, pr.get(Prop.HTMLOPT)), pr);
+    this(source, pr.get(Prop.HTMLOPT), pr);
+  }
+
+  /**
+   * Constructor.
+   * @param source document source
+   * @param options options
+   * @param pr database properties
+   * @throws IOException I/O exception
+   */
+  public HTMLParser(final IO source, final String options, final Prop pr)
+      throws IOException {
+    super(toXML(source, options), pr);
   }
 
   /**
