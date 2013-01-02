@@ -155,7 +155,7 @@ public enum Err {
   /** BXVA0001. */
   BXVA_FAIL(BXVA, 1, "Validation failed: %"),
 
-  // Fulltext module
+  // XQuery module
 
   /** BXXQ0001. */
   BXXQ_UPDATING(BXXQ, 1, "No updating expression allowed."),
@@ -962,6 +962,8 @@ public enum Err {
 
   /** XUST0001. */
   UPNOT(XUST, 1, "%: no updating expression allowed."),
+  /** XUST0001. */
+  UPALL(XUST, 1, "%: all expressions must be updating or return an empty sequence."),
   /** XUST0001. */
   UPCTX(XUST, 1, "Context item may not declare an updating expression."),
   /** XUST0002. */

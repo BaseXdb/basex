@@ -175,7 +175,7 @@ public abstract class ParseExpr extends Expr {
       e.checkUp();
       if(e.isVacuous()) continue;
       final boolean u = e.uses(Use.UPD);
-      if(u && s == 2 || !u && s == 1) UPNOT.thrw(info, description());
+      if(u && s == 2 || !u && s == 1) UPALL.thrw(info, description());
       s = u ? 1 : 2;
     }
   }
