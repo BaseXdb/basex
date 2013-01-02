@@ -56,12 +56,12 @@ public final class InfoDB extends AInfo {
     tb.addExt(header, DB_PROPS);
     info(tb, NAME, meta.name);
     info(tb, SIZE, Performance.format(meta.dbsize()));
-    info(tb, NODES, Integer.toString(meta.size));
+    info(tb, NODES, meta.size);
 
     // count number of raw files
-    info(tb, DOCUMENTS, Integer.toString(meta.ndocs));
+    info(tb, DOCUMENTS, meta.ndocs);
     final int b = meta.path != null ? meta.binaries().descendants().size() : 0;
-    info(tb, BINARIES, Integer.toString(b));
+    info(tb, BINARIES, b);
     info(tb, TIMESTAMP, DateTime.format(new Date(meta.dbtime()), DateTime.DATETIME));
     if(meta.corrupt) tb.add(' ' + DB_CORRUPT + NL);
 
@@ -77,10 +77,13 @@ public final class InfoDB extends AInfo {
       if(meta.oldindex()) {
         tb.add(' ' + H_INDEX_FORMAT + NL);
       } else {
-        info(tb, UP_TO_DATE, String.valueOf(meta.uptodate));
+        info(tb, UP_TO_DATE, meta.uptodate);
         info(tb, TEXT_INDEX, Util.flag(meta.textindex));
         info(tb, ATTRIBUTE_INDEX, Util.flag(meta.attrindex));
         info(tb, FULLTEXT_INDEX, Util.flag(meta.ftxtindex));
+        info(tb, Prop.UPDINDEX[0], Util.flag(meta.updindex));
+        info(tb, Prop.MAXCATS[0], meta.maxcats);
+        info(tb, Prop.MAXLEN[0], meta.maxlen);
       }
     }
     return tb.toString();

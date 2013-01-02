@@ -91,9 +91,9 @@ public final class MetaData {
   /** Flag for out-of-date indexes. */
   private volatile boolean oldindex;
   /** Flag for out-of-date wildcard index (legacy, deprecated). */
-  public volatile boolean wcindex;
+  private volatile boolean wcindex;
   /** Scoring mode (legacy, deprecated). */
-  public volatile int scoring;
+  private volatile int scoring;
 
   /**
    * Constructor, specifying the database properties.

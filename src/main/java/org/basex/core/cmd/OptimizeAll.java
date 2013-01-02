@@ -107,15 +107,17 @@ public final class OptimizeAll extends ACreate {
     // find unique temporary database name
     final String tname = ctx.mprop.random(m.name);
 
-    // adopt original meta data
+    // adopt original meta information
     ctx.prop.set(Prop.CHOP, m.chop);
+    // adopt original index options
     ctx.prop.set(Prop.UPDINDEX, m.updindex);
-    ctx.prop.set(Prop.STEMMING, m.stemming);
-    ctx.prop.set(Prop.CASESENS, m.casesens);
+    ctx.prop.set(Prop.MAXCATS,  m.maxcats);
+    ctx.prop.set(Prop.MAXLEN,   m.maxlen);
+    // adopt original full-text index options
+    ctx.prop.set(Prop.STEMMING,   m.stemming);
+    ctx.prop.set(Prop.CASESENS,   m.casesens);
     ctx.prop.set(Prop.DIACRITICS, m.diacritics);
-    ctx.prop.set(Prop.MAXCATS, m.maxcats);
-    ctx.prop.set(Prop.MAXLEN, m.maxlen);
-    ctx.prop.set(Prop.LANGUAGE, m.language.toString());
+    ctx.prop.set(Prop.LANGUAGE,   m.language.toString());
 
     // build database and index structures
     final DiskBuilder builder = new DiskBuilder(tname, new DBParser(old, cmd), ctx);
@@ -128,9 +130,9 @@ public final class OptimizeAll extends ACreate {
       d.meta.createtext = m.createtext;
       d.meta.createattr =  m.createattr;
       d.meta.createftxt = m.createftxt;
-      d.meta.filesize = m.filesize;
-      d.meta.users    = m.users;
-      d.meta.dirty    = true;
+      d.meta.filesize   = m.filesize;
+      d.meta.users      = m.users;
+      d.meta.dirty      = true;
 
       // move binary files
       final IOFile bin = data.meta.binaries();

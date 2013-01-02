@@ -49,11 +49,11 @@ public final class Info extends AInfo {
     if(context.user.has(Perm.ADMIN)) {
       final AProp prop = context.mprop;
       tb.add(NL + MAIN_OPTIONS + NL);
-      for(final String s : prop) info(tb, s, prop.get(s).toString());
+      for(final String s : prop) info(tb, s, prop.get(s));
     }
     final AProp prop = context.prop;
     tb.add(NL + OPTIONS + NL);
-    for(final String s : prop) info(tb, s, prop.get(s).toString());
+    for(final String s : prop) info(tb, s, prop.get(s));
     return tb.toString();
   }
 }
