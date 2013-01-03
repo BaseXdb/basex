@@ -122,7 +122,7 @@ public final class JavaFunc extends JavaMapping {
    * @return argument array or {@code null}
    * @throws QueryException query exception
    */
-  private static Object[] args(final Class<?>[] params, final Value[] args,
+  static Object[] args(final Class<?>[] params, final Value[] args,
       final boolean stat) throws QueryException {
 
     final int s = stat ? 0 : 1;

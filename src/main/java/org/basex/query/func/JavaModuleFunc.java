@@ -39,34 +39,34 @@ public final class JavaModuleFunc extends JavaMapping {
   }
 
   @Override
-  protected Object eval(final Value[] args, final QueryContext ctx)
+  protected Object eval(final Value[] vals, final QueryContext ctx)
       throws QueryException {
 
     // assign context if module is inheriting {@link QueryModule}
     if(module instanceof QueryModule) ((QueryModule) module).context = ctx;
 
-    try {
+    final Object[] args = JavaFunc.args(mth.getParameterTypes(), vals, true);
+    if(args != null) {
       try {
-        return mth.invoke(module, (Object[]) args);
-      } catch(final IllegalArgumentException iae) {
-        final Object[] ar = new Object[args.length];
-        for(int a = 0; a < args.length; a++) ar[a] = args[a].toJava();
-        return mth.invoke(module, ar);
+        return mth.invoke(module, args);
+      } catch(final InvocationTargetException ex) {
+        final Throwable cause = ex.getCause();
+        throw cause instanceof QueryException ? ((QueryException) cause).info(info) :
+          JAVAERR.thrw(info, cause);
+      } catch(final IllegalAccessException ex) {
+        /* ignored */
+        Util.debug(ex);
       }
-    } catch(final InvocationTargetException ex) {
-      final Throwable cause = ex.getCause();
-      throw cause instanceof QueryException ? ((QueryException) cause).info(info) :
-        JAVAERR.thrw(info, cause);
-    } catch(final Throwable ex) {
-      // compose expected signature
-      final TokenBuilder expect = new TokenBuilder();
-      for(final Class<?> c : mth.getParameterTypes()) {
-        if(!expect.isEmpty()) expect.add(", ");
-        expect.add(c.getSimpleName());
-      }
-      throw JAVAMOD.thrw(info, mth.getName() + '(' + expect + ')',
-          mth.getName() + '(' + foundArgs(args) + ')');
     }
+
+    // compose error message: expected arguments
+    final TokenBuilder expect = new TokenBuilder();
+    for(final Class<?> c : mth.getParameterTypes()) {
+      if(!expect.isEmpty()) expect.add(", ");
+      expect.add(c.getSimpleName());
+    }
+    throw JAVAMOD.thrw(info, mth.getName() + '(' + expect + ')',
+        mth.getName() + '(' + foundArgs(vals) + ')');
   }
 
   @Override
