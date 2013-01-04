@@ -151,7 +151,7 @@ public final class CElem extends CName {
     for(int i = ns.size() - 1; i >= 0; i--) {
       boolean f = eq(ns.name(i), pref);
       final AxisIter atts = node.attributes();
-      for(ANode it; f && (it = atts.next()) != null;) {
+      for(ANode it; !f && (it = atts.next()) != null;) {
         f |= eq(it.qname().prefix(), pref);
       }
       if(!f) ns.delete(i);
