@@ -213,7 +213,6 @@ final class DatabaseUpdates {
         upd.add(p);
         size += p.size();
       }
-      updatePrimitives.delete(pre);
     }
     updatePrimitives = null;
     nodes = null;
