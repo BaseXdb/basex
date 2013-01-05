@@ -216,6 +216,7 @@ public final class JSONSerializer extends OutputSerializer {
         if(++mode == 7) {
           tb.add(uc);
           mode = 0;
+          uc = 0;
         }
       } else if(cp == '_') {
         // limit underscore counter
