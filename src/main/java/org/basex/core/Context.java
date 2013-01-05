@@ -225,7 +225,8 @@ public final class Context {
         if(sl.get(d).isEmpty()) sl.set(d, data.meta.name);
       }
     }
-    locks.acquire(pr, sl);
+    locks.acquire(pr, pr.updating ? new StringList() : sl,
+                                  pr.updating ? sl : new StringList());
   }
 
   /**

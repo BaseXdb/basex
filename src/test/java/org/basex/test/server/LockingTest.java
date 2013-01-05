@@ -30,15 +30,28 @@ public final class LockingTest extends SandboxTest {
   private static final int REPEAT = 1;
 
   /** Maximum sleep time in ms. */
-  private static final int SLEEP = 100;
+  private static final int SLEEP = 200;
   /** Additional allowed holding time for client creation overhead, ... in ms. */
-  private static final int SYNC = 50;
+  private static final int SYNC = 100;
 
   /** Test document. */
   private static final String DOC = "src/test/resources/test.xml";
   /** XQuery code for handling latches. */
   private static final String Q
     = "Q{java:org.basex.test.server.LockingTest}countDownAndWait()";
+  /** How often to run each query in load test. */
+  private static final int RUN_COUNT = 100;
+  /**
+   * Queries to run in load test, %1$s will get substituted by DB name, %2$s by code for
+   * sleeping {@code SLEEP_LOAD} milliseconds.
+   */
+  private static final String[] QUERIES = {
+    "%2$s",
+    "(doc('%1$s'), %2$s)",
+    "insert node %2$s into doc('%1$s')",
+    "for $i in ('%1$s') return insert node %2$s into doc($i)",
+    "for $i in ('%1$s') return (doc($i), %2$s)"
+  };
 
   /** Server reference. */
   private static BaseXServer server;
@@ -131,7 +144,7 @@ public final class LockingTest extends SandboxTest {
    * @throws Exception None expected
    */
   @Test
-  public void noLocking() throws Exception {
+  public void lockingTests() throws Exception {
     // Not querying any databases
     testQueries(
         new XQuery(Q),
@@ -177,5 +190,24 @@ public final class LockingTest extends SandboxTest {
         new XQuery(f("for $i in ('%s') return insert node %s into doc($i)", NAME, Q)),
         new XQuery(f("for $i in ('%s') return insert node %s into doc($i)", NAME, Q)),
         false);
+  }
+
+  /**
+   * Load test.
+   * @throws Exception None expected
+   */
+  @Test
+  public void loadTests() throws Exception {
+    final int totalQueries = RUN_COUNT * QUERIES.length;
+    final ArrayList<Client> clients = new ArrayList<Client>(totalQueries);
+    final CountDownLatch allDone = new CountDownLatch(totalQueries);
+
+    for(int i = 0; i < RUN_COUNT; i++)
+      for(String query : QUERIES)
+        clients.add(new Client(new XQuery(f(query, NAME, "1")), null, allDone));
+
+    allDone.await(totalQueries * SLEEP, TimeUnit.MILLISECONDS);
+    for (Client client : clients)
+        assertTrue(client.error, client.error == null);
   }
 }

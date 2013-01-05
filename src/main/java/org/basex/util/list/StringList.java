@@ -146,4 +146,9 @@ public class StringList extends ElementList implements Iterable<String> {
       public void remove() { Util.notexpected(); }
     };
   }
+
+  @Override
+  public final String toString() {
+    return Arrays.toString(toArray());
+  }
 }
