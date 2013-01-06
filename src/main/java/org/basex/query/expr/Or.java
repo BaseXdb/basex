@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 
@@ -25,9 +26,9 @@ public final class Or extends Logical {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     // remove atomic values
-    final Expr c = super.compile(ctx);
+    final Expr c = super.compile(ctx, scp);
     if(c != this) return c;
 
     // merge predicates if possible
@@ -39,7 +40,7 @@ public final class Or extends Logical {
         // merge general comparisons
         final CmpG g = (CmpG) e;
         if(cmpg == null) cmpg = g;
-        else if(cmpg.union(g, ctx)) tmp = g;
+        else if(cmpg.union(g, ctx, scp)) tmp = g;
       }
       // no optimization found; add original expression
       if(tmp == null) ex = Array.add(ex, e);
@@ -49,7 +50,7 @@ public final class Or extends Logical {
     compFlatten(ctx);
 
     // return single expression if it yields a boolean
-    return expr.length == 1 ? compBln(expr[0]) : this;
+    return expr.length == 1 ? compBln(expr[0], info) : this;
   }
 
   @Override

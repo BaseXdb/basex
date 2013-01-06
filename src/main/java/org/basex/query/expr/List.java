@@ -9,6 +9,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -33,8 +34,8 @@ public final class List extends Arr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    for(int e = 0; e < expr.length; e++) expr[e] = expr[e].compile(ctx);
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    for(int e = 0; e < expr.length; e++) expr[e] = expr[e].compile(ctx, scp);
 
     // compute number of results
     size = 0;

@@ -10,6 +10,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -39,9 +40,9 @@ public final class CElem extends CName {
   }
 
   @Override
-  public CElem compile(final QueryContext ctx) throws QueryException {
+  public CElem compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     final int s = prepare(ctx);
-    super.compile(ctx);
+    super.compile(ctx, scp);
     ctx.sc.ns.size(s);
     return this;
   }

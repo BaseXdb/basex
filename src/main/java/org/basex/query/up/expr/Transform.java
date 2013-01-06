@@ -5,13 +5,14 @@ import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.flwor.*;
+import org.basex.query.gflwor.*;
 import org.basex.query.iter.*;
 import org.basex.query.up.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -45,14 +46,9 @@ public final class Transform extends Arr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    final int s = ctx.vars.size();
-    for(final Let c : copies) {
-      c.expr = c.expr.compile(ctx);
-      ctx.vars.add(c.var);
-    }
-    super.compile(ctx);
-    ctx.vars.size(s);
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    for(final Let c : copies) c.expr = c.expr.compile(ctx, scp);
+    super.compile(ctx, scp);
     return this;
   }
 
@@ -63,7 +59,6 @@ public final class Transform extends Arr {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    final int s = ctx.vars.size();
     final int o = (int) ctx.output.size();
     final ContextModifier tmp = ctx.updates.mod;
     final TransformModifier pu = new TransformModifier();
@@ -78,14 +73,13 @@ public final class Transform extends Arr {
         // copy node to main memory data instance
         i = ((ANode) i).dbCopy(ctx.context.prop);
         // add resulting node to variable
-        ctx.vars.add(fo.var.bind(i, ctx).copy());
+        ctx.set(fo.var, i, info);
         pu.addData(i.data());
       }
       ctx.value(expr[0]);
       ctx.updates.apply();
       return ctx.value(expr[1]);
     } finally {
-      ctx.vars.size(s);
       ctx.output.size(o);
       ctx.updates.mod = tmp;
     }
@@ -94,13 +88,6 @@ public final class Transform extends Arr {
   @Override
   public boolean uses(final Use u) {
     return u == Use.VAR || u != Use.UPD && super.uses(u);
-  }
-
-  @Override
-  public int count(final Var v) {
-    int c = 0;
-    for(final Let l : copies) c += l.count(v);
-    return c + super.count(v);
   }
 
   @Override
@@ -133,5 +120,13 @@ public final class Transform extends Arr {
       sb.append(t.var + " " + ASSIGN + ' ' + t.expr + ' ');
     return sb.append(MODIFY + ' ' + expr[0] + ' ' + RETURN + ' ' +
         expr[1]).toString();
+  }
+
+  @Override
+  public boolean visitVars(final VarVisitor visitor) {
+    if(!(visitor.visitAll(copies) && visitor.visitAll(expr))) return false;
+    for(int i = copies.length; --i >= 0;)
+      if(!visitor.undeclared(copies[i].var)) return false;
+    return true;
   }
 }

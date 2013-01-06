@@ -16,6 +16,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -127,8 +128,8 @@ public final class CmpG extends Cmp {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    super.compile(ctx);
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    super.compile(ctx, scp);
 
     // swap expressions; add text() to location paths to simplify optimizations
     if(swap()) {
@@ -284,12 +285,14 @@ public final class CmpG extends Cmp {
    * Creates a union of the existing and the specified expressions.
    * @param g general comparison
    * @param ctx query context
+   * @param scp variable scope
    * @return true if union was successful
    * @throws QueryException query exception
    */
-  boolean union(final CmpG g, final QueryContext ctx) throws QueryException {
+  boolean union(final CmpG g, final QueryContext ctx, final VarScope scp)
+      throws QueryException {
     if(op != g.op || !expr[0].sameAs(g.expr[0])) return false;
-    expr[1] = new List(info, expr[1], g.expr[1]).compile(ctx);
+    expr[1] = new List(info, expr[1], g.expr[1]).compile(ctx, scp);
     atomic = atomic && expr[1].type().zeroOrOne();
     return true;
   }

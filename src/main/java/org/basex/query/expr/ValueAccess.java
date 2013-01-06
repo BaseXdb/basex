@@ -12,6 +12,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -112,11 +113,6 @@ public final class ValueAccess extends IndexAccess {
   }
 
   @Override
-  public int count(final Var v) {
-    return expr.count(v);
-  }
-
-  @Override
   public boolean removable(final Var v) {
     return expr.removable(v);
   }
@@ -141,5 +137,10 @@ public final class ValueAccess extends IndexAccess {
   public String toString() {
     return (itype == IndexType.TEXT ? Function._DB_TEXT : Function._DB_ATTRIBUTE).get(
         info, Str.get(ictx.data.meta.name), expr).toString();
+  }
+
+  @Override
+  public boolean visitVars(final VarVisitor visitor) {
+    return expr.visitVars(visitor) && super.visitVars(visitor);
   }
 }

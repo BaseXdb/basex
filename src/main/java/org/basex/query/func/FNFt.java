@@ -219,7 +219,7 @@ public final class FNFt extends StandardFunc {
     }
 
     ctx.ftOpt(opt);
-    final FTWords words = new FTWords(info, ic.data, terms, m, ctx).compile(ctx);
+    final FTWords words = new FTWords(info, ic.data, terms, m, ctx);
     ctx.ftOpt(tmp);
     return new FTIndexAccess(info, words, ic).iter(ctx);
   }

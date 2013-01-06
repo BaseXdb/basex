@@ -9,6 +9,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -40,20 +41,21 @@ public class Filter extends Preds {
   }
 
   @Override
-  public final Expr compile(final QueryContext ctx) throws QueryException {
+  public final Expr compile(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
     // invalidate current context value (will be overwritten by filter)
     final Value cv = ctx.value;
     try {
-      root = root.compile(ctx);
+      root = root.compile(ctx, scp);
       // return empty root
       if(root.isEmpty()) return optPre(null, ctx);
       // convert filters without numeric predicates to axis paths
       if(root instanceof AxisPath && !super.uses(Use.POS))
-        return ((AxisPath) root).copy().addPreds(preds).compile(ctx);
+        return ((AxisPath) root).copy().addPreds(preds).compile(ctx, scp);
 
       // optimize filter expressions
       ctx.value = null;
-      final Expr e = super.compile(ctx);
+      final Expr e = super.compile(ctx, scp);
       if(e != this) return e;
 
       // no predicates.. return root; otherwise, do some advanced compilations
@@ -173,11 +175,6 @@ public class Filter extends Preds {
   }
 
   @Override
-  public final int count(final Var v) {
-    return root.count(v) + super.count(v);
-  }
-
-  @Override
   public final boolean removable(final Var v) {
     return root.removable(v) && super.removable(v);
   }
@@ -203,5 +200,10 @@ public class Filter extends Preds {
   @Override
   public final String toString() {
     return root + super.toString();
+  }
+
+  @Override
+  public boolean visitVars(final VarVisitor visitor) {
+    return root.visitVars(visitor) && visitor.visitAll(preds);
   }
 }

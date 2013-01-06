@@ -17,6 +17,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -47,7 +48,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   @Override
-  public final Value compile(final QueryContext ctx) {
+  public final Value compile(final QueryContext ctx, final VarScope scp) {
     return this;
   }
 
@@ -110,11 +111,6 @@ public abstract class Value extends Expr implements Iterable<Item> {
   @Override
   public boolean uses(final Use u) {
     return false;
-  }
-
-  @Override
-  public int count(final Var v) {
-    return 0;
   }
 
   @Override
@@ -199,4 +195,9 @@ public abstract class Value extends Expr implements Iterable<Item> {
    * @return result of check
    */
   public abstract boolean homogeneous();
+
+  @Override
+  public final boolean visitVars(final VarVisitor visitor) {
+    return true;
+  }
 }

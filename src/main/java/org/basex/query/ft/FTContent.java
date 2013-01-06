@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
@@ -70,5 +71,10 @@ public final class FTContent extends FTFilter {
   public String toString() {
     return super.toString() + (start || end ? AT + ' ' +
         (start ? START : END) : ENTIRE + ' ' + CONTENT);
+  }
+
+  @Override
+  public boolean visitVars(final VarVisitor visitor) {
+    return true;
   }
 }

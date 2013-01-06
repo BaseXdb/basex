@@ -228,4 +228,14 @@ public final class QNm extends Item {
   public String toString() {
     return Token.string(id());
   }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return obj.getClass() == QNm.class && eq((QNm) obj);
+  }
+
+  @Override
+  public int hashCode() {
+    return Token.hash(id());
+  }
 }

@@ -1,9 +1,11 @@
 package org.basex.query.expr;
 
+import java.util.*;
+
 import org.basex.data.*;
 import org.basex.query.*;
-import org.basex.query.flwor.*;
 import org.basex.query.func.*;
+import org.basex.query.gflwor.*;
 import org.basex.query.iter.*;
 import org.basex.query.path.*;
 import org.basex.query.util.*;
@@ -11,6 +13,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -44,10 +47,11 @@ public abstract class Expr extends ExprInfo {
    * Compiles and optimizes the expression, assigns data types and
    * cardinalities.
    * @param ctx query context
+   * @param scp variable scope
    * @return optimized expression
    * @throws QueryException query exception
    */
-  public abstract Expr compile(final QueryContext ctx) throws QueryException;
+  public abstract Expr compile(QueryContext ctx, VarScope scp) throws QueryException;
 
   /**
    * Evaluates the expression and returns an iterator on the resulting items.
@@ -172,7 +176,18 @@ public abstract class Expr extends ExprInfo {
    * @param v variable to be checked
    * @return number of occurrences
    */
-  public abstract int count(final Var v);
+  public final int count(final Var v) {
+    // circumventing the final-variables restriction
+    final int[] res = new int[1];
+    visitVars(new VarVisitor() {
+      @Override
+      public boolean used(final LocalVarRef ref) {
+        if(ref.var.is(v)) res[0]++;
+        return true;
+      }
+    });
+    return res[0];
+  }
 
   /**
    * Checks if the specified variable is replaceable by a context item.
@@ -193,7 +208,7 @@ public abstract class Expr extends ExprInfo {
   public abstract boolean removable(final Var v);
 
   /**
-   * Substitutes all {@link VarRef} expressions for the given variable
+   * Substitutes all {@link LocalVarRef} expressions for the given variable
    * by a {@link Context} reference. This method is called by
    * {@link GFLWOR#compile} to rewrite where clauses as predicates.
    * @param v variable to be replaced
@@ -299,20 +314,23 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Checks if this expression has free variables.
-   * @param ctx query context on the level of this expression
    * @return {@code true} if there are variables which are used but not declared
    *         in this expression, {@code false} otherwise
    */
-  public boolean hasFreeVars(final QueryContext ctx) {
-    final VarStack global = ctx.vars.globals();
-    for(int i = global.size; --i >= 0;) {
-      if(count(global.vars[i]) > 0) return true;
-    }
-    final VarStack vars = ctx.vars.locals();
-    for(int i = vars.size; --i >= 0;) {
-      if(count(vars.vars[i]) > 0) return true;
-    }
-    return false;
+  public boolean hasFreeVars() {
+    final BitSet declared = new BitSet();
+    return !visitVars(new VarVisitor() {
+      @Override
+      public boolean declared(final Var var) {
+        declared.set(var.id);
+        return true;
+      }
+
+      @Override
+      public boolean used(final LocalVarRef ref) {
+        return declared.get(ref.var.id);
+      }
+    });
   }
 
   /**
@@ -322,4 +340,12 @@ public abstract class Expr extends ExprInfo {
   public Expr markTailCalls() {
     return this;
   }
+
+  /**
+   * Traverses this expression, notifying the visitor of all declared and used variables.
+   * Variable declarations have to be reported before all uses of the variable.
+   * @param visitor variable visitor
+   * @return if the walk should be continued
+   */
+  public abstract boolean visitVars(final VarVisitor visitor);
 }

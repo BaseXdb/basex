@@ -676,6 +676,10 @@ public enum Err {
   /** XPST0003. */
   NOLET(XPST, 3, "Incomplete 'let' expression."),
   /** XPST0003. */
+  NOWINDOW(XPST, 3, "Incomplete 'window' expression."),
+  /** XPST0003. */
+  NOCOUNT(XPST, 3, "Incomplete 'count' expression."),
+  /** XPST0003. */
   NOCLOSING(XPST, 3, "Expecting closing tag </%>."),
   /** XPST0003. */
   COMCLOSE(XPST, 3, "Unclosed XQuery comment (: ..."),
@@ -866,6 +870,8 @@ public enum Err {
   MODNS(XQST, 48, "Declaration % does not match the module namespace."),
   /** XQST0049. */
   VARDEFINE(XQST, 49, "Duplicate declaration of %."),
+  /** XQST0054. */
+  CIRCVAR(XQST, 54, "Global variable depends on itself: %"),
   /** XQST0055. */
   DUPLCOPYNS(XQST, 55, "Duplicate 'copy-namespace' declaration."),
   /** XQST0057. */
@@ -926,6 +932,8 @@ public enum Err {
   DUPLDECFORM(XQST, 98, "Duplicate use of decimal-format '%'."),
   /** XQST0099. */
   DUPLITEM(XQST, 99, "Duplicate declaration of context item."),
+  /** XQST0103. */
+  WINDOWUNIQ(XQST, 103, "Duplicate variable name in window clause: %"),
   /** XQST0106. */
   DUPLUPD(XQST, 106, "More than one updating annotation declared."),
   /** XQST0106. */

@@ -4,6 +4,7 @@ import static org.basex.util.Token.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
@@ -50,5 +51,10 @@ public final class FTOrder extends FTFilter {
   @Override
   public String toString() {
     return super.toString() + QueryText.ORDERED;
+  }
+
+  @Override
+  public boolean visitVars(final VarVisitor visitor) {
+    return expr[0].visitVars(visitor);
   }
 }

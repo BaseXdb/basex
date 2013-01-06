@@ -135,10 +135,11 @@ public abstract class ParseExpr extends Expr {
    * If the specified expression yields a boolean value anyway, it will be
    * returned as is. Otherwise, it will be wrapped into a boolean function.
    * @param e expression to be rewritten
+   * @param ii input info
    * @return expression
    */
-  protected final Expr compBln(final Expr e) {
-    return e.type().eq(SeqType.BLN) ? e : Function.BOOLEAN.get(info, e);
+  public static final Expr compBln(final Expr e, final InputInfo ii) {
+    return e.type().eq(SeqType.BLN) ? e : Function.BOOLEAN.get(ii, e);
   }
 
   // VALIDITY CHECKS ==========================================================

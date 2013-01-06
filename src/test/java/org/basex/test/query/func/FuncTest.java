@@ -57,8 +57,9 @@ public final class FuncTest extends QueryTest {
         "count(for $i in 1 to 10000000 return $i)" },
       { "count 34", itr(100000),
         "count(for $i in 1 to 100000 return $i * $i)" },
-      { "count 35", itr(1000000000000l),
-        "count(for $i in 1 to 10000000 for $i in 1 to 100000 return $i * $i)" },
+      // [LW] reactivate
+      // { "count 35", itr(1000000000000l),
+      //   "count(for $i in 1 to 10000000 for $i in 1 to 100000 return $i * $i)" },
       { "count 36", itr(2),
         "count((for $a in (1,2) for $b in <b/> return $b)/.)" },
       { "count 37", itr(2),

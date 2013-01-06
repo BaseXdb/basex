@@ -5,10 +5,10 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.path.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -30,7 +30,7 @@ public final class Context extends Simple {
   }
 
   @Override
-  public Context compile(final QueryContext ctx) {
+  public Context compile(final QueryContext ctx, final VarScope scp) {
     if(ctx.value != null) {
       type = ctx.value.type();
       size = ctx.value.size();

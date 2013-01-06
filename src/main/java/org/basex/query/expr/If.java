@@ -10,6 +10,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -42,15 +43,15 @@ public final class If extends Arr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    cond = cond.compile(ctx).compEbv(ctx);
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    cond = cond.compile(ctx, scp).compEbv(ctx);
     // static condition: return branch in question
-    if(cond.isValue()) return optPre(eval(ctx).compile(ctx), ctx);
+    if(cond.isValue()) return optPre(eval(ctx).compile(ctx, scp), ctx);
 
     // compile and simplify branches
     for(int e = 0; e < expr.length; e++) {
       try {
-        expr[e] = expr[e].compile(ctx);
+        expr[e] = expr[e].compile(ctx, scp);
       } catch(final QueryException ex) {
         // replace original expression with error
         expr[e] = FNInfo.error(ex, info);
@@ -72,7 +73,7 @@ public final class If extends Arr {
     // if A then true() else false() -> boolean(A)
     if(expr[0] == Bln.TRUE && expr[1] == Bln.FALSE) {
       ctx.compInfo(OPTWRITE, this);
-      return compBln(cond);
+      return compBln(cond, info);
     }
 
     // if A then false() else true() -> not(A)
@@ -117,11 +118,6 @@ public final class If extends Arr {
   }
 
   @Override
-  public int count(final Var v) {
-    return cond.count(v) + super.count(v);
-  }
-
-  @Override
   public boolean removable(final Var v) {
     return cond.removable(v) && super.removable(v);
   }
@@ -163,5 +159,10 @@ public final class If extends Arr {
   @Override
   public String toString() {
     return IF + '(' + cond + ") " + THEN + ' ' + expr[0] + ' ' + ELSE + ' ' + expr[1];
+  }
+
+  @Override
+  public boolean visitVars(final VarVisitor visitor) {
+    return cond.visitVars(visitor) && super.visitVars(visitor);
   }
 }

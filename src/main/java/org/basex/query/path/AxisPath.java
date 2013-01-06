@@ -18,6 +18,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -81,7 +82,8 @@ public class AxisPath extends Path {
   }
 
   @Override
-  protected final Expr compilePath(final QueryContext ctx) throws QueryException {
+  protected final Expr compilePath(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
     // merge two axis paths
     if(root instanceof AxisPath) {
       Expr[] st = ((AxisPath) root).steps;
@@ -97,7 +99,7 @@ public class AxisPath extends Path {
     if(s != null) COMPSELF.thrw(info, s);
 
     for(int i = 0; i != steps.length; ++i) {
-      final Expr e = steps[i].compile(ctx);
+      final Expr e = steps[i].compile(ctx, scp);
       if(!(e instanceof AxisStep)) return e;
       steps[i] = e;
     }
@@ -111,7 +113,7 @@ public class AxisPath extends Path {
       // check children path rewriting
       if(e == this) e = children(ctx, data);
       // return optimized expression
-      if(e != this) return e.compile(ctx);
+      if(e != this) return e.compile(ctx, scp);
     }
 
     // analyze if result set can be cached - no predicates/variables...
@@ -401,13 +403,6 @@ public class AxisPath extends Path {
       if(nodes == null) return null;
     }
     return nodes;
-  }
-
-  @Override
-  public final int count(final Var v) {
-    int c = 0;
-    for(final Expr s : steps) c += s.count(v);
-    return c + super.count(v);
   }
 
   @Override

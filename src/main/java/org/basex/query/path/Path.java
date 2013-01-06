@@ -17,6 +17,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -77,9 +78,10 @@ public abstract class Path extends ParseExpr {
   }
 
   @Override
-  public final Expr compile(final QueryContext ctx) throws QueryException {
+  public final Expr compile(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
     if(root != null) {
-      root = root.compile(ctx);
+      root = root.compile(ctx, scp);
       if(root instanceof Context) {
         ctx.compInfo(OPTREMCTX);
         root = null;
@@ -89,7 +91,7 @@ public abstract class Path extends ParseExpr {
     final Value v = ctx.value;
     try {
       ctx.value = root(ctx);
-      return compilePath(ctx);
+      return compilePath(ctx, scp);
     } finally {
       ctx.value = v;
     }
@@ -98,10 +100,12 @@ public abstract class Path extends ParseExpr {
   /**
    * Compiles the location path.
    * @param ctx query context
+   * @param scp variable scope
    * @return optimized expression
    * @throws QueryException query exception
    */
-  protected abstract Expr compilePath(final QueryContext ctx) throws QueryException;
+  protected abstract Expr compilePath(final QueryContext ctx, VarScope scp)
+      throws QueryException;
 
   /**
    * Returns the root of the current context or {@code null}.
@@ -390,11 +394,6 @@ public abstract class Path extends ParseExpr {
   }
 
   @Override
-  public int count(final Var v) {
-    return root != null ? root.count(v) : 0;
-  }
-
-  @Override
   public boolean removable(final Var v) {
     return root == null || root.removable(v);
   }
@@ -430,5 +429,10 @@ public abstract class Path extends ParseExpr {
       else sb.append(s);
     }
     return sb.toString();
+  }
+
+  @Override
+  public boolean visitVars(final VarVisitor visitor) {
+    return (root == null || root.visitVars(visitor)) && visitor.visitAll(steps);
   }
 }

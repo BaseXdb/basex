@@ -7,6 +7,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -31,8 +32,8 @@ public final class Unary extends Single {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    super.compile(ctx);
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    super.compile(ctx, scp);
     type = expr.type();
     if(!type.type.isNumber()) {
       // expression will always yield a number, empty sequence or error

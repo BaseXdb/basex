@@ -6,6 +6,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -40,16 +41,16 @@ public final class Try extends Single {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     try {
-      super.compile(ctx);
+      super.compile(ctx, scp);
       if(expr.isValue()) return optPre(expr, ctx);
     } catch(final QueryException ex) {
       // replace original return expression with error
       expr = FNInfo.error(ex, info);
     }
 
-    for(final Catch c : ctch) c.compile(ctx);
+    for(final Catch c : ctch) c.compile(ctx, scp);
     type = expr.type();
     for(final Catch c : ctch) type = type.intersect(c.type());
     return this;
@@ -62,29 +63,16 @@ public final class Try extends Single {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    final int s = ctx.vars.size();
+    // don't catch errors from error handlers
     try {
-      // don't catch errors from error handlers
-      try {
-        return ctx.value(expr);
-      } catch(final QueryException ex) {
-        for(final Catch c : ctch) {
-          final Value val = c.value(ctx, ex);
-          if(val != null) return val;
-        }
-        throw ex;
+      return ctx.value(expr);
+    } catch(final QueryException ex) {
+      for(final Catch c : ctch) {
+        final Value val = c.value(ctx, ex);
+        if(val != null) return val;
       }
-    } finally {
-      // always reset the scope
-      ctx.vars.size(s);
+      throw ex;
     }
-  }
-
-  @Override
-  public int count(final Var v) {
-    int c = super.count(v);
-    for(final Catch ct : ctch) c += ct.count(v);
-    return c;
   }
 
   @Override
@@ -121,5 +109,10 @@ public final class Try extends Single {
     final StringBuilder sb = new StringBuilder("try { " + expr + " }");
     for(final Catch c : ctch) sb.append(' ').append(c);
     return sb.toString();
+  }
+
+  @Override
+  public boolean visitVars(final VarVisitor visitor) {
+    return expr.visitVars(visitor) && visitor.visitAll(ctch);
   }
 }

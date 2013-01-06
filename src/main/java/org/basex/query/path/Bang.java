@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -23,8 +24,8 @@ public final class Bang extends Single {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    super.compile(ctx);
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    super.compile(ctx, scp);
     type = expr.type();
     return this;
   }

@@ -8,6 +8,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -43,9 +44,9 @@ public abstract class CName extends CFrag {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    name = name.compile(ctx);
-    return super.compile(ctx);
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    name = name.compile(ctx, scp);
+    return super.compile(ctx, scp);
   }
 
   /**
@@ -114,11 +115,6 @@ public abstract class CName extends CFrag {
   }
 
   @Override
-  public final int count(final Var v) {
-    return name.count(v) + super.count(v);
-  }
-
-  @Override
   public final void plan(final FElem plan) {
     addPlan(plan, planElem(), name, expr);
   }
@@ -132,5 +128,10 @@ public abstract class CName extends CFrag {
   public final String toString() {
     return toString(desc + (name.type().eq(SeqType.QNM) ? " " + name :
       " { " + name + " }"));
+  }
+
+  @Override
+  public final boolean visitVars(final VarVisitor visitor) {
+    return name.visitVars(visitor) && visitor.visitAll(expr);
   }
 }

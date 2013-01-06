@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -49,5 +50,10 @@ public final class FTExtensionSelection extends FTExpr {
     final StringBuilder sb = new StringBuilder();
     for(final Pragma p : pragmas) sb.append(p).append(' ');
     return sb.append(BRACE1 + ' ' + expr[0] + ' ' + BRACE2).toString();
+  }
+
+  @Override
+  public boolean visitVars(final VarVisitor visitor) {
+    return visitor.visitAll(expr);
   }
 }

@@ -7,6 +7,7 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 
@@ -28,8 +29,9 @@ public final class FTOr extends FTExpr {
   }
 
   @Override
-  public FTExpr compile(final QueryContext ctx) throws QueryException {
-    super.compile(ctx);
+  public FTExpr compile(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+    super.compile(ctx, scp);
     boolean not = true;
     for(final FTExpr e : expr) not &= e instanceof FTNot;
     if(not) {
@@ -115,5 +117,10 @@ public final class FTOr extends FTExpr {
   @Override
   public String toString() {
     return PAR1 + toString(' ' + FTOR + ' ') + PAR2;
+  }
+
+  @Override
+  public boolean visitVars(final VarVisitor visitor) {
+    return visitor.visitAll(expr);
   }
 }

@@ -7,6 +7,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -43,17 +44,17 @@ public final class TypeSwitch extends ParseExpr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    ts = ts.compile(ctx);
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    ts = ts.compile(ctx, scp);
     // static condition: return branch in question
     if(ts.isValue()) {
       for(final TypeCase tc : cases) {
-        if(tc.var.type == null || tc.var.type.instance(ts.value(ctx)))
-          return optPre(tc.compile(ctx, (Value) ts).expr, ctx);
+        if(tc.matches(ts.value(ctx)))
+          return optPre(tc.compile(ctx, scp, (Value) ts).expr, ctx);
       }
     }
     // compile branches
-    for(final TypeCase tc : cases) tc.compile(ctx);
+    for(final TypeCase tc : cases) tc.compile(ctx, scp);
 
     // return result if all branches are equal (e.g., empty)
     boolean eq = true;
@@ -94,13 +95,6 @@ public final class TypeSwitch extends ParseExpr {
   }
 
   @Override
-  public int count(final Var v) {
-    int c = ts.count(v);
-    for(final TypeCase tc : cases) c += tc.count(v);
-    return c;
-  }
-
-  @Override
   public boolean removable(final Var v) {
     for(final TypeCase tc : cases) if(!tc.removable(v)) return false;
     return ts.removable(v);
@@ -134,5 +128,10 @@ public final class TypeSwitch extends ParseExpr {
   public Expr markTailCalls() {
     for(final TypeCase t : cases) t.markTailCalls();
     return this;
+  }
+
+  @Override
+  public boolean visitVars(final VarVisitor visitor) {
+    return ts.visitVars(visitor) && visitor.visitAll(cases);
   }
 }

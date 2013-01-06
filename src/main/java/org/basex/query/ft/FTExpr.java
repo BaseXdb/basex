@@ -6,6 +6,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -36,8 +37,9 @@ public abstract class FTExpr extends ParseExpr {
   }
 
   @Override
-  public FTExpr compile(final QueryContext ctx) throws QueryException {
-    for(int e = 0; e < expr.length; e++) expr[e] = expr[e].compile(ctx);
+  public FTExpr compile(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+    for(int e = 0; e < expr.length; e++) expr[e] = expr[e].compile(ctx, scp);
     return this;
   }
 
@@ -64,13 +66,6 @@ public abstract class FTExpr extends ParseExpr {
   public boolean uses(final Use u) {
     for(final FTExpr e : expr) if(e.uses(u)) return true;
     return false;
-  }
-
-  @Override
-  public int count(final Var v) {
-    int c = 0;
-    for(final FTExpr e : expr) c += e.count(v);
-    return c;
   }
 
   @Override

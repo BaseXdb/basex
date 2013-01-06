@@ -10,6 +10,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.list.*;
@@ -47,9 +48,10 @@ public class FTContains extends ParseExpr {
   }
 
   @Override
-  public final Expr compile(final QueryContext ctx) throws QueryException {
-    expr = expr.compile(ctx).addText(ctx);
-    ftexpr = ftexpr.compile(ctx);
+  public final Expr compile(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+    expr = expr.compile(ctx, scp).addText(ctx);
+    ftexpr = ftexpr.compile(ctx, scp);
     if(lex == null) lex = new FTLexer(new FTOpt());
     return expr.isEmpty() ? optPre(Bln.FALSE, ctx) : this;
   }
@@ -113,11 +115,6 @@ public class FTContains extends ParseExpr {
   }
 
   @Override
-  public final int count(final Var v) {
-    return expr.count(v) + ftexpr.count(v);
-  }
-
-  @Override
   public final boolean removable(final Var v) {
     return expr.removable(v) && ftexpr.removable(v);
   }
@@ -142,5 +139,10 @@ public class FTContains extends ParseExpr {
   @Override
   public String toString() {
     return expr + " " + CONTAINS + ' ' + TEXT + ' ' + ftexpr;
+  }
+
+  @Override
+  public boolean visitVars(final VarVisitor visitor) {
+    return expr.visitVars(visitor) && ftexpr.visitVars(visitor);
   }
 }

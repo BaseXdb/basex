@@ -12,6 +12,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
@@ -68,7 +69,8 @@ public final class Functions extends TokenSet {
 
     final StandardFunc f = fl.get(ii, args);
     // check number of arguments
-    if(args.length < fl.min || args.length > fl.max) XPARGS.thrw(ii, fl);
+    if(args.length < fl.min || args.length > fl.max)
+      XPARGS.thrw(ii, fl);
     return f;
   }
 
@@ -83,13 +85,17 @@ public final class Functions extends TokenSet {
    * @throws QueryException query exception
    */
   public static FItem get(final QNm name, final long arity, final boolean dyn,
-      final QueryContext ctx, final InputInfo ii) throws QueryException {
+      final QueryContext ctx, final InputInfo ii)
+          throws QueryException {
+
+    // use empty scope
+    final VarScope sc = new VarScope();
 
     final Expr[] args = new Expr[(int) arity];
     final Var[] vars = new Var[args.length];
     for(int i = 0; i < args.length; i++) {
-      vars[i] = ctx.uniqueVar(ii, null);
-      args[i] = new VarRef(ii, vars[i]);
+      vars[i] = sc.uniqueVar(ctx, null, true);
+      args[i] = new LocalVarRef(ii, vars[i]);
     }
 
     final TypedFunc f = get(name, args, dyn, ctx, ii);
@@ -101,11 +107,11 @@ public final class Functions extends TokenSet {
     // compile the function if it hasn't been done statically
     if(dyn && f.fun instanceof UserFuncCall) {
       final UserFunc usf = ((UserFuncCall) f.fun).func();
-      if(usf != null && usf.declared) usf.compile(ctx);
+      if(usf != null && usf.declared) usf.compile(ctx, sc);
     }
 
     final FuncType ft = f.type;
-    return new FuncItem(name, vars, f.fun, ft, false);
+    return new FuncItem(name, vars, f.fun, ft, false, null, sc);
   }
 
   /**
@@ -155,7 +161,8 @@ public final class Functions extends TokenSet {
           break;
         }
       }
-      return new TypedFunc(fun, fun.sig.type(args.length));
+      // [LW] correct annotations
+      return new TypedFunc(fun, new Ann(), fun.sig.type(args.length));
     }
 
     // user-defined function

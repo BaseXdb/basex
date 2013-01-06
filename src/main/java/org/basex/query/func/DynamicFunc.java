@@ -11,6 +11,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -31,8 +32,8 @@ public final class DynamicFunc extends Arr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    super.compile(ctx);
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    super.compile(ctx, scp);
     final int ar = expr.length - 1;
     final Expr f = expr[ar];
     final Type t = f.type().type;
@@ -90,7 +91,6 @@ public final class DynamicFunc extends Arr {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem());
     final FElem el = planElem();
     addPlan(plan, el, expr[expr.length - 1]);
     for(int i = 0; i < expr.length - 1; i++) expr[i].plan(el);

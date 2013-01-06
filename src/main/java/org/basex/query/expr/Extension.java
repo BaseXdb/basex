@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -35,10 +36,10 @@ public final class Extension extends Single {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     try {
       for(final Pragma p : pragmas) p.init(ctx, info);
-      expr = expr.compile(ctx);
+      expr = expr.compile(ctx, scp);
     } finally {
       for(final Pragma p : pragmas) p.finish(ctx);
     }

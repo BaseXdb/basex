@@ -8,6 +8,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -46,9 +47,9 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    cond = cond.compile(ctx);
-    for(final SwitchCase sc : cases) sc.compile(ctx);
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    cond = cond.compile(ctx, scp);
+    for(final SwitchCase sc : cases) sc.compile(ctx, scp);
 
     // check if expression can be pre-evaluated
     Expr ex = this;
@@ -99,13 +100,6 @@ public final class Switch extends ParseExpr {
   public boolean uses(final Use u) {
     for(final SwitchCase sc : cases) if(sc.uses(u)) return true;
     return cond.uses(u);
-  }
-
-  @Override
-  public int count(final Var v) {
-    int c = cond.count(v);
-    for(final SwitchCase sc : cases) c += sc.count(v);
-    return c;
   }
 
   @Override
@@ -165,5 +159,10 @@ public final class Switch extends ParseExpr {
   public Expr markTailCalls() {
     for(final SwitchCase sc : cases) sc.markTailCalls();
     return this;
+  }
+
+  @Override
+  public boolean visitVars(final VarVisitor visitor) {
+    return cond.visitVars(visitor) && visitor.visitAll(cases);
   }
 }

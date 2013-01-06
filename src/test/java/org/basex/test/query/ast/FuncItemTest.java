@@ -46,7 +46,7 @@ public final class FuncItemTest extends QueryPlanTest {
         "return starts-with(?, $sub)('foobar')",
         "true false",
         "empty(//" + Util.name(FuncItem.class) + ")",
-        "exists(//" + Util.name(InlineFunc.class) + ")"
+        "exists(//" + Util.name(PartFunc.class) + ")"
     );
   }
 

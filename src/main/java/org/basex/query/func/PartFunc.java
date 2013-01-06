@@ -1,14 +1,15 @@
 package org.basex.query.func;
 
-import static org.basex.query.QueryText.*;
+import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
-import org.basex.util.*;
+import org.basex.query.value.type.*;
+import org.basex.query.var.*;
+import org.basex.util.InputInfo;
+import org.basex.util.list.*;
 
 /**
  * Partial function application.
@@ -16,81 +17,88 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public final class PartFunc extends UserFunc {
+public final class PartFunc extends InlineFunc {
   /**
    * Function constructor for static calls.
+   * @param nm function name
    * @param ii input info
    * @param fun typed function expression
-   * @param arg arguments
-   * @param qc query context
+   * @param env environment
+   * @param stc static context
+   * @throws QueryException exception
    */
-  public PartFunc(final InputInfo ii, final TypedFunc fun, final Var[] arg,
-      final QueryContext qc) {
-    super(ii, new QNm(), nn(fun.type.type(arg)), fun.ret(), null, qc);
-    expr = fun.fun;
+  public PartFunc(final QNm nm, final InputInfo ii, final TypedFunc fun, final Env env,
+      final StaticContext stc)
+      throws QueryException {
+    super(ii, nm, fun.ret(), args(env, fun.type, ii), fun.fun, fun.ann, stc, env.scope);
   }
 
   /**
    * Function constructor for dynamic calls.
    * @param ii input info
    * @param func function expression
-   * @param arg arguments
-   * @param ctx query context
+   * @param env environment
+   * @param stc static context
+   * @throws QueryException query exception
    */
-  public PartFunc(final InputInfo ii, final Expr func, final Var[] arg,
-      final QueryContext ctx) {
-    // [LW] XQuery/HOF: dynamic type propagation
-    super(ii, new QNm(), nn(arg), func.type(), null, ctx);
-    expr = func;
-  }
-
-  @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    compile(ctx, false);
-    // defer creation of function item because of closure
-    return new InlineFunc(info, ret, args, expr, ann, ctx).compile(ctx);
-  }
-
-  @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    return compile(ctx).item(ctx, ii);
-  }
-
-  @Override
-  public Value value(final QueryContext ctx) throws QueryException {
-    return item(ctx, info);
-  }
-
-  @Override
-  public void plan(final FElem plan) {
-    final FElem el = planElem();
-    addPlan(plan, el, expr);
-    for(int i = 0; i < args.length; ++i) {
-      el.add(planAttr(ARG + i, args[i].name.string()));
-    }
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder(FUNCTION).append('(');
-    for(final Var v : args)
-      sb.append(v).append(v == args[args.length - 1] ? "" : ", ");
-    return sb.append(") { ").append(expr).append(" }").toString();
+  public PartFunc(final InputInfo ii, final Expr func, final Env env,
+      final StaticContext stc) throws QueryException {
+    // [LW] XQuery/HOF: dynamic type propagation, annotations
+    super(ii, new QNm(), func.type(), args(env, null, ii), func,
+        new Ann(), stc, env.scope);
   }
 
   /**
-   * Collects all non-{@code null} variables from the array.
-   * @param vars array of variables, can contain {@code null}s
-   * @return all non-{@code null} variables
+   * Gathers this partial function application's arguments and sets the types.
+   * @param env variables to type
+   * @param ft function type
+   * @param ii input info
+   * @return the variables for convenience
+   * @throws QueryException exception
    */
-  private static Var[] nn(final Var[] vars) {
-    Var[] out = {};
-    for(final Var v : vars) if(v != null) out = Array.add(out, v);
-    return out;
+  public static Var[] args(final Env env, final FuncType ft, final InputInfo ii)
+      throws QueryException {
+    final Var[] args = env.args.toArray(new Var[env.args.size()]);
+    if(ft != null && ft != FuncType.ANY_FUN) {
+      for(int i = 0; i < args.length; i++) {
+        final int pos = env.poss.get(i);
+        if(ft.args[pos] !=  null && ft.args[pos] != SeqType.ITEM_ZM)
+          args[i].setRetType(ft.args[pos], ii);
+      }
+    }
+    return args;
   }
 
-  @Override
-  protected boolean tco() {
-    return false;
+  /**
+   * Environment of a partial function application.
+   *
+   * @author BaseX Team 2005-12, BSD License
+   * @author Leo Woerteler
+   */
+  public static final class Env {
+    /** Position of the arguments. */
+    final IntList poss = new IntList();
+    /** Argument variables. */
+    final ArrayList<Var> args = new ArrayList<Var>();
+    /** Variable scope. */
+    public final VarScope scope;
+
+    /**
+     * Constructor.
+     * @param scp variable scope
+     */
+    public Env(final VarScope scp) {
+      scope = scp;
+    }
+
+    /**
+     * Adds a new argument to this environment.
+     * @param pos argument position
+     * @param var variable
+     */
+    public void add(final int pos, final Var var) {
+      poss.add(pos);
+      args.add(var);
+    }
   }
 }

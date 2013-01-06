@@ -12,6 +12,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
@@ -77,7 +78,7 @@ public final class FTWords extends FTExpr {
     query = t;
     mode = m;
     data = d;
-    compile(ctx);
+    compile(ctx, null);
   }
 
   @Override
@@ -87,12 +88,13 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public FTWords compile(final QueryContext ctx) throws QueryException {
-    if(occ != null) for(int o = 0; o < occ.length; ++o) occ[o] = occ[o].compile(ctx);
+  public FTWords compile(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+    if(occ != null) for(int o = 0; o < occ.length; ++o) occ[o] = occ[o].compile(ctx, scp);
 
     // compile only once
     if(txt == null) {
-      query = query.compile(ctx);
+      query = query.compile(ctx, scp);
       if(query.isValue()) txt = tokens(ctx);
       // choose fast evaluation for default settings
       fast = mode == FTMode.ANY && txt != null && occ == null;
@@ -398,13 +400,6 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public int count(final Var v) {
-    int c = 0;
-    if(occ != null) for(final Expr o : occ) c += o.count(v);
-    return c + query.count(v);
-  }
-
-  @Override
   public boolean removable(final Var v) {
     if(occ != null) for(final Expr o : occ) if(!o.removable(v)) return false;
     return query.removable(v);
@@ -457,5 +452,11 @@ public final class FTWords extends FTExpr {
       sb.append(OCCURS + ' ' + occ[0] + ' ' + TO + ' ' + occ[1] + ' ' + TIMES);
     }
     return sb.toString();
+  }
+
+  @Override
+  public boolean visitVars(final VarVisitor visitor) {
+    return visitor.visitAll(expr) && query.visitVars(visitor)
+        && (occ == null || visitor.visitAll(occ));
   }
 }

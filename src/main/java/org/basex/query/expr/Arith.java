@@ -7,6 +7,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -33,8 +34,8 @@ public final class Arith extends Arr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    super.compile(ctx);
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    super.compile(ctx, scp);
 
     final SeqType s0 = expr[0].type();
     final SeqType s1 = expr[1].type();

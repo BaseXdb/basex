@@ -12,10 +12,12 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.path.Test.Mode;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -70,7 +72,8 @@ public class AxisStep extends Preds {
   }
 
   @Override
-  public final Expr compile(final QueryContext ctx) throws QueryException {
+  public final Expr compile(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
     if(!test.compile(ctx)) return Empty.SEQ;
 
     // leaf flag indicates that a context node can be replaced by a text() step
@@ -88,7 +91,7 @@ public class AxisStep extends Preds {
       // as predicates will not necessarily start from the document node,
       // the context item type is temporarily generalized
       if(ct == NodeType.DOC) ctx.value.type = NodeType.NOD;
-      final Expr e = super.compile(ctx);
+      final Expr e = super.compile(ctx, scp);
 
       // return optimized step / don't re-optimize step
       if(e != this || e instanceof IterStep) return e;
@@ -250,5 +253,10 @@ public class AxisStep extends Preds {
       sb.append(test);
     }
     return sb.append(super.toString()).toString();
+  }
+
+  @Override
+  public boolean visitVars(final VarVisitor visitor) {
+    return visitor.visitAll(preds);
   }
 }

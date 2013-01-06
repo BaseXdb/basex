@@ -9,6 +9,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -39,19 +40,19 @@ public final class Catch extends Single {
    * @param ii input info
    * @param c supported error codes
    * @param ctx query context
+   * @param scp variable scope
    */
-  public Catch(final InputInfo ii, final QNm[] c, final QueryContext ctx) {
+  public Catch(final InputInfo ii, final QNm[] c, final QueryContext ctx,
+      final VarScope scp) {
     super(ii, null);
     codes = c;
     for(int i = 0; i < QNM.length; i++)
-      vars[i] = Var.create(ctx, null, QNM[i], TYPES[i], null);
+      vars[i] = scp.newLocal(ctx, QNM[i], TYPES[i], false);
   }
 
   @Override
-  public Catch compile(final QueryContext ctx) throws QueryException {
-    final int s = prepare(ctx);
-    super.compile(ctx);
-    ctx.vars.size(s);
+  public Catch compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    super.compile(ctx, scp);
     type = expr.type();
     return this;
   }
@@ -66,32 +67,24 @@ public final class Catch extends Single {
   Value value(final QueryContext ctx, final QueryException ex) throws QueryException {
     if(!find(ex.err(), ex.qname())) return null;
 
-    final int s = prepare(ctx);
-    try {
-      int i = 0;
-      final byte[] io = ex.file() == null ? EMPTY : token(ex.file());
-      final Value val = ex.value();
-      for(final Value v : new Value[] { ex.qname(),
-          Str.get(ex.getLocalizedMessage()), val == null ? Empty.SEQ : val,
-          Str.get(io), Int.get(ex.line()), Int.get(ex.col()),
-          Str.get(ex.getMessage().replaceAll("\r\n?", "\n")) }) {
-        vars[i++].bind(v, ctx);
-      }
-      return ctx.value(expr);
-    } finally {
-      ctx.vars.size(s);
+    int i = 0;
+    final byte[] io = ex.file() == null ? EMPTY : token(ex.file());
+    final Value val = ex.value();
+    for(final Value v : new Value[] { ex.qname(),
+        Str.get(ex.getLocalizedMessage()), val == null ? Empty.SEQ : val,
+        Str.get(io), Int.get(ex.line()), Int.get(ex.col()),
+        Str.get(ex.getMessage().replaceAll("\r\n?", "\n")) }) {
+      ctx.set(vars[i++], v, info);
     }
+    return ctx.value(expr);
   }
 
   /**
-   * Prepares the catch construction.
-   * @param ctx query context
-   * @return number of variables
+   * Returns the variables used in the {@code catch} expression.
+   * @return variables
    */
-  public int prepare(final QueryContext ctx) {
-    final int s = ctx.vars.size();
-    for(final Var v : vars) ctx.vars.add(v);
-    return s;
+  public Var[] vars() {
+    return vars;
   }
 
   /**
@@ -132,5 +125,10 @@ public final class Catch extends Single {
    */
   private static QNm create(final byte[] n) {
     return new QNm(concat(ERR, COLON, n), ERRORURI);
+  }
+
+  @Override
+  public boolean visitVars(final VarVisitor visitor) {
+    return visitor.withVars(vars, expr);
   }
 }

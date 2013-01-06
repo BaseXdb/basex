@@ -105,4 +105,9 @@ public final class FTMildNot extends FTExpr {
   public String toString() {
     return toString(' ' + NOT + ' ' + IN + ' ');
   }
+
+  @Override
+  public boolean visitVars(final VarVisitor visitor) {
+    return visitor.visitAll(expr);
+  }
 }

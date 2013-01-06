@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -34,8 +35,8 @@ public abstract class Arr extends ParseExpr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    for(int e = 0; e < expr.length; e++) expr[e] = expr[e].compile(ctx);
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    for(int e = 0; e < expr.length; e++) expr[e] = expr[e].compile(ctx, scp);
     return this;
   }
 
@@ -43,13 +44,6 @@ public abstract class Arr extends ParseExpr {
   public boolean uses(final Use u) {
     for(final Expr e : expr) if(e.uses(u)) return true;
     return false;
-  }
-
-  @Override
-  public int count(final Var v) {
-    int c = 0;
-    for(final Expr e : expr) c += e.count(v);
-    return c;
   }
 
   @Override
@@ -114,5 +108,10 @@ public abstract class Arr extends ParseExpr {
    */
   protected String toString(final String sep) {
     return new TokenBuilder(PAR1).addSep(expr, sep).add(PAR2).toString();
+  }
+
+  @Override
+  public boolean visitVars(final VarVisitor visitor) {
+    return visitor.visitAll(expr);
   }
 }

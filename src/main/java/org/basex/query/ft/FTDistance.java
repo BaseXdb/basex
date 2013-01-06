@@ -7,6 +7,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.list.*;
@@ -41,9 +42,10 @@ public final class FTDistance extends FTFilter {
   }
 
   @Override
-  public FTExpr compile(final QueryContext ctx) throws QueryException {
-    for(int d = 0; d < dist.length; d++) dist[d] = dist[d].compile(ctx);
-    return super.compile(ctx);
+  public FTExpr compile(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+    for(int d = 0; d < dist.length; d++) dist[d] = dist[d].compile(ctx, scp);
+    return super.compile(ctx, scp);
   }
 
   @Override
@@ -84,13 +86,6 @@ public final class FTDistance extends FTFilter {
   }
 
   @Override
-  public int count(final Var v) {
-    int c = 0;
-    for(final Expr d : dist) c += d.count(v);
-    return c + super.count(v);
-  }
-
-  @Override
   public boolean removable(final Var v) {
     for(final Expr d : dist) if(!d.removable(v)) return false;
     return super.removable(v);
@@ -117,5 +112,10 @@ public final class FTDistance extends FTFilter {
   public String toString() {
     return super.toString() + DISTANCE + PAR1 +
       dist[0] + '-' + dist[1] + ' ' + unit + PAR2;
+  }
+
+  @Override
+  public boolean visitVars(final VarVisitor visitor) {
+    return visitor.visitAll(expr) && visitor.visitAll(dist);
   }
 }

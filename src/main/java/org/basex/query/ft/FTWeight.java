@@ -7,6 +7,7 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -38,9 +39,10 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
-  public FTExpr compile(final QueryContext ctx) throws QueryException {
-    weight = weight.compile(ctx);
-    return super.compile(ctx);
+  public FTExpr compile(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+    weight = weight.compile(ctx, scp);
+    return super.compile(ctx, scp);
   }
 
   // called by sequential variant
@@ -89,11 +91,6 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
-  public int count(final Var v) {
-    return weight.count(v) + super.count(v);
-  }
-
-  @Override
   public boolean removable(final Var v) {
     return weight.removable(v) && super.removable(v);
   }
@@ -117,5 +114,10 @@ public final class FTWeight extends FTExpr {
   @Override
   public String toString() {
     return expr[0] + " " + QueryText.WEIGHT + ' ' + weight;
+  }
+
+  @Override
+  public boolean visitVars(final VarVisitor visitor) {
+    return visitor.visitAll(expr) && weight.visitVars(visitor);
   }
 }

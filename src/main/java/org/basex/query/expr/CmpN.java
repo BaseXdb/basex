@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -83,8 +84,8 @@ public final class CmpN extends Cmp {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    super.compile(ctx);
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    super.compile(ctx, scp);
     return optPre(oneIsEmpty() ? null : allAreValues() ? item(ctx, info) : this, ctx);
   }
 

@@ -9,11 +9,11 @@ import org.basex.query.expr.CmpG.OpG;
 import org.basex.query.expr.CmpV.OpV;
 import org.basex.query.func.*;
 import org.basex.query.path.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -48,9 +48,9 @@ public abstract class Preds extends ParseExpr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     for(int p = 0; p < preds.length; ++p) {
-      Expr pr = preds[p].compile(ctx).compEbv(ctx);
+      Expr pr = preds[p].compile(ctx, scp).compEbv(ctx);
       pr = Pos.get(OpV.EQ, pr, pr, info);
 
       // position() = last() -> last()
@@ -147,13 +147,6 @@ public abstract class Preds extends ParseExpr {
       if(u == Use.POS && p.type().mayBeNumber() || p.uses(u)) return true;
     }
     return false;
-  }
-
-  @Override
-  public int count(final Var v) {
-    int c = 0;
-    for(final Expr p : preds) c += p.count(v);
-    return c;
   }
 
   @Override

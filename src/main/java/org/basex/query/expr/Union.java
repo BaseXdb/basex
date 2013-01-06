@@ -7,6 +7,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -26,8 +27,8 @@ public final class Union extends Set {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    super.compile(ctx);
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    super.compile(ctx, scp);
 
     for(int e = 0; e != expr.length; ++e) {
       // remove empty operands

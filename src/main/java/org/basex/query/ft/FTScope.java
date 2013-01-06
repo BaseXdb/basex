@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
@@ -68,5 +69,10 @@ public final class FTScope extends FTFilter {
   @Override
   public String toString() {
     return super.toString() + (same ? SAME : DIFFERENT) + ' ' + unit;
+  }
+
+  @Override
+  public boolean visitVars(final VarVisitor visitor) {
+    return visitor.visitAll(expr);
   }
 }

@@ -16,6 +16,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.map.Map;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -41,9 +42,10 @@ public abstract class StandardFunc extends Arr {
   }
 
   @Override
-  public final Expr compile(final QueryContext ctx) throws QueryException {
+  public final Expr compile(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
     // compile all arguments
-    super.compile(ctx);
+    super.compile(ctx, scp);
     // skip context-based or non-deterministic functions, and non-values
     return optPre(uses(Use.CTX) || uses(Use.NDT) || !allAreValues() ? comp(ctx) :
       sig.ret.zeroOrOne() ? item(ctx, info) : value(ctx), ctx);

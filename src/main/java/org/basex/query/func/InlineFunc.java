@@ -2,6 +2,9 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
 
+import java.util.*;
+import java.util.Map.Entry;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -10,6 +13,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -19,7 +23,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public final class InlineFunc extends UserFunc {
+public class InlineFunc extends UserFunc {
   /**
    * Constructor.
    * @param ii input info
@@ -27,35 +31,60 @@ public final class InlineFunc extends UserFunc {
    * @param v arguments
    * @param e function body
    * @param a annotations
-   * @param q query context
+   * @param stc static context
+   * @param scp scope
    */
-  public InlineFunc(final InputInfo ii, final SeqType r, final Var[] v, final Expr e,
-      final Ann a, final QueryContext q) {
-    super(ii, null, v, r, a, q);
+  public InlineFunc(final InputInfo ii, final SeqType r, final Var[] v,
+      final Expr e, final Ann a, final StaticContext stc, final VarScope scp) {
+    this(ii, null, r, v, e, a, stc, scp);
+  }
+
+  /**
+   * Package-private constructor allowing a name.
+   * @param ii input info
+   * @param nm name of the function
+   * @param r return type
+   * @param v argument variables
+   * @param e function expression
+   * @param a annotations
+   * @param stc static context
+   * @param scp variable scope
+   */
+  InlineFunc(final InputInfo ii, final QNm nm, final SeqType r, final Var[] v,
+      final Expr e, final Ann a, final StaticContext stc, final VarScope scp) {
+    super(ii, nm, v, r, a, stc, scp);
     expr = e;
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    compile(ctx, false);
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    comp(ctx, scp);
+    type = FuncType.get(this).seqType();
+    size = 1;
     // only evaluate if the closure is empty, so we don't lose variables
-    return expr.hasFreeVars(ctx) ? this : optPre(item(ctx, info), ctx);
+    return scope.closure().isEmpty() ? preEval(ctx) : this;
   }
 
   @Override
-  public FuncItem item(final QueryContext ctx, final InputInfo ii) {
+  public FuncItem item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final FuncType ft = FuncType.get(this);
     final boolean c = ft.ret != null && !expr.type().instance(ft.ret);
-    return new FuncItem(args, expr, ft, ctx.vars.locals(), c);
+
+    // collect closure
+    final Map<Var, Value> clos = new HashMap<Var, Value>();
+    for(final Entry<Var, LocalVarRef> e : scope.closure().entrySet())
+      clos.put(e.getKey(), e.getValue().value(ctx));
+
+    return new FuncItem(args, expr, ft, clos, c, scope);
   }
 
   @Override
-  public Value value(final QueryContext ctx) {
+  public Value value(final QueryContext ctx) throws QueryException {
     return item(ctx, info);
   }
 
   @Override
-  public ValueIter iter(final QueryContext ctx) {
+  public ValueIter iter(final QueryContext ctx) throws QueryException {
     return value(ctx).iter();
   }
 
@@ -81,14 +110,11 @@ public final class InlineFunc extends UserFunc {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem());
-    /* avoid recursive calls
     final FElem el = planElem();
     addPlan(plan, el, expr);
     for(int i = 0; i < args.length; ++i) {
       el.add(planAttr(ARG + i, args[i].name.string()));
     }
-    */
   }
 
   @Override
@@ -106,5 +132,21 @@ public final class InlineFunc extends UserFunc {
   @Override
   protected boolean tco() {
     return false;
+  }
+
+  @Override
+  public boolean visit(final VarVisitor visitor) {
+    final Map<Var, LocalVarRef> clos = scope.closure();
+    if(clos.isEmpty()) return visitor.withVars(args, expr);
+
+    final Var[] cls = new Var[clos.size()];
+    int i = cls.length;
+    for(final Entry<Var, LocalVarRef> v : clos.entrySet()) {
+      if(!(visitor.used(v.getValue()) && visitor.declared(v.getKey()))) return false;
+      cls[--i] = v.getKey();
+    }
+    if(!visitor.withVars(args, expr)) return false;
+    for(final Var v : cls) if(!visitor.undeclared(v)) return false;
+    return true;
   }
 }

@@ -1,7 +1,7 @@
 package org.basex.test.query.ast;
 
 import org.basex.core.*;
-import org.basex.query.flwor.*;
+import org.basex.query.gflwor.*;
 import org.basex.util.*;
 import org.junit.*;
 
