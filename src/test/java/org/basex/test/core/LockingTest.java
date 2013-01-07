@@ -511,7 +511,7 @@ public final class LockingTest extends SandboxTest {
     }
 
     @Override
-    public synchronized void run() {
+    public void run() {
       // Await latch if set
       if(null != await) {
         try {
@@ -531,16 +531,18 @@ public final class LockingTest extends SandboxTest {
       if(null != countDown) countDown.countDown();
 
       // Wait until we're asked to release the lock
-      try {
-        while(!requestRelease || null != downgrade) {
-          if(null != downgrade) {
-            locks.downgrade(new StringList().add(downgrade));
-            downgrade = null;
+      synchronized(this) {
+        try {
+          while(!requestRelease || null != downgrade) {
+            if(null != downgrade) {
+              locks.downgrade(new StringList().add(downgrade));
+              downgrade = null;
+            }
+            if(!requestRelease) wait();
           }
-          if(!requestRelease) wait();
+        } catch(final InterruptedException e) {
+          throw new RuntimeException("Unexpectedly interrupted.");
         }
-      } catch(final InterruptedException e) {
-        throw new RuntimeException("Unexpectedly interrupted.");
       }
       locks.release(cmd);
     }
