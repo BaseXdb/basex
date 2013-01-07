@@ -44,7 +44,7 @@ public final class LockingTest extends SandboxTest {
   /** Locking instance used for testing. */
   DBLocking locks = new DBLocking(mprop);
   /** Objects used for locking. */
-  private final String[] objects = new String[1];
+  private final String[] objects = new String[5];
   /** Empty string array for convenience. */
   private static final String[] NONE = new String[0];
 
@@ -394,6 +394,88 @@ public final class LockingTest extends SandboxTest {
   }
 
   /**
+   * Lock downgrading, the other thread is reader.
+   * @throws InterruptedException Got interrupted.
+   */
+  @Test
+  public void downgradeOtherReadTest() throws InterruptedException {
+    final CountDownLatch sync = new CountDownLatch(1), test = new CountDownLatch(1);
+
+    assertTrue("Increase {@code objects.length}!", objects.length > 1);
+    final String[] release = Arrays.copyOf(objects, 1);
+    final String[] keep = Arrays.copyOfRange(objects, 1, objects.length);
+
+    final LockTester th1 = new LockTester(null, NONE, objects, sync);
+    final LockTester th2 = new LockTester(sync, release, NONE, test);
+
+    th1.start();
+    th2.start();
+    assertFalse("Thread 2 shouldn't be able to acquire lock yet.",
+        test.await(WAIT, TimeUnit.MILLISECONDS));
+    th1.downgrade(keep);
+    assertTrue("Thread 2 should be able to acquire lock now.",
+        test.await(WAIT, TimeUnit.MILLISECONDS));
+    th1.release();
+    th2.release();
+  }
+
+  /**
+   * Lock downgrading, the other thread is writer.
+   * @throws InterruptedException Got interrupted.
+   */
+  @Test
+  public void downgradeOtherWriteTest() throws InterruptedException {
+    final CountDownLatch sync = new CountDownLatch(1), test = new CountDownLatch(1);
+
+    assertTrue("Increase {@code objects.length}!", objects.length > 1);
+    final String[] release = Arrays.copyOf(objects, 1);
+    final String[] keep = Arrays.copyOfRange(objects, 1, objects.length);
+
+    final LockTester th1 = new LockTester(null, NONE, objects, sync);
+    final LockTester th2 = new LockTester(sync, NONE, release, test);
+
+    th1.start();
+    th2.start();
+    assertFalse("Thread 2 shouldn't be able to acquire lock yet.",
+        test.await(WAIT, TimeUnit.MILLISECONDS));
+    th1.downgrade(keep);
+    assertFalse("Thread 2 shouldn't be able to acquire lock yet.",
+        test.await(WAIT, TimeUnit.MILLISECONDS));
+    th1.release();
+    assertTrue("Thread 2 should be able to acquire lock now.",
+        test.await(WAIT, TimeUnit.MILLISECONDS));
+    th2.release();
+  }
+
+  /**
+   * Lock downgrading holding read locks.
+   * @throws InterruptedException Got interrupted.
+   */
+  @Test
+  public void downgradeHoldingReadLocksTest() throws InterruptedException {
+    final CountDownLatch sync = new CountDownLatch(1), test = new CountDownLatch(1);
+
+    assertTrue("Increase {@code objects.length}!", objects.length > 1);
+    final String[] release = Arrays.copyOf(objects, 1);
+    final String[] keep = Arrays.copyOfRange(objects, 1, objects.length);
+
+    final LockTester th1 = new LockTester(null, objects, release, sync);
+    final LockTester th2 = new LockTester(sync, NONE, keep, test);
+
+    th1.start();
+    th2.start();
+    assertFalse("Thread 2 shouldn't be able to acquire lock yet.",
+        test.await(WAIT, TimeUnit.MILLISECONDS));
+    th1.downgrade(NONE);
+    assertFalse("Thread 2 shouldn't be able to acquire lock yet.",
+        test.await(WAIT, TimeUnit.MILLISECONDS));
+    th1.release();
+    assertTrue("Thread 2 should be able to acquire lock now.",
+        test.await(WAIT, TimeUnit.MILLISECONDS));
+    th2.release();
+  }
+
+  /**
    * Default implementation for setting locks and latches.
    */
   private class LockTester extends Thread {
@@ -407,6 +489,8 @@ public final class LockingTest extends SandboxTest {
     private final String[] readObjects;
     /** Array of objects to put write locks onto. */
     private final String[] writeObjects;
+    /** If set, downgrade locks after being notified. */
+    private volatile String[] downgrade;
     /** Flag indicating to release locks after being notified. */
     private volatile boolean requestRelease;
 
@@ -448,8 +532,13 @@ public final class LockingTest extends SandboxTest {
 
       // Wait until we're asked to release the lock
       try {
-        while(!requestRelease)
-          wait();
+        while(!requestRelease || null != downgrade) {
+          if(null != downgrade) {
+            locks.downgrade(new StringList().add(downgrade));
+            downgrade = null;
+          }
+          if(!requestRelease) wait();
+        }
       } catch(final InterruptedException e) {
         throw new RuntimeException("Unexpectedly interrupted.");
       }
@@ -457,7 +546,16 @@ public final class LockingTest extends SandboxTest {
     }
 
     /**
-     * Release all locks tester owns. [@code release} gets called by other threads, so it
+     * Downgrade given locks.
+     * @param dg Locks to keep
+     */
+    public synchronized void downgrade(final String[] dg) {
+      downgrade = dg;
+      notifyAll();
+    }
+
+    /**
+     * Release all locks tester owns. {@code release} gets called by other threads, so it
      * cannot release locks directly (the thread holding the lock must do this). Set flag
      * in object that lock should be released and wake up all threads.
      */

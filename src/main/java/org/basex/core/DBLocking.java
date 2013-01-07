@@ -9,13 +9,16 @@ import java.util.concurrent.locks.*;
 import org.basex.util.list.*;
 
 /**
- * Manage read and write locks on arbitrary objects. Maximum of {@link MainProp#PARALLEL}
+ * Manage read and write locks on arbitrary strings. Maximum of {@link MainProp#PARALLEL}
  * concurrent transactions are allowed, further will be queued.
  *
- * This class prevents locking deadlocks by sorting all Objects to put locks on what
- * requires them to have be {@link Comparable}.
+ * This class prevents locking deadlocks by sorting all all strings
  *
- * Locks can only be released by the same thread which acquired it.
+ * Locks can only be released and downgraded by the same thread which acquired it.
+ *
+ * Locking methods are not synchronized to each other. The user must make sure not to call
+ * them in parallel by the same thread (it is fine to call arbitrary locking methods by
+ * different threads at the same time).
  *
  * This locking can be activated by setting {@link MainProp#DBLOCKING} to {@code true}.
  * It will get the default implementation in future versions.
@@ -111,18 +114,17 @@ public final class DBLocking implements ILocking {
           }
         }
         localWriters++;
-      } else {
-        // global read locking
-        if(null == read) {
-          while(localWriters > 0) {
-            try {
-              globalLock.wait();
-            } catch(InterruptedException e) {
-              Thread.currentThread().interrupt();
-            }
+      }
+      // global read locking
+      if(null == read) {
+        while(localWriters > 0) {
+          try {
+            globalLock.wait();
+          } catch(InterruptedException e) {
+            Thread.currentThread().interrupt();
           }
-          globalReaders++;
         }
+        globalReaders++;
       }
     }
 
@@ -164,6 +166,55 @@ public final class DBLocking implements ILocking {
     }
   }
 
+  /**
+   * Only keeps given write locks, downgrades the others to read locks.
+   * @param downgrade Write locks to keep
+   */
+  public void downgrade(final StringList downgrade) {
+    long threadID = Thread.currentThread().getId();
+    if (null == downgrade)
+      throw new IllegalMonitorStateException("Cannot downgrade to global write lock.");
+    downgrade.sort(true, true).unique();
+
+    // Fetch current locking status
+    final String[] writeObjects = writeLocked.remove(threadID);
+    final String[] readObjects = readLocked.remove(threadID);
+    final StringList newWriteObjects = new StringList();
+    final StringList newReadObjects = new StringList();
+    if (null != readObjects) newReadObjects.add(readObjects);
+
+    // Downgrade from global write lock to global read lock
+    if (writeAll.isWriteLocked()) {
+      writeAll.readLock().lock();
+      writeAll.writeLock().unlock();
+
+      synchronized(globalLock) {
+        if (downgrade.isEmpty())
+          localWriters++;
+        globalReaders++;
+        globalLock.notifyAll();
+      }
+    }
+
+    // Perform downgrades
+    for(String object : writeObjects) {
+      if (downgrade.contains(object))
+        newWriteObjects.add(object);
+      else {
+        final ReentrantReadWriteLock lock = locks.get(object);
+        assert 1 == lock.getWriteHoldCount() : "Unexpected write lock count: "
+            + lock.getWriteHoldCount();
+        lock.readLock().lock();
+        newReadObjects.add(object);
+        lock.writeLock().unlock();
+      }
+    }
+
+    // Write back new locking lists
+    writeLocked.put(threadID, newWriteObjects.toArray());
+    readLocked.put(threadID, newReadObjects.toArray());
+  }
+
   @Override
   public void release(final Progress pr) {
     // Release all write locks
@@ -179,8 +230,6 @@ public final class DBLocking implements ILocking {
     final Object[] readObjects = readLocked.remove(Thread.currentThread().getId());
     if(null != readObjects) for(final Object object : readObjects) {
       final ReentrantReadWriteLock lock = locks.get(object);
-      assert 1 == lock.getReadHoldCount() : "Unexpected read lock count: "
-          + lock.getReadHoldCount();
       lock.readLock().unlock();
     }
 
