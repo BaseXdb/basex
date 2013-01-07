@@ -127,41 +127,45 @@ public final class DBLocking implements ILocking {
         globalReaders++;
       }
     }
+    String[] writeObjects = new String[0];
+    String[] readObjects = new String[0];
 
-    // Local write locking
+    // Local locking
     if (null != write) {
-      // Sort entries and remove duplicates to prevent deadlocks
-      final String[] writeObjects = write.sort(true, true).unique().toArray();
-      // Store for unlocking later
+      writeObjects = write.sort(true, true).unique().toArray();
       writeLocked.put(thread, writeObjects);
-      // Finally lock objects
-      for(final String object : writeObjects) {
+    }
+    if (null != read) {
+      readObjects = read.sort(true, true).unique().toArray();
+      readLocked.put(thread, readObjects);
+    }
+    // Use pattern similar to merge sort
+    int w = 0, r = 0;
+    while (r < readObjects.length || w < writeObjects.length) {
+      // Look what token comes earlier in alphabet, prefer writing against reading
+      if(w < writeObjects.length && (r >= readObjects.length
+          || writeObjects[w].compareTo(readObjects[r]) <= 0)) {
         ReentrantReadWriteLock lock;
         synchronized(locks) { // Make sure each object lock is a singleton
-          lock = locks.get(object);
-          if(null == lock) {
+          lock = locks.get(writeObjects[w]);
+          if(null == lock) { // Create lock if needed
             lock = new ReentrantReadWriteLock();
-            locks.put(object, lock);
+            locks.put(writeObjects[w], lock);
           }
         }
         lock.writeLock().lock();
-      }
-    }
-
-    // Local read locking, same again
-    if (null != read) {
-      final String[] readObjects = read.sort(true, true).unique().toArray();
-      readLocked.put(thread, readObjects);
-      for(final String object : readObjects) {
+        w++; // Set pointer to next token
+      } else {
         ReentrantReadWriteLock lock;
         synchronized(locks) {
-          lock = locks.get(object);
+          lock = locks.get(readObjects[r]);
           if(null == lock) {
             lock = new ReentrantReadWriteLock();
-            locks.put(object, lock);
+            locks.put(readObjects[r], lock);
           }
         }
         lock.readLock().lock();
+        r++;
       }
     }
   }

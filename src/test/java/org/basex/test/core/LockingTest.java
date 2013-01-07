@@ -23,6 +23,14 @@ import org.junit.runners.Parameterized.*;
 public final class LockingTest extends SandboxTest {
   /** How often should tests be repeated? */
   private static final int REPEAT = 1;
+  /** How many milliseconds to wait for threads to finish. */
+  private static final long WAIT = 100L;
+  /** Number of threads used in fuzzing test. */
+  private static final int FUZZING_THREADS = 5;
+  /** Repeated locking events each thread should trigger. */
+  private static final int FUZZING_REPEATS = 50;
+  /** How long each lock should be hold before releasing it and fetching the next. */
+  private static final int HOLD_TIME = 10;
 
   /**
    * Enable repeated running of test to track down synchronization issues.
@@ -37,14 +45,12 @@ public final class LockingTest extends SandboxTest {
     return params;
   }
 
-  /** How many milliseconds to wait for threads to finish. */
-  private static final long WAIT = 100L;
   /** Main properties, used to read parallel transactions limit. */
   private final MainProp mprop = new Context().mprop;
   /** Locking instance used for testing. */
   DBLocking locks = new DBLocking(mprop);
   /** Objects used for locking. */
-  private final String[] objects = new String[5];
+  final String[] objects = new String[5];
   /** Empty string array for convenience. */
   private static final String[] NONE = new String[0];
 
@@ -473,6 +479,96 @@ public final class LockingTest extends SandboxTest {
     assertTrue("Thread 2 should be able to acquire lock now.",
         test.await(WAIT, TimeUnit.MILLISECONDS));
     th2.release();
+  }
+
+  /**
+   * Force deadlock.
+   * @throws InterruptedException Got interrupted.
+   */
+  @Test
+  public void deadlockTest() throws InterruptedException {
+    final CountDownLatch sync = new CountDownLatch(1), test2 = new CountDownLatch(1),
+        test3 = new CountDownLatch(1);;
+
+    final LockTester th1 = new LockTester(null, NONE, new String[] {"3"}, sync);
+    final LockTester th2 = new LockTester(sync, new String[] {"2"},
+        new String[] {"1", "3"}, test2);
+    final LockTester th3 = new LockTester(sync, new String[] {"1"},
+        new String[] {"2", "3"}, test3);
+
+    th1.start();
+    // Make sure thread 1 has wl(3)
+    Thread.sleep(WAIT);
+    th2.start();
+    th3.start();
+    th1.release();
+    assertTrue(
+        "One of the threads should be able to aquire its locks now.",
+        test2.await(WAIT, TimeUnit.MILLISECONDS)
+            || test3.await(WAIT, TimeUnit.MILLISECONDS));
+    boolean which = false;
+    if (test2.getCount() == 0) {
+      th2.release();
+      which = true;
+    } else th3.release();
+    assertTrue(
+        "The other thread should be able to acquire its locks now.",
+        test2.await(WAIT, TimeUnit.MILLISECONDS)
+            && test3.await(WAIT, TimeUnit.MILLISECONDS));
+    if (which) th3.release();
+    else th2.release();
+  }
+
+  /**
+   * Fuzzing test, watch for deadlocks. Uses multiple threads in parallel which all fetch
+   * random locks, hold them for a while, release them and fetch the next one.
+   * @throws InterruptedException Got interrupted.
+   */
+  @Test
+  public void fuzzingTest() throws InterruptedException {
+    assertTrue("Increase {@code objects.length}!", objects.length > 1);
+
+    Thread[] threads = new Thread[FUZZING_THREADS];
+    final CountDownLatch allDone = new CountDownLatch(FUZZING_THREADS * FUZZING_REPEATS);
+    for(int i = 0; i < FUZZING_THREADS; i++) {
+      threads[i] = new Thread() {
+        private String[] randomSubset(final String[] set, final boolean nullAllowed) {
+          if(nullAllowed && Math.random() * set.length == 0) return null;
+
+          int start = (int) (Math.random() * set.length);
+          int end = (int) (Math.random() * (set.length - start)) + start;
+          String[] subset = Arrays.copyOfRange(set, start, end);
+          return subset;
+        }
+
+        @Override
+        public void run() {
+          for(int j = 0; j < FUZZING_REPEATS; j++) {
+            final CountDownLatch latch = new CountDownLatch(1);
+            String[] read = randomSubset(objects, true);
+            String[] write = randomSubset(objects, true);
+            final LockTester th = new LockTester(null, read,
+                write, latch);
+            th.start();
+            try {
+              Thread.sleep(HOLD_TIME);
+              th.downgrade(randomSubset(write, false));
+              Thread.sleep(HOLD_TIME);
+              if(!latch.await(FUZZING_THREADS * HOLD_TIME + WAIT, TimeUnit.MILLISECONDS))
+                throw new RuntimeException("Looks like thread is stuck in a deadlock.");
+            } catch(InterruptedException e) {
+              throw new RuntimeException(e);
+            }
+            th.release();
+            allDone.countDown();
+          }
+        }
+      };
+      threads[i].start();
+    }
+    assertTrue("Looks like thread is stuck in a deadlock.",
+        allDone.await(FUZZING_THREADS * FUZZING_REPEATS * HOLD_TIME,
+            TimeUnit.MILLISECONDS));
   }
 
   /**
