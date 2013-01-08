@@ -113,7 +113,8 @@ public final class GUIConstants {
   }, {
     C_SHOWBUTTONS, C_SHOWINPUT, C_SHOWSTATUS, EMPTY,
     C_SHOWTEXT, C_SHOWMAP, C_SHOWTREE, C_SHOWFOLDER, C_SHOWPLOT, C_SHOWTABLE,
-    C_SHOWEXPLORE, EMPTY, C_FULL
+    C_SHOWEXPLORE, GUIMacOSX.nativeFullscreen() ? null : EMPTY,
+    GUIMacOSX.nativeFullscreen() ? null : C_FULL
   }, {
     C_COPY, C_PASTE, C_DELETE, C_INSERT, C_EDIT, EMPTY,
     C_COPYPATH, C_FILTER
