@@ -111,6 +111,7 @@ public final class GUI extends AGUI {
    */
   public GUI(final Context ctx, final GUIProp gprops) {
     super(ctx, gprops);
+    GUIMacOSX.enableOSXFullscreen(this);
 
     // set window size
     final Dimension scr = Toolkit.getDefaultToolkit().getScreenSize();
