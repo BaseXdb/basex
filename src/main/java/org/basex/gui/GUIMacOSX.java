@@ -185,6 +185,43 @@ public final class GUIMacOSX {
       if(main != null) main.setVisible(true);
     }
   }
+  
+  /**
+   * Returns true if the System has native Fullscreen support.
+   * @return fullscreen support
+   */
+  public static boolean nativeFullscreen() {
+    try {
+      Class.forName("com.apple.eawt.FullScreenUtilities");
+    } catch(ClassNotFoundException e) {
+      return false;
+    }
+    return true;
+  }
+  /**
+   * Enables OSX Lion native fullscreen where available.
+   * @param window the window
+   */
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  public static void enableOSXFullscreen(Window window) {
+      if(null == window) return;
+      try {
+        Class util = Class.forName("com.apple.eawt.FullScreenUtilities");
+        Class params[] = new Class[2];
+        params[0] = Window.class;
+        params[1] = Boolean.TYPE;
+        Method method = util.getMethod("setWindowCanFullScreen", params);
+        method.invoke(util, window, true);
+    } catch (ClassNotFoundException e) {
+        // log exception this does not count as an exception
+    } catch (NoSuchMethodException e) {
+        // log exception
+    } catch (InvocationTargetException e) {
+        // log exception
+    } catch (IllegalAccessException e) {
+        // log exception
+    }
+   }
 
   // ---------------------------------------------------------------------------
   // ---------------------------------------------------------------------------
