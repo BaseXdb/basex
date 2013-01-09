@@ -207,19 +207,11 @@ public final class GUIMacOSX {
     if(null == window) return;
     try {
       final Class<?> util = Class.forName("com.apple.eawt.FullScreenUtilities");
-      final Class<?>[] params = new Class[2];
-      params[0] = Window.class;
-      params[1] = Boolean.TYPE;
+      final Class<?>[] params = { Window.class, Boolean.TYPE };
       final Method method = util.getMethod("setWindowCanFullScreen", params);
       method.invoke(util, window, true);
-    } catch(final Exception e) {
-      // log exception
-    }
+    } catch(final Exception ignored) { }
   }
-
-  // ---------------------------------------------------------------------------
-  // ---------------------------------------------------------------------------
-  // ---------------------------------------------------------------------------
 
   /**
    * Invokes a method without arguments on the given object.
