@@ -17,7 +17,7 @@ import org.basex.util.list.*;
  * This class organizes all users.
  *
  * @author BaseX Team 2005-12, BSD License
- * @author Andreas Weiler
+ * @author Christian Gruen
  */
 public final class Users {
   /** User array. */
@@ -27,12 +27,15 @@ public final class Users {
 
   /**
    * Constructor for global users.
-   * @param global global flag
+   * @param ctx database context ({@code null} if instance is local)
    */
-  public Users(final boolean global) {
-    if(!global) return;
+  public Users(final Context ctx) {
+    if(ctx == null) return;
 
-    file = new IOFile(Prop.HOME, IO.BASEXSUFFIX + "perm");
+    // try to find permission file in database and home directory
+    file = new IOFile(ctx.mprop.dbpath(), IO.BASEXSUFFIX + "perm");
+    if(!file.exists()) file = new IOFile(Prop.HOME, IO.BASEXSUFFIX + "perm");
+
     if(!file.exists()) {
       // define default admin user with all rights
       list.add(new User(ADMIN, md5(ADMIN), Perm.ADMIN));

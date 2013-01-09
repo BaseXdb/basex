@@ -133,7 +133,7 @@ public final class MetaData {
     maxlen = prop.num(Prop.MAXLEN);
     maxcats = prop.num(Prop.MAXCATS);
     language = Language.get(prop);
-    users = new Users(false);
+    users = new Users(null);
   }
 
   // STATIC METHODS ==========================================================

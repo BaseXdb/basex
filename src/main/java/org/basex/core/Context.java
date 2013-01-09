@@ -107,7 +107,7 @@ public final class Context {
     blocker = new ClientBlocker();
     databases = new Databases(this);
     locks = mp.is(MainProp.DBLOCKING) ? new DBLocking(mp) : new ProcessLocking(this);
-    users = new Users(true);
+    users = new Users(this);
     repo = new Repo(this);
     log = new Log(this);
     user = users.get(ADMIN);
