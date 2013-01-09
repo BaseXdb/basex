@@ -64,7 +64,8 @@ public final class CreateBackup extends Command {
     final Zip zip = progress(new Zip(zf));
 
     try {
-      zip.zip(mprop.dbpath(db), Databases.FILES);
+      final IOFile path = mprop.dbpath(db);
+      zip.zip(path, path.descendants());
       return true;
     } catch(final IOException ex) {
       Util.debug(ex);

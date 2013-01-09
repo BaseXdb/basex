@@ -244,8 +244,8 @@ public abstract class Command extends Progress {
   }
 
   /**
-   * Adds the names of the database addressed by the argument index.
-   * Skipped if the argument uses glob syntax.
+   * Adds the names of the database that has been addressed by the argument index.
+   * No databases will be added if the argument uses glob syntax.
    * @param db databases
    * @param a argument index
    * @return {@code false} if database cannot be determined due to glob syntax
