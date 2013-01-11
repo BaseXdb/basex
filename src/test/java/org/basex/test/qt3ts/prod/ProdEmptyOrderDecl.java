@@ -20,9 +20,13 @@ public class ProdEmptyOrderDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare(::)default order empty(::)greatest; 1 eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -36,9 +40,13 @@ public class ProdEmptyOrderDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare(::)default order empty(::)least; 1 eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class ProdEmptyOrderDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare(::)default order empty(::)greatest; declare(::)default order empty(::)least; 1 eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0069")
     );
@@ -68,9 +80,13 @@ public class ProdEmptyOrderDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default order empty least; declare default order empty greatest;  \"aaa\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0069")
     );
@@ -84,9 +100,13 @@ public class ProdEmptyOrderDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default order empty greatest;  for $i in (<a>1</a>,<a>4</a>,<a></a>,<a>7</a>) order by zero-or-one($i/text()) descending return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a/><a>7</a><a>4</a><a>1</a>", false)
     );
@@ -100,9 +120,13 @@ public class ProdEmptyOrderDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default order empty greatest;  for $i in (<a>1</a>,<a>4</a>,<a></a>,<a></a>,<a>7</a>) order by zero-or-one($i/text()) descending return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a/><a/><a>7</a><a>4</a><a>1</a>", false)
     );
@@ -116,9 +140,13 @@ public class ProdEmptyOrderDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default order empty greatest;  for $i in (1,4,0 div 0E0,7) order by $i descending return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN 7 4 1")
     );
@@ -132,9 +160,13 @@ public class ProdEmptyOrderDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default order empty greatest;  for $i in (1,4,0 div 0E0,0 div 0E0,7) order by $i descending return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN NaN 7 4 1")
     );
@@ -148,9 +180,13 @@ public class ProdEmptyOrderDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default order empty least;  for $i in (<a>1</a>,<a>4</a>,<a></a>,<a>7</a>) order by zero-or-one($i/text()) ascending return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a/><a>1</a><a>4</a><a>7</a>", false)
     );
@@ -164,9 +200,13 @@ public class ProdEmptyOrderDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default order empty least;  for $i in (<a>1</a>,<a>4</a>,<a></a>,<a></a>,<a>7</a>) order by zero-or-one($i/text()) ascending return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a/><a/><a>1</a><a>4</a><a>7</a>", false)
     );
@@ -180,9 +220,13 @@ public class ProdEmptyOrderDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default order empty least;  for $i in (1,4,0 div 0E0,7) order by $i ascending return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN 1 4 7")
     );
@@ -196,9 +240,13 @@ public class ProdEmptyOrderDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default order empty least;  for $i in (1,4,0 div 0E0,0 div 0E0,7) order by $i ascending return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN NaN 1 4 7")
     );
@@ -212,9 +260,13 @@ public class ProdEmptyOrderDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default order empty least;  for $i in (<a>1</a>,<a>4</a>,<a></a>,<a>7</a>) order by zero-or-one($i/text()) descending return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>7</a><a>4</a><a>1</a><a/>", false)
     );
@@ -228,9 +280,13 @@ public class ProdEmptyOrderDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default order empty least;  for $i in (<a>1</a>,<a>4</a>,<a></a>,<a></a>,<a>7</a>) order by zero-or-one($i/text()) descending return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>7</a><a>4</a><a>1</a><a/><a/>", false)
     );
@@ -244,9 +300,13 @@ public class ProdEmptyOrderDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default order empty greatest;  for $i in (<a>1</a>,<a>4</a>,<a></a>,<a>7</a>) order by zero-or-one($i/text()) ascending return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>1</a><a>4</a><a>7</a><a/>", false)
     );
@@ -260,9 +320,13 @@ public class ProdEmptyOrderDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default order empty least;  for $i in (1,4,0 div 0E0,7) order by $i descending return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "7 4 1 NaN")
     );
@@ -276,9 +340,13 @@ public class ProdEmptyOrderDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default order empty least;  for $i in (1,4,0 div 0E0,0 div 0E0,7) order by $i descending return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "7 4 1 NaN NaN")
     );
@@ -292,9 +360,13 @@ public class ProdEmptyOrderDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default order empty greatest;  for $i in (<a>1</a>,<a>4</a>,<a></a>,<a>7</a>) order by zero-or-one($i/text()) ascending empty least return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a/><a>1</a><a>4</a><a>7</a>", false)
     );
@@ -308,9 +380,13 @@ public class ProdEmptyOrderDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default order empty greatest;  for $i in (1,4,3,0 div 0E0,7) order by $i ascending empty least return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN 1 3 4 7")
     );
@@ -324,9 +400,13 @@ public class ProdEmptyOrderDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default order empty greatest;  for $i in (<a>1</a>,<a>4</a>,<a></a>,<a>7</a>) order by zero-or-one($i/text()) ascending empty greatest return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>1</a><a>4</a><a>7</a><a/>", false)
     );
@@ -340,9 +420,13 @@ public class ProdEmptyOrderDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default order empty greatest;  for $i in (1,4,3,0 div 0E0,7) order by $i ascending empty greatest return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 3 4 7 NaN")
     );
@@ -356,9 +440,13 @@ public class ProdEmptyOrderDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default order empty least;  for $i in (<a>1</a>,<a>4</a>,<a></a>,<a>7</a>) order by $i/text() ascending empty greatest return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>1</a><a>4</a><a>7</a><a/>", false)
     );
@@ -372,9 +460,13 @@ public class ProdEmptyOrderDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default order empty least;  for $i in (1,4,3,0 div 0E0,7) order by $i ascending empty greatest return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 3 4 7 NaN")
     );
@@ -388,9 +480,13 @@ public class ProdEmptyOrderDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default order empty least;  for $i in (<a>1</a>,<a>4</a>,<a></a>,<a>7</a>) order by $i/text() ascending empty least return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a/><a>1</a><a>4</a><a>7</a>", false)
     );
@@ -404,9 +500,13 @@ public class ProdEmptyOrderDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default order empty least;  for $i in (1,4,3,0 div 0E0,7) order by $i ascending empty least return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN 1 3 4 7")
     );
@@ -420,9 +520,13 @@ public class ProdEmptyOrderDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default order empty greatest;  for $i in (<a>1</a>,<a>4</a>,<a></a>,<a></a>,<a>7</a>) order by zero-or-one($i/text()) ascending return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>1</a><a>4</a><a>7</a><a/><a/>", false)
     );
@@ -436,9 +540,13 @@ public class ProdEmptyOrderDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default order empty greatest;  for $i in (1,4,0 div 0E0,7) order by $i ascending return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 4 7 NaN")
     );
@@ -452,9 +560,13 @@ public class ProdEmptyOrderDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default order empty greatest;  for $i in (1,4,0 div 0E0,0 div 0E0,7) order by $i ascending return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 4 7 NaN NaN")
     );
@@ -468,9 +580,13 @@ public class ProdEmptyOrderDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default order empty greatest;  for $i in (<a>1</a>,<a>4</a>,<a></a>,<a>7</a>) return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>1</a><a>4</a><a/><a>7</a>", false)
     );
@@ -484,9 +600,13 @@ public class ProdEmptyOrderDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default order empty least;  for $i in (<a>1</a>,<a>4</a>,<a></a>,<a>7</a>) return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>1</a><a>4</a><a/><a>7</a>", false)
     );
@@ -500,9 +620,13 @@ public class ProdEmptyOrderDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default order empty greatest;  for $i in (1,4,0 div 0E0,7) return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 4 NaN 7")
     );
@@ -516,9 +640,13 @@ public class ProdEmptyOrderDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default order empty least;  for $i in (1,4,0 div 0E0,7) return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 4 NaN 7")
     );

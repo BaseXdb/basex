@@ -20,9 +20,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(QName('http://datypic.com/prod','product'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "product")
     );
@@ -36,9 +40,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(QName('http://datypic.com/prod', 'pre:product'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "pre:product")
     );
@@ -52,9 +60,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(QName('', 'product'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "product")
     );
@@ -68,9 +80,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(QName('http://datypic.com/prod','product'), QName('http://datypic.com/prod', 'pre:product'), QName('', 'product'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "product pre:product product")
     );
@@ -84,9 +100,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(abs(3.5))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "3.5")
     );
@@ -100,9 +120,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(abs(-4))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("4")
     );
@@ -116,9 +140,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(abs(xs:float('-INF')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "INF")
     );
@@ -132,9 +160,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(abs(3.5), abs(-4), abs(xs:float('-INF')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "3.5 4 INF")
     );
@@ -148,9 +180,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(adjust-date-to-timezone( xs:date('2006-02-15'), xs:dayTimeDuration('-PT8H')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2006-02-15-08:00")
     );
@@ -164,9 +200,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(adjust-date-to-timezone( xs:date('2006-02-15-03:00'), xs:dayTimeDuration('-PT8H')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2006-02-14-08:00")
     );
@@ -180,9 +220,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(adjust-date-to-timezone( xs:date('2006-02-15'), ()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2006-02-15")
     );
@@ -196,9 +240,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(adjust-date-to-timezone( xs:date('2006-02-15-03:00'), ()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2006-02-15")
     );
@@ -212,9 +260,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(adjust-date-to-timezone( xs:date('2006-02-15'), xs:dayTimeDuration('-PT8H')), adjust-date-to-timezone( xs:date('2006-02-15-03:00'), xs:dayTimeDuration('-PT8H')), adjust-date-to-timezone( xs:date('2006-02-15'), ()), adjust-date-to-timezone( xs:date('2006-02-15-03:00'), ()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2006-02-15-08:00 2006-02-14-08:00 2006-02-15 2006-02-15")
     );
@@ -228,9 +280,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(adjust-dateTime-to-timezone( xs:dateTime('2006-02-15T17:00:00'), xs:dayTimeDuration('-PT7H')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2006-02-15T17:00:00-07:00")
     );
@@ -244,9 +300,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(adjust-dateTime-to-timezone( xs:dateTime('2006-02-15T17:00:00-03:00'), xs:dayTimeDuration('-PT7H')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2006-02-15T13:00:00-07:00")
     );
@@ -260,9 +320,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(adjust-dateTime-to-timezone( xs:dateTime('2006-02-15T17:00:00'), ()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2006-02-15T17:00:00")
     );
@@ -276,9 +340,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(adjust-dateTime-to-timezone( xs:dateTime('2006-02-15T17:00:00-03:00'), ()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2006-02-15T17:00:00")
     );
@@ -292,9 +360,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(adjust-dateTime-to-timezone( xs:dateTime('2006-02-15T01:00:00-03:00'), xs:dayTimeDuration('-PT7H')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2006-02-14T21:00:00-07:00")
     );
@@ -308,9 +380,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(adjust-dateTime-to-timezone( xs:dateTime('2006-02-15T17:00:00'), xs:dayTimeDuration('-PT7H')), adjust-dateTime-to-timezone( xs:dateTime('2006-02-15T17:00:00-03:00'), xs:dayTimeDuration('-PT7H')), adjust-dateTime-to-timezone( xs:dateTime('2006-02-15T17:00:00'), ()), adjust-dateTime-to-timezone( xs:dateTime('2006-02-15T17:00:00-03:00'), ()), adjust-dateTime-to-timezone( xs:dateTime('2006-02-15T01:00:00-03:00'), xs:dayTimeDuration('-PT7H')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2006-02-15T17:00:00-07:00 2006-02-15T13:00:00-07:00 2006-02-15T17:00:00 2006-02-15T17:00:00 2006-02-14T21:00:00-07:00")
     );
@@ -324,9 +400,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(adjust-time-to-timezone( xs:time('17:00:00'), xs:dayTimeDuration('-PT7H')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "17:00:00-07:00")
     );
@@ -340,9 +420,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(adjust-time-to-timezone( xs:time('17:00:00-03:00'), xs:dayTimeDuration('-PT7H')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "13:00:00-07:00")
     );
@@ -356,9 +440,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(adjust-time-to-timezone( xs:time('17:00:00'), ()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "17:00:00")
     );
@@ -372,9 +460,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(adjust-time-to-timezone( xs:time('17:00:00-03:00'), ()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "17:00:00")
     );
@@ -388,9 +480,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(adjust-time-to-timezone( xs:time('17:00:00'), xs:dayTimeDuration('-PT7H')), adjust-time-to-timezone( xs:time('17:00:00-03:00'), xs:dayTimeDuration('-PT7H')), adjust-time-to-timezone( xs:time('17:00:00'), ()), adjust-time-to-timezone( xs:time('17:00:00-03:00'), ()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "17:00:00-07:00 13:00:00-07:00 17:00:00 17:00:00")
     );
@@ -404,9 +500,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(avg( (1, 2, 3, 4, 5) ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -420,9 +520,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(avg( (1, 2, 3, (), 4, 5) ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -436,9 +540,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(avg( (xs:yearMonthDuration('P4M'), xs:yearMonthDuration('P6M') ) ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P5M")
     );
@@ -452,10 +560,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (avg($ordDoc//item/@quantity))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1.1666666666666667")
     );
@@ -469,10 +581,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (avg( () ))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -486,10 +602,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (avg( (1, 2, 3, 4, 5) ), avg( (1, 2, 3, (), 4, 5) ), avg( (xs:yearMonthDuration('P4M'), xs:yearMonthDuration('P6M') ) ), avg($ordDoc//item/@quantity), avg( () ))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("3, 3, xs:yearMonthDuration('P5M'), 1.1666666666666667")
     );
@@ -503,10 +623,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $cats := (/) return (base-uri($cats//catalog[1]))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_cats.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_cats.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://example.org/ACC/")
     );
@@ -520,10 +644,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $cats := (/) return (base-uri($cats//catalog[2]/product))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_cats.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_cats.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://example.org/WMN/")
     );
@@ -537,10 +665,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $cats := (/) return (base-uri($cats//catalog[2]/product/@href))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_cats.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_cats.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://example.org/WMN/")
     );
@@ -554,10 +686,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $cats := (/) return (base-uri($cats//catalog[1]), base-uri($cats//catalog[2]/product), base-uri($cats//catalog[2]/product/@href))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_cats.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_cats.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://example.org/ACC/ http://example.org/WMN/ http://example.org/WMN/")
     );
@@ -571,10 +707,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (boolean( () ))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -588,10 +728,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (boolean(''))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -605,10 +749,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (boolean(0))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -622,10 +770,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (boolean('0'))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -639,10 +791,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (boolean('false'))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -656,10 +812,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (boolean(xs:float('NaN')))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -673,10 +833,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (boolean($ordDoc/order[1]))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -690,10 +854,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (boolean($ordDoc/noSuchChild))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -707,10 +875,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (boolean(<a>false</a>))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -724,10 +896,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (boolean( () ), boolean(''), boolean(0), boolean('0'), boolean('false'), boolean(xs:float('NaN')), boolean($ordDoc/order[1]), boolean($ordDoc/noSuchChild), boolean(<a>false</a>))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "false false false true true false true false true")
     );
@@ -741,9 +917,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(ceiling(5))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5")
     );
@@ -757,9 +937,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(ceiling(5.1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("6")
     );
@@ -773,9 +957,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(ceiling(5.5))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("6")
     );
@@ -789,9 +977,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(ceiling(-5.5))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-5")
     );
@@ -805,9 +997,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(ceiling(-5.51))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-5")
     );
@@ -821,9 +1017,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(ceiling( () ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -837,9 +1037,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(ceiling(5), ceiling(5.1), ceiling(5.5), ceiling(-5.5), ceiling(-5.51), ceiling( () ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "5 6 6 -5 -5")
     );
@@ -853,9 +1057,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(codepoint-equal('abc', 'abc'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -869,9 +1077,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(codepoint-equal('abc', 'ab c'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -885,9 +1097,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(codepoint-equal('abc', ()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -901,9 +1117,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(codepoint-equal('abc', 'abc'), codepoint-equal('abc', 'ab c'), codepoint-equal('abc', ()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true false")
     );
@@ -917,9 +1137,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(codepoints-to-string((97, 32, 98, 32, 99)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a b c")
     );
@@ -933,9 +1157,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(codepoints-to-string(97))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a")
     );
@@ -949,9 +1177,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(codepoints-to-string(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -965,9 +1197,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(codepoints-to-string((97, 32, 98, 32, 99)), codepoints-to-string(97), codepoints-to-string(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a b c a ")
     );
@@ -981,9 +1217,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(compare('a', 'b'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -997,9 +1237,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(compare('a', 'a'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1013,9 +1257,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(compare('b', 'a'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1029,9 +1277,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(compare('ab', 'abc'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1045,9 +1297,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(compare('a', 'B'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1061,9 +1317,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(compare(upper-case('a'), upper-case('B')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1077,9 +1337,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(compare('a', ()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -1093,9 +1357,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(compare('a', 'b'), compare('a', 'a'), compare('b', 'a'), compare('ab', 'abc'), compare('a', 'B'), compare(upper-case('a'), upper-case('B')), compare('a', ()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-1 0 1 -1 1 -1")
     );
@@ -1109,9 +1377,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(concat('a', 'b'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ab")
     );
@@ -1125,9 +1397,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(concat('a', 'b', 'c'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abc")
     );
@@ -1141,9 +1417,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(concat('a', (), 'b', '', 'c'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abc")
     );
@@ -1157,9 +1437,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(concat('a', <x>b</x>, 'c'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abc")
     );
@@ -1173,9 +1457,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(concat('a', 'b'), concat('a', 'b', 'c'), concat('a', (), 'b', '', 'c'), concat('a', <x>b</x>, 'c'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ab abc abc abc")
     );
@@ -1189,9 +1477,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(contains('query', 'e'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1205,9 +1497,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(contains('query', 'ery'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1221,9 +1517,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(contains('query', 'query'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1237,9 +1537,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(contains('query', 'x'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1253,9 +1557,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(contains('query', ''))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1269,9 +1577,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(contains('query', ()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1285,9 +1597,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(contains( (), 'q'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1301,9 +1617,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(contains('query', 'e'), contains('query', 'ery'), contains('query', 'query'), contains('query', 'x'), contains('query', ''), contains('query', ()), contains( (), 'q'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true true true false true true false")
     );
@@ -1317,10 +1637,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (count( (1, 2, 3) ))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -1334,10 +1658,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (count($ordDoc//item))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("6")
     );
@@ -1351,10 +1679,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (count( distinct-values($ordDoc//item/@num)))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("4")
     );
@@ -1368,10 +1700,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (count( (1, 2, 3, () ) ))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -1385,10 +1721,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (count( () ))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1402,10 +1742,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (count( (1, 2, 3) ), count($ordDoc//item), count( distinct-values($ordDoc//item/@num)), count( (1, 2, 3, () ) ), count( () ))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "3 6 4 3 0")
     );
@@ -1419,10 +1763,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $cat := (/) return (data($cat//product[1]/number))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_catalog.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_catalog.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "557")
     );
@@ -1436,10 +1784,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $cat := (/) return (data($cat//number))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_catalog.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_catalog.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "557 563 443 784")
     );
@@ -1453,10 +1805,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $cat := (/) return (data($cat//product[1]/@dept))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_catalog.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_catalog.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "WMN")
     );
@@ -1470,10 +1826,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $cat := (/) return (data($cat//product[1]/colorChoices))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_catalog.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_catalog.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "navy black")
     );
@@ -1487,10 +1847,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $cat := (/) return (data($cat//product[1]))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_catalog.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_catalog.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(true, "557 Fleece Pullover navy black")
     );
@@ -1504,10 +1868,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $cat := (/) return (data($cat//product[4]/desc))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_catalog.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_catalog.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Our favorite shirt!")
     );
@@ -1521,10 +1889,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $cat := (/) return (data($cat//product[1]/number), data($cat//number), data($cat//product[1]/@dept), data($cat//product[1]/colorChoices), data($cat//product[1]), data($cat//product[4]/desc))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_catalog.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_catalog.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(true, "557 557 563 443 784 WMN navy black 557 Fleece Pullover navy black Our favorite shirt!")
     );
@@ -1538,9 +1910,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(dateTime(xs:date('2006-08-15'), xs:time('12:30:45-05:00')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2006-08-15T12:30:45-05:00")
     );
@@ -1554,9 +1930,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(day-from-date(xs:date('2006-08-15')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("15")
     );
@@ -1570,9 +1950,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(day-from-dateTime( xs:dateTime('2006-08-15T10:30:23')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("15")
     );
@@ -1586,9 +1970,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(days-from-duration( xs:dayTimeDuration('P5D')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5")
     );
@@ -1602,9 +1990,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(days-from-duration( xs:dayTimeDuration('-PT24H')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1618,9 +2010,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(days-from-duration( xs:dayTimeDuration('PT23H')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1634,9 +2030,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(days-from-duration( xs:dayTimeDuration('P1DT36H')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -1650,9 +2050,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(days-from-duration( xs:dayTimeDuration('PT1440M')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1666,9 +2070,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(days-from-duration( xs:dayTimeDuration('P5D')), days-from-duration( xs:dayTimeDuration('-PT24H')), days-from-duration( xs:dayTimeDuration('PT23H')), days-from-duration( xs:dayTimeDuration('P1DT36H')), days-from-duration( xs:dayTimeDuration('PT1440M')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "5 -1 0 2 1")
     );
@@ -1682,9 +2090,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $prod1 := <product dept='MEN' id='P123'> <number>784</number> </product> return let $prod2 := <product id='P123' dept='MEN'><!--comment--> <number>784</number> </product> return (deep-equal( 1, 1 ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1698,9 +2110,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $prod1 := <product dept='MEN' id='P123'> <number>784</number> </product> return let $prod2 := <product id='P123' dept='MEN'><!--comment--> <number>784</number> </product> return (deep-equal( (1, 1), (1, 1) ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1714,9 +2130,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $prod1 := <product dept='MEN' id='P123'> <number>784</number> </product> return let $prod2 := <product id='P123' dept='MEN'><!--comment--> <number>784</number> </product> return (deep-equal( (1, 2), (1.0, 2.0) ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1730,9 +2150,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $prod1 := <product dept='MEN' id='P123'> <number>784</number> </product> return let $prod2 := <product id='P123' dept='MEN'><!--comment--> <number>784</number> </product> return (deep-equal( (1, 2), (2, 1) ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1746,9 +2170,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $prod1 := <product dept='MEN' id='P123'> <number>784</number> </product> return let $prod2 := <product id='P123' dept='MEN'><!--comment--> <number>784</number> </product> return (deep-equal( $prod1, $prod2 ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1762,9 +2190,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $prod1 := <product dept='MEN' id='P123'> <number>784</number> </product> return let $prod2 := <product id='P123' dept='MEN'><!--comment--> <number>784</number> </product> return (deep-equal( $prod1/number, $prod2/number ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1778,9 +2210,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $prod1 := <product dept='MEN' id='P123'> <number>784</number> </product> return let $prod2 := <product id='P123' dept='MEN'><!--comment--> <number>784</number> </product> return (deep-equal( 1, 1 ), deep-equal( (1, 1), (1, 1) ), deep-equal( (1, 2), (1.0, 2.0) ), deep-equal( (1, 2), (2, 1) ), deep-equal( $prod1, $prod2 ), deep-equal( $prod1/number, $prod2/number ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true true true false true true")
     );
@@ -1794,9 +2230,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(default-collation())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.w3.org/2005/xpath-functions/collation/codepoint")
     );
@@ -1810,9 +2250,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml := <in-xml> <a>3</a> <b>5</b> <b>3</b> </in-xml> return (distinct-values( ('a', 'b', 'a') ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a b")
     );
@@ -1826,9 +2270,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml := <in-xml> <a>3</a> <b>5</b> <b>3</b> </in-xml> return (distinct-values( (1, 2, 3) ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3")
     );
@@ -1842,9 +2290,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml := <in-xml> <a>3</a> <b>5</b> <b>3</b> </in-xml> return (distinct-values( ('a', 2, 3) ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a 2 3")
     );
@@ -1858,9 +2310,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml := <in-xml> <a>3</a> <b>5</b> <b>3</b> </in-xml> return (distinct-values( (xs:integer('1'), xs:decimal('1.0'), xs:float('1.0E0') ) ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1874,9 +2330,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml := <in-xml> <a>3</a> <b>5</b> <b>3</b> </in-xml> return (distinct-values($in-xml/*))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "3 5")
     );
@@ -1890,9 +2350,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml := <in-xml> <a>3</a> <b>5</b> <b>3</b> </in-xml> return (distinct-values( () ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -1906,9 +2370,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml := <in-xml> <a>3</a> <b>5</b> <b>3</b> </in-xml> return (distinct-values( ('a', 'b', 'a') ), distinct-values( (1, 2, 3) ), distinct-values( ('a', 2, 3) ), distinct-values( (xs:integer('1'), xs:decimal('1.0'), xs:float('1.0E0') ) ), distinct-values($in-xml/*), distinct-values( () ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a b 1 2 3 a 2 3 1 3 5")
     );
@@ -1922,10 +2390,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(doc-available( document-uri(/) ))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1939,9 +2411,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml := <in-xml> <a></a> <b/> <c>xyz</c> </in-xml> return (empty( ('a', 'b', 'c') ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1955,9 +2431,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml := <in-xml> <a></a> <b/> <c>xyz</c> </in-xml> return (empty( () ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1971,9 +2451,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml := <in-xml> <a></a> <b/> <c>xyz</c> </in-xml> return (empty(0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1987,9 +2471,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml := <in-xml> <a></a> <b/> <c>xyz</c> </in-xml> return (empty($in-xml/a))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2003,9 +2491,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml := <in-xml> <a></a> <b/> <c>xyz</c> </in-xml> return (empty($in-xml/b))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2019,9 +2511,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml := <in-xml> <a></a> <b/> <c>xyz</c> </in-xml> return (empty($in-xml/c))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2035,9 +2531,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml := <in-xml> <a></a> <b/> <c>xyz</c> </in-xml> return (empty($in-xml/foo))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2051,9 +2551,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml := <in-xml> <a></a> <b/> <c>xyz</c> </in-xml> return (empty( ('a', 'b', 'c') ), empty( () ), empty(0), empty($in-xml/a), empty($in-xml/b), empty($in-xml/c), empty($in-xml/foo))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "false true false false false false true")
     );
@@ -2067,9 +2571,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(encode-for-uri( 'Sales % Numbers.pdf'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Sales%20%25%20Numbers.pdf")
     );
@@ -2083,9 +2591,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(encode-for-uri( 'http://datypic.com/a%20URI#frag'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http%3A%2F%2Fdatypic.com%2Fa%2520URI%23frag")
     );
@@ -2099,9 +2611,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(encode-for-uri( 'Sales % Numbers.pdf'), encode-for-uri( 'http://datypic.com/a%20URI#frag'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Sales%20%25%20Numbers.pdf http%3A%2F%2Fdatypic.com%2Fa%2520URI%23frag")
     );
@@ -2115,9 +2631,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(ends-with('query', 'y'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2131,9 +2651,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(ends-with('query', 'query'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2147,9 +2671,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(ends-with('query', ''))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2163,9 +2691,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(ends-with('query ', 'y'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2179,9 +2711,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(ends-with('', 'y'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2195,9 +2731,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(ends-with('query', 'y'), ends-with('query', 'query'), ends-with('query', ''), ends-with('query ', 'y'), ends-with('', 'y'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true true true false false")
     );
@@ -2211,9 +2751,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(escape-html-uri( 'http://datypic.com/a%20URI#frag'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://datypic.com/a%20URI#frag")
     );
@@ -2227,9 +2771,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(escape-html-uri('http://datypic.com'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://datypic.com")
     );
@@ -2243,9 +2791,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(escape-html-uri( 'http://datypic.com/a%20URI#frag'), escape-html-uri('http://datypic.com'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://datypic.com/a%20URI#frag http://datypic.com")
     );
@@ -2259,9 +2811,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(exactly-one('a'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a")
     );
@@ -2275,9 +2831,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(exists( ('a', 'b', 'c') ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2291,9 +2851,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(exists( '' ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2307,9 +2871,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(exists( () ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2323,9 +2891,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(exists( false() ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2339,9 +2911,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(exists( ('a', 'b', 'c') ), exists( '' ), exists( () ), exists( false() ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true true false true")
     );
@@ -2355,9 +2931,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(false())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2371,9 +2951,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(floor(5))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5")
     );
@@ -2387,9 +2971,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(floor(5.1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5")
     );
@@ -2403,9 +2991,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(floor(5.7))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5")
     );
@@ -2419,9 +3011,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(floor(-5.1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-6")
     );
@@ -2435,9 +3031,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(floor(-5.7))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-6")
     );
@@ -2451,9 +3051,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(floor( () ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -2467,9 +3071,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(floor(5), floor(5.1), floor(5.7), floor(-5.1), floor(-5.7), floor( () ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "5 5 5 -6 -6")
     );
@@ -2483,9 +3091,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(hours-from-dateTime( xs:dateTime('2006-08-15T10:30:23')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("10")
     );
@@ -2499,9 +3111,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(hours-from-dateTime( xs:dateTime('2006-08-15T10:30:23-05:00')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("10")
     );
@@ -2515,9 +3131,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(hours-from-dateTime( xs:dateTime('2006-08-15T10:30:23')), hours-from-dateTime( xs:dateTime('2006-08-15T10:30:23-05:00')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "10 10")
     );
@@ -2531,9 +3151,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(hours-from-duration( xs:dayTimeDuration('P1DT5H')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5")
     );
@@ -2547,9 +3171,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(hours-from-duration( xs:dayTimeDuration('-PT36H')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-12")
     );
@@ -2563,9 +3191,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(hours-from-duration( xs:dayTimeDuration('PT1H90M')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -2579,9 +3211,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(hours-from-duration( xs:dayTimeDuration('PT2H59M')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -2595,9 +3231,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(hours-from-duration( xs:dayTimeDuration('PT3600S')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2611,9 +3251,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(hours-from-duration( xs:dayTimeDuration('P1DT5H')), hours-from-duration( xs:dayTimeDuration('-PT36H')), hours-from-duration( xs:dayTimeDuration('PT1H90M')), hours-from-duration( xs:dayTimeDuration('PT2H59M')), hours-from-duration( xs:dayTimeDuration('PT3600S')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "5 -12 2 2 1")
     );
@@ -2627,9 +3271,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(hours-from-time( xs:time('10:30:23')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("10")
     );
@@ -2643,9 +3291,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(hours-from-time( xs:time('10:30:23-05:00')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("10")
     );
@@ -2659,9 +3311,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(hours-from-time( xs:time('10:30:23')), hours-from-time( xs:time('10:30:23-05:00')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "10 10")
     );
@@ -2675,9 +3331,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(index-of( ('a', 'b', 'c'), 'a'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2691,9 +3351,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(index-of( ('a', 'b', 'c'), 'd'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -2707,9 +3371,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(index-of( (4, 5, 6, 4), 4))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 4")
     );
@@ -2723,9 +3391,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(index-of( (4, 5, 6, 4), 04.0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 4")
     );
@@ -2739,9 +3411,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(index-of( ('a', 5, 6), 'a'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2755,9 +3431,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(index-of( (), 'a'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -2771,9 +3451,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(index-of( (<a>1</a>, <b>1</b>), <c>1</c> ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2")
     );
@@ -2787,9 +3471,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(index-of( ('a', 'b', 'c'), 'a'), index-of( ('a', 'b', 'c'), 'd'), index-of( (4, 5, 6, 4), 4), index-of( (4, 5, 6, 4), 04.0), index-of( ('a', 5, 6), 'a'), index-of( (), 'a'), index-of( (<a>1</a>, <b>1</b>), <c>1</c> ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 1 4 1 4 1 1 2")
     );
@@ -2803,9 +3491,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(insert-before( ('a', 'b', 'c'), 1, ('x', 'y')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "x y a b c")
     );
@@ -2819,9 +3511,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(insert-before( ('a', 'b', 'c'), 2, ('x', 'y')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a x y b c")
     );
@@ -2835,9 +3531,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(insert-before( ('a', 'b', 'c'), 10, ('x', 'y')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a b c x y")
     );
@@ -2851,9 +3551,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(insert-before( ('a', 'b', 'c'), 0, ('x', 'y')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "x y a b c")
     );
@@ -2867,9 +3571,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(insert-before( ('a', 'b', 'c'), 2, ()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a b c")
     );
@@ -2883,9 +3591,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(insert-before( (), 3, ('a', 'b', 'c') ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a b c")
     );
@@ -2899,9 +3611,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(insert-before( ('a', 'b', 'c'), 1, ('x', 'y')), insert-before( ('a', 'b', 'c'), 2, ('x', 'y')), insert-before( ('a', 'b', 'c'), 10, ('x', 'y')), insert-before( ('a', 'b', 'c'), 0, ('x', 'y')), insert-before( ('a', 'b', 'c'), 2, ()), insert-before( (), 3, ('a', 'b', 'c') ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "x y a b c a x y b c a b c x y x y a b c a b c a b c")
     );
@@ -2915,9 +3631,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(iri-to-uri( 'http://datypic.com/Sales Numbers.pdf'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://datypic.com/Sales%20Numbers.pdf")
     );
@@ -2931,9 +3651,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml := <desclist xml:lang=\"en\"> <desc xml:lang=\"en-US\"> <line>A line of text.</line> </desc> <desc xml:lang=\"fr\"> <line>Une ligne de texte.</line> </desc> </desclist> return ($in-xml// desc[lang('en')])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<desc xml:lang=\"en-US\"><line>A line of text.</line></desc>", false)
     );
@@ -2947,9 +3671,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml := <desclist xml:lang=\"en\"> <desc xml:lang=\"en-US\"> <line>A line of text.</line> </desc> <desc xml:lang=\"fr\"> <line>Une ligne de texte.</line> </desc> </desclist> return ($in-xml// desc[lang('en-US')])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<desc xml:lang=\"en-US\"><line>A line of text.</line></desc>", false)
     );
@@ -2963,9 +3691,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml := <desclist xml:lang=\"en\"> <desc xml:lang=\"en-US\"> <line>A line of text.</line> </desc> <desc xml:lang=\"fr\"> <line>Une ligne de texte.</line> </desc> </desclist> return ($in-xml// desc[lang('fr')])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<desc xml:lang=\"fr\"><line>Une ligne de texte.</line></desc>", false)
     );
@@ -2979,9 +3711,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml := <desclist xml:lang=\"en\"> <desc xml:lang=\"en-US\"> <line>A line of text.</line> </desc> <desc xml:lang=\"fr\"> <line>Une ligne de texte.</line> </desc> </desclist> return ($in-xml// desc/line[lang('en')])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<line>A line of text.</line>", false)
     );
@@ -2995,9 +3731,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml := <desclist xml:lang=\"en\"> <desc xml:lang=\"en-US\"> <line>A line of text.</line> </desc> <desc xml:lang=\"fr\"> <line>Une ligne de texte.</line> </desc> </desclist> return ($in-xml[lang('en-US')])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -3011,9 +3751,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml := <desclist xml:lang=\"en\"> <desc xml:lang=\"en-US\"> <line>A line of text.</line> </desc> <desc xml:lang=\"fr\"> <line>Une ligne de texte.</line> </desc> </desclist> return ($in-xml// desc[lang('FR')])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<desc xml:lang=\"fr\"><line>Une ligne de texte.</line></desc>", false)
     );
@@ -3027,9 +3771,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml := <desclist xml:lang=\"en\"> <desc xml:lang=\"en-US\"> <line>A line of text.</line> </desc> <desc xml:lang=\"fr\"> <line>Une ligne de texte.</line> </desc> </desclist> return ($in-xml// desc[lang('en')], $in-xml// desc[lang('en-US')], $in-xml// desc[lang('fr')], $in-xml// desc/line[lang('en')], $in-xml[lang('en-US')], $in-xml// desc[lang('FR')])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<desc xml:lang=\"en-US\"><line>A line of text.</line></desc><desc xml:lang=\"en-US\"><line>A line of text.</line></desc><desc xml:lang=\"fr\"><line>Une ligne de texte.</line></desc><line>A line of text.</line><desc xml:lang=\"fr\"><line>Une ligne de texte.</line></desc>", false)
     );
@@ -3043,10 +3791,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/ catalog/product[last()])",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_catalog.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_catalog.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<product dept=\"MEN\">\n  <number>784</number>\n  <name language=\"en\">Cotton Dress Shirt</name>\n  <colorChoices>white gray</colorChoices>\n  <desc>Our <i>favorite</i> shirt!</desc>\n </product>", false)
     );
@@ -3062,9 +3814,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace unpre = \"http://datypic.com/unpre\";\n" +
       "         let $in-xml := <noNamespace> <pre:prefixed xmlns=\"http://datypic.com/unpre\" xmlns:pre=\"http://datypic.com/pre\"> <unprefixed pre:prefAttr=\"a\" noNSAttr=\"b\">123</unprefixed> </pre:prefixed> </noNamespace> return (local-name($in-xml))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "noNamespace")
     );
@@ -3080,9 +3836,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace unpre = \"http://datypic.com/unpre\";\n" +
       "         let $in-xml := <noNamespace> <pre:prefixed xmlns=\"http://datypic.com/unpre\" xmlns:pre=\"http://datypic.com/pre\"> <unprefixed pre:prefAttr=\"a\" noNSAttr=\"b\">123</unprefixed> </pre:prefixed> </noNamespace> return (local-name($in-xml//pre:prefixed))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "prefixed")
     );
@@ -3098,9 +3858,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace unpre = \"http://datypic.com/unpre\";\n" +
       "         let $in-xml := <noNamespace> <pre:prefixed xmlns=\"http://datypic.com/unpre\" xmlns:pre=\"http://datypic.com/pre\"> <unprefixed pre:prefAttr=\"a\" noNSAttr=\"b\">123</unprefixed> </pre:prefixed> </noNamespace> return (local-name($in-xml//unpre:unprefixed))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "unprefixed")
     );
@@ -3116,9 +3880,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace unpre = \"http://datypic.com/unpre\";\n" +
       "         let $in-xml := <noNamespace> <pre:prefixed xmlns=\"http://datypic.com/unpre\" xmlns:pre=\"http://datypic.com/pre\"> <unprefixed pre:prefAttr=\"a\" noNSAttr=\"b\">123</unprefixed> </pre:prefixed> </noNamespace> return (local-name($in-xml//@pre:prefAttr))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "prefAttr")
     );
@@ -3134,9 +3902,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace unpre = \"http://datypic.com/unpre\";\n" +
       "         let $in-xml := <noNamespace> <pre:prefixed xmlns=\"http://datypic.com/unpre\" xmlns:pre=\"http://datypic.com/pre\"> <unprefixed pre:prefAttr=\"a\" noNSAttr=\"b\">123</unprefixed> </pre:prefixed> </noNamespace> return (local-name($in-xml//@noNSAttr))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "noNSAttr")
     );
@@ -3152,9 +3924,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace unpre = \"http://datypic.com/unpre\";\n" +
       "         let $in-xml := <noNamespace> <pre:prefixed xmlns=\"http://datypic.com/unpre\" xmlns:pre=\"http://datypic.com/pre\"> <unprefixed pre:prefAttr=\"a\" noNSAttr=\"b\">123</unprefixed> </pre:prefixed> </noNamespace> return (local-name($in-xml), local-name($in-xml//pre:prefixed), local-name($in-xml//unpre:unprefixed), local-name($in-xml//@pre:prefAttr), local-name($in-xml//@noNSAttr))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "noNamespace prefixed unprefixed prefAttr noNSAttr")
     );
@@ -3168,9 +3944,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(local-name-from-QName( QName('http://datypic.com/prod', 'number')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "number")
     );
@@ -3184,9 +3964,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(local-name-from-QName(QName ('', 'number')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "number")
     );
@@ -3200,9 +3984,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(local-name-from-QName( () ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -3216,9 +4004,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(local-name-from-QName( QName('http://datypic.com/prod', 'number')), local-name-from-QName(QName ('', 'number')), local-name-from-QName( () ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "number number")
     );
@@ -3232,9 +4024,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(lower-case('QUERY'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "query")
     );
@@ -3248,9 +4044,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(lower-case('Query'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "query")
     );
@@ -3264,9 +4064,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(lower-case('QUERY123'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "query123")
     );
@@ -3280,9 +4084,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(lower-case('QUERY'), lower-case('Query'), lower-case('QUERY123'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "query query query123")
     );
@@ -3296,9 +4104,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $address := '123 Main Street Traverse City, MI 49684' return (matches('query', 'q'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3312,9 +4124,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $address := '123 Main Street Traverse City, MI 49684' return (matches($address, 'Street.*City', 's'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3329,9 +4145,13 @@ public class AppFunctxFn extends QT3TestSet {
       "let $address := '123 Main Street\n" +
       "Traverse City, MI 49684' return (matches($address, 'Street$'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3346,9 +4166,13 @@ public class AppFunctxFn extends QT3TestSet {
       "let $address := '123 Main Street\n" +
       "Traverse City, MI 49684' return (matches($address, 'Street$', 'm'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3363,9 +4187,13 @@ public class AppFunctxFn extends QT3TestSet {
       "let $address := '123 Main Street\n" +
       "Traverse City, MI 49684' return (matches($address, 'street'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3380,9 +4208,13 @@ public class AppFunctxFn extends QT3TestSet {
       "let $address := '123 Main Street\n" +
       "Traverse City, MI 49684' return (matches($address, 'street', 'i'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3397,9 +4229,13 @@ public class AppFunctxFn extends QT3TestSet {
       "let $address := '123 Main Street\n" +
       "Traverse City, MI 49684' return (matches($address, 'Main Street'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3414,9 +4250,13 @@ public class AppFunctxFn extends QT3TestSet {
       "let $address := '123 Main Street\n" +
       "Traverse City, MI 49684' return (matches($address, 'Main Street', 'x'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3431,9 +4271,13 @@ public class AppFunctxFn extends QT3TestSet {
       "let $address := '123 Main Street\n" +
       "Traverse City, MI 49684' return (matches($address, 'Main \\s Street', 'x'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3448,9 +4292,13 @@ public class AppFunctxFn extends QT3TestSet {
       "let $address := '123 Main Street\n" +
       "Traverse City, MI 49684' return (matches($address, 'street$', 'im'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3464,9 +4312,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $address := '123 Main Street Traverse City, MI 49684' return (matches('query', 'ue'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3480,9 +4332,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $address := '123 Main Street Traverse City, MI 49684' return (matches('query', '^qu'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3496,9 +4352,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $address := '123 Main Street Traverse City, MI 49684' return (matches('query', 'qu$'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3512,9 +4372,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $address := '123 Main Street Traverse City, MI 49684' return (matches('query', '[ux]'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3528,9 +4392,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $address := '123 Main Street Traverse City, MI 49684' return (matches('query', 'q.*'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3544,9 +4412,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $address := '123 Main Street Traverse City, MI 49684' return (matches('query', '[a-z]{5}'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3560,9 +4432,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $address := '123 Main Street Traverse City, MI 49684' return (matches((), 'q' ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3577,9 +4453,13 @@ public class AppFunctxFn extends QT3TestSet {
       "let $address := '123 Main Street\n" +
       "Traverse City, MI 49684' return (matches($address, 'Street.*City'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3603,9 +4483,13 @@ public class AppFunctxFn extends QT3TestSet {
       "            matches($address, 'Main Street', 'x'), matches($address, 'Main \\s Street', 'x'), \n" +
       "            matches($address, 'street$', 'im'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true true true false true true true false false true false true false true true false true true")
     );
@@ -3619,10 +4503,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (max( (2, 1, 5, 4, 3) ))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5")
     );
@@ -3636,10 +4524,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (max( ('a', 'b', 'c') ))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "c")
     );
@@ -3653,10 +4545,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (max( 2 ))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -3670,10 +4566,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (max($ordDoc//item/string(@dept)))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "WMN")
     );
@@ -3687,10 +4587,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (max( (2, 1, 5, 4, 3) ), max( ('a', 'b', 'c') ), max( 2 ), max($ordDoc//item/string(@dept)))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "5 c 2 WMN")
     );
@@ -3704,10 +4608,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (min( (2.0, 1, 3.5, 4) ))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -3721,10 +4629,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (min( ('a', 'b', 'c') ))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a")
     );
@@ -3738,10 +4650,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (min($ordDoc//item//string(@color)))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -3755,10 +4671,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (min($ordDoc//item/@color/string(.)))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "beige")
     );
@@ -3772,10 +4692,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (min( (2.0, 1, 3.5, 4) ), min( ('a', 'b', 'c') ), min($ordDoc//item//string(@color)), min($ordDoc//item/@color/string(.)))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 a  beige")
     );
@@ -3789,9 +4713,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(minutes-from-dateTime( xs:dateTime('2006-08-15T10:30:23')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("30")
     );
@@ -3805,9 +4733,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(minutes-from-duration( xs:dayTimeDuration('PT30M')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("30")
     );
@@ -3821,9 +4753,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(minutes-from-duration( xs:dayTimeDuration('-PT90M')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-30")
     );
@@ -3837,9 +4773,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(minutes-from-duration( xs:dayTimeDuration('PT1M90S')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -3853,9 +4793,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(minutes-from-duration( xs:dayTimeDuration('PT3H')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -3869,9 +4813,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(minutes-from-duration( xs:dayTimeDuration('PT60M')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -3885,9 +4833,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(minutes-from-duration( xs:dayTimeDuration('PT30M')), minutes-from-duration( xs:dayTimeDuration('-PT90M')), minutes-from-duration( xs:dayTimeDuration('PT1M90S')), minutes-from-duration( xs:dayTimeDuration('PT3H')), minutes-from-duration( xs:dayTimeDuration('PT60M')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "30 -30 2 0 0")
     );
@@ -3901,9 +4853,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(minutes-from-time(xs:time('10:30:23')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("30")
     );
@@ -3917,9 +4873,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(month-from-date(xs:date('2006-08-15')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("8")
     );
@@ -3933,9 +4893,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(month-from-dateTime( xs:dateTime('2006-08-15T10:30:23')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("8")
     );
@@ -3949,9 +4913,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(months-from-duration( xs:yearMonthDuration('P3M')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -3965,9 +4933,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(months-from-duration( xs:yearMonthDuration('-P18M')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-6")
     );
@@ -3981,9 +4953,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(months-from-duration( xs:yearMonthDuration('P1Y')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -3997,9 +4973,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(months-from-duration( xs:yearMonthDuration('P12M')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -4013,9 +4993,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(months-from-duration( xs:yearMonthDuration('P3M')), months-from-duration( xs:yearMonthDuration('-P18M')), months-from-duration( xs:yearMonthDuration('P1Y')), months-from-duration( xs:yearMonthDuration('P12M')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "3 -6 0 0")
     );
@@ -4031,9 +5015,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace unpre2 = \"http://datypic.com/unpre\";\n" +
       "         let $in-xml := <noNamespace> <pre:prefixed xmlns=\"http://datypic.com/unpre\" xmlns:pre=\"http://datypic.com/pre\"> <unprefixed pre:prefAttr=\"a\" noNSAttr=\"b\">123</unprefixed> </pre:prefixed> </noNamespace> return (name($in-xml))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "noNamespace")
     );
@@ -4049,9 +5037,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace unpre2 = \"http://datypic.com/unpre\";\n" +
       "         let $in-xml := <noNamespace> <pre:prefixed xmlns=\"http://datypic.com/unpre\" xmlns:pre=\"http://datypic.com/pre\"> <unprefixed pre:prefAttr=\"a\" noNSAttr=\"b\">123</unprefixed> </pre:prefixed> </noNamespace> return (name($in-xml//pre2:prefixed))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "pre:prefixed")
     );
@@ -4067,9 +5059,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace unpre2 = \"http://datypic.com/unpre\";\n" +
       "         let $in-xml := <noNamespace> <pre:prefixed xmlns=\"http://datypic.com/unpre\" xmlns:pre=\"http://datypic.com/pre\"> <unprefixed pre:prefAttr=\"a\" noNSAttr=\"b\">123</unprefixed> </pre:prefixed> </noNamespace> return (name($in-xml//unpre2:unprefixed))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "unprefixed")
     );
@@ -4085,9 +5081,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace unpre2 = \"http://datypic.com/unpre\";\n" +
       "         let $in-xml := <noNamespace> <pre:prefixed xmlns=\"http://datypic.com/unpre\" xmlns:pre=\"http://datypic.com/pre\"> <unprefixed pre:prefAttr=\"a\" noNSAttr=\"b\">123</unprefixed> </pre:prefixed> </noNamespace> return (name($in-xml//@pre2:prefAttr))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "pre:prefAttr")
     );
@@ -4103,9 +5103,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace unpre2 = \"http://datypic.com/unpre\";\n" +
       "         let $in-xml := <noNamespace> <pre:prefixed xmlns=\"http://datypic.com/unpre\" xmlns:pre=\"http://datypic.com/pre\"> <unprefixed pre:prefAttr=\"a\" noNSAttr=\"b\">123</unprefixed> </pre:prefixed> </noNamespace> return (name($in-xml//@noNSAttr))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "noNSAttr")
     );
@@ -4121,9 +5125,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace unpre2 = \"http://datypic.com/unpre\";\n" +
       "         let $in-xml := <noNamespace> <pre:prefixed xmlns=\"http://datypic.com/unpre\" xmlns:pre=\"http://datypic.com/pre\"> <unprefixed pre:prefAttr=\"a\" noNSAttr=\"b\">123</unprefixed> </pre:prefixed> </noNamespace> return (name($in-xml), name($in-xml//pre2:prefixed), name($in-xml//unpre2:unprefixed), name($in-xml//@pre2:prefAttr), name($in-xml//@noNSAttr))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "noNamespace pre:prefixed unprefixed pre:prefAttr noNSAttr")
     );
@@ -4139,9 +5147,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace unpre = \"http://datypic.com/unpre\";\n" +
       "         let $in-xml := <noNamespace> <pre:prefixed xmlns=\"http://datypic.com/unpre\" xmlns:pre=\"http://datypic.com/pre\"> <unprefixed pre:prefAttr=\"a\" noNSAttr=\"b\">123</unprefixed> </pre:prefixed> </noNamespace> return (namespace-uri($in-xml))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -4157,9 +5169,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace unpre = \"http://datypic.com/unpre\";\n" +
       "         let $in-xml := <noNamespace> <pre:prefixed xmlns=\"http://datypic.com/unpre\" xmlns:pre=\"http://datypic.com/pre\"> <unprefixed pre:prefAttr=\"a\" noNSAttr=\"b\">123</unprefixed> </pre:prefixed> </noNamespace> return (namespace-uri($in-xml//pre:prefixed))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://datypic.com/pre")
     );
@@ -4175,9 +5191,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace unpre = \"http://datypic.com/unpre\";\n" +
       "         let $in-xml := <noNamespace> <pre:prefixed xmlns=\"http://datypic.com/unpre\" xmlns:pre=\"http://datypic.com/pre\"> <unprefixed pre:prefAttr=\"a\" noNSAttr=\"b\">123</unprefixed> </pre:prefixed> </noNamespace> return (namespace-uri($in-xml//unpre:unprefixed))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://datypic.com/unpre")
     );
@@ -4193,9 +5213,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace unpre = \"http://datypic.com/unpre\";\n" +
       "         let $in-xml := <noNamespace> <pre:prefixed xmlns=\"http://datypic.com/unpre\" xmlns:pre=\"http://datypic.com/pre\"> <unprefixed pre:prefAttr=\"a\" noNSAttr=\"b\">123</unprefixed> </pre:prefixed> </noNamespace> return (namespace-uri($in-xml//@pre:prefAttr))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://datypic.com/pre")
     );
@@ -4211,9 +5235,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace unpre = \"http://datypic.com/unpre\";\n" +
       "         let $in-xml := <noNamespace> <pre:prefixed xmlns=\"http://datypic.com/unpre\" xmlns:pre=\"http://datypic.com/pre\"> <unprefixed pre:prefAttr=\"a\" noNSAttr=\"b\">123</unprefixed> </pre:prefixed> </noNamespace> return (namespace-uri($in-xml//@noNSAttr))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -4229,9 +5257,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace unpre = \"http://datypic.com/unpre\";\n" +
       "         let $in-xml := <noNamespace> <pre:prefixed xmlns=\"http://datypic.com/unpre\" xmlns:pre=\"http://datypic.com/pre\"> <unprefixed pre:prefAttr=\"a\" noNSAttr=\"b\">123</unprefixed> </pre:prefixed> </noNamespace> return (namespace-uri($in-xml), namespace-uri($in-xml//pre:prefixed), namespace-uri($in-xml//unpre:unprefixed), namespace-uri($in-xml//@pre:prefAttr), namespace-uri($in-xml//@noNSAttr))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, " http://datypic.com/pre http://datypic.com/unpre http://datypic.com/pre ")
     );
@@ -4247,9 +5279,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace unpre = \"http://datypic.com/unpre\";\n" +
       "         let $in-xml := <noNamespace> <pre:prefixed xmlns=\"http://datypic.com/unpre\" xmlns:pre=\"http://datypic.com/pre\"> <unprefixed pre:prefAttr=\"a\" noNSAttr=\"b\">123</unprefixed> </pre:prefixed> </noNamespace> return (namespace-uri-for-prefix( '', $in-xml))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -4265,9 +5301,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace unpre = \"http://datypic.com/unpre\";\n" +
       "         let $in-xml := <noNamespace> <pre:prefixed xmlns=\"http://datypic.com/unpre\" xmlns:pre=\"http://datypic.com/pre\"> <unprefixed pre:prefAttr=\"a\" noNSAttr=\"b\">123</unprefixed> </pre:prefixed> </noNamespace> return (namespace-uri-for-prefix( 'pre',$in-xml//pre:prefixed))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://datypic.com/pre")
     );
@@ -4283,9 +5323,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace unpre = \"http://datypic.com/unpre\";\n" +
       "         let $in-xml := <noNamespace> <pre:prefixed xmlns=\"http://datypic.com/unpre\" xmlns:pre=\"http://datypic.com/pre\"> <unprefixed pre:prefAttr=\"a\" noNSAttr=\"b\">123</unprefixed> </pre:prefixed> </noNamespace> return (namespace-uri-for-prefix( '',$in-xml//unpre:unprefixed))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://datypic.com/unpre")
     );
@@ -4301,9 +5345,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace unpre = \"http://datypic.com/unpre\";\n" +
       "         let $in-xml := <noNamespace> <pre:prefixed xmlns=\"http://datypic.com/unpre\" xmlns:pre=\"http://datypic.com/pre\"> <unprefixed pre:prefAttr=\"a\" noNSAttr=\"b\">123</unprefixed> </pre:prefixed> </noNamespace> return (namespace-uri-for-prefix( 'pre',$in-xml//unpre:unprefixed))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://datypic.com/pre")
     );
@@ -4329,11 +5377,15 @@ public class AppFunctxFn extends QT3TestSet {
       "                namespace-uri-for-prefix('pre',$in-xml//unpre:unprefixed))\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertStringValue(false, " http://datypic.com/pre http://datypic.com/unpre http://datypic.com/pre")
+      assertStringValue(false, "http://datypic.com/pre http://datypic.com/unpre http://datypic.com/pre")
     );
   }
 
@@ -4345,9 +5397,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(namespace-uri-from-QName( QName ('http://datypic.com/pre', 'prefixed')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://datypic.com/pre")
     );
@@ -4361,9 +5417,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(namespace-uri-from-QName( QName ('', 'unprefixed')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -4377,9 +5437,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(namespace-uri-from-QName( () ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -4393,9 +5457,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(namespace-uri-from-QName( QName ('http://datypic.com/pre', 'prefixed')), namespace-uri-from-QName( QName ('', 'unprefixed')), namespace-uri-from-QName( () ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://datypic.com/pre ")
     );
@@ -4409,9 +5477,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml := <root xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"> <child>12</child> <child xsi:nil=\"true\"></child> <child></child> <child/> <child xsi:nil=\"false\"></child> </root> return (nilled($in-xml//child[1]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4425,9 +5497,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml := <root xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"> <child>12</child> <child xsi:nil=\"true\"></child> <child></child> <child/> <child xsi:nil=\"false\"></child> </root> return (nilled($in-xml//child[3]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4441,9 +5517,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml := <root xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"> <child>12</child> <child xsi:nil=\"true\"></child> <child></child> <child/> <child xsi:nil=\"false\"></child> </root> return (nilled($in-xml//child[4]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4457,9 +5537,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml := <root xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"> <child>12</child> <child xsi:nil=\"true\"></child> <child></child> <child/> <child xsi:nil=\"false\"></child> </root> return (nilled($in-xml//child[5]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4473,9 +5557,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml := <root xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"> <child>12</child> <child xsi:nil=\"true\"></child> <child></child> <child/> <child xsi:nil=\"false\"></child> </root> return (nilled($in-xml//child[1]), nilled($in-xml//child[3]), nilled($in-xml//child[4]), nilled($in-xml//child[5]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "false false false false")
     );
@@ -4491,9 +5579,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace unpre2 = \"http://datypic.com/unpre\";\n" +
       "         let $in-xml := <noNamespace> <pre:prefixed xmlns=\"http://datypic.com/unpre\" xmlns:pre=\"http://datypic.com/pre\"> <unprefixed pre:prefAttr=\"a\" noNSAttr=\"b\">123</unprefixed> </pre:prefixed> </noNamespace> return (node-name($in-xml))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "noNamespace")
     );
@@ -4509,9 +5601,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace unpre2 = \"http://datypic.com/unpre\";\n" +
       "         let $in-xml := <noNamespace> <pre:prefixed xmlns=\"http://datypic.com/unpre\" xmlns:pre=\"http://datypic.com/pre\"> <unprefixed pre:prefAttr=\"a\" noNSAttr=\"b\">123</unprefixed> </pre:prefixed> </noNamespace> return (node-name($in-xml/pre2:prefixed))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "pre:prefixed")
     );
@@ -4527,9 +5623,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace unpre2 = \"http://datypic.com/unpre\";\n" +
       "         let $in-xml := <noNamespace> <pre:prefixed xmlns=\"http://datypic.com/unpre\" xmlns:pre=\"http://datypic.com/pre\"> <unprefixed pre:prefAttr=\"a\" noNSAttr=\"b\">123</unprefixed> </pre:prefixed> </noNamespace> return (node-name($in-xml//unpre2:unprefixed))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "unprefixed")
     );
@@ -4545,9 +5645,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace unpre2 = \"http://datypic.com/unpre\";\n" +
       "         let $in-xml := <noNamespace> <pre:prefixed xmlns=\"http://datypic.com/unpre\" xmlns:pre=\"http://datypic.com/pre\"> <unprefixed pre:prefAttr=\"a\" noNSAttr=\"b\">123</unprefixed> </pre:prefixed> </noNamespace> return (node-name($in-xml//@pre2:prefAttr))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "pre:prefAttr")
     );
@@ -4563,9 +5667,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace unpre2 = \"http://datypic.com/unpre\";\n" +
       "         let $in-xml := <noNamespace> <pre:prefixed xmlns=\"http://datypic.com/unpre\" xmlns:pre=\"http://datypic.com/pre\"> <unprefixed pre:prefAttr=\"a\" noNSAttr=\"b\">123</unprefixed> </pre:prefixed> </noNamespace> return (node-name($in-xml//@noNSAttr))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "noNSAttr")
     );
@@ -4581,9 +5689,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace unpre2 = \"http://datypic.com/unpre\";\n" +
       "         let $in-xml := <noNamespace> <pre:prefixed xmlns=\"http://datypic.com/unpre\" xmlns:pre=\"http://datypic.com/pre\"> <unprefixed pre:prefAttr=\"a\" noNSAttr=\"b\">123</unprefixed> </pre:prefixed> </noNamespace> return (node-name($in-xml), node-name($in-xml/pre2:prefixed), node-name($in-xml//unpre2:unprefixed), node-name($in-xml//@pre2:prefAttr), node-name($in-xml//@noNSAttr))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "noNamespace pre:prefixed unprefixed pre:prefAttr noNSAttr")
     );
@@ -4597,9 +5709,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(normalize-space('query'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "query")
     );
@@ -4613,9 +5729,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(normalize-space(' query '))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "query")
     );
@@ -4629,9 +5749,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(normalize-space('xml query'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xml query")
     );
@@ -4645,9 +5769,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(normalize-space('xml query'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xml query")
     );
@@ -4661,9 +5789,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(normalize-space('xml query'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xml query")
     );
@@ -4677,9 +5809,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(normalize-space(''))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -4693,9 +5829,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(normalize-space(' '))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -4709,9 +5849,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(normalize-space(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -4725,9 +5869,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(normalize-space( <element> query </element>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "query")
     );
@@ -4741,9 +5889,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(normalize-space('query'), normalize-space(' query '), normalize-space('xml query'), normalize-space('xml query'), normalize-space('xml query'), normalize-space(''), normalize-space(' '), normalize-space(()), normalize-space( <element> query </element>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "query query xml query xml query xml query    query")
     );
@@ -4757,9 +5909,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(normalize-unicode('query'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "query")
     );
@@ -4773,9 +5929,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(normalize-unicode('query', ''))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "query")
     );
@@ -4789,9 +5949,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(normalize-unicode('query'), normalize-unicode('query', ''))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "query query")
     );
@@ -4806,9 +5970,13 @@ public class AppFunctxFn extends QT3TestSet {
       "(not(32 >\n" +
       "         20))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4822,10 +5990,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(not((/) //product))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_catalog.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_catalog.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4839,9 +6011,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(not(true()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4855,9 +6031,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(not(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4871,9 +6051,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(not(''))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4887,9 +6071,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(not(0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4903,9 +6091,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(not(<e>false</e>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4919,10 +6111,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(not(32 > 20), not((/) //product), not(true()), not(()), not(''), not(0), not(<e>false</e>))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_catalog.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_catalog.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "false false false true true true false")
     );
@@ -4936,10 +6132,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $priceDoc := (/) return (number( $priceDoc//prod[1]/price))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_prices.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_prices.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "29.99")
     );
@@ -4953,10 +6153,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $priceDoc := (/) return (number( $priceDoc//prod[1]/@currency))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_prices.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_prices.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );
@@ -4970,10 +6174,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $priceDoc := (/) return (number('29.99'))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_prices.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_prices.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "29.99")
     );
@@ -4987,10 +6195,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $priceDoc := (/) return (number('ABC'))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_prices.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_prices.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );
@@ -5004,10 +6216,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $priceDoc := (/) return (number( () ))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_prices.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_prices.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );
@@ -5022,10 +6238,14 @@ public class AppFunctxFn extends QT3TestSet {
       "let $priceDoc := (/) return ($priceDoc// prod/price[number() >\n" +
       "         35])",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_prices.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_prices.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<price currency=\"USD\">69.99</price><price currency=\"USD\">39.99</price>", false)
     );
@@ -5040,10 +6260,14 @@ public class AppFunctxFn extends QT3TestSet {
       "let $priceDoc := (/) return (number( $priceDoc//prod[1]/price), number( $priceDoc//prod[1]/@currency), number('29.99'), number('ABC'), number( () ), $priceDoc// prod/price[number() >\n" +
       "         35])",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_prices.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_prices.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("29.99 NaN 29.99 NaN NaN<price currency=\"USD\">69.99</price><price currency=\"USD\">39.99</price>", false)
     );
@@ -5057,9 +6281,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(one-or-more('a'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a")
     );
@@ -5073,9 +6301,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(one-or-more( ('a', 'b') ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a b")
     );
@@ -5089,9 +6321,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(one-or-more('a'), one-or-more( ('a', 'b') ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a a b")
     );
@@ -5105,9 +6341,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml := <in-xml> <a>1</a> <c>2</c> <a>3</a> <a>4</a> <a>5</a> </in-xml> return ($in-xml/*[position() > 2])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>3</a><a>4</a><a>5</a>", false)
     );
@@ -5121,9 +6361,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml := <in-xml> <a>1</a> <c>2</c> <a>3</a> <a>4</a> <a>5</a> </in-xml> return ($in-xml/a[position() > 2])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>4</a><a>5</a>", false)
     );
@@ -5137,9 +6381,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml := <in-xml> <a>1</a> <c>2</c> <a>3</a> <a>4</a> <a>5</a> </in-xml> return ($in-xml/a[position() = 3])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>4</a>", false)
     );
@@ -5153,9 +6401,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml := <in-xml> <a>1</a> <c>2</c> <a>3</a> <a>4</a> <a>5</a> </in-xml> return ($in-xml/*[position() > 2], $in-xml/a[position() > 2], $in-xml/a[position() = 3])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>3</a><a>4</a><a>5</a><a>4</a><a>5</a><a>4</a>", false)
     );
@@ -5171,9 +6423,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace unpre = \"http://datypic.com/unpre\";\n" +
       "         let $in-xml := <noNamespace> <pre:prefixed xmlns=\"http://datypic.com/unpre\" xmlns:pre=\"http://datypic.com/pre\"> <unprefixed pre:prefAttr=\"a\" noNSAttr=\"b\">123</unprefixed> </pre:prefixed> </noNamespace> return (prefix-from-QName( node-name($in-xml)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -5189,9 +6445,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace unpre = \"http://datypic.com/unpre\";\n" +
       "         let $in-xml := <noNamespace> <pre:prefixed xmlns=\"http://datypic.com/unpre\" xmlns:pre=\"http://datypic.com/pre\"> <unprefixed pre:prefAttr=\"a\" noNSAttr=\"b\">123</unprefixed> </pre:prefixed> </noNamespace> return (prefix-from-QName( node-name($in-xml//pre2:prefixed)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "pre")
     );
@@ -5207,9 +6467,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace unpre = \"http://datypic.com/unpre\";\n" +
       "         let $in-xml := <noNamespace> <pre:prefixed xmlns=\"http://datypic.com/unpre\" xmlns:pre=\"http://datypic.com/pre\"> <unprefixed pre:prefAttr=\"a\" noNSAttr=\"b\">123</unprefixed> </pre:prefixed> </noNamespace> return (prefix-from-QName( node-name($in-xml//unpre:unprefixed)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -5225,9 +6489,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace unpre = \"http://datypic.com/unpre\";\n" +
       "         let $in-xml := <noNamespace> <pre:prefixed xmlns=\"http://datypic.com/unpre\" xmlns:pre=\"http://datypic.com/pre\"> <unprefixed pre:prefAttr=\"a\" noNSAttr=\"b\">123</unprefixed> </pre:prefixed> </noNamespace> return (prefix-from-QName( node-name($in-xml//@pre2:prefAttr)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "pre")
     );
@@ -5243,9 +6511,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace unpre = \"http://datypic.com/unpre\";\n" +
       "         let $in-xml := <noNamespace> <pre:prefixed xmlns=\"http://datypic.com/unpre\" xmlns:pre=\"http://datypic.com/pre\"> <unprefixed pre:prefAttr=\"a\" noNSAttr=\"b\">123</unprefixed> </pre:prefixed> </noNamespace> return (prefix-from-QName( node-name($in-xml//@noNSAttr)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -5261,9 +6533,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace unpre = \"http://datypic.com/unpre\";\n" +
       "         let $in-xml := <noNamespace> <pre:prefixed xmlns=\"http://datypic.com/unpre\" xmlns:pre=\"http://datypic.com/pre\"> <unprefixed pre:prefAttr=\"a\" noNSAttr=\"b\">123</unprefixed> </pre:prefixed> </noNamespace> return (prefix-from-QName( node-name(<pre2:new>xyz</pre2:new>)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "pre2")
     );
@@ -5279,9 +6555,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace unpre = \"http://datypic.com/unpre\";\n" +
       "         let $in-xml := <noNamespace> <pre:prefixed xmlns=\"http://datypic.com/unpre\" xmlns:pre=\"http://datypic.com/pre\"> <unprefixed pre:prefAttr=\"a\" noNSAttr=\"b\">123</unprefixed> </pre:prefixed> </noNamespace> return (prefix-from-QName( node-name($in-xml)), prefix-from-QName( node-name($in-xml//pre2:prefixed)), prefix-from-QName( node-name($in-xml//unpre:unprefixed)), prefix-from-QName( node-name($in-xml//@pre2:prefAttr)), prefix-from-QName( node-name($in-xml//@noNSAttr)), prefix-from-QName( node-name(<pre2:new>xyz</pre2:new>)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "pre pre pre2")
     );
@@ -5295,9 +6575,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(remove( ('a', 'b', 'c'), 2) )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a c")
     );
@@ -5311,9 +6595,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(remove( ('a', 'b', 'c'), 10))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a b c")
     );
@@ -5327,9 +6615,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(remove( ('a', 'b', 'c'), 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a b c")
     );
@@ -5343,9 +6635,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(remove( ('a', 'b', 'c'), 2) , remove( ('a', 'b', 'c'), 10), remove( ('a', 'b', 'c'), 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a c a b c a b c")
     );
@@ -5359,9 +6655,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(replace('query', 'r', 'as'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "queasy")
     );
@@ -5375,9 +6675,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(replace('reluctant', 'r.*?t', 'X'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Xant")
     );
@@ -5391,9 +6695,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(replace('aaah', 'a{2,3}', 'X'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Xh")
     );
@@ -5407,9 +6715,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(replace('aaah', 'a{2,3}?', 'X'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Xah")
     );
@@ -5423,9 +6735,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(replace('aaaah', 'a{2,3}', 'X'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Xah")
     );
@@ -5439,9 +6755,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(replace('aaaah', 'a{2,3}?', 'X'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "XXh")
     );
@@ -5455,9 +6775,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(replace('Chap 2...Chap 3...Chap 4...', 'Chap (\\d)', 'Sec $1.0'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Sec 2.0...Sec 3.0...Sec 4.0...")
     );
@@ -5471,9 +6795,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(replace('abc123', '([a-z])', '$1x'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "axbxcx123")
     );
@@ -5487,9 +6815,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(replace('2315551212', '(\\d{3})(\\d{3})(\\d{4})', '($1) $2-$3'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "(231) 555-1212")
     );
@@ -5503,9 +6835,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(replace('2006-10-18', '\\d{2}(\\d{2})-(\\d{2})-(\\d{2})', '$2/$3/$1'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "10/18/06")
     );
@@ -5519,9 +6855,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(replace('25', '(\\d+)', '\\$$1.00'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "$25.00")
     );
@@ -5535,9 +6875,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(replace('query', 'qu', 'quack'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "quackery")
     );
@@ -5551,9 +6895,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(replace('query', '[ry]', 'l'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "quell")
     );
@@ -5567,9 +6915,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(replace('query', '[ry]+', 'l'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "quel")
     );
@@ -5583,9 +6935,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(replace('query', 'z', 'a'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "query")
     );
@@ -5599,9 +6955,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(replace('query', 'query', ''))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -5615,9 +6975,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(replace( (), 'r', 'as'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -5631,9 +6995,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(replace('Chapter', '(Chap)|(Chapter)', 'x'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xter")
     );
@@ -5647,9 +7015,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(replace('reluctant', 'r.*t', 'X'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "X")
     );
@@ -5663,9 +7035,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(replace('query', 'r', 'as'), replace('query', 'qu', 'quack'), replace('query', '[ry]', 'l'), replace('query', '[ry]+', 'l'), replace('query', 'z', 'a'), replace('query', 'query', ''), replace( (), 'r', 'as'), replace('Chapter', '(Chap)|(Chapter)', 'x'), replace('reluctant', 'r.*t', 'X'), replace('reluctant', 'r.*?t', 'X'), replace('aaah', 'a{2,3}', 'X'), replace('aaah', 'a{2,3}?', 'X'), replace('aaaah', 'a{2,3}', 'X'), replace('aaaah', 'a{2,3}?', 'X'), replace('Chap 2...Chap 3...Chap 4...', 'Chap (\\d)', 'Sec $1.0'), replace('abc123', '([a-z])', '$1x'), replace('2315551212', '(\\d{3})(\\d{3})(\\d{4})', '($1) $2-$3'), replace('2006-10-18', '\\d{2}(\\d{2})-(\\d{2})-(\\d{2})', '$2/$3/$1'), replace('25', '(\\d+)', '\\$$1.00'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "queasy quackery quell quel query   xter X Xant Xh Xah Xah XXh Sec 2.0...Sec 3.0...Sec 4.0... axbxcx123 (231) 555-1212 10/18/06 $25.00")
     );
@@ -5682,9 +7058,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace dty2 = \"http://datypic.com/ns2\";\n" +
       "         let $root := <root> <order xmlns:ord=\"http://datypic.com/ord\" xmlns=\"http://datypic.com\"> <!-- ... --> </order> </root> return (resolve-QName('myName', $root))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "myName")
     );
@@ -5701,9 +7081,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace dty2 = \"http://datypic.com/ns2\";\n" +
       "         let $root := <root> <order xmlns:ord=\"http://datypic.com/ord\" xmlns=\"http://datypic.com\"> <!-- ... --> </order> </root> return (resolve-QName('myName', $root/dty:order))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "myName")
     );
@@ -5720,9 +7104,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace dty2 = \"http://datypic.com/ns2\";\n" +
       "         let $root := <root> <order xmlns:ord=\"http://datypic.com/ord\" xmlns=\"http://datypic.com\"> <!-- ... --> </order> </root> return (resolve-QName( 'ord:myName', $root/dty:order))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ord:myName")
     );
@@ -5739,9 +7127,13 @@ public class AppFunctxFn extends QT3TestSet {
       "         declare namespace dty2 = \"http://datypic.com/ns2\";\n" +
       "         let $root := <root> <order xmlns:ord=\"http://datypic.com/ord\" xmlns=\"http://datypic.com\"> <!-- ... --> </order> </root> return (resolve-QName('myName', $root), resolve-QName('myName', $root/dty:order), resolve-QName( 'ord:myName', $root/dty:order))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "myName myName ord:myName")
     );
@@ -5755,9 +7147,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(resolve-uri('prod', 'http://datypic.com/'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://datypic.com/prod")
     );
@@ -5771,9 +7167,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(resolve-uri('prod2', 'http://datypic.com/prod1'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://datypic.com/prod2")
     );
@@ -5787,9 +7187,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(resolve-uri( 'http://example.org','http://datypic.com'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://example.org")
     );
@@ -5803,9 +7207,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(resolve-uri( 'http://datypic.com', '../base'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "http://datypic.com")
@@ -5823,9 +7231,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(resolve-uri( '', 'http://datypic.com'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://datypic.com")
     );
@@ -5839,9 +7251,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(resolve-uri('prod', 'http://datypic.com/'), resolve-uri('prod2', 'http://datypic.com/prod1'), resolve-uri( 'http://example.org','http://datypic.com'), resolve-uri( 'http://datypic.com', '../base'), resolve-uri( '', 'http://datypic.com'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://datypic.com/prod http://datypic.com/prod2 http://example.org http://datypic.com http://datypic.com")
     );
@@ -5855,9 +7271,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(reverse( (1, 2, 3, 4, 5) ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "5 4 3 2 1")
     );
@@ -5871,9 +7291,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(reverse( (6, 2, 4) ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "4 2 6")
     );
@@ -5887,9 +7311,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(reverse( () ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -5903,9 +7331,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(reverse( (1, 2, 3, 4, 5) ), reverse( (6, 2, 4) ), reverse( () ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "5 4 3 2 1 4 2 6")
     );
@@ -5919,10 +7351,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml := <a><x>123</x></a> return (root( (/) //item[1]))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<order num=\"00299432\" date=\"2006-09-15\" cust=\"0221A\">\n  <item dept=\"WMN\" num=\"557\" quantity=\"1\" color=\"beige\"/>\n  <item dept=\"ACC\" num=\"563\" quantity=\"1\"/>\n  <item dept=\"ACC\" num=\"443\" quantity=\"2\"/>\n  <item dept=\"MEN\" num=\"784\" quantity=\"1\" color=\"blue/white\"/>\n  <item dept=\"MEN\" num=\"784\" quantity=\"1\" color=\"blue/red\"/>\n  <item dept=\"WMN\" num=\"557\" quantity=\"1\" color=\"sage\"/>\n</order>", false)
     );
@@ -5936,9 +7372,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml := <a><x>123</x></a> return (root($in-xml/x))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a><x>123</x></a>", false)
     );
@@ -5952,10 +7392,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml := <a><x>123</x></a> return (root( (/) //item[1]), root($in-xml/x))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<order num=\"00299432\" date=\"2006-09-15\" cust=\"0221A\">\n  <item dept=\"WMN\" num=\"557\" quantity=\"1\" color=\"beige\"/>\n  <item dept=\"ACC\" num=\"563\" quantity=\"1\"/>\n  <item dept=\"ACC\" num=\"443\" quantity=\"2\"/>\n  <item dept=\"MEN\" num=\"784\" quantity=\"1\" color=\"blue/white\"/>\n  <item dept=\"MEN\" num=\"784\" quantity=\"1\" color=\"blue/red\"/>\n  <item dept=\"WMN\" num=\"557\" quantity=\"1\" color=\"sage\"/>\n</order><a><x>123</x></a>", false)
     );
@@ -5969,9 +7413,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(round(5))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5")
     );
@@ -5985,9 +7433,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(round(5.1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5")
     );
@@ -6001,9 +7453,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(round(5.5))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("6")
     );
@@ -6017,9 +7473,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(round(-5.5))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-5")
     );
@@ -6033,9 +7493,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(round(-5.51))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-6")
     );
@@ -6049,9 +7513,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(round(5), round(5.1), round(5.5), round(-5.5), round(-5.51))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "5 5 6 -5 -6")
     );
@@ -6065,9 +7533,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(round-half-to-even(5.5))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("6")
     );
@@ -6081,9 +7553,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(round-half-to-even(6.5))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("6")
     );
@@ -6097,9 +7573,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(round-half-to-even(9372.253, 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "9372.25")
     );
@@ -6113,9 +7593,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(round-half-to-even(9372.253, 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("9372")
     );
@@ -6129,9 +7613,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(round-half-to-even(9372.253, -3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("9000")
     );
@@ -6145,9 +7633,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(round-half-to-even(5.5), round-half-to-even(6.5), round-half-to-even(9372.253, 2), round-half-to-even(9372.253, 0), round-half-to-even(9372.253, -3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "6 6 9372.25 9372 9000")
     );
@@ -6161,9 +7653,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(seconds-from-dateTime( xs:dateTime('2006-08-15T10:30:23.5')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "23.5")
     );
@@ -6177,9 +7673,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(seconds-from-duration( xs:dayTimeDuration('PT30.5S')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "30.5")
     );
@@ -6193,9 +7693,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(seconds-from-duration( xs:dayTimeDuration('-PT90.5S')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-30.5")
     );
@@ -6209,9 +7713,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(seconds-from-duration( xs:dayTimeDuration('PT1M')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -6225,9 +7733,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(seconds-from-duration( xs:dayTimeDuration('PT60S')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -6241,9 +7753,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(seconds-from-duration( xs:dayTimeDuration('PT30.5S')), seconds-from-duration( xs:dayTimeDuration('-PT90.5S')), seconds-from-duration( xs:dayTimeDuration('PT1M')), seconds-from-duration( xs:dayTimeDuration('PT60S')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "30.5 -30.5 0 0")
     );
@@ -6257,9 +7773,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(seconds-from-time(xs:time('10:30:23.5')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "23.5")
     );
@@ -6273,9 +7793,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(starts-with('query', 'que'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6289,9 +7813,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(starts-with('query', 'query'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6305,9 +7833,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(starts-with('query', 'u'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6321,9 +7853,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(starts-with('query', ''))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6337,9 +7873,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(starts-with('', 'query'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6353,9 +7893,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(starts-with('', ''))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6369,9 +7913,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(starts-with('query', ()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6385,9 +7933,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(starts-with(' query', 'q'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6401,9 +7953,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(starts-with('query', 'que'), starts-with('query', 'query'), starts-with('query', 'u'), starts-with('query', ''), starts-with('', 'query'), starts-with('', ''), starts-with('query', ()), starts-with(' query', 'q'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true true false true false true true false")
     );
@@ -6417,9 +7973,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml-2 := <product dept=\"MEN\"> <number>784</number> <name language=\"en\">Cotton Dress Shirt</name> <colorChoices>white gray</colorChoices> <desc>Our <i>favorite</i> shirt!</desc> </product> return (string($in-xml-2/number))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "784")
     );
@@ -6433,9 +7993,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml-2 := <product dept=\"MEN\"> <number>784</number> <name language=\"en\">Cotton Dress Shirt</name> <colorChoices>white gray</colorChoices> <desc>Our <i>favorite</i> shirt!</desc> </product> return (string($in-xml-2/desc))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Our favorite shirt!")
     );
@@ -6449,9 +8013,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml-2 := <product dept=\"MEN\"> <number>784</number> <name language=\"en\">Cotton Dress Shirt</name> <colorChoices>white gray</colorChoices> <desc>Our <i>favorite</i> shirt!</desc> </product> return (string($in-xml-2/@dept))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "MEN")
     );
@@ -6465,9 +8033,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in-xml-2 := <product dept=\"MEN\"> <number>784</number> <name language=\"en\">Cotton Dress Shirt</name> <colorChoices>white gray</colorChoices> <desc>Our <i>favorite</i> shirt!</desc> </product> return (string($in-xml-2/number), string($in-xml-2/desc), string($in-xml-2/@dept))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "784 Our favorite shirt! MEN")
     );
@@ -6481,9 +8053,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(string-join( ('a', 'b', 'c'), ''))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abc")
     );
@@ -6497,9 +8073,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(string-join( ('a', 'b', 'c'), '/*'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a/*b/*c")
     );
@@ -6513,9 +8093,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(string-join( ('a', '', 'c'), '/*'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a/*/*c")
     );
@@ -6529,9 +8113,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(string-join( 'a', '/*'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a")
     );
@@ -6545,9 +8133,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(string-join((), '/*'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -6561,9 +8153,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(string-join( ('a', 'b', 'c'), ''), string-join( ('a', 'b', 'c'), '/*'), string-join( ('a', '', 'c'), '/*'), string-join( 'a', '/*'), string-join((), '/*'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abc a/*b/*c a/*/*c a ")
     );
@@ -6577,9 +8173,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(string-length('query'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5")
     );
@@ -6595,9 +8195,13 @@ public class AppFunctxFn extends QT3TestSet {
       "query\n" +
       " '))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("9")
     );
@@ -6611,9 +8215,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(string-length(normalize-space(' query ')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5")
     );
@@ -6627,9 +8235,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(string-length('xml query'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("9")
     );
@@ -6643,9 +8255,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(string-length(''))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -6659,9 +8275,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(string-length(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -6679,9 +8299,13 @@ public class AppFunctxFn extends QT3TestSet {
       "query \n" +
       " ')), string-length('xml query'), string-length(''), string-length(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "5 10 5 9 0 0")
     );
@@ -6695,9 +8319,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(string-to-codepoints('abc'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "97 98 99")
     );
@@ -6711,9 +8339,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(string-to-codepoints('a'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("97")
     );
@@ -6727,9 +8359,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(string-to-codepoints(''))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -6743,9 +8379,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(string-to-codepoints('abc'), string-to-codepoints('a'), string-to-codepoints(''))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "97 98 99 97")
     );
@@ -6759,9 +8399,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(subsequence( ('a', 'b', 'c', 'd', 'e'), 3) )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "c d e")
     );
@@ -6775,9 +8419,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(subsequence( ('a', 'b', 'c', 'd', 'e'), 3, 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "c d")
     );
@@ -6791,9 +8439,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(subsequence( ('a', 'b', 'c', 'd', 'e'), 3, 10))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "c d e")
     );
@@ -6807,9 +8459,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(subsequence( ('a', 'b', 'c', 'd', 'e'), 10))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -6823,9 +8479,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(subsequence( ('a', 'b', 'c', 'd', 'e'), -2, 5))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a b")
     );
@@ -6839,9 +8499,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(subsequence( (), 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -6855,9 +8519,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(subsequence( ('a', 'b', 'c', 'd', 'e'), 3) , subsequence( ('a', 'b', 'c', 'd', 'e'), 3, 2), subsequence( ('a', 'b', 'c', 'd', 'e'), 3, 10), subsequence( ('a', 'b', 'c', 'd', 'e'), 10), subsequence( ('a', 'b', 'c', 'd', 'e'), -2, 5), subsequence( (), 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "c d e c d c d e a b")
     );
@@ -6871,9 +8539,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(substring('query', 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "query")
     );
@@ -6887,9 +8559,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(substring('', 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -6903,9 +8579,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(substring((), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -6919,9 +8599,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(substring('query', 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ery")
     );
@@ -6935,9 +8619,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(substring('query', 1, 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "q")
     );
@@ -6951,9 +8639,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(substring('query', 2, 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "uer")
     );
@@ -6967,9 +8659,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(substring('query', 2, 850))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "uery")
     );
@@ -6983,9 +8679,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(substring('query', 6, 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -6999,9 +8699,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(substring('query', -2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "query")
     );
@@ -7015,9 +8719,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(substring('query', -2, 5))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "qu")
     );
@@ -7031,9 +8739,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(substring('query', 1, 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -7047,9 +8759,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(substring-after('query', 'u'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ery")
     );
@@ -7063,9 +8779,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(substring-after('queryquery', 'ue'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ryquery")
     );
@@ -7079,9 +8799,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(substring-after('query', 'y'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -7095,9 +8819,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(substring-after('query', 'x'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -7111,9 +8839,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(substring-after('query', ''))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "query")
     );
@@ -7127,9 +8859,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(substring-after('', 'x'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -7143,9 +8879,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(substring-after('query', 'u'), substring-after('queryquery', 'ue'), substring-after('query', 'y'), substring-after('query', 'x'), substring-after('query', ''), substring-after('', 'x'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ery ryquery   query ")
     );
@@ -7159,9 +8899,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(substring('query', 1), substring('query', 3), substring('query', 1, 1), substring('query', 2, 3), substring('query', 2, 850), substring('query', 6, 2), substring('query', -2), substring('query', -2, 5), substring('query', 1, 0), substring('', 1), substring((), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "query ery q uer uery  query qu   ")
     );
@@ -7175,9 +8919,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(substring-before('query', 'r'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "que")
     );
@@ -7191,9 +8939,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(substring-before('query', 'ery'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "qu")
     );
@@ -7207,9 +8959,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(substring-before('queryquery', 'ery'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "qu")
     );
@@ -7223,9 +8979,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(substring-before('query', 'query'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -7239,9 +8999,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(substring-before('query', 'x'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -7255,9 +9019,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(substring-before('query', ''))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -7271,9 +9039,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(substring-before('query', ()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -7287,9 +9059,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(substring-before('query', 'r'), substring-before('query', 'ery'), substring-before('queryquery', 'ery'), substring-before('query', 'query'), substring-before('query', 'x'), substring-before('query', ''), substring-before('query', ()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "que qu qu    ")
     );
@@ -7303,10 +9079,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (sum( (1, 2, 3) ))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("6")
     );
@@ -7320,10 +9100,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (sum($ordDoc//item/@quantity))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("7")
     );
@@ -7337,10 +9121,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (sum( (xs:yearMonthDuration('P1Y2M'), xs:yearMonthDuration('P2Y3M')) ))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P3Y5M")
     );
@@ -7354,10 +9142,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (sum( (1, 2, 3, () ) ))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("6")
     );
@@ -7371,10 +9163,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (sum( () ))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -7388,10 +9184,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (sum( (), () ))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -7405,10 +9205,14 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ordDoc := (/) return (sum( (1, 2, 3) ), sum($ordDoc//item/@quantity), sum( (xs:yearMonthDuration('P1Y2M'), xs:yearMonthDuration('P2Y3M')) ), sum( (1, 2, 3, () ) ), sum( () ), sum( (), () ))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_order.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_order.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "6 7 P3Y5M 6 0")
     );
@@ -7422,9 +9226,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(timezone-from-date( xs:date('2006-08-15-05:00')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-PT5H")
     );
@@ -7438,9 +9246,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(timezone-from-date( xs:date('2006-08-15')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -7454,9 +9266,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(timezone-from-date( xs:date('2006-08-15-05:00')), timezone-from-date( xs:date('2006-08-15')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-PT5H")
     );
@@ -7470,9 +9286,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(timezone-from-dateTime( xs:dateTime('2006-08-15T10:30:23-05:00')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-PT5H")
     );
@@ -7486,9 +9306,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(timezone-from-dateTime( xs:dateTime('2006-08-15T10:30:23')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -7502,9 +9326,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(timezone-from-dateTime( xs:dateTime('2006-08-15T10:30:23-05:00')), timezone-from-dateTime( xs:dateTime('2006-08-15T10:30:23')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-PT5H")
     );
@@ -7518,9 +9346,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(timezone-from-time( xs:time('09:54:00-05:00')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-PT5H")
     );
@@ -7534,9 +9366,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(timezone-from-time( xs:time('09:54:00+05:00')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PT5H")
     );
@@ -7550,9 +9386,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(timezone-from-time( xs:time('09:54:00Z')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PT0S")
     );
@@ -7566,9 +9406,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(timezone-from-time( xs:time('09:54:00')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -7582,9 +9426,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(timezone-from-time( xs:time('09:54:00-05:00')), timezone-from-time( xs:time('09:54:00+05:00')), timezone-from-time( xs:time('09:54:00Z')), timezone-from-time( xs:time('09:54:00')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-PT5H PT5H PT0S")
     );
@@ -7598,9 +9446,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(tokenize( 'a b c', '\\s'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a b c")
     );
@@ -7614,9 +9466,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(tokenize( (), '\\s+'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -7630,9 +9486,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(tokenize( 'abc', '\\s'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abc")
     );
@@ -7646,9 +9506,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(tokenize( 'a,xb,xc', ',|,x'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a xb xc")
     );
@@ -7662,9 +9526,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-join(tokenize( 'a    b c', '\\s'), '|')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a||||b|c")
     );
@@ -7678,9 +9546,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(tokenize( 'a b c', '\\s+'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a b c")
     );
@@ -7694,9 +9566,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(tokenize( ' b c', '\\s'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, " b c")
     );
@@ -7710,9 +9586,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(tokenize( 'a,b,c', ','))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a b c")
     );
@@ -7726,9 +9606,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(tokenize( 'a,b,,c', ','))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a b  c")
     );
@@ -7742,9 +9626,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(tokenize( 'a, b, c', '[,\\s]+'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a b c")
     );
@@ -7758,9 +9646,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(tokenize( '2006-12-25T12:15:00', '[\\-T:]'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2006 12 25 12 15 00")
     );
@@ -7774,9 +9666,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(tokenize( 'Hello, there.', '\\W+'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Hello there ")
     );
@@ -7790,9 +9686,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(tokenize( 'a b c', '\\s'), tokenize( 'a b c', '\\s'), tokenize( 'a b c', '\\s+'), tokenize( ' b c', '\\s'), tokenize( 'a,b,c', ','), tokenize( 'a,b,,c', ','), tokenize( 'a, b, c', '[,\\s]+'), tokenize( '2006-12-25T12:15:00', '[\\-T:]'), tokenize( 'Hello, there.', '\\W+'), tokenize( (), '\\s+'), tokenize( 'abc', '\\s'), tokenize( 'a,xb,xc', ',|,x'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a b c a b c a b c  b c a b c a b  c a b c 2006 12 25 12 15 00 Hello there  abc a xb xc")
     );
@@ -7806,9 +9706,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(translate('1999/01/02', '/', '-'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1999-01-02")
     );
@@ -7822,9 +9726,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(translate('xml query', 'qlmx', 'QLMX'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "XML Query")
     );
@@ -7838,9 +9746,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(translate('xml query', 'qlmx ', 'Q'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Query")
     );
@@ -7854,9 +9766,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(translate('xml query', 'qlmx ', ''))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "uery")
     );
@@ -7870,9 +9786,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(translate('xml query', 'abcd', 'ABCD'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xml query")
     );
@@ -7886,9 +9806,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(translate('', 'qlmx ', 'Q'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -7902,9 +9826,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(translate((), 'qlmx ', 'Q'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -7918,9 +9846,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(translate('1999/01/02', '/', '-'), translate('xml query', 'qlmx', 'QLMX'), translate('xml query', 'qlmx ', 'Q'), translate('xml query', 'qlmx ', ''), translate('xml query', 'abcd', 'ABCD'), translate('', 'qlmx ', 'Q'), translate((), 'qlmx ', 'Q'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1999-01-02 XML Query Query uery xml query  ")
     );
@@ -7934,9 +9866,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(true())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7950,9 +9886,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(upper-case('query'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "QUERY")
     );
@@ -7966,9 +9906,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(upper-case('QUERY'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "QUERY")
     );
@@ -7982,9 +9926,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(upper-case('Query'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "QUERY")
     );
@@ -7998,9 +9946,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(upper-case('query-123'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "QUERY-123")
     );
@@ -8014,9 +9966,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(upper-case('query'), upper-case('QUERY'), upper-case('Query'), upper-case('query-123'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "QUERY QUERY QUERY QUERY-123")
     );
@@ -8030,9 +9986,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(year-from-date(xs:date('2006-08-15')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2006")
     );
@@ -8046,9 +10006,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(year-from-dateTime( xs:dateTime('2006-08-15T10:30:23')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2006")
     );
@@ -8062,9 +10026,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(years-from-duration( xs:yearMonthDuration('P3Y')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -8078,9 +10046,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(years-from-duration( xs:yearMonthDuration('P3Y11M')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -8094,9 +10066,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(years-from-duration( xs:yearMonthDuration('-P18M')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -8110,9 +10086,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(years-from-duration( xs:yearMonthDuration('P1Y18M')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -8126,9 +10106,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(years-from-duration( xs:yearMonthDuration('P12M')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -8142,9 +10126,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(years-from-duration( xs:yearMonthDuration('P3Y')), years-from-duration( xs:yearMonthDuration('P3Y11M')), years-from-duration( xs:yearMonthDuration('-P18M')), years-from-duration( xs:yearMonthDuration('P1Y18M')), years-from-duration( xs:yearMonthDuration('P12M')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "3 3 -1 2 1")
     );
@@ -8158,9 +10146,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(zero-or-one( () ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -8174,9 +10166,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(zero-or-one('a'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a")
     );
@@ -8190,9 +10186,13 @@ public class AppFunctxFn extends QT3TestSet {
     final XQuery query = new XQuery(
       "(zero-or-one( () ), zero-or-one('a'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a")
     );

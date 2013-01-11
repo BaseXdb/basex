@@ -20,9 +20,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min(xs:untypedAtomic(\"3\")) eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((xs:untypedAtomic(\"1\"), 3, 2)) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((3, xs:float(2), xs:untypedAtomic(\"1\"))) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((3, xs:float(2), xs:untypedAtomic(\"1\"))) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((1, xs:float(2), xs:decimal(3))) instance of xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,9 +140,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((3, xs:untypedAtomic(\"1\"), xs:float(2))) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -132,9 +160,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(min((1, xs:untypedAtomic(\"NaN\"), xs:float(2)))) eq \"NaN\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -148,9 +180,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(min((xs:float(\"NaN\"), xs:untypedAtomic(\"3\"), xs:float(2)))) eq \"NaN\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -164,9 +200,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((xs:float(\"NaN\"), xs:untypedAtomic(\"3\"), xs:double(2))) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -180,9 +220,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((xs:float(\"NaN\"), 1, 1, 2, xs:double(\"NaN\"))) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -196,9 +240,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min(\"a string\", \"http://www.w3.org/2005/xpath-functions/collation/codepoint\", \"wrong param\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -212,9 +260,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((xs:double(\"NaN\"), 1, 1, 2, xs:float(\"NaN\"))) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -228,9 +280,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((xs:float(\"NaN\"), 1, \"a string\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -244,9 +300,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((\"a string\", 1, xs:float(\"NaN\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -260,9 +320,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "max((xs:float(\"NaN\"), 1, xs:untypedAtomic(\"one\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0001")
     );
@@ -276,9 +340,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "max((xs:untypedAtomic(\"one\"), 1, xs:float(\"NaN\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0001")
     );
@@ -292,9 +360,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(min((xs:double(\"NaN\"), xs:double(\"NaN\")))) eq \"NaN\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -308,9 +380,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(min((xs:float(\"NaN\"), xs:float(\"NaN\")))) eq \"NaN\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -324,9 +400,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(min((3, xs:double(\"NaN\")))) eq \"NaN\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -340,9 +420,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(min((3, xs:float(\"NaN\")))) eq \"NaN\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -356,9 +440,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((3, xs:double(\"NaN\"))) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -372,9 +460,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(min(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -388,9 +480,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((3, xs:float(\"NaN\"))) instance of xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -404,9 +500,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(min((xs:float(-3), xs:untypedAtomic(\"3\"), xs:double(\"NaN\")))) eq \"NaN\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -420,9 +520,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((xs:float(-3), xs:untypedAtomic(\"3\"), xs:double(\"NaN\"))) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -436,9 +540,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(min(xs:float(\"NaN\"))) eq \"NaN\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -452,9 +560,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(min(xs:double(\"NaN\"))) eq \"NaN\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -468,9 +580,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min(xs:untypedAtomic(\"three\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0001")
     );
@@ -484,9 +600,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((xs:untypedAtomic(\"3\"), \"a string\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -500,9 +620,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((\"a string\", xs:untypedAtomic(\"3\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -516,9 +640,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min(QName(\"example.com/\", \"ncname\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -532,9 +660,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min(xs:anyURI(\"example.com/\")) eq xs:anyURI(\"example.com/\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -548,9 +680,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((3, 3, 3, 3, 3, 3)) eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -564,9 +700,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((xs:anyURI(\"example.com/\"), xs:anyURI(\"example.com/\"))) eq xs:anyURI(\"example.com/\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -580,9 +720,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((\"a string\")) eq \"a string\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -596,9 +740,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((\"a string\", QName(\"example.com/\", \"ncname\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -612,9 +760,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((5, 5.0e0)) eq 5.0e0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -628,9 +780,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((5.0e0, 5)) eq 5.0e0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -644,9 +800,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((3, 5.0e0)) eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -660,9 +820,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((5.0e0, 3)) eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -676,9 +840,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((xs:date(\"2005-01-01\"), xs:date(\"2001-01-01\"))) eq xs:date(\"2001-01-01\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -692,9 +860,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((3,4,5)) eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -708,9 +880,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((5, 5.0e0)) eq 5.0e0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -724,9 +900,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((3, 1, 1, 1, 1, 1)) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -740,9 +920,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((3,4, \"Zero\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -756,9 +940,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((xs:float(0.0E0), xs:float(-0.0E0))) eq xs:float(\"-0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -772,9 +960,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((1, 1, 1, 1, 1, 3)) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -788,9 +980,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((3, 1, 5, 1, 1, 3)) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -804,9 +1000,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((3, -5.0, 5, 1, -3, 3)) eq -5.0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -820,9 +1020,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min(xs:untypedAtomic(\"3\")) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -836,9 +1040,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((xs:anyURI(\"http://example.com/A\"), xs:anyURI(\"http://example.com/A\"))) eq xs:anyURI(\"http://example.com/A\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -852,9 +1060,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((5.0e0, 3)) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -868,9 +1080,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((1, 1, 1, 1, 1.0)) instance of xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -884,9 +1100,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((1.0, 1, 1, 1, 1)) instance of xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -900,9 +1120,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((1.0, 1, 1.0, 1, 1)) instance of xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -916,9 +1140,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((\"a\", \"b\", \"c\")) eq \"a\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -932,9 +1160,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min(xs:unsignedShort(\"1\")) instance of xs:unsignedShort",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -948,9 +1180,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((xs:anyURI(\"http://example.com/B\"), xs:anyURI(\"http://example.com/A\"))) eq xs:anyURI(\"http://example.com/A\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -964,9 +1200,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((xs:anyURI(\"http://example.com/8\"), xs:anyURI(\"http://example.com/4\"))) eq xs:anyURI(\"http://example.com/4\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -980,9 +1220,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((\"str1\", \"str2\"), \"http://example.com/UNSUPPORTED_COLLATION\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOCH0002")
     );
@@ -996,9 +1240,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min(xs:anyURI(\"str1\"), \"http://example.com/UNSUPPORTED_COLLATION\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("str1")
@@ -1016,9 +1264,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((\"str1\", \"str2\"), \"http://www.w3.org/2005/xpath-functions/collation/codepoint\", ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -1032,9 +1284,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((5, 5.0e0)) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1048,9 +1304,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((5.0e0, 5)) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1064,11 +1324,428 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((3, 5.0e0)) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test fn:min on xs:boolean arguments .
+   */
+  @org.junit.Test
+  public void cbclMin001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:f($x as xs:integer) { if ($x = 0) then false() else true() }; \n" +
+      "      \tmin(for $x in (1,2,3) return local:f($x))\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test fn:min on xs:boolean arguments .
+   */
+  @org.junit.Test
+  public void cbclMin002() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:f($x as xs:integer) { if ($x = 2) then false() else true() }; \n" +
+      "      \tmin(for $x in (1,2,3) return local:f($x))\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test fn:min on xs:boolean arguments .
+   */
+  @org.junit.Test
+  public void cbclMin003() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:f($x as xs:integer) { if ($x = 3) then $x else false() }; \n" +
+      "      \tmin(for $x in (1,2,3) return local:f($x))\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FORG0006")
+    );
+  }
+
+  /**
+   *  test fn:min with xs:date argument causing type error .
+   */
+  @org.junit.Test
+  public void cbclMin004() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:f($x as xs:integer) { if ($x < 3) then current-date() else current-time() }; \n" +
+      "      \tmin(for $x in (1,2,3) return local:f($x))\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FORG0006")
+    );
+  }
+
+  /**
+   *  test fn:min with xs:dateTime arguments .
+   */
+  @org.junit.Test
+  public void cbclMin005() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:f($x as xs:integer) { if ($x = 2) then xs:dateTime(\"1996-12-01T12:00:00\") else current-dateTime() }; \n" +
+      "      \tmin(for $x in (1,2,3) return local:f($x))\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "1996-12-01T12:00:00")
+    );
+  }
+
+  /**
+   *  test fn:min with xs:dateTime argument causing type error .
+   */
+  @org.junit.Test
+  public void cbclMin006() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:f($x as xs:integer) { if ($x < 3) then current-dateTime() else xs:dayTimeDuration(\"PT3S\") }; \n" +
+      "      \tmin(for $x in (1,2,3) return local:f($x))\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FORG0006")
+    );
+  }
+
+  /**
+   *  Test fn:min with xs:dayTimeDuration arguments .
+   */
+  @org.junit.Test
+  public void cbclMin007() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:f($x as xs:integer) { if ($x = 2) then xs:dayTimeDuration(\"P1D\") else xs:dayTimeDuration(\"PT3S\") }; \n" +
+      "      \tmin(for $x in (1,2,3) return local:f($x))\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "PT3S")
+    );
+  }
+
+  /**
+   *  Test fn:min with xs:dayTimeDuration argument causing type error .
+   */
+  @org.junit.Test
+  public void cbclMin008() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:f($x as xs:integer) { if ($x = 3) then xs:duration(\"P1D\") else xs:dayTimeDuration(\"PT3S\") }; \n" +
+      "      \tmin(for $x in (1,2,3) return local:f($x))\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FORG0006")
+    );
+  }
+
+  /**
+   *  Test fn:min with numeric arguments .
+   */
+  @org.junit.Test
+  public void cbclMin009() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:f($x as xs:integer) { (xs:decimal(1.1), xs:float(2.2), xs:double(1.4), xs:integer(2))[$x] }; \n" +
+      "      \tmin(for $x in (1,2,3) return local:f($x)) instance of xs:double\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  Test fn:min with numeric arguments .
+   */
+  @org.junit.Test
+  public void cbclMin010() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:f($x as xs:integer) { (xs:decimal(1.3), xs:float(1.2), xs:double(1.4), xs:integer(2))[$x] }; \n" +
+      "      \tmin(for $x in (1,2,3) return local:f($x)) instance of xs:double",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  Test fn:min with numeric arguments rasing error .
+   */
+  @org.junit.Test
+  public void cbclMin011() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:f($x as xs:integer) { (xs:decimal(1.1), xs:float(1.2), xs:double(0.4), xs:string(\"2\"))[$x] }; \n" +
+      "      \tmin(for $x in (1,4,2,3) return local:f($x))\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FORG0006")
+    );
+  }
+
+  /**
+   *  Test fn:min with numeric arguments .
+   */
+  @org.junit.Test
+  public void cbclMin012() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:f($x as xs:integer) { (xs:decimal(1.1), xs:float(1.2), xs:double(0.4), xs:integer(\"-3\"))[$x] }; \n" +
+      "      \tmin(for $x in (4,2,1,3) return local:f($x)) instance of xs:double\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test fn:min with xs:time arguments .
+   */
+  @org.junit.Test
+  public void cbclMin013() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:f($x as xs:integer) { if ($x = 2) then xs:time(\"12:00:00-01:00\") else xs:time(\"12:00:00+01:00\") }; \n" +
+      "      \tmin(for $x in (1,2,3) return local:f($x))\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "12:00:00+01:00")
+    );
+  }
+
+  /**
+   *  test fn:min with xs:time argument causing type error .
+   */
+  @org.junit.Test
+  public void cbclMin014() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:f($x as xs:integer) { if ($x < 3) then current-time() else xs:dayTimeDuration(\"PT3S\") }; \n" +
+      "      \tmin(for $x in (1,2,3) return local:f($x))\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FORG0006")
+    );
+  }
+
+  /**
+   *  Test fn:min with xs:yearMonthDuration arguments .
+   */
+  @org.junit.Test
+  public void cbclMin015() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:f($x as xs:integer) { if ($x = 2) then xs:yearMonthDuration(\"P11M\") else xs:yearMonthDuration(\"P1Y\") }; \n" +
+      "      \tmin(for $x in (1,2,3) return local:f($x))\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "P11M")
+    );
+  }
+
+  /**
+   *  Test fn:min with xs:yearMonthDuration argument causing type error .
+   */
+  @org.junit.Test
+  public void cbclMin016() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:f($x as xs:integer) { if ($x = 3) then xs:duration(\"P1Y\") else xs:yearMonthDuration(\"P11M\") }; \n" +
+      "      \tmin(for $x in (1,2,3) return local:f($x))\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FORG0006")
+    );
+  }
+
+  /**
+   *  Test fn:min with invalid type for first argument .
+   */
+  @org.junit.Test
+  public void cbclMin017() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:f($x as xs:integer) as xs:duration { if ($x = 1) then xs:duration(\"P1Y\") else xs:yearMonthDuration(\"P11M\") }; \n" +
+      "      \tmin(for $x in (1,2,3) return local:f($x))\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FORG0006")
+    );
+  }
+
+  /**
+   *  Test fn:min on a range expression .
+   */
+  @org.junit.Test
+  public void cbclMin018() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:f($x as xs:integer) as xs:integer { $x }; \n" +
+      "      \tmin(local:f(4) to local:f(10))\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "4")
     );
   }
 
@@ -1080,9 +1757,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((3,4,\"Zero\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1096,9 +1777,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $p in 1 to 4 let $x := (xs:integer(4), xs:decimal(3), xs:float(2), xs:double(1))[position() le $p] return typeswitch (min($x)) case xs:integer return \"integer\" case xs:decimal return \"decimal\" case xs:float return \"float\" case xs:double return \"double\" default return error()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "integer decimal float double")
     );
@@ -1112,9 +1797,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((\"a\", \"b\", \"c\", \"d\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a")
     );
@@ -1128,9 +1817,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((xs:date('1066-10-02'), xs:date('1588-08-08'), xs:date('2011-06-29')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1066-10-02")
     );
@@ -1144,9 +1837,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:integer(5000000),xs:double(3e8)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5.0E6")
     );
@@ -1160,9 +1857,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := fn:min((xs:long(22),xs:short(10))) return $var instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1176,9 +1877,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((xs:dayTimeDuration(\"P1D\"), xs:dayTimeDuration(\"PT2H\"))) instance of xs:dayTimeDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1192,9 +1897,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min(for $x in 1 to 10 return xs:dayTimeDuration(concat(\"PT\",$x,\"H\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PT1H")
     );
@@ -1208,9 +1917,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((xs:yearMonthDuration(\"P1Y\"), xs:yearMonthDuration(\"P1M\"))) instance of xs:yearMonthDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1224,9 +1937,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min(for $x in 1 to 10 return xs:yearMonthDuration(concat(\"P\",$x,\"M\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P1M")
     );
@@ -1240,9 +1957,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min((xs:yearMonthDuration(\"P1Y\"), xs:dayTimeDuration(\"P1D\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("FORG0006")
@@ -1260,9 +1981,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "min(xs:duration(\"P1Y1M1D\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("FORG0006")
@@ -1280,9 +2005,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:double(\"-1.7976931348623157E308\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1.7976931348623157E308")
     );
@@ -1296,9 +2025,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:double(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1312,9 +2045,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:double(\"1.7976931348623157E308\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1.7976931348623157E308")
     );
@@ -1328,9 +2065,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:double(\"-1.7976931348623157E308\"),xs:double(\"-1.7976931348623157E308\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1.7976931348623157E308")
     );
@@ -1344,9 +2085,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:double(\"0\"),xs:double(\"-1.7976931348623157E308\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1.7976931348623157E308")
     );
@@ -1360,9 +2105,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:double(\"1.7976931348623157E308\"),xs:double(\"-1.7976931348623157E308\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1.7976931348623157E308")
     );
@@ -1376,9 +2125,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:double(\"-1.7976931348623157E308\"),xs:double(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1.7976931348623157E308")
     );
@@ -1392,9 +2145,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:double(\"-1.7976931348623157E308\"),xs:double(\"1.7976931348623157E308\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1.7976931348623157E308")
     );
@@ -1408,9 +2165,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:decimal(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -1424,9 +2185,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:decimal(\"617375191608514839\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("617375191608514839")
     );
@@ -1440,9 +2205,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:decimal(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -1456,9 +2225,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:decimal(\"-999999999999999999\"),xs:decimal(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -1472,9 +2245,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:decimal(\"617375191608514839\"),xs:decimal(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -1488,9 +2265,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:decimal(\"999999999999999999\"),xs:decimal(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -1504,9 +2285,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:decimal(\"-999999999999999999\"),xs:decimal(\"617375191608514839\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -1520,9 +2305,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:decimal(\"-999999999999999999\"),xs:decimal(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -1536,9 +2325,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:float(\"-3.4028235E38\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:float(\"-3.4028235E38\")")
     );
@@ -1552,9 +2345,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:float(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1568,9 +2365,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:float(\"3.4028235E38\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:float(\"3.4028235E38\")")
     );
@@ -1584,9 +2385,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:float(\"-3.4028235E38\"),xs:float(\"-3.4028235E38\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:float(\"-3.4028235E38\")")
     );
@@ -1600,9 +2405,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:float(\"0\"),xs:float(\"-3.4028235E38\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:float(\"-3.4028235E38\")")
     );
@@ -1616,9 +2425,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:float(\"3.4028235E38\"),xs:float(\"-3.4028235E38\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:float(\"-3.4028235E38\")")
     );
@@ -1632,9 +2445,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:float(\"-3.4028235E38\"),xs:float(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:float(\"-3.4028235E38\")")
     );
@@ -1648,9 +2465,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:float(\"-3.4028235E38\"),xs:float(\"3.4028235E38\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:float(\"-3.4028235E38\")")
     );
@@ -1664,9 +2485,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:int(\"-2147483648\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-2147483648")
     );
@@ -1680,9 +2505,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:int(\"-1873914410\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1873914410")
     );
@@ -1696,9 +2525,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:int(\"2147483647\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2147483647")
     );
@@ -1712,9 +2545,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:int(\"-2147483648\"),xs:int(\"-2147483648\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-2147483648")
     );
@@ -1728,9 +2565,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:int(\"-1873914410\"),xs:int(\"-2147483648\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-2147483648")
     );
@@ -1744,9 +2585,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:int(\"2147483647\"),xs:int(\"-2147483648\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-2147483648")
     );
@@ -1760,9 +2605,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:int(\"-2147483648\"),xs:int(\"-1873914410\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-2147483648")
     );
@@ -1776,9 +2625,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:int(\"-2147483648\"),xs:int(\"2147483647\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-2147483648")
     );
@@ -1792,9 +2645,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:integer(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -1808,9 +2665,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:integer(\"830993497117024304\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("830993497117024304")
     );
@@ -1824,9 +2685,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:integer(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -1840,9 +2705,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:integer(\"-999999999999999999\"),xs:integer(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -1856,9 +2725,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:integer(\"830993497117024304\"),xs:integer(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -1872,9 +2745,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:integer(\"999999999999999999\"),xs:integer(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -1888,9 +2765,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:integer(\"-999999999999999999\"),xs:integer(\"830993497117024304\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -1904,9 +2785,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:integer(\"-999999999999999999\"),xs:integer(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -1920,9 +2805,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:long(\"-92233720368547758\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-92233720368547758")
     );
@@ -1936,9 +2825,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:long(\"-47175562203048468\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-47175562203048468")
     );
@@ -1952,9 +2845,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:long(\"92233720368547758\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("92233720368547758")
     );
@@ -1968,9 +2865,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:long(\"-92233720368547758\"),xs:long(\"-92233720368547758\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-92233720368547758")
     );
@@ -1984,9 +2885,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:long(\"-47175562203048468\"),xs:long(\"-92233720368547758\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-92233720368547758")
     );
@@ -2000,9 +2905,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:long(\"92233720368547758\"),xs:long(\"-92233720368547758\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-92233720368547758")
     );
@@ -2016,9 +2925,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:long(\"-92233720368547758\"),xs:long(\"-47175562203048468\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-92233720368547758")
     );
@@ -2032,9 +2945,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:long(\"-92233720368547758\"),xs:long(\"92233720368547758\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-92233720368547758")
     );
@@ -2048,9 +2965,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:negativeInteger(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -2064,9 +2985,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:negativeInteger(\"-297014075999096793\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-297014075999096793")
     );
@@ -2080,9 +3005,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:negativeInteger(\"-1\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -2096,9 +3025,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:negativeInteger(\"-999999999999999999\"),xs:negativeInteger(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -2112,9 +3045,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:negativeInteger(\"-297014075999096793\"),xs:negativeInteger(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -2128,9 +3065,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:negativeInteger(\"-1\"),xs:negativeInteger(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -2144,9 +3085,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:negativeInteger(\"-999999999999999999\"),xs:negativeInteger(\"-297014075999096793\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -2160,9 +3105,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:negativeInteger(\"-999999999999999999\"),xs:negativeInteger(\"-1\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -2176,9 +3125,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:nonNegativeInteger(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2192,9 +3145,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:nonNegativeInteger(\"303884545991464527\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("303884545991464527")
     );
@@ -2208,9 +3165,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:nonNegativeInteger(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -2224,9 +3185,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:nonNegativeInteger(\"0\"),xs:nonNegativeInteger(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2240,9 +3205,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:nonNegativeInteger(\"303884545991464527\"),xs:nonNegativeInteger(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2256,9 +3225,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:nonNegativeInteger(\"999999999999999999\"),xs:nonNegativeInteger(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2272,9 +3245,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:nonNegativeInteger(\"0\"),xs:nonNegativeInteger(\"303884545991464527\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2288,9 +3265,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:nonNegativeInteger(\"0\"),xs:nonNegativeInteger(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2304,9 +3285,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:nonPositiveInteger(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -2320,9 +3305,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:nonPositiveInteger(\"-475688437271870490\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-475688437271870490")
     );
@@ -2336,9 +3325,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:nonPositiveInteger(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2352,9 +3345,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:nonPositiveInteger(\"-999999999999999999\"),xs:nonPositiveInteger(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -2368,9 +3365,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:nonPositiveInteger(\"-475688437271870490\"),xs:nonPositiveInteger(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -2384,9 +3385,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:nonPositiveInteger(\"0\"),xs:nonPositiveInteger(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -2400,9 +3405,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:nonPositiveInteger(\"-999999999999999999\"),xs:nonPositiveInteger(\"-475688437271870490\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -2416,9 +3425,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:nonPositiveInteger(\"-999999999999999999\"),xs:nonPositiveInteger(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -2432,9 +3445,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:positiveInteger(\"1\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2448,9 +3465,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:positiveInteger(\"52704602390610033\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("52704602390610033")
     );
@@ -2464,9 +3485,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:positiveInteger(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -2480,9 +3505,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:positiveInteger(\"1\"),xs:positiveInteger(\"1\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2496,9 +3525,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:positiveInteger(\"52704602390610033\"),xs:positiveInteger(\"1\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2512,9 +3545,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:positiveInteger(\"999999999999999999\"),xs:positiveInteger(\"1\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2528,9 +3565,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:positiveInteger(\"1\"),xs:positiveInteger(\"52704602390610033\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2544,9 +3585,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:positiveInteger(\"1\"),xs:positiveInteger(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2560,9 +3605,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:short(\"-32768\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-32768")
     );
@@ -2576,9 +3625,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:short(\"-5324\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-5324")
     );
@@ -2592,9 +3645,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:short(\"32767\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("32767")
     );
@@ -2608,9 +3665,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:short(\"-32768\"),xs:short(\"-32768\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-32768")
     );
@@ -2624,9 +3685,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:short(\"-5324\"),xs:short(\"-32768\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-32768")
     );
@@ -2640,9 +3705,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:short(\"32767\"),xs:short(\"-32768\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-32768")
     );
@@ -2656,9 +3725,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:short(\"-32768\"),xs:short(\"-5324\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-32768")
     );
@@ -2672,9 +3745,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:short(\"-32768\"),xs:short(\"32767\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-32768")
     );
@@ -2688,9 +3765,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:unsignedLong(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2704,9 +3785,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:unsignedLong(\"130747108607674654\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("130747108607674654")
     );
@@ -2720,9 +3805,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:unsignedLong(\"184467440737095516\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("184467440737095516")
     );
@@ -2736,9 +3825,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:unsignedLong(\"0\"),xs:unsignedLong(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2752,9 +3845,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:unsignedLong(\"130747108607674654\"),xs:unsignedLong(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2768,9 +3865,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:unsignedLong(\"184467440737095516\"),xs:unsignedLong(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2784,9 +3885,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:unsignedLong(\"0\"),xs:unsignedLong(\"130747108607674654\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2800,9 +3905,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:unsignedLong(\"0\"),xs:unsignedLong(\"184467440737095516\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2816,9 +3925,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:unsignedShort(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2832,9 +3945,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:unsignedShort(\"44633\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("44633")
     );
@@ -2848,9 +3965,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:unsignedShort(\"65535\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("65535")
     );
@@ -2864,9 +3985,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:unsignedShort(\"0\"),xs:unsignedShort(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2880,9 +4005,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:unsignedShort(\"44633\"),xs:unsignedShort(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2896,9 +4025,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:unsignedShort(\"65535\"),xs:unsignedShort(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2912,9 +4045,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:unsignedShort(\"0\"),xs:unsignedShort(\"44633\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2928,9 +4065,13 @@ public class FnMin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((xs:unsignedShort(\"0\"),xs:unsignedShort(\"65535\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );

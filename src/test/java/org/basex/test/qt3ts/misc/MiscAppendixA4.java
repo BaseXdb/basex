@@ -20,9 +20,13 @@ public class MiscAppendixA4 extends QT3TestSet {
     final XQuery query = new XQuery(
       "-3 + 5 * 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("12")
     );
@@ -36,9 +40,13 @@ public class MiscAppendixA4 extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 - 5 * 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-12")
     );
@@ -52,9 +60,13 @@ public class MiscAppendixA4 extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 + 10 div 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("8")
     );
@@ -68,9 +80,13 @@ public class MiscAppendixA4 extends QT3TestSet {
     final XQuery query = new XQuery(
       "5 - 10 div 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -84,9 +100,13 @@ public class MiscAppendixA4 extends QT3TestSet {
     final XQuery query = new XQuery(
       "5 + 10 idiv 4",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("7")
     );
@@ -100,9 +120,13 @@ public class MiscAppendixA4 extends QT3TestSet {
     final XQuery query = new XQuery(
       "5 - 10 idiv 4",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -116,9 +140,13 @@ public class MiscAppendixA4 extends QT3TestSet {
     final XQuery query = new XQuery(
       "5 + 10 mod 4",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("7")
     );
@@ -132,9 +160,13 @@ public class MiscAppendixA4 extends QT3TestSet {
     final XQuery query = new XQuery(
       "5 - 10 mod 4",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -148,9 +180,13 @@ public class MiscAppendixA4 extends QT3TestSet {
     final XQuery query = new XQuery(
       "-+7",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-7")
     );

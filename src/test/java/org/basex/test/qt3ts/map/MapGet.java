@@ -20,9 +20,13 @@ public class MapGet extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:get(map{1:=\"Sunday\",2:=\"Monday\",3:=\"Tuesday\",4:=\"Wednesday\",5:=\"Thursday\",6:=\"Friday\",7:=\"Saturday\"}, 4)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Wednesday")
     );
@@ -36,9 +40,13 @@ public class MapGet extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:get(map{1:=\"Sunday\",2:=\"Monday\",3:=\"Tuesday\",4:=\"Wednesday\",5:=\"Thursday\",6:=\"Friday\",7:=\"Saturday\"}, 23)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -52,9 +60,13 @@ public class MapGet extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:get(map{}, 23)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -68,9 +80,13 @@ public class MapGet extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:get(map:entry(\"foo\", \"bar\"), \"baz\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -84,9 +100,13 @@ public class MapGet extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:get(map:entry(\"foo\", \"bar\"), \"foo\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "bar")
     );
@@ -100,9 +120,13 @@ public class MapGet extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:get(map:entry(\"foo\", \"bar\"), xs:untypedAtomic(\"foo\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "bar")
     );
@@ -116,9 +140,13 @@ public class MapGet extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:get(map:entry(xs:untypedAtomic(\"foo\"), \"bar\"), \"foo\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "bar")
     );
@@ -132,9 +160,13 @@ public class MapGet extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:get(map:entry(xs:untypedAtomic(\"12\"), \"bar\"), 12)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -148,9 +180,13 @@ public class MapGet extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:get(map:entry(12, \"bar\"), xs:untypedAtomic(\"12\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -164,9 +200,13 @@ public class MapGet extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:get(map{1:=\"Sunday\",2:=\"Monday\",3:=\"Tuesday\",4:=\"Wednesday\",5:=\"Thursday\",6:=\"Friday\",7:=\"Saturday\"}, 4.0e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Wednesday")
     );
@@ -180,9 +220,13 @@ public class MapGet extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:get(map{1:=\"Sunday\",2:=\"Monday\",3:=\"Tuesday\",4.0e0:=\"Wednesday\",5:=\"Thursday\",6:=\"Friday\",7:=\"Saturday\"}, 4)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Wednesday")
     );
@@ -196,9 +240,13 @@ public class MapGet extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:get(map{1:=\"Sunday\",2:=\"Monday\",3:=\"Tuesday\",\"urn:weds\":=\"Wednesday\",5:=\"Thursday\",6:=\"Friday\",7:=\"Saturday\"}, xs:anyURI(\"urn:weds\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Wednesday")
     );
@@ -212,9 +260,13 @@ public class MapGet extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:get(map{1:=\"Sunday\",2:=\"Monday\",3:=\"Tuesday\",xs:anyURI(\"urn:weds\"):=\"Wednesday\",5:=\"Thursday\",6:=\"Friday\",7:=\"Saturday\"}, \"urn:weds\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Wednesday")
     );
@@ -228,9 +280,13 @@ public class MapGet extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:get(map{1:=\"Sunday\",2:=\"Monday\",3:=\"Tuesday\",xs:anyURI(\"urn:weds\"):=\"Wednesday\",5:=\"Thursday\",6:=\"Friday\",7:=\"Saturday\"}, number('NaN'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -244,9 +300,13 @@ public class MapGet extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:get(map{1:=\"Sunday\",2:=\"Monday\",3:=\"Tuesday\",number('NaN'):=\"Wednesday\",5:=\"Thursday\",6:=\"Friday\",7:=\"Saturday\"}, number('NaN'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -264,9 +324,13 @@ public class MapGet extends QT3TestSet {
       "                         (for $i in 2500 to 3500 return map:entry($i, $i+30)))),\n" +
       "                         3260)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3290")
     );
@@ -280,9 +344,13 @@ public class MapGet extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:get(map{1:=\"Sunday\",2:=\"Monday\",3:=\"Tuesday\",xs:duration('P1Y'):=\"Wednesday\",5:=\"Thursday\",6:=\"Friday\",7:=\"Saturday\"}, xs:yearMonthDuration('P12M'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Wednesday")
     );
@@ -296,9 +364,13 @@ public class MapGet extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:get(map{1:=\"Sunday\",2:=\"Monday\",3:=\"Tuesday\",function-name(abs#1):=\"Wednesday\",5:=\"Thursday\",6:=\"Friday\",7:=\"Saturday\"}, xs:QName('fn:abs'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Wednesday")
     );
@@ -312,9 +384,13 @@ public class MapGet extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:get(map{1:=\"Sunday\",2:=\"Monday\",3:=\"Tuesday\",4:=(),5:=\"Thursday\",6:=\"Friday\",7:=\"Saturday\"}, 4)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -328,9 +404,13 @@ public class MapGet extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:get(map{\"su\":=\"Sunday\",\"mo\":=\"Monday\",\"tu\":=\"Tuesday\",\"we\":=\"Wednesday\",\"th\":=\"Thursday\",\"fr\":=\"Friday\",\"sa\":=\"Saturday\"}, \"TH\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -345,9 +425,13 @@ public class MapGet extends QT3TestSet {
       "map:get(map:new(map{\"su\":=\"Sunday\",\"mo\":=\"Monday\",\"tu\":=\"Tuesday\",\"we\":=\"Wednesday\",\"th\":=\"Thursday\",\"fr\":=\"Friday\",\"sa\":=\"Saturday\"}, \n" +
       "            \"http://www.w3.org/2005/xpath-functions/collation/codepoint\"), \"TH\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -363,9 +447,13 @@ public class MapGet extends QT3TestSet {
       "            map{\"su\":=\"Sunday\",\"mo\":=\"Monday\",\"tu\":=\"Tuesday\",\"we\":=\"Wednesday\",\"th\":=\"Thursday\",\"fr\":=\"Friday\",\"sa\":=\"Saturday\"},\n" +
       "            (\"we\", \"th\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertCount(2)
@@ -385,9 +473,13 @@ public class MapGet extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:contains(map{1:=\"Sunday\",2:=\"Monday\",3:=\"Tuesday\",number('NaN'):=\"Wednesday\",5:=\"Thursday\",6:=\"Friday\",7:=\"Saturday\"}, (1 to 5)[10])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -401,9 +493,13 @@ public class MapGet extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:get(map{1:=\"Sunday\",2:=\"Monday\",3:=\"Tuesday\",number('NaN'):=\"Wednesday\",5:=\"Thursday\",6:=\"Friday\",7:=\"Saturday\"}, (1 to 5)[. mod 2 = 0])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -417,9 +513,13 @@ public class MapGet extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:get((\"a\", \"b\", \"c\"), \"a\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -433,9 +533,13 @@ public class MapGet extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:get((), \"a\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -449,9 +553,13 @@ public class MapGet extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:get(abs#1, \"a\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -465,9 +573,13 @@ public class MapGet extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:get((map{}, map{\"a\":=\"b\"}), \"a\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );

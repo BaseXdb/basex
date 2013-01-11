@@ -20,9 +20,13 @@ public class FnHead extends QT3TestSet {
     final XQuery query = new XQuery(
       "head(3 to 10)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -36,9 +40,13 @@ public class FnHead extends QT3TestSet {
     final XQuery query = new XQuery(
       "head((\"a\", \"b\", current-dateTime()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("\"a\"")
     );
@@ -52,10 +60,14 @@ public class FnHead extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $a := /works return head($a/*)/string(@name)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Jane Doe 1")
     );
@@ -69,10 +81,14 @@ public class FnHead extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $a := /works return name(head($a))",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "works")
     );
@@ -86,10 +102,14 @@ public class FnHead extends QT3TestSet {
     final XQuery query = new XQuery(
       "head(/works/cucumber)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -103,10 +123,14 @@ public class FnHead extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $a := /works/* return (head($a) is $a[1])",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );

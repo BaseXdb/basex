@@ -20,9 +20,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(6) * xs:double(2) eq 12",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -36,9 +40,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:float(6) * xs:decimal(2)) instance of xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:float(6) * xs:integer(2)) instance of xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:integer(6) * xs:float(2)) instance of xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:float(6) * xs:float(2)) instance of xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:decimal(6) * xs:double(2)) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,9 +140,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:double(6) * xs:decimal(2)) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -132,9 +160,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:double(6) * xs:float(2)) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -148,9 +180,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:float(6) * xs:double(2)) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -164,9 +200,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:double(6) * xs:integer(2)) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -180,9 +220,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:integer(6) * xs:double(2)) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -196,9 +240,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(6) * xs:decimal(2) eq 12",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -212,9 +260,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:double(6) * xs:double(2)) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -228,9 +280,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(xs:float(\"NaN\") * 3) eq \"NaN\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -244,9 +300,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(xs:double(\"NaN\") * 3) eq \"NaN\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -260,9 +320,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(3 * xs:float(\"NaN\")) eq \"NaN\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -276,9 +340,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(3 * xs:double(\"NaN\")) eq \"NaN\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -292,9 +360,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "/*5",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -308,9 +380,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "/ * 5",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -324,9 +400,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "4 + / * 5",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -340,9 +420,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"3\" * \"3\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -356,9 +440,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 * \"3\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -372,9 +460,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(6) * xs:integer(2) eq 12",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -388,9 +480,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "(3 * xs:untypedAtomic(3)) eq 9",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -404,9 +500,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:untypedAtomic(3) * 3) eq 9",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -420,9 +520,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(() * ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -440,9 +544,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(() * 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -460,9 +568,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(6) * xs:float(2) eq 12",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -476,9 +588,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:decimal(6) * xs:integer(2)) instance of xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -492,9 +608,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:integer(6) * xs:decimal(2)) instance of xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -508,9 +628,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:integer(6) * xs:integer(2)) instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -524,9 +648,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:decimal(6) * xs:decimal(2)) instance of xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -540,9 +668,615 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:decimal(6) * xs:float(2)) instance of xs:float",
       ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
 
-    final QT3Result res = result(query);
-    result = res;
+  /**
+   *  test multiplication by xs:double NaN .
+   */
+  @org.junit.Test
+  public void cbclNumericMultiply001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:double) as xs:double { $arg * $arg }; \n" +
+      "      \txs:double('NaN') * local:square(7)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "NaN")
+    );
+  }
+
+  /**
+   *  test multiplication by xs:double NaN .
+   */
+  @org.junit.Test
+  public void cbclNumericMultiply002() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:double) as xs:double { $arg * $arg }; \n" +
+      "      \tlocal:square(7) * xs:double('NaN')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "NaN")
+    );
+  }
+
+  /**
+   *  test multiplication by xs:double 1 .
+   */
+  @org.junit.Test
+  public void cbclNumericMultiply003() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:double) as xs:double { $arg * $arg }; \n" +
+      "      \tlocal:square(7) * 1e0",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "49")
+    );
+  }
+
+  /**
+   *  test multiplication by xs:double 1 .
+   */
+  @org.junit.Test
+  public void cbclNumericMultiply004() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:double) as xs:double { $arg * $arg }; \n" +
+      "      \t1e0 * local:square(7)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "49")
+    );
+  }
+
+  /**
+   *  test multiplication by xs:double -1 .
+   */
+  @org.junit.Test
+  public void cbclNumericMultiply005() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:double) as xs:double { $arg * $arg }; \n" +
+      "      \tlocal:square(7) * -1e0",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "-49")
+    );
+  }
+
+  /**
+   *  test multiplication by xs:double -1 .
+   */
+  @org.junit.Test
+  public void cbclNumericMultiply006() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:double) as xs:double { $arg * $arg }; \n" +
+      "      \t-1e0 * local:square(7)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "-49")
+    );
+  }
+
+  /**
+   *  test multiplication by xs:float NaN .
+   */
+  @org.junit.Test
+  public void cbclNumericMultiply007() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:float) as xs:float { $arg * $arg }; \n" +
+      "      \txs:float('NaN') * local:square(7)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "NaN")
+    );
+  }
+
+  /**
+   *  test multiplication by xs:float NaN .
+   */
+  @org.junit.Test
+  public void cbclNumericMultiply008() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:float) as xs:float { $arg * $arg }; \n" +
+      "      \tlocal:square(7) * xs:float('NaN')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "NaN")
+    );
+  }
+
+  /**
+   *  test multiplication by xs:float 1 .
+   */
+  @org.junit.Test
+  public void cbclNumericMultiply009() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:float) as xs:float { $arg * $arg }; \n" +
+      "      \tlocal:square(7) * xs:float(1)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "49")
+    );
+  }
+
+  /**
+   *  test multiplication by xs:float 1 .
+   */
+  @org.junit.Test
+  public void cbclNumericMultiply010() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:float) as xs:float { $arg * $arg }; \n" +
+      "      \txs:float(1) * local:square(7)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "49")
+    );
+  }
+
+  /**
+   *  test multiplication by xs:float -1 .
+   */
+  @org.junit.Test
+  public void cbclNumericMultiply011() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:float) as xs:float { $arg * $arg }; \n" +
+      "      \tlocal:square(7) * xs:float(-1)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "-49")
+    );
+  }
+
+  /**
+   *  test multiplication by xs:float -1 .
+   */
+  @org.junit.Test
+  public void cbclNumericMultiply012() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:float) as xs:float { $arg * $arg }; \n" +
+      "      \txs:float(-1) * local:square(7)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "-49")
+    );
+  }
+
+  /**
+   *  test multiplication by xs:decimal 0 .
+   */
+  @org.junit.Test
+  public void cbclNumericMultiply013() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:decimal) as xs:decimal { $arg * $arg }; \n" +
+      "      \tlocal:square(2.0) * 0.0",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "0")
+    );
+  }
+
+  /**
+   *  test multiplication by xs:decimal 0 .
+   */
+  @org.junit.Test
+  public void cbclNumericMultiply014() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:decimal) as xs:decimal { $arg * $arg }; \n" +
+      "      \t0.0 * local:square(7.0)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "0")
+    );
+  }
+
+  /**
+   *  test multiplication by xs:decimal 1 .
+   */
+  @org.junit.Test
+  public void cbclNumericMultiply015() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:decimal) as xs:decimal { $arg * $arg }; \n" +
+      "      \tlocal:square(7.0) * 1.0",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "49")
+    );
+  }
+
+  /**
+   *  test multiplication by xs:decimal 1 .
+   */
+  @org.junit.Test
+  public void cbclNumericMultiply016() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:decimal) as xs:decimal { $arg * $arg }; \n" +
+      "      \t1.0 * local:square(7.0)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "49")
+    );
+  }
+
+  /**
+   *  test multiplication by xs:decimal -1 .
+   */
+  @org.junit.Test
+  public void cbclNumericMultiply017() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:decimal) as xs:decimal { $arg * $arg }; \n" +
+      "      \tlocal:square(7.0) * -1.0",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "-49")
+    );
+  }
+
+  /**
+   *  test multiplication by xs:decimal -1 .
+   */
+  @org.junit.Test
+  public void cbclNumericMultiply018() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:decimal) as xs:decimal { $arg * $arg }; \n" +
+      "      \t-1.0 * local:square(7.0)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "-49")
+    );
+  }
+
+  /**
+   *  test multiplication by xs:integer 0 .
+   */
+  @org.junit.Test
+  public void cbclNumericMultiply019() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:integer) as xs:integer { $arg * $arg }; \n" +
+      "      \tlocal:square(2) * 0",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "0")
+    );
+  }
+
+  /**
+   *  test multiplication by xs:integer 0 .
+   */
+  @org.junit.Test
+  public void cbclNumericMultiply020() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:integer) as xs:integer { $arg * $arg }; \n" +
+      "      \t0 * local:square(2)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "0")
+    );
+  }
+
+  /**
+   *  test multiplication by xs:integer 1 .
+   */
+  @org.junit.Test
+  public void cbclNumericMultiply021() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:integer) as xs:integer { $arg * $arg }; \n" +
+      "      \tlocal:square(7) * 1",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "49")
+    );
+  }
+
+  /**
+   *  test multiplication by xs:integer 1 .
+   */
+  @org.junit.Test
+  public void cbclNumericMultiply022() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:integer) as xs:integer { $arg * $arg }; \n" +
+      "      \t1 * local:square(7)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "49")
+    );
+  }
+
+  /**
+   *  test multiplication by xs:integer -1 .
+   */
+  @org.junit.Test
+  public void cbclNumericMultiply023() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:integer) as xs:integer { $arg * $arg }; \n" +
+      "      \tlocal:square(7) * -1",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "-49")
+    );
+  }
+
+  /**
+   *  test multiplication by xs:integer -1 .
+   */
+  @org.junit.Test
+  public void cbclNumericMultiply024() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:integer) as xs:integer { $arg * $arg }; \n" +
+      "      \t-1 * local:square(7)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "-49")
+    );
+  }
+
+  /**
+   *  test multiplication of large xs:decimal .
+   */
+  @org.junit.Test
+  public void cbclNumericMultiply025() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:decimal) as xs:decimal { $arg * $arg }; \n" +
+      "      \tlocal:square(9223372036854775808.1) gt 0",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("FOAR0002")
+      )
+    );
+  }
+
+  /**
+   *  test multiplication of large xs:integer .
+   */
+  @org.junit.Test
+  public void cbclNumericMultiply026() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:integer) as xs:integer { $arg * $arg }; \n" +
+      "      \tlocal:square(9223372036854775808) gt 0",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("FOAR0002")
+      )
+    );
+  }
+
+  /**
+   *  ensure that multiplying xs:integers returns an xs:integer .
+   */
+  @org.junit.Test
+  public void cbclNumericMultiply027() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:integer($x as xs:decimal) { if ($x mod 1 eq 0) then xs:integer($x) else $x }; \n" +
+      "      \t(local:integer(2) * local:integer(2)) instance of xs:integer",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -556,9 +1290,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $x in (1, xs:decimal(2), xs:float(3), xs:double(4), xs:untypedAtomic(5)) for $y in (1, xs:decimal(2), xs:float(3), xs:double(4), xs:untypedAtomic(5)) return typeswitch ($x * $y) case xs:integer return \"integer\" case xs:decimal return \"decimal\" case xs:float return \"float\" case xs:double return \"double\" default return error()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "integer decimal float double double decimal decimal float double double float float float double double double double double double double double double double double double")
     );
@@ -572,9 +1310,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"-1.0000000000\") * xs:double(\"-1.7976931348623157E308\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1.7976931348623157E308")
     );
@@ -588,9 +1330,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"0\") * xs:double(\"-1.7976931348623157E308\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-0")
     );
@@ -604,9 +1350,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"1.7976931348623157E308\") * xs:double(\"-1.0000000000\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1.7976931348623157E308")
     );
@@ -620,9 +1370,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"-1.7976931348623157E308\") * xs:double(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-0")
     );
@@ -636,9 +1390,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"-1.0000000000\") * xs:double(\"1.7976931348623157E308\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1.7976931348623157E308")
     );
@@ -652,9 +1410,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-1.0000000000\") * xs:decimal(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -668,9 +1430,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"617375191608514839\") * xs:decimal(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -684,9 +1450,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"999999999999999999\") * xs:decimal(\"-1.0000000000\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -700,9 +1470,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"0\") * xs:decimal(\"617375191608514839\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -716,9 +1490,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-1.0000000000\") * xs:decimal(\"999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -732,9 +1510,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"-1.0000000000\") * xs:float(\"-3.4028235E38\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:float(3.4028235E38)")
     );
@@ -748,9 +1530,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"0\") * xs:float(\"-3.4028235E38\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-0")
     );
@@ -764,9 +1550,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"3.4028235E38\") * xs:float(\"-1.0000000000\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:float(-3.4028235E38)")
     );
@@ -780,9 +1570,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"-3.4028235E38\") * xs:float(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-0")
     );
@@ -796,9 +1590,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"-1.0000000000\") * xs:float(\"3.4028235E38\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:float(-3.4028235E38)")
     );
@@ -812,9 +1610,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 * ()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEmpty()
@@ -832,9 +1634,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 * '1'",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -848,9 +1654,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 * xs:integer('1')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -864,9 +1674,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 * <a> 2 </a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -880,9 +1694,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 * <a> <b> 2 </b> </a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -896,9 +1714,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 * <a> <b> 2</b> <c> 2</c> </a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0001")
     );
@@ -912,9 +1734,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a> 1 </a> * <b> 2 </b>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -928,9 +1754,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 * <a> x </a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0001")
     );
@@ -944,9 +1774,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 * <a/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0001")
     );
@@ -960,9 +1794,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(\"0\") * xs:nonNegativeInteger(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -976,9 +1814,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(\"303884545991464527\") * xs:nonNegativeInteger(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -992,9 +1834,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(\"999999999999999999\") * xs:nonNegativeInteger(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1008,9 +1854,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(\"0\") * xs:nonNegativeInteger(\"303884545991464527\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1024,9 +1874,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(\"0\") * xs:nonNegativeInteger(\"999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1040,9 +1894,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(\"0\") * xs:nonPositiveInteger(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1056,9 +1914,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(\"-999999999999999999\") * xs:nonPositiveInteger(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1072,9 +1934,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(\"1\") * xs:positiveInteger(\"1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1088,9 +1954,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(\"52704602390610033\") * xs:positiveInteger(\"1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("52704602390610033")
     );
@@ -1104,9 +1974,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(\"999999999999999999\") * xs:positiveInteger(\"1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -1120,9 +1994,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(\"1\") * xs:positiveInteger(\"52704602390610033\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("52704602390610033")
     );
@@ -1136,9 +2014,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(\"1\") * xs:positiveInteger(\"999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -1152,9 +2034,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(\"0\") * xs:unsignedLong(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1168,9 +2054,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(\"130747108607674654\") * xs:unsignedLong(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1184,9 +2074,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(\"184467440737095516\") * xs:unsignedLong(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1200,9 +2094,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(\"0\") * xs:unsignedLong(\"130747108607674654\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1216,9 +2114,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(\"0\") * xs:unsignedLong(\"184467440737095516\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1232,9 +2134,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(\"0\") * xs:unsignedShort(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1248,9 +2154,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(\"44633\") * xs:unsignedShort(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1264,9 +2174,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(\"65535\") * xs:unsignedShort(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1280,9 +2194,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(\"0\") * xs:unsignedShort(\"44633\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1296,9 +2214,13 @@ public class OpNumericMultiply extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(\"0\") * xs:unsignedShort(\"65535\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );

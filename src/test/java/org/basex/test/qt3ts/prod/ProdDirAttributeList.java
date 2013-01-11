@@ -20,9 +20,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr=\"&#x30;&#x31;&#x32;\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem attr=\"012\"/>", false)
     );
@@ -36,9 +40,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr=\"abxxyz123890!@#$%^*()[]\\|?/>:;\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<elem attr=\"abxxyz123890!@#$%^*()[]\\|?/&gt;:;\"/>", false)
@@ -56,9 +64,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr=\"{\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -72,9 +84,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr=\"}\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -88,9 +104,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr=\"<\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -104,9 +124,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr=\"&\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -120,9 +144,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr=\"val1\" attr=\"val2\" attr2=\"val3\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0040")
     );
@@ -136,9 +164,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr=\"val1\" attr2=\"val2\" attr=\"val3\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0040")
     );
@@ -152,9 +184,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr1=\"val1\" attr=\"val2\" attr2=\"val3\" attr=\"val4\" attr3=\"val5\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0040")
     );
@@ -168,9 +204,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem xmlns:foo=\"http://www.w3.org/XQueryTest/Construct\" xmlns:bar=\"http://www.w3.org/XQueryTest/Construct\" foo:attr=\"val1\" bar:attr=\"val2\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0040")
     );
@@ -184,9 +224,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr=\"{1,'string',3.14,xs:float('1.2345e-2'),xs:dateTime('2002-04-02T12:00:00-01:00')}\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem attr=\"1 string 3.14 0.012345 2002-04-02T12:00:00-01:00\"/>", false)
     );
@@ -200,9 +244,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr=\"{<elem>123</elem>, (<elem attr='456'/>)/@attr, (<elem>789</elem>)/text()}\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem attr=\"123 456 789\"/>", false)
     );
@@ -216,9 +264,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr=\"{1,'',2}\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem attr=\"1  2\"/>", false)
     );
@@ -232,9 +284,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr=\"{1,<a/>,2}\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem attr=\"1  2\"/>", false)
     );
@@ -248,9 +304,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr=\"123{456}\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem attr=\"123456\"/>", false)
     );
@@ -264,9 +324,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr=\"{123}456\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem attr=\"123456\"/>", false)
     );
@@ -280,9 +344,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr=\"1{2,3}{4,5}6{<a>7</a>}{<a>8</a>}9\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem attr=\"12 34 56789\"/>", false)
     );
@@ -296,9 +364,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr=\"{(1,2)}{3}\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem attr=\"1 23\"/>", false)
     );
@@ -312,9 +384,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr=\"&amp;&lt;&gt;\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem attr=\"&amp;&lt;&gt;\"/>", false)
     );
@@ -328,9 +404,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-length(string((<elem attr=\"&amp;&lt;&gt;\"/>)/@attr))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -344,9 +424,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem xml:id=\"ncname\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem xml:id=\"ncname\"/>", false)
     );
@@ -360,9 +444,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem xml:id=\" a{'b c d',' '}\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<elem xml:id=\"ab c d\"/>", false)
@@ -380,9 +468,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count((<elem xmlns:foo=\"http://ns.example.com/uri\"/>)/@*)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -396,9 +488,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count((<elem xmlns=\"http://ns.example.com/uri\"/>)/@*)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -412,9 +508,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace foo=\"http://www.w3.org/XQueryTest/Construct\"; <elem foo:attr=\"value\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem xmlns:foo=\"http://www.w3.org/XQueryTest/Construct\" foo:attr=\"value\"/>", false)
     );
@@ -428,9 +528,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem xmlns:foo=\"http://www.w3.org/XQueryTest/Construct\"><child foo:attr=\"value\"/></elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem xmlns:foo=\"http://www.w3.org/XQueryTest/Construct\"><child foo:attr=\"value\"/></elem>", false)
     );
@@ -444,9 +548,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem xmlns:foo=\"http://www.w3.org/XQueryTest/Construct\" foo:attr=\"value\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem xmlns:foo=\"http://www.w3.org/XQueryTest/Construct\" foo:attr=\"value\"/>", false)
     );
@@ -460,9 +568,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem foo:attr=\"value\" xmlns:foo=\"http://www.w3.org/XQueryTest/Construct\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem xmlns:foo=\"http://www.w3.org/XQueryTest/Construct\" foo:attr=\"value\"/>", false)
     );
@@ -476,9 +588,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem att=\"{<p:e/>/namespace-uri()}\" xmlns:p=\"http://ns.example.com/uri\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem att=\"http://ns.example.com/uri\" xmlns:p=\"http://ns.example.com/uri\"/>", false)
     );
@@ -493,9 +609,13 @@ public class ProdDirAttributeList extends QT3TestSet {
       "<elem att=\"{<e2 a2=\"{<e3 a3=\"{<p:e/>/namespace-uri()}\"></e3>/@a3}\"></e2>/@a2}\" \n" +
       "                                     xmlns:p=\"http://ns.example.com/uri\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem att=\"http://ns.example.com/uri\" xmlns:p=\"http://ns.example.com/uri\"/>", false)
     );
@@ -509,9 +629,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $x in <elem attr=\"value\"/> return $x is $x/@attr/..",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -525,9 +649,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr=\"value\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem attr=\"value\"/>", false)
     );
@@ -541,9 +669,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr=\"value\" />",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem attr=\"value\"/>", false)
     );
@@ -557,9 +689,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr1=\"val1\" attr2=\"val2\" attr3=\"val3\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem attr1=\"val1\" attr2=\"val2\" attr3=\"val3\"/>", false)
     );
@@ -573,9 +709,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr='value'/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem attr=\"value\"/>", false)
     );
@@ -589,9 +729,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr=''''/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem attr=\"'\"/>", false)
     );
@@ -605,9 +749,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr=\"\"\"\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem attr=\"&quot;\"/>", false)
     );
@@ -621,9 +769,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr='value\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -637,9 +789,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr=\"value'/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -653,9 +809,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr1=\"val1\" attr2=\"val2\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem attr1=\"val1\" attr2=\"val2\"/>", false)
     );
@@ -669,9 +829,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr = \"value\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem attr=\"value\"/>", false)
     );
@@ -685,9 +849,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr=\" \"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem attr=\" \"/>", false)
     );
@@ -701,9 +869,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr=\" \"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem attr=\" \"/>", false)
     );
@@ -717,9 +889,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr=\"&#xd;\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem attr=\"&#xD;\"/>", false)
     );
@@ -733,9 +909,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr=\"&#xa;\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem attr=\"&#xA;\"/>", false)
     );
@@ -749,9 +929,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr=\"&#x9;\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem attr=\"&#x9;\"/>", false)
     );
@@ -765,9 +949,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<shoe name=\" \"\"\"\" \"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<shoe name=\" &#34;&#34; \"/>", false)
     );
@@ -781,9 +969,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<shoe name=\" '''''''' \"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<shoe name=\" '''''''' \"/>", false)
     );
@@ -797,9 +989,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<ncname (:a misplaced comment:)/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -813,9 +1009,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<foo attr=\"content<content\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -829,9 +1029,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<foo attr=\"content}content\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -845,9 +1049,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<foo attr=\"content{1\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -861,9 +1069,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<foo attr=\"{{{\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -877,9 +1089,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<foo attr=\"{\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -893,9 +1109,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<foo attr=\"{",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -909,9 +1129,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e attr=\"content}\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -925,9 +1149,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<foo attr=\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -941,9 +1169,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<foo attr=\"<foo/>\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -957,9 +1189,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<foo attr=\"<?target content?>\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -973,9 +1209,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<(:a misplaced comment:)ncname/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -989,9 +1229,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<foo attr=\"<!-- a comment-->\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1005,9 +1249,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<foo attr=\"<![CDATA[content]]>\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1021,9 +1269,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<foo attr=",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1037,9 +1289,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr=\"content'/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1053,9 +1309,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr='content\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1069,9 +1329,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<foo (:comment :)/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1085,9 +1349,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<foo attr=(:comment:)\"value\" />",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1101,9 +1369,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<foo attr(:comment:)=\"value\" />",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1117,9 +1389,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<foo attr=\"value\" (:comment:) attr2=\"value\" />",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1133,9 +1409,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(<foo attr=\"\"\"\"/>/@attr)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "\"")
     );
@@ -1149,9 +1429,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<ncname></ ncname>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1165,9 +1449,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(<foo attr='\"\"'/>/@attr)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "\"\"")
     );
@@ -1181,9 +1469,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(<foo attr=\"''\"/>/@attr)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "''")
     );
@@ -1197,9 +1489,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(<foo attr=''''/>/@attr)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "'")
     );
@@ -1213,9 +1509,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e attr=\"x{<e>a</e>, <e>b</e>, <e>c</e>, 1, 2, 3}y\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e attr=\"xa b c 1 2 3y\"/>", false)
     );
@@ -1229,9 +1529,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(<elem attr=\"{comment {\" content \"}}\"/>/@attr)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, " content ")
     );
@@ -1245,9 +1549,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "local-name(<elem attr=\"{comment {\" content \"}}\"/>/@attr)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "attr")
     );
@@ -1261,9 +1569,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(<elem attr=\"{processing-instruction name {\" content \"}}\"/>/@attr)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "content ")
     );
@@ -1277,9 +1589,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "local-name(<elem attr=\"{processing-instruction name {\" content \"}}\"/>/@attr)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "attr")
     );
@@ -1293,9 +1609,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "local-name(<elem attr=\"{attribute name {\" content \"}}\"/>/@attr)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "attr")
     );
@@ -1309,9 +1629,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(<elem attr=\"{attribute name {\" content \"}}\"/>/@attr)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, " content ")
     );
@@ -1325,9 +1649,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<ncname></ncname (:a misplaced comment:)>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XPST0003")
@@ -1345,9 +1673,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr1=\"\"\"\" attr2='''' attr3=\"''\" attr4='\"\"' attr5=\"'\" attr6='\"'/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem attr1=\"&quot;\" attr2=\"'\" attr3=\"''\" attr4=\"&quot;&quot;\" attr5=\"'\" attr6=\"&quot;\"/>", false)
     );
@@ -1361,9 +1693,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<foo attr=\"{<foo attr=\"foo\"/>}\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<foo attr=\"\"/>", false)
     );
@@ -1377,9 +1713,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<foo attr=\"{<!-- comment -->}\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<foo attr=\" comment \"/>", false)
     );
@@ -1393,9 +1733,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<foo attr=\"{<?target dat a ?>}\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<foo attr=\"dat a \"/>", false)
     );
@@ -1409,9 +1753,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://example.com/level/file.ext\"; <e xml:base=\"../\">{ static-base-uri()}</e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e xml:base=\"../\">http://example.com/level/file.ext</e>", false)
     );
@@ -1425,9 +1773,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://example.com/level/file.ext\"; <e xml:base=\"http://example.com/2/2\">{ static-base-uri()}</e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e xml:base=\"http://example.com/2/2\">http://example.com/level/file.ext</e>", false)
     );
@@ -1441,9 +1793,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e> { <b attr=\"fo\" a=\"bo\"/>/@* } </e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e attr=\"fo\" a=\"bo\"/>", false)
     );
@@ -1457,9 +1813,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "data(<e foo=\"content\"/>/@*) instance of xs:untypedAtomic",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1473,9 +1833,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a foo=\"1\"fb=\"1\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1489,9 +1853,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a b=\"1\" c=\"1\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a b=\"1\" c=\"1\"/>", false)
     );
@@ -1505,9 +1873,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<ncname>content</ncname > = 'content'",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1521,9 +1893,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a b=\"1\" c=\"1\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a b=\"1\" c=\"1\"/>", false)
     );
@@ -1537,9 +1913,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a foo='1'fb='1'/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1553,9 +1933,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a b='1' c='1'/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a b=\"1\" c=\"1\"/>", false)
     );
@@ -1569,9 +1953,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a b=\"1\"/a=\"1\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1585,9 +1973,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a b='1'/a='1'/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1601,9 +1993,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a b=\"1\">a=\"1\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1617,9 +2013,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a b='1'>a='1'/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1633,9 +2033,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a attr=\"content\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1649,9 +2053,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a attr='content'",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1665,9 +2073,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a attr=\"content\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1681,9 +2093,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<ncname></ncnameNOTBALANCED>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0118")
     );
@@ -1697,9 +2113,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a attr='content'",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1713,9 +2133,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a attr='con",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1729,9 +2153,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a attr=\"con",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1745,9 +2173,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a attr=",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1761,9 +2193,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a attr=",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1777,9 +2213,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a attr",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1793,9 +2233,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a b='1'/",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1809,9 +2253,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a b='1'/",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1825,9 +2273,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e xmlns=\"\" xmlns=\"\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0071")
     );
@@ -1841,9 +2293,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e xmlns:xml=\"http://www.w3.org/XML/1998/namespace\" xmlns:xml=\"http://www.w3.org/XML/1998/namespace\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0071")
     );
@@ -1857,9 +2313,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<![CDATA[a string]]>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1873,9 +2333,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default element namespace \"http://typedecl\"; namespace-uri-from-QName(node-name(exactly-one(<e attr=\"foo\"/>/@attr))) eq \"\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1889,9 +2353,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default element namespace \"http://typedecl\"; namespace-uri-from-QName(node-name(exactly-one(<e>{attribute attr {()} }/</e>/@attr))) eq \"\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1905,9 +2373,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "namespace-uri-from-QName(node-name(exactly-one(<e xmlns=\"http://example.com/\">{attribute attr {()} }/</e>/@attr))) eq \"\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1921,9 +2393,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default element namespace \"http://example.com/\"; namespace-uri-from-QName(node-name(attribute e {()})) eq \"\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1937,9 +2413,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e attr=\"{1}&#86;{1}&#86;\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e attr=\"1V1V\"/>", false)
     );
@@ -1951,192 +2431,19 @@ public class ProdDirAttributeList extends QT3TestSet {
   @org.junit.Test
   public void k2DirectConElemAttr75() {
     final XQuery query = new XQuery(
-      "(:*******************************************************:)\n" +
-      "(: Test: K2-DirectConElemAttr-75                         :)\n" +
-      "(: Written by: Frans Englich                             :)\n" +
-      "(: Date: 2007-11-22T11:31:21+01:00                       :)\n" +
-      "(: Purpose: Mix several ways for creating text for various kinds of nodes. This test is useful if an implementation is performing normalization of such constructors. :)\n" +
-      "(:*******************************************************:)\n" +
-      "<e attribute=\"{\n" +
-      "\"abc\",\n" +
-      "\"def\",\n" +
-      "\"ghi\",\n" +
-      "1,\n" +
-      "2,\n" +
-      "3,\n" +
-      "xs:untypedAtomic(\"abc\"),\n" +
-      "text {\"a text node\"},\n" +
-      "text {\"a text node\"},\n" +
-      "xs:untypedAtomic(\"def\"),\n" +
-      "xs:untypedAtomic(\"ghi\"),\n" +
-      "xs:hexBinary(\"FF\"),\n" +
-      "xs:untypedAtomic(\"abc\"),\n" +
-      "xs:string(\"def\"),\n" +
-      "xs:untypedAtomic(\"ghi\")\n" +
-      "}\n" +
-      "textNode\n" +
-      "{\"xs:string\"}\n" +
-      "textNode\n" +
-      "{\"xs:string\"}\n" +
-      "textNode\n" +
-      "{\"xs:string\"}\n" +
-      "text {\"a text node\"},\n" +
-      "{\"xs:string\"}\n" +
-      "{\"xs:string\"}textnode\">\n" +
-      "{ \n" +
-      "\n" +
-      "attribute name\n" +
-      "{\n" +
-      "text {\"a text node\"},\n" +
-      "text {\"a text node\"},\n" +
-      "\"abc\",\n" +
-      "\"def\",\n" +
-      "text {\"a text node\"},\n" +
-      "\"ghi\",\n" +
-      "1,\n" +
-      "2,\n" +
-      "text {\"a text node\"},\n" +
-      "3,\n" +
-      "xs:untypedAtomic(\"abc\"),\n" +
-      "xs:untypedAtomic(\"def\"),\n" +
-      "text {\"a text node\"},\n" +
-      "xs:untypedAtomic(\"ghi\"),\n" +
-      "xs:hexBinary(\"FF\"),\n" +
-      "xs:untypedAtomic(\"abc\"),\n" +
-      "xs:string(\"def\"),\n" +
-      "xs:untypedAtomic(\"ghi\"),\n" +
-      "\"xs:string\",\n" +
-      "xs:untypedAtomic(\"ghi\"),\n" +
-      "\"xs:string\",\n" +
-      "\"xs:string\",\n" +
-      "\"xs:string\",\n" +
-      "xs:untypedAtomic(\"ghi\")\n" +
-      "}\n" +
-      "}\n" +
-      "{\n" +
-      "text {\"a text node\"},\n" +
-      "text {\"a text node\"},\n" +
-      "\"abc\",\n" +
-      "\"def\",\n" +
-      "text {\"a text node\"},\n" +
-      "\"ghi\",\n" +
-      "1,\n" +
-      "2,\n" +
-      "text {\"a text node\"},\n" +
-      "3,\n" +
-      "xs:untypedAtomic(\"abc\"),\n" +
-      "text {\"a text node\"},\n" +
-      "xs:untypedAtomic(\"def\"),\n" +
-      "xs:untypedAtomic(\"ghi\"),\n" +
-      "xs:hexBinary(\"FF\"),\n" +
-      "xs:untypedAtomic(\"abc\"),\n" +
-      "xs:string(\"def\"),\n" +
-      "xs:untypedAtomic(\"ghi\")\n" +
-      "}\n" +
-      "textNode\n" +
-      "{\"xs:string\"}\n" +
-      "textNode\n" +
-      "{\"xs:string\"}\n" +
-      "textNode\n" +
-      "{\"xs:string\"}\n" +
-      "{\"xs:string\"}\n" +
-      "{\"xs:string\"}\n" +
-      "text {\"a text node\"},\n" +
-      "text {\"a text node\"},\n" +
-      "text {\"a text node\"},\n" +
-      "text {\"a text node\"},\n" +
-      "\n" +
-      "{\n" +
-      "comment\n" +
-      "{\n" +
-      "\"abc\",\n" +
-      "\"def\",\n" +
-      "\"ghi\",\n" +
-      "1,\n" +
-      "2,\n" +
-      "3,\n" +
-      "xs:untypedAtomic(\"abc\"),\n" +
-      "xs:untypedAtomic(\"def\"),\n" +
-      "xs:untypedAtomic(\"ghi\"),\n" +
-      "xs:hexBinary(\"FF\"),\n" +
-      "xs:untypedAtomic(\"abc\"),\n" +
-      "xs:string(\"def\"),\n" +
-      "xs:untypedAtomic(\"ghi\"),\n" +
-      "\"xs:string\",\n" +
-      "\"xs:string\",\n" +
-      "xs:untypedAtomic(\"ghi\"),\n" +
-      "\"xs:string\",\n" +
-      "text {\"a text node\"},\n" +
-      "text {\"a text node\"},\n" +
-      "\"xs:string\",\n" +
-      "xs:untypedAtomic(\"ghi\"),\n" +
-      "\"xs:string\"\n" +
-      "},\n" +
-      "processing-instruction target\n" +
-      "{\n" +
-      "\"abc\",\n" +
-      "\"def\",\n" +
-      "\"ghi\",\n" +
-      "1,\n" +
-      "2,\n" +
-      "3,\n" +
-      "xs:untypedAtomic(\"abc\"),\n" +
-      "xs:untypedAtomic(\"def\"),\n" +
-      "xs:untypedAtomic(\"ghi\"),\n" +
-      "text {\"a text node\"},\n" +
-      "text {\"a text node\"},\n" +
-      "xs:hexBinary(\"FF\"),\n" +
-      "xs:untypedAtomic(\"abc\"),\n" +
-      "xs:string(\"def\"),\n" +
-      "xs:untypedAtomic(\"ghi\"),\n" +
-      "\"xs:string\",\n" +
-      "\"xs:string\",\n" +
-      "xs:untypedAtomic(\"ghi\"),\n" +
-      "\"xs:string\",\n" +
-      "\"xs:string\",\n" +
-      "xs:untypedAtomic(\"ghi\"),\n" +
-      "text {\"a text node\"},\n" +
-      "\"xs:string\"\n" +
-      "},\n" +
-      "text\n" +
-      "{\n" +
-      "text {\"a text node\"},\n" +
-      "text {\"a text node\"},\n" +
-      "text {\"a text node\"},\n" +
-      "text {\"a text node\"},\n" +
-      "\"abc\",\n" +
-      "\"def\",\n" +
-      "\"ghi\",\n" +
-      "1,\n" +
-      "2,\n" +
-      "text {\"a text node\"},\n" +
-      "3,\n" +
-      "xs:untypedAtomic(\"abc\"),\n" +
-      "text {\"a text node\"},\n" +
-      "xs:untypedAtomic(\"def\"),\n" +
-      "xs:untypedAtomic(\"ghi\"),\n" +
-      "xs:hexBinary(\"FF\"),\n" +
-      "xs:untypedAtomic(\"abc\"),\n" +
-      "xs:string(\"def\"),\n" +
-      "xs:untypedAtomic(\"ghi\"),\n" +
-      "\"xs:string\",\n" +
-      "\"xs:string\",\n" +
-      "xs:untypedAtomic(\"ghi\"),\n" +
-      "\"xs:string\",\n" +
-      "\"xs:string\",\n" +
-      "xs:untypedAtomic(\"ghi\"),\n" +
-      "\"xs:string\",\n" +
-      "text {\"a text node\"}\n" +
-      "}\n" +
-      "\n" +
-      "}\n" +
-      "</e>",
+      queryFile(
+          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirAttributeList/K2-DirectConElemAttr-75.xq"
+      ),
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertSerialization("<e attribute=\"abc def ghi 1 2 3 abc a text node a text node def ghi FF abc def ghi textNode xs:string textNode xs:string textNode xs:string text a text node, xs:string xs:stringtextnode\" name=\"a text node a text node abc def a text node ghi 1 2 a text node 3 abc def a text node ghi FF abc def ghi xs:string ghi xs:string xs:string xs:string ghi\">a text nodea text nodeabc defa text nodeghi 1 2a text node3 abca text nodedef ghi FF abc def ghi\ntextNode\nxs:string\ntextNode\nxs:string\ntextNode\nxs:stringxs:stringxs:string\ntext a text node,\ntext a text node,\ntext a text node,\ntext a text node,\n\n<!--abc def ghi 1 2 3 abc def ghi FF abc def ghi xs:string xs:string ghi xs:string a text node a text node xs:string ghi xs:string--><?target abc def ghi 1 2 3 abc def ghi a text node a text node FF abc def ghi xs:string xs:string ghi xs:string xs:string ghi a text node xs:string?>a text node a text node a text node a text node abc def ghi 1 2 a text node 3 abc a text node def ghi FF abc def ghi xs:string xs:string ghi xs:string xs:string ghi xs:string a text node</e>", false)
+      assertSerialization("<e attribute=\"abc def ghi 1 2 3 abc a text node a text node def ghi FF abc def ghi textNode xs:string textNode xs:string textNode xs:string text a text node, xs:string xs:stringtextnode\" name=\"a text node a text node abc def a text node ghi 1 2 a text node 3 abc def a text node ghi FF abc def ghi xs:string ghi xs:string xs:string xs:string ghi\">a text nodea text nodeabc defa text nodeghi 1 2a text node3 abca text nodedef ghi FF abc def ghi\r\ntextNode\r\nxs:string\r\ntextNode\r\nxs:string\r\ntextNode\r\nxs:stringxs:stringxs:string\r\ntext a text node,\r\ntext a text node,\r\ntext a text node,\r\ntext a text node,\r\n\r\n<!--abc def ghi 1 2 3 abc def ghi FF abc def ghi xs:string xs:string ghi xs:string a text node a text node xs:string ghi xs:string--><?target abc def ghi 1 2 3 abc def ghi a text node a text node FF abc def ghi xs:string xs:string ghi xs:string xs:string ghi a text node xs:string?>a text node a text node a text node a text node abc def ghi 1 2 a text node 3 abc a text node def ghi FF abc def ghi xs:string xs:string ghi xs:string xs:string ghi xs:string a text node</e>", false)
     );
   }
 
@@ -2152,9 +2459,13 @@ public class ProdDirAttributeList extends QT3TestSet {
       "        <out fromFunction=\"{local:t()}\" fromVariable=\"{$var}\"/>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<out fromFunction=\" [ 3 ] \" fromVariable=\" [ 3 ] \"/>", false)
     );
@@ -2168,9 +2479,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<foo attr=\"\"\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -2184,9 +2499,13 @@ public class ProdDirAttributeList extends QT3TestSet {
     final XQuery query = new XQuery(
       "<foo attr='''/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );

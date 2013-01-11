@@ -20,9 +20,13 @@ public class MapCollation extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:collation(map{})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.w3.org/2005/xpath-functions/collation/codepoint")
     );
@@ -36,9 +40,13 @@ public class MapCollation extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:collation(map:new(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.w3.org/2005/xpath-functions/collation/codepoint")
     );
@@ -52,9 +60,13 @@ public class MapCollation extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:collation(map:new(map:entry(\"a\",\"x\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.w3.org/2005/xpath-functions/collation/codepoint")
     );
@@ -68,9 +80,13 @@ public class MapCollation extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:collation(map:entry(\"a\",\"x\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.w3.org/2005/xpath-functions/collation/codepoint")
     );
@@ -84,9 +100,13 @@ public class MapCollation extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:collation(map{\"a\":=1,\"b\":=2})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.w3.org/2005/xpath-functions/collation/codepoint")
     );
@@ -100,9 +120,13 @@ public class MapCollation extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:collation(map:new((map:entry(\"a\",\"x\"),map:entry(\"b\",\"y\"))))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.w3.org/2005/xpath-functions/collation/codepoint")
     );
@@ -116,9 +140,13 @@ public class MapCollation extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:collation(map:new((), \"http://www.w3.org/2005/xpath-functions/collation/codepoint\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.w3.org/2005/xpath-functions/collation/codepoint")
     );
@@ -132,9 +160,13 @@ public class MapCollation extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:collation(map:new(map{\"a\":=1,\"b\":=2}, \"http://www.w3.org/2005/xpath-functions/collation/codepoint\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.w3.org/2005/xpath-functions/collation/codepoint")
     );
@@ -148,10 +180,14 @@ public class MapCollation extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:collation(map:new(map{\"a\":=1,\"b\":=2}, \"xpath-functions/collation/codepoint\"))",
       ctx);
-    query.baseURI("http://www.w3.org/2005/");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.baseURI("http://www.w3.org/2005/");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.w3.org/2005/xpath-functions/collation/codepoint")
     );

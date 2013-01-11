@@ -20,10 +20,14 @@ public class ProdFLWORExprStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "(: Description: In LetClause, binding expr's ST must be subtype of variable's ST. Under REC FS, both are 'processing-instruction?', so STA succeeds. Under PER FS, former is 'processing-instruction filesystem?', latter is 'processing-instruction filesytem', so STA fails, raises error. (Note that an implementation that doesn't do STA will not raise an error.) :) let $pi as processing-instruction(filesystem) := (//processing-instruction(filesystem))[1] return $pi",
       ctx);
-    query.context(node(file("prod/ForClause/fsx_NS.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx_NS.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -45,10 +49,14 @@ public class ProdFLWORExprStaticTyping extends QT3TestSet {
       "        let $pi2 as processing-instruction(filesystem) := $pi \n" +
       "        return $pi2",
       ctx);
-    query.context(node(file("prod/ForClause/fsx_NS.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx_NS.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -62,9 +70,14 @@ public class ProdFLWORExprStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $file in (//Folder)[1]/File where ($file, 1) return $file/FileName",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XPTY0004")
@@ -82,9 +95,14 @@ public class ProdFLWORExprStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $file in (//Folder)[1]/File where (1, $file) return $file/FileName",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XPTY0004")
@@ -102,9 +120,13 @@ public class ProdFLWORExprStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (\"a\",\"b\",\"c\") where $var + 1 = 3 return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -118,9 +140,13 @@ public class ProdFLWORExprStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (\"a\",\"b\",\"c\") where ($var div 2) = 3 return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -134,9 +160,13 @@ public class ProdFLWORExprStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (\"a\",\"b\",\"c\") where ($var idiv 2) = 3 return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -150,9 +180,13 @@ public class ProdFLWORExprStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (\"a\",\"b\",\"c\") where ($var mod 2) = 3 return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -166,9 +200,13 @@ public class ProdFLWORExprStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := (\"a\",\"b\",\"c\") where ($var eq 1) return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -182,9 +220,13 @@ public class ProdFLWORExprStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := (\"a\",\"b\",\"c\") where ($var le 1) return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -198,9 +240,13 @@ public class ProdFLWORExprStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := (\"a\",\"b\",\"c\") where ($var lt 1) return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -214,9 +260,13 @@ public class ProdFLWORExprStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := (\"a\",\"b\",\"c\") where ($var gt 1) return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -230,9 +280,13 @@ public class ProdFLWORExprStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := (\"a\",\"b\",\"c\") where ($var ne 1) return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -246,9 +300,13 @@ public class ProdFLWORExprStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := (1,2,3) where ($var + 1) return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -262,9 +320,13 @@ public class ProdFLWORExprStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := (1,2,3) where ($var - 1) return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -278,9 +340,13 @@ public class ProdFLWORExprStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (\"a\",\"b\",\"c\") where fn:abs(($var)) return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -294,9 +360,13 @@ public class ProdFLWORExprStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := (1,2,3) where ($var * 1) return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -310,9 +380,13 @@ public class ProdFLWORExprStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $x := 1 let $z := $x + $y return $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -326,9 +400,13 @@ public class ProdFLWORExprStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := $y + 1; \"abc\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -342,9 +420,13 @@ public class ProdFLWORExprStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $x in (1, 2, 3) for $z in ($x, $y) return $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -358,9 +440,13 @@ public class ProdFLWORExprStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := (\"a\",\"b\",\"c\") where fn:not($var) eq fn:true() return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XPTY0004")
@@ -378,9 +464,13 @@ public class ProdFLWORExprStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (\"a\",\"b\",\"c\") where fn:avg(($var,1)) return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -394,9 +484,13 @@ public class ProdFLWORExprStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (\"a\",\"b\",\"c\") where fn:max(($var,1)) return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -410,9 +504,13 @@ public class ProdFLWORExprStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (\"a\",\"b\",\"c\") where fn:min(($var,1)) return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -426,9 +524,13 @@ public class ProdFLWORExprStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (\"a\",\"b\",\"c\") where fn:sum(($var,1)) return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -442,9 +544,13 @@ public class ProdFLWORExprStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := (\"a\",\"b\",\"c\") where fn:boolean($var) = fn:true() return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XPTY0004")
@@ -462,9 +568,13 @@ public class ProdFLWORExprStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (\"a\",\"b\",\"c\") where ($var - 1) = 3 return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -478,9 +588,13 @@ public class ProdFLWORExprStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (\"a\",\"b\",\"c\") where ($var * 1) = 3 return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );

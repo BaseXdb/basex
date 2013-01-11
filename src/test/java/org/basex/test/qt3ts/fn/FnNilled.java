@@ -13,22 +13,6 @@ import org.basex.test.qt3ts.QT3TestSet;
 public class FnNilled extends QT3TestSet {
 
   /**
-   *  A test whose essence is: `nilled()`. .
-   */
-  @org.junit.Test
-  public void kNilledFunc1() {
-    final XQuery query = new XQuery(
-      "nilled()",
-      ctx);
-
-    final QT3Result res = result(query);
-    result = res;
-    test(
-      error("XPST0017")
-    );
-  }
-
-  /**
    *  A test whose essence is: `nilled((), "wrong param")`. .
    */
   @org.junit.Test
@@ -36,9 +20,13 @@ public class FnNilled extends QT3TestSet {
     final XQuery query = new XQuery(
       "nilled((), \"wrong param\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -52,9 +40,13 @@ public class FnNilled extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(nilled( () ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,11 +60,37 @@ public class FnNilled extends QT3TestSet {
     final XQuery query = new XQuery(
       "nilled(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
+    );
+  }
+
+  /**
+   *  Test fn:nilled on non-element nodes. .
+   */
+  @org.junit.Test
+  public void cbclNilled007() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tempty(nilled( <?foo ?> ))\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
     );
   }
 
@@ -84,9 +102,13 @@ public class FnNilled extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:nilled(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -100,9 +122,13 @@ public class FnNilled extends QT3TestSet {
     final XQuery query = new XQuery(
       " fn:not(fn:nilled(<shoe xsi:nil=\"{fn:false()}\"/>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,9 +142,13 @@ public class FnNilled extends QT3TestSet {
     final XQuery query = new XQuery(
       " fn:not(fn:nilled(<shoe xsi:nil=\"{fn:true()}\"/>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -132,9 +162,13 @@ public class FnNilled extends QT3TestSet {
     final XQuery query = new XQuery(
       " fn:nilled(<shoe xsi:nil=\"{fn:true()}\"/>) and fn:true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -148,9 +182,13 @@ public class FnNilled extends QT3TestSet {
     final XQuery query = new XQuery(
       " fn:nilled(<shoe xsi:nil=\"{fn:true()}\"/>) and fn:false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -164,9 +202,13 @@ public class FnNilled extends QT3TestSet {
     final XQuery query = new XQuery(
       " fn:nilled(<shoe xsi:nil=\"{fn:true()}\"/>) or fn:true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -180,9 +222,13 @@ public class FnNilled extends QT3TestSet {
     final XQuery query = new XQuery(
       " fn:nilled(<shoe xsi:nil=\"{fn:true()}\"/>) or fn:false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -196,25 +242,33 @@ public class FnNilled extends QT3TestSet {
     final XQuery query = new XQuery(
       " fn:nilled(<shoe xsi:nil=\"{fn:true()}\"/>) ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
   }
 
   /**
-   *  Evaluation of nilled function used as argument to xs:boolean function. Returns true .
+   *  Evaluation of nilled function used as argument to xs:boolean function. Returns false .
    */
   @org.junit.Test
   public void fnNilled17() {
     final XQuery query = new XQuery(
       " xs:boolean(fn:nilled(<shoe xsi:nil=\"{fn:true()}\"/>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -228,27 +282,35 @@ public class FnNilled extends QT3TestSet {
     final XQuery query = new XQuery(
       " xs:boolean(fn:nilled(<shoe xsi:nil=\"{fn:false()}\"/>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
   }
 
   /**
-   *  Evaluation of nilled function with argument set to a document node Uses fn:count to avoid empty file. .
+   *  Evaluation of nilled function with argument set to a document node .
    */
   @org.junit.Test
   public void fnNilled19() {
     final XQuery query = new XQuery(
-      " fn:count(fn:nilled(document {<aList><anElement>data</anElement></aList>}))",
+      " fn:nilled(document {<aList><anElement>data</anElement></aList>})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertStringValue(false, "0")
+      assertEmpty()
     );
   }
 
@@ -260,60 +322,223 @@ public class FnNilled extends QT3TestSet {
     final XQuery query = new XQuery(
       " fn:count(fn:nilled(/works[1]/employee[2]/child::text()[last()]))",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
   }
 
   /**
-   *  Evaluation of nilled function with argument set to an attribute node Uses fn:count to avoid empty file. .
+   *  Evaluation of nilled function with argument set to an attribute node .
    */
   @org.junit.Test
   public void fnNilled20() {
     final XQuery query = new XQuery(
-      " fn:count(fn:nilled(attribute size {1}))",
+      " fn:nilled(attribute size {1})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertStringValue(false, "0")
+      assertEmpty()
     );
   }
 
   /**
-   *  Evaluation of nilled function with argument set to a comment node Uses fn:count to avoid empty file. .
+   *  Evaluation of nilled function with argument set to a comment node .
    */
   @org.junit.Test
   public void fnNilled21() {
     final XQuery query = new XQuery(
-      " fn:count(fn:nilled(<!-- This is a comment node -->))",
+      " fn:nilled(<!-- This is a comment node -->)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertStringValue(false, "0")
+      assertEmpty()
     );
   }
 
   /**
-   *  Evaluation of nilled function with argument set to a processing instruction node Uses fn:count to avoid empty file. .
+   *  Evaluation of nilled function with argument set to a processing instruction node.
    */
   @org.junit.Test
   public void fnNilled22() {
     final XQuery query = new XQuery(
-      " fn:count(fn:nilled(<?format role=\"output\" ?>))",
+      " fn:nilled(<?format role=\"output\" ?>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertStringValue(false, "0")
+      assertEmpty()
+    );
+  }
+
+  /**
+   *  nilled() applied to document node (Allowed in 3.0). .
+   */
+  @org.junit.Test
+  public void fnNilled23() {
+    final XQuery query = new XQuery(
+      "nilled()",
+      ctx);
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEmpty()
+    );
+  }
+
+  /**
+   *   nilled() applied to element node (Allowed in 3.0). .
+   */
+  @org.junit.Test
+  public void fnNilled24() {
+    final XQuery query = new XQuery(
+      "/*/nilled()",
+      ctx);
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *   nilled() applied to attribute node (Allowed in 3.0). .
+   */
+  @org.junit.Test
+  public void fnNilled25() {
+    final XQuery query = new XQuery(
+      "/works/employee[1]/@gender/nilled()",
+      ctx);
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEmpty()
+    );
+  }
+
+  /**
+   *   nilled() applied to text node (Allowed in 3.0). .
+   */
+  @org.junit.Test
+  public void fnNilled26() {
+    final XQuery query = new XQuery(
+      "/works/employee[1]/empnum/text()/nilled()",
+      ctx);
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEmpty()
+    );
+  }
+
+  /**
+   *   nilled() applied to untyped element node with xsi:nil=true (Allowed in 3.0). .
+   */
+  @org.junit.Test
+  public void fnNilled27() {
+    final XQuery query = new XQuery(
+      " (<shoe xsi:nil=\"true\"/>)/fn:nilled()",
+      ctx);
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *   nilled() : context item is atomic .
+   */
+  @org.junit.Test
+  public void fnNilled28() {
+    final XQuery query = new XQuery(
+      "23[nilled()]",
+      ctx);
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   *   nilled() : context item is a function item .
+   */
+  @org.junit.Test
+  public void fnNilled29() {
+    final XQuery query = new XQuery(
+      "nilled#0[nilled()]",
+      ctx);
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
     );
   }
 
@@ -325,12 +550,36 @@ public class FnNilled extends QT3TestSet {
     final XQuery query = new XQuery(
       " fn:nilled(/works[1]/employee[2])",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
+    );
+  }
+
+  /**
+   *   nilled() : context item is absent .
+   */
+  @org.junit.Test
+  public void fnNilled30() {
+    final XQuery query = new XQuery(
+      "current-date() gt current-date()+xs:dayTimeDuration('P1D') or nilled()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPDY0002")
     );
   }
 
@@ -342,9 +591,13 @@ public class FnNilled extends QT3TestSet {
     final XQuery query = new XQuery(
       " fn:nilled(<shoe size = \"5\"/>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -358,9 +611,13 @@ public class FnNilled extends QT3TestSet {
     final XQuery query = new XQuery(
       " fn:nilled(<shoe xsi:nil=\"true\"/>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -374,9 +631,13 @@ public class FnNilled extends QT3TestSet {
     final XQuery query = new XQuery(
       " fn:nilled(<shoe xsi:nil=\"false\"/>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -390,9 +651,13 @@ public class FnNilled extends QT3TestSet {
     final XQuery query = new XQuery(
       " fn:nilled(<shoe xsi:nil=\"{fn:true()}\"/>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -406,9 +671,13 @@ public class FnNilled extends QT3TestSet {
     final XQuery query = new XQuery(
       " fn:nilled(<shoe xsi:nil=\"{fn:false()}\"/>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -422,9 +691,13 @@ public class FnNilled extends QT3TestSet {
     final XQuery query = new XQuery(
       " fn:nilled(<shoe xsi:nil=\"{fn:true()}\"/>,\"A Second Argument\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );

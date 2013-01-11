@@ -20,9 +20,13 @@ public class FnImplicitTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "implicit-timezone(\"WRONG PARAM\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnImplicitTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "seconds-from-duration(implicit-timezone()) le 0 or seconds-from-duration(implicit-timezone()) gt 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class FnImplicitTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(seconds-from-duration(implicit-timezone()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnImplicitTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:implicit-timezone(\"Argument 1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -84,9 +100,13 @@ public class FnImplicitTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:implicit-timezone() div ( 0 div 0E0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOCA0005")
     );
@@ -100,9 +120,13 @@ public class FnImplicitTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:implicit-timezone() div 0 )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FODT0002")
     );
@@ -116,9 +140,13 @@ public class FnImplicitTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:implicit-timezone() div -0 )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FODT0002")
     );
@@ -132,9 +160,13 @@ public class FnImplicitTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "(implicit-timezone() + xs:dayTimeDuration('PT1S')) div (implicit-timezone() + xs:dayTimeDuration('PT1S'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -148,9 +180,13 @@ public class FnImplicitTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:implicit-timezone() div xs:dayTimeDuration(\"P0DT60M00S\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertType("xs:string")
     );
@@ -164,9 +200,13 @@ public class FnImplicitTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"05:00:00\") + fn:implicit-timezone()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertType("xs:time")
     );
@@ -180,9 +220,13 @@ public class FnImplicitTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"05:00:00\") - fn:implicit-timezone()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertType("xs:time")
     );
@@ -196,9 +240,13 @@ public class FnImplicitTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:date(\"2000-10-30\") - fn:implicit-timezone())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertType("xs:date")
     );
@@ -212,9 +260,13 @@ public class FnImplicitTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:date(\"2000-10-30\") + fn:implicit-timezone())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertType("xs:date")
     );
@@ -228,9 +280,13 @@ public class FnImplicitTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:dateTime(\"2000-10-30T11:12:00\") - fn:implicit-timezone())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertType("xs:dateTime")
     );
@@ -244,9 +300,13 @@ public class FnImplicitTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:implicit-timezone()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertType("xs:dayTimeDuration")
     );
@@ -260,9 +320,13 @@ public class FnImplicitTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:dateTime(\"2000-10-30T11:12:00\") + fn:implicit-timezone())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertType("xs:dateTime")
     );
@@ -276,9 +340,13 @@ public class FnImplicitTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:adjust-date-to-timezone(xs:date(\"2000-10-30\"),fn:implicit-timezone()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertType("xs:date")
     );
@@ -292,9 +360,13 @@ public class FnImplicitTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:adjust-time-to-timezone(xs:time(\"10:00:00\"),fn:implicit-timezone()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertType("xs:time")
     );
@@ -308,9 +380,13 @@ public class FnImplicitTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:adjust-dateTime-to-timezone(xs:dateTime(\"2002-03-07T10:00:00\"),fn:implicit-timezone()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertType("xs:dateTime")
     );
@@ -324,9 +400,13 @@ public class FnImplicitTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "implicit-timezone() ge xs:dayTimeDuration('-PT14H') and implicit-timezone() le xs:dayTimeDuration('PT14H')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -340,9 +420,13 @@ public class FnImplicitTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:implicit-timezone() + fn:implicit-timezone())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertType("xs:string")
     );
@@ -356,9 +440,13 @@ public class FnImplicitTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:implicit-timezone() - fn:implicit-timezone())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PT0S")
     );
@@ -372,9 +460,13 @@ public class FnImplicitTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:implicit-timezone() * xs:double(2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertType("xs:dayTimeDuration")
     );
@@ -388,9 +480,13 @@ public class FnImplicitTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:implicit-timezone() * (0 div 0E0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOCA0005")
     );
@@ -404,9 +500,13 @@ public class FnImplicitTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:implicit-timezone() * 0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PT0S")
     );
@@ -420,9 +520,13 @@ public class FnImplicitTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:implicit-timezone() * -0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PT0S")
     );
@@ -436,9 +540,13 @@ public class FnImplicitTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:implicit-timezone() div xs:double(2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertType("xs:string")
     );

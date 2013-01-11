@@ -20,12 +20,16 @@ public class AppUseCaseSTRING extends QT3TestSet {
     final XQuery query = new XQuery(
       "//news_item/title[contains(., \"Foobar Corporation\")]",
       ctx);
-    query.context(node(file("docs/string.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/string.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertSerialization("<title>Foobar Corporation releases its new line of Foo products\n   today</title><title>Foobar Corporation is suing Gorilla Corporation for\n   patent infringement </title>", false)
+      assertSerialization("<title>Foobar Corporation releases its new line of Foo products\r\n   today</title><title>Foobar Corporation is suing Gorilla Corporation for\r\n   patent infringement </title>", false)
     );
   }
 
@@ -64,13 +68,17 @@ public class AppUseCaseSTRING extends QT3TestSet {
       "            </news_item>\n" +
       "      ",
       ctx);
-    query.bind("$string", node(file("docs/string.xml")));
-    query.bind("$company-data", node(file("docs/company-data.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("$string", node(file("docs/string.xml")));
+      query.bind("$company-data", node(file("docs/company-data.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertSerialization("<news_item><title> Gorilla Corporation acquires YouNameItWeIntegrateIt.com </title><date>1-20-2000</date></news_item><news_item><title>Foobar Corporation releases its new line of Foo products\n   today</title><date>1-20-2000</date></news_item><news_item><title>Foobar Corporation is suing Gorilla Corporation for\n   patent infringement </title><date>1-20-2000</date></news_item>", false)
+      assertSerialization("<news_item><title> Gorilla Corporation acquires YouNameItWeIntegrateIt.com </title><date>1-20-2000</date></news_item><news_item><title>Foobar Corporation releases its new line of Foo products\r\n   today</title><date>1-20-2000</date></news_item><news_item><title>Foobar Corporation is suing Gorilla Corporation for\r\n   patent infringement </title><date>1-20-2000</date></news_item>", false)
     );
   }
 
@@ -92,13 +100,17 @@ public class AppUseCaseSTRING extends QT3TestSet {
       "          and (some $p in $partners satisfies contains(string($item), $p) and $item/news_agent != $c/name) \n" +
       "        return $item",
       ctx);
-    query.bind("$string", node(file("docs/string.xml")));
-    query.bind("$company-data", node(file("docs/company-data.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("$string", node(file("docs/string.xml")));
+      query.bind("$company-data", node(file("docs/company-data.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertSerialization("<news_item>\n   <title> Gorilla Corporation acquires YouNameItWeIntegrateIt.com </title>\n   <content>\n      <par> Today, Gorilla Corporation announced that it will purchase\n          YouNameItWeIntegrateIt.com. The shares of\n          YouNameItWeIntegrateIt.com dropped $3.00 as a result of this\n          announcement.\n      </par>\n\n      <par> As a result of this acquisition, the CEO of\n          YouNameItWeIntegrateIt.com Bill Smarts resigned. He did not\n          announce what he will do next.  Sources close to\n          YouNameItWeIntegrateIt.com hint that Bill Smarts might be\n          taking a position in Foobar Corporation.\n      </par>\n\n      <par>YouNameItWeIntegrateIt.com is a leading systems integrator\n          that enables <quote>brick and mortar</quote> companies to\n          have a presence on the web.\n      </par>\n\n   </content>\n   <date>1-20-2000</date>\n   <author>Mark Davis</author>\n   <news_agent>News Online</news_agent>\n</news_item><news_item> <title>Foobar Corporation is suing Gorilla Corporation for\n   patent infringement </title>\n   <content>\n      <par> In surprising developments today, Foobar Corporation\n         announced that it is suing Gorilla Corporation for patent\n         infringement. The patents that were mentioned as part of the\n         lawsuit are considered to be the basis of Foobar\n         Corporation's <quote>Wireless Foo</quote> line of products.\n      </par>\n      <par>The tension between Foobar and Gorilla Corporations has\n         been increasing ever since the Gorilla Corporation acquired\n         more than 40 engineers who have left Foobar Corporation,\n         TheAppCompany Inc. and YouNameItWeIntegrateIt.com over the\n         past 3 months. The engineers who have left the Foobar\n         corporation and its partners were rumored to be working on\n         the next generation of server products and applications which\n         will directly compete with Foobar's Foo 20.9 servers. Most of\n         the engineers have relocated to Hawaii where the Gorilla\n         Corporation's server development is located.\n      </par>\n   </content>\n   <date>1-20-2000</date>\n   <news_agent>Reliable News Corporation</news_agent>\n</news_item>", false)
+      assertSerialization("<news_item>\r\n   <title> Gorilla Corporation acquires YouNameItWeIntegrateIt.com </title>\r\n   <content>\r\n      <par> Today, Gorilla Corporation announced that it will purchase\r\n          YouNameItWeIntegrateIt.com. The shares of\r\n          YouNameItWeIntegrateIt.com dropped $3.00 as a result of this\r\n          announcement.\r\n      </par>\r\n\r\n      <par> As a result of this acquisition, the CEO of\r\n          YouNameItWeIntegrateIt.com Bill Smarts resigned. He did not\r\n          announce what he will do next.  Sources close to\r\n          YouNameItWeIntegrateIt.com hint that Bill Smarts might be\r\n          taking a position in Foobar Corporation.\r\n      </par>\r\n\r\n      <par>YouNameItWeIntegrateIt.com is a leading systems integrator\r\n          that enables <quote>brick and mortar</quote> companies to\r\n          have a presence on the web.\r\n      </par>\r\n\r\n   </content>\r\n   <date>1-20-2000</date>\r\n   <author>Mark Davis</author>\r\n   <news_agent>News Online</news_agent>\r\n</news_item><news_item> <title>Foobar Corporation is suing Gorilla Corporation for\r\n   patent infringement </title>\r\n   <content>\r\n      <par> In surprising developments today, Foobar Corporation\r\n         announced that it is suing Gorilla Corporation for patent\r\n         infringement. The patents that were mentioned as part of the\r\n         lawsuit are considered to be the basis of Foobar\r\n         Corporation's <quote>Wireless Foo</quote> line of products.\r\n      </par>\r\n      <par>The tension between Foobar and Gorilla Corporations has\r\n         been increasing ever since the Gorilla Corporation acquired\r\n         more than 40 engineers who have left Foobar Corporation,\r\n         TheAppCompany Inc. and YouNameItWeIntegrateIt.com over the\r\n         past 3 months. The engineers who have left the Foobar\r\n         corporation and its partners were rumored to be working on\r\n         the next generation of server products and applications which\r\n         will directly compete with Foobar's Foo 20.9 servers. Most of\r\n         the engineers have relocated to Hawaii where the Gorilla\r\n         Corporation's server development is located.\r\n      </par>\r\n   </content>\r\n   <date>1-20-2000</date>\r\n   <news_agent>Reliable News Corporation</news_agent>\r\n</news_item>", false)
     );
   }
 
@@ -117,12 +129,16 @@ public class AppUseCaseSTRING extends QT3TestSet {
       "               </item_summary>\n" +
       "      ",
       ctx);
-    query.context(node(file("docs/string.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/string.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertSerialization("<item_summary> Gorilla Corporation acquires YouNameItWeIntegrateIt.com . 1-20-2000.  Today, Gorilla Corporation announced that it will purchase\n          YouNameItWeIntegrateIt.com. The shares of\n          YouNameItWeIntegrateIt.com dropped $3.00 as a result of this\n          announcement.\n      </item_summary><item_summary>Foobar Corporation is suing Gorilla Corporation for\n   patent infringement . 1-20-2000.  In surprising developments today, Foobar Corporation\n         announced that it is suing Gorilla Corporation for patent\n         infringement. The patents that were mentioned as part of the\n         lawsuit are considered to be the basis of Foobar\n         Corporation's Wireless Foo line of products.\n      </item_summary>", false)
+      assertSerialization("<item_summary> Gorilla Corporation acquires YouNameItWeIntegrateIt.com . 1-20-2000.  Today, Gorilla Corporation announced that it will purchase\r\n          YouNameItWeIntegrateIt.com. The shares of\r\n          YouNameItWeIntegrateIt.com dropped $3.00 as a result of this\r\n          announcement.\r\n      </item_summary><item_summary>Foobar Corporation is suing Gorilla Corporation for\r\n   patent infringement . 1-20-2000.  In surprising developments today, Foobar Corporation\r\n         announced that it is suing Gorilla Corporation for patent\r\n         infringement. The patents that were mentioned as part of the\r\n         lawsuit are considered to be the basis of Foobar\r\n         Corporation's Wireless Foo line of products.\r\n      </item_summary>", false)
     );
   }
 }

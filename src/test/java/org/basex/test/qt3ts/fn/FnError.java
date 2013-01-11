@@ -20,9 +20,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "if(true()) then true() else error()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -36,9 +40,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "exactly-one((true(), error()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOER0000")
     );
@@ -52,9 +60,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "if(true()) then true() else error(QName(\"\", \"local\"), \"description\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "error(QName(\"\", \"local\"), \"description\", \"object\", \"wrong param\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -84,9 +100,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "error( () )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -100,9 +120,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "error(QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOER0000")
     );
@@ -116,9 +140,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "error((), \"description\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOER0000")
     );
@@ -132,9 +160,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "if(false()) then error((), \"description\") else true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -148,9 +180,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "error()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOER0000")
     );
@@ -164,9 +200,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "error(QName(\"\", \"XPDY6666\"), \"description\", \"error object\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("*")
     );
@@ -180,9 +220,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, error())[2]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "2")
@@ -200,9 +244,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default element namespace \"\"; fn:error(xs:QName(\"onlyAnNCName\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("*")
     );
@@ -216,11 +264,851 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "error(QName(\"\", \"FOO\"), \"DESCRIPTION\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("*")
+    );
+  }
+
+  /**
+   *  fn:error() may never be evaluated here .
+   */
+  @org.junit.Test
+  public void cbclError001() {
+    final XQuery query = new XQuery(
+      "declare function local:ignore($arg) { true() }; local:ignore( fn:error() )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("FOER0000")
+      )
+    );
+  }
+
+  /**
+   *  fn:error() may never be evaluated here .
+   */
+  @org.junit.Test
+  public void cbclError002() {
+    final XQuery query = new XQuery(
+      "empty(() + fn:error())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("FOER0000")
+      )
+    );
+  }
+
+  /**
+   *  fn:error() may never be evaluated here .
+   */
+  @org.junit.Test
+  public void cbclError003() {
+    final XQuery query = new XQuery(
+      "empty(fn:error() + ())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("FOER0000")
+      )
+    );
+  }
+
+  /**
+   *  fn:error() may never be evaluated here .
+   */
+  @org.junit.Test
+  public void cbclError004() {
+    final XQuery query = new XQuery(
+      "empty(() eq fn:error())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("FOER0000")
+      )
+    );
+  }
+
+  /**
+   *  fn:error() may never be evaluated here .
+   */
+  @org.junit.Test
+  public void cbclError005() {
+    final XQuery query = new XQuery(
+      "empty(fn:error() eq ())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("FOER0000")
+      )
+    );
+  }
+
+  /**
+   *  fn:error() may never be evaluated here .
+   */
+  @org.junit.Test
+  public void cbclError006() {
+    final XQuery query = new XQuery(
+      "fn:error() = ()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(false)
+      ||
+        error("FOER0000")
+      )
+    );
+  }
+
+  /**
+   *  fn:error() may never be evaluated here .
+   */
+  @org.junit.Test
+  public void cbclError007() {
+    final XQuery query = new XQuery(
+      "() = fn:error()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(false)
+      ||
+        error("FOER0000")
+      )
+    );
+  }
+
+  /**
+   *  fn:error() may never be evaluated here .
+   */
+  @org.junit.Test
+  public void cbclError008() {
+    final XQuery query = new XQuery(
+      "empty(fn:error() is ())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("FOER0000")
+      )
+    );
+  }
+
+  /**
+   *  fn:error() may never be evaluated here .
+   */
+  @org.junit.Test
+  public void cbclError009() {
+    final XQuery query = new XQuery(
+      "empty(() is fn:error())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("FOER0000")
+      )
+    );
+  }
+
+  /**
+   *  fn:error() may never be evaluated here .
+   */
+  @org.junit.Test
+  public void cbclError010() {
+    final XQuery query = new XQuery(
+      "fn:error() and false()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(false)
+      ||
+        error("FOER0000")
+      )
+    );
+  }
+
+  /**
+   *  fn:error() may never be evaluated here .
+   */
+  @org.junit.Test
+  public void cbclError011() {
+    final XQuery query = new XQuery(
+      "false() and fn:error()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(false)
+      ||
+        error("FOER0000")
+      )
+    );
+  }
+
+  /**
+   *  fn:error() may never be evaluated here .
+   */
+  @org.junit.Test
+  public void cbclError012() {
+    final XQuery query = new XQuery(
+      "fn:error() or true()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("FOER0000")
+      )
+    );
+  }
+
+  /**
+   *  fn:error() may never be evaluated here .
+   */
+  @org.junit.Test
+  public void cbclError013() {
+    final XQuery query = new XQuery(
+      "true() or fn:error()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("FOER0000")
+      )
+    );
+  }
+
+  /**
+   *  fn:error() may never be evaluated here .
+   */
+  @org.junit.Test
+  public void cbclError014() {
+    final XQuery query = new XQuery(
+      "for $x in fn:error() return true()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("FOER0000")
+      )
+    );
+  }
+
+  /**
+   *  fn:error() may never be evaluated here .
+   */
+  @org.junit.Test
+  public void cbclError015() {
+    final XQuery query = new XQuery(
+      "for $x at $p in fn:error() return true()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("FOER0000")
+      )
+    );
+  }
+
+  /**
+   *  fn:error() may never be evaluated here .
+   */
+  @org.junit.Test
+  public void cbclError016() {
+    final XQuery query = new XQuery(
+      "let $x := fn:error() return true()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("FOER0000")
+      )
+    );
+  }
+
+  /**
+   *  fn:error() may never be evaluated here .
+   */
+  @org.junit.Test
+  public void cbclError017() {
+    final XQuery query = new XQuery(
+      "if (fn:error()) then true() else true()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("FOER0000")
+      )
+    );
+  }
+
+  /**
+   *  fn:error() may never be evaluated here .
+   */
+  @org.junit.Test
+  public void cbclError018() {
+    final XQuery query = new XQuery(
+      "some $x in fn:error() satisfies false()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(false)
+      ||
+        error("FOER0000")
+      )
+    );
+  }
+
+  /**
+   *  fn:error() may never be evaluated here .
+   */
+  @org.junit.Test
+  public void cbclError019() {
+    final XQuery query = new XQuery(
+      "every $x in fn:error() satisfies true()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("FOER0000")
+      )
+    );
+  }
+
+  /**
+   *  fn:error() may never be evaluated here .
+   */
+  @org.junit.Test
+  public void cbclError020() {
+    final XQuery query = new XQuery(
+      "fn:error() instance of xs:integer",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("FOER0000")
+      )
+    );
+  }
+
+  /**
+   *  fn:error() may never be evaluated here .
+   */
+  @org.junit.Test
+  public void cbclError021() {
+    final XQuery query = new XQuery(
+      "typeswitch ( fn:error() ) case xs:integer return true() default return false()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("FOER0000")
+      )
+    );
+  }
+
+  /**
+   *  fn:error() may never be evaluated here .
+   */
+  @org.junit.Test
+  public void cbclError022() {
+    final XQuery query = new XQuery(
+      "typeswitch ( fn:error() ) case xs:integer return true() default return false()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("FOER0000")
+      )
+    );
+  }
+
+  /**
+   *  fn:error() may never be evaluated here .
+   */
+  @org.junit.Test
+  public void cbclError023() {
+    final XQuery query = new XQuery(
+      "empty(fn:error()[2])",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("FOER0000")
+      )
+    );
+  }
+
+  /**
+   *  fn:error() may never be evaluated here .
+   */
+  @org.junit.Test
+  public void cbclError024() {
+    final XQuery query = new XQuery(
+      "empty(fn:error()[false()])",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("FOER0000")
+      )
+    );
+  }
+
+  /**
+   *  fn:error() may never be evaluated here .
+   */
+  @org.junit.Test
+  public void cbclError025() {
+    final XQuery query = new XQuery(
+      "empty((1 div 0)[false()])",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("FOAR0001")
+      )
+    );
+  }
+
+  /**
+   *  fn:error() may never be evaluated here the static type of the conditional expression is empty .
+   */
+  @org.junit.Test
+  public void cbclError026() {
+    final XQuery query = new XQuery(
+      "empty( if (current-date() lt xs:date('2009-01-01')) then fn:error() else ())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("FOER0000")
+      )
+    );
+  }
+
+  /**
+   *  fn:error() may never be evaluated here the static type of the conditional expression is empty .
+   */
+  @org.junit.Test
+  public void cbclError027() {
+    final XQuery query = new XQuery(
+      "empty( if (current-date() lt xs:date('2009-01-01')) then () else fn:error())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("FOER0000")
+      )
+    );
+  }
+
+  /**
+   *  fn:error() may never be evaluated here the static type of the typeswitch expression is empty .
+   */
+  @org.junit.Test
+  public void cbclError028() {
+    final XQuery query = new XQuery(
+      "declare function local:item() { if (current-date() lt xs:date('2012-10-10')) then 1 else \"one\" }; empty( typeswitch ( local:item() ) case xs:integer return fn:error() default return ())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("FOER0000")
+      )
+    );
+  }
+
+  /**
+   *  fn:error() may never be evaluated here the static type of the typeswitch expression is empty .
+   */
+  @org.junit.Test
+  public void cbclError029() {
+    final XQuery query = new XQuery(
+      "declare function local:item() { if (current-date() gt xs:date('1900-01-01')) then 1 else \"one\" }; empty( typeswitch ( local:item() ) case xs:integer return () default return fn:error())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  fn:error() may never be evaluated here the static type of the fn:remove call is empty .
+   */
+  @org.junit.Test
+  public void cbclError030() {
+    final XQuery query = new XQuery(
+      "empty(fn:remove( fn:error(), 1))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("FOER0000")
+      )
+    );
+  }
+
+  /**
+   *  fn:error() may never be evaluated here the static type of the fn:remove call is empty .
+   */
+  @org.junit.Test
+  public void cbclError031() {
+    final XQuery query = new XQuery(
+      "empty(fn:subsequence( fn:error(), 2, 2))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("FOER0000")
+      )
+    );
+  }
+
+  /**
+   *  fn:error() may never be evaluated here the static type of the except operator is empty .
+   */
+  @org.junit.Test
+  public void cbclError032() {
+    final XQuery query = new XQuery(
+      "empty(fn:error() except fn:error() )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("FOER0000")
+      )
+    );
+  }
+
+  /**
+   *  fn:error() may never be evaluated here the static type of the intersect operator is empty .
+   */
+  @org.junit.Test
+  public void cbclError033() {
+    final XQuery query = new XQuery(
+      "empty(fn:error() intersect fn:error() )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("FOER0000")
+      )
+    );
+  }
+
+  /**
+   *  fn:error() may never be evaluated here the static type of fn:zero-or-one call is empty .
+   */
+  @org.junit.Test
+  public void cbclError034() {
+    final XQuery query = new XQuery(
+      "empty( fn:zero-or-one(fn:error()) )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("FOER0000")
+      )
+    );
+  }
+
+  /**
+   *  fn:error() may never be evaluated here the static type of the treat as expression is empty .
+   */
+  @org.junit.Test
+  public void cbclError035() {
+    final XQuery query = new XQuery(
+      "empty( fn:error() treat as empty-sequence() )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("FOER0000")
+      )
     );
   }
 
@@ -232,9 +1120,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOER0000")
     );
@@ -248,9 +1140,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:SENR0001'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("SENR0001")
     );
@@ -264,9 +1160,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:SEPM0004'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("SEPM0004")
     );
@@ -280,9 +1180,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:SEPM0009'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("SEPM0009")
     );
@@ -296,9 +1200,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:SEPM0010'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("SEPM0010")
     );
@@ -312,9 +1220,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:SEPM0016'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("SEPM0016")
     );
@@ -328,9 +1240,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:SERE0003'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("SERE0003")
     );
@@ -344,9 +1260,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:SERE0005'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("SERE0005")
     );
@@ -360,9 +1280,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:SERE0006'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("SERE0006")
     );
@@ -376,9 +1300,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:SERE0008'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("SERE0008")
     );
@@ -392,9 +1320,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:SERE0012'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("SERE0012")
     );
@@ -408,9 +1340,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.example.com/HR', 'myerr:toohighsal'), 'Does not apply because salary is too high')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("*")
     );
@@ -424,9 +1360,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:SERE0014'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("SERE0014")
     );
@@ -440,9 +1380,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:SESU0007'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("SESU0007")
     );
@@ -456,9 +1400,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:SESU0011'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("SESU0011")
     );
@@ -472,9 +1420,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:XPDY0002'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -488,9 +1440,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:XPST0010'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0010")
     );
@@ -504,9 +1460,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:XPST0080'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0080")
     );
@@ -520,9 +1480,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:XPTY0018'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0018")
     );
@@ -536,9 +1500,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:XQDY0027'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0027")
     );
@@ -552,9 +1520,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error('Wrong Argument Type')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -568,9 +1540,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:XQDY0061'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0061")
     );
@@ -584,9 +1560,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:XQDY0084'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0084")
     );
@@ -600,9 +1580,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:XQST0009'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0009")
     );
@@ -616,9 +1600,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:XQST0012'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0012")
     );
@@ -632,9 +1620,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:XQST0013'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0013")
     );
@@ -648,9 +1640,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:XQST0016'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0016")
     );
@@ -664,9 +1660,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:XQST0035'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0035")
     );
@@ -680,9 +1680,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:XQST0036'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0036")
     );
@@ -696,9 +1700,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:XQST0046'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0046")
     );
@@ -712,9 +1720,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:XQST0047'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0047")
     );
@@ -728,9 +1740,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOCH0004'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOCH0004")
     );
@@ -744,9 +1760,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:XQST0048'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0048")
     );
@@ -760,9 +1780,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:XQST0054'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0054")
     );
@@ -776,9 +1800,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:XQST0055'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0055")
     );
@@ -792,9 +1820,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:XQST0057'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0057")
     );
@@ -808,9 +1840,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:XQST0058'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0058")
     );
@@ -824,9 +1860,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:XQST0060'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0060")
     );
@@ -840,9 +1880,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:XQST0073'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0073")
     );
@@ -856,9 +1900,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:XQST0075'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0075")
     );
@@ -872,9 +1920,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:XQST0076'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0076")
     );
@@ -888,9 +1940,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:XQST0079'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0079")
     );
@@ -904,9 +1960,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error((), 'err:FOER0000')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOER0000")
     );
@@ -920,9 +1980,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:XQST0087'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0087")
     );
@@ -936,9 +2000,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:XQTY0030'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQTY0030")
     );
@@ -952,9 +2020,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error((), 'err:FOER0000','error raised by this test by setting first argument to empty sequence')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOER0000")
     );
@@ -968,9 +2040,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FODT0001'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FODT0001")
     );
@@ -984,9 +2060,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FORG0009'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0009")
     );
@@ -1000,9 +2080,13 @@ public class FnError extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOTY0012'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOTY0012")
     );

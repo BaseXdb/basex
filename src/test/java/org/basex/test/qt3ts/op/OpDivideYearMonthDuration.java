@@ -27,9 +27,13 @@ public class OpDivideYearMonthDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P3Y36M\") div 3 eq xs:yearMonthDuration(\"P2Y\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -50,9 +54,13 @@ public class OpDivideYearMonthDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P3Y36M\") div xs:double(\"-INF\") eq xs:yearMonthDuration(\"P0M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -73,9 +81,13 @@ public class OpDivideYearMonthDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P3Y36M\") div xs:double(\"INF\") eq xs:yearMonthDuration(\"P0M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -96,9 +108,13 @@ public class OpDivideYearMonthDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P3Y36M\") div 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FODT0002")
     );
@@ -119,9 +135,13 @@ public class OpDivideYearMonthDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P3Y36M\") div xs:double(\"NaN\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOCA0005")
     );
@@ -142,9 +162,79 @@ public class OpDivideYearMonthDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P3Y36M\") div xs:double(\"-0\")",
       ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FODT0002")
+    );
+  }
 
-    final QT3Result res = result(query);
-    result = res;
+  /**
+   *  test division of xs:yearMonthDuration by 0 .
+   */
+  @org.junit.Test
+  public void cbclDivideYearMonthDuration001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:yearMonthDuration($years as xs:integer) as xs:yearMonthDuration { xs:yearMonthDuration(concat(\"P\", $years, \"Y\")) };\n" +
+      "        local:yearMonthDuration(2) div 0",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FODT0002")
+    );
+  }
+
+  /**
+   *  test division of xs:yearMonthDuration by 1 .
+   */
+  @org.junit.Test
+  public void cbclDivideYearMonthDuration002() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:yearMonthDuration($years as xs:integer) as xs:yearMonthDuration { xs:yearMonthDuration(concat(\"P\", $years, \"Y\")) };\n" +
+      "        local:yearMonthDuration(2) div 1",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "P2Y")
+    );
+  }
+
+  /**
+   *  test possible overflow in division of xs:yearMonthDuration .
+   */
+  @org.junit.Test
+  public void cbclDivideYearMonthDuration003() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:yearMonthDuration($years as xs:integer) as xs:yearMonthDuration { xs:yearMonthDuration(concat(\"P\", $years, \"Y\")) };\n" +
+      "        local:yearMonthDuration(768614336404564650) div 0.5",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FODT0002")
     );
@@ -166,9 +256,13 @@ public class OpDivideYearMonthDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:yearMonthDuration(\"P2Y11M\") div 1.5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P1Y11M")
     );
@@ -191,9 +285,13 @@ public class OpDivideYearMonthDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string((xs:yearMonthDuration(\"P05Y02M\") div 2.0)) or fn:string((xs:yearMonthDuration(\"P05Y03M\") div 2.0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -215,9 +313,13 @@ public class OpDivideYearMonthDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:yearMonthDuration(\"P20Y11M\") div 2.0) div (xs:yearMonthDuration(\"P20Y11M\") div 2.0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -240,9 +342,13 @@ public class OpDivideYearMonthDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string((xs:yearMonthDuration(\"P10Y11M\") div 2.0)) and (fn:true())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -264,9 +370,13 @@ public class OpDivideYearMonthDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:yearMonthDuration(\"P23Y11M\") div 2.0) eq xs:yearMonthDuration(\"P23Y11M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -288,9 +398,13 @@ public class OpDivideYearMonthDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:yearMonthDuration(\"P21Y12M\") div 2.0) ne xs:yearMonthDuration(\"P08Y05M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -312,9 +426,13 @@ public class OpDivideYearMonthDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:yearMonthDuration(\"P10Y01M\") div 2.0) le xs:yearMonthDuration(\"P17Y02M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -336,9 +454,13 @@ public class OpDivideYearMonthDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:yearMonthDuration(\"P13Y09M\") div 2.0) ge xs:yearMonthDuration(\"P18Y02M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -360,9 +482,13 @@ public class OpDivideYearMonthDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $i in (-2, -4, -10, -50, +50, +10, +4, +2) return (xs:yearMonthDuration(\"P5M\") div $i)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-P2M -P1M P0M P0M P0M P1M P1M P3M")
     );
@@ -384,9 +510,13 @@ public class OpDivideYearMonthDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string((xs:yearMonthDuration(\"P10Y11M\") div 2.0)) and fn:false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -408,9 +538,13 @@ public class OpDivideYearMonthDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string((xs:yearMonthDuration(\"P20Y10M\") div 2.0)) or fn:false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -432,9 +566,13 @@ public class OpDivideYearMonthDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(fn:string(xs:yearMonthDuration(\"P11Y04M\") div 2.0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -457,9 +595,13 @@ public class OpDivideYearMonthDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:boolean(fn:string(xs:yearMonthDuration(\"P05Y08M\") div 2.0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -480,9 +622,13 @@ public class OpDivideYearMonthDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:yearMonthDuration(\"P02Y09M\") div 2.0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );
@@ -504,9 +650,13 @@ public class OpDivideYearMonthDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(xs:yearMonthDuration(\"P03Y08M\") div 2.0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P1Y10M")
     );
@@ -528,9 +678,13 @@ public class OpDivideYearMonthDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:yearMonthDuration(\"P10Y01M\") div -2.0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-P5Y")
     );
@@ -553,9 +707,13 @@ public class OpDivideYearMonthDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string((xs:yearMonthDuration(\"P01Y01M\") div 2.0)) and fn:string((xs:yearMonthDuration(\"P02Y03M\") div 2.0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -579,9 +737,13 @@ public class OpDivideYearMonthDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P0Y0M\") div xs:double(\"-1.7976931348623157E308\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P0M")
     );
@@ -605,9 +767,13 @@ public class OpDivideYearMonthDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1000Y6M\") div xs:double(\"-1.7976931348623157E308\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P0M")
     );
@@ -631,9 +797,13 @@ public class OpDivideYearMonthDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P2030Y12M\") div xs:double(\"-1.7976931348623157E308\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P0M")
     );
@@ -657,9 +827,13 @@ public class OpDivideYearMonthDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P0Y0M\") div xs:double(\"0.1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P0M")
     );
@@ -683,9 +857,13 @@ public class OpDivideYearMonthDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P0Y0M\") div xs:double(\"1.7976931348623157E308\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P0M")
     );

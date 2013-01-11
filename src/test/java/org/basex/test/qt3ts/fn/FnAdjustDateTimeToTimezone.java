@@ -4,7 +4,7 @@ import org.basex.tests.bxapi.XQuery;
 import org.basex.test.qt3ts.QT3TestSet;
 
 /**
-.
+ * Tests for the adjust-dateTime-to-timeZone() function.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
@@ -20,9 +20,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "adjust-dateTime-to-timezone()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "adjust-dateTime-to-timezone(xs:dateTime(\"2002-03-07T10:00:00\"), xs:dayTimeDuration(\"-PT5H0M\")) eq xs:dateTime(\"2002-03-07T10:00:00-05:00\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "adjust-dateTime-to-timezone(xs:dateTime(\"2002-03-07T10:00:00-07:00\"), xs:dayTimeDuration(\"-PT5H0M\")) eq xs:dateTime(\"2002-03-07T12:00:00-05:00\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "adjust-dateTime-to-timezone(xs:dateTime(\"2002-03-07T10:00:00\"), xs:dayTimeDuration(\"-PT10H\")) eq xs:dateTime(\"2002-03-07T10:00:00-10:00\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "adjust-dateTime-to-timezone(xs:dateTime(\"2002-03-07T10:00:00-07:00\"), xs:dayTimeDuration(\"-PT10H\")) eq xs:dateTime(\"2002-03-07T07:00:00-10:00\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "adjust-dateTime-to-timezone(xs:dateTime(\"2002-03-07T10:00:00-07:00\"), xs:dayTimeDuration(\"PT10H\")) eq xs:dateTime(\"2002-03-08T03:00:00+10:00\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,9 +140,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "adjust-dateTime-to-timezone(xs:dateTime(\"2002-03-07T00:00:00+01:00\"), xs:dayTimeDuration(\"-PT8H\")) eq xs:dateTime(\"2002-03-06T15:00:00-08:00\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -132,9 +160,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "adjust-dateTime-to-timezone(xs:dateTime(\"2002-03-07T10:00:00\"), ()) eq xs:dateTime(\"2002-03-07T10:00:00\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -148,9 +180,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "adjust-dateTime-to-timezone((), (), \"WRONG PARAM\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -164,9 +200,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(adjust-dateTime-to-timezone(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -180,9 +220,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(adjust-dateTime-to-timezone((), ()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -196,9 +240,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "adjust-dateTime-to-timezone(()) instance of xs:dateTime?",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -212,9 +260,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "timezone-from-dateTime(adjust-dateTime-to-timezone(xs:dateTime(\"2001-02-03T00:00:00\"))) eq implicit-timezone()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -228,9 +280,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "adjust-dateTime-to-timezone(xs:dateTime(\"2001-02-03T08:02:00\"), xs:dayTimeDuration(\"PT14H1M\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FODT0003")
     );
@@ -244,9 +300,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "adjust-dateTime-to-timezone(xs:dateTime(\"2001-02-03T08:02:00\"), xs:dayTimeDuration(\"-PT14H1M\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FODT0003")
     );
@@ -260,9 +320,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "adjust-dateTime-to-timezone(xs:dateTime(\"2001-02-03T08:02:00\"), xs:dayTimeDuration(\"PT14H0M0.001S\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FODT0003")
     );
@@ -276,11 +340,95 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:adjust-dateTime-to-timezone(xs:dateTime(\"1999-12-31T24:00:00\"), ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2000-01-01T00:00:00")
+    );
+  }
+
+  /**
+   * Check optimization codepath in adjust-dateTime-to-timezone.
+   */
+  @org.junit.Test
+  public void cbclAdjustDateTimeToTimezone001() {
+    final XQuery query = new XQuery(
+      "adjust-dateTime-to-timezone(current-dateTime(), implicit-timezone()) eq current-dateTime()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   * Test that adjust-dateTime-to-timezone underflows nicely. .
+   */
+  @org.junit.Test
+  public void cbclAdjustDateTimeToTimezone002() {
+    final XQuery query = new XQuery(
+      "adjust-dateTime-to-timezone(xs:dateTime(\"-25252734927766555-06-07T01:00:00+02:00\"), xs:dayTimeDuration(\"PT0S\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FODT0001")
+    );
+  }
+
+  /**
+   * A query testing that adjust-dateTime-to-timezone overflows nicely. .
+   */
+  @org.junit.Test
+  public void cbclAdjustDateTimeToTimezone003() {
+    final XQuery query = new XQuery(
+      "adjust-dateTime-to-timezone(xs:dateTime(\"25252734927766555-07-28T23:00:00-02:00\"), xs:dayTimeDuration(\"PT0S\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FODT0001")
+    );
+  }
+
+  /**
+   * Check optimization codepath in adjust-dateTime-to-timezone .
+   */
+  @org.junit.Test
+  public void cbclAdjustDateTimeToTimezone004() {
+    final XQuery query = new XQuery(
+      "adjust-dateTime-to-timezone(current-dateTime(), xs:dayTimeDuration(\"PT2H\")) eq adjust-dateTime-to-timezone(current-dateTime(), xs:dayTimeDuration(\"-PT2H\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
     );
   }
 
@@ -292,9 +440,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:adjust-dateTime-to-timezone(xs:dateTime(\"2002-03-07T10:00:00-05:00\"),xs:dayTimeDuration(\"-PT5H0M\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2002-03-07T10:00:00-05:00")
     );
@@ -308,9 +460,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:adjust-dateTime-to-timezone(xs:dateTime(\"2002-03-07T10:00:00-07:00\")) - fn:adjust-dateTime-to-timezone(xs:dateTime(\"2002-03-07T10:00:00-07:00\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PT0S")
     );
@@ -324,9 +480,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:adjust-dateTime-to-timezone(xs:dateTime(\"2002-03-07T10:00:00-04:00\"),()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2002-03-07T10:00:00")
     );
@@ -340,9 +500,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:boolean(fn:string(fn:adjust-dateTime-to-timezone(xs:dateTime(\"2002-03-07T10:00:00-04:00\"),())))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -356,9 +520,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(fn:string(fn:adjust-dateTime-to-timezone(xs:dateTime(\"2002-03-07T10:00:00-04:00\"),())))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -372,9 +540,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:adjust-dateTime-to-timezone(xs:dateTime(\"2002-03-07T10:00:00-04:00\"),())) or fn:true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -388,9 +560,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:adjust-dateTime-to-timezone(xs:dateTime(\"2002-03-07T10:00:00-04:00\"),())) or fn:false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -404,9 +580,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:adjust-dateTime-to-timezone(xs:dateTime(\"2002-03-07T10:00:00-04:00\"),())) and fn:true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -420,9 +600,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:adjust-dateTime-to-timezone(xs:dateTime(\"2002-03-07T10:00:00-04:00\"),())) and fn:false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -436,9 +620,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:adjust-dateTime-to-timezone(xs:dateTime(\"2002-03-07T10:00:00-04:00\")) - xs:dateTime(\"2006-03-07T10:00:00-05:00\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-P1461DT1H")
     );
@@ -452,9 +640,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:adjust-dateTime-to-timezone(xs:dateTime(\"2002-03-07T10:00:00-04:00\")) - xs:dateTime(\"2001-03-07T10:00:00-05:00\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P364DT23H")
     );
@@ -468,9 +660,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:adjust-dateTime-to-timezone(xs:dateTime(\"2002-03-07T10:00:00-07:00\"),xs:dayTimeDuration(\"-PT5H0M\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2002-03-07T12:00:00-05:00")
     );
@@ -484,9 +680,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:adjust-dateTime-to-timezone(xs:dateTime(\"2002-03-07T10:00:00-04:00\")) ge fn:adjust-dateTime-to-timezone(xs:dateTime(\"2005-03-07T10:00:00-04:00\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -500,9 +700,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:adjust-dateTime-to-timezone(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -516,9 +720,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:adjust-dateTime-to-timezone(xs:dateTime(\"2002-03-07T10:00:00-04:00\"),xs:dayTimeDuration(\"-PT15H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FODT0003")
     );
@@ -532,9 +740,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:adjust-dateTime-to-timezone(xs:dateTime(\"2002-03-07T10:00:00-04:00\"),xs:dayTimeDuration(\"PT15H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FODT0003")
     );
@@ -548,9 +760,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $tz := xs:dayTimeDuration(\"-PT10H\") return fn:adjust-dateTime-to-timezone(xs:dateTime(\"2002-03-07T10:00:00\"), $tz)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2002-03-07T10:00:00-10:00")
     );
@@ -564,9 +780,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $tz := xs:dayTimeDuration(\"-PT10H\") return fn:adjust-dateTime-to-timezone(xs:dateTime(\"2002-03-07T10:00:00-07:00\"), $tz)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2002-03-07T07:00:00-10:00")
     );
@@ -580,9 +800,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:adjust-dateTime-to-timezone(xs:dateTime(\"2002-03-07T10:00:00-07:00\"), xs:dayTimeDuration(\"PT10H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2002-03-08T03:00:00+10:00")
     );
@@ -596,9 +820,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:adjust-dateTime-to-timezone(xs:dateTime(\"2002-03-07T00:00:00+01:00\"), xs:dayTimeDuration(\"-PT8H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2002-03-06T15:00:00-08:00")
     );
@@ -612,9 +840,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:adjust-dateTime-to-timezone(xs:dateTime(\"2002-03-07T10:00:00\"), ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2002-03-07T10:00:00")
     );
@@ -628,9 +860,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:adjust-dateTime-to-timezone(xs:dateTime(\"2002-03-07T10:00:00-07:00\"), ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2002-03-07T10:00:00")
     );
@@ -644,9 +880,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:adjust-dateTime-to-timezone(xs:dateTime(\"2002-03-07T10:00:00-07:00\")) - fn:adjust-dateTime-to-timezone(xs:dateTime(\"2006-03-07T10:00:00-07:00\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-P1461D")
     );
@@ -660,9 +900,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:adjust-dateTime-to-timezone(xs:dateTime(\"1970-01-01T00:00:00Z\"),xs:dayTimeDuration(\"-PT10H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1969-12-31T14:00:00-10:00")
     );
@@ -676,9 +920,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:adjust-dateTime-to-timezone(xs:dateTime(\"1996-04-07T01:40:52Z\"),xs:dayTimeDuration(\"-PT10H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1996-04-06T15:40:52-10:00")
     );
@@ -692,9 +940,13 @@ public class FnAdjustDateTimeToTimezone extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:adjust-dateTime-to-timezone(xs:dateTime(\"2030-12-31T23:59:59Z\"),xs:dayTimeDuration(\"-PT10H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2030-12-31T13:59:59-10:00")
     );

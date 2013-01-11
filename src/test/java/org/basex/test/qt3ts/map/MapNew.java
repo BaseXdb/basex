@@ -20,9 +20,13 @@ public class MapNew extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:new()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertCount(1)
@@ -44,9 +48,13 @@ public class MapNew extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:new(())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertCount(1)
@@ -66,9 +74,13 @@ public class MapNew extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:new(map:entry(\"foo\", 1 to 5))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertCount(1)
@@ -90,9 +102,13 @@ public class MapNew extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:new((map:entry(\"foo\", 1 to 5), map:entry(\"bar\", 6 to 10)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertCount(1)
@@ -114,9 +130,13 @@ public class MapNew extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:new(for $i in 1 to 20 return map:entry($i, $i*$i))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertCount(1)
@@ -140,9 +160,13 @@ public class MapNew extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:new((map:entry(\"foo\", 3), map:entry(\"foo\", 4)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertCount(1)
@@ -167,9 +191,13 @@ public class MapNew extends QT3TestSet {
       "let $foo := map:entry(\"foo\", 3), $bar := map:entry(\"foo\", 4), $foobar := map:new(($foo, $bar))\n" +
       "              return ($foobar, $bar, $foo)[3]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertCount(1)
@@ -194,9 +222,13 @@ public class MapNew extends QT3TestSet {
       "let $foo := map:new(for $i in 1 to 20 return map:entry($i, $i*$i)), $bar := map:entry(8, 63), $foobar := map:new(($foo, $bar))\n" +
       "              return ($foobar, $bar, $foo)[3]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertCount(1)
@@ -221,9 +253,13 @@ public class MapNew extends QT3TestSet {
       "let $foo := map:new(for $i in 1 to 20 return map:entry($i, $i*$i)), $bar := map:entry(8, 63), $foobar := map:new(($foo, $bar))\n" +
       "              return ($foobar, $bar, $foo)[2]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertCount(1)
@@ -248,9 +284,13 @@ public class MapNew extends QT3TestSet {
       "let $foo := map:new(for $i in 1 to 20 return map:entry($i, $i*$i)), $bar := map:new(), $foobar := map:new(($foo, $bar))\n" +
       "              return $foobar",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertCount(1)
@@ -274,9 +314,13 @@ public class MapNew extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:new((map:entry(3, \"three\"), map:entry(3.0e0, \"threeD\"), map:entry(xs:float('3.0'), \"threeF\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertCount(1)
@@ -301,15 +345,19 @@ public class MapNew extends QT3TestSet {
       "map:new(for $n in distinct-values(//*/node-name()) \n" +
       "                      return map:entry($n, //*[node-name() eq $n]))",
       ctx);
-    query.namespace("ma", "http://www.example.com/AuctionWatch");
-    query.namespace("xlink", "http://www.w3.org/1999/xlink");
-    query.namespace("anyzone", "http://www.example.com/auctioneers#anyzone");
-    query.namespace("eachbay", "http://www.example.com/auctioneers#eachbay");
-    query.namespace("yabadoo", "http://www.example.com/auctioneers#yabadoo");
-    query.context(node(file("docs/auction.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("ma", "http://www.example.com/AuctionWatch");
+      query.namespace("xlink", "http://www.w3.org/1999/xlink");
+      query.namespace("anyzone", "http://www.example.com/auctioneers#anyzone");
+      query.namespace("eachbay", "http://www.example.com/auctioneers#eachbay");
+      query.namespace("yabadoo", "http://www.example.com/auctioneers#yabadoo");
+      query.context(node(file("docs/auction.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertCount(1)
@@ -329,9 +377,13 @@ public class MapNew extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:new(for $n in 1 to 20 return map:entry($n, map{$n:=string($n), $n+1:=string($n+1), $n+2:=string($n+2)}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertType("map(xs:integer, map(xs:integer, xs:string))")
@@ -349,9 +401,13 @@ public class MapNew extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:new(map{\"abc\":=1,\"xyz\":=2}, \"http://www.w3.org/2005/xpath-functions/collation/codepoint\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertQuery("map:collation($result) eq \"http://www.w3.org/2005/xpath-functions/collation/codepoint\"")
     );
@@ -365,10 +421,14 @@ public class MapNew extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:new(map{\"abc\":=1,\"xyz\":=2}, \"collation/codepoint\")",
       ctx);
-    query.baseURI("http://www.w3.org/2005/xpath-functions/");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.baseURI("http://www.w3.org/2005/xpath-functions/");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertQuery("map:collation($result) eq \"http://www.w3.org/2005/xpath-functions/collation/codepoint\"")
     );
@@ -382,9 +442,13 @@ public class MapNew extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(map{}, map:new(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -398,9 +462,13 @@ public class MapNew extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(map{\"a\":=1}, map:entry(\"a\", 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -414,9 +482,13 @@ public class MapNew extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(map{\"a\":=1,\"b\":=2,\"c\":=(3,4,5)}, map{\"c\":=(3,4,5),\"a\":=1,\"b\":=2})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -430,9 +502,13 @@ public class MapNew extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(map{\"a\":=1}, map:new(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -447,9 +523,13 @@ public class MapNew extends QT3TestSet {
       "deep-equal(map:new(for $i in 1 to 1000 return map:entry($i, $i+1)),\n" +
       "                         map:new(for $i in 2 to 1001 return map:entry($i, $i+1)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -464,9 +544,13 @@ public class MapNew extends QT3TestSet {
       "deep-equal(map:new(for $i in 1 to 1000 return map:entry($i, $i+1)),\n" +
       "                         map:new(((for $i in 1 to 1000 return map:entry($i, $i+1)), map:entry(400, 402))))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -481,9 +565,13 @@ public class MapNew extends QT3TestSet {
       "deep-equal(map:new(for $i in 1 to 1000 return map:entry($i, $i+1)),\n" +
       "                         map:new(for $i in 0 to 1000 return map:entry($i, $i+1)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -498,9 +586,13 @@ public class MapNew extends QT3TestSet {
       "deep-equal(map:new(for $i in 1 to 1000 return map:entry($i, $i+1)),\n" +
       "                         map:new(for $i in 2 to 1000 return map:entry($i, $i+1)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );

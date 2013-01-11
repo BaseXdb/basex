@@ -27,9 +27,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(1) gt xs:integer(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -50,9 +54,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"INF\") gt 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -73,9 +81,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(1) gt xs:float(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -96,9 +108,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(1) ge xs:float(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -119,9 +135,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:double(\"NaN\") gt 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -142,9 +162,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:float(\"NaN\") gt 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -165,9 +189,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:double(\"NaN\") ge 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -188,9 +216,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:float(\"NaN\") ge 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -211,9 +243,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(1 gt xs:double(\"NaN\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -234,9 +270,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(1 gt xs:float(\"NaN\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -257,9 +297,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(1 ge xs:double(\"NaN\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -280,9 +324,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(1) ge xs:integer(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -303,9 +351,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(1 ge xs:float(\"NaN\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -326,9 +378,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 le count((1, 2, 3, timezone-from-time(current-time()), 4))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -349,9 +405,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "count((1, 2, 3, timezone-from-time(current-time()), 4)) ge 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -372,9 +432,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "count((1, 2, 3, timezone-from-time(current-time()), 4)) gt 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -395,9 +459,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(1) gt xs:decimal(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -418,9 +486,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(1) ge xs:decimal(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -441,9 +513,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "0 gt xs:double(\"-INF\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -464,9 +540,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"INF\") gt 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -487,9 +567,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(1) gt xs:double(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -510,9 +594,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(1) ge xs:double(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -533,9 +621,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "0 gt xs:float(\"-INF\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -556,9 +648,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(\"100\") gt xs:unsignedLong(\"18446744073709551615\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -579,11 +675,535 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(\"18446744073709551615\") gt xs:unsignedLong(\"100\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
+    );
+  }
+
+  /**
+   * compare two doubles, where the second value is NaN.
+   */
+  @org.junit.Test
+  public void k2NumericGT3() {
+    final XQuery query = new XQuery(
+      "xs:double(\"3\") gt xs:double(\"NaN\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   * compare two flots, where the second value is NaN.
+   */
+  @org.junit.Test
+  public void k2NumericGT4() {
+    final XQuery query = new XQuery(
+      "xs:float(\"3\") lt xs:float(\"NaN\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of xs:double .
+   */
+  @org.junit.Test
+  public void cbclNumericGreaterThan001() {
+    final XQuery query = new XQuery(
+      "declare function local:square($arg as xs:double) as xs:double { $arg * $arg }; not( local:square(1e0) gt local:square(2e0) )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of xs:float .
+   */
+  @org.junit.Test
+  public void cbclNumericGreaterThan002() {
+    final XQuery query = new XQuery(
+      "declare function local:square($arg as xs:float) as xs:float { $arg * $arg }; not( local:square(xs:float(1e0)) gt local:square(xs:float(2e0)) )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of xs:decimal .
+   */
+  @org.junit.Test
+  public void cbclNumericGreaterThan003() {
+    final XQuery query = new XQuery(
+      "declare function local:square($arg as xs:decimal) as xs:decimal { $arg * $arg }; not( local:square(1.0) gt local:square(2.0) )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of xs:integer .
+   */
+  @org.junit.Test
+  public void cbclNumericGreaterThan004() {
+    final XQuery query = new XQuery(
+      "declare function local:square($arg as xs:integer) as xs:integer { $arg * $arg }; not( local:square(1) gt local:square(2) )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of xs:double .
+   */
+  @org.junit.Test
+  public void cbclNumericGreaterThan005() {
+    final XQuery query = new XQuery(
+      "declare function local:square($arg as xs:double) as xs:double { $arg * $arg }; not( local:square(1e0) le local:square(2e0) )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of xs:float .
+   */
+  @org.junit.Test
+  public void cbclNumericGreaterThan006() {
+    final XQuery query = new XQuery(
+      "declare function local:square($arg as xs:float) as xs:float { $arg * $arg }; not( local:square(xs:float(1e0)) le local:square(xs:float(2e0)) )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of xs:decimal .
+   */
+  @org.junit.Test
+  public void cbclNumericGreaterThan007() {
+    final XQuery query = new XQuery(
+      "declare function local:square($arg as xs:decimal) as xs:decimal { $arg * $arg }; not( local:square(1.0) le local:square(2.0) )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of xs:integer .
+   */
+  @org.junit.Test
+  public void cbclNumericGreaterThan008() {
+    final XQuery query = new XQuery(
+      "declare function local:square($arg as xs:integer) as xs:integer { $arg * $arg }; not( local:square(1) le local:square(2) )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of xs:double .
+   */
+  @org.junit.Test
+  public void cbclNumericGreaterThan009() {
+    final XQuery query = new XQuery(
+      "declare function local:square($arg as xs:double) as xs:double { $arg * $arg }; not(not( local:square(1e0) gt local:square(2e0) ))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of xs:float .
+   */
+  @org.junit.Test
+  public void cbclNumericGreaterThan010() {
+    final XQuery query = new XQuery(
+      "declare function local:square($arg as xs:float) as xs:float { $arg * $arg }; not(not( local:square(xs:float(1e0)) gt local:square(xs:float(2e0)) ))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of xs:double .
+   */
+  @org.junit.Test
+  public void cbclNumericGreaterThan011() {
+    final XQuery query = new XQuery(
+      "declare function local:square($arg as xs:double) as xs:double { $arg * $arg }; not(not( local:square(1e0) le local:square(2e0) ))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of xs:float .
+   */
+  @org.junit.Test
+  public void cbclNumericGreaterThan012() {
+    final XQuery query = new XQuery(
+      "declare function local:square($arg as xs:float) as xs:float { $arg * $arg }; not(not( local:square(xs:float(1e0)) le local:square(xs:float(2e0)) ))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of integers .
+   */
+  @org.junit.Test
+  public void cbclNumericGreaterThan013() {
+    final XQuery query = new XQuery(
+      "declare function local:factorial($arg as xs:integer) as xs:integer { if ($arg lt 1) then 1 else $arg * local:factorial($arg - 1) }; let $x := local:factorial(5) return $x + 1 gt 121",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of integers .
+   */
+  @org.junit.Test
+  public void cbclNumericGreaterThan014() {
+    final XQuery query = new XQuery(
+      "declare function local:factorial($arg as xs:integer) as xs:integer { if ($arg lt 1) then 1 else $arg * local:factorial($arg - 1) }; let $x := local:factorial(5) return $x - 1 gt 121",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of integers .
+   */
+  @org.junit.Test
+  public void cbclNumericGreaterThan015() {
+    final XQuery query = new XQuery(
+      "declare function local:factorial($arg as xs:integer) as xs:integer { if ($arg lt 1) then 1 else $arg * local:factorial($arg - 1) }; let $x := local:factorial(5) return 121 gt $x + 1",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of integers .
+   */
+  @org.junit.Test
+  public void cbclNumericGreaterThan016() {
+    final XQuery query = new XQuery(
+      "declare function local:factorial($arg as xs:integer) as xs:integer { if ($arg lt 1) then 1 else $arg * local:factorial($arg - 1) }; let $x := local:factorial(5) return 121 gt 1 + $x",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of integers .
+   */
+  @org.junit.Test
+  public void cbclNumericGreaterThan017() {
+    final XQuery query = new XQuery(
+      "declare function local:factorial($arg as xs:integer) as xs:integer { if ($arg lt 1) then 1 else $arg * local:factorial($arg - 1) }; let $x := local:factorial(5) return $x + 1 le 121",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of integers .
+   */
+  @org.junit.Test
+  public void cbclNumericGreaterThan018() {
+    final XQuery query = new XQuery(
+      "declare function local:factorial($arg as xs:integer) as xs:integer { if ($arg lt 1) then 1 else $arg * local:factorial($arg - 1) }; let $x := local:factorial(5) return $x - 1 le 121",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of integers .
+   */
+  @org.junit.Test
+  public void cbclNumericGreaterThan019() {
+    final XQuery query = new XQuery(
+      "declare function local:factorial($arg as xs:integer) as xs:integer { if ($arg lt 1) then 1 else $arg * local:factorial($arg - 1) }; let $x := local:factorial(5) return 121 le $x + 1",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of integers .
+   */
+  @org.junit.Test
+  public void cbclNumericGreaterThan020() {
+    final XQuery query = new XQuery(
+      "declare function local:factorial($arg as xs:integer) as xs:integer { if ($arg lt 1) then 1 else $arg * local:factorial($arg - 1) }; let $x := local:factorial(5) return 121 le 1 + $x",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of integers .
+   */
+  @org.junit.Test
+  public void cbclNumericGreaterThan021() {
+    final XQuery query = new XQuery(
+      "declare function local:factorial($arg as xs:integer) as xs:integer { if ($arg lt 1) then 1 else $arg * local:factorial($arg - 1) }; let $x := local:factorial(5) return 121 gt $x - 1",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of integers .
+   */
+  @org.junit.Test
+  public void cbclNumericGreaterThan022() {
+    final XQuery query = new XQuery(
+      "declare function local:factorial($arg as xs:integer) as xs:integer { if ($arg lt 1) then 1 else $arg * local:factorial($arg - 1) }; let $x := local:factorial(5) return 1 + $x gt 121",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of integers .
+   */
+  @org.junit.Test
+  public void cbclNumericGreaterThan023() {
+    final XQuery query = new XQuery(
+      "declare function local:factorial($arg as xs:integer) as xs:integer { if ($arg lt 1) then 1 else $arg * local:factorial($arg - 1) }; let $x := local:factorial(5) return 1 + $x le 121",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of integers .
+   */
+  @org.junit.Test
+  public void cbclNumericGreaterThan024() {
+    final XQuery query = new XQuery(
+      "declare function local:factorial($arg as xs:integer) as xs:integer { if ($arg lt 1) then 1 else $arg * local:factorial($arg - 1) }; let $x := local:factorial(5) return 121 le $x - 1",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
     );
   }
 
@@ -605,9 +1225,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"-1.7976931348623157E308\") gt xs:double(\"-1.7976931348623157E308\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -631,9 +1255,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"0\") gt xs:double(\"-1.7976931348623157E308\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -657,9 +1285,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"1.7976931348623157E308\") gt xs:double(\"-1.7976931348623157E308\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -683,9 +1315,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"-1.7976931348623157E308\") gt xs:double(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -709,9 +1345,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"-1.7976931348623157E308\") gt xs:double(\"1.7976931348623157E308\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -735,9 +1375,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-999999999999999999\") gt xs:decimal(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -761,9 +1405,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"617375191608514839\") gt xs:decimal(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -787,9 +1435,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"999999999999999999\") gt xs:decimal(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -813,9 +1465,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-999999999999999999\") gt xs:decimal(\"617375191608514839\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -839,9 +1495,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-999999999999999999\") gt xs:decimal(\"999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -865,9 +1525,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"-3.4028235E38\") gt xs:float(\"-3.4028235E38\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -891,9 +1555,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"0\") gt xs:float(\"-3.4028235E38\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -917,9 +1585,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"3.4028235E38\") gt xs:float(\"-3.4028235E38\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -943,9 +1615,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"-3.4028235E38\") gt xs:float(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -969,9 +1645,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"-3.4028235E38\") gt xs:float(\"3.4028235E38\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -995,9 +1675,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(\"-2147483648\") gt xs:int(\"-2147483648\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1021,9 +1705,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(\"-1873914410\") gt xs:int(\"-2147483648\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1047,9 +1735,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(\"2147483647\") gt xs:int(\"-2147483648\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1073,9 +1765,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(\"-2147483648\") gt xs:int(\"-1873914410\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1099,9 +1795,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(\"-2147483648\") gt xs:int(\"2147483647\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1125,9 +1825,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"-999999999999999999\") gt xs:integer(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1151,9 +1855,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"830993497117024304\") gt xs:integer(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1177,9 +1885,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"999999999999999999\") gt xs:integer(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1203,9 +1915,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"-999999999999999999\") gt xs:integer(\"830993497117024304\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1229,9 +1945,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"-999999999999999999\") gt xs:integer(\"999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1255,9 +1975,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(\"-92233720368547758\") gt xs:long(\"-92233720368547758\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1281,9 +2005,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(\"-47175562203048468\") gt xs:long(\"-92233720368547758\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1307,9 +2035,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(\"92233720368547758\") gt xs:long(\"-92233720368547758\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1333,9 +2065,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(\"-92233720368547758\") gt xs:long(\"-47175562203048468\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1359,9 +2095,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(\"-92233720368547758\") gt xs:long(\"92233720368547758\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1385,9 +2125,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:negativeInteger(\"-999999999999999999\") gt xs:negativeInteger(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1411,9 +2155,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:negativeInteger(\"-297014075999096793\") gt xs:negativeInteger(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1437,9 +2185,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:negativeInteger(\"-1\") gt xs:negativeInteger(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1463,9 +2215,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:negativeInteger(\"-999999999999999999\") gt xs:negativeInteger(\"-297014075999096793\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1489,9 +2245,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:negativeInteger(\"-999999999999999999\") gt xs:negativeInteger(\"-1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1515,9 +2275,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(\"0\") gt xs:nonNegativeInteger(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1541,9 +2305,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(\"303884545991464527\") gt xs:nonNegativeInteger(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1567,9 +2335,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(\"999999999999999999\") gt xs:nonNegativeInteger(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1593,9 +2365,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(\"0\") gt xs:nonNegativeInteger(\"303884545991464527\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1619,9 +2395,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(\"0\") gt xs:nonNegativeInteger(\"999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1645,9 +2425,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(\"-999999999999999999\") gt xs:nonPositiveInteger(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1671,9 +2455,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(\"-475688437271870490\") gt xs:nonPositiveInteger(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1697,9 +2485,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(\"0\") gt xs:nonPositiveInteger(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1723,9 +2515,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(\"-999999999999999999\") gt xs:nonPositiveInteger(\"-475688437271870490\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1749,9 +2545,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(\"-999999999999999999\") gt xs:nonPositiveInteger(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1775,9 +2575,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(\"1\") gt xs:positiveInteger(\"1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1801,9 +2605,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(\"52704602390610033\") gt xs:positiveInteger(\"1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1827,9 +2635,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(\"999999999999999999\") gt xs:positiveInteger(\"1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1853,9 +2665,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(\"1\") gt xs:positiveInteger(\"52704602390610033\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1879,9 +2695,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(\"1\") gt xs:positiveInteger(\"999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1905,9 +2725,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(\"-32768\") gt xs:short(\"-32768\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1931,9 +2755,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(\"-5324\") gt xs:short(\"-32768\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1957,9 +2785,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(\"32767\") gt xs:short(\"-32768\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1983,9 +2815,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(\"-32768\") gt xs:short(\"-5324\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2009,9 +2845,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(\"-32768\") gt xs:short(\"32767\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2035,9 +2875,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(\"0\") gt xs:unsignedLong(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2061,9 +2905,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(\"130747108607674654\") gt xs:unsignedLong(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2087,9 +2935,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(\"184467440737095516\") gt xs:unsignedLong(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2113,9 +2965,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(\"0\") gt xs:unsignedLong(\"130747108607674654\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2139,9 +2995,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(\"0\") gt xs:unsignedLong(\"184467440737095516\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2165,9 +3025,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(\"0\") gt xs:unsignedShort(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2191,9 +3055,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(\"44633\") gt xs:unsignedShort(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2217,9 +3085,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(\"65535\") gt xs:unsignedShort(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2243,9 +3115,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(\"0\") gt xs:unsignedShort(\"44633\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2269,9 +3145,13 @@ public class OpNumericGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(\"0\") gt xs:unsignedShort(\"65535\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );

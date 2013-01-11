@@ -27,9 +27,13 @@ public class OpAddDayTimeDurations extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3DT4H3M3.100S\") + xs:dayTimeDuration(\"PT0S\") eq xs:dayTimeDuration(\"P3DT4H3M3.100S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -50,9 +54,13 @@ public class OpAddDayTimeDurations extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"PT0S\") + xs:dayTimeDuration(\"P3DT4H3M3.100S\") eq xs:dayTimeDuration(\"P3DT4H3M3.100S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -73,11 +81,825 @@ public class OpAddDayTimeDurations extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3DT4H3M3.100S\") + xs:dayTimeDuration(\"P3DT12H31M56.303S\") eq xs:dayTimeDuration(\"P6DT16H34M59.403S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test addition of zero duration to dayTimeDuration .
+   */
+  @org.junit.Test
+  public void cbclAddDayTimeDurations001() {
+    final XQuery query = new XQuery(
+      "declare function local:dayTimeDuration($days as xs:integer, $hours as xs:integer ) { xs:dayTimeDuration(concat('P', $days, 'DT', $hours, 'H')) }; local:dayTimeDuration(1, 1) + xs:dayTimeDuration(\"P0D\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "P1DT1H")
+    );
+  }
+
+  /**
+   *  test addition of zero duration to dayTimeDuration .
+   */
+  @org.junit.Test
+  public void cbclAddDayTimeDurations002() {
+    final XQuery query = new XQuery(
+      "declare function local:dayTimeDuration($days as xs:integer, $hours as xs:integer ) { xs:dayTimeDuration(concat('P', $days, 'DT', $hours, 'H')) }; xs:dayTimeDuration(\"P0D\") + local:dayTimeDuration(1, 1)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "P1DT1H")
+    );
+  }
+
+  /**
+   *  test addition of dayTimeDurations .
+   */
+  @org.junit.Test
+  public void cbclAddDayTimeDurations003() {
+    final XQuery query = new XQuery(
+      "declare function local:dayTimeDuration($days as xs:integer, $hours as xs:integer ) { xs:dayTimeDuration(concat('P', $days, 'DT', $hours, 'H')) }; local:dayTimeDuration(1, 1) + local:dayTimeDuration(1, 1)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "P2DT2H")
+    );
+  }
+
+  /**
+   *  Test behaviour of plus operator when presented with an expression with static type duration .
+   */
+  @org.junit.Test
+  public void cbclPlus001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1D\") else xs:dayTimeDuration(\"P1D\") };\n" +
+      "        xs:date(\"1997-01-01\") + local:f(false())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "1997-01-02")
+    );
+  }
+
+  /**
+   *  Test behaviour of plus operator when presented with an expression with static type duration .
+   */
+  @org.junit.Test
+  public void cbclPlus002() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1D\") else xs:dayTimeDuration(\"P1D\") };\n" +
+      "        xs:date(\"1997-01-01\") + local:f(true())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   *  Test behaviour of plus operator when presented with an expression with static type duration .
+   */
+  @org.junit.Test
+  public void cbclPlus003() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1D\") else xs:yearMonthDuration(\"P1M\") };\n" +
+      "        xs:date(\"1997-01-01\") + local:f(false())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "1997-02-01")
+    );
+  }
+
+  /**
+   *  Test behaviour of plus operator when presented with an expression with static type duration .
+   */
+  @org.junit.Test
+  public void cbclPlus004() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1D\") else xs:yearMonthDuration(\"P1M\") };\n" +
+      "        xs:date(\"1997-01-01\") + local:f(true())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   *  Test behaviour of plus operator when presented with an expression with static type duration .
+   */
+  @org.junit.Test
+  public void cbclPlus005() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1D\") else xs:dayTimeDuration(\"P1D\") };\n" +
+      "        xs:dateTime(\"1997-01-01T12:00:00\") + local:f(false())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "1997-01-02T12:00:00")
+    );
+  }
+
+  /**
+   *  Test behaviour of plus operator when presented with an expression with static type duration .
+   */
+  @org.junit.Test
+  public void cbclPlus006() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1D\") else xs:dayTimeDuration(\"P1D\") };\n" +
+      "        xs:dateTime(\"1997-01-01T12:00:00\") + local:f(true())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   *  Test behaviour of plus operator when presented with an expression with static type duration .
+   */
+  @org.junit.Test
+  public void cbclPlus007() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1D\") else xs:yearMonthDuration(\"P1M\") };\n" +
+      "        xs:dateTime(\"1997-01-01T12:00:00\") + local:f(false())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "1997-02-01T12:00:00")
+    );
+  }
+
+  /**
+   *  Test behaviour of plus operator when presented with an expression with static type duration .
+   */
+  @org.junit.Test
+  public void cbclPlus008() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1D\") else xs:yearMonthDuration(\"P1M\") };\n" +
+      "        xs:dateTime(\"1997-01-01T12:00:00\") + local:f(true())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   *  Test behaviour of plus operator when presented with an expression with static type duration .
+   */
+  @org.junit.Test
+  public void cbclPlus009() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1D\") else xs:dayTimeDuration(\"PT1H\") };\n" +
+      "        xs:time(\"12:00:00\") + local:f(false())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "13:00:00")
+    );
+  }
+
+  /**
+   *  Test behaviour of plus operator when presented with an expression with static type duration .
+   */
+  @org.junit.Test
+  public void cbclPlus010() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1D\") else xs:dayTimeDuration(\"P1H\") };\n" +
+      "        xs:time(\"12:00:00\") + local:f(true())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   *  Test behaviour of plus operator when presented with an expression with static type duration .
+   */
+  @org.junit.Test
+  public void cbclPlus011() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1D\") else xs:dayTimeDuration(\"P1D\") };\n" +
+      "        xs:dayTimeDuration(\"PT1H\") + local:f(false())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "P1DT1H")
+    );
+  }
+
+  /**
+   *  Test behaviour of plus operator when presented with an expression with static type duration .
+   */
+  @org.junit.Test
+  public void cbclPlus012() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1D\") else xs:dayTimeDuration(\"P1D\") };\n" +
+      "        xs:dayTimeDuration(\"PT1H\") + local:f(true())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   *  Test behaviour of plus operator when presented with an expression with static type duration .
+   */
+  @org.junit.Test
+  public void cbclPlus013() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1M\") else xs:yearMonthDuration(\"P1M\") };\n" +
+      "        xs:yearMonthDuration(\"P1Y\") + local:f(false())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "P1Y1M")
+    );
+  }
+
+  /**
+   *  Test behaviour of plus operator when presented with an expression with static type duration .
+   */
+  @org.junit.Test
+  public void cbclPlus014() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1M\") else xs:yearMonthDuration(\"P1M\") };\n" +
+      "        xs:yearMonthDuration(\"P1Y\") + local:f(true())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   *  Test behaviour of plus operator when presented with an expression with static type duration .
+   */
+  @org.junit.Test
+  public void cbclPlus015() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1D\") else xs:dayTimeDuration(\"P1D\") };\n" +
+      "        local:f(false()) + xs:date(\"1997-01-01\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "1997-01-02")
+    );
+  }
+
+  /**
+   *  Test behaviour of plus operator when presented with an expression with static type duration .
+   */
+  @org.junit.Test
+  public void cbclPlus016() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1D\") else xs:dayTimeDuration(\"P1D\") };\n" +
+      "        local:f(true()) + xs:date(\"1997-01-01\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   *  Test behaviour of plus operator when presented with an expression with static type duration .
+   */
+  @org.junit.Test
+  public void cbclPlus017() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1D\") else xs:yearMonthDuration(\"P1M\") };\n" +
+      "        local:f(false()) + xs:date(\"1997-01-01\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "1997-02-01")
+    );
+  }
+
+  /**
+   *  Test behaviour of plus operator when presented with an expression with static type duration .
+   */
+  @org.junit.Test
+  public void cbclPlus018() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1D\") else xs:yearMonthDuration(\"P1M\") };\n" +
+      "        local:f(true()) + xs:date(\"1997-01-01\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   *  Test behaviour of plus operator when presented with an expression with static type duration .
+   */
+  @org.junit.Test
+  public void cbclPlus019() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1D\") else xs:dayTimeDuration(\"P1D\") };\n" +
+      "        local:f(false()) + xs:dateTime(\"1997-01-01T12:00:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "1997-01-02T12:00:00")
+    );
+  }
+
+  /**
+   *  Test behaviour of plus operator when presented with an expression with static type duration .
+   */
+  @org.junit.Test
+  public void cbclPlus020() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1D\") else xs:dayTimeDuration(\"P1D\") };\n" +
+      "        local:f(true()) + xs:dateTime(\"1997-01-01T12:00:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   *  Test behaviour of plus operator when presented with an expression with static type duration .
+   */
+  @org.junit.Test
+  public void cbclPlus021() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1D\") else xs:yearMonthDuration(\"P1M\") };\n" +
+      "        local:f(false()) + xs:dateTime(\"1997-01-01T12:00:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "1997-02-01T12:00:00")
+    );
+  }
+
+  /**
+   *  Test behaviour of plus operator when presented with an expression with static type duration .
+   */
+  @org.junit.Test
+  public void cbclPlus022() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1D\") else xs:yearMonthDuration(\"P1M\") };\n" +
+      "        local:f(true()) + xs:dateTime(\"1997-01-01T12:00:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   *  Test behaviour of plus operator when presented with an expression with static type duration .
+   */
+  @org.junit.Test
+  public void cbclPlus023() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1D\") else xs:dayTimeDuration(\"PT1H\") };\n" +
+      "        local:f(false()) + xs:time(\"12:00:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "13:00:00")
+    );
+  }
+
+  /**
+   *  Test behaviour of plus operator when presented with an expression with static type duration .
+   */
+  @org.junit.Test
+  public void cbclPlus024() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1D\") else xs:dayTimeDuration(\"PT1H\") };\n" +
+      "        local:f(true()) + xs:time(\"12:00:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   *  Test behaviour of plus operator when presented with an expression with static type duration .
+   */
+  @org.junit.Test
+  public void cbclPlus025() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1D\") else xs:dayTimeDuration(\"P1D\") };\n" +
+      "        local:f(false()) + xs:dayTimeDuration(\"PT1H\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "P1DT1H")
+    );
+  }
+
+  /**
+   *  Test behaviour of plus operator when presented with an expression with static type duration .
+   */
+  @org.junit.Test
+  public void cbclPlus026() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1D\") else xs:dayTimeDuration(\"P1D\") };\n" +
+      "        local:f(true()) + xs:dayTimeDuration(\"PT1H\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   *  Test behaviour of plus operator when presented with an expression with static type duration .
+   */
+  @org.junit.Test
+  public void cbclPlus027() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1M\") else xs:yearMonthDuration(\"P1M\") };\n" +
+      "        local:f(false()) + xs:yearMonthDuration(\"P1Y\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "P1Y1M")
+    );
+  }
+
+  /**
+   *  Test behaviour of plus operator when presented with an expression with static type duration .
+   */
+  @org.junit.Test
+  public void cbclPlus028() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1M\") else xs:yearMonthDuration(\"P1M\") };\n" +
+      "        local:f(true()) + xs:yearMonthDuration(\"P1Y\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   *  Test behaviour of plus operator when presented with an expression with static type duration .
+   */
+  @org.junit.Test
+  public void cbclPlus029() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1M\") else xs:yearMonthDuration(\"P1M\") };\n" +
+      "        local:f(false()) + local:f(false())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "P2M")
+    );
+  }
+
+  /**
+   *  Test behaviour of plus operator when presented with an expression with static type duration .
+   */
+  @org.junit.Test
+  public void cbclPlus030() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1M\") else xs:yearMonthDuration(\"P1M\") };\n" +
+      "        local:f(true()) + local:f(true())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   *  Test behaviour of plus operator when presented with an expression with static type duration .
+   */
+  @org.junit.Test
+  public void cbclPlus031() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1D\") else xs:dayTimeDuration(\"P1D\") };\n" +
+      "        local:f(false()) + local:f(false())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "P2D")
+    );
+  }
+
+  /**
+   *  Test behaviour of plus operator when presented with an expression with static type duration .
+   */
+  @org.junit.Test
+  public void cbclPlus032() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1D\") else xs:dayTimeDuration(\"P1D\") };\n" +
+      "        local:f(true()) + local:f(true())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   *  Test behaviour of plus operator when presented with an expression with static type duration .
+   */
+  @org.junit.Test
+  public void cbclPlus033() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1D\") else xs:dayTimeDuration(\"P1D\") };\n" +
+      "        declare function local:g($x) { if ($x) then xs:duration(\"P1M\") else xs:yearMonthDuration(\"P1M\") };\n" +
+      "        local:f(false()) + local:g(false())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   *  Test behaviour of plus operator when presented with an expression with static type duration .
+   */
+  @org.junit.Test
+  public void cbclPlus034() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1D\") else xs:dayTimeDuration(\"P1D\") };\n" +
+      "        declare function local:g($x) { if ($x) then xs:duration(\"P1M\") else xs:yearMonthDuration(\"P1M\") };\n" +
+      "        local:f(true()) + local:g(true())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
     );
   }
 
@@ -97,9 +919,13 @@ public class OpAddDayTimeDurations extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P2DT12H5M\") + xs:dayTimeDuration(\"P5DT12H\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P8DT5M")
     );
@@ -122,9 +948,13 @@ public class OpAddDayTimeDurations extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string((xs:dayTimeDuration(\"P05DT09H02M\") + xs:dayTimeDuration(\"P03DT01H04M\"))) or fn:string((xs:dayTimeDuration(\"P05DT05H03M\") + xs:dayTimeDuration(\"P01DT01H03M\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -146,9 +976,13 @@ public class OpAddDayTimeDurations extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:dayTimeDuration(\"P42DT10H10M\") + xs:dayTimeDuration(\"P10DT10H10M\")) div (xs:dayTimeDuration(\"P42DT10H10M\") + xs:dayTimeDuration(\"P10DT10H10M\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -171,9 +1005,13 @@ public class OpAddDayTimeDurations extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string((xs:dayTimeDuration(\"P10DT08H11M\") + xs:dayTimeDuration(\"P05DT08H11M\"))) and (fn:true())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -195,9 +1033,13 @@ public class OpAddDayTimeDurations extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:dayTimeDuration(\"P23DT11H11M\") + xs:dayTimeDuration(\"P23DT11H11M\")) eq xs:dayTimeDuration(\"P23DT11H11M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -219,9 +1061,13 @@ public class OpAddDayTimeDurations extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:dayTimeDuration(\"P21DT08H12M\") + xs:dayTimeDuration(\"P08DT08H05M\")) ne xs:dayTimeDuration(\"P08DT08H05M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -243,9 +1089,13 @@ public class OpAddDayTimeDurations extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:dayTimeDuration(\"P10DT10H01M\") + xs:dayTimeDuration(\"P17DT10H02M\")) le xs:dayTimeDuration(\"P17DT10H02M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -267,9 +1117,13 @@ public class OpAddDayTimeDurations extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:dayTimeDuration(\"P13DT09H09M\") + xs:dayTimeDuration(\"P18DT02H02M\")) ge xs:dayTimeDuration(\"P18DT02H02M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -292,9 +1146,13 @@ public class OpAddDayTimeDurations extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(xs:dayTimeDuration(\"P10DT10H11M\") + xs:dayTimeDuration(\"P12DT10H07M\")) and fn:false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -316,9 +1174,13 @@ public class OpAddDayTimeDurations extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(xs:dayTimeDuration(\"P20DT20H10M\") + xs:dayTimeDuration(\"P19DT13H10M\")) or fn:false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -341,9 +1203,13 @@ public class OpAddDayTimeDurations extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(fn:string(xs:dayTimeDuration(\"P11DT12H04M\") + xs:dayTimeDuration(\"P02DT07H01M\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -366,9 +1232,13 @@ public class OpAddDayTimeDurations extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:boolean(fn:string(xs:dayTimeDuration(\"P05DT09H08M\") + xs:dayTimeDuration(\"P03DT08H06M\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -390,9 +1260,13 @@ public class OpAddDayTimeDurations extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:dayTimeDuration(\"P02DT06H09M\") + xs:dayTimeDuration(\"P10DT08H01M\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );
@@ -414,9 +1288,13 @@ public class OpAddDayTimeDurations extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(xs:dayTimeDuration(\"P03DT04H08M\") + xs:dayTimeDuration(\"P01DT09H02M\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P4DT13H10M")
     );
@@ -438,9 +1316,13 @@ public class OpAddDayTimeDurations extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:dayTimeDuration(\"P10DT01H01M\") + xs:dayTimeDuration(\"-P11DT02H02M\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-P1DT1H1M")
     );
@@ -463,9 +1345,13 @@ public class OpAddDayTimeDurations extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string((xs:dayTimeDuration(\"P01DT02H01M\") + xs:dayTimeDuration(\"P02DT09H02M\"))) and fn:string((xs:dayTimeDuration(\"P02DT03H03M\") + xs:dayTimeDuration(\"P04DT04H04M\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -489,9 +1375,13 @@ public class OpAddDayTimeDurations extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P0DT0H0M0S\") + xs:dayTimeDuration(\"P0DT0H0M0S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PT0S")
     );
@@ -515,9 +1405,13 @@ public class OpAddDayTimeDurations extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P15DT11H59M59S\") + xs:dayTimeDuration(\"P0DT0H0M0S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P15DT11H59M59S")
     );
@@ -541,9 +1435,13 @@ public class OpAddDayTimeDurations extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P31DT23H59M59S\") + xs:dayTimeDuration(\"P0DT0H0M0S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P31DT23H59M59S")
     );
@@ -567,9 +1465,13 @@ public class OpAddDayTimeDurations extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P0DT0H0M0S\") + xs:dayTimeDuration(\"P15DT11H59M59S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P15DT11H59M59S")
     );
@@ -593,9 +1495,13 @@ public class OpAddDayTimeDurations extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P0DT0H0M0S\") + xs:dayTimeDuration(\"P31DT23H59M59S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P31DT23H59M59S")
     );

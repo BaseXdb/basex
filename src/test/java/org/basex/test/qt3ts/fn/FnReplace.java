@@ -4,7 +4,7 @@ import org.basex.tests.bxapi.XQuery;
 import org.basex.test.qt3ts.QT3TestSet;
 
 /**
-.
+ * Tests for the replace() function.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
@@ -20,9 +20,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "replace(\"input\", \"pattern\", \"replacement\", \" \")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0001")
     );
@@ -36,9 +40,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "replace(\"input\", (), \"replacement\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -52,9 +60,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "replace(\"input\", \"pattern\", ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -68,9 +80,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "replace(\"input\", \"pattern\", \"replacement\", \"X\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0001")
     );
@@ -84,9 +100,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "replace(\"input\", \"pattern\", \"replacement\", \"\", ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -100,9 +120,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "replace(\"input\", \"in\", \"thisIsInvalid\\\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0004")
     );
@@ -116,9 +140,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "replace(\"input\", \"(input)\", \"thisIsInvalid$\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0004")
     );
@@ -132,9 +160,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "replace(\"input\", \"in\", \"thisIsInvalid\\ \")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0004")
     );
@@ -148,9 +180,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "replace(\"input\", \"in\", \"thisIsInvalid$ \")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0004")
     );
@@ -164,9 +200,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "replace(\"a a a \", \"(a )\", \"replacment: \\1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0004")
     );
@@ -180,9 +220,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "replace(\"a a a \", \"(a )\", \"replacment: \\1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0004")
     );
@@ -196,9 +240,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "replace(\"abcd\", \"(a)\\2(b)\", \"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0002")
     );
@@ -212,9 +260,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "replace(\"abcd\", \"(asd)[\\1]\", \"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0002")
     );
@@ -228,9 +280,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "replace(\"abcd\", \"(asd)[asd\\1]\", \"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0002")
     );
@@ -244,9 +300,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "replace(\"abcd\", \"(asd)[asd\\0]\", \"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0002")
     );
@@ -260,9 +320,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "replace(\"abcd\", \"1[asd\\0]\", \"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0002")
     );
@@ -276,11 +340,123 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:doReplace($input as xs:string?, $pattern as xs:string, $replacement as xs:string) as xs:string { fn:replace($input, $pattern, $replacement) }; <result> <para>{fn:replace(\"ThiY Ybcd.\", \"Y\", \"Q\")}</para> <para>{local:doReplace(\"ThiY iY a abYY.\", \"Y\", \"Q\")}</para> </result>, fn:replace(\"ThiY abcdY.\", \"Y\", \"Q\"), local:doReplace(\"ThiY iY a abYY.\", \"Y\", \"Q\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result><para>ThiQ Qbcd.</para><para>ThiQ iQ a abQQ.</para></result>ThiQ abcdQ. ThiQ iQ a abQQ.", false)
+    );
+  }
+
+  /**
+   *  Tests a replace with prepared value evaluated to a boolean .
+   */
+  @org.junit.Test
+  public void cbclFnReplace001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      boolean(replace(if(exists((1 to 10)[. mod 2 = 0])) then \"blah\" else (),\"a\",\"e\",\"m\"))\n" +
+      "   ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  Tests a prepared expression which matches the empty sequence .
+   */
+  @org.junit.Test
+  public void cbclFnReplace002() {
+    final XQuery query = new XQuery(
+      "replace(\"a\",\"\",\"b\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FORX0003")
+    );
+  }
+
+  /**
+   *  Tests empty regex on prepared fn:replace .
+   */
+  @org.junit.Test
+  public void cbclFnReplace003() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        replace(string-join(for $x in (1 to 10)[. mod 2 = 0] return string($x),\",\"),\"\",\"c\")\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FORX0003")
+    );
+  }
+
+  /**
+   *  Tests empty regex on prepared fn:replace .
+   */
+  @org.junit.Test
+  public void cbclFnReplace004() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        replace(string-join(for $x in (1 to 10)[. mod 2 = 0] return string($x),\",\"),\"\",\"c\",\"m\")\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FORX0003")
+    );
+  }
+
+  /**
+   *  Tests empty regex on prepared fn:replace .
+   */
+  @org.junit.Test
+  public void cbclFnReplace005() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        replace(string-join(for $x in (1 to 10)[. mod 2 = 0] return string($x),\",\"),\"\",\"c\",\"m\")\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FORX0003")
     );
   }
 
@@ -292,9 +468,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "replace(\"abracadabra\", \"bra\", \"*\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a*cada*")
     );
@@ -308,9 +488,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"abcd\", \"(ab)|(a)\", \"[1=$1][2=$2]\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "[1=ab][2=]cd")
     );
@@ -324,9 +508,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:replace((), \"bra\", \"*\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -340,9 +528,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "replace(\"abracadabra\", \"bra\", \"*\", \"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a*cada*")
     );
@@ -356,9 +548,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"abracadabra?abracadabra\", \"\\?\", \"with\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abracadabrawithabracadabra")
     );
@@ -372,9 +568,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"abracadabra*abracadabra\", \"\\*\", \"with\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abracadabrawithabracadabra")
     );
@@ -388,9 +588,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"abracadabra+abracadabra\", \"\\+\", \"with\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abracadabrawithabracadabra")
     );
@@ -404,9 +608,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"abracadabra{abracadabra\", \"\\{\", \"with\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abracadabrawithabracadabra")
     );
@@ -420,9 +628,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"abracadabra}abracadabra\", \"\\}\", \"with\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abracadabrawithabracadabra")
     );
@@ -436,9 +648,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"abracadabra(abracadabra\", \"\\(\", \"with\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abracadabrawithabracadabra")
     );
@@ -452,9 +668,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"abracadabra)abracadabra\", \"\\)\", \"with\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abracadabrawithabracadabra")
     );
@@ -468,9 +688,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "replace(\"abracadabra\", \"a.*a\", \"*\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "*")
     );
@@ -484,9 +708,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"abracadabra[abracadabra\", \"\\[\", \"with\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abracadabrawithabracadabra")
     );
@@ -500,9 +728,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"abracadabra]abracadabra\", \"\\]\", \"with\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abracadabrawithabracadabra")
     );
@@ -516,9 +748,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"abracadabra-abracadabra\", \"\\-\",\"with\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abracadabrawithabracadabra")
     );
@@ -532,9 +768,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"abracadabra.abracadabra\", \"\\.\",\"with\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abracadabrawithabracadabra")
     );
@@ -548,9 +788,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"abracadabra|abracadabra\", \"\\|\",\"with\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abracadabrawithabracadabra")
     );
@@ -564,9 +808,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"abracadabra\\abracadabra\", \"\\\\\",\"with\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abracadabrawithabracadabra")
     );
@@ -580,9 +828,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"abracadabra\tabracadabra\", \"\\t\",\"with\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abracadabrawithabracadabra")
     );
@@ -597,9 +849,13 @@ public class FnReplace extends QT3TestSet {
       "fn:replace(\"abracadabra\n" +
       "abracadabra\", \"\\n\",\"with\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abracadabrawithabracadabra")
     );
@@ -613,9 +869,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"abracadabraabracadabra\", \"aa{1}\",\"with\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abracadabrwithbracadabra")
     );
@@ -629,9 +889,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"abracadabraabracadabraabracadabra\", \"aa{1,}\",\"with\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abracadabrwithbracadabrwithbracadabra")
     );
@@ -645,9 +909,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "replace(\"abracadabra\", \"a.*?a\", \"*\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "*c*bra")
     );
@@ -661,9 +929,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"abracadabraabracadabraabracadabra\", \"aa{1,2}\",\"with\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abracadabrwithbracadabrwithbracadabra")
     );
@@ -677,9 +949,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"abracadabra^abracadabra\", \"\\^\",\"with\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abracadabrawithabracadabra")
     );
@@ -693,9 +969,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"abracadabra\", \"^a\",\"with\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "withbracadabra")
     );
@@ -709,9 +989,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"abracadabra\", \"ww\",\"with\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abracadabra")
     );
@@ -725,9 +1009,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"abracadabra\", \"a\", \"\\$\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "$br$c$d$br$")
     );
@@ -741,9 +1029,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"abracadabra\", \"(a)\", \"\\$$1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "$abr$ac$ad$abr$a")
     );
@@ -757,9 +1049,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"abracadabra\", \"a\", \"\\\\\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "\\br\\c\\d\\br\\")
     );
@@ -773,9 +1069,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "replace(\"abracadabra\", \"a\", \"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "brcdbr")
     );
@@ -789,9 +1089,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"abracadabra\", \"((((( ((((( (((((a))))) ))))) )))))\", \"|$1$15|\", \"x\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "|aa|br|aa|c|aa|d|aa|br|aa|")
     );
@@ -805,9 +1109,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"abracadabra\", \"((((( ((((( (((((a))))) ))))) )))))\", \"$1520\", \"x\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a20bra20ca20da20bra20")
     );
@@ -821,11 +1129,55 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"abracadabra\", \"((((( ((((( (((((a)(b))))) ))))) )))))\", \"($14.$15.$16.$17)\", \"x\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "(ab.a.b.ab7)racad(ab.a.b.ab7)ra")
+    );
+  }
+
+  /**
+   *  "." does NOT match CR in default mode.
+   */
+  @org.junit.Test
+  public void fnReplace43() {
+    final XQuery query = new XQuery(
+      "fn:replace(concat('Mary', codepoints-to-string(13), 'Jones'), 'Mary.Jones', 'Jacob Jones')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("concat('Mary', codepoints-to-string(13), 'Jones')")
+    );
+  }
+
+  /**
+   *  "." does match CR in dot-all mode.
+   */
+  @org.junit.Test
+  public void fnReplace44() {
+    final XQuery query = new XQuery(
+      "fn:replace(concat('Mary', codepoints-to-string(13), 'Jones'), 'Mary.Jones', 'Jacob Jones', 's')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("'Jacob Jones'")
     );
   }
 
@@ -837,9 +1189,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "replace(\"abracadabra\", \"a(.)\", \"a$1$1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abbraccaddabbra")
     );
@@ -853,9 +1209,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "replace(\"abracadabra\", \".*?\", \"$1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0003")
     );
@@ -869,9 +1229,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "replace(\"AAAA\", \"A+\", \"b\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "b")
     );
@@ -885,9 +1249,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "replace(\"AAAA\", \"A+?\", \"b\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "bbbb")
     );
@@ -901,9 +1269,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "replace(\"darted\", \"^(.*?)d(.*)$\", \"$1c$2\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "carted")
     );
@@ -917,9 +1289,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"This is a characte\",\"This is a characte\",\"This is a characte\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "This is a characte")
     );
@@ -933,9 +1309,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"This is a characte\",\"This is a characte\",\"This is a characte\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "This is a characte")
     );
@@ -949,9 +1329,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"This is a characte\",\"This is a characte\",\"This is a characte\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "This is a characte")
     );
@@ -965,9 +1349,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"This is a characte\",\"This is a characte\",\"This is a characte\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "This is a characte")
     );
@@ -981,9 +1369,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"This is a characte\",\"This is a characte\",\"This is a characte\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "This is a characte")
     );
@@ -997,9 +1389,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"This is a characte\",\"This is a characte\",\"This is a characte\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "This is a characte")
     );
@@ -1013,9 +1409,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(xs:string(\"This is a characte\"),xs:string(\"This is a characte\"),xs:string(\"This is a characte\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "This is a characte")
     );
@@ -1029,9 +1429,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"abracadabra\", \"bra\", \"*\", \"p\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0001")
     );
@@ -1045,9 +1449,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"abracadabra\", \"bra\", \"\\\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0004")
     );
@@ -1061,9 +1469,13 @@ public class FnReplace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:replace(\"abracadabra\", \"bra\", \"$y\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0004")
     );

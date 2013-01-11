@@ -20,9 +20,13 @@ public class OpNodeBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(1 << ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -42,9 +46,13 @@ public class OpNodeBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "<< 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -58,9 +66,13 @@ public class OpNodeBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "<<<",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -74,9 +86,13 @@ public class OpNodeBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(() << 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -96,9 +112,13 @@ public class OpNodeBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 << 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -112,9 +132,13 @@ public class OpNodeBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(() << ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -132,9 +156,13 @@ public class OpNodeBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "() <<< ()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -148,9 +176,13 @@ public class OpNodeBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "() <<",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -164,9 +196,13 @@ public class OpNodeBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "<< ()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -180,9 +216,13 @@ public class OpNodeBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "<<",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -196,11 +236,61 @@ public class OpNodeBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 <<",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
+    );
+  }
+
+  /**
+   *  test node before operator .
+   */
+  @org.junit.Test
+  public void cbclNodeBefore001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tlet $node := <a> <b/> <c/> </a> \n" +
+      "      \treturn not(exactly-one($node/b[1]) << exactly-one($node/c[1]))\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test node before operator .
+   */
+  @org.junit.Test
+  public void cbclNodeBefore002() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tlet $node := <a> <b/> <c/> </a> \n" +
+      "      \treturn not(not(exactly-one($node/b[1]) << exactly-one($node/c[1])))\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
     );
   }
 
@@ -212,9 +302,13 @@ public class OpNodeBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(() << 100)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -235,9 +329,13 @@ public class OpNodeBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(() << ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -256,9 +354,13 @@ public class OpNodeBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(() << <a>50000</a>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -277,10 +379,14 @@ public class OpNodeBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(() << /works[1]/employee[1]/empnum[1])",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -299,10 +405,14 @@ public class OpNodeBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(() << /staff[1]/employee[1]/empnum[1])",
       ctx);
-    query.context(node(file("docs/staff.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/staff.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -321,9 +431,13 @@ public class OpNodeBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(<a>50000</a> << ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -342,9 +456,13 @@ public class OpNodeBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a>50000</a> << <a>50000</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -363,10 +481,14 @@ public class OpNodeBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a>50000</a> << /works[1]/employee[1]/empnum[1]",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -385,10 +507,14 @@ public class OpNodeBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a>50000</a> << (/staff[1]/employee[1]/empnum[1])",
       ctx);
-    query.context(node(file("docs/staff.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/staff.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -407,10 +533,14 @@ public class OpNodeBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(/works[1]/employee[1]/empnum[1] << ())",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -429,10 +559,14 @@ public class OpNodeBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "/works[1]/employee[1]/empnum[1] << <a>50000</a>",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -451,10 +585,14 @@ public class OpNodeBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "/works[1]/employee[1]/empnum[1] << /works[1]/employee[1]/empnum[1]",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -469,11 +607,15 @@ public class OpNodeBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "$works/works[1]/employee[1]/empnum[1] << $staff/staff[1]/employee[1]/empnum[1]",
       ctx);
-    query.bind("$works", node(file("docs/works.xml")));
-    query.bind("$staff", node(file("docs/staff.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("$works", node(file("docs/works.xml")));
+      query.bind("$staff", node(file("docs/staff.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -492,10 +634,14 @@ public class OpNodeBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "count((/staff[1]/employee[1]/empnum[1]) << ())",
       ctx);
-    query.context(node(file("docs/staff.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/staff.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -514,10 +660,14 @@ public class OpNodeBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/staff[1]/employee[1]/empnum[1]) << <a>50000</a>",
       ctx);
-    query.context(node(file("docs/staff.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/staff.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -543,11 +693,15 @@ public class OpNodeBefore extends QT3TestSet {
       "         and ($works/works[1]/employee[1]/empnum[1] >> $staff/staff[1]/employee[2]/empnum[1]) \n" +
       "         and ($works/works[1]/employee[1]/empnum[1] >> $staff/staff[1]/employee[3]/empnum[1]))",
       ctx);
-    query.bind("$works", node(file("docs/works.xml")));
-    query.bind("$staff", node(file("docs/staff.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("$works", node(file("docs/works.xml")));
+      query.bind("$staff", node(file("docs/staff.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -562,10 +716,14 @@ public class OpNodeBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/staff[1]/employee[1]/empnum[1]) << (/staff[1]/employee[1]/empnum[1])",
       ctx);
-    query.context(node(file("docs/staff.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/staff.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -580,10 +738,14 @@ public class OpNodeBefore extends QT3TestSet {
       "((/staff[1]/employee[1]/empnum[1]) << (/staff[1]/employee[1]/empnum[1])) \n" +
       "         le ((/staff[1]/employee[1]/empnum[1]) << (/staff[1]/employee[1]/empnum[1]))",
       ctx);
-    query.context(node(file("docs/staff.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/staff.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -597,10 +759,14 @@ public class OpNodeBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not((/staff[1]/employee[1]/empnum[1]) << (/staff[1]/employee[1]/empnum[1]))",
       ctx);
-    query.context(node(file("docs/staff.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/staff.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -616,10 +782,14 @@ public class OpNodeBefore extends QT3TestSet {
       "         lt \n" +
       "         ((/staff[1]/employee[1]/empnum[1]) << (/staff[1]/employee[1]/empnum[1]))",
       ctx);
-    query.context(node(file("docs/staff.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/staff.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -635,10 +805,14 @@ public class OpNodeBefore extends QT3TestSet {
       "         ge\n" +
       "         ((/staff[1]/employee[1]/empnum[1]) << (/staff[1]/employee[1]/empnum[1]))",
       ctx);
-    query.context(node(file("docs/staff.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/staff.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -653,10 +827,14 @@ public class OpNodeBefore extends QT3TestSet {
       "((/staff[1]/employee[1]/empnum[1]) << (/staff[1]/employee[1]/empnum[1])) \n" +
       "         gt ((/staff[1]/employee[1]/empnum[1]) << (/staff[1]/employee[1]/empnum[1]))",
       ctx);
-    query.context(node(file("docs/staff.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/staff.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );

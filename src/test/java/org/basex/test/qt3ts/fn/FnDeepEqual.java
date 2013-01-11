@@ -20,9 +20,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(xs:float(\"NaN\"), xs:double(\"NaN\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(xs:double(\"NaN\"), xs:float(\"NaN\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(deep-equal(xs:float(\"NaN\"), xs:float(0)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(deep-equal(xs:float(0), xs:float(\"NaN\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(deep-equal(xs:double(0), xs:double(\"NaN\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,9 +140,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(deep-equal(xs:double(\"NaN\"), xs:double(0)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -132,9 +160,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(deep-equal(xs:decimal(\"1\"), xs:anyURI(\"example.com\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -148,9 +180,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(deep-equal(QName(\"example.com\", \"ncname\"), 3e2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -164,9 +200,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(deep-equal((1, 2, xs:anyURI(\"example.com\")), (1, 2, 3)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -180,9 +220,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(deep-equal((1, xs:decimal(\"2.2\"), 3), (1, 2, 3)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -196,9 +240,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(\"a string\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -212,9 +260,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(deep-equal((true(), 2, 3), (1, 2, 3)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -228,9 +280,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(deep-equal((1, 2, 3), (1, 2, QName(\"example.com\", \"ncname\"))))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -244,9 +300,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(deep-equal((1, 2, 3), (1, xs:hexBinary(\"FF\"), 3)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -260,9 +320,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(deep-equal((1, 2, 3), (xs:base64Binary(\"FFFF\"), 2, 3)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -276,9 +340,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2, xs:base64Binary(\"FFFF\")), (1, 2, xs:base64Binary(\"FFFF\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -292,9 +360,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 1, 1), (1, 1, 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -308,9 +380,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(deep-equal((1, 1, 3), (1, 1, 1)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -324,9 +400,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(deep-equal((1, 3, 1), (1, 1, 1)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -340,9 +420,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(deep-equal((3, 1, 1), (1, 1, 1)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -356,9 +440,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(deep-equal((1, 1, 1), (3, 1, 1)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -372,9 +460,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(\"a string\", \"a string\", \"http://www.w3.org/2005/xpath-functions/collation/codepoint\", \"wrong param\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -388,9 +480,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(deep-equal((1, 1, 1), (1, 3, 1)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -404,9 +500,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(deep-equal((1, 1, 1), (1, 1, 3)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -420,9 +520,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(index-of(20, 20), (1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -436,9 +540,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(index-of((20, 40), 20), (1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -452,9 +560,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(index-of((20, 20), 20), (1, 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -468,9 +580,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(index-of((20, 40, 20), 20), (1, 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -484,9 +600,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 1, \"str\"), (1, 1, \"str\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -500,9 +620,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, \"str\", 1), (1, \"str\", 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -516,9 +640,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((\"str\", 1, 1), (\"str\", 1, 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -532,9 +660,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 1, ()), (1, 1, ()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -548,9 +680,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(\"a string\", \"a string\", \"http://www.example.com/COLLATION/NOT/SUPPORTED\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOCH0002")
     );
@@ -564,9 +700,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, (), 1), (1, (), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -580,9 +720,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(((), 1, 1), ((), 1, 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -596,9 +740,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(deep-equal((1, 1, ()), (1, 1, 1)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -612,9 +760,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(deep-equal((1, (), 1), (1, 1, 1)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -628,9 +780,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(deep-equal(((), 1, 1), (1, 1, 1)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -644,9 +800,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(deep-equal((1, 1, 1), (1, 1, ())))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -660,9 +820,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(deep-equal((1, 1, 1), (1, (), 1)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -676,9 +840,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(deep-equal((1, 1, 1), ((), 1, 1)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -692,9 +860,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(deep-equal((1, 1), (1, 1, 1)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -708,9 +880,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(deep-equal((1, 1, 1), (1, 1)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -724,9 +900,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(\"a string\", \"a string\", ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -740,9 +920,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(deep-equal((), (1, 1, 1)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -756,9 +940,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(deep-equal((1, 1, 1), ()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -772,9 +960,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((), reverse(0 to -5))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -788,9 +980,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((), 0 to -5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -804,9 +1000,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(reverse(0 to -5), ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -820,9 +1020,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(0 to -5, ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -836,9 +1040,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(\"a string\", \"a string\", \"http://www.w3.org/2005/xpath-functions/collation/codepoint\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -852,9 +1060,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((), ()) eq true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -868,9 +1080,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(xs:float(\"NaN\"), xs:float(\"NaN\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -884,9 +1100,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(xs:double(\"NaN\"), xs:double(\"NaN\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -900,9 +1120,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(deep-equal(current-time(), current-date()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -916,9 +1140,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((<a/>, <b/>, <c/>), (<a/>, <b/>, <c/>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -932,9 +1160,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((<a/>, <b/>, <c/>), (<a/>, <b/>, <a/>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -948,9 +1180,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((<a/>, <b/>), (<a/>, <b/>, <c/>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -964,9 +1200,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((<a/>, <b/>, <c/>), (<a/>, <b/>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -980,9 +1220,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $d1 := document { <?target data?>, text{\"some text\"}}; declare variable $d2 := document {text{\"some text\"}}; deep-equal($d1, $d2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -996,9 +1240,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $d1 := document {()}; declare variable $d2 := document {<?target data?>}; deep-equal($d1, $d2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1012,9 +1260,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $d1 := document { <?target data?>, text{\"some text\"}}; declare variable $d2 := document {text{\"some text\"}}; deep-equal($d1, $d2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1028,9 +1280,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $d1 := document {()}; declare variable $d2 := document {<?target data?>}; deep-equal($d1, $d2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1044,9 +1300,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(<e>1</e>, 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1060,9 +1320,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(1, <e>1</e>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1076,9 +1340,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(current-time(), <e/>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1092,9 +1360,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $d1 := <e a=\"1\" b=\"2\">te<?target data?>xt</e>; declare variable $d2 := <e b=\"2\" a=\"1\">text</e>; deep-equal($d1, $d2), deep-equal($d2, $d1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "false false")
     );
@@ -1108,9 +1380,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $d1 := <e a=\"1\" b=\"2\"><?target data?>text</e>; declare variable $d2 := <e b=\"2\" a=\"1\">text</e>; deep-equal($d1, $d2), deep-equal($d2, $d1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true true")
     );
@@ -1124,9 +1400,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $d1 := <e a=\"1\" b=\"2\">te<!-- content -->xt</e>; declare variable $d2 := <e b=\"2\" a=\"1\">text</e>; deep-equal($d1, $d2), deep-equal($d2, $d1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "false false")
     );
@@ -1140,9 +1420,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $d1 := <e a=\"1\" b=\"2\"><!-- content -->text</e>; declare variable $d2 := <e b=\"2\" a=\"1\">text</e>; deep-equal($d1, $d2), deep-equal($d2, $d1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true true")
     );
@@ -1156,9 +1440,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(attribute name {\"content\"}, attribute name {\"content\"})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1172,9 +1460,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((attribute name2 {\"content\"}, attribute name {\"content\"}), (attribute name {\"content\"}, attribute name2 {\"content\"}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1188,9 +1480,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((attribute name {\"content\"}, attribute name {\"content\"}), (attribute name {\"content\"}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1204,9 +1500,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((attribute name {\"content\"}, attribute name {\"content\"}), attribute name {\"content\"})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1220,9 +1520,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(attribute name {}, attribute name {})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1236,9 +1540,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(attribute name {\"content\"}, attribute name {\"content\"})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1252,9 +1560,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(<e/>, current-time())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1268,9 +1580,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(attribute name {\"content\"}, attribute name {})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1284,9 +1600,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(attribute name {}, attribute name2 {})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1300,11 +1620,81 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(attribute name {\"content \"}, attribute name2 {\"content \"})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
+    );
+  }
+
+  /**
+   *  Namespace prefixes and namespace nodes are ignored.
+   */
+  @org.junit.Test
+  public void k2SeqDeepEqualFunc33() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        deep-equal(<e xmlns=\"http://www.example.com/ns\"/>, <p:e xmlns:p=\"http://www.example.com/ns\"/>)\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  Parent node is ignored.
+   */
+  @org.junit.Test
+  public void k2SeqDeepEqualFunc34() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        deep-equal(<e><a>12</a></e>/*, <f><a>12</a></f>/*)\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  Type annotation is ignored for atomic values.
+   */
+  @org.junit.Test
+  public void k2SeqDeepEqualFunc35() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        deep-equal(\"a\", xs:NCName(\"a\"))\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
     );
   }
 
@@ -1316,11 +1706,37 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((current-time(), current-time(), current-time()), (current-time(), current-time()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
+    );
+  }
+
+  /**
+   *  Handle dependency on implicit timezone .
+   */
+  @org.junit.Test
+  public void k2SeqDeepEqualFunc40() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        deep-equal(xs:dateTime('2012-05-30T12:00:00'), xs:dateTime('2012-05-30T12:00:00Z') - implicit-timezone())\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
     );
   }
 
@@ -1332,9 +1748,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, <e/>, 2), (1, <e/>, 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1348,9 +1768,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, <a/>, 2), (1, <b/>, 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1364,9 +1788,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((<a/>, <b/>, 4), (<a/>, <b/>, 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1380,9 +1808,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -1396,11 +1828,215 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2, 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
+    );
+  }
+
+  /**
+   *  Test deep-equal ignores processing instructions and comments in elements. .
+   */
+  @org.junit.Test
+  public void cbclDeepEqual001() {
+    final XQuery query = new XQuery(
+      "let $doc1 := <doc><?processing-instruction content ?></doc> let $doc2 := <doc><!--comment--></doc> return deep-equal($doc1, $doc2)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  Test deep-equal on processing instructions with different values. .
+   */
+  @org.junit.Test
+  public void cbclDeepEqual002() {
+    final XQuery query = new XQuery(
+      "let $doc1 := <?cheese brie?> let $doc2 := <?cheese stilton?> return deep-equal($doc1, $doc2)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  Test deep-equal on processing instructions with different names. .
+   */
+  @org.junit.Test
+  public void cbclDeepEqual003() {
+    final XQuery query = new XQuery(
+      "let $doc1 := <?foo test?> let $doc2 := <?bar test?> return deep-equal($doc1, $doc2)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  Test deep-equal on equal processing instructions .
+   */
+  @org.junit.Test
+  public void cbclDeepEqual004() {
+    final XQuery query = new XQuery(
+      "let $doc1 := <?foo bar?> let $doc2 := <?foo bar?> return deep-equal($doc1, $doc2)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  Test deep-equal simplifying to fn:empty .
+   */
+  @org.junit.Test
+  public void cbclDeepEqual005() {
+    final XQuery query = new XQuery(
+      "declare function local:f($x as xs:integer)as xs:integer* { 1 to $x }; deep-equal((local:f(3), 2, local:f(1)), (local:f(3), 2))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  Test deep-equal simplifying to fn:empty .
+   */
+  @org.junit.Test
+  public void cbclDeepEqual006() {
+    final XQuery query = new XQuery(
+      "declare function local:f($x as xs:integer) as xs:integer* { 1 to $x }; deep-equal((local:f(3), 2), (local:f(3), 2, local:f(1)))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  Test deep-equal on comparison requiring dynamic context .
+   */
+  @org.junit.Test
+  public void cbclDeepEqual007() {
+    final XQuery query = new XQuery(
+      "deep-equal(xs:gMonth(\"--12+03:00\"), xs:gMonth(\"--12\")) eq (implicit-timezone() eq xs:dayTimeDuration(\"PT3H\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  Test that deep equal compares untypedAtomic values correctly .
+   */
+  @org.junit.Test
+  public void cbclDeepEqual008() {
+    final XQuery query = new XQuery(
+      "deep-equal((xs:untypedAtomic(\"a\"), xs:untypedAtomic(\"P1Y\"), 2.0), (xs:untypedAtomic(\"a\"), xs:yearMonthDuration(\"P12M\"), xs:untypedAtomic(\" 2\")))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test fn:deep equal (was duplicate cbcl-deep-equal-001).
+   */
+  @org.junit.Test
+  public void cbclDeepEqual009() {
+    final XQuery query = new XQuery(
+      "fn:deep-equal(<a b=\"b\" c=\"c\" />, <a b=\"b\" />)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  Test that deep equal compares untypedAtomic values correctly .
+   */
+  @org.junit.Test
+  public void cbclDeepEqual010() {
+    final XQuery query = new XQuery(
+      "deep-equal((<a />, xs:untypedAtomic(\"a\"), xs:untypedAtomic(\"P1Y\"), 2.0), (<a />, xs:untypedAtomic(\"a\"), xs:yearMonthDuration(\"P12M\"), xs:untypedAtomic(\" 2\")))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
     );
   }
 
@@ -1412,9 +2048,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal( (1,2) , (2,1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1428,9 +2068,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal( (1,2) , (1,2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1444,9 +2088,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal( xs:string(\"A\") , \"A\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1460,9 +2108,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal( xs:string(\"A\") , \"a\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1476,9 +2128,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal( xs:string(\"A\") , (\"A\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1492,9 +2148,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal( xs:string(\"\") , (\"\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1508,9 +2168,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal( () , ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1524,9 +2188,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal( (()) , ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1540,9 +2208,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal( ( ) , ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1556,9 +2228,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal(xs:string(\"abc\"), xs:string(\"cba\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1572,9 +2248,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal( xs:anyURI(\"www.example.com\") , \"www.example.com\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1588,9 +2268,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal( xs:anyURI(\"www.example.com\") , xs:string(\"www.example.com\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1604,9 +2288,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal( xs:integer(1) , xs:decimal(1.0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1620,9 +2308,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal( xs:integer(1) , xs:integer(-1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1636,9 +2328,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal( xs:integer(1) , xs:float(1.0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1652,9 +2348,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal( xs:integer(1) , xs:double(1.0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1668,9 +2368,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal( xs:decimal(1.01) , xs:float(1.01))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1684,9 +2388,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal( xs:decimal(1.01) , xs:double(1.01))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1700,9 +2408,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal( xs:float(1.01) , xs:double(1.01))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1716,9 +2428,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal( xs:float(\"INF\") , xs:double(\"INF\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1732,9 +2448,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal( xs:float(\"-INF\") , xs:double(\"-INF\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1748,9 +2468,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal( xs:float(\"NaN\") , xs:double(\"NaN\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1764,9 +2488,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal( xs:boolean(\"1\") , xs:boolean(\"true\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1780,9 +2508,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal( xs:boolean(\"true\") , xs:boolean(\"true\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1796,9 +2528,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal( xs:boolean(\"true\") , true())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1812,9 +2548,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal( xs:boolean(\"0\") , xs:boolean(\"false\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1828,9 +2568,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal( xs:boolean(\"false\") , false())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1844,9 +2588,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal( xs:date(\"1993-03-31\") , \"1993-03-31\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1860,9 +2608,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal( xs:date(\"1993-03-31\") , xs:string(\"1993-03-31\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1876,9 +2628,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal(xs:dateTime(\"1972-12-31T00:00:00\"), \"1972-12-31T00:00:00\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1892,9 +2648,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal(xs:time(\"12:30:00\"), \"12:30:00\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1908,10 +2668,14 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal(<a> {/bib/node()} </a>/node(), <b> {/bib/node()} </b>/node() )",
       ctx);
-    query.context(node(file("docs/bib.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/bib.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1925,10 +2689,14 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal(<a> {/bib/node(), /bib/node()} </a>/node(), <b> {/bib/node(), <difference/>, /bib/node()} </b>/node() )",
       ctx);
-    query.context(node(file("docs/bib.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/bib.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1942,10 +2710,14 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal(<a> {/node(), /node()} </a>/node(), <b> {/node(), 'difference', /node()} </b>/node() )",
       ctx);
-    query.context(node(file("docs/bib.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/bib.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1959,10 +2731,14 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal(<a> {/node(), <diff x='1'/>, /node()} </a>/node(), <b> {/node(), <diff x='2'/>, /node()} </b>/node() )",
       ctx);
-    query.context(node(file("docs/bib.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/bib.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1976,10 +2752,14 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal(<a> {/node(), <diff x='1'/>, /node()} </a>/node(), <b> {/node(), <diff xx='1'/>, /node()} </b>/node() )",
       ctx);
-    query.context(node(file("docs/bib.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/bib.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1993,9 +2773,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:double(\"-1.7976931348623157E308\")),(xs:double(\"-1.7976931348623157E308\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2009,9 +2793,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:double(\"0\")),(xs:double(\"-1.7976931348623157E308\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2025,9 +2813,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:double(\"1.7976931348623157E308\")),(xs:double(\"-1.7976931348623157E308\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2041,9 +2833,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:double(\"-1.7976931348623157E308\")),(xs:double(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2057,9 +2853,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:double(\"-1.7976931348623157E308\")),(xs:double(\"1.7976931348623157E308\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2073,9 +2873,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:decimal(\"-999999999999999999\")),(xs:decimal(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2089,9 +2893,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:decimal(\"617375191608514839\")),(xs:decimal(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2105,9 +2913,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:decimal(\"999999999999999999\")),(xs:decimal(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2121,9 +2933,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:decimal(\"-999999999999999999\")),(xs:decimal(\"617375191608514839\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2137,9 +2953,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:decimal(\"-999999999999999999\")),(xs:decimal(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2153,9 +2973,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:float(\"-3.4028235E38\")),(xs:float(\"-3.4028235E38\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2169,9 +2993,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:float(\"0\")),(xs:float(\"-3.4028235E38\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2185,9 +3013,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:float(\"3.4028235E38\")),(xs:float(\"-3.4028235E38\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2201,9 +3033,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:float(\"-3.4028235E38\")),(xs:float(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2217,9 +3053,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:float(\"-3.4028235E38\")),(xs:float(\"3.4028235E38\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2233,9 +3073,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:int(\"-2147483648\")),(xs:int(\"-2147483648\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2249,9 +3093,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:int(\"-1873914410\")),(xs:int(\"-2147483648\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2265,9 +3113,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:int(\"2147483647\")),(xs:int(\"-2147483648\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2281,9 +3133,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:int(\"-2147483648\")),(xs:int(\"-1873914410\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2297,9 +3153,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:int(\"-2147483648\")),(xs:int(\"2147483647\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2313,9 +3173,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:integer(\"-999999999999999999\")),(xs:integer(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2329,9 +3193,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:integer(\"830993497117024304\")),(xs:integer(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2345,9 +3213,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:integer(\"999999999999999999\")),(xs:integer(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2361,9 +3233,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:integer(\"-999999999999999999\")),(xs:integer(\"830993497117024304\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2377,9 +3253,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:integer(\"-999999999999999999\")),(xs:integer(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2393,9 +3273,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:long(\"-92233720368547758\")),(xs:long(\"-92233720368547758\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2409,9 +3293,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:long(\"-47175562203048468\")),(xs:long(\"-92233720368547758\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2425,9 +3313,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:long(\"92233720368547758\")),(xs:long(\"-92233720368547758\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2441,9 +3333,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:long(\"-92233720368547758\")),(xs:long(\"-47175562203048468\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2457,9 +3353,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:long(\"-92233720368547758\")),(xs:long(\"92233720368547758\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2473,9 +3373,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:negativeInteger(\"-999999999999999999\")),(xs:negativeInteger(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2489,9 +3393,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:negativeInteger(\"-297014075999096793\")),(xs:negativeInteger(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2505,9 +3413,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:negativeInteger(\"-1\")),(xs:negativeInteger(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2521,9 +3433,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:negativeInteger(\"-999999999999999999\")),(xs:negativeInteger(\"-297014075999096793\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2537,9 +3453,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:negativeInteger(\"-999999999999999999\")),(xs:negativeInteger(\"-1\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2553,9 +3473,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:nonNegativeInteger(\"0\")),(xs:nonNegativeInteger(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2569,9 +3493,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:nonNegativeInteger(\"303884545991464527\")),(xs:nonNegativeInteger(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2585,9 +3513,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:nonNegativeInteger(\"999999999999999999\")),(xs:nonNegativeInteger(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2601,9 +3533,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:nonNegativeInteger(\"0\")),(xs:nonNegativeInteger(\"303884545991464527\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2617,9 +3553,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:nonNegativeInteger(\"0\")),(xs:nonNegativeInteger(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2633,9 +3573,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:nonPositiveInteger(\"-999999999999999999\")),(xs:nonPositiveInteger(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2649,9 +3593,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:nonPositiveInteger(\"-475688437271870490\")),(xs:nonPositiveInteger(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2665,9 +3613,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:nonPositiveInteger(\"0\")),(xs:nonPositiveInteger(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2681,9 +3633,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:nonPositiveInteger(\"-999999999999999999\")),(xs:nonPositiveInteger(\"-475688437271870490\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2697,9 +3653,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:nonPositiveInteger(\"-999999999999999999\")),(xs:nonPositiveInteger(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2713,9 +3673,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:positiveInteger(\"1\")),(xs:positiveInteger(\"1\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2729,9 +3693,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:positiveInteger(\"52704602390610033\")),(xs:positiveInteger(\"1\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2745,9 +3713,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:positiveInteger(\"999999999999999999\")),(xs:positiveInteger(\"1\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2761,9 +3733,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:positiveInteger(\"1\")),(xs:positiveInteger(\"52704602390610033\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2777,9 +3753,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:positiveInteger(\"1\")),(xs:positiveInteger(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2793,9 +3773,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:short(\"-32768\")),(xs:short(\"-32768\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2809,9 +3793,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:short(\"-5324\")),(xs:short(\"-32768\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2825,9 +3813,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:short(\"32767\")),(xs:short(\"-32768\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2841,9 +3833,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:short(\"-32768\")),(xs:short(\"-5324\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2857,9 +3853,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:short(\"-32768\")),(xs:short(\"32767\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2873,9 +3873,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:unsignedLong(\"0\")),(xs:unsignedLong(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2889,9 +3893,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:unsignedLong(\"130747108607674654\")),(xs:unsignedLong(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2905,9 +3913,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:unsignedLong(\"184467440737095516\")),(xs:unsignedLong(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2921,9 +3933,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:unsignedLong(\"0\")),(xs:unsignedLong(\"130747108607674654\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2937,9 +3953,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:unsignedLong(\"0\")),(xs:unsignedLong(\"184467440737095516\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2953,9 +3973,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:unsignedShort(\"0\")),(xs:unsignedShort(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2969,9 +3993,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:unsignedShort(\"44633\")),(xs:unsignedShort(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2985,9 +4013,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:unsignedShort(\"65535\")),(xs:unsignedShort(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3001,9 +4033,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:unsignedShort(\"0\")),(xs:unsignedShort(\"44633\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3017,9 +4053,13 @@ public class FnDeepEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal((xs:unsignedShort(\"0\")),(xs:unsignedShort(\"65535\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );

@@ -27,9 +27,13 @@ public class OpHexBinaryEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(\"FF\") eq xs:hexBinary(\"ff\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -50,9 +54,13 @@ public class OpHexBinaryEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(\"FF\") ne xs:hexBinary(\"aa\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -73,9 +81,13 @@ public class OpHexBinaryEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:hexBinary(\"FF\") eq xs:hexBinary(\"aa\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -96,9 +108,13 @@ public class OpHexBinaryEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(xs:base64Binary(xs:hexBinary(\"03\"))) eq xs:hexBinary(\"03\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -119,11 +135,75 @@ public class OpHexBinaryEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(xs:base64Binary(xs:hexBinary(\"03\"))) ne xs:hexBinary(\"13\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test equality of xs:hexBinary .
+   */
+  @org.junit.Test
+  public void cbclHexBinaryEqual001() {
+    final XQuery query = new XQuery(
+      "declare function local:hexBinary-value($arg as xs:boolean) as xs:hexBinary { if ($arg) then xs:hexBinary('68656c6c6f') else xs:hexBinary('676f6f64627965') }; local:hexBinary-value(true()) eq local:hexBinary-value(false())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test equality of xs:hexBinary .
+   */
+  @org.junit.Test
+  public void cbclHexBinaryEqual002() {
+    final XQuery query = new XQuery(
+      "declare function local:hexBinary-value($arg as xs:boolean) as xs:hexBinary { if ($arg) then xs:hexBinary('68656c6c6f') else xs:hexBinary('676f6f64627965') }; not(local:hexBinary-value(true()) eq local:hexBinary-value(false()))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test equality of xs:hexBinary .
+   */
+  @org.junit.Test
+  public void cbclHexBinaryEqual003() {
+    final XQuery query = new XQuery(
+      "declare function local:hexBinary-value($arg as xs:boolean) as xs:hexBinary { if ($arg) then xs:hexBinary('68656c6c6f') else xs:hexBinary('676f6f64627965') }; not(local:hexBinary-value(true()) ne local:hexBinary-value(false()))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
     );
   }
 
@@ -139,9 +219,13 @@ public class OpHexBinaryEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:hexBinary(\"786174616d61616772\") eq xs:hexBinary(\"767479716c6a647663\")) and (xs:hexBinary(\"786174616d61616772\") eq xs:hexBinary(\"767479716c6a647663\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -158,9 +242,13 @@ public class OpHexBinaryEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not((xs:hexBinary(\"786174616d61616772\") ne xs:hexBinary(\"786174616d61616772\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -178,9 +266,13 @@ public class OpHexBinaryEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:hexBinary(\"786174616d61616772\") ne xs:hexBinary(\"767479716c6a647663\")) and fn:true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -198,9 +290,13 @@ public class OpHexBinaryEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:hexBinary(\"786174616d61616772\") ne xs:hexBinary(\"767479716c6a647663\")) and fn:false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -218,9 +314,13 @@ public class OpHexBinaryEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:hexBinary(\"786174616d61616772\") ne xs:hexBinary(\"767479716c6a647663\")) or fn:true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -238,9 +338,13 @@ public class OpHexBinaryEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:hexBinary(\"786174616d61616772\") ne xs:hexBinary(\"767479716c6a647663\")) or fn:false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -258,9 +362,13 @@ public class OpHexBinaryEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:hexBinary(\"786174616d61616772\") eq xs:hexBinary(\"767479716c6a647663\")) or (xs:hexBinary(\"786174616d61616772\") eq xs:hexBinary(\"767479716c6a647663\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -277,9 +385,13 @@ public class OpHexBinaryEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not((xs:hexBinary(\"786174616d61616772\") eq xs:hexBinary(\"786174616d61616772\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -297,9 +409,13 @@ public class OpHexBinaryEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:hexBinary(\"786174616d61616772\") eq xs:hexBinary(\"767479716c6a647663\")) and fn:true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -317,9 +433,13 @@ public class OpHexBinaryEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:hexBinary(\"786174616d61616772\") eq xs:hexBinary(\"767479716c6a647663\")) and fn:false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -337,9 +457,13 @@ public class OpHexBinaryEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:hexBinary(\"786174616d61616772\") eq xs:hexBinary(\"767479716c6a647663\")) or fn:true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -357,9 +481,13 @@ public class OpHexBinaryEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:hexBinary(\"786174616d61616772\") eq xs:hexBinary(\"767479716c6a647663\")) or fn:false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -377,9 +505,13 @@ public class OpHexBinaryEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:hexBinary(\"786174616d61616772\") ne xs:hexBinary(\"767479716c6a647663\")) and (xs:hexBinary(\"786174616d61616772\") ne xs:hexBinary(\"767479716c6a647663\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -397,9 +529,13 @@ public class OpHexBinaryEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:hexBinary(\"786174616d61616772\") ne xs:hexBinary(\"767479716c6a647663\")) or (xs:hexBinary(\"786174616d61616772\") ne xs:hexBinary(\"767479716c6a647663\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -423,9 +559,13 @@ public class OpHexBinaryEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(\"767479716c6a647663\") eq xs:hexBinary(\"767479716c6a647663\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -449,9 +589,13 @@ public class OpHexBinaryEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(\"767479716c6a647663\") ne xs:hexBinary(\"786174616d61616772\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -475,9 +619,13 @@ public class OpHexBinaryEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(\"6e7875626264756366\") eq xs:hexBinary(\"767479716c6a647663\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -501,9 +649,13 @@ public class OpHexBinaryEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(\"786174616d61616772\") eq xs:hexBinary(\"767479716c6a647663\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -527,9 +679,13 @@ public class OpHexBinaryEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(\"767479716c6a647663\") eq xs:hexBinary(\"6e7875626264756366\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -553,9 +709,13 @@ public class OpHexBinaryEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(\"767479716c6a647663\") eq xs:hexBinary(\"786174616d61616772\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -579,9 +739,13 @@ public class OpHexBinaryEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(\"767479716c6a647663\") ne xs:hexBinary(\"767479716c6a647663\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -605,9 +769,13 @@ public class OpHexBinaryEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(\"6e7875626264756366\") ne xs:hexBinary(\"767479716c6a647663\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -631,9 +799,13 @@ public class OpHexBinaryEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(\"786174616d61616772\") ne xs:hexBinary(\"767479716c6a647663\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -657,9 +829,13 @@ public class OpHexBinaryEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(\"767479716c6a647663\") ne xs:hexBinary(\"6e7875626264756366\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );

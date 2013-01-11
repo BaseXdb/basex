@@ -20,9 +20,13 @@ public class ProdPositionalVar extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $a at $p in (1, 2) return 1, $p",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -36,9 +40,13 @@ public class ProdPositionalVar extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2, 3), for $i at $p in distinct-values((1, 2, 3, 1, 2)) return $p)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class ProdPositionalVar extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(for $i at $p in () return $p)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -72,9 +84,13 @@ public class ProdPositionalVar extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2, 3, 4), for $i at $p in insert-before((1, current-time()), 13, (current-date(), 3)) return $p)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -88,9 +104,13 @@ public class ProdPositionalVar extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2, 3, 4), for $i at $p in insert-before((1, current-time()), 1, (current-date(), 3)) return $p)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -104,9 +124,13 @@ public class ProdPositionalVar extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2, 3, 4), for $i at $p in insert-before((1, current-time()), 2, (current-date(), 3)) return $p)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -120,9 +144,13 @@ public class ProdPositionalVar extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2, 3, 4), for $i at $p in 1 to 4 return $p)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -136,9 +164,13 @@ public class ProdPositionalVar extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2, 3, 4), for $i at $p in -10 to -7 return $p)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -152,9 +184,13 @@ public class ProdPositionalVar extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2, 3), for $i at $p in remove((1, 2, 3, current-time()), 2) return $p)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -168,9 +204,13 @@ public class ProdPositionalVar extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2, 3), for $i at $p in remove((1, 2, 3, current-time()), 4) return $p)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -184,9 +224,13 @@ public class ProdPositionalVar extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2, 3), for $i at $p in remove((1, 2, current-time()), 10) return $p)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -200,9 +244,13 @@ public class ProdPositionalVar extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $a at $p1 in (1, 2), $b at $p2 in (1, 2), $c at $p3 in (1, 2) return 1, $p1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -216,9 +264,13 @@ public class ProdPositionalVar extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2, 3), for $i at $p in remove((1, 2, current-time()), 0) return $p)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -232,9 +284,13 @@ public class ProdPositionalVar extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2, 3), for $i at $p in remove((1, 2, 3, current-time()), 1) return $p)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -248,9 +304,13 @@ public class ProdPositionalVar extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2, 3), for $i at $p in remove((1, 2, 3, current-time()), 3) return $p)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -264,9 +324,13 @@ public class ProdPositionalVar extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 eq (for $i at $p in subsequence((1, 2, 3, current-time()), 1, 1) return $p)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -280,9 +344,13 @@ public class ProdPositionalVar extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(for $i at $p in subsequence((1, 2, 3, current-time()), 5) return $p)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -300,9 +368,13 @@ public class ProdPositionalVar extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(for $i at $p in subsequence((1, 2, 3, current-time()), 5, 8) return $p)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -320,9 +392,13 @@ public class ProdPositionalVar extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2), for $i at $p in subsequence((1, 2, 3, current-time()), 3, 2) return $p)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -336,9 +412,13 @@ public class ProdPositionalVar extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2), for $i at $p in subsequence((1, 2, 3, current-time()), 1, 2) return $p)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -352,9 +432,13 @@ public class ProdPositionalVar extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2), for $i at $p in subsequence((1, 2, 3, current-time()), 2, 2) return $p)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -368,9 +452,13 @@ public class ProdPositionalVar extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 eq (for $i at $p in 0 return $p)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -384,9 +472,13 @@ public class ProdPositionalVar extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $a at $p1 in (1, 2), $b at $p2 in (1, 2), $c at $p3 in (1, 2) return 1, $p2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -400,9 +492,13 @@ public class ProdPositionalVar extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(for $i at $p in (1, 2, 3, 4) return ($i, $p), (1, 1, 2, 2, 3, 3, 4, 4))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -416,9 +512,13 @@ public class ProdPositionalVar extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $a at $p1 in (1, 2), $b at $p2 in (1, 2), $c at $p3 in (1, 2) return 1, $p3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -432,9 +532,13 @@ public class ProdPositionalVar extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $a at p1 in 1 return 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -448,9 +552,13 @@ public class ProdPositionalVar extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2, 3), for $i at $p in (1, 2, 3) return $p)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -464,9 +572,13 @@ public class ProdPositionalVar extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((true(), true()), for $i at $p in (1, 2) return boolean($p))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -480,9 +592,13 @@ public class ProdPositionalVar extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $i at $p in (1, 2, 3) return $p + \"1\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -496,9 +612,13 @@ public class ProdPositionalVar extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2, 3), for $i at $p in string-to-codepoints(\"abc\") return $p)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -512,9 +632,13 @@ public class ProdPositionalVar extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $i at $p in remove((1, 2, 3), 10) return $p",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3")
     );
@@ -528,9 +652,13 @@ public class ProdPositionalVar extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $tree := <e> <a id=\"1\"/> <a id=\"2\"/> <a id=\"3\"/> </e> for $i at $pos in (\"a\", \"b\", \"c\") return ($tree/@id eq $pos, $pos)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "1 2 3")
@@ -548,9 +676,13 @@ public class ProdPositionalVar extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $tree := <e> <a id=\"1\"/> <a id=\"2\"/> <a id=\"3\"/> </e> for $i at $pos in (\"a\", \"b\", \"c\") return ($tree/a/@id = $pos, $pos)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true 1 true 2 true 3")
     );
@@ -564,9 +696,13 @@ public class ProdPositionalVar extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $i at $pos in (3 to 6) let $let := $pos + 1 return ($let, $let - 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2 1 3 2 4 3 5 4")
     );

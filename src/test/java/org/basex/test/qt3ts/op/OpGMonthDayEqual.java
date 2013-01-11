@@ -27,9 +27,13 @@ public class OpGMonthDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--04-01 \") eq xs:gMonthDay(\"--04-01\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -50,9 +54,13 @@ public class OpGMonthDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:gMonthDay(\"--03-03\") eq xs:gMonthDay(\"--04-03\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -73,9 +81,13 @@ public class OpGMonthDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--04-12\") ne xs:gMonthDay(\"--04-11\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -96,9 +108,13 @@ public class OpGMonthDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:gMonthDay(\"--04-11\") ne xs:gMonthDay(\"--04-11\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -119,9 +135,13 @@ public class OpGMonthDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--03-01-00:00\") eq xs:gMonthDay(\"--03-01Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -142,9 +162,13 @@ public class OpGMonthDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--03-01+00:00\") eq xs:gMonthDay(\"--03-01Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -165,9 +189,13 @@ public class OpGMonthDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--03-01Z\") eq xs:gMonthDay(\"--03-01Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -188,11 +216,415 @@ public class OpGMonthDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--03-01-00:00\") eq xs:gMonthDay(\"--03-01+00:00\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of gMonthDay .
+   */
+  @org.junit.Test
+  public void cbclGMonthDayEqual001() {
+    final XQuery query = new XQuery(
+      "declare function local:gMonthDay($day as xs:integer) { if ($day lt 10) then xs:gMonthDay(concat(\"--12-0\", $day)) else xs:gMonthDay(concat(\"--12-\", $day)) }; not(local:gMonthDay(1) eq xs:gMonthDay(\"--12-31\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of gMonthDay .
+   */
+  @org.junit.Test
+  public void cbclGMonthDayEqual002() {
+    final XQuery query = new XQuery(
+      "xs:gMonthDay(\"--12-30\") eq xs:gMonthDay(\"--12-31+09:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gMonthDay .
+   */
+  @org.junit.Test
+  public void cbclGMonthDayEqual003() {
+    final XQuery query = new XQuery(
+      "xs:gMonthDay(\"--12-31+09:00\") eq xs:gMonthDay(\"--12-30\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gMonthDay .
+   */
+  @org.junit.Test
+  public void cbclGMonthDayEqual004() {
+    final XQuery query = new XQuery(
+      "xs:gMonthDay(\"--12-30\") eq xs:gMonthDay(\"--12-31+09:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gMonthDay .
+   */
+  @org.junit.Test
+  public void cbclGMonthDayEqual005() {
+    final XQuery query = new XQuery(
+      "xs:gMonthDay(\"--12-31+09:00\") eq xs:gMonthDay(\"--12-30\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gMonthDay .
+   */
+  @org.junit.Test
+  public void cbclGMonthDayEqual006() {
+    final XQuery query = new XQuery(
+      "declare function local:gMonthDay($day as xs:integer) { if ($day lt 10) then xs:gMonthDay(concat(\"--12-0\", $day)) else xs:gMonthDay(concat(\"--12-\", $day)) }; not(local:gMonthDay(1) ne xs:gMonthDay(\"--12-31\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gMonthDay .
+   */
+  @org.junit.Test
+  public void cbclGMonthDayEqual007() {
+    final XQuery query = new XQuery(
+      "xs:gMonthDay(\"--12-30\") ne xs:gMonthDay(\"--12-31+09:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of gMonthDay .
+   */
+  @org.junit.Test
+  public void cbclGMonthDayEqual008() {
+    final XQuery query = new XQuery(
+      "xs:gMonthDay(\"--12-31+09:00\") ne xs:gMonthDay(\"--12-30\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of gMonthDay .
+   */
+  @org.junit.Test
+  public void cbclGMonthDayEqual009() {
+    final XQuery query = new XQuery(
+      "xs:gMonthDay(\"--12-30\") ne xs:gMonthDay(\"--12-31+09:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of gMonthDay .
+   */
+  @org.junit.Test
+  public void cbclGMonthDayEqual010() {
+    final XQuery query = new XQuery(
+      "xs:gMonthDay(\"--12-31+09:00\") ne xs:gMonthDay(\"--12-30\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of gMonthDay .
+   */
+  @org.junit.Test
+  public void cbclGMonthDayEqual011() {
+    final XQuery query = new XQuery(
+      "declare function local:gMonthDay($gMonthDay as xs:gMonthDay, $null as xs:boolean) { if ($null) then () else $gMonthDay }; exists(local:gMonthDay(xs:gMonthDay(\"--12-31\"), fn:true()) eq xs:gMonthDay(\"--12-31\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gMonthDay .
+   */
+  @org.junit.Test
+  public void cbclGMonthDayEqual012() {
+    final XQuery query = new XQuery(
+      "declare function local:gMonthDay($gMonthDay as xs:gMonthDay, $null as xs:boolean) { if ($null) then () else $gMonthDay }; local:gMonthDay(xs:gMonthDay(\"--12-31\"), fn:false()) eq xs:gMonthDay(\"--12-31\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of gMonthDay .
+   */
+  @org.junit.Test
+  public void cbclGMonthDayEqual013() {
+    final XQuery query = new XQuery(
+      "declare function local:gMonthDay($gMonthDay as xs:gMonthDay, $null as xs:boolean) { if ($null) then () else $gMonthDay }; exists(local:gMonthDay(xs:gMonthDay(\"--12-31\"), fn:true()) ne xs:gMonthDay(\"--12-31\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gMonthDay .
+   */
+  @org.junit.Test
+  public void cbclGMonthDayEqual014() {
+    final XQuery query = new XQuery(
+      "declare function local:gMonthDay($gMonthDay as xs:gMonthDay, $null as xs:boolean) { if ($null) then () else $gMonthDay }; local:gMonthDay(xs:gMonthDay(\"--12-31\"), fn:false()) ne xs:gMonthDay(\"--12-31\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gDay .
+   */
+  @org.junit.Test
+  public void cbclGMonthDayEqual015() {
+    final XQuery query = new XQuery(
+      "xs:gMonthDay(\"--01-30-12:00\") eq xs:gMonthDay(\"--01-31+12:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of gDay .
+   */
+  @org.junit.Test
+  public void cbclGMonthDayEqual016() {
+    final XQuery query = new XQuery(
+      "xs:gMonthDay(\"--01-31+12:00\") eq xs:gMonthDay(\"--01-30-12:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of gDay .
+   */
+  @org.junit.Test
+  public void cbclGMonthDayEqual017() {
+    final XQuery query = new XQuery(
+      "xs:gMonthDay(\"--01-30-12:00\") ne xs:gMonthDay(\"--01-31+12:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gDay .
+   */
+  @org.junit.Test
+  public void cbclGMonthDayEqual018() {
+    final XQuery query = new XQuery(
+      "xs:gMonthDay(\"--01-31+12:00\") ne xs:gMonthDay(\"--01-30-12:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gMonthDay .
+   */
+  @org.junit.Test
+  public void cbclGMonthDayEqual019() {
+    final XQuery query = new XQuery(
+      "xs:gMonthDay(\"--12-31\") eq xs:gMonthDay(\"--12-31+01:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gMonthDay .
+   */
+  @org.junit.Test
+  public void cbclGMonthDayEqual020() {
+    final XQuery query = new XQuery(
+      "xs:gMonthDay(\"--12-31+01:00\") eq xs:gMonthDay(\"--12-31\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
     );
   }
 
@@ -212,9 +644,13 @@ public class OpGMonthDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gMonthDay(\"--06-02Z\") ne xs:gMonthDay(\"--06-09Z\")) or (xs:gMonthDay(\"--08-06Z\") ne xs:gMonthDay(\"--09-01Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -236,9 +672,13 @@ public class OpGMonthDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gMonthDay(\"--03-04Z\") eq xs:gMonthDay(\"--01-07Z\")) or (fn:true())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -260,9 +700,13 @@ public class OpGMonthDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gMonthDay(\"--08-04Z\") ne xs:gMonthDay(\"--07-12Z\")) or (fn:true())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -284,9 +728,13 @@ public class OpGMonthDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gMonthDay(\"--05-05Z\") eq xs:gMonthDay(\"--05-05Z\")) or (fn:false())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -308,9 +756,13 @@ public class OpGMonthDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gMonthDay(\"--09-09Z\") ne xs:gMonthDay(\"--09-10Z\")) or (fn:false())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -331,9 +783,13 @@ public class OpGMonthDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gMonthDay(\"--12-25Z\") eq xs:gMonthDay(\"--12-26Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -355,9 +811,13 @@ public class OpGMonthDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not((xs:gMonthDay(\"--12-10Z\") eq xs:gMonthDay(\"--12-10Z\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -379,9 +839,13 @@ public class OpGMonthDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:gMonthDay(\"--05-01Z\") ne xs:gMonthDay(\"--06-12Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -403,9 +867,13 @@ public class OpGMonthDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:gMonthDay(\"--11-10Z\") eq xs:gMonthDay(\"--10-02Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -427,9 +895,13 @@ public class OpGMonthDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:gMonthDay(\"--05-10Z\") ne xs:gMonthDay(\"--05-10Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -451,9 +923,13 @@ public class OpGMonthDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gMonthDay(\"--04-02Z\") eq xs:gMonthDay(\"--02-03Z\")) and (xs:gMonthDay(\"--01-07Z\") eq xs:gMonthDay(\"--12-10Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -475,9 +951,13 @@ public class OpGMonthDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gMonthDay(\"--12-10Z\") ne xs:gMonthDay(\"--03-11Z\")) and (xs:gMonthDay(\"--05-12Z\") ne xs:gMonthDay(\"--08-08Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -499,9 +979,13 @@ public class OpGMonthDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gMonthDay(\"--02-01Z\") eq xs:gMonthDay(\"--02-10Z\")) or (xs:gMonthDay(\"--06-02Z\") eq xs:gMonthDay(\"--06-03Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -525,9 +1009,13 @@ public class OpGMonthDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--01-01Z\") eq xs:gMonthDay(\"--01-01Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -551,9 +1039,13 @@ public class OpGMonthDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--01-01Z\") ne xs:gMonthDay(\"--12-31Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -577,9 +1069,13 @@ public class OpGMonthDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--04-10Z\") eq xs:gMonthDay(\"--01-01Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -603,9 +1099,13 @@ public class OpGMonthDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--12-31Z\") eq xs:gMonthDay(\"--01-01Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -629,9 +1129,13 @@ public class OpGMonthDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--01-01Z\") eq xs:gMonthDay(\"--04-10Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -655,9 +1159,13 @@ public class OpGMonthDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--01-01Z\") eq xs:gMonthDay(\"--12-31Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -681,9 +1189,13 @@ public class OpGMonthDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--01-01Z\") ne xs:gMonthDay(\"--01-01Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -707,9 +1219,13 @@ public class OpGMonthDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--04-10Z\") ne xs:gMonthDay(\"--01-01Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -733,9 +1249,13 @@ public class OpGMonthDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--12-31Z\") ne xs:gMonthDay(\"--01-01Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -759,9 +1279,13 @@ public class OpGMonthDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--01-01Z\") ne xs:gMonthDay(\"--04-10Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );

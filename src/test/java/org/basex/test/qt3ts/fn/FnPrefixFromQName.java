@@ -20,9 +20,13 @@ public class FnPrefixFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "prefix-from-QName()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnPrefixFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "prefix-from-QName(1, 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -52,9 +60,13 @@ public class FnPrefixFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(prefix-from-QName( () ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnPrefixFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "prefix-from-QName( QName(\"example.com/\", \"pre:lname\")) eq \"pre\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class FnPrefixFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:prefix-from-QName(\"arg1\",\"arg2\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -100,10 +120,14 @@ public class FnPrefixFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:lower-case(fn:prefix-from-QName(xs:QName(\"FOO:bar\")))",
       ctx);
-    query.namespace("FOO", "http://example.org");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("FOO", "http://example.org");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "foo")
     );
@@ -117,10 +141,14 @@ public class FnPrefixFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(fn:prefix-from-QName(xs:QName(\"foo:bar\")),\":bar\")",
       ctx);
-    query.namespace("foo", "http://example.org");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("foo", "http://example.org");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "foo:bar")
     );
@@ -134,10 +162,14 @@ public class FnPrefixFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring-before(fn:prefix-from-QName(xs:QName(\"foo:bar\")),\"oo\")",
       ctx);
-    query.namespace("foo", "http://example.org");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("foo", "http://example.org");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "f")
     );
@@ -151,10 +183,14 @@ public class FnPrefixFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring-after(fn:prefix-from-QName(xs:QName(\"foo:bar\")),\"f\")",
       ctx);
-    query.namespace("foo", "http://example.org");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("foo", "http://example.org");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "oo")
     );
@@ -168,10 +204,14 @@ public class FnPrefixFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-length(fn:prefix-from-QName(xs:QName(\"foo:bar\")))",
       ctx);
-    query.namespace("foo", "http://example.org");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("foo", "http://example.org");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "3")
     );
@@ -185,10 +225,14 @@ public class FnPrefixFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring(fn:prefix-from-QName(xs:QName(\"foo:bar\")),2)",
       ctx);
-    query.namespace("foo", "http://example.org");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("foo", "http://example.org");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "oo")
     );
@@ -202,10 +246,14 @@ public class FnPrefixFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-join((fn:prefix-from-QName(xs:QName(\"foo:bar\")),\":bar\"),\"\")",
       ctx);
-    query.namespace("foo", "http://example.org");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("foo", "http://example.org");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "foo:bar")
     );
@@ -219,10 +267,14 @@ public class FnPrefixFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:starts-with(fn:prefix-from-QName(xs:QName(\"foo:bar\")),\"f\")",
       ctx);
-    query.namespace("foo", "http://example.org");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("foo", "http://example.org");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -236,10 +288,14 @@ public class FnPrefixFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ends-with(fn:prefix-from-QName(xs:QName(\"foo:bar\")),\"f\")",
       ctx);
-    query.namespace("foo", "http://example.org");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("foo", "http://example.org");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -253,10 +309,14 @@ public class FnPrefixFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:contains(fn:prefix-from-QName(xs:QName(\"foo:bar\")),\"f\")",
       ctx);
-    query.namespace("foo", "http://example.org");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("foo", "http://example.org");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -270,9 +330,13 @@ public class FnPrefixFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:prefix-from-QName(xs:integer(1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -286,11 +350,15 @@ public class FnPrefixFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:prefix-from-QName(xs:QName(\"foo:bar\"))",
       ctx);
-    query.namespace("foo", "http://example.org");
-    query.namespace("FOO", "http://example.org");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("foo", "http://example.org");
+      query.namespace("FOO", "http://example.org");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "foo")
     );
@@ -304,9 +372,13 @@ public class FnPrefixFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:prefix-from-QName(xs:QName(\"name\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -320,9 +392,13 @@ public class FnPrefixFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-length(xs:string(fn:prefix-from-QName(xs:QName(\"name\"))))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -336,10 +412,14 @@ public class FnPrefixFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(fn:prefix-from-QName(xs:QName(\"foo:name\")))",
       ctx);
-    query.namespace("foo", "http://example.org");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("foo", "http://example.org");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "foo")
     );
@@ -353,10 +433,14 @@ public class FnPrefixFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:prefix-from-QName(xs:QName(\"foo:name\")))",
       ctx);
-    query.namespace("foo", "http://example.org");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("foo", "http://example.org");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "foo")
     );
@@ -370,9 +454,13 @@ public class FnPrefixFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:prefix-from-QName(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -386,9 +474,13 @@ public class FnPrefixFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:prefix-from-QName(xs:QName(\"foo:bar\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FONS0004")
     );
@@ -402,10 +494,14 @@ public class FnPrefixFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:upper-case(fn:prefix-from-QName(xs:QName(\"foo:bar\")))",
       ctx);
-    query.namespace("foo", "http://example.org");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("foo", "http://example.org");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "FOO")
     );

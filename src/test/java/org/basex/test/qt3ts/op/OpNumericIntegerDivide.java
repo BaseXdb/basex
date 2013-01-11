@@ -20,9 +20,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:decimal(6) idiv xs:integer(2)) instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -36,9 +40,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:float(6) idiv xs:float(2)) instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:decimal(6) idiv xs:double(2)) instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:double(6) idiv xs:decimal(2)) instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:double(6) idiv xs:float(2)) instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:float(6) idiv xs:double(2)) instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,9 +140,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:double(6) idiv xs:integer(2)) instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -132,9 +160,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:integer(6) idiv xs:double(2)) instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -148,9 +180,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:double(6) idiv xs:double(2)) instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -164,9 +200,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "10 idiv 3 eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -180,9 +220,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 idiv -2 eq -1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -196,9 +240,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:integer(6) idiv xs:decimal(2)) instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -212,9 +260,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "-3 idiv 2 eq -1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -228,9 +280,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "-3 idiv -2 eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -244,9 +300,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "5.0 idiv 2.0 eq 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -260,9 +320,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "9.0 idiv 3 eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -276,9 +340,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "-3.5 idiv 3 eq -1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -292,9 +360,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "3.0 idiv 4 eq 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -308,9 +380,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "3.1E1 idiv 6 eq 5",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -324,9 +400,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "3.1E1 idiv 7 eq 4",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -340,9 +420,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1.1 idiv 1) instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -356,9 +440,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:double(1.1) idiv 1.1) instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -372,9 +460,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:integer(6) idiv xs:integer(2)) instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -388,9 +480,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 idiv 1.1 eq 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -404,9 +500,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 idiv xs:float(\"NaN\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0002")
     );
@@ -420,9 +520,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"NaN\") idiv 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0002")
     );
@@ -436,9 +540,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"INF\") idiv xs:float(3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0002")
     );
@@ -452,9 +560,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"-INF\") idiv xs:float(3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0002")
     );
@@ -468,9 +580,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"3\") idiv xs:float(\"INF\") eq xs:float(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -484,9 +600,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"3\") idiv xs:float(\"-INF\") eq xs:float(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -500,9 +620,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 idiv xs:double(\"NaN\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0002")
     );
@@ -516,9 +640,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"NaN\") idiv 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0002")
     );
@@ -532,9 +660,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"INF\") idiv xs:double(3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0002")
     );
@@ -548,9 +680,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:decimal(6) idiv xs:decimal(2)) instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -564,9 +700,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"-INF\") idiv xs:double(3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0002")
     );
@@ -580,9 +720,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"3\") idiv xs:double(\"INF\") eq xs:double(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -596,9 +740,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"3\") idiv xs:double(\"-INF\") eq xs:double(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -612,9 +760,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "10idiv 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -628,9 +780,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "10 idiv3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -644,9 +800,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "10idiv3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -660,9 +820,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"3\" idiv \"3\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -676,9 +840,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"3\" idiv xs:float(3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -692,9 +860,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:untypedAtomic(\"9\") idiv xs:float(5)) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -708,9 +880,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:float(9) idiv xs:untypedAtomic(\"5\")) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -724,9 +900,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:decimal(6) idiv xs:decimal(2)) instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -740,9 +920,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:untypedAtomic(\"nine\") idiv xs:float(5)) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0001")
     );
@@ -756,9 +940,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:float(9) idiv xs:untypedAtomic(\"five\")) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0001")
     );
@@ -772,9 +960,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(() idiv ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -792,9 +984,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(() idiv xs:decimal(1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -812,9 +1008,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:float(6) idiv xs:decimal(2)) instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -828,9 +1028,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:decimal(6) idiv xs:float(2)) instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -844,9 +1048,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:float(6) idiv xs:integer(2)) instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -860,9 +1068,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:integer(6) idiv xs:float(2)) instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -876,9 +1088,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 idiv 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0001")
     );
@@ -892,9 +1108,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 idiv 0.0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0001")
     );
@@ -908,9 +1128,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 idiv +0.0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0001")
     );
@@ -924,9 +1148,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 idiv -0.0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0001")
     );
@@ -940,9 +1168,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 idiv 0e0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0001")
     );
@@ -956,9 +1188,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "-1 idiv 0e0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0001")
     );
@@ -972,9 +1208,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 idiv xs:float(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0001")
     );
@@ -988,11 +1228,222 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "-1 idiv xs:float(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0001")
+    );
+  }
+
+  /**
+   *  test possible overflow of xs:decimal .
+   */
+  @org.junit.Test
+  public void cbclNumericIdivide001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:decimal) as xs:decimal { $arg * $arg }; \n" +
+      "      \tlocal:square(4294967296.0) idiv 0.0000000000005 gt 0",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("FOAR0002")
+      )
+    );
+  }
+
+  /**
+   *  test possible overflow of xs:double .
+   */
+  @org.junit.Test
+  public void cbclNumericIdivide002() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:double) as xs:double { $arg * $arg }; \n" +
+      "      \tlocal:square(1e100) idiv 5e-100",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        error("FOAR0002")
+      ||
+        (
+          assertType("xs:integer")
+        &&
+          assertQuery("string-length(string($result)) gt 299")
+        )
+      )
+    );
+  }
+
+  /**
+   *  test possible overflow of xs:float .
+   */
+  @org.junit.Test
+  public void cbclNumericIdivide003() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:float) as xs:float { $arg * $arg }; \n" +
+      "      \tlocal:square(xs:float(1e30)) idiv xs:float(5e-30)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FOAR0002")
+    );
+  }
+
+  /**
+   *  ensure that idividing xs:integers returns an xs:integer .
+   */
+  @org.junit.Test
+  public void cbclNumericIdivide004() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:integer($x as xs:decimal) { if ($x mod 1 eq 0) then xs:integer($x) else $x };\n" +
+      "      \t (local:integer(2) idiv local:integer(2)) instance of xs:integer",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  Test idiv by one on an xs:integer .
+   */
+  @org.junit.Test
+  public void cbclNumericIdivide005() {
+    final XQuery query = new XQuery(
+      "xs:integer(2) idiv xs:decimal(1)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("2")
+    );
+  }
+
+  /**
+   *  Test idiv by one on an xs:float .
+   */
+  @org.junit.Test
+  public void cbclNumericIdivide006() {
+    final XQuery query = new XQuery(
+      "xs:float(1.5) idiv xs:decimal(1)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("1")
+    );
+  }
+
+  /**
+   *  Test idiv by one on an xs:double .
+   */
+  @org.junit.Test
+  public void cbclNumericIdivide007() {
+    final XQuery query = new XQuery(
+      "xs:double(1.5) idiv xs:decimal(1)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("1")
+    );
+  }
+
+  /**
+   *  Test idiv by one on an xs:double .
+   */
+  @org.junit.Test
+  public void cbclNumericIdivide008() {
+    final XQuery query = new XQuery(
+      "xs:float('1e38') idiv xs:float('1e-37')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FOAR0002")
+    );
+  }
+
+  /**
+   *  Test numeric idiv with a potential type check error .
+   */
+  @org.junit.Test
+  public void cbclNumericIdivide009() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:value($number as xs:boolean) { if ($number) then 1 else xs:string('1') }; \n" +
+      "      \tlocal:value(true()) idiv local:value(true())\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertEq("1")
+      ||
+        error("XPTY0004")
+      )
     );
   }
 
@@ -1004,9 +1455,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(0 div 0E0) idiv xs:integer(2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0002")
     );
@@ -1020,9 +1475,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-999999999999999999\") idiv xs:decimal(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1036,9 +1495,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"617375191608514839\") idiv xs:decimal(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1052,9 +1515,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"999999999999999999\") idiv xs:decimal(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1068,9 +1535,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-999999999999999999\") idiv xs:decimal(\"617375191608514839\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1084,9 +1555,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-999999999999999999\") idiv xs:decimal(\"999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1100,9 +1575,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"-INF\") idiv xs:double(\"1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0002")
     );
@@ -1116,9 +1595,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"1\") idiv xs:double(\"NaN\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0002")
     );
@@ -1132,9 +1615,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"1\") idiv xs:double(\"0.0E0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0001")
     );
@@ -1148,9 +1635,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"INF\") idiv xs:double(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0001")
     );
@@ -1164,9 +1655,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"12.78e-2\") idiv xs:double(\"3\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1180,9 +1675,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"-INF\") idiv xs:float(\"1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0002")
     );
@@ -1196,9 +1695,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"1\") idiv xs:float(\"NaN\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0002")
     );
@@ -1212,9 +1715,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"1\") idiv xs:float(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0001")
     );
@@ -1228,9 +1735,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"INF\") idiv xs:float(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0001")
     );
@@ -1244,9 +1755,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"-3.5\") idiv xs:float(\"3\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1260,9 +1775,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(\"-2147483648\") idiv xs:int(\"-2147483648\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1276,9 +1795,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(\"-1873914410\") idiv xs:int(\"-2147483648\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1292,9 +1815,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(\"2147483647\") idiv xs:int(\"-2147483648\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1308,9 +1835,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(\"-2147483648\") idiv xs:int(\"-1873914410\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1324,9 +1855,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(\"-2147483648\") idiv xs:int(\"2147483647\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1340,9 +1875,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"-999999999999999999\") idiv xs:integer(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1356,9 +1895,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"830993497117024304\") idiv xs:integer(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1372,9 +1915,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"999999999999999999\") idiv xs:integer(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1388,9 +1935,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"-999999999999999999\") idiv xs:integer(\"830993497117024304\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1404,9 +1955,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"-999999999999999999\") idiv xs:integer(\"999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1420,9 +1975,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(\"-92233720368547758\") idiv xs:long(\"-92233720368547758\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1436,9 +1995,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(\"-47175562203048468\") idiv xs:long(\"-92233720368547758\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1452,9 +2015,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(\"92233720368547758\") idiv xs:long(\"-92233720368547758\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1468,9 +2035,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(\"-92233720368547758\") idiv xs:long(\"-47175562203048468\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1484,9 +2055,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(\"-92233720368547758\") idiv xs:long(\"92233720368547758\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1500,9 +2075,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "() idiv 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEmpty()
@@ -1520,9 +2099,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 idiv 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0001")
     );
@@ -1536,9 +2119,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 idiv '1'",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -1552,9 +2139,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 idiv xs:integer('1')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1568,9 +2159,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 idiv <a> 2 </a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1584,9 +2179,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 idiv <a> <b> 2 </b> </a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1600,9 +2199,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 idiv <a> <b> 2</b> <c> 2</c> </a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0001")
     );
@@ -1616,9 +2219,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a> 1 </a> idiv <b> 2 </b>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1632,9 +2239,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 idiv <a> x </a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0001")
     );
@@ -1648,9 +2259,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 idiv <a/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0001")
     );
@@ -1664,9 +2279,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:negativeInteger(\"-999999999999999999\") idiv xs:negativeInteger(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1680,9 +2299,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:negativeInteger(\"-297014075999096793\") idiv xs:negativeInteger(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1696,9 +2319,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:negativeInteger(\"-1\") idiv xs:negativeInteger(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1712,9 +2339,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:negativeInteger(\"-999999999999999999\") idiv xs:negativeInteger(\"-297014075999096793\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -1728,9 +2359,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:negativeInteger(\"-999999999999999999\") idiv xs:negativeInteger(\"-1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -1744,9 +2379,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(\"0\") idiv xs:nonNegativeInteger(\"303884545991464527\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1760,9 +2399,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(\"0\") idiv xs:nonNegativeInteger(\"999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1776,9 +2419,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(\"-999999999999999999\") idiv xs:nonPositiveInteger(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1792,9 +2439,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(\"-475688437271870490\") idiv xs:nonPositiveInteger(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1808,9 +2459,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(\"0\") idiv xs:nonPositiveInteger(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1824,9 +2479,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(\"-999999999999999999\") idiv xs:nonPositiveInteger(\"-475688437271870490\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -1840,9 +2499,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(\"1\") idiv xs:positiveInteger(\"1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1856,9 +2519,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(\"52704602390610033\") idiv xs:positiveInteger(\"1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("52704602390610033")
     );
@@ -1872,9 +2539,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(\"999999999999999999\") idiv xs:positiveInteger(\"1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -1888,9 +2559,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(\"1\") idiv xs:positiveInteger(\"52704602390610033\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1904,9 +2579,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(\"1\") idiv xs:positiveInteger(\"999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1920,9 +2599,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(\"-32768\") idiv xs:short(\"-32768\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1936,9 +2619,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(\"-5324\") idiv xs:short(\"-32768\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1952,9 +2639,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(\"32767\") idiv xs:short(\"-32768\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1968,9 +2659,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(\"-32768\") idiv xs:short(\"-5324\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("6")
     );
@@ -1984,9 +2679,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(\"-32768\") idiv xs:short(\"32767\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -2000,9 +2699,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(\"0\") idiv xs:unsignedLong(\"130747108607674654\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2016,9 +2719,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(\"0\") idiv xs:unsignedLong(\"184467440737095516\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2032,9 +2739,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(\"0\") idiv xs:unsignedShort(\"44633\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2048,9 +2759,13 @@ public class OpNumericIntegerDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(\"0\") idiv xs:unsignedShort(\"65535\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );

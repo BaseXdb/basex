@@ -20,9 +20,13 @@ public class ProdDefaultCollationDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://www.w3.org/2005/xpath-functions/\"; declare default collation \"collation/codepoint\"; default-collation() eq \"http://www.w3.org/2005/xpath-functions/collation/codepoint\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -36,9 +40,13 @@ public class ProdDefaultCollationDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://example.com/\"; declare default collation \"collation/codepoint/DOESNOTEXIT/Testing\"; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0038")
     );
@@ -52,9 +60,13 @@ public class ProdDefaultCollationDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default collation \"http://www.w3.org/2005/xpath-functions/collation/codepoint\"; default-collation() eq \"http://www.w3.org/2005/xpath-functions/collation/codepoint\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class ProdDefaultCollationDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default collation \"http://www.w3.org/2005/xpath-functions/collation/codepoint\"; declare default collation \"http://www.w3.org/2005/xpath-functions/collation/codepoint\"; default-collation() eq \"http://www.w3.org/2005/xpath-functions/collation/codepoint\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0038")
     );
@@ -84,9 +100,13 @@ public class ProdDefaultCollationDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default collation \"http://www.w3.org/2005/xpath-functions/collation/codepoint\"; declare default collation \"http://www.w3.org/2005/xpath-functions/collation/codepoint2\"; default-collation() eq \"http://www.w3.org/2005/xpath-functions/collation/codepoint\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0038")
     );
@@ -100,9 +120,13 @@ public class ProdDefaultCollationDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default collation \"&\"; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -116,9 +140,13 @@ public class ProdDefaultCollationDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default collation \"http://www.w3.org/2005/xpath-functions/collation/codepoint\"; declare default collation \"http://www.w3.org/2005/xpath-functions/collation/codepoint\"; declare variable $input-context1 external; \"aaa\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0038")
     );
@@ -132,9 +160,13 @@ public class ProdDefaultCollationDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default collation \"http://nonexistentcollition.org/ifsupportedwoooayouarethebestQueryimplementation/makeitharder\"; declare variable $input-context1 external; \"aaa\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0038")
     );

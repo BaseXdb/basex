@@ -20,9 +20,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 + remove((\"foo\", 2), 2)asdasdad",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -36,9 +40,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"f oo\" eq \"f oo",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -52,9 +60,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "normalize-unicode(\"f oo\") eq \"f oo",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -68,9 +80,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "---..---",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -84,9 +100,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "foo- foo",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -100,9 +120,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "nametest : nametest",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -116,9 +140,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "nametest: nametest",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -132,9 +160,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "nametest :nametest",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -148,9 +180,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "f oo\" eq \"f oo\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -164,9 +200,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"f oo eq \"f oo\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -180,9 +220,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"f oo\" eq f oo\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -196,9 +240,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "//",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -212,9 +260,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "parent::",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -228,9 +280,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "no-binding:*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -244,9 +300,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var := <elem xml:space=\"default\"/>; $var/@xml:space eq \"default\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -260,9 +320,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var := <elem xml:space=\"preserve\"/>; string(($var/@xml:*)[1])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "preserve")
     );
@@ -276,9 +340,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var := <elem>text<a/><!-- a comment --><b/><?target data?><c/><![CDATA[more text]]></elem>; $var/child::*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a/><b/><c/>", false)
     );
@@ -292,9 +360,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $e := <a b =\"content\"><?b asd?><b/><c b=\"content\"/></a>; $e/b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<b/>", false)
     );
@@ -308,9 +380,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $e := <a b =\"content\"><?b asd?><b/></a>; $e/*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<b/>", false)
     );
@@ -324,9 +400,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $e := <a b =\"content\"><?b asd?><b/></a>; <a>{$e/@b}</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a b=\"content\"/>", false)
     );
@@ -340,9 +420,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $e := <a b =\"content\"><?b asd?><b/></a>; <a>{$e/@*}</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a b=\"content\"/>", false)
     );
@@ -356,9 +440,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $e := <a b =\"content\"><?b asd?><b/></a>; $e/processing-instruction(b)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<?b asd?>", false)
     );
@@ -372,9 +460,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "/*5",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -388,9 +480,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $e := <a b =\"content\"><?b asd?><b/></a>; <a>{$e/processing-instruction()}</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a><?b asd?></a>", false)
     );
@@ -404,9 +500,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(let $e := <a b =\"content\"><?b asd?><b/></a> return $e/processing-instruction(\"123ncname\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -420,9 +520,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(let $e := <a b =\"content\"><?b asd?><b/></a> return $e/processing-instruction(\"b \"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -436,9 +540,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(let $e := <a b =\"content\"><?b asd?><b/></a> return $e/processing-instruction(\"prefix:b\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -452,9 +560,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e/>/processing-instruction(1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -468,9 +580,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e/>/processing-instruction(prefix:ncname))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -484,9 +600,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $name := \"ncname\" return <e/>/processing-instruction($name))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -500,9 +620,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $name := \"ncname\" return <e/>/processing-instruction($name))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -516,9 +640,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e/>/element(\"any\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -532,9 +660,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e/>/attribute(\"any\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -548,9 +680,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "/ * 5",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -564,9 +700,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace a = \"http://example.com/1\"; declare namespace b = \"http://example.com/2\"; let $e := <e a:n1=\"content\" b:n1=\"content\"> <a:n1/> <b:n1/> <?n1 ?> <n1/> </e> return $e/*:n1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a:n1 xmlns:b=\"http://example.com/2\" xmlns:a=\"http://example.com/1\"/><b:n1 xmlns:b=\"http://example.com/2\" xmlns:a=\"http://example.com/1\"/><n1 xmlns:b=\"http://example.com/2\" xmlns:a=\"http://example.com/1\"/>", false)
     );
@@ -580,9 +720,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace a = \"http://example.com/1\"; declare namespace b = \"http://example.com/2\"; let $e := <e a:n1=\"content\" b:n1=\"content\"> <a:n1/> <b:n1/> <?n1 ?> <n1/> </e> return $e/a:*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a:n1 xmlns:b=\"http://example.com/2\" xmlns:a=\"http://example.com/1\"/>", false)
     );
@@ -596,9 +740,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a>{<e foo=\"content2\" bar=\"content1\"/>/attribute(foo)}</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a foo=\"content2\"/>", false)
     );
@@ -612,9 +760,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "schema-element(\"quotesAreNotAllowed\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -628,9 +780,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "schema-attribute(\"quotesAreNotAllowed\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -644,9 +800,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "schema-element(notDeclared:ncname)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -660,9 +820,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "schema-attribute(notDeclared:ncname)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -676,9 +840,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "schema-element(thisTypeDoesNotExistExample.Com)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -692,9 +860,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "schema-attribute(thisTypeDoesNotExistExample.Com)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -708,9 +880,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace e = \"http://www.example.com/\"; schema-element(e:thisTypeDoesNotExistExample.Com)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -724,9 +900,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "4 + / * 5",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -740,9 +920,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace e = \"http://www.example.com/\"; schema-attribute(e:thisTypeDoesNotExistExample.Com)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -756,9 +940,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "unknownprefix:*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -772,9 +960,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "@unknownprefix:*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -788,9 +980,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "@xmlns:*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -804,9 +1000,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "@xmlns:ncname",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -820,9 +1020,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "xmlns:ncname",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -836,9 +1040,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "xmlns:*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -852,9 +1060,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $i := <e > <xmlns/> <xmlns/> <xmlns/> <xmlns/> </e>; $i/xmlns",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<xmlns/><xmlns/><xmlns/><xmlns/>", false)
     );
@@ -868,9 +1080,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $i := <e xmlns=\"http://example.com/\"/>; empty($i/@xmlns)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -884,9 +1100,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace p = \"http://example.com/\"; <a>{<e p:a=\"1\" p:b=\"2\" p:c=\"3\"/>/attribute::*/p:*}</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<a></a>", false)
@@ -904,9 +1124,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace namespace = \"http://example.com\"; declare union <union>for gibberish { for $for in for return <for>***div div</for> }</union>, if(if) then then else else- +-++-**-* instance of element(*)* * * **---++div- div -div",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XPTY0004")
@@ -924,9 +1148,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace p = \"http://example.com/\"; <a>{document {<p:e/>}/@p:*}</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<a></a>", false)
@@ -944,9 +1172,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a>{attribute name{\"content\"}/*}</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<a></a>", false)
@@ -964,9 +1196,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a>{comment {\"content\"}/*}</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<a/>", false)
@@ -984,9 +1220,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a>{<!-- a comment -->/*}</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<a/>", false)
@@ -1004,9 +1244,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a>{processing-instruction name {\"content\"}/*}</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<a/>", false)
@@ -1024,9 +1268,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a>{<?target data?>/*}</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<a/>", false)
@@ -1044,9 +1292,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $a := <e><a/><b/><c/></e>; <a>{$a/*:ncname eq 1}</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<a/>", false)
@@ -1064,9 +1316,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $a := <e><a/><b/><c/></e>; <a>{$a/*:ncname eq 1}</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<a/>", false)
@@ -1084,9 +1340,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace prefix = \"http://example.com/\"; declare variable $a := <e><a/><b/><c/></e>; <a>{$a/prefix:* eq 1}</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<a/>", false)
@@ -1104,9 +1364,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace prefix = \"http://example.com/\"; declare variable $a := <e><a/><b/><c/></e>; <a>{$a/@prefix:* eq 1}</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<a/>", false)
@@ -1124,9 +1388,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "::ncname",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1142,9 +1410,13 @@ public class ProdNameTest extends QT3TestSet {
       "        declare variable $input := <e/>; \n" +
       "        empty(for $PI as processing-instruction() in $input//processing-instruction() return $PI)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -1162,9 +1434,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e>{for $PI in ()/processing-instruction() return ()}</e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<e/>", false)
@@ -1182,9 +1458,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e>{for $PI in <e/>/processing-instruction() return ()}</e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<e/>", false)
@@ -1202,9 +1482,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "<x> <x> <y id=\"0\"/> </x> <y id=\"1\"/> </x>/descendant-or-self::x/child::y",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<y id=\"0\"/><y id=\"1\"/>", false)
     );
@@ -1218,9 +1502,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e>{<e foo=\"asd\"/>/attribute(*, xs:untypedAtomic)}</e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e foo=\"asd\"/>", false)
     );
@@ -1234,9 +1522,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e>{<e foo=\"asd\"/>/attribute(foo, xs:untypedAtomic)}</e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e foo=\"asd\"/>", false)
     );
@@ -1250,9 +1542,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e>{<e foo=\"asd\"/>/attribute(notBound:foo, xs:untypedAtomic)}</e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -1266,9 +1562,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e>{<e foo=\"asd\"/>/attribute(foo, notBound:untypedAtomic)}</e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -1282,9 +1582,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e>{<e foo=\"1\"/>/attribute(foo, xs:integer)}</e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<e/>", false)
@@ -1302,9 +1606,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e>{<e foo=\"1\"/>/attribute(foo, doesNotExistExampleCom)}</e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1318,9 +1626,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "::local:ncname",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1334,9 +1646,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e>{<e foo=\"1\"/>/attribute(foo, xs:doesNotExistExampleCom)}</e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1350,9 +1666,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e>{<b foo=\"1\"/>/attribute(foo, xs:anyType)}</e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e foo=\"1\"/>", false)
     );
@@ -1366,9 +1686,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e>{<e><b/></e>/element(p:foo)}</e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -1382,9 +1706,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e>{<e><b/></e>/element(foo, notBound:type)}</e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -1398,9 +1726,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e>{<e><b/></e>/element(foo, xs:doesNotExist)}</e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1414,9 +1746,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e>{<e><b/></e>/element(foo, doesNotExist)}</e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1430,9 +1766,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e><b/></e>/element(b, xs:anyType)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<b/>", false)
     );
@@ -1446,9 +1786,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e><b/></e>/element(b, xs:anyType)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<b/>", false)
     );
@@ -1462,9 +1806,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "let",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -1478,9 +1826,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "let",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -1494,9 +1846,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "@",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1510,9 +1866,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "as",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -1526,9 +1886,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "of",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -1542,9 +1906,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "child:",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1558,9 +1926,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "child::element",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -1574,9 +1946,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default function namespace \"http://www.example.com/\"; declare namespace e = \"http://www.example.com/\"; declare function element() { 1 }; e:element()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("1")
@@ -1594,9 +1970,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "_",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -1610,9 +1990,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "pod_pod",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -1626,9 +2010,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e>{<e foo=\"1\"/>/attribute(*, doesNotExistExampleCom)}</e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1642,9 +2030,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e>{<e foo=\"1\"/>/attribute(*, xs:doesNotExistExampleCom)}</e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1658,9 +2050,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e>{<e foo=\"1\"/>/attribute(*, doesNotExistExampleCom)}</e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1674,9 +2070,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "@",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1690,9 +2090,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e>{<e foo=\"1\"/>/attribute(*, xs:doesNotExistExampleCom)}</e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1706,10 +2110,14 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "/*/*[1]/name()",
       ctx);
-    query.context(node(file("prod/AxisStep/nw_Customers.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/nw_Customers.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Customers")
     );
@@ -1723,10 +2131,14 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "/.",
       ctx);
-    query.context(node(file("prod/AxisStep/nw_Customers.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/nw_Customers.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertType("document-node(element(Root))")
@@ -1744,10 +2156,14 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "/*/.",
       ctx);
-    query.context(node(file("prod/AxisStep/nw_Customers.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/nw_Customers.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertType("element(Root)")
@@ -1765,9 +2181,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := <a attr1 = \"abc1\"><b attr2 = \"abc2\">context2</b></a> return $var/child::*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<b attr2=\"abc2\">context2</b>", false)
     );
@@ -1781,9 +2201,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default element namespace \"http://www.example.org/examples\"; let $var := <a attr1 = \"abc1\"><b attr2 = \"abc2\">context2</b></a> return fn:namespace-uri(exactly-one($var/child::b))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.org/examples")
     );
@@ -1797,9 +2221,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := <a attr1 = \"abc1\"><b attr2 = \"abc2\">context2</b></a> return fn:count(fn:namespace-uri(exactly-one($var/child::b)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1813,10 +2241,14 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := /works/employee[12]/overtime return $var/child::*:day[1] | $var/child::*:day[2]",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<day>Monday</day><day>Tuesday</day>", false)
     );
@@ -1830,10 +2262,14 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := /works[1]/child::employee[12]/overtime return $var/child::* intersect $var/child::day",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<day>Monday</day><day>Tuesday</day>", false)
     );
@@ -1847,10 +2283,14 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := /works[1]/child::employee[12]/overtime return fn:count($var/child::* except $var/child::day)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1864,10 +2304,14 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := /works return fn:count($var/child::*)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("13")
     );
@@ -1881,10 +2325,14 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := /works return fn:count($var/child::employee)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("13")
     );
@@ -1898,10 +2346,14 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := /works return fn:count($var/child::*:employee)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("13")
     );
@@ -1915,9 +2367,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ns1 = \"http://example.org\"; let $var := <a attr1 = \"abc1\"><ns1:b attr2 = \"abc2\">context2</ns1:b></a> return $var/child::*:b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<ns1:b xmlns:ns1=\"http://example.org\" attr2=\"abc2\">context2</ns1:b>", false)
     );
@@ -1931,9 +2387,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := <a attr1 = \"abc1\"><b attr2 = \"abc2\">context2</b></a> return $var/child::b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<b attr2=\"abc2\">context2</b>", false)
     );
@@ -1947,9 +2407,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := <a attr1 = \"abc1\"><b attr2 = \"abc2\">context2</b></a> return $var/child::pr:b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -1963,9 +2427,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := <a attr1 = \"abc1\"><b attr2 = \"abc2\">context2</b></a> return $var/child::pr:*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -1979,9 +2447,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := <a attr1 = \"abc1\"><b attr2 = \"abc2\">context2</b></a> return $var/child::*:b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<b attr2=\"abc2\">context2</b>", false)
     );
@@ -1995,9 +2467,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ns1 = \"http://example.org\"; let $var := <a attr1 = \"abc1\"><ns1:b attr2 = \"abc2\">context2</ns1:b></a> return $var/child::ns1:b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<ns1:b xmlns:ns1=\"http://example.org\" attr2=\"abc2\">context2</ns1:b>", false)
     );
@@ -2011,9 +2487,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := <a attr1 = \"abc1\"><b attr2 = \"abc2\">context2</b></a> return $var/b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<b attr2=\"abc2\">context2</b>", false)
     );
@@ -2027,9 +2507,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := <a attr1 = \"abc1\"><b attr2 = \"abc2\">context2</b></a> return fn:node-name(exactly-one($var/b))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "b")
     );
@@ -2043,9 +2527,13 @@ public class ProdNameTest extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := <a attr1 = \"abc1\"><b attr2 = \"abc2\">context2</b></a> return fn:count(($var/empty-node-list)[1])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );

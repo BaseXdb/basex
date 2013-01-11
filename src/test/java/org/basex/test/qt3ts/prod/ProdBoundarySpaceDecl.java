@@ -20,9 +20,13 @@ public class ProdBoundarySpaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "(::)declare(::)boundary-space(::)strip(::); 1 eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -36,9 +40,13 @@ public class ProdBoundarySpaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "(::)declare(::)boundary-space(::)strip(::); 1 eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class ProdBoundarySpaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "(::)declare(::)boundary-space(::)strip(::); (::)declare(::)boundary-space(::)preserve(::); 1 eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0068")
     );
@@ -68,9 +80,13 @@ public class ProdBoundarySpaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "(::)declare(::)boundary space(::)strip(::); 1 eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -84,9 +100,13 @@ public class ProdBoundarySpaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "boundary-space ne boundary-space",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -100,9 +120,13 @@ public class ProdBoundarySpaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space strip; <a> {\"abc\"} </a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>abc</a>", false)
     );
@@ -116,9 +140,13 @@ public class ProdBoundarySpaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space preserve; <a> {\"abc\"} </a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a> abc </a>", false)
     );
@@ -132,9 +160,13 @@ public class ProdBoundarySpaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space strip; <a> z {\"abc\"}</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a> z abc</a>", false)
     );
@@ -148,9 +180,13 @@ public class ProdBoundarySpaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space preserve; <a> z {\"abc\"}</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a> z abc</a>", false)
     );
@@ -164,9 +200,13 @@ public class ProdBoundarySpaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space strip; <a>&#x20;{\"abc\"}</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a> abc</a>", false)
     );
@@ -180,9 +220,13 @@ public class ProdBoundarySpaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space preserve; <a>&#x20;{\"abc\"}</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a> abc</a>", false)
     );
@@ -196,9 +240,13 @@ public class ProdBoundarySpaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space strip; <a>&#x20;{\"abc\"}{' '}</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a> abc </a>", false)
     );
@@ -212,9 +260,13 @@ public class ProdBoundarySpaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space preserve; <a>&#x20;{\"abc\"}{' '}</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a> abc </a>", false)
     );
@@ -228,9 +280,13 @@ public class ProdBoundarySpaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space strip; <a>&#x20;{\"abc\"}{\" \"}</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a> abc </a>", false)
     );
@@ -244,9 +300,13 @@ public class ProdBoundarySpaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space preserve; <a>&#x20;{\"abc\"}{\" \"}</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a> abc </a>", false)
     );
@@ -267,9 +327,13 @@ public class ProdBoundarySpaceDecl extends QT3TestSet {
       "</res>\n" +
       "",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<res>\na\nb\nc\n</res>", false)
     );
@@ -289,9 +353,13 @@ public class ProdBoundarySpaceDecl extends QT3TestSet {
       "c\n" +
       "</res>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<res>\na\nb\nc\n</res>", false)
     );
@@ -311,9 +379,13 @@ public class ProdBoundarySpaceDecl extends QT3TestSet {
       "  c\n" +
       "</res>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<res>\n  a\n  b\n  c\n</res>", false)
     );
@@ -333,9 +405,13 @@ public class ProdBoundarySpaceDecl extends QT3TestSet {
       "  c\n" +
       "</res>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<res>\n  a\n  b\n  c\n</res>", false)
     );
@@ -351,9 +427,13 @@ public class ProdBoundarySpaceDecl extends QT3TestSet {
       "declare boundary-space strip;\n" +
       "<A>  A   {\"B\"}   C   {\"D\"}  </A>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<A>  A   B   C   D</A>", false)
     );
@@ -369,9 +449,13 @@ public class ProdBoundarySpaceDecl extends QT3TestSet {
       "declare boundary-space preserve;\n" +
       "<A>  A   {\"B\"}   C   {\"D\"}  </A>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<A>  A   B   C   D  </A>", false)
     );
@@ -387,9 +471,13 @@ public class ProdBoundarySpaceDecl extends QT3TestSet {
       "declare boundary-space strip;\n" +
       "<A>  A   {\"B\"}   C   {\"D  \"}</A>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<A>  A   B   C   D  </A>", false)
     );
@@ -405,9 +493,13 @@ public class ProdBoundarySpaceDecl extends QT3TestSet {
       "declare boundary-space preserve;\n" +
       "<A>  A   {\"B\"}   C   {\"D  \"}</A>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<A>  A   B   C   D  </A>", false)
     );
@@ -423,9 +515,13 @@ public class ProdBoundarySpaceDecl extends QT3TestSet {
       "declare boundary-space strip;\n" +
       "<A> (a), (b), (c) </A>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<A> (a), (b), (c) </A>", false)
     );
@@ -441,9 +537,13 @@ public class ProdBoundarySpaceDecl extends QT3TestSet {
       "declare boundary-space preserve;\n" +
       "<A> (a), (b), (c) </A>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<A> (a), (b), (c) </A>", false)
     );
@@ -457,9 +557,13 @@ public class ProdBoundarySpaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space strip; (\" \",10, 20, 30, 40,\" \")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "  10 20 30 40  ")
     );
@@ -473,9 +577,13 @@ public class ProdBoundarySpaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space preserve; (\" \",10, 20, 30, 40,\" \")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "  10 20 30 40  ")
     );
@@ -489,9 +597,13 @@ public class ProdBoundarySpaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space preserve; declare boundary-space strip; \"abc\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0068")
     );

@@ -20,9 +20,13 @@ public class FnIdref extends QT3TestSet {
     final XQuery query = new XQuery(
       "idref((), ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -36,9 +40,13 @@ public class FnIdref extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3)[idref(\"ncname\", .)]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -52,11 +60,87 @@ public class FnIdref extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3)[idref(\"ncname\")]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
+    );
+  }
+
+  /**
+   *  test fn:idref on the empty sequence .
+   */
+  @org.junit.Test
+  public void cbclIdref001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:generate($arg as xs:integer?) as xs:string* { if ($arg = 0) then () else 'id1', 'id2' }; \n" +
+      "      \tlet $doc := document { <root /> } return fn:empty( fn:idref( local:generate(0), $doc) )\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test fn:idref on the empty sequence .
+   */
+  @org.junit.Test
+  public void cbclIdref002() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tlet $doc := document { <root /> } return fn:empty( fn:idref( (), $doc) )\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("XPST0005")
+      )
+    );
+  }
+
+  /**
+   *  test fn:idref in an axis expression .
+   */
+  @org.junit.Test
+  public void cbclIdref003() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:generate($arg as xs:integer?) as xs:string* { if ($arg = 0) then () else 'id1', 'id2' }; \n" +
+      "      \tlet $doc := document { <root /> } return fn:empty( $doc/fn:idref( local:generate(0)) )\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
     );
   }
 
@@ -68,10 +152,14 @@ public class FnIdref extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:idref(\"argument 1\", / ,\"Argument 3\")",
       ctx);
-    query.context(node(file("fn/id/iddtd.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/id/iddtd.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -85,9 +173,13 @@ public class FnIdref extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1 to 10)[fn:idref(\"argument1\")]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -101,9 +193,13 @@ public class FnIdref extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:idref(\"argument1\",.)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -117,9 +213,13 @@ public class FnIdref extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:idref(\"argument1\", \"A\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -136,11 +236,15 @@ public class FnIdref extends QT3TestSet {
       "        let $var := copy:copy(/*) return fn:idref(\"argument1\", $var)\n" +
       "      ",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-    query.addModule("http://www.w3.org/QT3/copy", file("fn/id/copy.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      query.addModule("http://www.w3.org/QT3/copy", file("fn/id/copy.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FODC0001")
     );
@@ -154,10 +258,14 @@ public class FnIdref extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:idref(\"nomatching1 nomatching2\", /IDS[1]))",
       ctx);
-    query.context(node(file("fn/id/iddtd.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/id/iddtd.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -171,10 +279,14 @@ public class FnIdref extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:idref(\"\", /IDS[1]))",
       ctx);
-    query.context(node(file("fn/id/iddtd.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/id/iddtd.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -188,10 +300,14 @@ public class FnIdref extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:node-name(fn:idref(\"id2\", /IDS[1]))",
       ctx);
-    query.context(node(file("fn/id/iddtd.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/id/iddtd.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "anIdRef")
     );
@@ -205,10 +321,14 @@ public class FnIdref extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:idref(\"id1\", /IDS[1])) is (fn:idref(\"id1\", /IDS[1]))",
       ctx);
-    query.context(node(file("fn/id/iddtd.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/id/iddtd.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -222,10 +342,14 @@ public class FnIdref extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:idref(\"id1\", /IDS[1])) is (fn:idref(\"id2\", /IDS[1]))",
       ctx);
-    query.context(node(file("fn/id/iddtd.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/id/iddtd.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -239,10 +363,14 @@ public class FnIdref extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(fn:idref((\"id1\",\"id1\"), /IDS[1]))",
       ctx);
-    query.context(node(file("fn/id/iddtd.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/id/iddtd.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -256,10 +384,14 @@ public class FnIdref extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(fn:idref((\"id1\",\"ID1\"), /IDS[1]))",
       ctx);
-    query.context(node(file("fn/id/iddtd.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/id/iddtd.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -273,10 +405,14 @@ public class FnIdref extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:idref(fn:lower-case(\"ID1\"), /IDS[1])/name(..)",
       ctx);
-    query.context(node(file("fn/id/iddtd.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/id/iddtd.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "elementwithidrefattr-1")
     );
@@ -290,10 +426,14 @@ public class FnIdref extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:idref(fn:upper-case(\"id5\"), /IDS[1])/name(..)",
       ctx);
-    query.context(node(file("fn/id/iddtd.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/id/iddtd.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "elementwithidrefattr-6")
     );
@@ -307,10 +447,14 @@ public class FnIdref extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:idref(fn:concat(\"i\",\"d1\"), /IDS[1])/name(..)",
       ctx);
-    query.context(node(file("fn/id/iddtd.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/id/iddtd.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "elementwithidrefattr-1")
     );
@@ -324,10 +468,14 @@ public class FnIdref extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:idref(xs:string(\"id1\"), /IDS[1])/name(..)",
       ctx);
-    query.context(node(file("fn/id/iddtd.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/id/iddtd.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "elementwithidrefattr-1")
     );
@@ -341,10 +489,14 @@ public class FnIdref extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:idref(fn:string-join((\"id\",\"1\"),\"\"), /IDS[1])/name(..)",
       ctx);
-    query.context(node(file("fn/id/iddtd.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/id/iddtd.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "elementwithidrefattr-1")
     );
@@ -359,10 +511,14 @@ public class FnIdref extends QT3TestSet {
       "declare ordering ordered;  \n" +
       "        <results>{fn:idref(\"id4\", /IDS[1])}</results>",
       ctx);
-    query.context(node(file("fn/id/iddtd.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/id/iddtd.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<results anIdRef=\"id4\"/>", false)
     );
@@ -376,10 +532,14 @@ public class FnIdref extends QT3TestSet {
     final XQuery query = new XQuery(
       "<results>{fn:idref(\"language\", /)}</results>",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_book.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_book.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<results refs='context language'/>", false)
     );
@@ -393,10 +553,14 @@ public class FnIdref extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:idref(\"id1\")/name(..)",
       ctx);
-    query.context(node(file("fn/id/iddtd.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/id/iddtd.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "elementwithidrefattr-1")
     );
@@ -410,10 +574,14 @@ public class FnIdref extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:idref(\"id1\",/IDS[1])/name(..)",
       ctx);
-    query.context(node(file("fn/id/iddtd.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/id/iddtd.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "elementwithidrefattr-1")
     );
@@ -427,10 +595,14 @@ public class FnIdref extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:idref(\"nomatchingid\", /IDS[1])",
       ctx);
-    query.context(node(file("fn/id/iddtd.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/id/iddtd.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -444,10 +616,14 @@ public class FnIdref extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:idref(\"id4\", /IDS[1])/name(..)",
       ctx);
-    query.context(node(file("fn/id/iddtd.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/id/iddtd.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "elementwithidrefattr-4")
     );
@@ -461,10 +637,14 @@ public class FnIdref extends QT3TestSet {
     final XQuery query = new XQuery(
       "<results>{fn:idref((\"id1\", \"id2\"), /IDS[1])}</results>",
       ctx);
-    query.context(node(file("fn/id/iddtd.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/id/iddtd.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0025")
     );
@@ -478,10 +658,14 @@ public class FnIdref extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:idref((\"id1\", \"nomatching\"), /IDS[1])/name(..)",
       ctx);
-    query.context(node(file("fn/id/iddtd.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/id/iddtd.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "elementwithidrefattr-1")
     );

@@ -20,9 +20,13 @@ public class FnDaysFromDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "days-from-duration()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnDaysFromDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "days-from-duration((), \"Wrong param\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -52,9 +60,13 @@ public class FnDaysFromDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(days-from-duration(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnDaysFromDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "days-from-duration(()) instance of xs:integer?",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class FnDaysFromDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "days-from-duration(xs:dayTimeDuration(\"P45678DT8H2M1.03S\")) eq 45678",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class FnDaysFromDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "days-from-duration(xs:dayTimeDuration(\"-P45678DT8H2M1.03S\")) eq -45678",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,11 +140,35 @@ public class FnDaysFromDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "days-from-duration(xs:duration(\"-P3Y4M8DT1H23M2.34S\")) eq -8",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test fn:days-from-duration on xs:yearMonthDuration .
+   */
+  @org.junit.Test
+  public void cbclDaysFromDuration001() {
+    final XQuery query = new XQuery(
+      "fn:days-from-duration(xs:yearMonthDuration('P1Y'))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "0")
     );
   }
 
@@ -132,9 +180,13 @@ public class FnDaysFromDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:days-from-duration(xs:dayTimeDuration(\"P3DT10H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -148,9 +200,13 @@ public class FnDaysFromDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:days-from-duration(xs:dayTimeDuration(\"P20DT09H\")) * fn:days-from-duration(xs:dayTimeDuration(\"P03DT10H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("60")
     );
@@ -164,9 +220,13 @@ public class FnDaysFromDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:days-from-duration(xs:dayTimeDuration(\"P20DT10H\")) div fn:days-from-duration(xs:dayTimeDuration(\"P05DT05H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("4")
     );
@@ -180,9 +240,13 @@ public class FnDaysFromDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:days-from-duration(xs:dayTimeDuration(\"P25DT10H\")) idiv fn:days-from-duration(xs:dayTimeDuration(\"P05DT02H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5")
     );
@@ -196,9 +260,13 @@ public class FnDaysFromDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:days-from-duration(xs:dayTimeDuration(\"P10DT10H\")) mod fn:days-from-duration(xs:dayTimeDuration(\"P03DT03H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -212,9 +280,13 @@ public class FnDaysFromDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "+fn:days-from-duration(xs:dayTimeDuration(\"P21DT10H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("21")
     );
@@ -228,9 +300,13 @@ public class FnDaysFromDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "-fn:days-from-duration(xs:dayTimeDuration(\"P20DT03H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-20")
     );
@@ -244,9 +320,13 @@ public class FnDaysFromDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:days-from-duration(xs:dayTimeDuration(\"P22DT10H\")) eq fn:days-from-duration(xs:dayTimeDuration(\"P22DT09H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -260,9 +340,13 @@ public class FnDaysFromDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:days-from-duration(xs:dayTimeDuration(\"P23DT08H\")) ne fn:days-from-duration(xs:dayTimeDuration(\"P12DT05H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -276,9 +360,13 @@ public class FnDaysFromDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:days-from-duration(xs:dayTimeDuration(\"P20DT03H\")) le fn:days-from-duration(xs:dayTimeDuration(\"P21DT15H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -292,9 +380,13 @@ public class FnDaysFromDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:days-from-duration(xs:dayTimeDuration(\"P21DT07H\")) ge fn:days-from-duration(xs:dayTimeDuration(\"P20DT01H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -308,9 +400,13 @@ public class FnDaysFromDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:days-from-duration(xs:dayTimeDuration(\"P3DT55H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5")
     );
@@ -324,9 +420,13 @@ public class FnDaysFromDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:days-from-duration(xs:duration(\"P1Y2M3DT10H30M\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -340,9 +440,13 @@ public class FnDaysFromDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:days-from-duration(xs:dayTimeDuration(\"P20DT20H\")) lt fn:days-from-duration(xs:dayTimeDuration(\"P03DT02H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -356,9 +460,13 @@ public class FnDaysFromDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:days-from-duration(xs:dayTimeDuration(\"P21DT10H\")) le fn:days-from-duration(xs:dayTimeDuration(\"P22DT10H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -372,9 +480,13 @@ public class FnDaysFromDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:days-from-duration(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -388,9 +500,13 @@ public class FnDaysFromDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:days-from-duration(xs:dayTimeDuration(\"P01DT01H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -404,9 +520,13 @@ public class FnDaysFromDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((fn:days-from-duration(xs:dayTimeDuration(\"P23DT10H\")),fn:days-from-duration(xs:dayTimeDuration(\"P21DT10H\"))))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("22")
     );
@@ -420,9 +540,13 @@ public class FnDaysFromDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:days-from-duration(xs:dayTimeDuration(\"P21DT10H\")) + fn:days-from-duration(xs:dayTimeDuration(\"P22DT11H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("43")
     );
@@ -436,9 +560,13 @@ public class FnDaysFromDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:days-from-duration(xs:dayTimeDuration(\"P30DT10H\")) - fn:days-from-duration(xs:dayTimeDuration(\"P10DT09H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("20")
     );
@@ -452,9 +580,13 @@ public class FnDaysFromDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:days-from-duration(xs:dayTimeDuration(\"P0DT0H0M0S\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -468,9 +600,13 @@ public class FnDaysFromDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:days-from-duration(xs:dayTimeDuration(\"P15DT11H59M59S\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("15")
     );
@@ -484,9 +620,13 @@ public class FnDaysFromDuration extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:days-from-duration(xs:dayTimeDuration(\"P31DT23H59M59S\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("31")
     );

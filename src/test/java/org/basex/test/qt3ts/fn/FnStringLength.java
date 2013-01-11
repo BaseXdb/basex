@@ -4,7 +4,7 @@ import org.basex.tests.bxapi.XQuery;
 import org.basex.test.qt3ts.QT3TestSet;
 
 /**
-.
+ * Tests for the string-length() function.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
@@ -20,9 +20,13 @@ public class FnStringLength extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-length(\"a string\", \"wrong param\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnStringLength extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-length(\"ebv\") eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class FnStringLength extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-length(\"ebv\") instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnStringLength extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-length(()) eq 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class FnStringLength extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-length(\"\") eq 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class FnStringLength extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-length(()) instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,9 +140,13 @@ public class FnStringLength extends QT3TestSet {
     final XQuery query = new XQuery(
       "if(false()) then string-length() else true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -136,9 +164,13 @@ public class FnStringLength extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-length(\"Harp not on that string, madam; that is past.\") eq 45",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -152,9 +184,13 @@ public class FnStringLength extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-length(\"Harp not on that string, madam; that is past.\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("45")
     );
@@ -168,9 +204,13 @@ public class FnStringLength extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-length(\"*****\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5")
     );
@@ -184,9 +224,13 @@ public class FnStringLength extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-length(\"zzzzz\") + fn:string-length(\"zzzzz\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("10")
     );
@@ -200,9 +244,13 @@ public class FnStringLength extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:boolean(fn:string-length(\"abcde\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -216,9 +264,13 @@ public class FnStringLength extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(fn:string-length(\"abcde\"), fn:string-length(\"fghi\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("\"54\"")
     );
@@ -232,9 +284,13 @@ public class FnStringLength extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(fn:string-length(\"abcde\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -248,9 +304,13 @@ public class FnStringLength extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-length(\"%$#@!\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5")
     );
@@ -264,9 +324,13 @@ public class FnStringLength extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-length(\"string-length\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("13")
     );
@@ -280,9 +344,13 @@ public class FnStringLength extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-length(\"abc\") and fn:string-length(\"abc\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -296,9 +364,13 @@ public class FnStringLength extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-length()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -312,10 +384,14 @@ public class FnStringLength extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-length(.//employee/@name )",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -329,9 +405,13 @@ public class FnStringLength extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-length(())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -345,9 +425,13 @@ public class FnStringLength extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-length(\"𐀂\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -361,11 +445,15 @@ public class FnStringLength extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-length(string-length#1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPTY0004")
+      error("FOTY0013")
     );
   }
 
@@ -377,9 +465,13 @@ public class FnStringLength extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-length(\"12345\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5")
     );
@@ -393,9 +485,13 @@ public class FnStringLength extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-length(\"12345abcd\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("9")
     );
@@ -409,9 +505,13 @@ public class FnStringLength extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-length(\"ABCD\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("4")
     );
@@ -425,9 +525,13 @@ public class FnStringLength extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-length(\"abcde\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5")
     );
@@ -441,9 +545,13 @@ public class FnStringLength extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-length(\"ABCDEabcde\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("10")
     );
@@ -457,9 +565,13 @@ public class FnStringLength extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-length(\"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -473,9 +585,13 @@ public class FnStringLength extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-length(fn:string(\"AbcDH\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5")
     );
@@ -489,9 +605,13 @@ public class FnStringLength extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-length(xs:string(\"This is a characte\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("18")
     );
@@ -505,9 +625,13 @@ public class FnStringLength extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-length(xs:string(\"This is a characte\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("18")
     );
@@ -521,9 +645,13 @@ public class FnStringLength extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-length(xs:string(\"This is a characte\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("18")
     );

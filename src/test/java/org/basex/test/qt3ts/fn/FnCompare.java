@@ -20,9 +20,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "codepoint-equal()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "compare((), (), \"http://www.w3.org/2005/xpath-functions/collation/codepoint\", \"wrong param\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -52,9 +60,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(compare((), \"a string\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(compare(\"a string\", ()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(compare(\"a string\", (), \"http://www.w3.org/2005/xpath-functions/collation/codepoint\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "compare(\"str\", \"str\") instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,9 +140,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(compare(\"a string\", \"a string\", \"http://www.example.com/COLLATION/NOT/SUPPORTED\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(false)
@@ -136,9 +164,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "codepoint-equal(())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -152,9 +184,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "codepoint-equal((), (), ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -168,9 +204,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(codepoint-equal((), \"a string\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -184,9 +224,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(codepoint-equal(\"a string\", ()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -200,9 +244,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "codepoint-equal(\"a string\", \"a string\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -216,9 +264,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(codepoint-equal(\"cow\", \"a string\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -232,9 +284,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "compare()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -248,9 +304,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "compare(())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -264,9 +324,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "compare(\"a\", \"a\", (\"http://www.w3.org/2005/xpath-functions/collation/codepoint\", ()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -280,9 +344,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "compare(\"a\", \"a\", ((), \"http://www.w3.org/2005/xpath-functions/collation/codepoint\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -296,9 +364,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "compare(\"a\", \"a\", ((), \"http://www.w3.org/2005/xpath-functions/collation/codepoint\", ()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -314,9 +386,13 @@ public class FnCompare extends QT3TestSet {
       "        $vB  := (\"b string\", current-time())[1] treat as xs:string\n" +
       "        return compare(lower-case($vA), lower-case($vB))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -332,9 +408,13 @@ public class FnCompare extends QT3TestSet {
       "                $vB  := (\"b string\", current-time())[1] treat as xs:string \n" +
       "        return compare(upper-case($vA), upper-case($vB))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -350,9 +430,13 @@ public class FnCompare extends QT3TestSet {
       "                $vB  := (\"no match\", current-time())[1] treat as xs:string \n" +
       "        return compare(lower-case($vA), lower-case($vB))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -368,9 +452,13 @@ public class FnCompare extends QT3TestSet {
       "                $vB  := (\"no match\", current-time())[1] treat as xs:string \n" +
       "        return compare(upper-case($vA), upper-case($vB))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -386,9 +474,13 @@ public class FnCompare extends QT3TestSet {
       "                $vB  := (\"no match\", current-time())[1] treat as xs:string \n" +
       "        return compare(upper-case($vA), lower-case($vB))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -404,9 +496,13 @@ public class FnCompare extends QT3TestSet {
       "                $vB  := (\"no match\", current-time())[1] treat as xs:string \n" +
       "        return compare(lower-case($vA), upper-case($vB))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -420,9 +516,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "compare(\"a\", \"b\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-1")
@@ -440,9 +540,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "compare(\"b\", \"a\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -456,9 +560,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "compare(\"b\", \"b\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -472,9 +580,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "compare(\"b\", ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -488,9 +600,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "compare((), \"b\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -504,9 +620,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "compare((), ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -520,9 +640,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "compare(\"𐀁\", \"𐀂\", \"http://www.w3.org/2005/xpath-functions/collation/codepoint\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -536,9 +660,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "compare(\"𐀁\", \"\ufff0\", \"http://www.w3.org/2005/xpath-functions/collation/codepoint\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -552,11 +680,75 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "compare(\"𐀁\", \"\ufff0\", \"http://www.w3.org/2005/xpath-functions/collation/codepoint\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
+    );
+  }
+
+  /**
+   * compare() only works on strings.
+   */
+  @org.junit.Test
+  public void compare011() {
+    final XQuery query = new XQuery(
+      "compare(123, 456)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   * compare() only works on strings, but xs:anyURI gets promoted.
+   */
+  @org.junit.Test
+  public void compare012() {
+    final XQuery query = new XQuery(
+      "compare(xs:anyURI('http://www.example.com/'), 'http://www.example.com/')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("0")
+    );
+  }
+
+  /**
+   * compare() only works on strings, but xs:untypedAtomic gets promoted.
+   */
+  @org.junit.Test
+  public void compare013() {
+    final XQuery query = new XQuery(
+      "compare(xs:untypedAtomic('http://www.example.com/'), 'http://www.example.com/')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("0")
     );
   }
 
@@ -568,9 +760,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:compare(\"\",\"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -584,9 +780,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:compare(\" \",\"AAAAABBBBB\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -600,9 +800,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(fn:compare(\"A\",\"A\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -616,9 +820,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(fn:compare(\"A\",\"B\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -632,9 +840,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:compare(xs:string(\"A\"),\"A\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -648,9 +860,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:compare(\"A\",xs:string(\"A\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -664,9 +880,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:compare(\"A\",\"a\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -680,9 +900,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:compare(\"a\",\"A\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -696,9 +920,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:compare(\"compare\",\"compare\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -712,9 +940,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:compare(\"comparecompare\",\"compare\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -728,9 +960,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:compare(\"****\",\"***\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -744,9 +980,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:compare(\"\",\"A Character String\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -760,9 +1000,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:compare(\"12345\",\"1234\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -776,9 +1020,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:compare(\"compare\",\"erapmoc\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -792,9 +1040,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:compare(\"a\",\"a\",\"CollationA\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOCH0002")
     );
@@ -808,9 +1060,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:compare(\"A Character String\",\"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -824,9 +1080,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:compare((),\"\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -840,9 +1100,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:compare(\"\",()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -856,9 +1120,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:compare(\"A Character String\",()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -872,9 +1140,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:compare((),\"A Character String\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -888,9 +1160,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:compare(\"AAAAABBBBBCCCCC\",\"BBBBB\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -904,9 +1180,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:compare(\"AAAAABBBBB\",\" \")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -920,9 +1200,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:compare(xs:string(\"This is a characte\"),xs:string(\"This is a characte\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -936,9 +1220,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:compare(xs:string(\"This is a characte\"),xs:string(\"This is a characte\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -952,9 +1240,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:compare(xs:string(\"This is a characte\"),xs:string(\"This is a characte\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -968,9 +1260,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:compare(xs:string(\"This is a characte\"),xs:string(\"This is a characte\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -984,9 +1280,13 @@ public class FnCompare extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:compare(xs:string(\"This is a characte\"),xs:string(\"This is a characte\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );

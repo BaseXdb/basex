@@ -20,9 +20,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 treat as xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0050")
     );
@@ -36,9 +40,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 treat as empty-sequence()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0050")
     );
@@ -52,9 +60,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(\"asda\" treat as xs:string +) eq \"asda\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -72,9 +84,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(\"asda\" treat as xs:string *) eq \"asda\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -92,9 +108,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(3 treat as xs:integer * * 3) eq 9",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -112,9 +132,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(3 treat as xs:integer ? * 3) eq 9",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -128,9 +152,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(4 treat as item() + - 5) = ((4 treat as item()+) - 5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -148,9 +176,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 treat as item(",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -164,9 +196,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(remove((5, 1e0), 2) treat as xs:integer) eq 5",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -180,9 +216,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"3\") treat as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0050")
     );
@@ -196,9 +236,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"example.com/\") treat as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0050")
     );
@@ -212,9 +256,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "3.0 treat as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0050")
     );
@@ -228,9 +276,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(3) treat as xs:decimal instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -244,9 +296,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"3\" treat as xs:string eq '3'",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -260,9 +316,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"3\") treat as xs:decimal instance of xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -276,9 +336,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 treat as prefixDoesNotExist:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -292,9 +356,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 treat as xs:doesNotExist",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0051")
     );
@@ -308,9 +376,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(3) treat as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0050")
     );
@@ -324,9 +396,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 treat as item()+ + +1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("4")
     );
@@ -340,9 +416,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:root(self::node()) treat as document-node()/X",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -356,11 +436,502 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(* treat as empty-sequence()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
+    );
+  }
+
+  /**
+   *  Tests treat as with + quantifier .
+   */
+  @org.junit.Test
+  public void cbclTreatAs001() {
+    final XQuery query = new XQuery(
+      "(1 to 10)[. mod 2 = 0] treat as xs:integer+",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "2 4 6 8 10")
+    );
+  }
+
+  /**
+   *  Tests treat as with * quantifier .
+   */
+  @org.junit.Test
+  public void cbclTreatAs002() {
+    final XQuery query = new XQuery(
+      "(1 to 10)[. mod 2 = 0] treat as xs:integer*",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "2 4 6 8 10")
+    );
+  }
+
+  /**
+   *  Tests treat as with + quantifier with ? input .
+   */
+  @org.junit.Test
+  public void cbclTreatAs003() {
+    final XQuery query = new XQuery(
+      "zero-or-one((1 to 10)[. div 2 = 1]) treat as xs:integer+",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "2")
+    );
+  }
+
+  /**
+   *  Tests treat as with * quantifier with ? input .
+   */
+  @org.junit.Test
+  public void cbclTreatAs004() {
+    final XQuery query = new XQuery(
+      "zero-or-one((1 to 10)[. div 2 = 1]) treat as xs:integer*",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "2")
+    );
+  }
+
+  /**
+   *  Tests treat as with + quantifier with 1 input .
+   */
+  @org.junit.Test
+  public void cbclTreatAs005() {
+    final XQuery query = new XQuery(
+      "exactly-one((1 to 10)[. div 2 = 1]) treat as xs:integer+",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "2")
+    );
+  }
+
+  /**
+   *  Tests treat as with * quantifier and 1 input .
+   */
+  @org.junit.Test
+  public void cbclTreatAs006() {
+    final XQuery query = new XQuery(
+      "exactly-one((1 to 10)[. div 2 = 1]) treat as xs:integer*",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "2")
+    );
+  }
+
+  /**
+   *  Tests treat as with + quantifier .
+   */
+  @org.junit.Test
+  public void cbclTreatAs007() {
+    final XQuery query = new XQuery(
+      "count((1 to 10)[. mod 2 = 0] treat as xs:integer+)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "5")
+    );
+  }
+
+  /**
+   *  Tests treat as with + quantifier .
+   */
+  @org.junit.Test
+  public void cbclTreatAs008() {
+    final XQuery query = new XQuery(
+      "subsequence((1 to 10)[. mod 2 = 0] treat as xs:integer+,1,2)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "2 4")
+    );
+  }
+
+  /**
+   *  Tests treat as with + quantifier .
+   */
+  @org.junit.Test
+  public void cbclTreatAs009() {
+    final XQuery query = new XQuery(
+      "(1 to 10)[. div 2 = 0] treat as xs:integer+",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPDY0050")
+    );
+  }
+
+  /**
+   *  Tests treat as with + quantifier .
+   */
+  @org.junit.Test
+  public void cbclTreatAs010() {
+    final XQuery query = new XQuery(
+      "(1 to 10)[. mod 2 = 0] treat as xs:negativeInteger+",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPDY0050")
+    );
+  }
+
+  /**
+   *  Tests treat as with + quantifier .
+   */
+  @org.junit.Test
+  public void cbclTreatAs011() {
+    final XQuery query = new XQuery(
+      "(1 to 10)[. mod 2 = 0] treat as xs:integer",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPDY0050")
+    );
+  }
+
+  /**
+   *  Tests treat as with + quantifier .
+   */
+  @org.junit.Test
+  public void cbclTreatAs012() {
+    final XQuery query = new XQuery(
+      "(1 to 10)[. mod 2 = 0] treat as xs:negativeInteger*",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPDY0050")
+    );
+  }
+
+  /**
+   *  Tests treat as with + quantifier .
+   */
+  @org.junit.Test
+  public void cbclTreatAs013() {
+    final XQuery query = new XQuery(
+      "zero-or-one((1 to 10)[. div 2 = 0]) treat as xs:integer",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPDY0050")
+    );
+  }
+
+  /**
+   *  Tests treat as with + quantifier with ? input .
+   */
+  @org.junit.Test
+  public void cbclTreatAs014() {
+    final XQuery query = new XQuery(
+      "zero-or-one((1 to 10)[. div 2 = 0]) treat as xs:integer+",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPDY0050")
+    );
+  }
+
+  /**
+   *  test treat as cardinality checks are correct .
+   */
+  @org.junit.Test
+  public void cbclTreatAs015() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:range($arg as xs:integer) as xs:integer* { 1 to $arg };\n" +
+      "        declare function local:double($arg as xs:integer) { $arg * 2 };\n" +
+      "        local:double(local:range(0) treat as xs:integer)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPDY0050")
+    );
+  }
+
+  /**
+   *  test treat as cardinality checks are correct .
+   */
+  @org.junit.Test
+  public void cbclTreatAs016() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:range($arg as xs:integer) as xs:integer* { 1 to $arg };\n" +
+      "        declare function local:double($arg as xs:integer) { $arg * 2 };\n" +
+      "        local:double(local:range(1) treat as xs:integer)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "2")
+    );
+  }
+
+  /**
+   *  test treat as cardinality checks are correct .
+   */
+  @org.junit.Test
+  public void cbclTreatAs017() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:range($arg as xs:integer) as xs:integer* { 1 to $arg };\n" +
+      "        declare function local:double($arg as xs:integer) { $arg * 2 };\n" +
+      "        local:double(local:range(3) treat as xs:integer)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPDY0050")
+    );
+  }
+
+  /**
+   *  test treat as cardinality checks are correct .
+   */
+  @org.junit.Test
+  public void cbclTreatAs018() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:range($arg as xs:integer) as xs:integer* { 1 to $arg };\n" +
+      "        declare function local:double($arg as xs:integer?) { $arg * 2 };\n" +
+      "        empty(local:double(local:range(0) treat as xs:integer?))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test treat as cardinality checks are correct .
+   */
+  @org.junit.Test
+  public void cbclTreatAs019() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:range($arg as xs:integer) as xs:integer* { 1 to $arg };\n" +
+      "        declare function local:double($arg as xs:integer?) { $arg * 2 };\n" +
+      "        local:double(local:range(1) treat as xs:integer?)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "2")
+    );
+  }
+
+  /**
+   *  test treat as cardinality checks are correct .
+   */
+  @org.junit.Test
+  public void cbclTreatAs020() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:range($arg as xs:integer) as xs:integer* { 1 to $arg };\n" +
+      "        declare function local:double($arg as xs:integer?) { $arg * 2 };\n" +
+      "        local:double(local:range(2) treat as xs:integer?)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPDY0050")
+    );
+  }
+
+  /**
+   *  test treat as cardinality checks are correct .
+   */
+  @org.junit.Test
+  public void cbclTreatAs021() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:range($arg as xs:integer) as xs:integer* { 1 to $arg };\n" +
+      "        declare function local:double($arg as xs:integer+) { for $a in $arg return $a * 2 };\n" +
+      "        local:double(local:range(0) treat as xs:integer+)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPDY0050")
+    );
+  }
+
+  /**
+   *  test treat as cardinality checks are correct .
+   */
+  @org.junit.Test
+  public void cbclTreatAs022() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:range($arg as xs:integer) as xs:integer* { 1 to $arg };\n" +
+      "        declare function local:double($arg as xs:integer+) { for $a in $arg return $a * 2 };\n" +
+      "        local:double(local:range(1) treat as xs:integer+)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "2")
+    );
+  }
+
+  /**
+   *  test treat as cardinality checks are correct .
+   */
+  @org.junit.Test
+  public void cbclTreatAs023() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:range($arg as xs:integer) as xs:integer* { 1 to $arg };\n" +
+      "        declare function local:double($arg as xs:integer+) { for $a in $arg return $a * 2 };\n" +
+      "        local:double(local:range(2) treat as xs:integer+)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "2 4")
     );
   }
 
@@ -372,9 +943,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := (100+200) div 2 return fn:concat($var treat as xs:string,\"a string\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0050")
     );
@@ -388,9 +963,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := xs:dateTime(\"1999-05-31T13:20:00-05:00\") return fn:minutes-from-dateTime($var treat as xs:dateTime)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("20")
     );
@@ -404,9 +983,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := xs:time(\"01:23:00+05:00\") return fn:hours-from-time($var treat as xs:time)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -420,9 +1003,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := 100 return ($var treat as xs:integer, $var treat as xs:integer, $var treat as xs:integer)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "100 100 100")
     );
@@ -436,9 +1023,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := 100 return (xs:decimal($var) treat as xs:decimal, xs:double($var) treat as xs:double, xs:float($var) treat as xs:float, $var treat as xs:integer)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "100 100 100 100")
     );
@@ -452,9 +1043,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := -100 return fn:abs($var cast as xs:float treat as xs:float)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("100")
     );
@@ -468,9 +1063,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := -100 return fn:abs($var cast as xs:double treat as xs:double)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("100")
     );
@@ -484,9 +1083,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := xs:float(-100) return fn:abs($var cast as xs:integer treat as xs:integer)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("100")
     );
@@ -500,9 +1103,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := xs:double(-100) return fn:abs($var cast as xs:integer treat as xs:integer)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("100")
     );
@@ -516,9 +1123,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := xs:double(-100) return fn:abs($var cast as xs:float treat as xs:float)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("100")
     );
@@ -532,9 +1143,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := xs:float(-100) return fn:abs($var cast as xs:double treat as xs:double)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("100")
     );
@@ -548,9 +1163,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := \"String 1\" return fn:concat($var treat as xs:string,\"String 2\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "String 1String 2")
     );
@@ -564,9 +1183,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := xs:decimal(-100) return fn:abs($var cast as xs:double treat as xs:double)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("100")
     );
@@ -580,9 +1203,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := xs:decimal(-100) return fn:abs($var cast as xs:float treat as xs:float)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("100")
     );
@@ -596,9 +1223,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := xs:float(-100) return fn:abs($var cast as xs:decimal treat as xs:decimal)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("100")
     );
@@ -612,9 +1243,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := xs:double(-100) return fn:abs($var cast as xs:decimal treat as xs:decimal)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("100")
     );
@@ -628,9 +1263,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := (100+200) div 10 return ($var cast as xs:integer treat as xs:integer) + 10",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("40")
     );
@@ -644,9 +1283,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := (100+200) div 10 return ($var cast as xs:integer treat as xs:integer) - 10",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("20")
     );
@@ -660,9 +1303,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := 100 return ($var treat as xs:integer) div 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("50")
     );
@@ -676,9 +1323,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := 100 return fn:abs($var treat as xs:decimal)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("100")
     );
@@ -692,9 +1343,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := xs:decimal(100) return fn:abs($var cast as xs:integer treat as xs:integer)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("100")
     );
@@ -708,9 +1363,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := xs:float(100) return fn:abs($var treat as xs:float)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("100")
     );
@@ -724,9 +1383,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := xs:double(100) return fn:abs($var treat as xs:double)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("100")
     );
@@ -740,9 +1403,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := xs:boolean(fn:true()) return fn:not($var treat as xs:boolean)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -756,9 +1423,13 @@ public class ProdTreatExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := xs:date(\"2000-01-01+05:00\") return fn:year-from-date($var treat as xs:date)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2000")
     );

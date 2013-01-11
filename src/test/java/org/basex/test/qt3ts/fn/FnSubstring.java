@@ -20,9 +20,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "sub-string(\"a string\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "substring(\"12345\", 0 div 0E0, 3) eq \"\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "substring(\"12345\", 1, 0 div 0E0) eq \"\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "substring(\"12345\", -3, 5) eq \"1\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "substring(\"12345\", -42, 1 div 0E0) eq \"12345\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "substring(\"12345\", -1 div 0E0, 1 div 0E0) eq \"\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,9 +140,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "substring(\"12345\", 5, -3) eq \"\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -132,9 +160,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "sub-string(\"a string\", 1, 2, \"wrong param\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -148,9 +180,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "substring((), 1, 2) eq \"\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -164,9 +200,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "substring((), 1) eq \"\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -180,9 +220,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "substring(\"12345\", 1.5, 2.6) eq \"234\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -196,9 +240,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "substring((), 1, 3) eq \"\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -212,9 +260,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "substring(\"motor car\", 6) eq \" car\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -228,9 +280,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "substring(\"12345\", 0, 3) eq \"12\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -244,11 +300,55 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "substring(\"metadata\", 4, 3) eq \"ada\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test fn:substring empty string .
+   */
+  @org.junit.Test
+  public void cbclSubstring001() {
+    final XQuery query = new XQuery(
+      "fn:boolean(fn:substring('', 1, 1))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test fn:substring with index past end of string .
+   */
+  @org.junit.Test
+  public void cbclSubstring002() {
+    final XQuery query = new XQuery(
+      "fn:boolean(fn:substring('five', 5, 1))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
     );
   }
 
@@ -260,9 +360,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring(\"motor car\", 6)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, " car")
@@ -280,9 +384,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring(\"12345\", -42, 1 div 0E0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "12345")
     );
@@ -296,9 +404,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:substring(\"12345\", -1 div 0E0, 1 div 0E0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -312,9 +424,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:substring(\"\",0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -328,9 +444,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:boolean(fn:substring(\"ABC\",1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -344,9 +464,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(fn:substring(\"ABC\",1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -360,9 +484,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring(fn:substring(\"ABCDE\",1),1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ABCDE")
     );
@@ -376,9 +504,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring(\"substring\",1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "substring")
     );
@@ -392,9 +524,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(fn:substring(\"ABC\",1),\"DEF\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ABCDEF")
     );
@@ -408,9 +544,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:contains(fn:substring(\"ABCDEF\",1),\"DEF\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -424,9 +564,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring(\"!@#$%^*()\",1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "!@#$%^*()")
     );
@@ -440,9 +584,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring(\"metadata\", 4, 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ada")
     );
@@ -456,9 +604,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring(\"ABCD\",xs:double(1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ABCD")
     );
@@ -472,9 +624,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring(\"ABCDE\",1+1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "BCDE")
     );
@@ -488,10 +644,14 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "concat('#', fn:substring(./concepts/@id, string-length(./concepts/@id) - 18, 1), '#')",
       ctx);
-    query.context(node(file("fn/substring/concepts.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/substring/concepts.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "##")
     );
@@ -505,9 +665,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "substring(\"abcd𐀁efgh\", 6)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("\"efgh\"")
     );
@@ -521,9 +685,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "substring(\"abcd𐀁efgh\", 5, 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("\"𐀁e\"")
     );
@@ -537,9 +705,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring(\"12345\", 1.5, 2.6)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "234")
     );
@@ -553,9 +725,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring(\"12345\", 0, 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "12")
     );
@@ -569,9 +745,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:substring(\"12345\", 5, -3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -585,9 +765,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring(\"12345\", -3, 5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -601,9 +785,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:substring(\"12345\", 0 div 0E0, 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -617,9 +805,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:substring(\"12345\", 1, 0 div 0E0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -633,9 +825,13 @@ public class FnSubstring extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:substring((), 1, 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );

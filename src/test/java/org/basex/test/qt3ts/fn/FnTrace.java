@@ -20,9 +20,13 @@ public class FnTrace extends QT3TestSet {
     final XQuery query = new XQuery(
       "trace()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnTrace extends QT3TestSet {
     final XQuery query = new XQuery(
       "trace(.)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -52,9 +60,13 @@ public class FnTrace extends QT3TestSet {
     final XQuery query = new XQuery(
       "trace(., \"message\", \"wrong parameter\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -68,9 +80,13 @@ public class FnTrace extends QT3TestSet {
     final XQuery query = new XQuery(
       "trace(\"a string\", \"trace message\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a string")
     );
@@ -84,9 +100,13 @@ public class FnTrace extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(trace((), \"trace message\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -104,9 +124,13 @@ public class FnTrace extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(trace(error(), \"trace message\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOER0000")
     );
@@ -120,9 +144,13 @@ public class FnTrace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:trace()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -136,9 +164,13 @@ public class FnTrace extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (\"aa\",\"bb\",\"cc\",\"dd\",\"ee\") return fn:trace(fn:concat($var,$var) ,\"The Value of concat($var,$var) is: \")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "aaaa bbbb cccc dddd eeee")
     );
@@ -152,10 +184,14 @@ public class FnTrace extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (/works//hours) return fn:trace(($var div 2) ,\"The Value of hours div/2 is: \")",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "20 35 10 40 10 20 10 15 6 20 40 10 10 10 20 40")
     );
@@ -169,10 +205,14 @@ public class FnTrace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:trace((for $var in (/works//hours) return $var + $var) ,\"The Value of the given expression is: \")",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "80 140 40 160 40 80 40 60 24 80 160 40 40 40 80 160")
     );
@@ -186,9 +226,13 @@ public class FnTrace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:trace((fn:avg((1,3,3,4,5)) * 2) ,\"The Value of 'fn:avg((1,3,3,4,5)) * 2' is: \")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "6.4")
     );
@@ -202,9 +246,13 @@ public class FnTrace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:trace((for $var in (1.1,2.2,3.3,4.4,5.5) return xs:integer($var)) ,\"The Value of 'for $var in (1.1,2.2,3.3,4.4,5.5) return xs:float($var)' is: \")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3 4 5")
     );
@@ -218,9 +266,13 @@ public class FnTrace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:trace((fn:trace((2+2),\"The value of '2 + 2' is:\" )) ,\"The Value of 'fn:trace(2+2)' is: \")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "4")
     );
@@ -234,9 +286,13 @@ public class FnTrace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:trace((fn:count((1,2,-3,-4,5)) * 2) ,\"The Value of 'fn:count(1,2,-3,-4,5)) * 2' is: \")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "10")
     );
@@ -250,9 +306,13 @@ public class FnTrace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:trace((for $var in (fn:true(),fn:false(),fn:true()) return $var and fn:true()) ,\"The value of 'for $var in (fn:true(),fn:false(),fn:true() return $var and fn:true()' is:\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true false true")
     );
@@ -266,9 +326,13 @@ public class FnTrace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:trace((for $var in (fn:true(),fn:false(),fn:true()) return $var or fn:true()) ,\"The value of 'for $var in (fn:true(),fn:false(),fn:true() return $var or fn:true()' is:\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true true true")
     );
@@ -282,9 +346,13 @@ public class FnTrace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:trace(() ,\"The value of the empty sequence is:\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "0")
@@ -304,9 +372,13 @@ public class FnTrace extends QT3TestSet {
       "         let $var := xs:integer(\"123\") \n" +
       "         return fn:trace($var,\"The Value of $var is: \")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "123")
     );
@@ -320,9 +392,13 @@ public class FnTrace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:trace(\"\" ,\"The value of the zero length string is:\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -336,9 +412,13 @@ public class FnTrace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:trace((for $var in (fn:upper-case(\"a\"),fn:lower-case(\"B\")) return (fn:lower-case($var),fn:upper-case($var))) ,\"The value of the complex expression on the other argument is:\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a A b B")
     );
@@ -352,9 +432,13 @@ public class FnTrace extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (1,2,3,4,5) return fn:trace($var + 1,\"The Value of $var + 1 is: \")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2 3 4 5 6")
     );
@@ -368,9 +452,13 @@ public class FnTrace extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (2,3,4,5) return fn:trace($var - 1,\"The Value of $var - 1 is: \")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3 4")
     );
@@ -384,9 +472,13 @@ public class FnTrace extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (2,3,4,5) return fn:trace($var * 2 ,\"The Value of $var * 2 is: \")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "4 6 8 10")
     );
@@ -400,9 +492,13 @@ public class FnTrace extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (2,4,6,8) return fn:trace($var div 2 ,\"The Value of $var div 2 is: \")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3 4")
     );
@@ -416,9 +512,13 @@ public class FnTrace extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (2,4,6,8) return fn:trace($var idiv 2 ,\"The Value of $var idiv 2 is: \")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3 4")
     );
@@ -432,9 +532,13 @@ public class FnTrace extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (2,4,6,8) return fn:trace($var mod 2 ,\"The Value of $var mod 2 is: \")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0 0 0 0")
     );
@@ -449,9 +553,13 @@ public class FnTrace extends QT3TestSet {
       "for $var1 in (2,4,6,8), $var2 in (3 + $var1) - (4 * $var1) \n" +
       "        return fn:trace($var1 + $var2 ,\"The Value of $var 1 + $var2 is: \")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-1 -5 -9 -13")
     );

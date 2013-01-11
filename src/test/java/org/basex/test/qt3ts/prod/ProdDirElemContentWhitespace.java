@@ -18,16 +18,17 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   @org.junit.Test
   public void constrWsAdjcdata1() {
     final XQuery query = new XQuery(
-      "(: Name: Constr-ws-adjcdata-1 :)\n" +
-      "(: Written by: Andreas Behm :)\n" +
-      "(: Description: preserve space adjacent to cdata section :)\n" +
-      "\n" +
-      "declare boundary-space strip;\n" +
-      "<elem> <![CDATA[]]> </elem>",
+      queryFile(
+          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-adjcdata-1.xq"
+      ),
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem>  </elem>", false)
     );
@@ -39,18 +40,17 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   @org.junit.Test
   public void constrWsAdjcdata2() {
     final XQuery query = new XQuery(
-      "(: Name: Constr-ws-adjcdata-2 :)\n" +
-      "(: Written by: Andreas Behm :)\n" +
-      "(: Description: preserve line feed adjacent to cdata section :)\n" +
-      "\n" +
-      "declare boundary-space strip;\n" +
-      "<elem>\n" +
-      "<![CDATA[]]>\n" +
-      "</elem>",
+      queryFile(
+          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-adjcdata-2.xq"
+      ),
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertQuery("deep-equal(string-to-codepoints(string($result)), (10, 10))")
     );
@@ -62,16 +62,17 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   @org.junit.Test
   public void constrWsAdjcdata3() {
     final XQuery query = new XQuery(
-      "(: Name: Constr-ws-adjcdata-3 :)\n" +
-      "(: Written by: Andreas Behm :)\n" +
-      "(: Description: preserve tab adjacent to cdata section :)\n" +
-      "\n" +
-      "declare boundary-space strip;\n" +
-      "<elem>\t<![CDATA[]]>\t</elem>",
+      queryFile(
+          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-adjcdata-3.xq"
+      ),
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertQuery("deep-equal(string-to-codepoints(string($result)), (9, 9))")
     );
@@ -85,9 +86,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space strip; <elem> &#x30; </elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem> 0 </elem>", false)
     );
@@ -99,18 +104,17 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   @org.junit.Test
   public void constrWsAdjchref2() {
     final XQuery query = new XQuery(
-      "(: Name: Constr-ws-adjchref-2 :)\n" +
-      "(: Written by: Andreas Behm :)\n" +
-      "(: Description: preserve line feed adjacent to character reference :)\n" +
-      "\n" +
-      "declare boundary-space strip;\n" +
-      "<elem>\n" +
-      "&#x30;\n" +
-      "</elem>",
+      queryFile(
+          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-adjchref-2.xq"
+      ),
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertQuery("deep-equal(string-to-codepoints(string($result)), (10, 48, 10))")
     );
@@ -122,16 +126,17 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   @org.junit.Test
   public void constrWsAdjchref3() {
     final XQuery query = new XQuery(
-      "(: Name: Constr-ws-adjchref-3 :)\n" +
-      "(: Written by: Andreas Behm :)\n" +
-      "(: Description: preserve tab adjacent to character reference :)\n" +
-      "\n" +
-      "declare boundary-space strip;\n" +
-      "<elem>\t&#x30;\t</elem>",
+      queryFile(
+          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-adjchref-3.xq"
+      ),
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertQuery("deep-equal(string-to-codepoints(string($result)), (9, 48, 9))")
     );
@@ -145,9 +150,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space strip; <elem> {1}</elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem>1</elem>", false)
     );
@@ -161,9 +170,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space strip; <elem> <a/> <b/> </elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem><a/><b/></elem>", false)
     );
@@ -177,9 +190,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space strip; <elem> <a/> <b/> </elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem><a/><b/></elem>", false)
     );
@@ -193,9 +210,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space strip; <elem> <a/> <b/> </elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem><a/><b/></elem>", false)
     );
@@ -209,9 +230,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space preserve; <elem>   {1}</elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem>   1</elem>", false)
     );
@@ -228,9 +253,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
       "\n" +
       "{1}</elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem>\n\n\n1</elem>", false)
     );
@@ -242,16 +271,17 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   @org.junit.Test
   public void constrWsEnclexpr15() {
     final XQuery query = new XQuery(
-      "(: Name: Constr-ws-enclexpr-15 :)\n" +
-      "(: Written by: Andreas Behm :)\n" +
-      "(: Description: preserve whitespace tab between open tag and enclosed expression :)\n" +
-      "\n" +
-      "declare boundary-space preserve; \n" +
-      "<elem>\t\t\t{1}</elem>",
+      queryFile(
+          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-enclexpr-15.xq"
+      ),
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem>\t\t\t1</elem>", false)
     );
@@ -263,16 +293,17 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   @org.junit.Test
   public void constrWsEnclexpr16() {
     final XQuery query = new XQuery(
-      "(: Name: Constr-ws-enclexpr-16 :)\n" +
-      "(: Written by: Andreas Behm :)\n" +
-      "(: Description: preserve whitespace space between enclosed expressions :)\n" +
-      "\n" +
-      "declare boundary-space preserve; \n" +
-      "<elem>{1}   {2}</elem>",
+      queryFile(
+          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-enclexpr-16.xq"
+      ),
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem>1   2</elem>", false)
     );
@@ -284,21 +315,19 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   @org.junit.Test
   public void constrWsEnclexpr17() {
     final XQuery query = new XQuery(
-      "(: Name: Constr-ws-enclexpr-17 :)\n" +
-      "(: Written by: Andreas Behm :)\n" +
-      "(: Description: preserve whitespace line feed between enclosed expressions :)\n" +
-      "\n" +
-      "declare boundary-space preserve; \n" +
-      "<elem>{1}\n" +
-      "\n" +
-      "\n" +
-      "{2}</elem>",
+      queryFile(
+          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-enclexpr-17.xq"
+      ),
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertSerialization("<elem>1\n\n\n2</elem>", false)
+      assertSerialization("<elem>1\r\n\r\n\r\n2</elem>", false)
     );
   }
 
@@ -308,16 +337,17 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   @org.junit.Test
   public void constrWsEnclexpr18() {
     final XQuery query = new XQuery(
-      "(: Name: Constr-ws-enclexpr-18 :)\n" +
-      "(: Written by: Andreas Behm :)\n" +
-      "(: Description: preserve whitespace tab between enclosed expressions :)\n" +
-      "\n" +
-      "declare boundary-space preserve; \n" +
-      "<elem>{1}\t\t\t{2}</elem>",
+      queryFile(
+          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-enclexpr-18.xq"
+      ),
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem>1\t\t\t2</elem>", false)
     );
@@ -329,16 +359,17 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   @org.junit.Test
   public void constrWsEnclexpr19() {
     final XQuery query = new XQuery(
-      "(: Name: Constr-ws-enclexpr-19 :)\n" +
-      "(: Written by: Andreas Behm :)\n" +
-      "(: Description: preserve whitespace space between enclosed expression and close tag :)\n" +
-      "\n" +
-      "declare boundary-space preserve; \n" +
-      "<elem>{1}   </elem>",
+      queryFile(
+          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-enclexpr-19.xq"
+      ),
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem>1   </elem>", false)
     );
@@ -352,9 +383,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space strip; <elem> {1}</elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem>1</elem>", false)
     );
@@ -366,21 +401,19 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   @org.junit.Test
   public void constrWsEnclexpr20() {
     final XQuery query = new XQuery(
-      "(: Name: Constr-ws-enclexpr-20 :)\n" +
-      "(: Written by: Andreas Behm :)\n" +
-      "(: Description: preserve whitespace line feed between enclosed expression and close tag :)\n" +
-      "\n" +
-      "declare boundary-space preserve; \n" +
-      "<elem>{1}\n" +
-      "\n" +
-      "\n" +
-      "</elem>",
+      queryFile(
+          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-enclexpr-20.xq"
+      ),
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertSerialization("<elem>1\n\n\n</elem>", false)
+      assertSerialization("<elem>1\r\n\r\n\r\n</elem>", false)
     );
   }
 
@@ -390,16 +423,17 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   @org.junit.Test
   public void constrWsEnclexpr21() {
     final XQuery query = new XQuery(
-      "(: Name: Constr-ws-enclexpr-21 :)\n" +
-      "(: Written by: Andreas Behm :)\n" +
-      "(: Description: preserve whitespace tab between enclosed expression and close tag :)\n" +
-      "\n" +
-      "declare boundary-space preserve; \n" +
-      "<elem>{1}\t\t\t</elem>",
+      queryFile(
+          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-enclexpr-21.xq"
+      ),
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem>1\t\t\t</elem>", false)
     );
@@ -411,16 +445,17 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   @org.junit.Test
   public void constrWsEnclexpr22() {
     final XQuery query = new XQuery(
-      "(: Name: Constr-ws-enclexpr-22 :)\n" +
-      "(: Written by: Andreas Behm :)\n" +
-      "(: Description: preserve whitespace space between child elements :)\n" +
-      "\n" +
-      "declare boundary-space preserve;\n" +
-      "<elem>   <a/>   <b/>   </elem>",
+      queryFile(
+          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-enclexpr-22.xq"
+      ),
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem>   <a/>   <b/>   </elem>", false)
     );
@@ -432,27 +467,19 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   @org.junit.Test
   public void constrWsEnclexpr23() {
     final XQuery query = new XQuery(
-      "(: Name: Constr-ws-enclexpr-23 :)\n" +
-      "(: Written by: Andreas Behm :)\n" +
-      "(: Description: preserve whitespace line feed between child elements :)\n" +
-      "\n" +
-      "declare boundary-space preserve;\n" +
-      "<elem>\n" +
-      "\n" +
-      "\n" +
-      "<a/>\n" +
-      "\n" +
-      "\n" +
-      "<b/>\n" +
-      "\n" +
-      "\n" +
-      "</elem>",
+      queryFile(
+          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-enclexpr-23.xq"
+      ),
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertSerialization("<elem>\n\n\n<a/>\n\n\n<b/>\n\n\n</elem>", false)
+      assertSerialization("<elem>\r\n\r\n\r\n<a/>\r\n\r\n\r\n<b/>\r\n\r\n\r\n</elem>", false)
     );
   }
 
@@ -462,16 +489,17 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   @org.junit.Test
   public void constrWsEnclexpr24() {
     final XQuery query = new XQuery(
-      "(: Name: Constr-ws-enclexpr-24 :)\n" +
-      "(: Written by: Andreas Behm :)\n" +
-      "(: Description: preserve whitespace tab between child elements :)\n" +
-      "\n" +
-      "declare boundary-space preserve;\n" +
-      "<elem>\t\t\t<a/>\t\t\t<b/>\t\t\t</elem>",
+      queryFile(
+          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-enclexpr-24.xq"
+      ),
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem>\t\t\t<a/>\t\t\t<b/>\t\t\t</elem>", false)
     );
@@ -485,9 +513,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space strip; <elem> {1}</elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem>1</elem>", false)
     );
@@ -501,9 +533,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space strip; <elem>{1} {2}</elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem>12</elem>", false)
     );
@@ -517,9 +553,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space strip; <elem>{1} {2}</elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem>12</elem>", false)
     );
@@ -533,9 +573,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space strip; <elem>{1} {2}</elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem>12</elem>", false)
     );
@@ -549,9 +593,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space strip; <elem>{1} </elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem>1</elem>", false)
     );
@@ -565,9 +613,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space strip; <elem>{1} </elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem>1</elem>", false)
     );
@@ -581,9 +633,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space strip; <elem>{1} </elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem>1</elem>", false)
     );
@@ -597,9 +653,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space strip; <elem><![CDATA[ ]]></elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem> </elem>", false)
     );
@@ -611,16 +671,17 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   @org.junit.Test
   public void constrWsGencdata3() {
     final XQuery query = new XQuery(
-      "(: Name: Constr-ws-gencdata-3 :)\n" +
-      "(: Written by: Andreas Behm :)\n" +
-      "(: Description: preserve cdata tab :)\n" +
-      "\n" +
-      "declare boundary-space strip;\n" +
-      "<elem><![CDATA[\t]]></elem>",
+      queryFile(
+          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-gencdata-3.xq"
+      ),
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertQuery("deep-equal(string-to-codepoints(string($result)), (9))")
     );
@@ -634,9 +695,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space strip; <elem>&#x20;</elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem> </elem>", false)
     );
@@ -650,9 +715,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space strip; <elem>&#xA;</elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertQuery("deep-equal(string-to-codepoints(string($result)), (10))")
     );
@@ -666,9 +735,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space strip; <elem>&#xD;</elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem>&#xD;</elem>", false)
     );
@@ -682,9 +755,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space strip; <elem>&#x9;</elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem>\t</elem>", false)
     );
@@ -698,9 +775,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space strip; <elem>{\" \"}</elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem> </elem>", false)
     );
@@ -712,17 +793,17 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   @org.junit.Test
   public void constrWsGenenclexpr2() {
     final XQuery query = new XQuery(
-      "(: Name: Constr-ws-genenclexpr-2 :)\n" +
-      "(: Written by: Andreas Behm :)\n" +
-      "(: Description: preserve enclosed exp line feed :)\n" +
-      "\n" +
-      "declare boundary-space strip;\n" +
-      "<elem>{\"\n" +
-      "\"}</elem>",
+      queryFile(
+          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-genenclexpr-2.xq"
+      ),
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertQuery("deep-equal(string-to-codepoints(string($result)), (10))")
     );
@@ -734,16 +815,17 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   @org.junit.Test
   public void constrWsGenenclexpr3() {
     final XQuery query = new XQuery(
-      "(: Name: Constr-ws-genenclexpr-3 :)\n" +
-      "(: Written by: Andreas Behm :)\n" +
-      "(: Description: preserve enclosed exp tab :)\n" +
-      "\n" +
-      "declare boundary-space strip;\n" +
-      "<elem>{\"\t\"}</elem>",
+      queryFile(
+          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-genenclexpr-3.xq"
+      ),
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertQuery("deep-equal(string-to-codepoints(string($result)), (9))")
     );
@@ -757,9 +839,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space strip; <elem> x</elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem> x</elem>", false)
     );
@@ -771,17 +857,17 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   @org.junit.Test
   public void constrWsNobound2() {
     final XQuery query = new XQuery(
-      "(: Name: Constr-ws-nobound-2 :)\n" +
-      "(: Written by: Andreas Behm :)\n" +
-      "(: Description: preserve leading line feed :)\n" +
-      "\n" +
-      "declare boundary-space strip;\n" +
-      "<elem>\n" +
-      "x</elem>",
+      queryFile(
+          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-nobound-2.xq"
+      ),
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertQuery("string-to-codepoints(string($result))[1] = 10")
     );
@@ -793,16 +879,17 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   @org.junit.Test
   public void constrWsNobound3() {
     final XQuery query = new XQuery(
-      "(: Name: Constr-ws-nobound-3 :)\n" +
-      "(: Written by: Andreas Behm :)\n" +
-      "(: Description: preserve leading tab :)\n" +
-      "\n" +
-      "declare boundary-space strip;\n" +
-      "<elem>\tx</elem>",
+      queryFile(
+          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-nobound-3.xq"
+      ),
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertQuery("string-to-codepoints(string($result))[1] = 9")
     );
@@ -816,9 +903,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space strip; <elem>x </elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem>x </elem>", false)
     );
@@ -830,17 +921,17 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   @org.junit.Test
   public void constrWsNobound5() {
     final XQuery query = new XQuery(
-      "(: Name: Constr-ws-nobound-5 :)\n" +
-      "(: Written by: Andreas Behm :)\n" +
-      "(: Description: preserve trailing line feed :)\n" +
-      "\n" +
-      "declare boundary-space strip;\n" +
-      "<elem>x\n" +
-      "</elem>",
+      queryFile(
+          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-nobound-5.xq"
+      ),
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertQuery("deep-equal(string-to-codepoints(string($result)), (120, 10))")
     );
@@ -852,16 +943,17 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   @org.junit.Test
   public void constrWsNobound6() {
     final XQuery query = new XQuery(
-      "(: Name: Constr-ws-nobound-6 :)\n" +
-      "(: Written by: Andreas Behm :)\n" +
-      "(: Description: preserve trailing tab :)\n" +
-      "\n" +
-      "declare boundary-space strip;\n" +
-      "<elem>x\t</elem>",
+      queryFile(
+          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-nobound-6.xq"
+      ),
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertQuery("deep-equal(string-to-codepoints(string($result)), (120, 9))")
     );
@@ -875,9 +967,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space strip; <elem> </elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem/>", false)
     );
@@ -891,9 +987,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space preserve; fn:count((<elem> <a> </a> <a> </a> <a> <b> </b> </a> </elem>)//text())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("9")
     );
@@ -907,9 +1007,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space strip; <elem> </elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem/>", false)
     );
@@ -923,9 +1027,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space strip; <elem> </elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem/>", false)
     );
@@ -939,9 +1047,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space strip; <elem> <a> </a> <a> </a> <a> <b> </b> </a> </elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem><a/><a/><a><b/></a></elem>", false)
     );
@@ -955,9 +1067,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space strip; fn:count((<elem> <a> </a> <a> </a> <a> <b> </b> </a> </elem>)//text())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -971,9 +1087,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space preserve; <elem>   </elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem>   </elem>", false)
     );
@@ -990,9 +1110,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
       "\n" +
       "</elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem>\n\n\n</elem>", false)
     );
@@ -1006,9 +1130,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space preserve; <elem>\t\t\t</elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem>\t\t\t</elem>", false)
     );
@@ -1034,9 +1162,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
       "\t\t\n" +
       "      </elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem>   \t\n      \t    <a>          \t         \n\t\t\n\t\n        </a>\t\n<a>        \t     </a>             <a>\t  <b>\n\n         \t </b>\n\n  </a>\t\n\n\t\t\n      </elem>", false)
     );
@@ -1050,9 +1182,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space strip; <elem xml:space=\"preserve\"> </elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem xml:space=\"preserve\"/>", false)
     );
@@ -1066,9 +1202,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space preserve; <elem xml:space=\"strip\"> </elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<elem xml:space=\"strip\"> </elem>", false)
@@ -1086,9 +1226,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space preserve; string(<e> <b/> </e>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "  ")
     );
@@ -1102,9 +1246,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(<e> &#32; </e>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "   ")
     );
@@ -1118,9 +1266,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(<e> <![CDATA[ ]]> </e>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "   ")
     );
@@ -1134,9 +1286,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(<e>123<b>XX</b>abc</e>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "123XXabc")
     );
@@ -1150,9 +1306,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(<e>123<!-- a comment -->ab<!-- another comment -->c</e>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "123abc")
     );
@@ -1166,9 +1326,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(<e>123<?target content ?>ab<?target2 content?>c</e>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "123abc")
     );
@@ -1182,9 +1346,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(<elem>str{\"\"}asdas{\"asd\", \"asd\", \"''\", \"\"}{''}asd{''}{''}</elem>/text())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1198,9 +1366,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(<a></a>/node())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1214,9 +1386,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(<a/>/node())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1230,9 +1406,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(<elem> <![CDATA[]]> </elem>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "  ")
     );
@@ -1246,9 +1426,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(<e>e<b>ddd</b></e>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "eddd")
     );
@@ -1262,9 +1446,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem>{\"\"}</elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem/>", false)
     );
@@ -1278,9 +1466,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e>{1}{1}{1}<e/></e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e>111<e/></e>", false)
     );
@@ -1294,9 +1486,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e><e/>{1}{1}{1}</e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e><e/>111</e>", false)
     );
@@ -1310,9 +1506,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(<e>]]></e>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "]]>")
     );
@@ -1326,9 +1526,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(<elem><![CDATA[cdat]]><!-- a comment --><?target content?></elem>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "cdat")
     );
@@ -1342,9 +1546,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(<elem> content <![CDATA[ content ]]> content </elem>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, " content  content  content ")
     );
@@ -1358,9 +1566,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(<elem><![CDATA[cdata&<>'\"< ]]>asda <?target content?>asdad</elem>) eq \"cdata&amp;<>'\"\"&lt;&#x20;asda asdad\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1374,9 +1586,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(<a> {1} <b> {1} </b> </a>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "11")
     );
@@ -1390,9 +1606,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(<a>aaaa<b/>aaaa</a>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "aaaaaaaa")
     );
@@ -1406,9 +1626,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space preserve; <e> <b/>  </e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e> <b/>  </e>", false)
     );
@@ -1422,9 +1646,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space strip; string(<e xml:space=\"preserve\"> </e>) eq \"\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1438,9 +1666,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space strip; <e xml:space=\"preserve\"> </e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e xml:space=\"preserve\"/>", false)
     );
@@ -1454,9 +1686,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space preserve; string(<e xml:space=\"default\"> </e>) eq \" \"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1470,9 +1706,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare boundary-space preserve; <e xml:space=\"preserve\"> </e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e xml:space=\"preserve\"> </e>", false)
     );
@@ -1486,9 +1726,13 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(<e>'a''a'''a\"a\"\"a\"\"\"a\"</e>) eq \"'a''a'''a\"\"a\"\"\"\"a\"\"\"\"\"\"a\"\"\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );

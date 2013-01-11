@@ -20,9 +20,13 @@ public class FnNamespaceUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "namespace-uri((), \"wrong param\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnNamespaceUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "if(false()) then namespace-uri() else true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -56,9 +64,13 @@ public class FnNamespaceUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "namespace-uri(()) eq xs:anyURI(\"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -72,9 +84,13 @@ public class FnNamespaceUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "namespace-uri(<?target data?>) eq \"\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -88,9 +104,13 @@ public class FnNamespaceUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "namespace-uri(<!--comment-->) eq \"\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -104,11 +124,35 @@ public class FnNamespaceUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "namespace-uri(text{()}) eq \"\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test fn:boolean on fn:namespace-uri .
+   */
+  @org.junit.Test
+  public void cbclNamespaceUri001() {
+    final XQuery query = new XQuery(
+      "fn:boolean(fn:namespace-uri(<element />))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
     );
   }
 
@@ -120,9 +164,13 @@ public class FnNamespaceUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:namespace-uri()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -136,10 +184,14 @@ public class FnNamespaceUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "namespace-uri(/*)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("\"\"")
     );
@@ -153,9 +205,13 @@ public class FnNamespaceUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:namespace-uri(element elementNode {\"with no namespace\"})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("\"\"")
     );
@@ -169,10 +225,14 @@ public class FnNamespaceUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:namespace-uri(/works/employee[1]/@name)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("\"\"")
     );
@@ -186,9 +246,13 @@ public class FnNamespaceUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:namespace-uri(attribute anAttribute {\"Attribute Value No Namespace\"})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("\"\"")
@@ -206,10 +270,14 @@ public class FnNamespaceUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:namespace-uri(/works[1]/employee[1])",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("\"\"")
     );
@@ -223,10 +291,14 @@ public class FnNamespaceUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:namespace-uri(/works[1]/employee[1]/@name)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("\"\"")
     );
@@ -240,10 +312,14 @@ public class FnNamespaceUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := /works/employee[1] return $var/fn:namespace-uri()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("\"\"")
@@ -261,9 +337,13 @@ public class FnNamespaceUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "namespace-uri(<anElement xmlns = \"http://www.example.com/examples\"/>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("\"http://www.example.com/examples\"")
@@ -282,9 +362,13 @@ public class FnNamespaceUri extends QT3TestSet {
       "declare namespace ex = \"http://www.example.com/examples\"; \n" +
       "            fn:string(fn:namespace-uri(element ex:anElement {\"An Element Content\"}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/examples")
     );
@@ -300,9 +384,13 @@ public class FnNamespaceUri extends QT3TestSet {
       "declare namespace ex = \"http://www.example.com/examples\"; \n" +
       "            fn:namespace-uri(element anElement {\"An Element Content\"})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -316,10 +404,14 @@ public class FnNamespaceUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:namespace-uri(/*,\"A Second Argument\")",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -335,9 +427,13 @@ public class FnNamespaceUri extends QT3TestSet {
       "declare namespace ex = \"http://www.example.com/examples\"; \n" +
       "              fn:namespace-uri(<anElement>An Element Content</anElement>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -352,9 +448,13 @@ public class FnNamespaceUri extends QT3TestSet {
       "declare namespace ex = \"http://www.example.com/examples\"; \n" +
       "            fn:namespace-uri(<ex:anElement>An Element Content</ex:anElement>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/examples")
     );
@@ -369,9 +469,13 @@ public class FnNamespaceUri extends QT3TestSet {
       "declare default element namespace \"http://www.example.com/examples\"; \n" +
       "            fn:string(fn:namespace-uri(<anElement>An Element Content</anElement>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/examples")
     );
@@ -387,9 +491,13 @@ public class FnNamespaceUri extends QT3TestSet {
       "        declare namespace ex = \"http://www.example.com/exampleswithPrefix\"; \n" +
       "        fn:string(fn:namespace-uri(<ex:anElement>An Element Content</ex:anElement>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/exampleswithPrefix")
     );
@@ -405,9 +513,13 @@ public class FnNamespaceUri extends QT3TestSet {
       "        declare namespace ex = \"http://www.example.com/exampleswithPrefix\"; \n" +
       "        fn:string(fn:namespace-uri(element ex:anElement {\"An Element Content\"}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/exampleswithPrefix")
     );
@@ -423,9 +535,13 @@ public class FnNamespaceUri extends QT3TestSet {
       "        declare namespace ex = \"http://www.example.com/exampleswithPrefix\"; \n" +
       "        fn:string(fn:namespace-uri(element anElement {\"An Element Content\"}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/examples")
     );
@@ -439,9 +555,13 @@ public class FnNamespaceUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:namespace-uri(.)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -455,9 +575,13 @@ public class FnNamespaceUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1 to 100)[fn:namespace-uri()]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -471,9 +595,13 @@ public class FnNamespaceUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:namespace-uri(())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("\"\"")
     );
@@ -487,15 +615,19 @@ public class FnNamespaceUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "namespace-uri((//comment())[1])",
       ctx);
-    query.namespace("ma", "http://www.example.com/AuctionWatch");
-    query.namespace("xlink", "http://www.w3.org/1999/xlink");
-    query.namespace("anyzone", "http://www.example.com/auctioneers#anyzone");
-    query.namespace("eachbay", "http://www.example.com/auctioneers#eachbay");
-    query.namespace("yabadoo", "http://www.example.com/auctioneers#yabadoo");
-    query.context(node(file("docs/auction.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("ma", "http://www.example.com/AuctionWatch");
+      query.namespace("xlink", "http://www.w3.org/1999/xlink");
+      query.namespace("anyzone", "http://www.example.com/auctioneers#anyzone");
+      query.namespace("eachbay", "http://www.example.com/auctioneers#eachbay");
+      query.namespace("yabadoo", "http://www.example.com/auctioneers#yabadoo");
+      query.context(node(file("docs/auction.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("\"\"")
     );
@@ -509,9 +641,13 @@ public class FnNamespaceUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "namespace-uri(<!--comment-->)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("\"\"")
     );
@@ -525,15 +661,19 @@ public class FnNamespaceUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "namespace-uri((//processing-instruction())[1])",
       ctx);
-    query.namespace("ma", "http://www.example.com/AuctionWatch");
-    query.namespace("xlink", "http://www.w3.org/1999/xlink");
-    query.namespace("anyzone", "http://www.example.com/auctioneers#anyzone");
-    query.namespace("eachbay", "http://www.example.com/auctioneers#eachbay");
-    query.namespace("yabadoo", "http://www.example.com/auctioneers#yabadoo");
-    query.context(node(file("docs/auction.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("ma", "http://www.example.com/AuctionWatch");
+      query.namespace("xlink", "http://www.w3.org/1999/xlink");
+      query.namespace("anyzone", "http://www.example.com/auctioneers#anyzone");
+      query.namespace("eachbay", "http://www.example.com/auctioneers#eachbay");
+      query.namespace("yabadoo", "http://www.example.com/auctioneers#yabadoo");
+      query.context(node(file("docs/auction.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("\"\"")
     );
@@ -547,9 +687,13 @@ public class FnNamespaceUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "namespace-uri(<?pi data?>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("\"\"")
     );
@@ -563,15 +707,19 @@ public class FnNamespaceUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "namespace-uri((//text())[1])",
       ctx);
-    query.namespace("ma", "http://www.example.com/AuctionWatch");
-    query.namespace("xlink", "http://www.w3.org/1999/xlink");
-    query.namespace("anyzone", "http://www.example.com/auctioneers#anyzone");
-    query.namespace("eachbay", "http://www.example.com/auctioneers#eachbay");
-    query.namespace("yabadoo", "http://www.example.com/auctioneers#yabadoo");
-    query.context(node(file("docs/auction.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("ma", "http://www.example.com/AuctionWatch");
+      query.namespace("xlink", "http://www.w3.org/1999/xlink");
+      query.namespace("anyzone", "http://www.example.com/auctioneers#anyzone");
+      query.namespace("eachbay", "http://www.example.com/auctioneers#eachbay");
+      query.namespace("yabadoo", "http://www.example.com/auctioneers#yabadoo");
+      query.context(node(file("docs/auction.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("\"\"")
     );

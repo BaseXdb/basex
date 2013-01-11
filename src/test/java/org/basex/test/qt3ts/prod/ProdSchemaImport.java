@@ -41,9 +41,13 @@ public class ProdSchemaImport extends QT3TestSet {
       "        3\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "3")
     );
@@ -58,9 +62,13 @@ public class ProdSchemaImport extends QT3TestSet {
       "import schema namespace aSpace=\"http://www.youcannotfindthisschemaorg/schemas\" at \"http://www.youcannotfindithere/noschemas\";\n" +
       "             \"abc\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0059")
     );
@@ -76,9 +84,13 @@ public class ProdSchemaImport extends QT3TestSet {
       "             import schema namespace ns2 = \"http://www.w3.org/XQueryTestOrderBy\";\n" +
       "             \"abc\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0058")
     );
@@ -93,9 +105,13 @@ public class ProdSchemaImport extends QT3TestSet {
       "import schema namespace ns1 = \"\";\n" +
       "             \"abc\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0057")
     );

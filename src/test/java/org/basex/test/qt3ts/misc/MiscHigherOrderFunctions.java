@@ -4,7 +4,7 @@ import org.basex.tests.bxapi.XQuery;
 import org.basex.test.qt3ts.QT3TestSet;
 
 /**
- * Tests for the EQName.
+ * Tests for features associated with higher order functions.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
@@ -20,9 +20,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "concat#64 instance of function(*)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -36,9 +40,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "(let $a := 92, $b := true() return function($c) { $a, $b, $c }) instance of function(item()*) as item()*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "(let $a := 92, $b := true() return function($c) { $a, $b, $c })((xs:QName(\"foo\"), 5.0e3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("92, true(), fn:QName(\"\",\"foo\"), 5000")
     );
@@ -68,9 +80,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "function($a as item()) as item() { $a } instance of function(*)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "function($a as item()) as xs:integer { $a } instance of function(item()) as item()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "function($a as item()) as item() { $a } instance of function(xs:string) as item()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,9 +140,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "function($a as item()) as item() { $a } instance of function() as item()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -132,9 +160,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "function($a as item()) as xs:integer { $a } instance of function(item(), item()) as item()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -148,9 +180,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "function($a as xs:string) as item() { $a } instance of function(item()) as item()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -164,9 +200,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-join#1((\"a\", \"b\", \"c\", \"d\", \"e\", \"f\", \"g\", \"h\", \"i\", \"j\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abcdefghij")
     );
@@ -180,9 +220,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-join#1 is string-join#1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -196,9 +240,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-join#1 eq string-join#1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOTY0013")
     );
@@ -212,9 +260,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "element a { avg#1 }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQTY0105")
     );
@@ -228,9 +280,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "attribute a { avg#1 }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOTY0013")
     );
@@ -244,9 +300,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "(let $a := 92, $b := true() return function($c) { $a, $b, $c })(\"lala\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("92, true(), \"lala\"")
     );
@@ -260,9 +320,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-name(function-name#1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:QName(\"fn:function-name\")")
     );
@@ -276,16 +340,20 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-name(let $a := 92, $b := true() return function($c) { $a, $b, $c })",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertCount(0)
     );
   }
 
   /**
-   *  inline function literal, user-defined function  .
+   *  named function reference, user-defined function  .
    */
   @org.junit.Test
   public void hof001() {
@@ -294,16 +362,20 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "        declare function local:f($x as xs:integer) as xs:integer { $x + 1 }; \n" +
       "        let $f := local:f#1 return $f(2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
   }
 
   /**
-   *  inline function literal, user-defined function  .
+   *  named function reference, user-defined function  .
    */
   @org.junit.Test
   public void hof002() {
@@ -314,16 +386,20 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "      \tlet $f := local:f#0 return $f()\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("42")
     );
   }
 
   /**
-   *  inline function literal, imported user-defined function  .
+   *  named function reference, imported user-defined function  .
    */
   @org.junit.Test
   public void hof003() {
@@ -332,49 +408,61 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "        import module namespace m=\"http://example.com/hof-003\"; \n" +
       "        let $f := m:f#1 return $f(17)",
       ctx);
-    query.addModule("http://example.com/hof-003", file("misc/HigherOrderFunctions/module-hof-003.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://example.com/hof-003", file("misc/HigherOrderFunctions/module-hof-003.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("18")
     );
   }
 
   /**
-   *  inline function literal, system function  .
+   *  named function reference, system function  .
    */
   @org.junit.Test
   public void hof004() {
     final XQuery query = new XQuery(
       "let $f := fn:round#1 return $f(1.2345)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
   }
 
   /**
-   *  inline function literal, system function  .
+   *  named function reference, system function  .
    */
   @org.junit.Test
   public void hof005() {
     final XQuery query = new XQuery(
       "let $f := concat#8 return $f('a','b','c','d','e','f','g','h')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abcdefgh")
     );
   }
 
   /**
-   *  inline function literal, user-defined function, default function namespace  .
+   *  named function reference, user-defined function, default function namespace  .
    */
   @org.junit.Test
   public void hof006() {
@@ -385,16 +473,20 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "      let $f := g#1 return $f(21)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("22")
     );
   }
 
   /**
-   *  inline function literal, constructor function, default namespace  .
+   *  named function reference, constructor function, default namespace  .
    */
   @org.junit.Test
   public void hof007() {
@@ -404,25 +496,33 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "      let $f := date#1 return $f('2008-01-31')\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2008-01-31")
     );
   }
 
   /**
-   *  inline function literal, constructor function, non default namespace  .
+   *  named function reference, constructor function, non default namespace  .
    */
   @org.junit.Test
   public void hof008() {
     final XQuery query = new XQuery(
       "let $f := xs:date#1 return $f('2008-01-31')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2008-01-31")
     );
@@ -439,9 +539,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "      let $f as function(*) := local:f#1 return $f(2)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -459,9 +563,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "      return $f(2)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5")
     );
@@ -479,9 +587,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "      return $f(2, xs:long(5))\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("7")
     );
@@ -500,9 +612,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "      let $f as (function(xs:integer) as xs:integer)* := (local:f#1, local:g#1, local:h#1) return $f[3](2)[1]\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("7")
     );
@@ -520,9 +636,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "      local:case(true())(\"Mike\"), local:case(false())(\"Mike\")\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "MIKE mike")
     );
@@ -539,9 +659,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "      \t{ if ($x) then fn:upper-case#1 else fn:lower-case#1 }; \n" +
       "      local:case(true())(\"Mike\"), local:case(false())(\"Mike\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "MIKE mike")
     );
@@ -558,9 +682,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "      local:case(upper-case#1, \"Mike\"), local:case(lower-case#1, \"Mike\")\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "MIKE mike")
     );
@@ -577,9 +705,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "      local:case(upper-case#1, \"Mike\"), local:case(lower-case#1, \"Mike\")\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "MIKE mike")
     );
@@ -592,14 +724,20 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
   public void hof018() {
     final XQuery query = new XQuery(
       "\n" +
-      "      declare function local:scramble($x as function(xs:string) as xs:string, $y as xs:string) as xs:string { $x($y) }; \n" +
-      "      declare function local:rot13($x as xs:string) as xs:string { translate($x, \"abcdefghijklmnopqrstuvwxyz\", \"nopqrstuvwxyzabcdefghijklm\") }; \n" +
+      "      declare function local:scramble($x as function(xs:string) as xs:string, $y as xs:string) as xs:string \n" +
+      "      \t{ $x($y) }; \n" +
+      "      declare function local:rot13($x as xs:string) as xs:string \n" +
+      "      \t{ translate($x, \"abcdefghijklmnopqrstuvwxyz\", \"nopqrstuvwxyzabcdefghijklm\") }; \n" +
       "      local:scramble(local:rot13#1, \"mike\")\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "zvxr")
     );
@@ -617,9 +755,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "      local:scramble(local:rot13#1, \"mike\")\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "zvxr")
     );
@@ -636,9 +778,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "      local:scramble(function($x){translate($x, \"abcdefghijklmnopqrstuvwxyz\", \"nopqrstuvwxyzabcdefghijklm\")}, \"john\")\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "wbua")
     );
@@ -655,9 +801,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "      local:scramble(function($x){translate($x, \"abcdefghijklmnopqrstuvwxyz\", \"nopqrstuvwxyzabcdefghijklm\")}, \"john\")\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "wbua")
     );
@@ -675,9 +825,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "      return (local-name-from-QName($n), namespace-uri-from-QName($n), function-arity(local:scramble#2))\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "scramble http://www.w3.org/2005/xquery-local-functions 2")
     );
@@ -693,9 +847,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "        let $f := fn:function-name#1, $n := function-name($f) \n" +
       "        return (local-name-from-QName($n), namespace-uri-from-QName($n), function-arity($f))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "function-name http://www.w3.org/2005/xpath-functions 1")
     );
@@ -711,9 +869,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "        let $f := xs:dateTime#1, $n := function-name($f) \n" +
       "        return (local-name-from-QName($n), namespace-uri-from-QName($n), function-arity($f))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "dateTime http://www.w3.org/2001/XMLSchema 1")
     );
@@ -725,14 +887,18 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
   @org.junit.Test
   public void hof025() {
     final XQuery query = new XQuery(
-      "let $f := concat#123456, $n := function-name($f) \n" +
+      "let $f := concat#1234, $n := function-name($f) \n" +
       "        return (local-name-from-QName($n), namespace-uri-from-QName($n), function-arity($f))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertStringValue(false, "concat http://www.w3.org/2005/xpath-functions 123456")
+      assertStringValue(false, "concat http://www.w3.org/2005/xpath-functions 1234")
     );
   }
 
@@ -749,9 +915,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "        \t\t\tarity=\"{function-arity($f)}\" eloc=\"{empty(local-name-from-QName($n))}\" euri=\"{empty(namespace-uri-from-QName($n))}\"/>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a uri=\"\" loc=\"\" euri=\"true\" eloc=\"true\" arity=\"1\"/>", false)
     );
@@ -767,9 +937,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "        let $f := fn:contains(?, \"e\") \n" +
       "        return for $s in (\"Mike\", \"John\", \"Dave\", \"Mary\", \"Jane\") return $f($s)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true false true false true")
     );
@@ -786,9 +960,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "      string-join(local:splitter()(\"A nice cup of tea\"), '|')\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "A|nice|cup|of|tea")
     );
@@ -806,9 +984,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "      string-join(local:splitter()(\"A nice cup of tea\"), '|')\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "A|NICE|CUP|OF|TEA")
     );
@@ -827,9 +1009,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "      string-join(local:splitter()(\"A nice cup of tea\"), '|')\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "A|NICE|CUP|OF|TEA")
     );
@@ -847,9 +1033,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "      string-join(local:splitter(\"\\s\")(\"A nice cup of tea\"), '|')\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "A|NICE|CUP|OF|TEA")
     );
@@ -863,9 +1053,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "(if (current-date() gt xs:date('2000-12-31')) then upper-case#1 else lower-case#1)(\"Mike\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "MIKE")
     );
@@ -879,9 +1073,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "local-name-from-QName(function-name((upper-case#1, lower-case#1)[.(\"Mike\") = \"MIKE\"]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "upper-case")
     );
@@ -895,9 +1093,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "local-name-from-QName(function-name((upper-case#1, lower-case#1)[ordered{.}(\"Mike\") = \"MIKE\"]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "upper-case")
     );
@@ -911,25 +1113,33 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "local-name-from-QName(function-name((upper-case#1, lower-case#1)[ordered{.}(\"Mike\") = \"MIKE\"]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "upper-case")
     );
   }
 
   /**
-   *  Heterogeneous sequence of atomics and functions on rhs of "/" - not clear if this is allowed  .
+   *  Heterogeneous sequence of atomics and functions on rhs of "/"   .
    */
   @org.junit.Test
   public void hof036() {
     final XQuery query = new XQuery(
       "(<a b=\"3\"/>/(string(@b), upper-case#1, 17))[. instance of xs:anyAtomicType]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "3 17")
     );
@@ -951,9 +1161,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "        local:f#2 instance of function(item()*, item()*) as element(e)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true true false false")
     );
@@ -976,9 +1190,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "        local:f#2 instance of function(item()+, item()+) as element(e)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true false false false false")
     );
@@ -997,16 +1215,22 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "      \tlocal:f#2 instance of function(xs:long, xs:NCName) as element()?, \n" +
       "      \tlocal:f#2 instance of function(xs:long, xs:NCName) as element()*, \n" +
       "      \tlocal:f#2 instance of function(xs:long, xs:NCName) as element(e)*, \n" +
+      "      \tlocal:f#2 instance of function(xs:long, xs:NCName) as element(e, xs:anyType?)*, \n" +
+      "      \tlocal:f#2 instance of function(xs:long, xs:NCName) as element(*, xs:anyType?)?, \n" +
       "      \tlocal:f#2 instance of function(xs:long, xs:NCName) as element(e, xs:anyType)*, \n" +
       "      \tlocal:f#2 instance of function(xs:long, xs:NCName) as element(*, xs:anyType)?, \n" +
       "      \tlocal:f#2 instance of function(xs:long, xs:NCName) as element(*, xs:untyped)?\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertStringValue(false, "false false true true true true true false")
+      assertStringValue(false, "false false true true true true true false false false")
     );
   }
 
@@ -1022,9 +1246,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "      return string-join(local:apply($ops, 'Michael Kay'), '~')\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "MICHAEL KAY~michael kay~Michail Kay~Michael")
     );
@@ -1042,9 +1270,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "      string-join(for $f in local:ops() return $f('Michael Kay'), '~')\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "MICHAEL KAY~michael kay~Michail Kay~Michael")
     );
@@ -1063,9 +1295,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "        string-join(for $f in local:ops() return $f(<a name=\"Michael Kay\"/>/@name), '~')\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "MICHAEL KAY~'michael kay'~Michail Kay~Michael")
     );
@@ -1085,9 +1321,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "      string-join(for $f in local:ops() return string($f(xs:untypedAtomic('123.456'))), '~')\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "123.456~123~124.456~123.46")
     );
@@ -1106,9 +1346,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "      string-join(for $f in local:ops() return string(round-half-to-even($f(xs:decimal('123.456')), 4)), '~')\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "123.456~123~124.456~123.46")
     );
@@ -1124,9 +1368,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "      declare function local:round($x as xs:double, $algorithm as (function(xs:double) as xs:double)) as xs:double { $algorithm($x) }; \n" +
       "      declare variable $roundToCeiling := local:round(?, ceiling#1); $roundToCeiling(12.4)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("13")
     );
@@ -1151,9 +1399,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "       }</out>\n" +
       "    ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<out><tokens><t>HOW</t><t>NICE!</t><t>THANK</t><t>YOU,</t><t>I</t><t>ENJOYED</t><t>THAT.</t></tokens><tokens><t>HOW NICE! THANK YOU</t><t> I ENJOYED THAT.</t></tokens><tokens><t>HOW NICE</t><t> THANK YOU, I ENJOYED THAT.</t></tokens></out>", false)
     );
@@ -1179,9 +1431,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "        }</out>\n" +
       "     ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<out><tokens><t>\\s:HOW</t><t>\\s:NICE!</t><t>\\s:THANK</t><t>\\s:YOU,</t><t>\\s:I</t><t>\\s:ENJOYED</t><t>\\s:THAT.</t></tokens><tokens><t>,:HOW NICE! THANK YOU</t><t>,: I ENJOYED THAT.</t></tokens><tokens><t>!:HOW NICE</t><t>!: THANK YOU, I ENJOYED THAT.</t></tokens></out>", false)
     );
@@ -1198,9 +1454,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "        declare function local:f($x as xs:integer) as xs:integer { $x + 1 }; \n" +
       "        local:do()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("6")
     );
@@ -1219,9 +1479,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "        <out>{(local:tf(0)(), local:tf(1)())}</out>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<out>false true</out>", false)
     );
@@ -1235,9 +1499,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $f := fn:substring-before#2(?, '-') return <out>{$f('the-end-of-the-world')}</out>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<out>the</out>", false)
     );
@@ -1254,9 +1522,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "            starts-with($a, $b) and ends-with($a, $b)}(?, 'a') \n" +
       "        return <out>{$f('abracadabra')}</out>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<out>true</out>", false)
     );
@@ -1270,9 +1542,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $f := fn:concat#3(?, '*', ?) let $g := $f('[', ?) return <out>{$g(']')}</out>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<out>[*]</out>", false)
     );
@@ -1284,11 +1560,17 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
   @org.junit.Test
   public void hof901() {
     final XQuery query = new XQuery(
-      "declare function local:f($x as xs:integer) as xs:integer { $x + 1 }; let $f := local:g#1 return $f(2)",
+      "\n" +
+      "      \tdeclare function local:f($x as xs:integer) as xs:integer { $x + 1 }; \n" +
+      "      \tlet $f := local:g#1 return $f(2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -1300,11 +1582,18 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
   @org.junit.Test
   public void hof902() {
     final XQuery query = new XQuery(
-      "declare function local:f($x as xs:integer) as xs:integer { $x + 1 }; let $f := local:f#3 return $f(2)",
+      "\n" +
+      "      \tdeclare function local:f($x as xs:integer) as xs:integer { $x + 1 }; \n" +
+      "      \tlet $f := local:f#3 return $f(2)\n" +
+      "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -1316,11 +1605,18 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
   @org.junit.Test
   public void hof903() {
     final XQuery query = new XQuery(
-      "declare function local:f($x as xs:integer) as xs:integer { $x + 1 }; let $f := xs:date#2 return $f('2008-03-01')",
+      "\n" +
+      "      \tdeclare function local:f($x as xs:integer) as xs:integer { $x + 1 }; \n" +
+      "      \tlet $f := xs:date#2 return $f('2008-03-01')\n" +
+      "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -1332,11 +1628,18 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
   @org.junit.Test
   public void hof904() {
     final XQuery query = new XQuery(
-      "declare function local:f($x as xs:integer) as xs:integer { $x + 1 }; let $f := concat#1 return $f('2008-03-01')",
+      "\n" +
+      "      \tdeclare function local:f($x as xs:integer) as xs:integer { $x + 1 }; \n" +
+      "      \tlet $f := concat#1 return $f('2008-03-01')\n" +
+      "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -1348,11 +1651,18 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
   @org.junit.Test
   public void hof905() {
     final XQuery query = new XQuery(
-      "declare function local:f($x as xs:integer) as xs:integer { $x + 1 }; string(local:f#1)",
+      "\n" +
+      "      \tdeclare function local:f($x as xs:integer) as xs:integer { $x + 1 }; \n" +
+      "      \tstring(local:f#1)\n" +
+      "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOTY0014")
     );
@@ -1364,11 +1674,18 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
   @org.junit.Test
   public void hof906() {
     final XQuery query = new XQuery(
-      "declare function local:f($x as xs:integer) as xs:integer { $x + 1 }; exists(data(local:f#1))",
+      "\n" +
+      "      \tdeclare function local:f($x as xs:integer) as xs:integer { $x + 1 }; \n" +
+      "      \texists(data(local:f#1))\n" +
+      "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOTY0013")
     );
@@ -1380,11 +1697,18 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
   @org.junit.Test
   public void hof907() {
     final XQuery query = new XQuery(
-      "declare function local:f($x as xs:integer) as xs:integer { $x + 1 }; deep-equal((1,2,3,4,local:f#1), (1,2,3,4,local:f#1))",
+      "\n" +
+      "      \tdeclare function local:f($x as xs:integer) as xs:integer { $x + 1 }; \n" +
+      "      \tdeep-equal((1,2,3,4,local:f#1), (1,2,3,4,local:f#1))\n" +
+      "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOTY0015")
     );
@@ -1396,11 +1720,18 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
   @org.junit.Test
   public void hof908() {
     final XQuery query = new XQuery(
-      "declare function local:f($x as xs:integer) as xs:integer { $x + 1 }; local:f#1 eq 3",
+      "\n" +
+      "      \tdeclare function local:f($x as xs:integer) as xs:integer { $x + 1 }; \n" +
+      "      \tlocal:f#1 eq 3\n" +
+      "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOTY0013")
     );
@@ -1412,11 +1743,18 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
   @org.junit.Test
   public void hof909() {
     final XQuery query = new XQuery(
-      "declare function local:f($x as xs:integer) as xs:integer { $x + 1 }; number(local:f#1)",
+      "\n" +
+      "      \tdeclare function local:f($x as xs:integer) as xs:integer { $x + 1 }; \n" +
+      "      \tnumber(local:f#1)\n" +
+      "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOTY0013")
     );
@@ -1436,9 +1774,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "        return $f(3)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1452,9 +1794,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a b=\"3\"/>/(@b, upper-case#1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0018")
     );
@@ -1473,9 +1819,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "            substring-before(?, ' ', ?)) \n" +
       "        return string-join(local:apply($ops, 'Michael Kay'), '~')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -1494,9 +1844,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "            string-length#1) \n" +
       "        return string-join(local:apply($ops, 'Michael Kay'), '~')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -1514,9 +1868,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "        let $ops := (upper-case#1, lower-case#1, function($x as xs:double){string($x)}) \n" +
       "        return string-join(local:apply($ops, 'Michael Kay'), '~')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -1530,9 +1888,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ops := substring-before('abc', ' ', (), ?) return $ops('Michael Kay')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -1546,9 +1908,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ops := substring-before(?, ?) return $ops('Michael Kay')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -1562,9 +1928,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $ops := substring-before(?, 2) return $ops('Michael Kay')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -1583,9 +1953,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "        $roundToCeiling(12.4)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -1607,9 +1981,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "      string-join(for $f in local:ops() return string(round-half-to-even($f(xs:decimal('123.456')), 4)), '~')\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -1623,9 +2001,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "function() { 5 } instance of function(*)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1639,9 +2021,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "function($a) { \"lala\", $a }, $a",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1655,9 +2041,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $a := \"monkey\" return function($a) { \"lala\", $a }(\"gibbon\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"lala\", \"gibbon\"")
     );
@@ -1671,9 +2061,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "function($a) { let $a := \"monkey\" return (\"lala\", $a) }(\"gibbon\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"lala\", \"monkey\"")
     );
@@ -1687,9 +2081,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "$a, function($a) { \"lala\", $a }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1703,9 +2101,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "function($a, $a) { \"lala\", $a }(\"gibbon\", \"monkey\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0039")
     );
@@ -1719,9 +2121,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "function($local:foo, $local:bar, $local:foo) { \"lala\", $local:foo, $local:bar }(\"gibbon\", \"monkey\", \"ape\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0039")
     );
@@ -1735,9 +2141,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "function($local:foo, $local:bar, $fn:foo) { \"lala\", $local:foo, $local:bar }(\"gibbon\", \"monkey\", \"ape\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"lala\", \"gibbon\", \"monkey\"")
     );
@@ -1751,9 +2161,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-name(function() { 5 })",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertCount(0)
     );
@@ -1767,9 +2181,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "function() as xs:integer { 5 }()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5")
     );
@@ -1783,9 +2201,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "function($a as xs:integer) as xs:integer { $a + 5 }(3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("8")
     );
@@ -1799,9 +2221,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "function($a as xs:integer, $b as xs:double) as xs:double { $a * $b + 5 }(3, 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("11")
     );
@@ -1815,9 +2241,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "function($a, $b as xs:double) as xs:double { $a * $b + 5 } instance of function(item()*, xs:double) as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1831,9 +2261,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "function($a as node()+, $b) as xs:double { $a * $b + 5 } instance of function(node(), item()*) as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1847,9 +2281,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "function($a as node()+) { $a + 5 } instance of function(node()) as item()*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1863,9 +2301,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "function() { true() } instance of function() as item()*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1971,9 +2413,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "\")\n" +
       "",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("\"osterich\nkey: a, value: (antelope)\nkey: e, value: (elephant, eagle)\nkey: o, value: (osterich)\nkey: t, value: (terrapin)\nkey: z, value: (zebra)\"")
     );
@@ -1990,9 +2436,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "return $f(\"two\")\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"one two three\", \"one \", true(), xs:NCName(\"two\")")
     );
@@ -2006,9 +2456,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "()(\"two\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -2022,9 +2476,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "(concat(\"one \", ?, \" three\"), substring-before(\"one two three\", ?), matches(?, \"t.*o\"), xs:NCName(?))(\"two\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -2042,9 +2500,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "      \n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -2062,11 +2524,161 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "      \n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
+    );
+  }
+
+  /**
+   * Test closure over context.
+   */
+  @org.junit.Test
+  public void xqhof15() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "let $f := <b/>/name#0\n" +
+      "return <a/>/$f()\n" +
+      "      \n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("\"b\"")
+    );
+  }
+
+  /**
+   * Test closure over context.
+   */
+  @org.junit.Test
+  public void xqhof16() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "declare base-uri \"main\";\n" +
+      "import module namespace lib = \"lib\";\n" +
+      "\n" +
+      "lib:getfun()(),\n" +
+      "fn:static-base-uri#0(),\n" +
+      "fn:static-base-uri()\n" +
+      "      ",
+      ctx);
+    try {
+      query.addModule("lib", file("misc/HigherOrderFunctions/module-xqhof16.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertQuery("fn:ends-with($result[1], \"lib\")")
+      &&
+        assertQuery("fn:ends-with($result[2], \"main\")")
+      &&
+        assertQuery("fn:ends-with($result[3], \"main\")")
+      )
+    );
+  }
+
+  /**
+   * Test closure over context.
+   */
+  @org.junit.Test
+  public void xqhof17() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "import module namespace lib = \"lib\";\n" +
+      "\n" +
+      "<main/>/lib:getfun2()(),\n" +
+      "<main/>/name#0(),\n" +
+      "<main/>/name()\n" +
+      "      ",
+      ctx);
+    try {
+      query.addModule("lib", file("misc/HigherOrderFunctions/module-xqhof16.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertDeepEq("\"lib\", \"main\", \"main\"")
+    );
+  }
+
+  /**
+   * Test closure over context.
+   */
+  @org.junit.Test
+  public void xqhof18() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "declare base-uri \"main\";\n" +
+      "import module namespace lib = \"lib\";\n" +
+      "\n" +
+      "lib:getfun3()(xs:QName(\"fn:static-base-uri\"),0)(),\n" +
+      "function-lookup#2(xs:QName(\"fn:static-base-uri\"),0)(),\n" +
+      "function-lookup(xs:QName(\"fn:static-base-uri\"),0)()\n" +
+      "      ",
+      ctx);
+    try {
+      query.addModule("lib", file("misc/HigherOrderFunctions/module-xqhof16.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertQuery("fn:ends-with($result[1], \"lib\")")
+      &&
+        assertQuery("fn:ends-with($result[2], \"main\")")
+      &&
+        assertQuery("fn:ends-with($result[3], \"main\")")
+      )
+    );
+  }
+
+  /**
+   * Test closure over context.
+   */
+  @org.junit.Test
+  public void xqhof19() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "import module namespace lib = \"lib\";\n" +
+      "\n" +
+      "<main/>/lib:getfun3()(xs:QName(\"fn:name\"),0)(),\n" +
+      "<main/>/function-lookup#2(xs:QName(\"fn:name\"),0)(),\n" +
+      "<main/>/function-lookup(xs:QName(\"fn:name\"),0)()\n" +
+      "      ",
+      ctx);
+    try {
+      query.addModule("lib", file("misc/HigherOrderFunctions/module-xqhof16.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertDeepEq("\"lib\", \"main\", \"main\"")
     );
   }
 
@@ -2083,10 +2695,14 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "return $f(\"foo\")(\" bar\")(\" baz\")(\" what's\")(\" next?\")\n" +
       "      ",
       ctx);
-    query.addModule("http://snelson.org.uk/functions/functional", file("misc/HigherOrderFunctions/functional.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://snelson.org.uk/functions/functional", file("misc/HigherOrderFunctions/functional.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("\"foo bar baz what's next?\"")
     );
@@ -2126,10 +2742,14 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "\")\n" +
       "      ",
       ctx);
-    query.addModule("http://snelson.org.uk/functions/functional", file("misc/HigherOrderFunctions/functional.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://snelson.org.uk/functions/functional", file("misc/HigherOrderFunctions/functional.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("\"0\n0\n1\n1\n2\n1\n3\n2\n4\n3\n5\n5\n6\n8\n7\n13\n8\n21\n9\n34\n10\n55\n11\n89\n12\n144\n13\n233\n14\n377\n15\n610\n16\n987\n17\n1597\n18\n2584\n19\n4181\n20\n6765\n21\n10946\n22\n17711\n23\n28657\n24\n46368\n25\n75025\n26\n121393\n27\n196418\n28\n317811\n29\n514229\n30\n832040\n31\n1346269\n32\n2178309\n33\n3524578\n34\n5702887\n35\n9227465\n36\n14930352\n37\n24157817\n38\n39088169\n39\n63245986\n40\n102334155\n41\n165580141\n42\n267914296\n43\n433494437\n44\n701408733\n45\n1134903170\n46\n1836311903\n47\n2971215073\n48\n4807526976\n49\n7778742049\"")
     );
@@ -2149,9 +2769,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "local:hof(('1', '2'), concat#2)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("\"12\"")
     );
@@ -2168,9 +2792,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "return $a((\"foo\", \"bar\", \"baz\"))\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("\"foobarbaz\"")
     );
@@ -2191,9 +2819,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       "local:curry(substring-after#2)(\"foobar\")(\"foo\")\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("\"bar\"")
     );
@@ -2207,9 +2839,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "concat#3(\"one\", \"two\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -2223,9 +2859,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "concat#4(\"one\", ?, \"three\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -2239,9 +2879,13 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "concat#2(\"one\", ?, \"three\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );

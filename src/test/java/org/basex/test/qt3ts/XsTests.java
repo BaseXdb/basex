@@ -14,8 +14,12 @@ import org.basex.test.qt3ts.xs.*;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
+  XsBase64Binary.class,
   XsDateTimeStamp.class,
   XsDouble.class,
-  XsFloat.class
+  XsFloat.class,
+  XsHexBinary.class,
+  XsNormalizedString.class,
+  XsToken.class
 })
 public class XsTests { }

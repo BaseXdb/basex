@@ -20,9 +20,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "not()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(fn:boolean((1, 2, 3, current-time())[1] treat as xs:integer)) eq false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(1, 2, 3, 4, 5, 6)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -68,9 +80,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(false() and false())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(not(true()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(false())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,9 +140,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -132,9 +160,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -148,9 +180,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:anyURI(\"\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -164,9 +200,119 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(not(xs:anyURI(\"example.com/\")))",
       ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
 
-    final QT3Result res = result(query);
-    result = res;
+  /**
+   *  test fn:not on a sequence of one or more nodes .
+   */
+  @org.junit.Test
+  public void cbclNot001() {
+    final XQuery query = new XQuery(
+      "fn:not(for $x in 1 to 10 return <e>{$x}</e>)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test fn:not on the empty sequence .
+   */
+  @org.junit.Test
+  public void cbclNot002() {
+    final XQuery query = new XQuery(
+      "fn:not(())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test fn:not on a context-sensitive comparison .
+   */
+  @org.junit.Test
+  public void cbclNot003() {
+    final XQuery query = new XQuery(
+      "fn:not(current-date() > xs:date(\"1997-01-01Z\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test fn:not on fn:not .
+   */
+  @org.junit.Test
+  public void cbclNot004() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:f($x as xs:integer) as xs:integer { $x }; \n" +
+      "      \tnot(not(local:f(1)))\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test fn:not on fn:exists .
+   */
+  @org.junit.Test
+  public void cbclNot005() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:f($x as xs:integer) as xs:integer* { 1 to $x }; \n" +
+      "      \tnot(exists(local:f(0)))\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -180,9 +326,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -196,9 +346,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(\"true\") ge fn:not(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -212,9 +366,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(\"true\") = fn:not(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -228,9 +386,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(\"true\") != fn:not(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -244,9 +406,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(\"true\") < fn:not(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -260,9 +426,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(\"true\") <= fn:not(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -276,9 +446,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(\"true\") > fn:not(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -292,9 +466,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(\"true\") >= fn:not(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -308,9 +486,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(fn:not(\"true\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -324,9 +506,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:not(\"true\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'false'")
     );
@@ -340,9 +526,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:string(fn:not(\"true\")),xs:string(fn:not(\"true\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'falsefalse'")
     );
@@ -356,9 +546,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(\"fn:not()\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -372,9 +566,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:contains(xs:string(fn:not(\"true\")),xs:string(fn:not(\"true\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -388,9 +586,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-length(xs:string(fn:not(\"true\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5")
     );
@@ -404,9 +606,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:double('NaN'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -420,9 +626,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:float('NaN'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -436,9 +646,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(\"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -452,9 +666,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "not((true(), false()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -468,9 +686,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(\"true\") and fn:not(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -484,9 +706,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(\"true\") or fn:not(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -500,9 +726,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(\"true\") eq fn:not(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -516,9 +746,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(\"true\") ne fn:not(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -532,9 +766,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(\"true\") lt fn:not(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -548,9 +786,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(\"true\") le fn:not(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -564,9 +806,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(\"true\") gt fn:not(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -580,9 +826,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:double(\"-1.7976931348623157E308\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -596,9 +846,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:double(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -612,9 +866,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:double(\"1.7976931348623157E308\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -628,9 +886,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:decimal(\"-999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -644,9 +906,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:decimal(\"617375191608514839\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -660,9 +926,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:decimal(\"999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -676,9 +946,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:float(\"-3.4028235E38\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -692,9 +966,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:float(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -708,9 +986,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:float(\"3.4028235E38\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -724,9 +1006,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:int(\"-2147483648\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -740,9 +1026,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:int(\"-1873914410\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -756,9 +1046,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:int(\"2147483647\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -772,9 +1066,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:integer(\"-999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -788,9 +1086,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:integer(\"830993497117024304\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -804,9 +1106,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:integer(\"999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -820,9 +1126,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:long(\"-92233720368547758\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -836,9 +1146,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:long(\"-47175562203048468\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -852,9 +1166,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:long(\"92233720368547758\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -868,9 +1186,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:negativeInteger(\"-999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -884,9 +1206,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:negativeInteger(\"-297014075999096793\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -900,9 +1226,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:negativeInteger(\"-1\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -916,9 +1246,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:nonNegativeInteger(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -932,9 +1266,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:nonNegativeInteger(\"303884545991464527\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -948,9 +1286,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:nonNegativeInteger(\"999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -964,9 +1306,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:nonPositiveInteger(\"-999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -980,9 +1326,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:nonPositiveInteger(\"-475688437271870490\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -996,9 +1346,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:nonPositiveInteger(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1012,9 +1366,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:positiveInteger(\"1\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1028,9 +1386,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:positiveInteger(\"52704602390610033\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1044,9 +1406,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:positiveInteger(\"999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1060,9 +1426,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:short(\"-32768\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1076,9 +1446,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:short(\"-5324\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1092,9 +1466,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:short(\"32767\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1108,9 +1486,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:unsignedLong(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1124,9 +1506,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:unsignedLong(\"130747108607674654\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1140,9 +1526,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:unsignedLong(\"184467440737095516\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1156,9 +1546,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:unsignedShort(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1172,9 +1566,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:unsignedShort(\"44633\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1188,9 +1586,13 @@ public class FnNot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:unsignedShort(\"65535\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );

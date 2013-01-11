@@ -20,9 +20,13 @@ public class ProdVarDefaultValue extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $ext external := 0; <a>{$ext}</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>0</a>", false)
     );
@@ -36,10 +40,14 @@ public class ProdVarDefaultValue extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $ext external := 0; $ext",
       ctx);
-    query.bind("ext", new XQuery("5", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("ext", new XQuery("5", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5")
     );
@@ -53,9 +61,13 @@ public class ProdVarDefaultValue extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $ext as xs:integer external := 0; <a>{$ext}</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>0</a>", false)
     );
@@ -69,10 +81,14 @@ public class ProdVarDefaultValue extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $ext as xs:integer external := 0; <a>{$ext}</a>",
       ctx);
-    query.bind("ext", new XQuery("5", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("ext", new XQuery("5", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>5</a>", false)
     );
@@ -86,10 +102,14 @@ public class ProdVarDefaultValue extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $ext as xs:integer external := 0; <a>{$ext}</a>",
       ctx);
-    query.bind("ext", new XQuery("xs:date('2008-12-01')", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("ext", new XQuery("xs:date('2008-12-01')", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -103,9 +123,13 @@ public class ProdVarDefaultValue extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $ext as xs:integer* external := (0,1,2); <a>{sum($ext)}</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>3</a>", false)
     );
@@ -119,10 +143,14 @@ public class ProdVarDefaultValue extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $ext as xs:integer* external := (0,1,2); <a>{sum($ext)}</a>",
       ctx);
-    query.bind("ext", new XQuery("4,5,6", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("ext", new XQuery("4,5,6", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>15</a>", false)
     );
@@ -136,10 +164,14 @@ public class ProdVarDefaultValue extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $ext as xs:integer* external := (0,1,2); <a>{sum($ext)}</a>",
       ctx);
-    query.bind("ext", new XQuery("42", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("ext", new XQuery("42", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>42</a>", false)
     );
@@ -153,9 +185,13 @@ public class ProdVarDefaultValue extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $ext as xs:integer* external := 0,1,2; <a>{sum($ext)}</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -169,9 +205,13 @@ public class ProdVarDefaultValue extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $ext as xs:integer* external := ; <a></a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -188,9 +228,13 @@ public class ProdVarDefaultValue extends QT3TestSet {
       "         declare variable $ext as element(a) external := <a>{$var}</a>; \n" +
       "         <out>{$ext}</out>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<out><a>17</a></out>", false)
     );
@@ -208,10 +252,14 @@ public class ProdVarDefaultValue extends QT3TestSet {
       "        <out>{$ext}</out>\n" +
       "      ",
       ctx);
-    query.bind("ext", new XQuery("862", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("ext", new XQuery("862", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<out>862</out>", false)
     );
@@ -229,10 +277,14 @@ public class ProdVarDefaultValue extends QT3TestSet {
       "        <out>{$ext}</out>\n" +
       "      ",
       ctx);
-    query.bind("ext", new XQuery("862", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("ext", new XQuery("862", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -249,9 +301,13 @@ public class ProdVarDefaultValue extends QT3TestSet {
       "        $ext gt xs:date('2008-12-30')\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -265,9 +321,13 @@ public class ProdVarDefaultValue extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x external; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -281,9 +341,13 @@ public class ProdVarDefaultValue extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x external; \"result\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "result")
@@ -306,9 +370,13 @@ public class ProdVarDefaultValue extends QT3TestSet {
       "        $x\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -327,9 +395,13 @@ public class ProdVarDefaultValue extends QT3TestSet {
       "        $a\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("28")
     );
@@ -343,15 +415,19 @@ public class ProdVarDefaultValue extends QT3TestSet {
     final XQuery query = new XQuery(
       "\n" +
       "        declare variable $a := $x;\n" +
-      "        declare variable $x external := $a + $b;\n" +
+      "        declare variable $x external := $a + 2;\n" +
       "        $x\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XQST0054")
+      error("XQDY0054")
     );
   }
 
@@ -373,11 +449,15 @@ public class ProdVarDefaultValue extends QT3TestSet {
       "         $x\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XQST0054")
+      error("XQDY0054")
     );
   }
 
@@ -394,9 +474,13 @@ public class ProdVarDefaultValue extends QT3TestSet {
       "        $x \n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -417,10 +501,14 @@ public class ProdVarDefaultValue extends QT3TestSet {
       "        $x \n" +
       "      ",
       ctx);
-    query.bind("y", new XQuery("16", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("y", new XQuery("16", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("28")
     );
@@ -437,10 +525,14 @@ public class ProdVarDefaultValue extends QT3TestSet {
       "        fn:count($x)\n" +
       "      ",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -459,11 +551,15 @@ public class ProdVarDefaultValue extends QT3TestSet {
       "        $x\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XQST0107")
+      error("XQDY0054")
     );
   }
 
@@ -480,11 +576,15 @@ public class ProdVarDefaultValue extends QT3TestSet {
       "        $x\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertEq("3")
+      assertEq("1")
     );
   }
 
@@ -495,17 +595,21 @@ public class ProdVarDefaultValue extends QT3TestSet {
   public void extvardef016b() {
     final XQuery query = new XQuery(
       "\n" +
-      "        declare variable $y := (<a>1</a>,<a>2</a>,<a>3</a>,<a>4</a>,<a>5</a>,<a>6</a>,<a>7</a>,<a>8</a>,<a>9</a>,<a>10</a>);\n" +
+      "        declare variable $y := <root><a>1</a>,<a>2</a>,<a>3</a>,<a>4</a>,<a>5</a>,<a>6</a>,<a>7</a>,<a>8</a>,<a>9</a>,<a>10</a></root>;\n" +
       "        declare context item := $y;\n" +
       "        declare variable $x external := fn:last();\n" +
       "        $x\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertEq("10")
+      assertEq("1")
     );
   }
 
@@ -520,9 +624,13 @@ public class ProdVarDefaultValue extends QT3TestSet {
       "        $x\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("10")
     );
@@ -539,9 +647,13 @@ public class ProdVarDefaultValue extends QT3TestSet {
       "        $x\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -559,9 +671,13 @@ public class ProdVarDefaultValue extends QT3TestSet {
       "        $y\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("28")
     );
@@ -581,9 +697,13 @@ public class ProdVarDefaultValue extends QT3TestSet {
       "        $y\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("28")
     );
@@ -601,9 +721,13 @@ public class ProdVarDefaultValue extends QT3TestSet {
       "        $y instance of xs:decimal\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("fn:true()")
     );
@@ -620,138 +744,18 @@ public class ProdVarDefaultValue extends QT3TestSet {
       "          $x\n" +
       "        };\n" +
       "        declare variable $x external := 5;\n" +
-      "        $y instance of xs:decimal\n" +
+      "        local:foo()\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5")
-    );
-  }
-
-  /**
-   * Schema validation in default external var. .
-   */
-  @org.junit.Test
-  public void extvardef023() {
-    final XQuery query = new XQuery(
-      "\n" +
-      "        declare construction strip; \n" +
-      "        import schema default element namespace \"http://www.w3.org/XQueryTest/hats\" at \"SchemaImport/hats.xsd\"; \n" +
-      "        declare variable $x :=\n" +
-      "          validate strict {\n" +
-      "            <abf> \n" +
-      "              <a/> <b/> <b/> <f/> <f/> <f/> \n" +
-      "            </abf>};\n" +
-      "        $x\n" +
-      "      ",
-      ctx);
-
-    final QT3Result res = result(query);
-    result = res;
-    test(
-      assertSerialization("<abf xmlns=\"http://www.w3.org/XQueryTest/hats\"><a/><b/><b/><f/><f/><f/></abf>", false)
-    );
-  }
-
-  /**
-   * Schema validation failure in default external var. .
-   */
-  @org.junit.Test
-  public void extvardef024() {
-    final XQuery query = new XQuery(
-      "\n" +
-      "        declare construction strip; \n" +
-      "        import schema default element namespace \"http://www.w3.org/XQueryTest/hats\" at \"SchemaImport/hats.xsd\"; \n" +
-      "        declare variable $x external :=\n" +
-      "          validate strict {\n" +
-      "            <abc> \n" +
-      "              <a/> <b/> <b/> <f/> <f/> <f/> \n" +
-      "            </abc>};\n" +
-      "        $x\n" +
-      "      ",
-      ctx);
-
-    final QT3Result res = result(query);
-    result = res;
-    test(
-      error("XQDY0084")
-    );
-  }
-
-  /**
-   * Schema validation in default external var, incl variable type. Type match. .
-   */
-  @org.junit.Test
-  public void extvardef025() {
-    final XQuery query = new XQuery(
-      "\n" +
-      "        declare construction strip; \n" +
-      "        import schema namespace hats=\"http://www.w3.org/XQueryTest/hats\" at \"SchemaImport/hats.xsd\"; \n" +
-      "        declare variable $x as schema-element(hats:abf) external :=\n" +
-      "          validate strict {\n" +
-      "            <hats:abf> \n" +
-      "              <hats:a/> <hats:b/> <hats:b/> <hats:f/> <hats:f/> <hats:f/> \n" +
-      "            </hats:abf>};\n" +
-      "        $x\n" +
-      "      ",
-      ctx);
-
-    final QT3Result res = result(query);
-    result = res;
-    test(
-      assertSerialization("<hats:abf xmlns:hats=\"http://www.w3.org/XQueryTest/hats\"><hats:a/><hats:b/><hats:b/><hats:f/><hats:f/><hats:f/></hats:abf>", false)
-    );
-  }
-
-  /**
-   * Schema validation in default external var, incl variable type. Type missmatch. .
-   */
-  @org.junit.Test
-  public void extvardef026() {
-    final XQuery query = new XQuery(
-      "\n" +
-      "        declare construction strip; \n" +
-      "        import schema namespace hats=\"http://www.w3.org/XQueryTest/hats\" at \"SchemaImport/hats.xsd\"; \n" +
-      "        declare variable $x as schema-element(hats:s) external :=\n" +
-      "          validate strict {\n" +
-      "            <hats:abf> \n" +
-      "              <hats:a/> <hats:b/> <hats:b/> <hats:f/> <hats:f/> <hats:f/> \n" +
-      "            </hats:abf>};\n" +
-      "        $x\n" +
-      "      ",
-      ctx);
-
-    final QT3Result res = result(query);
-    result = res;
-    test(
-      error("XPTY0004")
-    );
-  }
-
-  /**
-   * Schema validation in default external var, incl variable type. Validation missing. .
-   */
-  @org.junit.Test
-  public void extvardef027() {
-    final XQuery query = new XQuery(
-      "\n" +
-      "        declare construction strip; \n" +
-      "        import schema namespace hats=\"http://www.w3.org/XQueryTest/hats\" at \"SchemaImport/hats.xsd\"; \n" +
-      "        declare variable $x as schema-element(hats:s) external :=\n" +
-      "            <hats:abf> \n" +
-      "              <hats:a/> <hats:b/> <hats:b/> <hats:f/> <hats:f/> <hats:f/> \n" +
-      "            </hats:abf>;\n" +
-      "        $x\n" +
-      "      ",
-      ctx);
-
-    final QT3Result res = result(query);
-    result = res;
-    test(
-      error("XPTY0004")
     );
   }
 }

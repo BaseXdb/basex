@@ -20,10 +20,14 @@ public class ProdAxisStepUnabbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works/employee) return $h/child::empnum",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<empnum>E1</empnum><empnum>E1</empnum><empnum>E1</empnum><empnum>E1</empnum><empnum>E1</empnum><empnum>E1</empnum><empnum>E2</empnum><empnum>E2</empnum><empnum>E3</empnum><empnum>E3</empnum><empnum>E4</empnum><empnum>E4</empnum><empnum>E4</empnum>", false)
     );
@@ -37,10 +41,14 @@ public class ProdAxisStepUnabbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works/employee[1]) return $h/descendant-or-self::employee",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<employee name=\"Jane Doe 1\" gender=\"female\">\n   <empnum>E1</empnum>\n   <pnum>P1</pnum>\n   <hours>40</hours>\n  </employee>", false)
     );
@@ -54,10 +62,14 @@ public class ProdAxisStepUnabbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works/employee[1]) return $h/self::employee",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<employee name=\"Jane Doe 1\" gender=\"female\">\n   <empnum>E1</empnum>\n   <pnum>P1</pnum>\n   <hours>40</hours>\n  </employee>", false)
     );
@@ -71,10 +83,14 @@ public class ProdAxisStepUnabbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works[1]/employee[1]) return fn:count(($h/self::employee[1000]))",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -88,10 +104,14 @@ public class ProdAxisStepUnabbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/child::employee/descendant::empnum",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<empnum>E1</empnum><empnum>E1</empnum><empnum>E1</empnum><empnum>E1</empnum><empnum>E1</empnum><empnum>E1</empnum><empnum>E2</empnum><empnum>E2</empnum><empnum>E3</empnum><empnum>E3</empnum><empnum>E4</empnum><empnum>E4</empnum><empnum>E4</empnum>", false)
     );
@@ -105,10 +125,14 @@ public class ProdAxisStepUnabbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/child::*/child::pnum",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<pnum>P1</pnum><pnum>P2</pnum><pnum>P3</pnum><pnum>P4</pnum><pnum>P5</pnum><pnum>P6</pnum><pnum>P1</pnum><pnum>P2</pnum><pnum>P2</pnum><pnum>P2</pnum><pnum>P2</pnum><pnum>P4</pnum><pnum>P5</pnum>", false)
     );
@@ -122,10 +146,14 @@ public class ProdAxisStepUnabbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/descendant::pnum",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<pnum>P1</pnum><pnum>P2</pnum><pnum>P3</pnum><pnum>P4</pnum><pnum>P5</pnum><pnum>P6</pnum><pnum>P1</pnum><pnum>P2</pnum><pnum>P2</pnum><pnum>P2</pnum><pnum>P2</pnum><pnum>P4</pnum><pnum>P5</pnum>", false)
     );
@@ -139,10 +167,14 @@ public class ProdAxisStepUnabbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/descendant::employee/child::pnum",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<pnum>P1</pnum><pnum>P2</pnum><pnum>P3</pnum><pnum>P4</pnum><pnum>P5</pnum><pnum>P6</pnum><pnum>P1</pnum><pnum>P2</pnum><pnum>P2</pnum><pnum>P2</pnum><pnum>P2</pnum><pnum>P4</pnum><pnum>P5</pnum>", false)
     );
@@ -156,10 +188,14 @@ public class ProdAxisStepUnabbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works/employee[1]) return $h/child::*",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<empnum>E1</empnum><pnum>P1</pnum><hours>40</hours>", false)
     );
@@ -173,10 +209,14 @@ public class ProdAxisStepUnabbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/child::employee[fn:position() = 1]",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<employee name=\"Jane Doe 1\" gender=\"female\">\n   <empnum>E1</empnum>\n   <pnum>P1</pnum>\n   <hours>40</hours>\n  </employee>", false)
     );
@@ -190,10 +230,14 @@ public class ProdAxisStepUnabbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/child::employee[fn:position() = fn:last()]",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<employee name=\"Jane Doe 13\" gender=\"female\" type=\"FT\">\n   <empnum>E4</empnum>\n   <pnum>P5</pnum>\n   <hours>80</hours>\n   <status>active</status>\n  </employee>", false)
     );
@@ -207,10 +251,14 @@ public class ProdAxisStepUnabbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/child::employee[fn:position() = fn:last()-1]",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<employee name=\"John Doe 12\" gender=\"male\">\n   <empnum>E4</empnum>\n   <pnum>P4</pnum>\n   <hours>40</hours>\n   <overtime>\n     <day>Monday</day>\n     <day>Tuesday</day>\n   </overtime>\n  </employee>", false)
     );
@@ -224,10 +272,14 @@ public class ProdAxisStepUnabbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works/employee) return $h/child::hours[fn:position() > 1]",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<hours>20</hours><hours>40</hours><hours>30</hours>", false)
     );
@@ -241,10 +293,14 @@ public class ProdAxisStepUnabbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/descendant::employee[fn:position() = 12]",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<employee name=\"John Doe 12\" gender=\"male\">\n   <empnum>E4</empnum>\n   <pnum>P4</pnum>\n   <hours>40</hours>\n   <overtime>\n     <day>Monday</day>\n     <day>Tuesday</day>\n   </overtime>\n  </employee>", false)
     );
@@ -258,10 +314,14 @@ public class ProdAxisStepUnabbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "/child::works/child::employee[fn:position() = 5]/child::hours[fn:position() = 2]",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<hours>30</hours>", false)
     );
@@ -275,10 +335,14 @@ public class ProdAxisStepUnabbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/child::employee[attribute::name eq \"Jane Doe 11\"]",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<employee name=\"Jane Doe 11\" gender=\"female\">\n   <empnum>E4</empnum>\n   <pnum>P2</pnum>\n   <hours>20</hours>\n  </employee>", false)
     );
@@ -292,10 +356,14 @@ public class ProdAxisStepUnabbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/child::employee[attribute::gender eq 'female'][fn:position() = 5]",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<employee name=\"Jane Doe 9\" gender=\"female\">\n   <empnum>E3</empnum>\n   <pnum>P2</pnum>\n   <hours>20</hours>\n  </employee>", false)
     );
@@ -309,10 +377,14 @@ public class ProdAxisStepUnabbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works[1]/employee[2]) return $h/child::text()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(true, "Text data from Employee[2]")
     );
@@ -326,10 +398,14 @@ public class ProdAxisStepUnabbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/child::employee[child::empnum = 'E3']",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<employee name=\"Jane Doe 9\" gender=\"female\">\n   <empnum>E3</empnum>\n   <pnum>P2</pnum>\n   <hours>20</hours>\n  </employee><employee name=\"John Doe 10\" gender=\"male\">\n   <empnum>E3</empnum>\n   <pnum>P2</pnum>\n   <hours>20</hours>\n  </employee>", false)
     );
@@ -343,10 +419,14 @@ public class ProdAxisStepUnabbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/child::employee[child::status]",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<employee name=\"Jane Doe 13\" gender=\"female\" type=\"FT\">\n   <empnum>E4</empnum>\n   <pnum>P5</pnum>\n   <hours>80</hours>\n   <status>active</status>\n  </employee>", false)
     );
@@ -360,10 +440,14 @@ public class ProdAxisStepUnabbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works/employee[7]) return $h/child::*[self::pnum or self::empnum]",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<empnum>E2</empnum><pnum>P1</pnum>", false)
     );
@@ -377,10 +461,14 @@ public class ProdAxisStepUnabbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works/employee[6]) return $h/child::*[self::empnum or self::pnum][fn:position() = fn:last()]",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<pnum>P6</pnum>", false)
     );
@@ -394,10 +482,14 @@ public class ProdAxisStepUnabbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works/employee[1]) return $h/child::node()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("\n   <empnum>E1</empnum>\n   <pnum>P1</pnum>\n   <hours>40</hours>\n  ", false)
     );
@@ -411,10 +503,14 @@ public class ProdAxisStepUnabbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works/employee[2]) return $h/child::node()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("\n   <empnum>E1</empnum>\n   <pnum>P2</pnum>\n   <hours>70</hours>\n   <hours>20</hours>Text data from Employee[2]\n  ", false)
     );
@@ -428,10 +524,14 @@ public class ProdAxisStepUnabbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works/employee[1]/hours) return $h/parent::node()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<employee name=\"Jane Doe 1\" gender=\"female\">\n   <empnum>E1</empnum>\n   <pnum>P1</pnum>\n   <hours>40</hours>\n  </employee>", false)
     );
@@ -445,10 +545,14 @@ public class ProdAxisStepUnabbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works/employee) return $h/descendant::empnum",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<empnum>E1</empnum><empnum>E1</empnum><empnum>E1</empnum><empnum>E1</empnum><empnum>E1</empnum><empnum>E1</empnum><empnum>E2</empnum><empnum>E2</empnum><empnum>E3</empnum><empnum>E3</empnum><empnum>E4</empnum><empnum>E4</empnum><empnum>E4</empnum>", false)
     );

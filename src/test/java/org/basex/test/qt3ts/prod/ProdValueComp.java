@@ -21,9 +21,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3) eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -37,9 +41,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 gt (1, 2, 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -53,9 +61,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3) ge 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -69,9 +81,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 ge (1, 2, 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -85,9 +101,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(() eq 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -105,9 +125,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(1 eq ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -125,9 +149,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(() eq ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -145,9 +173,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"1\") eq xs:integer(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -161,9 +193,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(1) eq xs:untypedAtomic(\"1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -177,9 +213,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"0\") ne xs:double(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -193,9 +233,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(1) ne xs:untypedAtomic(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -209,9 +253,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 eq (1, 2, 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -225,9 +273,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"0\") lt xs:float(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -241,9 +293,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(0) lt xs:untypedAtomic(\"1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -257,9 +313,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"0\") gt xs:decimal(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -273,9 +333,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(0) gt xs:untypedAtomic(\"1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -289,9 +353,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"4\") eq 4",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -305,9 +373,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "4 eq xs:untypedAtomic(\"4\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -321,9 +393,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"3\") eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -337,9 +413,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(2) lt xs:untypedAtomic(\"3\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -353,9 +433,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(4) gt xs:untypedAtomic(\"3\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -369,9 +453,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"3\") ne xs:decimal(3.1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -385,9 +473,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3) ne 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -401,9 +493,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"a string\") eq \"a string\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -417,9 +513,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"a string\" eq xs:untypedAtomic(\"a string\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -433,9 +533,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "count((0, current-time())) ge 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -449,9 +553,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "count((0, current-time())) ne 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -465,9 +573,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(count((1, 2, current-time())) eq 0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -481,9 +593,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "error() eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOER0000")
     );
@@ -497,9 +613,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "error() eq error()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOER0000")
     );
@@ -513,9 +633,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 eq error()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOER0000")
     );
@@ -529,9 +653,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 eq (error(), 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOER0000")
     );
@@ -545,9 +673,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 eq (3, error())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOER0000")
     );
@@ -561,9 +693,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 ne (1, 2, 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -577,9 +713,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "(error(), 3) eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOER0000")
     );
@@ -593,9 +733,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "(3, error()) eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOER0000")
     );
@@ -609,9 +753,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "count((1, 2)) eq 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -625,9 +773,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3) lt 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -641,9 +793,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 lt (1, 2, 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -657,9 +813,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3) le 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -673,9 +833,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 le (1, 2, 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -689,9 +853,13 @@ public class ProdValueComp extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3) gt 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );

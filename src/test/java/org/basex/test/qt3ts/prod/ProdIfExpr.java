@@ -20,9 +20,13 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "if (fn:true()) then <elem1/> else <elem2/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem1/>", false)
     );
@@ -36,9 +40,13 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "if (fn:false()) then <elem1/> else <elem2/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem2/>", false)
     );
@@ -52,10 +60,14 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "if (//CompanyName) then <elem1/> else <elem2/>",
       ctx);
-    query.context(node(file("prod/AxisStep/nw_Customers.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/nw_Customers.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem1/>", false)
     );
@@ -69,10 +81,14 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "if (//NodeDoesNotExist) then <elem1/> else <elem2/>",
       ctx);
-    query.context(node(file("prod/AxisStep/nw_Customers.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/nw_Customers.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem2/>", false)
     );
@@ -86,9 +102,13 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "<out>{ if (1 != 0) then if (4 != 5) then 1 else 2 else 3 }</out>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<out>1</out>", false)
     );
@@ -102,10 +122,14 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "if (//MissingNode) then <elem3/> else if (/Root/Customers[@CustomerID='ALFKI']//Country = \"Germany\") then <elem1/> else <elem2/>",
       ctx);
-    query.context(node(file("prod/AxisStep/nw_Customers.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/nw_Customers.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem1/>", false)
     );
@@ -119,10 +143,14 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "if ( /Root/Customers[1]/@CustomerID = 'ALFKI' and /Root/Customers[1]/FullAddress/City = 'Berlin') then \"pass\" else \"fail\"",
       ctx);
-    query.context(node(file("prod/AxisStep/nw_Customers.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/nw_Customers.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "pass")
     );
@@ -136,10 +164,14 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "if (/Root/Customers[1]/@CustomerID = 'ALFKI' or /Root/Customers[1]/FullAddress/City = 'Non-Existent') then \"pass\" else \"fail\"",
       ctx);
-    query.context(node(file("prod/AxisStep/nw_Customers.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/nw_Customers.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "pass")
     );
@@ -153,9 +185,13 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       " if (2 != 4) then 1 else 0 ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -169,9 +205,13 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-length(if (2 != 3) then 'foo' else 'expanded-foo')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -185,10 +225,14 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "if (/doc/widget1/@unit-cost = /doc/widget2/@unit-cost) then /doc/widget1/@name else /doc/widget2/@name",
       ctx);
-    query.context(node(file("prod/IfExpr/xq311A.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/IfExpr/xq311A.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "axolotl")
     );
@@ -202,10 +246,14 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       " if (if (5 != 3) then fn:true() else fn:empty(/doc/widget1)) then \"search\" else \"assume\" ",
       ctx);
-    query.context(node(file("prod/IfExpr/xq311A.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/IfExpr/xq311A.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "search")
     );
@@ -219,10 +267,14 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       " ( if (3 != 2) then 16 else 0 ) + ( if (8 = 7) then 4 else 1 ) ",
       ctx);
-    query.context(node(file("prod/IfExpr/xq311A.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/IfExpr/xq311A.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("17")
     );
@@ -236,9 +288,13 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       " (if (3 != 2) then 16 else 0) + (if (8 = 7) then 4 else 1) ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("17")
     );
@@ -252,10 +308,14 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(//Folder)[1]/File[ if ( ./@name='File00000000000' ) then 2 else true() ]/FileName",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<FileName>File00000000001</FileName><FileName>File00000000002</FileName><FileName>File00000000003</FileName><FileName>File00000000004</FileName><FileName>File00000000005</FileName><FileName>File00000000006</FileName><FileName>File00000000007</FileName><FileName>File00000000008</FileName><FileName>File00000000009</FileName><FileName>File00000000010</FileName><FileName>File00000000011</FileName><FileName>File00000000012</FileName><FileName>File00000000013</FileName><FileName>File00000000014</FileName><FileName>File00000000015</FileName><FileName>File00000000016</FileName><FileName>File00000000017</FileName><FileName>File00000000018</FileName><FileName>File00000000019</FileName><FileName>File00000000020</FileName><FileName>File00000000021</FileName><FileName>File00000000022</FileName><FileName>File00000000023</FileName><FileName>File00000000024</FileName><FileName>File00000000025</FileName><FileName>File00000000026</FileName><FileName>File00000000027</FileName><FileName>File00000000028</FileName><FileName>File00000000029</FileName><FileName>File00000000030</FileName>", false)
     );
@@ -269,10 +329,14 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $file in (//Folder)[1]/File return if( $file/FileName='File00000000000' ) then $file/FileName else data( $file/FileName )",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<FileName>File00000000000</FileName>File00000000001 File00000000002 File00000000003 File00000000004 File00000000005 File00000000006 File00000000007 File00000000008 File00000000009 File00000000010 File00000000011 File00000000012 File00000000013 File00000000014 File00000000015 File00000000016 File00000000017 File00000000018 File00000000019 File00000000020 File00000000021 File00000000022 File00000000023 File00000000024 File00000000025 File00000000026 File00000000027 File00000000028 File00000000029 File00000000030", false)
     );
@@ -286,10 +350,14 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $file in (//Folder)[1]/File return if( $file/FileName='File00000000004' ) then 1 else data( $file/FileName )",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "File00000000000 File00000000001 File00000000002 File00000000003 1 File00000000005 File00000000006 File00000000007 File00000000008 File00000000009 File00000000010 File00000000011 File00000000012 File00000000013 File00000000014 File00000000015 File00000000016 File00000000017 File00000000018 File00000000019 File00000000020 File00000000021 File00000000022 File00000000023 File00000000024 File00000000025 File00000000026 File00000000027 File00000000028 File00000000029 File00000000030")
     );
@@ -303,10 +371,14 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "if //File[1] then \"true\" else \"false\"",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -320,9 +392,13 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "if (doc-available('nodocument.xml')) then doc('nodocument.xml') else 10 cast as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("10")
     );
@@ -336,10 +412,14 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "if( false() ) then /Folder[1] cast as xs:double ? else 10 cast as xs:double ?",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("10")
     );
@@ -353,10 +433,14 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "if( true() ) then 10 cast as xs:double ? else /Folder[1] cast as xs:double ?",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("10")
     );
@@ -370,9 +454,13 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(if(2) then 1 else 0) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -386,9 +474,13 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "if(count((1, 2, 3, current-time(), 4))) then true() else 4",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -402,9 +494,13 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "if(not(count(remove((1, 2, 3, current-time()), 1)))) then 3 else true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -418,9 +514,13 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "if(boolean((1, 2, 3, current-time())[1] treat as xs:integer)) then true() else 4",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -434,9 +534,13 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "if(()) then false() else true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -450,9 +554,13 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(if((1, current-time())[1] treat as xs:integer) then true() else false()) eq true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -466,9 +574,13 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(if(boolean((1, current-time())[1] treat as xs:integer)) then true() else false()) eq true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -482,9 +594,13 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "if((1, 2, 3, hours-from-time(current-time()))[1]) then true() else false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -498,9 +614,13 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(if(boolean((1, current-time())[1] treat as xs:integer)) then true() else false()) eq \"true\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -514,9 +634,13 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(if(current-time()) then 1 else 0) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -530,9 +654,13 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 eq (if(xs:anyURI(\"example.com/\")) then 1 else 0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -546,9 +674,13 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "0 eq (if(xs:anyURI(\"\")) then 1 else 0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -562,9 +694,13 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(if(<e>{current-time()}</e>) then () else ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -582,9 +718,13 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(if(<e>{current-time()}</e>) then 1 else 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -598,9 +738,13 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default function namespace \"http://www.example.com/\"; declare function unordered() { 1 }; unordered()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -614,10 +758,14 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "if(//(employee[location = \"Denver\"]/ancestor::*)) then 1 else 3",
       ctx);
-    query.context(node(file("op/union/acme_corp.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("op/union/acme_corp.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -631,9 +779,13 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "if(!true()) then 2 else 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -647,9 +799,13 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e/>/if(true()) then 1 else 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -663,11 +819,61 @@ public class ProdIfExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "if (1) then 1 else if (1) then 1 else if (1) then 1 else if (1) then 1 else if (1) then 1 else if (1) then 1 else if (1) then 1 else if (1) then 1 else if (1) then 1 else if (1) then 1 else if (1) then 1 else if (1) then 1 else if (1) then 1 else if (1) then 1 else if (1) then 1 else if (1) then 1 else if (1) then 1 else if (1) then 1 else if (1) then 1 else if (1) then 1 else if (1) then 1 else if (1) then 1 else if (1) then 1 else if (1) then 1 else if (1) then 1 else if (1) then 1 else if (1) then 1 else if (1) then 1 else ()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
+    );
+  }
+
+  /**
+   *  Tests if(exists($x)) then f($x) else () optimization .
+   */
+  @org.junit.Test
+  public void cbclCondexpr001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tlet $x := zero-or-one((1 to 10)[. div 2 = 2]) \n" +
+      "      \treturn if(exists($x)) then xs:string($x) else ()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "4")
+    );
+  }
+
+  /**
+   *  tests if(empty($x)) then () else f($x) optimization .
+   */
+  @org.junit.Test
+  public void cbclCondexpr002() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tlet $x := zero-or-one((1 to 10)[. div 2 = 2]) \n" +
+      "      \treturn if(empty($x)) then () else xs:string($x)\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "4")
     );
   }
 }

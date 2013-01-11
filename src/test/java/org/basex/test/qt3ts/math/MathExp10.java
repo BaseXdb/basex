@@ -20,9 +20,14 @@ public class MathExp10 extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:exp10(())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -36,9 +41,14 @@ public class MathExp10 extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:exp10(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1.0e0")
     );
@@ -52,9 +62,14 @@ public class MathExp10 extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:exp10(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1.0e1")
     );
@@ -68,11 +83,20 @@ public class MathExp10 extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:exp10(0.5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertEq("3.1622776601683795e0")
+      (
+        assertEq("3.1622776601683795")
+      ||
+        assertEq("3.162277660168379")
+      )
     );
   }
 
@@ -84,9 +108,14 @@ public class MathExp10 extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:exp10(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1.0e-1")
     );
@@ -100,9 +129,14 @@ public class MathExp10 extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:exp10(xs:double('NaN'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );
@@ -116,9 +150,14 @@ public class MathExp10 extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:exp10(xs:double('INF'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:double('INF')")
     );
@@ -132,9 +171,14 @@ public class MathExp10 extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:exp10(xs:double('-INF'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0.0e0")
     );

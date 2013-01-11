@@ -20,9 +20,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "in-scope-prefixes()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "in-scope-prefixes(\"string\", \"nodetest\", \"wrong param\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -52,9 +60,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(in-scope-prefixes(<e/>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -68,9 +80,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default element namespace \"http://www.example.com\"; count(fn:in-scope-prefixes(<e/>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -84,9 +100,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default element namespace \"http://www.example.com/\"; let $i := <e> <a xmlns=\"\"/> <b xmlns=\"http://www.example.com/\"/> <c xmlns=\"http://www.example.com/Second\"/> </e> return (count(in-scope-prefixes($i)), count(in-scope-prefixes(exactly-one($i/*[namespace-uri() eq \"\"]))), count(in-scope-prefixes(exactly-one($i/b))), count(in-scope-prefixes(exactly-one($i/*[namespace-uri() eq \"http://www.example.com/Second\"]))), $i)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("2 1 2 2<e xmlns=\"http://www.example.com/\"><a xmlns=\"\"/><b/><c xmlns=\"http://www.example.com/Second\"/></e>", false)
     );
@@ -100,9 +120,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default element namespace \"http://www.example.com/\"; let $i := element e { element {QName(\"\", \"a\")} {}, element {QName(\"http://www.example.com/\", \"b\")} {}, element {QName(\"http://www.example.com/Second\", \"c\")} {} } return (count(in-scope-prefixes($i)), count(in-scope-prefixes(exactly-one($i/*[namespace-uri() eq \"\"]))), count(in-scope-prefixes(exactly-one($i/b))), count(in-scope-prefixes(exactly-one($i/*[namespace-uri() eq \"http://www.example.com/Second\"]))), $i)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("2 1 2 2<e xmlns=\"http://www.example.com/\"><a xmlns=\"\"/><b/><c xmlns=\"http://www.example.com/Second\"/></e>", false)
     );
@@ -116,9 +140,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default element namespace \"http://www.example.com/\"; let $i := element e { element b {()} } return (count(in-scope-prefixes($i/b)), count(in-scope-prefixes($i)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2 2")
     );
@@ -132,9 +160,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(in-scope-prefixes(element e{()}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -148,9 +180,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $i := element e { element b {()} } return (count(in-scope-prefixes($i/b)), count(in-scope-prefixes($i)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 1")
     );
@@ -169,9 +205,13 @@ public class FnInScopePrefixes extends QT3TestSet {
       "                  </e> \n" +
       "        return (count(in-scope-prefixes($i)), count(in-scope-prefixes(exactly-one($i/*))))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2 2")
     );
@@ -185,9 +225,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace p = \"http://example.com/\"; count(in-scope-prefixes(<p:e/>)), count(in-scope-prefixes(element p:e {()}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2 2")
     );
@@ -201,9 +245,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default element namespace \"http://example.com/\"; <e xmlns:p=\"http://example.com/\"> { count(in-scope-prefixes(<e/>)), count(in-scope-prefixes(element e {()})) } </e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e xmlns=\"http://example.com/\" xmlns:p=\"http://example.com/\">3 3</e>", false)
     );
@@ -217,9 +265,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(in-scope-prefixes(element xml:space {()}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -233,9 +285,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(in-scope-prefixes(element name {7}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -249,9 +305,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(in-scope-prefixes(element fn:space {()}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -265,9 +325,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(in-scope-prefixes(element xs:space {()}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -281,9 +345,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(in-scope-prefixes(<fn:space/>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -297,9 +365,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(in-scope-prefixes(<xs:space/>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -313,9 +385,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace p = \"http://example.com/\"; count(in-scope-prefixes(<element/>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -339,9 +415,13 @@ public class FnInScopePrefixes extends QT3TestSet {
       "             for $i in a:n1/in-scope-prefixes(.) order by $i return $i)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a b xml | a b xml")
     );
@@ -355,9 +435,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $i := <e> { attribute {QName(\"http://example.com/\", \"prefix:attributeName\")} {()} } </e> return ($i, for $ps in in-scope-prefixes($i) order by $ps return $ps)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e xmlns:prefix=\"http://example.com/\" prefix:attributeName=\"\"/>prefix xml", false)
     );
@@ -371,9 +455,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace a = \"http://example.com/1\"; declare namespace b = \"http://example.com/2\"; <e a:n1=\"content\" b:n1=\"content\"/>/(for $i in in-scope-prefixes(.) order by $i return $i)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a b xml")
     );
@@ -387,9 +475,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default element namespace \"http://www.example.com/\"; let $i := <e> <a xmlns=\"\"/> <b xmlns=\"http://www.example.com/\"/> <c xmlns=\"http://www.example.com/Second\"/> </e> return (count(in-scope-prefixes($i)), count(in-scope-prefixes(exactly-one($i/*[namespace-uri() eq \"\"]))), count(in-scope-prefixes(exactly-one($i/b))), count(in-scope-prefixes(exactly-one($i/*[namespace-uri() eq \"http://www.example.com/Second\"]))), $i)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("2 1 2 2<e xmlns=\"http://www.example.com/\"><a xmlns=\"\"/><b/><c xmlns=\"http://www.example.com/Second\"/></e>", false)
     );
@@ -403,9 +495,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default element namespace \"http://www.example.com/\"; <a2/>/element e { element {QName(\"\", \"a\")} {} }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e xmlns=\"http://www.example.com/\"><a xmlns=\"\"/></e>", false)
     );
@@ -419,9 +515,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "in-scope-prefixes(text {\"some text\"})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -435,9 +535,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default element namespace \"http://www.example.com/\"; <a2 xmlns:p=\"http://ns.example.com/foo\"/>/element e { element {QName(\"http://example.com/2\", \"p:a\")} {} }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e xmlns=\"http://www.example.com/\"><p:a xmlns:p=\"http://example.com/2\"/></e>", false)
     );
@@ -451,9 +555,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "in-scope-prefixes(comment {\"content\"})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -467,9 +575,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "in-scope-prefixes(<?target data?>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -483,9 +595,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(in-scope-prefixes(<a xmlns=\"http://www.example.com\" xmlns:p=\"http://ns.example.com/asd\" xmlns:b=\"http://ns.example.com/asd\"/>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("4")
     );
@@ -499,9 +615,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(in-scope-prefixes(<a xmlns=\"\"/>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -515,9 +635,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default element namespace \"http://www.example.com/A\"; count(in-scope-prefixes(<anElement xmlns=\"http://www.example.com/B\"/>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -531,9 +655,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $i in fn:in-scope-prefixes(<e xmlns:p=\"http://example.com\" xmlns:a=\"http://example.com\"> <b/> </e>/b) order by $i return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a p xml")
     );
@@ -547,9 +675,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:in-scope-prefixes(<a1 xmlns:p1=\"http://www.exampole.com\"></a1>,\"Second Argument\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -563,9 +695,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-length(fn:in-scope-prefixes(<anElement>Some content</anElement>)[1])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -579,9 +715,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:upper-case(fn:in-scope-prefixes(<anElement>Some content</anElement>)[1])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "XML")
     );
@@ -595,9 +735,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:lower-case(fn:in-scope-prefixes(<anElement>Some content</anElement>)[1])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xml")
     );
@@ -611,9 +755,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-to-codepoints(fn:in-scope-prefixes(<anElement>Some content</anElement>)[1])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "120 109 108")
     );
@@ -627,9 +775,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(fn:in-scope-prefixes(<anElement>Some content</anElement>)[1])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xml")
     );
@@ -643,9 +795,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring-before(fn:in-scope-prefixes(<anElement>Some content</anElement>)[1],\"m\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "x")
     );
@@ -659,9 +815,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring-after(fn:in-scope-prefixes(<anElement>Some content</anElement>)[1],\"m\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "l")
     );
@@ -675,9 +835,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(fn:in-scope-prefixes(<anElement>Some content</anElement>),\"m\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xmlm")
     );
@@ -691,9 +855,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-join((fn:in-scope-prefixes(<anElement>Some content</anElement>),\"xml\"),\"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xmlxml")
     );
@@ -707,9 +875,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring(fn:in-scope-prefixes(<anElement>Some content</anElement>)[1],2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ml")
     );
@@ -723,9 +895,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:in-scope-prefixes(200)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -739,9 +915,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:contains(fn:in-scope-prefixes(<anElement>Some content</anElement>)[1],\"l\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -755,15 +935,19 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "in-scope-prefixes(/*)",
       ctx);
-    query.namespace("ma", "http://www.example.com/AuctionWatch");
-    query.namespace("xlink", "http://www.w3.org/1999/xlink");
-    query.namespace("anyzone", "http://www.example.com/auctioneers#anyzone");
-    query.namespace("eachbay", "http://www.example.com/auctioneers#eachbay");
-    query.namespace("yabadoo", "http://www.example.com/auctioneers#yabadoo");
-    query.context(node(file("docs/auction.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("ma", "http://www.example.com/AuctionWatch");
+      query.namespace("xlink", "http://www.w3.org/1999/xlink");
+      query.namespace("anyzone", "http://www.example.com/auctioneers#anyzone");
+      query.namespace("eachbay", "http://www.example.com/auctioneers#eachbay");
+      query.namespace("yabadoo", "http://www.example.com/auctioneers#yabadoo");
+      query.context(node(file("docs/auction.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\"ma\", \"xlink\", \"anyzone\", \"eachbay\", \"yabadoo\", \"xml\"")
     );
@@ -777,15 +961,19 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "in-scope-prefixes((//*)[19])",
       ctx);
-    query.namespace("ma", "http://www.example.com/AuctionWatch");
-    query.namespace("xlink", "http://www.w3.org/1999/xlink");
-    query.namespace("anyzone", "http://www.example.com/auctioneers#anyzone");
-    query.namespace("eachbay", "http://www.example.com/auctioneers#eachbay");
-    query.namespace("yabadoo", "http://www.example.com/auctioneers#yabadoo");
-    query.context(node(file("docs/auction.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("ma", "http://www.example.com/AuctionWatch");
+      query.namespace("xlink", "http://www.w3.org/1999/xlink");
+      query.namespace("anyzone", "http://www.example.com/auctioneers#anyzone");
+      query.namespace("eachbay", "http://www.example.com/auctioneers#eachbay");
+      query.namespace("yabadoo", "http://www.example.com/auctioneers#yabadoo");
+      query.context(node(file("docs/auction.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\"ma\", \"xlink\", \"anyzone\", \"eachbay\", \"yabadoo\", \"xml\"")
     );
@@ -799,15 +987,19 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "in-scope-prefixes(/)",
       ctx);
-    query.namespace("ma", "http://www.example.com/AuctionWatch");
-    query.namespace("xlink", "http://www.w3.org/1999/xlink");
-    query.namespace("anyzone", "http://www.example.com/auctioneers#anyzone");
-    query.namespace("eachbay", "http://www.example.com/auctioneers#eachbay");
-    query.namespace("yabadoo", "http://www.example.com/auctioneers#yabadoo");
-    query.context(node(file("docs/auction.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("ma", "http://www.example.com/AuctionWatch");
+      query.namespace("xlink", "http://www.w3.org/1999/xlink");
+      query.namespace("anyzone", "http://www.example.com/auctioneers#anyzone");
+      query.namespace("eachbay", "http://www.example.com/auctioneers#eachbay");
+      query.namespace("yabadoo", "http://www.example.com/auctioneers#yabadoo");
+      query.context(node(file("docs/auction.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -821,10 +1013,14 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "in-scope-prefixes(/*)",
       ctx);
-    query.context(node(file("fn/in-scope-prefixes/NamespaceSuppliedInternally.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/in-scope-prefixes/NamespaceSuppliedInternally.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\"\", \"xml\", \"xlink\"")
     );
@@ -838,10 +1034,14 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "in-scope-prefixes(/*/p)",
       ctx);
-    query.context(node(file("fn/path/pathdata.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/path/pathdata.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xml")
     );
@@ -855,9 +1055,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:in-scope-prefixes(<anElement>some content</anElement>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xml")
     );
@@ -871,9 +1075,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:in-scope-prefixes(<anElement xmlns:p1 = \"http://www.example.com\">some content</anElement>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "xml p1")
@@ -891,9 +1099,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:in-scope-prefixes(element anElement {\"Some content\"})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xml")
     );
@@ -907,9 +1119,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default element namespace \"http://www.example.com\"; let $seq := fn:in-scope-prefixes(element anElement {\"Some content\"}) return (count($seq),$seq=(\"xml\",\"\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2 true")
     );
@@ -923,9 +1139,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default element namespace \"http://www.example.com\"; let $seq := fn:in-scope-prefixes(<anElement>Some content</anElement>) return (count($seq),$seq=(\"xml\",\"\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2 true")
     );
@@ -939,9 +1159,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace p1 = \"http://www.example.com\"; fn:in-scope-prefixes(<anElement xmlns:p1=\"http://www.somenamespace.com\">Some content</anElement>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "xml p1")
@@ -959,9 +1183,13 @@ public class FnInScopePrefixes extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace p1 = \"http://www.example.com\"; fn:in-scope-prefixes(<anElement>Some content</anElement>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xml")
     );

@@ -20,9 +20,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "number(1, 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(()) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(fn:number(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(number(xs:anyURI(\"example.com/\"))) eq \"NaN\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(number(xs:anyURI(\"1\"))) eq \"NaN\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(number(\"1\")) eq \"1\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,9 +140,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(number(xs:gYear(\"2005\"))) eq \"NaN\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -132,9 +160,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2, 3)[number()], (1, 2, 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -148,9 +180,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1)[number()] eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -164,9 +200,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(1) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -180,9 +220,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(fn:number(\"results in NaN\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -196,9 +240,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(\"results in NaN\") instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -212,9 +260,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(1) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -228,9 +280,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(1.1) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -244,9 +300,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:float(3)) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -260,9 +320,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:double(3)) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -276,9 +340,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(\"NaN\") instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -292,9 +360,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );
@@ -308,9 +380,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "number(xs:untypedAtomic(\"1000\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertType("xs:double")
@@ -328,9 +404,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(\"A String\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );
@@ -344,9 +424,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -360,9 +444,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(.)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -376,9 +464,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "number(true())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertType("xs:double")
@@ -396,9 +488,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "number(false())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertType("xs:double")
@@ -416,9 +512,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "number(implicit-timezone())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertType("xs:double")
@@ -436,9 +536,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "number(\"  -22e0  \")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertType("xs:double")
@@ -456,9 +560,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "number(\"+22e0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertType("xs:double")
@@ -476,9 +584,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:double(\"-1.7976931348623157E308\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-1.7976931348623157E308")
     );
@@ -492,9 +604,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:double(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -508,9 +624,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:double(\"1.7976931348623157E308\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1.7976931348623157E308")
     );
@@ -524,9 +644,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:decimal(\"-999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-1.0E18")
     );
@@ -540,9 +664,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:decimal(\"617375191608514839\")) eq 617375191608514839",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -556,9 +684,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:decimal(\"999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1.0E18")
     );
@@ -572,9 +704,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:float(\"-3.4028235E38\")) eq -3.4028234663852885E38",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -588,9 +724,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:float(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -604,9 +744,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:float(\"3.4028235E38\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "3.4028234663852885E38")
@@ -626,9 +770,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:int(\"-2147483648\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-2.147483648E9")
     );
@@ -642,9 +790,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:int(\"-1873914410\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-1.87391441E9")
     );
@@ -658,9 +810,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:int(\"2147483647\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2.147483647E9")
     );
@@ -674,9 +830,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:integer(\"-999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-1.0E18")
     );
@@ -690,9 +850,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:integer(\"830993497117024304\")) eq 830993497117024304",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -706,9 +870,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:integer(\"999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1.0E18")
     );
@@ -722,9 +890,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:long(\"-92233720368547758\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-9.223372036854776E16")
     );
@@ -738,9 +910,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:long(\"-47175562203048468\")) eq -47175562203048468",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -754,9 +930,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:long(\"92233720368547758\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "9.223372036854776E16")
     );
@@ -770,9 +950,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:negativeInteger(\"-999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-1.0E18")
     );
@@ -786,9 +970,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:negativeInteger(\"-297014075999096793\")) eq -297014075999096793",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -802,9 +990,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:negativeInteger(\"-1\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-1")
     );
@@ -818,9 +1010,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:nonNegativeInteger(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -834,9 +1030,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:nonNegativeInteger(\"303884545991464527\")) eq 303884545991464527",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -850,9 +1050,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:nonNegativeInteger(\"999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1.0E18")
     );
@@ -866,9 +1070,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:nonPositiveInteger(\"-999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-1.0E18")
     );
@@ -882,9 +1090,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:nonPositiveInteger(\"-475688437271870490\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "-4.7568843727187049E17")
@@ -904,9 +1116,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:nonPositiveInteger(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -920,9 +1136,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:positiveInteger(\"1\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -936,9 +1156,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:positiveInteger(\"52704602390610033\")) eq 52704602390610033",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -952,9 +1176,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:positiveInteger(\"999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1.0E18")
     );
@@ -968,9 +1196,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:short(\"-32768\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-32768")
     );
@@ -984,9 +1216,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:short(\"-5324\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-5324")
     );
@@ -1000,9 +1236,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:short(\"32767\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "32767")
     );
@@ -1016,9 +1256,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:unsignedLong(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -1032,9 +1276,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:unsignedLong(\"130747108607674654\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "1.3074710860767466E17")
@@ -1082,9 +1330,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:unsignedLong(\"184467440737095516\")) eq 1.8446744073709551E17",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1098,9 +1350,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:unsignedShort(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -1114,9 +1370,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:unsignedShort(\"44633\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "44633")
     );
@@ -1130,9 +1390,13 @@ public class FnNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:unsignedShort(\"65535\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "65535")
     );

@@ -20,9 +20,13 @@ public class MiscXMLEdition extends QT3TestSet {
     final XQuery query = new XQuery(
       "<foo> a <![CDATA[cdata section]]> in mixed content. a <!-- comment --> in mixed content. a <?processing instruction?> in mixed content. </foo>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<foo> a cdata section in mixed content. a <!-- comment --> in mixed content. a <?processing instruction?> in mixed content. </foo>", false)
     );
@@ -36,9 +40,13 @@ public class MiscXMLEdition extends QT3TestSet {
     final XQuery query = new XQuery(
       "xquery version \"1.0\" encoding \"utf-8\"; <\u037fnode/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -52,9 +60,13 @@ public class MiscXMLEdition extends QT3TestSet {
     final XQuery query = new XQuery(
       "xquery version \"1.0\" encoding \"utf-8\"; <\u037fnode/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<\u037fnode/>", false)
     );
@@ -67,19 +79,17 @@ public class MiscXMLEdition extends QT3TestSet {
   @org.junit.Test
   public void xML104edExcludedChar2() {
     final XQuery query = new XQuery(
-      "(: Name: Excluded-char-2 :)\n" +
-      "(: Written by: Nicolae Brinza :)\n" +
-      "(: Description: The character #x0100 is excluded from the start of a Name :)\n" +
-      "(:              in XML 1.0 4th edition and older                          :)\n" +
-      "\n" +
-      "xquery version \"1.0\" encoding \"utf-8\";\n" +
-      "\n" +
-      "<\u0001\u0000node/>\n" +
-      "",
+      queryFile(
+          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/misc/XMLEdition/XML10-4ed-Excluded-char-2.xq"
+      ),
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -93,9 +103,13 @@ public class MiscXMLEdition extends QT3TestSet {
     final XQuery query = new XQuery(
       "<foo>\u007f</foo>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<foo>&#x7f;</foo>", false)
     );
@@ -109,9 +123,13 @@ public class MiscXMLEdition extends QT3TestSet {
     final XQuery query = new XQuery(
       "<eggſ/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -125,9 +143,13 @@ public class MiscXMLEdition extends QT3TestSet {
     final XQuery query = new XQuery(
       "<eggſ/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<eggſ/>", false)
     );
@@ -142,9 +164,13 @@ public class MiscXMLEdition extends QT3TestSet {
       "deep-equal(string-to-codepoints('\n" +
       "'), (10))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -159,9 +185,13 @@ public class MiscXMLEdition extends QT3TestSet {
       "deep-equal(string-to-codepoints('\r\n" +
       "'), (10))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -177,9 +207,13 @@ public class MiscXMLEdition extends QT3TestSet {
       " \n" +
       "\r'), (10, 32, 10, 32, 10, 10))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -193,9 +227,13 @@ public class MiscXMLEdition extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(string-to-codepoints('\r\u0085'), (10, 133))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -209,9 +247,13 @@ public class MiscXMLEdition extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(string-to-codepoints(' \u0085 '), (32, 133, 32))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -225,9 +267,13 @@ public class MiscXMLEdition extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(string-to-codepoints(' \u2028 '), (32, 8232, 32))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );

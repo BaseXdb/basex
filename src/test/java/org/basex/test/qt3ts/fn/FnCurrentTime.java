@@ -20,9 +20,13 @@ public class FnCurrentTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "current-time(\"WRONG PARAM\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnCurrentTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "current-time() eq current-time()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class FnCurrentTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:current-time()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertType("xs:time")
     );
@@ -68,9 +80,13 @@ public class FnCurrentTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(fn:current-time())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertType("xs:string")
     );
@@ -84,9 +100,13 @@ public class FnCurrentTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:timezone-from-time(current-time())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertType("xs:dayTimeDuration")
     );
@@ -100,9 +120,13 @@ public class FnCurrentTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:current-time()) eq fn:string(fn:current-time())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,9 +140,13 @@ public class FnCurrentTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:current-time()) ne fn:string(fn:current-time())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -132,9 +160,13 @@ public class FnCurrentTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:current-time()) le fn:string(fn:current-time())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -148,9 +180,13 @@ public class FnCurrentTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:current-time()) ge fn:string(fn:current-time())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -164,9 +200,13 @@ public class FnCurrentTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:current-time()) and fn:true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -180,9 +220,13 @@ public class FnCurrentTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:current-time()) and fn:false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -196,9 +240,13 @@ public class FnCurrentTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:current-time()) or fn:true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -212,9 +260,13 @@ public class FnCurrentTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:current-time()) or fn:false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -228,9 +280,13 @@ public class FnCurrentTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:hours-from-time(fn:current-time())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertType("xs:integer")
     );
@@ -244,9 +300,13 @@ public class FnCurrentTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(fn:string(fn:current-time()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -260,9 +320,13 @@ public class FnCurrentTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(timezone-from-time(current-time()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -276,9 +340,13 @@ public class FnCurrentTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "current-time() = xs:time(current-dateTime())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -292,9 +360,13 @@ public class FnCurrentTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:minutes-from-time(fn:current-time())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertType("xs:integer")
     );
@@ -308,9 +380,13 @@ public class FnCurrentTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:seconds-from-time(fn:current-time())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertType("xs:decimal")
     );
@@ -324,9 +400,13 @@ public class FnCurrentTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:current-time() - fn:current-time()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PT0S")
     );
@@ -340,9 +420,13 @@ public class FnCurrentTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:current-time() + xs:dayTimeDuration(\"P3DT1H15M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertType("xs:time")
     );
@@ -356,9 +440,13 @@ public class FnCurrentTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:current-time() - xs:dayTimeDuration(\"P3DT1H15M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertType("xs:time")
     );
@@ -372,9 +460,13 @@ public class FnCurrentTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:current-time(\"Argument 1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -388,9 +480,13 @@ public class FnCurrentTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:current-time() - fn:current-time()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PT0S")
     );

@@ -20,9 +20,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare copy-namespaces preserve, no-inherit; declare copy-namespaces no-preserve, no-inherit; 1 eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0055")
     );
@@ -36,9 +40,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare copy-namespaces no-preserve, no-inherit; 1 eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare copy-namespaces preserve, inherit; 1 eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare copy-namespaces no-inherit, no-preserve; 1 eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -84,9 +100,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare copy-namespaces inherit, preserve; 1 eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -100,9 +120,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare copy-namespaces no-preserve, inherit; <doc> <a>{<b xmlns:p=\"http://example.com/\"/>}</a> <a><b xmlns:p=\"http://example.com/\"/></a> </doc>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<doc><a><b/></a><a><b xmlns:p=\"http://example.com/\"/></a></doc>", false)
     );
@@ -116,9 +140,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "copy-namespaces lt copy-namespaces",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -132,9 +160,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "namespace lt namespace",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -148,9 +180,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare copy-namespaces preserve, no-inherit; <e xmlns=\"http://example.com/\"> { <b/> } </e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e xmlns=\"http://example.com/\"><b/></e>", false)
     );
@@ -164,9 +200,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare copy-namespaces no-preserve, no-inherit; <e xmlns:appearsUnused=\"http://example.com/\"> { <b> <appearsUnused:c/> </b> } </e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e xmlns:appearsUnused=\"http://example.com/\"><b><appearsUnused:c xmlns:appearsUnused=\"http://example.com/\"/></b></e>", false)
     );
@@ -180,9 +220,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ns = \"http://example.com/\"; <e xmlns:appearsUnused=\"http://example.com/\"> { <b> <appearsUnused:c/> </b> } </e>/(for $n in (., b, b/ns:c), $i in in-scope-prefixes($n) order by $i return ($i, '|'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "appearsUnused | appearsUnused | appearsUnused | xml | xml | xml |")
     );
@@ -196,9 +240,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare copy-namespaces no-preserve, no-inherit; <e> { <b> <c xmlns:unused=\"http://example.com\"/> </b> } </e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e><b><c/></b></e>", false)
     );
@@ -212,9 +260,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare copy-namespaces no-preserve,inherit; <a> { <b>{()}</b> } </a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a><b/></a>", false)
     );
@@ -228,9 +280,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare copy-namespaces preserve, no-inherit; declare variable $e1 := <e1 xmlns:namespace1=\"http://www.namespace1.com\"/>; declare variable $e2 := <e2 xmlns:namespace2=\"http://www.namespace2.com\">{$e1}</e2>; for $n in <e3 xmlns:namespace3=\"http://www.namespace3.com\">{$e2}</e3>/e2/e1, $ps in in-scope-prefixes($n) order by $ps return $ps, '|', for $n in <e3 xmlns:namespace3=\"http://www.namespace3.com\">{<e2 xmlns:namespace2=\"http://www.namespace2.com\">{<e1 xmlns:namespace1=\"http://www.namespace1.com\"/>}</e2>}</e3>/e2/e1, $ps in in-scope-prefixes($n) order by $ps return $ps",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "namespace1 xml | namespace1 namespace2 namespace3 xml")
     );
@@ -244,9 +300,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare copy-namespaces preserve, no-inherit; declare copy-namespaces no-preserve, no-inherit; declare variable $input-context1 external; \"aaa\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0055")
     );
@@ -260,9 +320,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare copy-namespaces preserve,inherit; declare variable $existingElement := <existingElement xmlns:existingNamespace=\"http://www.existingnamespace.com\">{\"Existing Content\"}</existingElement>; declare variable $new := <newElement xmlns:newNamespace = \"http://www.mynamespace.com\">{$existingElement}</newElement>; declare variable $input-context1 external; for $var in (in-scope-prefixes($new/existingElement)) order by exactly-one($var) ascending return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "existingNamespace newNamespace xml")
     );
@@ -276,9 +340,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare copy-namespaces preserve,inherit; declare variable $existingElement := <existingElement xmlns:existingNamespace=\"http://www.existingnamespace.com\">{\"Existing Content\"}</existingElement>; declare variable $new := <newElement xmlns:existingNamespace = \"http://www.mynamespace.com\">{$existingElement}</newElement>; declare variable $input-context1 external; for $var in (in-scope-prefixes($new/existingElement)) order by exactly-one($var) ascending return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "existingNamespace xml")
     );
@@ -292,9 +360,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare copy-namespaces preserve,inherit; declare variable $existingElement := <existingElement xmlns:existingNamespace=\"http://www.existingnamespace.com\">{\"Existing Content\"}</existingElement>; declare variable $new := <newElement xmlns:newNamespace = \"http://www.existingnamespace.com\">{$existingElement}</newElement>; declare variable $input-context1 external; for $var in (in-scope-prefixes($new/existingElement)) order by exactly-one($var) ascending return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "existingNamespace newNamespace xml")
     );
@@ -308,9 +380,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare copy-namespaces preserve,inherit; declare variable $existingElement := <existingElement>{\"Existing Content\"}</existingElement>; declare variable $new := <newElement>{$existingElement}</newElement>; declare variable $input-context1 external; for $var in (in-scope-prefixes(exactly-one($new/existingElement))) return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xml")
     );
@@ -324,9 +400,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare copy-namespaces preserve,inherit; declare variable $existingElement := <existingElement xmlns:somespace=\"http://www.existingnamespace.com\">{\"Existing Content\"}</existingElement>; declare variable $new := <newElement xmlns:SOMESPACE=\"http://www.another.com\">{$existingElement}</newElement>; declare variable $input-context1 external; for $var in (in-scope-prefixes($new/existingElement)) order by exactly-one($var) ascending return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "SOMESPACE somespace xml")
     );
@@ -340,9 +420,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare copy-namespaces preserve,inherit; declare variable $element1 := <element1 xmlns:namespace1=\"http://www.namespace1.com\"></element1>; declare variable $element2 := <element2 xmlns:namespace2=\"http://www.namespace2.com\">{$element1}</element2>; declare variable $element3 := <element3 xmlns:namespace3=\"http://www.namespace3.com\">{$element2}</element3>; declare variable $input-context1 external; for $var in (in-scope-prefixes($element3/element2/element1)) order by exactly-one($var) ascending return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "namespace1 namespace2 namespace3 xml")
     );
@@ -356,9 +440,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare copy-namespaces no-preserve,inherit; declare variable $element1 := <element1 xmlns:namespace1=\"http://www.namespace1.com\"></element1>; declare variable $element2 := <element2 xmlns:namespace2=\"http://www.namespace2.com\">{$element1}</element2>; declare variable $element3 := <element3 xmlns:namespace3=\"http://www.namespace3.com\">{$element2}</element3>; declare variable $input-context1 external; for $var in (in-scope-prefixes($element3/element2/element1)) order by exactly-one($var) ascending return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "namespace3 xml")
     );
@@ -372,9 +460,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare copy-namespaces no-preserve,no-inherit; declare variable $element1 := <element1 xmlns:namespace1=\"http://www.namespace1.com\"></element1>; declare variable $element2 := <element2 xmlns:namespace2=\"http://www.namespace2.com\">{$element1}</element2>; declare variable $element3 := <element3 xmlns:namespace3=\"http://www.namespace3.com\">{$element2}</element3>; declare variable $input-context1 external; for $var in (in-scope-prefixes($element3/element2/element1)) order by exactly-one($var) ascending return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xml")
     );
@@ -388,9 +480,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare copy-namespaces preserve,no-inherit; declare variable $element1 := <element1 xmlns:namespace1=\"http://www.namespace1.com\"></element1>; declare variable $element2 := <element2 xmlns:namespace2=\"http://www.namespace2.com\">{$element1}</element2>; declare variable $element3 := <element3 xmlns:namespace3=\"http://www.namespace3.com\">{$element2}</element3>; declare variable $input-context1 external; for $var in (in-scope-prefixes($element3/element2/element1)) order by exactly-one($var) ascending return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "namespace1 xml")
     );
@@ -404,9 +500,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare copy-namespaces preserve,inherit; declare variable $element1 := <element1 xmlns:namespace1=\"http://www.namespace1.com\"></element1>; declare variable $element2 := <element2 xmlns:namespace2=\"http://www.namespace2.com\">{$element1}</element2>; declare variable $element3 := <element3 xmlns:namespace3=\"http://www.namespace3.com\">{$element2}</element3>; declare variable $input-context1 external; for $var in (in-scope-prefixes($element3/element2)) order by exactly-one($var) ascending return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "namespace2 namespace3 xml")
     );
@@ -420,9 +520,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare copy-namespaces preserve,no-inherit; declare default element namespace \"http://example.org/names\"; declare variable $input-context1 external; let $new := <newElement xmlns = \"http://www.example.com/mynamespace\">{element original {\"Original Content\"}}</newElement> return $new//*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<original xmlns=\"http://www.example.com/mynamespace\">Original Content</original>", false)
     );
@@ -436,9 +540,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare copy-namespaces no-preserve,inherit; declare variable $element1 := <element1 xmlns:namespace1=\"http://www.namespace1.com\"></element1>; declare variable $element2 := <element2 xmlns:namespace2=\"http://www.namespace2.com\">{$element1}</element2>; declare variable $element3 := <element3 xmlns:namespace3=\"http://www.namespace3.com\">{$element2}</element3>; declare variable $input-context1 external; for $var in (in-scope-prefixes($element3/element2)) order by exactly-one($var) ascending return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "namespace3 xml")
     );
@@ -452,9 +560,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare copy-namespaces no-preserve,no-inherit; declare variable $element1 := <element1 xmlns:namespace1=\"http://www.namespace1.com\"></element1>; declare variable $element2 := <element2 xmlns:namespace2=\"http://www.namespace2.com\">{$element1}</element2>; declare variable $element3 := <element3 xmlns:namespace3=\"http://www.namespace3.com\">{$element2}</element3>; declare variable $input-context1 external; for $var in (in-scope-prefixes($element3/element2)) order by exactly-one($var) ascending return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xml")
     );
@@ -468,9 +580,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare copy-namespaces preserve,no-inherit; declare variable $element1 := <element1 xmlns:namespace1=\"http://www.namespace1.com\"></element1>; declare variable $element2 := <element2 xmlns:namespace2=\"http://www.namespace2.com\">{$element1}</element2>; declare variable $element3 := <element3 xmlns:namespace3=\"http://www.namespace3.com\">{$element2}</element3>; declare variable $input-context1 external; for $var in (in-scope-prefixes($element3/element2)) order by exactly-one($var) ascending return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "namespace2 xml")
     );
@@ -490,9 +606,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
       "        return in-scope-prefixes(exactly-one($new/child::node()))\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\"\", \"xml\"")
     );
@@ -506,9 +626,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace foo = \"http://example.org\"; declare copy-namespaces preserve,inherit; declare variable $input-context1 external; let $existingElement := <existingElement xmlns=\"http://www.existingnamespace.com\">{\"Existing Content\"}</existingElement> let $new := <foo:newElement xmlns = \"http://www.mynamespace.com\">{$existingElement}</foo:newElement> for $var in (in-scope-prefixes($new//child::*)) order by exactly-one($var) ascending return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, " foo xml")
     );
@@ -522,9 +646,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace foo = \"http://example.org\"; declare copy-namespaces preserve,no-inherit; declare variable $input-context1 external; let $existingElement := <foo:existingElement xmlns=\"http://www.existingnamespace.com\">{\"Existing Content\"}</foo:existingElement> let $new := <foo:newElement xmlns = \"http://www.mynamespace.com\">{$existingElement}</foo:newElement> for $var in (in-scope-prefixes($new//child::*)) order by exactly-one($var) ascending return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, " foo xml")
     );
@@ -538,9 +666,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace foo = \"http://example.org\"; declare copy-namespaces preserve,inherit; declare variable $input-context1 external; let $existingElement := <foo:existingElement xmlns=\"http://www.existingnamespace.com\">{\"Existing Content\"}</foo:existingElement> let $new := <foo:newElement xmlns = \"http://www.mynamespace.com\">{$existingElement}</foo:newElement> for $var in (in-scope-prefixes($new//child::*)) order by exactly-one($var) ascending return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, " foo xml")
     );
@@ -554,9 +686,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare copy-namespaces no-preserve,no-inherit; declare variable $existingElement := <existingElement xmlns:existingNamespace=\"http://www.existingnamespace.com\">{\"Existing Content\"}</existingElement>; declare variable $new := <newElement xmlns = \"http://www.mynamespace.com\">{$existingElement}</newElement>; declare variable $input-context1 external; for $var in (in-scope-prefixes($new/existingElement)) order by exactly-one($var )ascending return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xml")
     );
@@ -570,9 +706,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare copy-namespaces preserve,no-inherit; declare variable $existingElement := <existingElement xmlns:existingNamespace=\"http://www.existingnamespace.com\">{\"Existing Content\"}</existingElement>; declare variable $new := <newElement xmlns = \"http://www.mynamespace.com\">{$existingElement}</newElement>; declare variable $input-context1 external; for $var in (in-scope-prefixes($new/existingElement)) order by exactly-one($var) ascending return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "existingNamespace xml")
     );
@@ -586,9 +726,13 @@ public class ProdCopyNamespacesDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare copy-namespaces no-preserve,inherit; declare variable $existingElement := <existingElement xmlns:existingNamespace=\"http://www.existingnamespace.com\">{\"Existing Content\"}</existingElement>; declare variable $new := <newElement xmlns:newNamespace = \"http://www.mynamespace.com\">{$existingElement}</newElement>; declare variable $input-context1 external; for $var in (in-scope-prefixes($new/existingElement)) order by exactly-one($var) ascending return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "newNamespace xml")
     );

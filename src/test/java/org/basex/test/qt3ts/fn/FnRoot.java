@@ -20,9 +20,13 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "Root(2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3)[root()]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -52,9 +60,13 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "root(2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -68,9 +80,13 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(root(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -88,9 +104,13 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:root(<e/>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e/>", false)
     );
@@ -104,9 +124,13 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(fn:root(<e/>/..))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -120,9 +144,13 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:root(<!-- comment -->)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<!-- comment -->", false)
     );
@@ -136,9 +164,13 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e>{fn:root(attribute name {\"value\"})}</e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e name=\"value\"/>", false)
     );
@@ -152,9 +184,13 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:root(<?target data?>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<?target data?>", false)
     );
@@ -168,9 +204,13 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:root(text{\"text node\"})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "text node")
     );
@@ -184,9 +224,13 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:root(text{\"text node\"})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "text node")
     );
@@ -200,9 +244,13 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "root(document {()}) instance of document-node()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -216,9 +264,13 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:root()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -232,9 +284,13 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := element anElement {attribute anAttribute {\"Attribute Value\"}} return fn:root($var)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<anElement anAttribute=\"Attribute Value\"/>", false)
     );
@@ -248,9 +304,13 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:root(element anElement {attribute anAttribute {\"Attribute Value\"}})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<anElement anAttribute=\"Attribute Value\"/>", false)
     );
@@ -264,9 +324,13 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := document {<anElement><anInternalElement>element content</anInternalElement></anElement>} return fn:root($var)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<anElement><anInternalElement>element content</anInternalElement></anElement>", false)
     );
@@ -280,9 +344,13 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:root(document {<anElement><anInternalElement>element content</anInternalElement></anElement>})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<anElement><anInternalElement>element content</anInternalElement></anElement>", false)
     );
@@ -296,10 +364,14 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:root(fn:exactly-one(/langs[1]/para[1]))",
       ctx);
-    query.context(node(file("fn/lang/lang.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/lang/lang.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<langs>\n <para xml:lang=\"en\"/>\n <div xml:lang=\"en\"><para>And now, and forever!</para></div>\n <para xml:lang=\"EN\"/>\n <para xml:lang=\"en-us\"/>\n</langs>", false)
     );
@@ -313,10 +385,14 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:root(/langs[1]/para[1]/@xml:lang)",
       ctx);
-    query.context(node(file("fn/lang/lang.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/lang/lang.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<langs>\n <para xml:lang=\"en\"/>\n <div xml:lang=\"en\"><para>And now, and forever!</para></div>\n <para xml:lang=\"EN\"/>\n <para xml:lang=\"en-us\"/>\n</langs>", false)
     );
@@ -330,9 +406,13 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:root(text {\"A text Node\"})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "A text Node")
     );
@@ -346,9 +426,13 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := text {\"a text Node\"} return fn:root($var)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a text Node")
     );
@@ -362,9 +446,13 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := element anElement {\"Element Content\"} return fn:root($var) is fn:root($var)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -378,9 +466,13 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := element anElement {\"Element Content\"} return fn:root($var) is fn:root($var)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -394,9 +486,13 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1 to 100)[fn:root()]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -411,9 +507,13 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := element anElement {\"Element Content\"} return fn:count(fn:namespace-uri(fn:root($var)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -428,9 +528,13 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := <!-- An Element Node --> return fn:count(fn:namespace-uri(fn:root($var)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -445,9 +549,13 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := <?format role=\"output\" ?> return fn:count(fn:namespace-uri(fn:root($var)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -461,9 +569,13 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := text {\"A text node\"} return fn:count(fn:namespace-uri(fn:root($var)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -477,9 +589,13 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:root(.)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -493,9 +609,13 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:root(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -513,9 +633,13 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := <!-- A Comment Node --> return fn:root($var)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<!-- A Comment Node -->", false)
     );
@@ -529,9 +653,13 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:root(<!-- A Comment Node -->)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<!-- A Comment Node -->", false)
     );
@@ -545,9 +673,13 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := <anElement>An Element Content</anElement> return fn:root($var)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<anElement>An Element Content</anElement>", false)
     );
@@ -561,9 +693,13 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:root(<anElement>An Element Content</anElement>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<anElement>An Element Content</anElement>", false)
     );
@@ -577,9 +713,13 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := <?format role=\"output\" ?> return fn:root($var)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<?format role=\"output\" ?>", false)
     );
@@ -593,9 +733,13 @@ public class FnRoot extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:root(<?format role=\"output\" ?>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<?format role=\"output\" ?>", false)
     );

@@ -20,9 +20,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:myFunc() { e[1] }; local:myFunc()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -36,9 +40,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $myVar := <e>text</e>; $myVar/text()/(<e/>, (), 1, <e/>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0018")
     );
@@ -52,9 +60,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "///",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -68,9 +80,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $e := ()/.; declare variable $b := <b/>/.; $e, <b/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<b/>", false)
@@ -88,9 +104,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(for $i in e return $i))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -104,9 +124,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "<r> { let $i := <e> <a/> <b/> </e> let $b := ($i/b, $i/a, $i/b, $i/a) return ()/$b } </r>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<r/>", false)
@@ -124,9 +148,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "<r> { let $i := <e> <a/> <b/> </e> let $b := ($i/b, $i/a, $i/b, $i/a) return <e/>/$b } </r>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<r><a/><b/></r>", false)
     );
@@ -140,9 +168,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "<r> { let $i := <e> <a/> <b/> </e> let $b := ($i/b, $i/a, $i/b, $i/a) return <e/>/./$b } </r>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<r><a/><b/></r>", false)
     );
@@ -156,9 +188,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "<r> { let $i := <e> <a/> <b/> </e> let $b := ($i/b, $i/a, $i/b, $i/a) return $b/. } </r>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<r><a/><b/></r>", false)
     );
@@ -172,9 +208,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e> <a/> </e>/*/(., .)/.",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a/>", false)
     );
@@ -188,9 +228,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e> <a/> </e>/(., .)/.",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e><a/></e>", false)
     );
@@ -204,9 +248,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:myFunc() { e[928] }; local:myFunc()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XPDY0002")
@@ -224,9 +272,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e> <a/> <b/> </e>/((b, a)/., (.), (*, *))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e><a/><b/></e><a/><b/>", false)
     );
@@ -240,9 +292,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $root := <a> <b e=\"B\"/> <c e=\"B\"/> </a>; declare function local:function($arg) { $root[\"B\" eq $arg/@e] }; $root/local:function(c)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a><b e=\"B\"/><c e=\"B\"/></a>", false)
     );
@@ -256,9 +312,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $root := <a> <b e=\"B\"/> <c e=\"B\"/> </a>; declare function local:function($arg) { $root[exactly-one($arg/@e)] }; $root/local:function(c)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a><b e=\"B\"/><c e=\"B\"/></a>", false)
     );
@@ -272,9 +332,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $root := <a><c e=\"\"/></a>; declare function local:function($arg) { $root[$arg/@e] }; $root/local:function(c)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a><c e=\"\"/></a>", false)
     );
@@ -288,9 +352,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $root := <root> <b d=\"\"/> <c> <c d=\"\"/> <c/> </c> </root>; declare function local:function($object) { $root/b[@d = $object/@d] }; $root/c/c/local:function(.)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<b d=\"\"/>", false)
     );
@@ -307,9 +375,13 @@ public class ProdStepExpr extends QT3TestSet {
       "        declare function local:function($object) { $root/b[@d = $object/@d] }; \n" +
       "        $root//local:function(c)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<b d=\"\"/>", false)
     );
@@ -323,9 +395,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $root := <root> <b d=\"\"/> <c> <c d=\"\"/> <c/> </c> </root>; declare function local:function($object) { $root/b[$object/@d] }; $root//local:function(c)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<b d=\"\"/>", false)
     );
@@ -339,9 +415,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $root := <root> <b d=\"\"/> <c> <c d=\"\"/> <c/> </c> </root>; declare function local:function($object) { $root[$object/@d] }; $root//local:function(c)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<root><b d=\"\"/><c><c d=\"\"/><c/></c></root>", false)
     );
@@ -355,9 +435,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $root := <root> <b d=\"\"/> <c d=\"\"/> </root>; declare function local:function($object) { $root[$object/@d] }; $root//local:function(c)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<root><b d=\"\"/><c d=\"\"/></root>", false)
     );
@@ -371,9 +455,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $root := <root> <c d=\"\"/> </root>; declare function local:function($object) { $root[$object/@d] }; $root//local:function(c)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<root><c d=\"\"/></root>", false)
     );
@@ -387,9 +475,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:myFunc() { e[true()] }; local:myFunc()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XPDY0002")
@@ -407,9 +499,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $root := <root> <c d=\"\"/> </root>; declare function local:function($object) { $root[$object] }; $root//local:function(c)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<root><c d=\"\"/></root>", false)
     );
@@ -423,9 +519,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $root := <root><c/></root>; declare function local:function($arg) { $root[$arg] }; $root//local:function(.)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<root><c/></root>", false)
     );
@@ -439,9 +539,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $root := <root/>; declare function local:function($arg, $count as xs:integer) { $arg, $root, if($count eq 2) then $root else local:function($arg, $count + 1) }; $root/local:function(., 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<root/>", false)
     );
@@ -455,9 +559,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $root := ( <b d=\"\"/>, <c> <c d=\"\"/> </c> ); declare function local:function($object) { $root[@d eq $object/@d] }; $root/local:function(c)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<b d=\"\"/>", false)
     );
@@ -471,9 +579,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $root := ( <b d=\"\"/>, <c d=\"\"> <c d=\"\"/> </c> ); declare function local:function($object) { $root[@d eq $object/@d] }; $root/local:function(c)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<b d=\"\"/><c d=\"\"><c d=\"\"/></c>", false)
     );
@@ -487,9 +599,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e/>[1]/text{string-join(., \" \")}, 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertCount(2)
@@ -509,9 +625,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:myFunc() { e[last()] }; local:myFunc()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -525,9 +645,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<a/>/a)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -541,9 +665,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a/>/.",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a/>", false)
     );
@@ -557,9 +685,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "count((<a/>, <!--comment-->)/3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -573,9 +705,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/)/(//)/foo",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XPST0003")
@@ -593,9 +729,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "child::local:b(:ada",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -609,9 +749,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var := document {<a>123</a>}; $var[/*5]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -625,9 +769,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var := document {<a>123</a>}; $var[/*]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>123</a>", false)
     );
@@ -641,9 +789,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var := document {<a>123</a>}; $var[/<a/>]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>123</a>", false)
     );
@@ -657,9 +809,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var := document {<a>123</a>}; $var[/<a div=\"3\"/>]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>123</a>", false)
     );
@@ -673,9 +829,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var := document {<a>123</a>}; $var[/unordered{a}]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>123</a>", false)
     );
@@ -689,9 +849,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var := document {<a>123</a>}; $var[/max(a)]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -705,9 +869,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var := document {<a>123</a>}; $var[/-5]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -721,9 +889,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var := document {<a>123</a>}; declare variable $a := document {<a>123</a>}; $var[/=$a]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>123</a>", false)
     );
@@ -737,9 +909,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var := document {<a>123</a>}; declare variable $a := document {<a>123</a>}; $var[5*/]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -753,9 +929,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var := document {<a>123</a>}; $var[(/)*5]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -769,9 +949,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var := document {<a>123</a>}; $var[/<a]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -785,9 +969,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var := document {<a>123</a>}; $var[(/)<a]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -801,9 +989,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var := document {<a>123</a>}; $var[/<5]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -817,9 +1009,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var := document {<a>123</a>}; $var[(/)<5]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -833,9 +1029,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var := document {<a>123</a>}; $var[/</b]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -849,9 +1049,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var := document {<a>123</a>}; $var[/<a div 3]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -865,9 +1069,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var := document {<a>123</a>}; $var[(/)<a div 3]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -881,9 +1089,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var := document {<a>123</a>}; $var[/if ($doclevel) then / else /*]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -897,9 +1109,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var := document {<a>123</a>}; declare variable $a := document {<a>123</a>}; $var[/ is $a]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -913,9 +1129,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var := document {<a>123</a>}; declare variable $a := document {<a>123</a>}; $var[(/) is $a]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -929,9 +1149,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var := document {<a>123</a>}; $var[/ instance of document-node(element(x))]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -945,9 +1169,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var := document {<a>123</a>}; $var[(/) instance of document-node(element(x))]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -961,9 +1189,13 @@ public class ProdStepExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var := document {<a>123</a>}; let $doc := / return $doc/*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );

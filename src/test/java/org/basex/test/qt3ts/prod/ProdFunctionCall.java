@@ -21,9 +21,13 @@ public class ProdFunctionCall extends QT3TestSet {
     final XQuery query = new XQuery(
       "concat(<a>X</a>, <a>Y</a>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "XY")
     );
@@ -37,9 +41,13 @@ public class ProdFunctionCall extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(<a>0</a>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -55,9 +63,13 @@ public class ProdFunctionCall extends QT3TestSet {
       "         declare function local:f($in as xs:boolean) as xs:boolean { $in };\n" +
       "         local:f(<a>0</a>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -74,9 +86,13 @@ public class ProdFunctionCall extends QT3TestSet {
       "         return $f(<a>0</a>)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -84,7 +100,7 @@ public class ProdFunctionCall extends QT3TestSet {
 
   /**
    * Test that a sequence of untypedAtomic values is cast to the target type: user-defined function.
-   *          Also tests XPath 3.0 inline functions, casting to list, and bang operator..
+   *          Also tests XPath 3.0 casting to list, and bang operator..
    */
   @org.junit.Test
   public void functionCall009() {
@@ -94,9 +110,13 @@ public class ProdFunctionCall extends QT3TestSet {
       "        local:f(xs:NMTOKENS('1 1.2 1.3 1.4')!xs:untypedAtomic(.))\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertType("xs:decimal")
@@ -119,9 +139,13 @@ public class ProdFunctionCall extends QT3TestSet {
       "        local:f(12, 34)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertType("xs:integer")
@@ -144,9 +168,13 @@ public class ProdFunctionCall extends QT3TestSet {
       "        return $f(12, 34)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertType("xs:integer")
@@ -164,9 +192,13 @@ public class ProdFunctionCall extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-join((<a>X</a>, <a>Y</a>, <a>Z</a>), '')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "XYZ")
     );
@@ -180,9 +212,13 @@ public class ProdFunctionCall extends QT3TestSet {
     final XQuery query = new XQuery(
       "func-does-not-exist(1, 2, 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -196,9 +232,13 @@ public class ProdFunctionCall extends QT3TestSet {
     final XQuery query = new XQuery(
       "p:f:lname()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XPST0003")
@@ -216,9 +256,13 @@ public class ProdFunctionCall extends QT3TestSet {
     final XQuery query = new XQuery(
       "document(\"example.com/file.ext\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -232,9 +276,13 @@ public class ProdFunctionCall extends QT3TestSet {
     final XQuery query = new XQuery(
       "key('func', \"a value\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -248,9 +296,13 @@ public class ProdFunctionCall extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(3, \"0000\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("\"0003\"")
     );
@@ -264,9 +316,13 @@ public class ProdFunctionCall extends QT3TestSet {
     final XQuery query = new XQuery(
       "matches(format-time(current-time(), \"[H01]:[m01]\"), \"[0-2][0-9]:[0-5][0-9]\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -280,9 +336,13 @@ public class ProdFunctionCall extends QT3TestSet {
     final XQuery query = new XQuery(
       "matches(format-time(current-time(), \"[H01]:[m01]\", (), (), ()), \"..:..\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -296,9 +356,13 @@ public class ProdFunctionCall extends QT3TestSet {
     final XQuery query = new XQuery(
       "matches(format-dateTime(current-dateTime(), \"[Y0001]-[M01]-[D01]\"), \"[0-9]{4}-[0-9]{2}-[0-9]{2}\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -316,9 +380,13 @@ public class ProdFunctionCall extends QT3TestSet {
     final XQuery query = new XQuery(
       "matches(format-dateTime(current-dateTime(), \"[Y0001]-[M01]-[D01]\", (), (), ()), \"....-..-..\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -336,9 +404,13 @@ public class ProdFunctionCall extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:func-does-not-exist(1, 2, 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -352,9 +424,13 @@ public class ProdFunctionCall extends QT3TestSet {
     final XQuery query = new XQuery(
       "matches(format-dateTime(current-dateTime(), \"[M01]/[D01]/[Y0001] at [H01]:[m01]:[s01]\"), \"[0-1][0-9]/[0-3][0-9]/[0-9]{4} at [0-9]{2}:[0-9]{2}:[0-9]{2}\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -372,9 +448,13 @@ public class ProdFunctionCall extends QT3TestSet {
     final XQuery query = new XQuery(
       "matches(format-dateTime(current-dateTime(), \"[M01]/[D01]/[Y0001] at [H01]:[m01]:[s01]\", (), (), ()), \"../../.... at ..:..:..\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -385,32 +465,40 @@ public class ProdFunctionCall extends QT3TestSet {
   }
 
   /**
-   *  No function by name fn:current() exists(although one does in XSL-T). .
+   *  No function by name fn:current() exists(although one does in XSLT). .
    */
   @org.junit.Test
   public void kFunctionCallExpr22() {
     final XQuery query = new XQuery(
       "current()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
   }
 
   /**
-   *  No function by name fn:unparsed-entity-uri() exists(although one does in XSL-T). .
+   *  No function by name fn:unparsed-entity-uri() exists(although one does in XSLT). .
    */
   @org.junit.Test
   public void kFunctionCallExpr23() {
     final XQuery query = new XQuery(
       "unparsed-entity-uri(\"example.com/file.ext\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -424,9 +512,13 @@ public class ProdFunctionCall extends QT3TestSet {
     final XQuery query = new XQuery(
       "unparsed-entity-public-id(\"entity\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -440,9 +532,13 @@ public class ProdFunctionCall extends QT3TestSet {
     final XQuery query = new XQuery(
       "generate-id(<a/>) castable as xs:NCName",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -456,9 +552,13 @@ public class ProdFunctionCall extends QT3TestSet {
     final XQuery query = new XQuery(
       "system-property(\"xsl:vendor\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -472,9 +572,13 @@ public class ProdFunctionCall extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:escape-uri(\"http:/example.com/\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -488,9 +592,13 @@ public class ProdFunctionCall extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sub-sequence(\"http:/example.com/\", 1, 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -504,9 +612,13 @@ public class ProdFunctionCall extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:func-does-not-exist(1, 2, 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -520,9 +632,13 @@ public class ProdFunctionCall extends QT3TestSet {
     final XQuery query = new XQuery(
       "local:func-does-not-exist(1, 2, 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -536,9 +652,13 @@ public class ProdFunctionCall extends QT3TestSet {
     final XQuery query = new XQuery(
       "prefix-does-not-exist:func-does-not-exist(1, 2, 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -552,9 +672,13 @@ public class ProdFunctionCall extends QT3TestSet {
     final XQuery query = new XQuery(
       "f:f:()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XPST0003")
@@ -572,9 +696,13 @@ public class ProdFunctionCall extends QT3TestSet {
     final XQuery query = new XQuery(
       ":f()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -588,9 +716,13 @@ public class ProdFunctionCall extends QT3TestSet {
     final XQuery query = new XQuery(
       ":f()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -604,9 +736,13 @@ public class ProdFunctionCall extends QT3TestSet {
     final XQuery query = new XQuery(
       "1fd()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -623,9 +759,13 @@ public class ProdFunctionCall extends QT3TestSet {
       "        declare function local:moo($k) { $k }; \n" +
       "        local:moo(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -644,9 +784,13 @@ public class ProdFunctionCall extends QT3TestSet {
       "        local:testSingleNodeIdentity(<a/>), local:testDoubleNodeIdentity(<a/>, <b/>), local:testDoubleNodeIdentity($a, $a)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true false true")
     );
@@ -675,9 +819,13 @@ public class ProdFunctionCall extends QT3TestSet {
       "        local:compare(\"aba\", \"bab\")\n" +
       "     ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0 1 1 0 2 1 0 1 3")
     );
@@ -694,9 +842,13 @@ public class ProdFunctionCall extends QT3TestSet {
       "        declare function local:func2($a) { if(matches(\"\",$a)) then () else 4 }; \n" +
       "        local:func1()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -710,9 +862,13 @@ public class ProdFunctionCall extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:foo($arg) { local:foo(local:foo(1)) }; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -726,9 +882,13 @@ public class ProdFunctionCall extends QT3TestSet {
     final XQuery query = new XQuery(
       "current-grouping-key()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -742,9 +902,13 @@ public class ProdFunctionCall extends QT3TestSet {
     final XQuery query = new XQuery(
       "current()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -758,9 +922,13 @@ public class ProdFunctionCall extends QT3TestSet {
     final XQuery query = new XQuery(
       "unparsed-entity-uri(\"str\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -774,41 +942,13 @@ public class ProdFunctionCall extends QT3TestSet {
     final XQuery query = new XQuery(
       "unparsed-entity-public-id(\"str\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
-    test(
-      error("XPST0017")
-    );
-  }
-
-  /**
-   *  Function generate-id() is not available in XQuery. .
-   */
-  @org.junit.Test
-  public void k2FunctionCallExpr6() {
-    final XQuery query = new XQuery(
-      "generate-id(\"str\")",
-      ctx);
-
-    final QT3Result res = result(query);
-    result = res;
-    test(
-      error("XPST0017")
-    );
-  }
-
-  /**
-   *  Function generate-id() is not available in XQuery(#2). .
-   */
-  @org.junit.Test
-  public void k2FunctionCallExpr7() {
-    final XQuery query = new XQuery(
-      "generate-id()",
-      ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -822,9 +962,13 @@ public class ProdFunctionCall extends QT3TestSet {
     final XQuery query = new XQuery(
       "system-property(\"property\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -838,11 +982,561 @@ public class ProdFunctionCall extends QT3TestSet {
     final XQuery query = new XQuery(
       "key(\"id\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
+    );
+  }
+
+  /**
+   *  Ensure sequence types are promoted correctly .
+   */
+  @org.junit.Test
+  public void cbclPromotion001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        string-join( (xs:anyURI('http://www.microsoft.com'), xs:anyURI('http://www.google.com/')), ' ')\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "http://www.microsoft.com http://www.google.com/")
+    );
+  }
+
+  /**
+   *  Test that type promotion occurs correctly for values passed to user-defined functions .
+   */
+  @org.junit.Test
+  public void cbclPromotion002() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:index-of($seq as xs:double*, $item as xs:double) { for $x at $p in $seq return if ($x eq $item) then $p else () };\n" +
+      "        declare function local:sequence($x as xs:integer) { (\"string\", 1, 2.0, xs:float(3))[$x] };\n" +
+      "        local:index-of(for $x in (2,3,4) return local:sequence($x), 2)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "2")
+    );
+  }
+
+  /**
+   *  Test that type promotion occurs correctly for values returned from user-defined functions .
+   */
+  @org.junit.Test
+  public void cbclPromotion003() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:index-of($seq as xs:integer*, $item as xs:integer?) as xs:float* { \n" +
+      "          if (empty($item)) \n" +
+      "            then -1\n" +
+      "            else for $x at $p in $seq return if ($x eq $item) then $p else () \n" +
+      "        };\n" +
+      "        local:index-of(1 to 10, 3)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "3")
+    );
+  }
+
+  /**
+   *  Test that type promotion occurs correctly for sequence values returned from user-defined functions .
+   */
+  @org.junit.Test
+  public void cbclPromotion004() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f() as xs:double* { \n" +
+      "          if (day-from-date(current-date()) < 32) then xs:integer(3) else -1\n" +
+      "        };\n" +
+      "        local:f() + 1",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "4")
+    );
+  }
+
+  /**
+   *  Test a function declared to return optional returning more than one value .
+   */
+  @org.junit.Test
+  public void cbclPromotion005() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:index-of($seq, $item) as xs:double? { for $x at $p in $seq return if ($x eq $item) then $p else () };\n" +
+      "        local:index-of((1, 2.0, xs:float(3), 2), 2)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   *  Test a function taking optional argument being passed more than one .
+   */
+  @org.junit.Test
+  public void cbclPromotion006() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($arg as xs:anyAtomicType?) { $arg };\n" +
+      "        local:f(index-of((1,2,3,2),2))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   *  Check that correct type constraint is inserted. .
+   */
+  @org.junit.Test
+  public void cbclPromotion007() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($v as xs:double*) as xs:double+ { if (empty($v)) then 0 else $v };\n" +
+      "        declare function local:g($v as xs:double*) as xs:double+ { local:f($v) };\n" +
+      "        local:g((1,2,3))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "1 2 3")
+    );
+  }
+
+  /**
+   * Check that reserved function name attribute is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionCallReservedFunctionNames001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function local:attribute($arg) { fn:true() };\n" +
+      "\tattribute(1)\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name comment is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionCallReservedFunctionNames002() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function local:comment($arg) { fn:true() };\n" +
+      "\tcomment(1)\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name document-node is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionCallReservedFunctionNames003() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function local:document-node($arg) { fn:true() };\n" +
+      "\tdocument-node(1)\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name element is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionCallReservedFunctionNames004() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function local:element($arg) { fn:true() };\n" +
+      "\telement(1)\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name empty-sequence is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionCallReservedFunctionNames005() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function local:empty-sequence() { fn:true() };\n" +
+      "\tempty-sequence()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name if is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionCallReservedFunctionNames006() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function local:if() { fn:true() };\n" +
+      "\tif()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name item is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionCallReservedFunctionNames007() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function local:item($arg) { fn:true() };\n" +
+      "\titem(1)\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name node is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionCallReservedFunctionNames008() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function local:node($arg) { fn:true() };\n" +
+      "\tnode(1)\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name processing-instruction is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionCallReservedFunctionNames009() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function local:processing-instruction($arg) { fn:true() };\n" +
+      "\tprocessing-instruction(1)\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name schema-attribute is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionCallReservedFunctionNames010() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function local:schema-attribute() { fn:true() };\n" +
+      "\tschema-attribute()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name schema-element is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionCallReservedFunctionNames011() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function local:schema-element() { fn:true() };\n" +
+      "\tschema-element()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name text is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionCallReservedFunctionNames012() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function local:text($arg) { fn:true() };\n" +
+      "\ttext(1)\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name typeswitch is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionCallReservedFunctionNames013() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function local:typeswitch() { fn:true() };\n" +
+      "\ttypeswitch()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name function is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionCallReservedFunctionNames017() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function local:function() { fn:true() };\n" +
+      "\tfunction()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name namespace-node is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionCallReservedFunctionNames018() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function local:namespace-node($arg) { fn:true() };\n" +
+      "\tnamespace-node(1)\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name switch is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionCallReservedFunctionNames019() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function local:switch() { fn:true() };\n" +
+      "\tswitch()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
     );
   }
 }

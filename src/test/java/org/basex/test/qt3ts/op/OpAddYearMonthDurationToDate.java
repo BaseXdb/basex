@@ -27,9 +27,13 @@ public class OpAddYearMonthDurationToDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1999-08-12\") + xs:yearMonthDuration(\"P3Y7M\") eq xs:date(\"2003-03-12\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -50,9 +54,13 @@ public class OpAddYearMonthDurationToDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P3Y7M\") + xs:date(\"1999-08-12\") eq xs:date(\"2003-03-12\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -73,9 +81,13 @@ public class OpAddYearMonthDurationToDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1Y\") - xs:date(\"1999-08-12\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -96,11 +108,87 @@ public class OpAddYearMonthDurationToDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1Y\") - xs:dateTime(\"1999-08-12T08:01:23\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
+    );
+  }
+
+  /**
+   *  test addition of zero duration to date .
+   */
+  @org.junit.Test
+  public void cbclAddYearMonthDurationToDate001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:two-digit($number as xs:integer) { let $string := string($number) return if (string-length($string) lt 2) then concat('0', $string) else $string }; \n" +
+      "      \tdeclare function local:date($year as xs:integer, $month as xs:integer, $day as xs:integer) { let $m := local:two-digit($month), $d := local:two-digit($day) return xs:date(concat($year, '-', $m, '-', $d)) }; \n" +
+      "      \tlocal:date(2008, 05, 12) + xs:dayTimeDuration(\"P0D\")\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "2008-05-12")
+    );
+  }
+
+  /**
+   *  test addition of zero duration to date .
+   */
+  @org.junit.Test
+  public void cbclAddYearMonthDurationToDate002() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:two-digit($number as xs:integer) { let $string := string($number) return if (string-length($string) lt 2) then concat('0', $string) else $string }; \n" +
+      "      \tdeclare function local:date($year as xs:integer, $month as xs:integer, $day as xs:integer) { let $m := local:two-digit($month), $d := local:two-digit($day) return xs:date(concat($year, '-', $m, '-', $d)) }; \n" +
+      "      \txs:dayTimeDuration(\"P0D\") + local:date(2008, 05, 12)\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "2008-05-12")
+    );
+  }
+
+  /**
+   *  test addition of large duration to date .
+   */
+  @org.junit.Test
+  public void cbclAddYearMonthDurationToDate003() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:two-digit($number as xs:integer) { let $string := string($number) return if (string-length($string) lt 2) then concat('0', $string) else $string }; \n" +
+      "      \tdeclare function local:date($year as xs:integer, $month as xs:integer, $day as xs:integer) { let $m := local:two-digit($month), $d := local:two-digit($day) return xs:date(concat($year, '-', $m, '-', $d)) }; \n" +
+      "      \tlocal:date(25252734927766555, 05, 12) + xs:yearMonthDuration(\"P4267296Y\")\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FODT0001")
     );
   }
 
@@ -120,9 +208,13 @@ public class OpAddYearMonthDurationToDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"2000-10-30\") + xs:yearMonthDuration(\"P1Y2M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2001-12-30")
     );
@@ -144,9 +236,13 @@ public class OpAddYearMonthDurationToDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string((xs:date(\"1985-07-05Z\") + xs:yearMonthDuration(\"P02Y02M\"))) or fn:string((xs:date(\"1985-07-05Z\") + xs:yearMonthDuration(\"P02Y02M\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -168,9 +264,13 @@ public class OpAddYearMonthDurationToDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string((xs:date(\"1980-03-02Z\") + xs:yearMonthDuration(\"P05Y05M\"))) and (fn:true())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -192,9 +292,13 @@ public class OpAddYearMonthDurationToDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:date(\"1980-05-05Z\") + xs:yearMonthDuration(\"P23Y11M\")) eq xs:date(\"1980-05-05Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -216,9 +320,13 @@ public class OpAddYearMonthDurationToDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:date(\"1979-12-12Z\") + xs:yearMonthDuration(\"P08Y08M\")) ne xs:date(\"1979-12-12Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -240,9 +348,13 @@ public class OpAddYearMonthDurationToDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:date(\"1978-12-12Z\") + xs:yearMonthDuration(\"P17Y12M\")) le xs:date(\"1978-12-12Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -264,9 +376,13 @@ public class OpAddYearMonthDurationToDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:date(\"1977-12-12Z\") + xs:yearMonthDuration(\"P18Y02M\")) ge xs:date(\"1977-12-12Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -288,9 +404,13 @@ public class OpAddYearMonthDurationToDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(xs:date(\"2000-12-12Z\") + xs:dayTimeDuration(\"P12DT10H07M\")) and fn:false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -311,9 +431,13 @@ public class OpAddYearMonthDurationToDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string((xs:date(\"1999-10-23Z\") + xs:yearMonthDuration(\"P19Y12M\"))) or fn:false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -335,9 +459,13 @@ public class OpAddYearMonthDurationToDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(fn:string(xs:date(\"1998-09-12Z\") + xs:yearMonthDuration(\"P20Y03M\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -359,9 +487,13 @@ public class OpAddYearMonthDurationToDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:boolean(fn:string(xs:date(\"1962-03-12Z\") + xs:yearMonthDuration(\"P10Y01M\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -383,9 +515,13 @@ public class OpAddYearMonthDurationToDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:date(\"1988-01-28Z\") + xs:yearMonthDuration(\"P09Y02M\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );
@@ -407,9 +543,13 @@ public class OpAddYearMonthDurationToDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(xs:date(\"1989-07-05Z\") + xs:yearMonthDuration(\"P08Y04M\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1997-11-05Z")
     );
@@ -431,9 +571,13 @@ public class OpAddYearMonthDurationToDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:date(\"0001-01-01Z\") + xs:yearMonthDuration(\"-P20Y07M\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "-0021-06-01Z")
@@ -459,9 +603,13 @@ public class OpAddYearMonthDurationToDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string((xs:date(\"1993-12-09Z\") + xs:yearMonthDuration(\"P03Y03M\"))) and fn:string((xs:date(\"1993-12-09Z\") + xs:yearMonthDuration(\"P03Y03M\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -485,9 +633,13 @@ public class OpAddYearMonthDurationToDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1970-01-01Z\") + xs:yearMonthDuration(\"P0Y0M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1970-01-01Z")
     );
@@ -511,9 +663,13 @@ public class OpAddYearMonthDurationToDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1983-11-17Z\") + xs:yearMonthDuration(\"P0Y0M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1983-11-17Z")
     );
@@ -537,9 +693,13 @@ public class OpAddYearMonthDurationToDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"2030-12-31Z\") + xs:yearMonthDuration(\"P0Y0M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2030-12-31Z")
     );
@@ -563,9 +723,13 @@ public class OpAddYearMonthDurationToDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1970-01-01Z\") + xs:yearMonthDuration(\"P1000Y6M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2970-07-01Z")
     );
@@ -589,9 +753,13 @@ public class OpAddYearMonthDurationToDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1970-01-01Z\") + xs:yearMonthDuration(\"P2030Y12M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "4001-01-01Z")
     );

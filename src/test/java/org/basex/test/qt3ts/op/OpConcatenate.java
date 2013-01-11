@@ -20,9 +20,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(((1, (2, (3, 4, (5, 6)), 7), 8, (9, 10), 11)), (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -36,9 +40,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(((), (), ((), (), ((), (), (())), ()), (), (())))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       "((), (), ((), (), ((), (), (\"str\")), ()), (), (())) eq \"str\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 1 + 1, 3, 4, 5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("1, 2, 3, 4, 5")
     );
@@ -84,9 +100,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       " (fn:not(\"true\"),fn:not(\"false\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("false(), false()")
     );
@@ -100,9 +120,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       " (fn:true() and fn:true(), fn:true())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("true(), true()")
     );
@@ -116,9 +140,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       " (fn:true() or fn:true(), fn:true())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("true(), true()")
     );
@@ -132,9 +160,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       " (xs:string(\"ABC\"), \"D\", \"E\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"ABC\", \"D\", \"E\"")
     );
@@ -148,9 +180,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       " (xs:integer(1), 2, 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("1, 2, 3")
     );
@@ -164,9 +200,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       " (xs:decimal(1), 2, 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("1, 2, 3")
     );
@@ -180,9 +220,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       " (xs:anyURI(\"http://www.example.com\"),xs:anyURI(\"http://www.example1.com\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"http://www.example.com\", \"http://www.example1.com\"")
     );
@@ -196,9 +240,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       " (xs:float(1.1), 2.2, 3.3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("xs:float('1.1e0'), 2.2, 3.3")
     );
@@ -212,9 +260,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       " (xs:double(1.2E2), 2.2E2, 3.3E2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("120, 220, 330")
     );
@@ -228,9 +280,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       " (xs:boolean(fn:true()), fn:false(), fn:true())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("true(), false(), true()")
     );
@@ -244,9 +300,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 3 - 1, 3, 4, 5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("1, 2 ,3, 4, 5")
     );
@@ -260,9 +320,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       " (xs:date(\"2004-12-25Z\"),xs:date(\"2004-12-26Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-12-25Z 2004-12-26Z")
     );
@@ -276,9 +340,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       " (xs:dateTime(\"1999-11-28T09:00:00Z\"),xs:dateTime(\"1998-11-28T09:00:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1999-11-28T09:00:00Z 1998-11-28T09:00:00Z")
     );
@@ -292,9 +360,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       " (xs:time(\"08:00:00+09:00\"),xs:time(\"08:00:00+10:00\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "08:00:00+09:00 08:00:00+10:00")
     );
@@ -308,9 +380,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       " (1, 2 * 1, 3, 4, 5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("1, 2, 3, 4, 5")
     );
@@ -324,9 +400,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       " (1, 4 div 2, 3, 4, 5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("1, 2, 3, 4, 5")
     );
@@ -340,9 +420,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       " (1, 4 idiv 2, 3, 4, 5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("1, 2, 3, 4, 5")
     );
@@ -356,9 +440,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       " (1, fn:count((1, 2)), 3, 4, 5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("1, 2, 3, 4, 5")
     );
@@ -372,9 +460,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       " (1, fn:string-length(\"AB\"), 3, 4, 5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("1, 2, 3, 4, 5")
     );
@@ -388,9 +480,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       " (fn:true(),fn:true())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("true(), true()")
     );
@@ -404,9 +500,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       " (fn:false(),fn:false())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("false(), false()")
     );
@@ -420,9 +520,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1) , (2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("1, 2")
     );
@@ -436,9 +540,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"a\") , xs:string(\"b\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"a\", \"b\"")
     );
@@ -452,9 +560,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"a\") , (), \"xyz\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"a\", \"xyz\"")
     );
@@ -468,9 +580,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"xyz\" , xs:string(\" \"), \"b\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"xyz\", \" \", \"b\"")
     );
@@ -484,9 +600,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"a\") , xs:anyURI(\"www.example.com\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"a\", \"www.example.com\"")
     );
@@ -500,9 +620,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"hello\") , xs:integer(\"100\"), xs:anyURI(\"www.example.com\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"hello\", 100, \"www.example.com\"")
     );
@@ -516,9 +640,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"www.example.com\") , xs:decimal(\"1.01\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"www.example.com\", 1.01")
     );
@@ -532,9 +660,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"1.01\"), xs:float(\"NaN\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1.01 NaN")
     );
@@ -548,9 +680,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"INF\") , xs:double(\"NaN\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "INF NaN")
     );
@@ -564,9 +700,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"INF\"), xs:double(\"-INF\"), xs:float(\"-INF\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "INF -INF -INF")
     );
@@ -580,9 +720,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") , xs:boolean(\"0\"), xs:integer(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("true(), false(), 0")
     );
@@ -596,9 +740,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"false\"), xs:boolean(\"1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("false(), true()")
     );
@@ -612,9 +760,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1993-03-31\") , xs:boolean(\"true\"), xs:string(\"abc\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1993-03-31 true abc")
     );
@@ -628,9 +780,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1972-12-31T00:00:00Z\") , (())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1972-12-31T00:00:00Z")
     );
@@ -644,9 +800,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"12:30:00Z\") , xs:string(\" \") , xs:decimal(\"2.000000000000002\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "12:30:00Z   2.000000000000002")
     );
@@ -660,9 +820,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       "() , xs:string(\" \") , xs:decimal(\"2.000000000000002\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "  2.000000000000002")
     );
@@ -676,9 +840,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1+1), (2-2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("2, 0")
     );
@@ -692,9 +860,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1,2,2),(1,2,3),(123,\"\"),(),(\"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("1, 2, 2, 1, 2, 3, 123, \"\", \"\"")
     );
@@ -708,10 +880,14 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       "//book/price, (), (1)",
       ctx);
-    query.context(node(file("docs/bib.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/bib.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<price>65.95</price><price>65.95</price><price>39.95</price><price>129.95</price>1", false)
     );
@@ -725,10 +901,14 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       "//book/price, //book/title",
       ctx);
-    query.context(node(file("docs/bib.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/bib.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<price>65.95</price><price>65.95</price><price>39.95</price><price>129.95</price><title>TCP/IP Illustrated</title><title>Advanced Programming in the Unix environment</title><title>Data on the Web</title><title>The Economics of Technology and Content for Digital TV</title>", false)
     );
@@ -742,9 +922,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1,2,3,4,5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("1, 2, 3, 4, 5")
     );
@@ -758,9 +942,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1,(2,3),4,5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("1, 2, 3, 4, 5")
     );
@@ -774,9 +962,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, (), 3, 4)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("1, 2, 3, 4")
     );
@@ -790,9 +982,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2 to 5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("1, 2, 3, 4, 5")
     );
@@ -806,9 +1002,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("1, 2, 2")
     );
@@ -822,9 +1022,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       "count((15 to 10))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -838,9 +1042,13 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse(10 to 15)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("15, 14, 13, 12, 11, 10")
     );
@@ -854,10 +1062,14 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       "//empnum",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<empnum>E1</empnum><empnum>E1</empnum><empnum>E1</empnum><empnum>E1</empnum><empnum>E1</empnum><empnum>E1</empnum><empnum>E2</empnum><empnum>E2</empnum><empnum>E3</empnum><empnum>E3</empnum><empnum>E4</empnum><empnum>E4</empnum><empnum>E4</empnum>", false)
     );
@@ -871,11 +1083,15 @@ public class OpConcatenate extends QT3TestSet {
     final XQuery query = new XQuery(
       " ($works//empnum,$staff//empname)",
       ctx);
-    query.bind("$works", node(file("docs/works.xml")));
-    query.bind("$staff", node(file("docs/staff.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("$works", node(file("docs/works.xml")));
+      query.bind("$staff", node(file("docs/staff.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<empnum>E1</empnum><empnum>E1</empnum><empnum>E1</empnum><empnum>E1</empnum><empnum>E1</empnum><empnum>E1</empnum><empnum>E2</empnum><empnum>E2</empnum><empnum>E3</empnum><empnum>E3</empnum><empnum>E4</empnum><empnum>E4</empnum><empnum>E4</empnum><empname>Alice</empname><empname>Betty</empname><empname>Carmen</empname><empname>Don</empname><empname>Ed</empname>", false)
     );

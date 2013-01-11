@@ -20,9 +20,13 @@ public class ProdAxisStepPrecedingSibling extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $i := <root> <child> <preceding2/> <child2> <preceding1/> <child3> <leaf/> </child3> <following/> </child2> <following/> </child> <following/> </root>; empty(root($i)/preceding-sibling::node())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -36,9 +40,13 @@ public class ProdAxisStepPrecedingSibling extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $i := <root> <child> <preceding2/> <child2> <preceding1/> <child3> <leaf/> </child3> <following/> </child2> <following/> </child> <following/> </root>; empty(root($i)/preceding::node())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class ProdAxisStepPrecedingSibling extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $i := <root> <child> <preceding2/> <child2> <preceding1/> <child3> <leaf/> </child3> <following/> </child2> <following/> </child> <following/> </root>; count(root($i)/preceding::node())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -68,9 +80,13 @@ public class ProdAxisStepPrecedingSibling extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $i := <root> <child> <preceding2/> <child2> <preceding1/> <child3> <leaf/> </child3> <following/> </child2> <following/> </child> <following/> </root>; count(root($i)//leaf/preceding::node())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -84,9 +100,13 @@ public class ProdAxisStepPrecedingSibling extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $i := <root> <child> <preceding2/> <child2> <preceding1/> <child3> <leaf/> </child3> <following/> </child2> <following/> </child> <following/> </root>; root($i)//count(preceding-sibling::node())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0 0 0 1 0 1 0 2 2 1")
     );
@@ -100,9 +120,13 @@ public class ProdAxisStepPrecedingSibling extends QT3TestSet {
     final XQuery query = new XQuery(
       "(200)/preceding-sibling::*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0019")
     );
@@ -116,10 +140,14 @@ public class ProdAxisStepPrecedingSibling extends QT3TestSet {
     final XQuery query = new XQuery(
       "exactly-one(/works[1]/employee[13]) >> exactly-one(/works[1]/employee[2]/preceding-sibling::employee)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -133,10 +161,14 @@ public class ProdAxisStepPrecedingSibling extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works/employee[12]/*/day[2]/preceding-sibling::day) | (/works/employee[12]/*/day[2]/preceding-sibling::day)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<day>Monday</day>", false)
     );
@@ -150,10 +182,14 @@ public class ProdAxisStepPrecedingSibling extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works/employee[12]/*/day[2]/preceding-sibling::day) | (/works/employee[12]/*/day[2])",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<day>Monday</day><day>Tuesday</day>", false)
     );
@@ -167,10 +203,14 @@ public class ProdAxisStepPrecedingSibling extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works[1]/employee[12]/overtime[1]/day[2]/preceding-sibling::day) intersect (/works[1]/employee[12]/overtime[1]/day[2]/preceding-sibling::day)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<day>Monday</day>", false)
     );
@@ -184,10 +224,14 @@ public class ProdAxisStepPrecedingSibling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count((/works[1]/employee[12]/preceding-sibling::employee) except (/works[1]/employee[12]/preceding-sibling::employee))",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -201,10 +245,14 @@ public class ProdAxisStepPrecedingSibling extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works[1]/employee[12]/overtime/day) except (/works[1]/employee[12]/overtime/day[2]/preceding-sibling::day)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<day>Tuesday</day>", false)
     );
@@ -218,10 +266,14 @@ public class ProdAxisStepPrecedingSibling extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works[1]/employee[12]/preceding-sibling::employee) and fn:true()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -235,10 +287,14 @@ public class ProdAxisStepPrecedingSibling extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works[1]/employee[12]/preceding-sibling::employee) and fn:false()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -252,10 +308,14 @@ public class ProdAxisStepPrecedingSibling extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works[1]/employee[12]/preceding-sibling::employee) or fn:true()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -269,10 +329,14 @@ public class ProdAxisStepPrecedingSibling extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works[1]/employee[12]/preceding-sibling::employee) or fn:false()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -286,10 +350,14 @@ public class ProdAxisStepPrecedingSibling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/works/employee[1]/preceding-sibling::noSuchNode)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -303,10 +371,14 @@ public class ProdAxisStepPrecedingSibling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal(/works[1]/employee[12]/preceding-sibling::employee,/works[1]/employee[12]/preceding-sibling::employee)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -320,9 +392,13 @@ public class ProdAxisStepPrecedingSibling extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := <anElement>Some Content</anElement> return fn:count($var/preceding-sibling::*)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -336,10 +412,14 @@ public class ProdAxisStepPrecedingSibling extends QT3TestSet {
     final XQuery query = new XQuery(
       "exactly-one(/works/employee[2]/preceding-sibling::employee) is exactly-one(/works/employee[1])",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -353,10 +433,14 @@ public class ProdAxisStepPrecedingSibling extends QT3TestSet {
     final XQuery query = new XQuery(
       "exactly-one(/works[1]/employee[2]/preceding-sibling::employee) is exactly-one(/works[1]/employee[2])",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -370,10 +454,14 @@ public class ProdAxisStepPrecedingSibling extends QT3TestSet {
     final XQuery query = new XQuery(
       "exactly-one(/works[1]/employee[2]/preceding-sibling::employee) << exactly-one(/works[1]/employee[2])",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -387,10 +475,14 @@ public class ProdAxisStepPrecedingSibling extends QT3TestSet {
     final XQuery query = new XQuery(
       "exactly-one(/works[1]/employee[2]/preceding-sibling::employee) << exactly-one(/works[1]/employee[2]/preceding-sibling::employee)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -404,10 +496,14 @@ public class ProdAxisStepPrecedingSibling extends QT3TestSet {
     final XQuery query = new XQuery(
       "exactly-one(/works[1]/employee[2]/preceding-sibling::employee) << exactly-one(/works[1])",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -421,10 +517,14 @@ public class ProdAxisStepPrecedingSibling extends QT3TestSet {
     final XQuery query = new XQuery(
       "exactly-one(/works[1]/employee[13]) >> exactly-one(/works[1]/employee[12]/preceding-sibling::employee[1])",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -438,10 +538,14 @@ public class ProdAxisStepPrecedingSibling extends QT3TestSet {
     final XQuery query = new XQuery(
       "exactly-one(/works[1]/employee[2]/preceding-sibling::employee) >> exactly-one(/works[1]/employee[2]/preceding-sibling::employee)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -455,9 +559,13 @@ public class ProdAxisStepPrecedingSibling extends QT3TestSet {
     final XQuery query = new XQuery(
       "<foo a='1' b='2' c='3'> <bar>4</bar> <bar>5</bar> <bar>6</bar> </foo>/@c/preceding-sibling::node()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -471,10 +579,14 @@ public class ProdAxisStepPrecedingSibling extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works/employee[2]) return $h/preceding-sibling::employee[fn:position() = 1]",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<employee name=\"Jane Doe 1\" gender=\"female\">\n   <empnum>E1</empnum>\n   <pnum>P1</pnum>\n   <hours>40</hours>\n  </employee>", false)
     );

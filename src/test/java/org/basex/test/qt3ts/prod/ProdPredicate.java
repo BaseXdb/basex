@@ -20,9 +20,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3)[",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -36,9 +40,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty((1, 2, 3)[0.1])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty((1, 2, 3)[1.1])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty((1, 2, 3)[1.01])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty((1, 2, 3)[4])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty((1, 2, 3)[4.1])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,9 +140,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty((1, 2, 3)[4.01])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -132,9 +160,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(empty((1, 2, 3)[1]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -148,9 +180,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(empty((1, 2, 3)[3]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -164,9 +200,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3)[1] eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -180,9 +220,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3)[1.0] eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -196,9 +240,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3)]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -212,9 +260,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3)[1.0e0] eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -228,9 +280,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3)[3] eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -244,9 +300,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3)[3.0] eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -260,9 +320,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3)[3.0e0] eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -276,9 +340,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(0, 1, 2)[1] eq 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -292,9 +360,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(0, 1, 2)[2] eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -308,9 +380,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(0, 1, 2)[3] eq 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -324,9 +400,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(0)[1] eq 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -340,9 +420,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "0[1] eq 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -356,9 +440,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(0, 1)[1] eq 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -372,9 +460,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3)[]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -388,9 +480,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty((1, 2, 3)[false()])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -408,9 +504,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2, 3), (1, 2, 3)[true()])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -424,9 +524,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2, 3), (1, 2, 3)[. instance of xs:integer])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -440,9 +544,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((true(), true(), true()), (false(), true(), true(), false(), true(), false())[.])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -456,9 +564,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((2, 3, 4, 5, 7, 8, 9), (0, 2, 3, 4, 5, 5, 7, 8, 10 - 1)[.])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -472,9 +584,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "1[true()] eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -488,9 +604,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, current-time())[1]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -504,9 +624,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2, 3), (1, 2, 3)[xs:anyURI(\"example.com/\")])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -520,9 +644,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3)[(xs:anyURI(\"example.com/\"), xs:anyURI(\"example.com/\"))]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -536,9 +664,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2, 3), (1, 2, 3)[xs:untypedAtomic(\"content\")])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -552,9 +684,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "[true()]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -568,9 +704,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3)[(xs:untypedAtomic(\"content\"), xs:untypedAtomic(\"content\"))]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -584,9 +724,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(0, 1, 2)[true()][1] eq 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -600,9 +744,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3)[position() eq 2 or position() eq 3][2] eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -616,9 +764,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty((1, 2, 3)[position() eq 2 or position() eq 3][3])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -632,9 +784,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2, 3), (1, 2, 3)[2 or 3])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -648,9 +804,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty((1, 2, 3)[3][2])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -664,9 +824,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty((1, 2, 3)[3][0])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -680,9 +844,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(0, 2, 4, 5)[1][1][1][true()][1][true()][1] eq 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -696,9 +864,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty((1, 2, 3)[3e8])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -712,9 +884,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty((0, 1, 2)[false()][1])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -732,9 +908,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "[]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -748,9 +928,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((\"a\", \"b\", \"c\"), (0, 1, 2, \"a\", \"b\", \"c\")[. instance of xs:string])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -764,9 +948,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "((0, 1, 2, \"a\", \"b\", \"c\")[. instance of xs:string][. treat as xs:string eq \"c\"] treat as xs:string) eq \"c\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -784,9 +972,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "((0, 1, 2, \"a\", \"b\", \"c\")[. instance of xs:integer][. treat as xs:integer eq 0] treat as xs:integer) eq 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -804,9 +996,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(0, 1, 2, \"a\", \"b\", \"c\")[. instance of xs:integer][. eq \"c\"] eq 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -820,9 +1016,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(()[()])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -840,9 +1040,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty((1, 2, 3)[()])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -860,9 +1064,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(()[last()])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -880,9 +1088,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(()[1])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -900,9 +1112,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(()[position()])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -920,9 +1136,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(()[count(remove((current-time(), 1), 1)) eq 1])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -940,9 +1160,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty((1, 2, 3)[0])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -956,9 +1180,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2, 3), (1, 2, 3)[position() >= 1])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -972,9 +1200,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2, 3), (1, 2, 3)[3 >= position()])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -988,9 +1220,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2, 3), (1, 2, 3)[position() ge 1])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1004,9 +1240,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2, 3), (1, 2, 3)[3 ge position()])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1020,9 +1260,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((0, 1, 2), (0, 1, 2)[position() eq position()])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1036,9 +1280,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((0, 1, 2), (0, 1, 2)[position() = position()])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1052,9 +1300,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(0, 1, 2)[1 eq position()]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1068,9 +1320,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(0, 1, 2)[3 eq position()]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -1084,9 +1340,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(0, 1, 2)[position() eq 3]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -1100,9 +1360,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2, 3), (1, 2, 3)[number(.)])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1116,9 +1380,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty((1, 2, 3)[4])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1132,9 +1400,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2), (0, 1, 2)[if(. eq 1) then 2 else 3])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1148,9 +1420,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((0, 1, 2), (0, 1, 2)[if(. eq 8) then \"str\" else position()])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1164,9 +1440,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((0, 1, 2), (0, 1, 2)[if(. eq 8) then 0 else position()])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1180,9 +1460,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(0, 1, 2)[last()]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -1196,9 +1480,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(0, 1, \"2\")[last()]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2")
     );
@@ -1212,9 +1500,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "2 eq (0, 1, \"2\")[last()]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -1228,9 +1520,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty((())[last()])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -1248,9 +1544,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(()[last()])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -1268,9 +1568,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(0, 1, 2)[. eq 0]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1284,9 +1588,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(0, 1, 2)[. eq 1]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1300,9 +1608,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty((1, 2, 3)[0])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1316,9 +1628,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(0, 1, 2)[. eq 2]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -1332,9 +1648,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((0, 1, 2), (0, 1, 2)[. eq 0 or . eq 1 or . eq 2])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1348,9 +1668,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(0, 1, 2)[remove((1, \"a string\"), 2)]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -1368,9 +1692,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2), (1, 2)[remove((true(), \"a string\"), 2)])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -1388,9 +1716,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty((1, 2, 3)[remove((false(), \"a string\"), 2)])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -1410,9 +1742,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty((1, 2, 3)[remove((false(), \"a string\"), 2)])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -1432,9 +1768,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(current-time()[2])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1448,9 +1788,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty((1, 2, 3, current-time())[0])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1464,9 +1808,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(remove((1, 2, 3, current-time()), 4)[false()])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -1484,9 +1832,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(remove((1, 2, 3, current-time()), 4)[true()], (1, 2, 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1500,9 +1852,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty((1, 2, 3)[4])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1516,9 +1872,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3)[(last(), last())[2]]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -1532,9 +1892,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3)[xs:hexBinary(\"FF\")]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1548,9 +1912,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3)[1, 2]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1564,9 +1932,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3)[1, \"a string\"]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1580,9 +1952,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3)[\"a string\", 1]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1596,9 +1972,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var := (for $i in 1 to 100 return <e>{$i}</e>); $var[last()]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e>100</e>", false)
     );
@@ -1612,9 +1992,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var := (for $i in 1 to 100 return <e>{$i}</e>); $var[5]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e>5</e>", false)
     );
@@ -1628,9 +2012,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty((1,2,3,4,5)[3.4])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1644,9 +2032,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e><a/></e>//a[3.4])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -1664,9 +2056,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $d := document {<root><child type=\"\"/></root>} return $d//*[let $i := @type return $d//*[$i]], (1, 2, 3)[true()], (4, 5, 6)[false()]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<child type=\"\"/>1 2 3", false)
@@ -1684,9 +2080,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $d := document { <root><child type=\"\"/></root> } return $d//*[let $i := @type return $d//*[$i]]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<child type=\"\"/>", false)
     );
@@ -1700,9 +2100,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(<x/>, <?y?>)[self::processing-instruction()]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<?y?>", false)
     );
@@ -1716,9 +2120,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(<?z?>, <?y?>)[self::processing-instruction(y)] treat as empty-sequence()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0050")
     );
@@ -1732,9 +2140,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"c\"[. treat as xs:string]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "c")
     );
@@ -1748,9 +2160,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $myvar := <elem> <a/> <b/> <c/></elem>; $myvar/*[last()]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<c/>", false)
     );
@@ -1764,9 +2180,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $myvar := <elem> <a/> <b/> <c/></elem>; $myvar/*[last() - 1]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<b/>", false)
     );
@@ -1780,9 +2200,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $myvar := <elem> <a/> <b/> <c/></elem>; $myvar/*[1]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a/>", false)
     );
@@ -1796,9 +2220,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(<a/>, <b/>, <c/>)[1][1]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a/>", false)
     );
@@ -1812,9 +2240,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "<b attr=\"f\"/>[1]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<b attr=\"f\"/>", false)
     );
@@ -1828,9 +2260,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "<r>{<e xml:lang=\"ene\"/>/(ancestor-or-self::*/@xml:lang)[last()]}</r>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<r xml:lang=\"ene\"/>", false)
     );
@@ -1844,9 +2280,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:foo($arg as item()) { $arg[@arg] }; local:foo(<e arg=\"\">result</e>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e arg=\"\">result</e>", false)
     );
@@ -1860,11 +2300,298 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:foo($arg as item()) { string($arg/@arg) }; local:foo(<e arg=\"result\"/>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "result")
+    );
+  }
+
+  /**
+   *  Tests various filter optimizations .
+   */
+  @org.junit.Test
+  public void cbclFilter001() {
+    final XQuery query = new XQuery(
+      "let $x := exists((1 to 10)[. mod 2 = 0]) return (1 to 100)[position() mod 2 = 0 and position() mod 3 = 0 and $x]",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "6 12 18 24 30 36 42 48 54 60 66 72 78 84 90 96")
+    );
+  }
+
+  /**
+   *  Test that negated floating point comparisons against the position variable optimize correctly. .
+   */
+  @org.junit.Test
+  public void cbclFilterexpr001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:nan() { xs:float(\"NaN\") }; \n" +
+      "      \t(1 to 10)[not(position() < xs:float(\"NaN\"))]\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "1 2 3 4 5 6 7 8 9 10")
+    );
+  }
+
+  /**
+   *  test fn:first-in-sequence on sub-expression where quant = 1 .
+   */
+  @org.junit.Test
+  public void cbclFirstInSequence001() {
+    final XQuery query = new XQuery(
+      "declare function local:generate($arg as xs:integer?) { if ($arg = 0) then (1, 2, 3) else () }; ( local:generate(0), 1, local:generate(0) )[1]",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "1")
+    );
+  }
+
+  /**
+   *  test fn:first-in-sequence on a for expression .
+   */
+  @org.junit.Test
+  public void cbclFirstInSequence002() {
+    final XQuery query = new XQuery(
+      "declare function local:generate($arg as xs:integer?) as xs:integer* { if ($arg = 0) then (1, 2, 3) else $arg }; ( local:generate(()), for $x in local:generate(0) return $x + 2 )[1]",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "3")
+    );
+  }
+
+  /**
+   *  test fn:first-in-sequence on a for expression .
+   */
+  @org.junit.Test
+  public void cbclFirstInSequence003() {
+    final XQuery query = new XQuery(
+      "declare function local:generate($arg as xs:integer?) as xs:integer? { if ($arg = 0) then 0 else () }; ( local:generate(()), for $x in local:generate(0) return $x + 2 )[1]",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "2")
+    );
+  }
+
+  /**
+   *  test fn:first-in-sequence on a for-at expression .
+   */
+  @org.junit.Test
+  public void cbclFirstInSequence004() {
+    final XQuery query = new XQuery(
+      "declare function local:generate($arg as xs:integer?) as xs:integer* { if ($arg = 0) then ( 1, 2, 3 ) else ( $arg ) }; ( local:generate(()), for $x at $p in local:generate(0) return $p + $x)[1]",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "2")
+    );
+  }
+
+  /**
+   *  test fn:first-in-sequence on a for-at expression .
+   */
+  @org.junit.Test
+  public void cbclFirstInSequence005() {
+    final XQuery query = new XQuery(
+      "declare function local:generate($arg as xs:integer?) as xs:integer? { if ($arg = 0) then 1 else $arg }; ( local:generate(()), for $x at $p in local:generate(0) return $p + $x)[1]",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "2")
+    );
+  }
+
+  /**
+   *  test fn:first-in-sequence on a map expression .
+   */
+  @org.junit.Test
+  public void cbclFirstInSequence006() {
+    final XQuery query = new XQuery(
+      "declare function local:generate($arg as xs:integer?) as xs:string* { if ($arg = 0) then ('a', 'b', 'c') else ('d' ) }; ( if (local:generate(1) = 'd') then () else 1, for $x in local:generate(0) return fn:lower-case($x))[1]",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "a")
+    );
+  }
+
+  /**
+   *  test fn:first-in-sequence on a map expression .
+   */
+  @org.junit.Test
+  public void cbclFirstInSequence007() {
+    final XQuery query = new XQuery(
+      "declare function local:generate($arg as xs:integer?) as xs:integer? { $arg }; ( if (local:generate(0) = 0) then () else 1, for $x in local:generate(0) return -$x)[1]",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "0")
+    );
+  }
+
+  /**
+   *  test fn:first-in-sequence on a distinct-doc-order .
+   */
+  @org.junit.Test
+  public void cbclFirstInSequence008() {
+    final XQuery query = new XQuery(
+      "( (<a><b>cheese</b></a>)/b )[1]",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertSerialization("<b>cheese</b>", false)
+    );
+  }
+
+  /**
+   *  test fn:first-in-sequence on a for-each expression Author: Tim Mills .
+   */
+  @org.junit.Test
+  public void cbclFirstInSequence009() {
+    final XQuery query = new XQuery(
+      "declare function local:generate($arg as xs:integer?) as xs:string* { if ($arg = 0) then ('a', 'b', 'c') else () }; ( local:generate(()), for $x in local:generate(0) return 3)[1]",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "3")
+    );
+  }
+
+  /**
+   *  test fn:boolean on fn:first-in-sequence .
+   */
+  @org.junit.Test
+  public void cbclFirstInSequence010() {
+    final XQuery query = new XQuery(
+      "declare function local:generate($arg as xs:integer?) as xs:string* { if ($arg = 0) then ('a', 'b', 'c') else () }; boolean(local:generate(0)[1])",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test fn:boolean on fn:first-in-sequence .
+   */
+  @org.junit.Test
+  public void cbclFirstInSequence011() {
+    final XQuery query = new XQuery(
+      "declare function local:generate($arg as xs:integer?) as xs:string* { if ($arg = 0) then ('a', 'b', 'c') else () }; boolean(local:generate(1)[1])",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test fn:first-in-sequence on a for-each expression .
+   */
+  @org.junit.Test
+  public void cbclFirstInSequence012() {
+    final XQuery query = new XQuery(
+      "declare function local:generate($arg as xs:boolean) as xs:string+ { if ($arg) then ('a', 'b', 'c') else ('A', 'B', 'C') }; ( for $x in local:generate(true()) return 3)[1]",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "3")
     );
   }
 
@@ -1876,10 +2603,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works/employee[xs:integer(hours[1]) gt 20])",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<employee>\n   <empnum>E1</empnum>\n   <pnum>P1</pnum>\n   <hours>40</hours>\n  </employee><employee>\n   <empnum>E1</empnum>\n   <pnum>P3</pnum>\n   <hours>80</hours>\n  </employee><employee>\n   <empnum>E2</empnum>\n   <pnum>P1</pnum>\n   <hours>40</hours>\n  </employee><employee>\n   <empnum>E2</empnum>\n   <pnum>P2</pnum>\n   <hours>80</hours>\n  </employee><employee>\n   <empnum>E4</empnum>\n   <pnum>P4</pnum>\n   <hours>40</hours>\n  </employee><employee>\n   <empnum>E4</empnum>\n   <pnum>P5</pnum>\n   <hours>80</hours>\n  </employee>", false)
     );
@@ -1893,9 +2624,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "((1 to 11)[. ne 10])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3 4 5 6 7 8 9 11")
     );
@@ -1909,9 +2644,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "((1 to 11)[(. eq 10) and (. mod 5 eq 0)])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("10")
     );
@@ -1925,9 +2664,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "((1 to 11)[(. eq 10) or (. eq 5)])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "5 10")
     );
@@ -1941,9 +2684,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "((1,2,4,5,6,7,8,9,10,11)[(. div 2 eq 5)])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("10")
     );
@@ -1957,9 +2704,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "((1,2,4,5,6,7,8,9,10,11)[(. * 2 eq 10)])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5")
     );
@@ -1973,9 +2724,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "((1,2,4,5,6,7,8,9,10,11)[(. + 2 eq 10)])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("8")
     );
@@ -1989,9 +2744,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "((1,2,4,5,6,7,8,9,10,11)[(. - 2 eq 6)])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("8")
     );
@@ -2005,9 +2764,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "((1,2,4,5,6,7,8,9,10,11)[(. idiv 2 eq 3)])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "6 7")
     );
@@ -2021,9 +2784,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "((1,2,3,4,5,6,7,8,9,10,11)[(xs:string(.) eq \"3\")])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -2037,9 +2804,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "((1,2,3,4,5,6,7,8,9,10,11)[. gt 1][. gt 5])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "6 7 8 9 10 11")
     );
@@ -2053,9 +2824,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "((1 to 25)[. mod 2 eq 0])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2 4 6 8 10 12 14 16 18 20 22 24")
     );
@@ -2069,9 +2844,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "((1,2,3,4,5,6,7,8,9,10,11)[(. gt 1) and (. gt 2)][(. gt 5) and (. gt 6)])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "7 8 9 10 11")
     );
@@ -2085,9 +2864,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "((1,2,3,4,5,6,7,8,9,10,11)[fn:true()])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3 4 5 6 7 8 9 10 11")
     );
@@ -2101,9 +2884,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(((1,2,3,4,5,6,7,8,9,10,11)[fn:false()]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -2121,9 +2908,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "((1 to 25)[25])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("25")
     );
@@ -2137,10 +2928,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(//empnum | (/))//employee[xs:integer(hours[1]) gt 20]",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<employee>\n   <empnum>E1</empnum>\n   <pnum>P1</pnum>\n   <hours>40</hours>\n  </employee><employee>\n   <empnum>E1</empnum>\n   <pnum>P3</pnum>\n   <hours>80</hours>\n  </employee><employee>\n   <empnum>E2</empnum>\n   <pnum>P1</pnum>\n   <hours>40</hours>\n  </employee><employee>\n   <empnum>E2</empnum>\n   <pnum>P2</pnum>\n   <hours>80</hours>\n  </employee><employee>\n   <empnum>E4</empnum>\n   <pnum>P4</pnum>\n   <hours>40</hours>\n  </employee><employee>\n   <empnum>E4</empnum>\n   <pnum>P5</pnum>\n   <hours>80</hours>\n  </employee>", false)
     );
@@ -2154,10 +2949,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(//employee[fn:last()])",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<employee>\n   <empnum>E4</empnum>\n   <pnum>P5</pnum>\n   <hours>80</hours>\n  </employee>", false)
     );
@@ -2171,9 +2970,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "((1 to 25)[. ge 10])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25")
     );
@@ -2187,9 +2990,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "((1 to 25)[. lt 10])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3 4 5 6 7 8 9")
     );
@@ -2203,9 +3010,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "((1 to 25)[. le 10])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3 4 5 6 7 8 9 10")
     );
@@ -2219,9 +3030,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "((1 to 25)[. eq 10])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("10")
     );
@@ -2235,10 +3050,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(//integer[fn:true()])",
       ctx);
-    query.context(node(file("docs/atomicns.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/atomicns.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<integer>12678967543233</integer>", false)
     );
@@ -2252,10 +3071,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/root/decimal[xs:decimal(.) = 12678967.543233])",
       ctx);
-    query.context(node(file("docs/atomicns.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/atomicns.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<decimal attr=\"12678967.543233\">12678967.543233</decimal>", false)
     );
@@ -2269,10 +3092,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/root/float[xs:float(.) = xs:float(1267.43233E12)])",
       ctx);
-    query.context(node(file("docs/atomicns.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/atomicns.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<float>1267.43233E12</float>", false)
     );
@@ -2286,10 +3113,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/root/double[xs:double(.) = 1267.43233E12])",
       ctx);
-    query.context(node(file("docs/atomicns.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/atomicns.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<double>1267.43233E12</double>", false)
     );
@@ -2303,10 +3134,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/root/boolean[xs:boolean(.) = fn:true()])",
       ctx);
-    query.context(node(file("docs/atomicns.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/atomicns.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<boolean>true</boolean>", false)
     );
@@ -2320,10 +3155,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/root/date[xs:date(.) = xs:date(\"2000-01-01+05:00\")])",
       ctx);
-    query.context(node(file("docs/atomicns.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/atomicns.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<date>2000-01-01+05:00</date>", false)
     );
@@ -2337,10 +3176,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works/employee[@name=\"Jane Doe 11\"])",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<employee name=\"Jane Doe 11\" gender=\"female\">\n   <empnum>E4</empnum>\n   <pnum>P2</pnum>\n   <hours>20</hours>\n  </employee>", false)
     );
@@ -2354,10 +3197,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works//day[xs:string(.) ne \"Monday\"])",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<day>Tuesday</day>", false)
     );
@@ -2371,10 +3218,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works//hours[xs:integer(.) lt 13])",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<hours>12</hours>", false)
     );
@@ -2388,10 +3239,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count((//integer[fn:false()]))",
       ctx);
-    query.context(node(file("docs/atomicns.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/atomicns.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -2409,10 +3264,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works//hours[xs:integer(.) le 12])",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<hours>12</hours>", false)
     );
@@ -2426,10 +3285,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works//hours[xs:integer(.) gt 79])",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<hours>80</hours><hours>80</hours><hours>80</hours>", false)
     );
@@ -2443,10 +3306,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works//hours[xs:integer(.) ge 80])",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<hours>80</hours><hours>80</hours><hours>80</hours>", false)
     );
@@ -2460,10 +3327,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works//hours[xs:integer(.) = 12])",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<hours>12</hours>", false)
     );
@@ -2477,10 +3348,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works[1]//employee[empnum != \"E1\" and empnum != \"E4\"])",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<employee name=\"Jane Doe 7\" gender=\"female\">\n   <empnum>E2</empnum>\n   <pnum>P1</pnum>\n   <hours>40</hours>\n  </employee><employee name=\"John Doe 8\" gender=\"male\">\n   <empnum>E2</empnum>\n   <pnum>P2</pnum>\n   <hours>80</hours>\n  </employee><employee name=\"Jane Doe 9\" gender=\"female\">\n   <empnum>E3</empnum>\n   <pnum>P2</pnum>\n   <hours>20</hours>\n  </employee><employee name=\"John Doe 10\" gender=\"male\">\n   <empnum>E3</empnum>\n   <pnum>P2</pnum>\n   <hours>20</hours>\n  </employee>", false)
     );
@@ -2494,10 +3369,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works//hours[xs:integer(.) < 13])",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<hours>12</hours>", false)
     );
@@ -2511,10 +3390,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works//hours[xs:integer(.) <= 12])",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<hours>12</hours>", false)
     );
@@ -2528,10 +3411,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works//hours[xs:integer(.) > 79])",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<hours>80</hours><hours>80</hours><hours>80</hours>", false)
     );
@@ -2545,10 +3432,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works//hours[xs:integer(.) >= 80])",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<hours>80</hours><hours>80</hours><hours>80</hours>", false)
     );
@@ -2562,9 +3453,13 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $foo := <element1><element2>some content</element2></element1> return $foo[(2 to 5)]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -2578,10 +3473,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(//integer[fn:not(fn:false())])",
       ctx);
-    query.context(node(file("docs/atomicns.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/atomicns.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<integer>12678967543233</integer>", false)
     );
@@ -2595,10 +3494,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $x in /works/employee[fn:position() lt 5][fn:position() mod 2 eq 1] return (fn:data($x/empnum), fn:data($x/pnum))",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "E1 P1 E1 P3")
     );
@@ -2612,10 +3515,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $x in /works/employee[fn:position() mod 2 eq 1][fn:position() lt 5] return (fn:data($x/empnum), fn:data($x/pnum))",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "E1 P1 E1 P3 E1 P5 E2 P1")
     );
@@ -2629,10 +3536,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(//integer[fn:true() and fn:true()])",
       ctx);
-    query.context(node(file("docs/atomicns.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/atomicns.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<integer>12678967543233</integer>", false)
     );
@@ -2646,10 +3557,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(//integer[fn:true() or fn:true()])",
       ctx);
-    query.context(node(file("docs/atomicns.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/atomicns.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<integer>12678967543233</integer>", false)
     );
@@ -2663,10 +3578,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count((//integer[fn:false() and fn:false()]))",
       ctx);
-    query.context(node(file("docs/atomicns.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/atomicns.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -2684,10 +3603,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count((//integer[fn:false() or fn:false()]))",
       ctx);
-    query.context(node(file("docs/atomicns.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/atomicns.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -2705,10 +3628,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/root/string[xs:string(.) = \"A String Function\"])",
       ctx);
-    query.context(node(file("docs/atomicns.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/atomicns.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<string>A String Function</string>", false)
     );
@@ -2722,10 +3649,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/root/integer[xs:integer(.) = 12678967543233])",
       ctx);
-    query.context(node(file("docs/atomicns.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/atomicns.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<integer>12678967543233</integer>", false)
     );
@@ -2739,10 +3670,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count((//integer[fn:true()]))",
       ctx);
-    query.context(node(file("docs/atomicns.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/atomicns.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2756,10 +3691,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/root/decimal[(xs:decimal(.) = 12678967.543233)])",
       ctx);
-    query.context(node(file("docs/atomicns.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/atomicns.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<decimal attr=\"12678967.543233\">12678967.543233</decimal>", false)
     );
@@ -2773,10 +3712,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/root/float[xs:float(.) = xs:float(1267.43233E12)])",
       ctx);
-    query.context(node(file("docs/atomicns.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/atomicns.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<float>1267.43233E12</float>", false)
     );
@@ -2790,10 +3733,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/root/double[xs:double(.) = 1267.43233E12])",
       ctx);
-    query.context(node(file("docs/atomicns.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/atomicns.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<double>1267.43233E12</double>", false)
     );
@@ -2807,10 +3754,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/root/boolean[xs:boolean(.) = fn:true()])",
       ctx);
-    query.context(node(file("docs/atomicns.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/atomicns.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<boolean>true</boolean>", false)
     );
@@ -2824,10 +3775,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/root/date[xs:date(.) = xs:date(\"2000-01-01+05:00\")])",
       ctx);
-    query.context(node(file("docs/atomicns.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/atomicns.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<date>2000-01-01+05:00</date>", false)
     );
@@ -2841,10 +3796,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count((//integer[fn:false()]))",
       ctx);
-    query.context(node(file("docs/atomicns.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/atomicns.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -2862,10 +3821,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(//integer[fn:not(fn:false())])",
       ctx);
-    query.context(node(file("docs/atomicns.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/atomicns.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<integer>12678967543233</integer>", false)
     );
@@ -2879,10 +3842,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(//integer[fn:true() and fn:true()])",
       ctx);
-    query.context(node(file("docs/atomicns.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/atomicns.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<integer>12678967543233</integer>", false)
     );
@@ -2896,10 +3863,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(//integer[fn:true() or fn:true()])",
       ctx);
-    query.context(node(file("docs/atomicns.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/atomicns.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<integer>12678967543233</integer>", false)
     );
@@ -2913,10 +3884,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count((//integer[fn:false() and fn:false()]))",
       ctx);
-    query.context(node(file("docs/atomicns.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/atomicns.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -2934,10 +3909,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count((//integer[fn:false() or fn:false()]))",
       ctx);
-    query.context(node(file("docs/atomicns.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/atomicns.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -2955,10 +3934,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/root/string[xs:string(.) = \"A String Function\"])",
       ctx);
-    query.context(node(file("docs/atomicns.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/atomicns.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<string>A String Function</string>", false)
     );
@@ -2972,10 +3955,14 @@ public class ProdPredicate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/root/integer[xs:integer(.) = 12678967543233])",
       ctx);
-    query.context(node(file("docs/atomicns.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/atomicns.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<integer>12678967543233</integer>", false)
     );

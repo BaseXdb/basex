@@ -20,9 +20,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "concat()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "concat(\"a string\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -52,9 +60,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "concat(\"ab\", \"c\") eq \"abc\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "concat(\"ab\", \"c\") instance of xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "concat((), ()) instance of xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "concat((), ()) eq \"\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,9 +140,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "concat('a', 'b', 'c', (), 'd', 'e', 'f', 'g', 'h', ' ', 'i', 'j', 'k l') eq \"abcdefgh ijk l\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -132,9 +160,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "concat(1, 2, 3) eq \"123\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -148,9 +180,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "concat(1, \"2\", 3) eq \"123\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -164,9 +200,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "concat((\"a\", \"b\"), \"c\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -180,9 +220,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "concat(\"1\", \"2\", \"3\", (\"a\", \"b\"), \"c\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -196,11 +240,35 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "concat(\"1\", \"2\", \"3\", \"c\", (\"a\", \"b\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
+    );
+  }
+
+  /**
+   *  test fn:boolean(fn:concat()) where concat returns empty string .
+   */
+  @org.junit.Test
+  public void cbclConcat001() {
+    final XQuery query = new XQuery(
+      "fn:boolean(fn:concat('', ''))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
     );
   }
 
@@ -212,9 +280,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat('un', 'grateful')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ungrateful")
     );
@@ -228,9 +300,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(\"**\",\"***\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "*****")
     );
@@ -244,9 +320,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(fn:concat(\"zzz\",\"zz\"),\"123\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "zzzzz123")
     );
@@ -260,9 +340,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:boolean(fn:concat(\"ab\",\"cde\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -276,9 +360,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:concat(\"abc\",\"de\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abcde")
     );
@@ -292,9 +380,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(fn:concat(\"ab\",\"cde\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -308,9 +400,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(\"%$\",\"#@!\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "%$#@!")
     );
@@ -324,9 +420,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(\"concat\",\"concat\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "concatconcat")
     );
@@ -340,9 +440,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(\"abc\",\"abc\") and fn:concat(\"abc\",\"abc\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -356,11 +460,15 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(\"abc\",\"abc\", fn:concat#3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPTY0004")
+      error("FOTY0013")
     );
   }
 
@@ -372,9 +480,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat('Thy ', (), 'old ', \"groans\", \"\", ' ring', ' yet', ' in', ' my', ' ancient',' ears.')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Thy old groans ring yet in my ancient ears.")
     );
@@ -388,9 +500,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat('Ciao!',())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Ciao!")
     );
@@ -404,9 +520,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat('Ingratitude, ', 'thou ', 'marble-hearted', ' fiend!')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Ingratitude, thou marble-hearted fiend!")
     );
@@ -420,9 +540,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(\"AB\",\"CD\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ABCD")
     );
@@ -436,9 +560,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(\"abc\",\"de\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abcde")
     );
@@ -452,9 +580,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(\"ABCDE\",\"abcde\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ABCDEabcde")
     );
@@ -468,9 +600,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:concat(\"\",\"\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -484,9 +620,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(fn:upper-case(\"Abc\"),fn:upper-case(\"DH\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ABCDH")
     );
@@ -500,9 +640,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:double(\"-1.7976931348623157E308\"),xs:double(\"-1.7976931348623157E308\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-1.7976931348623157E308-1.7976931348623157E308")
     );
@@ -516,9 +660,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:double(\"0\"),xs:double(\"-1.7976931348623157E308\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0-1.7976931348623157E308")
     );
@@ -532,9 +680,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:double(\"1.7976931348623157E308\"),xs:double(\"-1.7976931348623157E308\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1.7976931348623157E308-1.7976931348623157E308")
     );
@@ -548,9 +700,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:double(\"-1.7976931348623157E308\"),xs:double(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-1.7976931348623157E3080")
     );
@@ -564,9 +720,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:double(\"-1.7976931348623157E308\"),xs:double(\"1.7976931348623157E308\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-1.7976931348623157E3081.7976931348623157E308")
     );
@@ -580,9 +740,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:decimal(\"-999999999999999999\"),xs:decimal(\"-999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-999999999999999999-999999999999999999")
     );
@@ -596,9 +760,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:decimal(\"617375191608514839\"),xs:decimal(\"-999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "617375191608514839-999999999999999999")
     );
@@ -612,9 +780,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:decimal(\"999999999999999999\"),xs:decimal(\"-999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "999999999999999999-999999999999999999")
     );
@@ -628,9 +800,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:decimal(\"-999999999999999999\"),xs:decimal(\"617375191608514839\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-999999999999999999617375191608514839")
     );
@@ -644,9 +820,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:decimal(\"-999999999999999999\"),xs:decimal(\"999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-999999999999999999999999999999999999")
     );
@@ -660,9 +840,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:float(\"-3.4028235E38\"),xs:float(\"-3.4028235E38\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-3.4028235E38-3.4028235E38")
     );
@@ -676,9 +860,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:float(\"0\"),xs:float(\"-3.4028235E38\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0-3.4028235E38")
     );
@@ -692,9 +880,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:float(\"3.4028235E38\"),xs:float(\"-3.4028235E38\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "3.4028235E38-3.4028235E38")
     );
@@ -708,9 +900,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:float(\"-3.4028235E38\"),xs:float(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-3.4028235E380")
     );
@@ -724,9 +920,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:float(\"-3.4028235E38\"),xs:float(\"3.4028235E38\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-3.4028235E383.4028235E38")
     );
@@ -740,9 +940,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:int(\"-2147483648\"),xs:int(\"-2147483648\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-2147483648-2147483648")
     );
@@ -756,9 +960,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:int(\"-1873914410\"),xs:int(\"-2147483648\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-1873914410-2147483648")
     );
@@ -772,9 +980,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:int(\"2147483647\"),xs:int(\"-2147483648\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2147483647-2147483648")
     );
@@ -788,9 +1000,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:int(\"-2147483648\"),xs:int(\"-1873914410\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-2147483648-1873914410")
     );
@@ -804,9 +1020,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:int(\"-2147483648\"),xs:int(\"2147483647\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-21474836482147483647")
     );
@@ -820,9 +1040,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:integer(\"-999999999999999999\"),xs:integer(\"-999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-999999999999999999-999999999999999999")
     );
@@ -836,9 +1060,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:integer(\"830993497117024304\"),xs:integer(\"-999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "830993497117024304-999999999999999999")
     );
@@ -852,9 +1080,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:integer(\"999999999999999999\"),xs:integer(\"-999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "999999999999999999-999999999999999999")
     );
@@ -868,9 +1100,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:integer(\"-999999999999999999\"),xs:integer(\"830993497117024304\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-999999999999999999830993497117024304")
     );
@@ -884,9 +1120,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:integer(\"-999999999999999999\"),xs:integer(\"999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-999999999999999999999999999999999999")
     );
@@ -900,9 +1140,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:long(\"-92233720368547758\"),xs:long(\"-92233720368547758\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-92233720368547758-92233720368547758")
     );
@@ -916,9 +1160,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:long(\"-47175562203048468\"),xs:long(\"-92233720368547758\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-47175562203048468-92233720368547758")
     );
@@ -932,9 +1180,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:long(\"92233720368547758\"),xs:long(\"-92233720368547758\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "92233720368547758-92233720368547758")
     );
@@ -948,9 +1200,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:long(\"-92233720368547758\"),xs:long(\"-47175562203048468\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-92233720368547758-47175562203048468")
     );
@@ -964,9 +1220,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:long(\"-92233720368547758\"),xs:long(\"92233720368547758\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-9223372036854775892233720368547758")
     );
@@ -980,9 +1240,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:negativeInteger(\"-999999999999999999\"),xs:negativeInteger(\"-999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-999999999999999999-999999999999999999")
     );
@@ -996,9 +1260,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:negativeInteger(\"-297014075999096793\"),xs:negativeInteger(\"-999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-297014075999096793-999999999999999999")
     );
@@ -1012,9 +1280,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:negativeInteger(\"-1\"),xs:negativeInteger(\"-999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-1-999999999999999999")
     );
@@ -1028,9 +1300,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:negativeInteger(\"-999999999999999999\"),xs:negativeInteger(\"-297014075999096793\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-999999999999999999-297014075999096793")
     );
@@ -1044,9 +1320,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:negativeInteger(\"-999999999999999999\"),xs:negativeInteger(\"-1\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-999999999999999999-1")
     );
@@ -1060,9 +1340,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:nonNegativeInteger(\"0\"),xs:nonNegativeInteger(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "00")
     );
@@ -1076,9 +1360,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:nonNegativeInteger(\"303884545991464527\"),xs:nonNegativeInteger(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "3038845459914645270")
     );
@@ -1092,9 +1380,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:nonNegativeInteger(\"999999999999999999\"),xs:nonNegativeInteger(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "9999999999999999990")
     );
@@ -1108,9 +1400,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:nonNegativeInteger(\"0\"),xs:nonNegativeInteger(\"303884545991464527\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0303884545991464527")
     );
@@ -1124,9 +1420,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:nonNegativeInteger(\"0\"),xs:nonNegativeInteger(\"999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0999999999999999999")
     );
@@ -1140,9 +1440,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:nonPositiveInteger(\"-999999999999999999\"),xs:nonPositiveInteger(\"-999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-999999999999999999-999999999999999999")
     );
@@ -1156,9 +1460,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:nonPositiveInteger(\"-475688437271870490\"),xs:nonPositiveInteger(\"-999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-475688437271870490-999999999999999999")
     );
@@ -1172,9 +1480,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:nonPositiveInteger(\"0\"),xs:nonPositiveInteger(\"-999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0-999999999999999999")
     );
@@ -1188,9 +1500,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:nonPositiveInteger(\"-999999999999999999\"),xs:nonPositiveInteger(\"-475688437271870490\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-999999999999999999-475688437271870490")
     );
@@ -1204,9 +1520,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:nonPositiveInteger(\"-999999999999999999\"),xs:nonPositiveInteger(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-9999999999999999990")
     );
@@ -1220,9 +1540,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:positiveInteger(\"1\"),xs:positiveInteger(\"1\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "11")
     );
@@ -1236,9 +1560,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:positiveInteger(\"52704602390610033\"),xs:positiveInteger(\"1\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "527046023906100331")
     );
@@ -1252,9 +1580,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:positiveInteger(\"999999999999999999\"),xs:positiveInteger(\"1\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "9999999999999999991")
     );
@@ -1268,9 +1600,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:positiveInteger(\"1\"),xs:positiveInteger(\"52704602390610033\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "152704602390610033")
     );
@@ -1284,9 +1620,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:positiveInteger(\"1\"),xs:positiveInteger(\"999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1999999999999999999")
     );
@@ -1300,9 +1640,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:short(\"-32768\"),xs:short(\"-32768\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-32768-32768")
     );
@@ -1316,9 +1660,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:short(\"-5324\"),xs:short(\"-32768\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-5324-32768")
     );
@@ -1332,9 +1680,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:short(\"32767\"),xs:short(\"-32768\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "32767-32768")
     );
@@ -1348,9 +1700,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:short(\"-32768\"),xs:short(\"-5324\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-32768-5324")
     );
@@ -1364,9 +1720,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:short(\"-32768\"),xs:short(\"32767\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-3276832767")
     );
@@ -1380,9 +1740,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:unsignedLong(\"0\"),xs:unsignedLong(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "00")
     );
@@ -1396,9 +1760,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:unsignedLong(\"130747108607674654\"),xs:unsignedLong(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1307471086076746540")
     );
@@ -1412,9 +1780,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:unsignedLong(\"184467440737095516\"),xs:unsignedLong(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1844674407370955160")
     );
@@ -1428,9 +1800,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:unsignedLong(\"0\"),xs:unsignedLong(\"130747108607674654\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0130747108607674654")
     );
@@ -1444,9 +1820,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:unsignedLong(\"0\"),xs:unsignedLong(\"184467440737095516\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0184467440737095516")
     );
@@ -1460,9 +1840,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:unsignedShort(\"0\"),xs:unsignedShort(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "00")
     );
@@ -1476,9 +1860,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:unsignedShort(\"44633\"),xs:unsignedShort(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "446330")
     );
@@ -1492,9 +1880,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:unsignedShort(\"65535\"),xs:unsignedShort(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "655350")
     );
@@ -1508,9 +1900,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:unsignedShort(\"0\"),xs:unsignedShort(\"44633\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "044633")
     );
@@ -1524,9 +1920,13 @@ public class FnConcat extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(xs:unsignedShort(\"0\"),xs:unsignedShort(\"65535\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "065535")
     );

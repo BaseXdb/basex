@@ -23,9 +23,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
       "        static-base-uri() eq 'http://example.com/declareBaseURITest'\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -41,9 +45,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
       "        declare(::)base-uri(::)\"http://example.com/declareBaseURITest\"; \n" +
       "        declare(::)base-uri(::)\"http://example.com/declareBaseURITest2\"; 1 eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0032")
     );
@@ -59,9 +67,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
       "        declare(::)base-uri(::)\"http://example.com/declareBaseURITest\"(::); \n" +
       "        declare(::)base-uri(::)\"http://example.com/declareBaseURITest\"(::); 1 eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0032")
     );
@@ -75,9 +87,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http:\\\\invalid>URI\\someURI\"; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("1")
@@ -95,9 +111,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"c:\\windows\"; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("1")
@@ -115,9 +135,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"c:\\windows\"; fn:doc(\"example.com.xml\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XQST0046")
@@ -139,9 +163,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"abc\"; declare function local:isAbsolute($uri as xs:string?) as xs:boolean { fn:matches($uri, \"[a-zA-Z0-9\\-.]*:/\") }; local:isAbsolute(fn:static-base-uri())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -159,9 +187,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"\"; ends-with(fn:static-base-uri(), \"prod/BaseURIDecl.xml\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -179,9 +211,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://example.com/BASEURI\"; <e xml:base=\"../\"> {fn:static-base-uri()} </e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e xml:base=\"../\">http://example.com/BASEURI</e>", false)
     );
@@ -195,9 +231,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "base-uri lt base-uri",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -211,9 +251,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://example.org\"; declare base-uri \"http://example.org\"; \"aaa\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0032")
     );
@@ -227,9 +271,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:static-base-uri())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -247,9 +295,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://www.example.com/abc123\"; fn:string(fn:static-base-uri())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/abc123")
     );
@@ -263,9 +315,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://www.example.com/abc\"\"\"; fn:string(fn:static-base-uri())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "http://www.example.com/abc\"")
@@ -283,9 +339,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri 'http://www.example.com/abc'''; fn:string(fn:static-base-uri())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/abc'")
     );
@@ -299,9 +359,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri 'http://www.example.com/abc##0;'; fn:string(fn:static-base-uri())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "http://www.example.com/abc##0;")
@@ -319,9 +383,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://A\"; fn:string(fn:static-base-uri())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://A")
     );
@@ -335,9 +403,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http:/www.abc&#xa;.com\"; fn:string(fn:static-base-uri())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "http:/www.abc .com")
@@ -355,9 +427,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://declarebase-uri.com\"; fn:string(fn:static-base-uri())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "http://declarebase-uri.com")
@@ -375,9 +451,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://www.example.com/abc&lt;\"; \"aaa\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "aaa")
@@ -395,9 +475,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://www.base-uri.com\"; fn:string(fn:static-base-uri())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.base-uri.com")
     );
@@ -411,9 +495,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://www.BASE-URI.com\"; fn:string(fn:static-base-uri())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.BASE-URI.com")
     );
@@ -427,9 +515,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \" http://www.example.org/examples\"; fn:string(fn:static-base-uri())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.org/examples")
     );
@@ -443,9 +535,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://www.example.org/examples \"; fn:string(fn:static-base-uri())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.org/examples")
     );
@@ -459,9 +555,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://www.example.org/ examples\"; fn:string(fn:static-base-uri())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "http://www.example.org/ examples")
@@ -479,9 +579,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://www.example.com/abc&gt;\"; \"aaa\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "aaa")
@@ -499,9 +603,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://www.example.com/abc&amp;\"; \"aaa\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "aaa")
     );
@@ -515,9 +623,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://www.example.com/abc&quot;\"; \"aaa\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "aaa")
@@ -535,9 +647,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://www.example.com/abc&apos;\"; \"aaa\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "aaa")
     );
@@ -551,9 +667,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://www.example.com/\"; fn:string(fn:resolve-uri(\"examples\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/examples")
     );
@@ -572,9 +692,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
       "        }; \n" +
       "        eg:noContextFunction()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "true")
@@ -592,11 +716,39 @@ public class ProdBaseURIDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://example.org\"; fn:string(fn:static-base-uri())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://example.org")
+    );
+  }
+
+  /**
+   * Test the base uri declaration in an imported module..
+   */
+  @org.junit.Test
+  public void baseURIModules001() {
+    final XQuery query = new XQuery(
+      "declare base-uri \"http://www.example.org/base1\";\n" +
+      "          import module namespace m =\"http://www.w3.org/TestModules/module-001\";\n" +
+      "          static-base-uri() eq m:static-base-uri()\n" +
+      "    ",
+      ctx);
+    try {
+      query.addModule("http://www.w3.org/TestModules/module-001", file("prod/BaseURIDecl/module-001.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
     );
   }
 
@@ -608,9 +760,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://www.example.org/%20%20examples\"; fn:string(fn:static-base-uri())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.org/%20%20examples")
     );
@@ -624,9 +780,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"abc\"; fn:ends-with(fn:string(fn:static-base-uri()),\"abc\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -640,9 +800,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://www.example.com/\"; fn:base-uri(<elem xml:base=\"fluster\"></elem>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/fluster")
     );
@@ -656,9 +820,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://www.example.com/\"; fn:base-uri(exactly-one((<elem xml:base=\"fluster\"><a/></elem>)/a))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/fluster")
     );
@@ -672,9 +840,13 @@ public class ProdBaseURIDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://www.example.com/\"; fn:base-uri(exactly-one((<elem xml:base=\"fluster/\"><a xml:base=\"now\"/></elem>)/a))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/fluster/now")
     );

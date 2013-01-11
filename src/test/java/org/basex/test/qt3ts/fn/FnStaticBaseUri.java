@@ -20,9 +20,13 @@ public class FnStaticBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "static-base-uri(.)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnStaticBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "static-base-uri(1, 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -52,9 +60,13 @@ public class FnStaticBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "if(static-base-uri()) then true() else true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnStaticBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:static-base-uri(\"A argument\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -84,9 +100,13 @@ public class FnStaticBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://www.example.com\"; fn:concat(fn:string(fn:static-base-uri()),\"another string\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.comanother string")
     );
@@ -100,9 +120,13 @@ public class FnStaticBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://www.example.com\"; fn:string-join((fn:string(fn:static-base-uri()),\"another string\"),\"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.comanother string")
     );
@@ -116,9 +140,13 @@ public class FnStaticBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://www.example.com\"; fn:string-length(fn:string(fn:static-base-uri()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "22")
     );
@@ -132,9 +160,13 @@ public class FnStaticBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://www.example.com\"; fn:substring-before(fn:string(fn:static-base-uri()),\":\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http")
     );
@@ -148,9 +180,13 @@ public class FnStaticBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://www.example.com\"; fn:substring-after(fn:string(fn:static-base-uri()),\":\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "//www.example.com")
     );
@@ -164,10 +200,14 @@ public class FnStaticBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "static-base-uri()",
       ctx);
-    query.baseURI("http://www.example.com");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.baseURI("http://www.example.com");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com")
     );
@@ -181,9 +221,13 @@ public class FnStaticBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"ftp://ftp.is.co.za/rfc/somefile.txt\"; fn:string(fn:static-base-uri())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ftp://ftp.is.co.za/rfc/somefile.txt")
     );
@@ -197,9 +241,13 @@ public class FnStaticBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"mailto:John.Doe@example.com\"; fn:string(fn:static-base-uri())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "mailto:John.Doe@example.com")
     );
@@ -213,9 +261,13 @@ public class FnStaticBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"news:comp.infosystems.www.servers.unix\"; fn:string(fn:static-base-uri())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "news:comp.infosystems.www.servers.unix")
     );
@@ -229,9 +281,13 @@ public class FnStaticBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"telnet://192.0.2.16:80/\"; fn:string(fn:static-base-uri())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "telnet://192.0.2.16:80/")
     );
@@ -245,9 +301,13 @@ public class FnStaticBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"tel:+1-816-555-1212\"; fn:string(fn:static-base-uri())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "tel:+1-816-555-1212")
     );
@@ -261,9 +321,13 @@ public class FnStaticBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"urn:oasis:names:specification:docbook:dtd:xml:4.1.2\"; fn:string(fn:static-base-uri())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "urn:oasis:names:specification:docbook:dtd:xml:4.1.2")
     );
@@ -277,9 +341,13 @@ public class FnStaticBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://www.example.com\"; fn:upper-case(fn:string(fn:static-base-uri()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "HTTP://WWW.EXAMPLE.COM")
     );
@@ -293,9 +361,13 @@ public class FnStaticBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://www.example.com\"; fn:lower-case(fn:string(fn:static-base-uri()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com")
     );

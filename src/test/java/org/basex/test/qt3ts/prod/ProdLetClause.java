@@ -20,9 +20,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $i := 5, $j := 20 * $i return $i, $j",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -36,9 +40,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $i = 5 return 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -52,9 +60,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $i in 5 return 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -71,9 +83,13 @@ public class ProdLetClause extends QT3TestSet {
       "        declare variable $t := false(); \n" +
       "        deep-equal((let $i := true(), $t := true() return ($i, $t)), (true(), true()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -87,9 +103,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((<b/>, <b/>, <b/>, <b/>), (for $v1 in (1, 2, 3, 4) let $v2 := <b/> return ($v2))/.)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -103,9 +123,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $i as xs:double := 1.1 return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -119,9 +143,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $i as xs:float := 1 return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -135,9 +163,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $i as xs:double := 1 return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -151,9 +183,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $i as xs:double := xs:float(3) return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -167,9 +203,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $i as xs:string := xs:untypedAtomic(\"a string\") return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -183,9 +223,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $i as xs:string := xs:anyURI(\"http://www.example.com/\") return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -199,9 +243,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $e := <e/>; for $i in (<a/>, $e, <c/>) return $i is $e",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "false true false")
     );
@@ -215,9 +263,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:function() { let $b := (i/a) return () }; empty(local:function())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -237,9 +289,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:foo($a as xs:integer) { if($a = 3) then $a else let $a := $a return local:foo($a + 1) }; local:foo(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -253,9 +309,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $v := . return 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("1")
@@ -273,9 +333,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((<b/>, <b/>, <b/>, <b/>), (for $v1 in (1, 2, 3, 4) let $v2 := <b/> return ($v2)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -294,10 +358,14 @@ public class ProdLetClause extends QT3TestSet {
       "        return <dept> <deptno>{$d}</deptno> <headcount> {count($e)} </headcount> <payroll> {sum($e/salary)} </payroll> </dept>\n" +
       "      ",
       ctx);
-    query.context(node(file("op/union/acme_corp.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("op/union/acme_corp.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<dept><deptno>1</deptno><headcount>2</headcount><payroll>130000</payroll></dept><dept><deptno>2</deptno><headcount>1</headcount><payroll>80000</payroll></dept>", false)
     );
@@ -311,9 +379,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e/>/(for $b in 1, $i in self::node() return $i)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e/>", false)
     );
@@ -327,9 +399,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e/>/(for $i in self::node() return $i)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e/>", false)
     );
@@ -343,9 +419,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(<e/>/(let $i := . return (string($i), data($i))))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -359,9 +439,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:function() { let $b := (i/a) return 1 }; local:function()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("1")
@@ -406,9 +490,13 @@ public class ProdLetClause extends QT3TestSet {
       "                            else if ($b) then 1 \n" +
       "                            else ()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -422,9 +510,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $e := <element/>, $outer as element() := $e/element() return $outer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -438,9 +530,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:myFunc() { let $v := . return $v }; local:myFunc()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -454,9 +550,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:myFunc($arg as node()) { let $v := . return $arg/$v }; local:myFunc(<e/>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -470,9 +570,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:myFunc($arg as node()) { let $v := aNameTest return $arg/$v }; local:myFunc(<e/>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -486,9 +590,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:myFunc($arg as node()) { let $v := aNameTest return $arg/$v }; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("1")
@@ -506,9 +614,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $i as xs:integer := xs:untypedAtomic(\"1\") return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -522,9 +634,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "return 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -538,9 +654,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $i as xs:float := 1.1 return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -554,9 +674,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $x := \"92233720368547758\" return $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "92233720368547758")
     );
@@ -570,9 +694,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $x := 92233720368547758 return $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("92233720368547758")
     );
@@ -586,9 +714,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $x := 92233720368547758+1 return $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("92233720368547759")
     );
@@ -602,9 +734,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $x := xs:long(\"92233720368547758\") return $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("92233720368547758")
     );
@@ -618,9 +754,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $x := xs:long(\"-92233720368547758\")+1 return $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-92233720368547757")
     );
@@ -634,9 +774,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $x := xs:double(\"1.7976931348623157E308\") return $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1.7976931348623157E308")
     );
@@ -650,9 +794,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $x:=<a>{1+1}</a> return $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>2</a>", false)
     );
@@ -666,9 +814,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $x:=1, $y:=$x+1 return $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -682,9 +834,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $x:=1, $y:=<a>{$x+1}</a> return $y",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>2</a>", false)
     );
@@ -698,9 +854,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $x:=(1,2,3), $y:=$x+1 return $y",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -714,9 +874,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $x :=(1 to 100)[. mod 5 eq 0] return $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "5 10 15 20 25 30 35 40 45 50 55 60 65 70 75 80 85 90 95 100")
     );
@@ -730,9 +894,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $x :=(1 to 100)[. mod 5 eq 0], $y := $x[. mod 10 eq 0] return $y",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "10 20 30 40 50 60 70 80 90 100")
     );
@@ -746,9 +914,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $x:=\"hello\", $y:=concat($x,\" there\") return $y",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "hello there")
     );
@@ -762,9 +934,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $x := \"1\", $y := $x+1 return $y",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -778,9 +954,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $x := (0,0.1e-1,2.0,'a',\"cat\",'',true()) return $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0 0.01 2 a cat  true")
     );
@@ -794,9 +974,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $a := (<elem1/>, <elem2/>, <elem3 att=\"test\"/>) return <root>{$a}</root>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<root><elem1/><elem2/><elem3 att=\"test\"/></root>", false)
     );
@@ -810,9 +994,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $x := (<a> <b> <c> 123 </c> </b> </a>) return $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a><b><c> 123 </c></b></a>", false)
     );
@@ -826,9 +1014,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $x := (0,0.1e-1,2.0,'a',\"cat\",'',true(), ('<a> <b> <c> 123 </c> </b> </a>')/a/b) return $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0019")
     );
@@ -842,9 +1034,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $a := <elem/> let $b := <elem2/> return ($a,$b)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem/><elem2/>", false)
     );
@@ -858,9 +1054,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $a := 1 let $b := $a let $c := $a+$b return ($c)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -874,9 +1074,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $a := $b return ($a)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -890,9 +1094,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $salary as xs:decimal := \"cat\" return $salary * 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -906,9 +1114,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var as xs:dateTime := xs:dateTime(\"1999-05-31T13:20:00Z\") return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1999-05-31T13:20:00Z")
     );
@@ -922,9 +1134,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var as xs:float := xs:float(100) return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("100")
     );
@@ -938,9 +1154,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var as xs:integer := 100+200 return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("300")
     );
@@ -954,9 +1174,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var as xs:integer := fn:count((100,200)) return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -970,9 +1194,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var as xs:boolean := fn:not(fn:true()) return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -986,9 +1214,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var as xs:boolean := fn:true() and fn:true() return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1002,9 +1234,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var as xs:boolean := fn:true() and fn:true() return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1018,9 +1254,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var as xs:integer := fn:string-length(\"A String\") return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("8")
     );
@@ -1034,9 +1274,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var as xs:string := xs:string((xs:integer(100))) return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "100")
     );
@@ -1050,9 +1294,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var as xs:string := xs:string((xs:decimal(100))) return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "100")
     );
@@ -1066,9 +1314,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var as xs:decimal := 100 return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("100")
     );
@@ -1082,9 +1334,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var as xs:string := xs:string((xs:double(100E2))) return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "10000")
     );
@@ -1098,9 +1354,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var as xs:string := xs:string(fn:true()) return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true")
     );
@@ -1114,9 +1374,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var as xs:integer := 100 return $var + 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("101")
     );
@@ -1130,9 +1394,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var as xs:boolean := if (fn:true()) then fn:true() else fn:false() return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1146,9 +1414,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var as xs:string := typeswitch(fn:true()) case $i as xs:boolean return \"Test Passed\" default return \"Test failed\" return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Test Passed")
     );
@@ -1162,9 +1434,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var as xs:integer := 100 return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("100")
     );
@@ -1178,9 +1454,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var as xs:double := 100E1 return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1000")
     );
@@ -1194,9 +1474,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var as xs:string := \"A String\" return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "A String")
     );
@@ -1210,9 +1494,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var as xs:boolean := fn:true() return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1226,9 +1514,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var as xs:boolean := fn:false() return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1242,9 +1534,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var as xs:date := xs:date(\"1999-05-31Z\") return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1999-05-31Z")
     );
@@ -1258,9 +1554,13 @@ public class ProdLetClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var as xs:time := xs:time(\"21:23:00Z\") return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "21:23:00Z")
     );
@@ -1318,9 +1618,13 @@ public class ProdLetClause extends QT3TestSet {
       "      let $union := 1 let $unordered := 1 let $validate := 1 let $variable := 1 let $version := 1 \n" +
       "      let $where := 1 let $xquery := 1 return 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -1355,10 +1659,14 @@ public class ProdLetClause extends QT3TestSet {
       "       /where\n" +
       "       /xquery",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -1392,9 +1700,13 @@ public class ProdLetClause extends QT3TestSet {
       "      <where/> \n" +
       "      <xquery/> </keywords>/name()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "keywords")
     );
@@ -1404,39 +1716,144 @@ public class ProdLetClause extends QT3TestSet {
    * Purpose : keywords can be used as variable names .
    */
   @org.junit.Test
-  public void xquery11keywords() {
+  public void xquery30keywords() {
     final XQuery query = new XQuery(
-      "let $allowing := 1 let $ancestor-or-self := 1 let $ancestor := 1 let $and := 1 let $as := 1 \n" +
-      "      let $ascending := 1 let $at := 1 let $attribute := 1 \n" +
-      "      let $base-uri := 1 let $boundary-space := 1 let $by := 1 \n" +
-      "      let $case := 1 let $cast := 1 let $castable := 1 let $catch := 1 let $child := 1 let $collation := 1 \n" +
-      "      let $comment := 1 let $construction := 1 let $context := 1 let $copy-namespaces := 1 let $count := 1 \n" +
-      "      let $decimal-format := 1 let $decimal-separator := 1 let $declare := 1 let $default := 1 \n" +
-      "      let $descendant-or-self := 1 let $descendant := 1 let $descending := 1 let $deterministic := 1 \n" +
-      "      let $digit := 1 let $div := 1 let $document-node := 1 let $document := 1 \n" +
-      "      let $element := 1 let $else := 1 let $empty-sequence := 1 let $empty := 1 let $encoding := 1 \n" +
-      "      let $end := 1 let $eq := 1 let $every := 1 let $except := 1 let $external := 1 \n" +
-      "      let $following-sibling := 1 let $following := 1 let $for := 1 let $function := 1 \n" +
-      "      let $ge := 1 let $greatest := 1 let $group := 1 let $grouping-separator := 1 let $gt := 1 \n" +
-      "      let $idiv := 1 let $if := 1 let $import := 1 let $in := 1 let $infinity := 1 let $inherit := 1 \n" +
-      "      let $instance := 1 let $intersect := 1 let $is := 1 let $item := 1 \n" +
-      "      let $lax := 1 let $le := 1 let $least := 1 let $let := 1 let $lt := 1 \n" +
-      "      let $minus-sign := 1 let $mod := 1 let $module := 1 \n" +
-      "      let $namespace-node := 1 let $namespace := 1 let $NaN := 1 let $ne := 1 let $next := 1 \n" +
-      "      let $no-inherit := 1 let $no-preserve := 1 let $node := 1 let $nondeterministic := 1 \n" +
-      "      let $of := 1 let $only := 1 let $option := 1 let $or := 1 let $order := 1 let $ordered := 1 let $ordering := 1 \n" +
-      "      let $parent := 1 let $pattern-separator := 1 let $per-mille := 1 let $percent := 1 let $preceding-sibling := 1 \n" +
-      "      let $preceding := 1 let $preserve := 1 let $previous := 1 let $private := 1 let $processing-instruction := 1 \n" +
-      "      let $public := 1 let $return := 1 \n" +
-      "      let $satisfies := 1 let $schema-attribute := 1 let $schema-element := 1 let $schema := 1 let $self := 1 \n" +
-      "      let $sliding := 1 let $some := 1 let $stable := 1 let $start := 1 let $strict := 1 let $strip := 1 \n" +
-      "      let $switch := 1 let $text := 1 let $then := 1 let $to := 1 let $treat := 1 let $try := 1 let $tumbling := 1 \n" +
-      "      let $typeswitch := 1 let $union := 1 let $unordered := 1 let $validate := 1 let $variable := 1 let $version := 1 \n" +
-      "      let $when := 1 let $where := 1 let $window := 1 let $xquery := 1 let $zero-digit := 1 return 2",
+      "\n" +
+      "        let $NaN := 1\n" +
+      "        let $allowing := 1\n" +
+      "        let $ancestor-or-self := 1\n" +
+      "        let $ancestor := 1\n" +
+      "        let $and := 1\n" +
+      "        let $as := 1\n" +
+      "        let $ascending := 1\n" +
+      "        let $at := 1\n" +
+      "        let $attribute := 1\n" +
+      "        let $base-uri := 1\n" +
+      "        let $boundary-space := 1\n" +
+      "        let $by := 1\n" +
+      "        let $case := 1\n" +
+      "        let $cast := 1\n" +
+      "        let $castable := 1\n" +
+      "        let $catch := 1\n" +
+      "        let $child := 1\n" +
+      "        let $collation := 1\n" +
+      "        let $comment := 1\n" +
+      "        let $construction := 1\n" +
+      "        let $context := 1\n" +
+      "        let $copy-namespaces := 1\n" +
+      "        let $count := 1\n" +
+      "        let $decimal-format := 1\n" +
+      "        let $decimal-separator := 1\n" +
+      "        let $declare := 1\n" +
+      "        let $default := 1\n" +
+      "        let $descendant-or-self := 1\n" +
+      "        let $descendant := 1\n" +
+      "        let $descending := 1\n" +
+      "        let $digit := 1\n" +
+      "        let $div := 1\n" +
+      "        let $document-node := 1\n" +
+      "        let $document := 1\n" +
+      "        let $element := 1\n" +
+      "        let $else := 1\n" +
+      "        let $empty-sequence := 1\n" +
+      "        let $empty := 1\n" +
+      "        let $encoding := 1\n" +
+      "        let $end := 1\n" +
+      "        let $eq := 1\n" +
+      "        let $every := 1\n" +
+      "        let $except := 1\n" +
+      "        let $external := 1\n" +
+      "        let $following-sibling := 1\n" +
+      "        let $following := 1\n" +
+      "        let $for := 1\n" +
+      "        let $function := 1\n" +
+      "        let $ge := 1\n" +
+      "        let $greatest := 1\n" +
+      "        let $group := 1\n" +
+      "        let $grouping-separator := 1\n" +
+      "        let $gt := 1\n" +
+      "        let $idiv := 1\n" +
+      "        let $if := 1\n" +
+      "        let $import := 1\n" +
+      "        let $in := 1\n" +
+      "        let $infinity := 1\n" +
+      "        let $inherit := 1\n" +
+      "        let $instance := 1\n" +
+      "        let $intersect := 1\n" +
+      "        let $is := 1\n" +
+      "        let $item := 1\n" +
+      "        let $lax := 1\n" +
+      "        let $le := 1\n" +
+      "        let $least := 1\n" +
+      "        let $let := 1\n" +
+      "        let $lt := 1\n" +
+      "        let $minus-sign := 1\n" +
+      "        let $mod := 1\n" +
+      "        let $module := 1\n" +
+      "        let $namespace-node := 1\n" +
+      "        let $namespace := 1\n" +
+      "        let $ne := 1\n" +
+      "        let $next := 1\n" +
+      "        let $no-inherit := 1\n" +
+      "        let $no-preserve := 1\n" +
+      "        let $node := 1\n" +
+      "        let $of := 1\n" +
+      "        let $only := 1\n" +
+      "        let $option := 1\n" +
+      "        let $or := 1\n" +
+      "        let $order := 1\n" +
+      "        let $ordered := 1\n" +
+      "        let $ordering := 1\n" +
+      "        let $parent := 1\n" +
+      "        let $pattern-separator := 1\n" +
+      "        let $per-mille := 1\n" +
+      "        let $percent := 1\n" +
+      "        let $preceding-sibling := 1\n" +
+      "        let $preceding := 1\n" +
+      "        let $preserve := 1\n" +
+      "        let $previous := 1\n" +
+      "        let $processing-instruction := 1\n" +
+      "        let $return := 1\n" +
+      "        let $satisfies := 1\n" +
+      "        let $schema-attribute := 1\n" +
+      "        let $schema-element := 1\n" +
+      "        let $schema := 1\n" +
+      "        let $self := 1\n" +
+      "        let $sliding := 1\n" +
+      "        let $some := 1\n" +
+      "        let $stable := 1\n" +
+      "        let $start := 1\n" +
+      "        let $strict := 1\n" +
+      "        let $strip := 1\n" +
+      "        let $switch := 1\n" +
+      "        let $text := 1\n" +
+      "        let $then := 1\n" +
+      "        let $to := 1\n" +
+      "        let $treat := 1\n" +
+      "        let $try := 1\n" +
+      "        let $tumbling := 1\n" +
+      "        let $type := 1\n" +
+      "        let $typeswitch := 1\n" +
+      "        let $union := 1\n" +
+      "        let $unordered := 1\n" +
+      "        let $validate := 1\n" +
+      "        let $variable := 1\n" +
+      "        let $version := 1\n" +
+      "        let $when := 1\n" +
+      "        let $where := 1\n" +
+      "        let $window := 1\n" +
+      "        let $xquery := 1\n" +
+      "        let $zero-digit := 1\n" +
+      "        return 2\n" +
+      "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -1446,32 +1863,146 @@ public class ProdLetClause extends QT3TestSet {
    * Purpose : keywords can be used as element name tests .
    */
   @org.junit.Test
-  public void xquery11keywords2() {
+  public void xquery30keywords2() {
     final XQuery query = new XQuery(
       "\n" +
-      "      let $x := (/) return $x /allowing /ancestor-or-self /ancestor /and /as /ascending /at /attribute \n" +
-      "      /base-uri /boundary-space /by \n" +
-      "      /case /cast /castable /catch /child /collation /comment /construction /context /copy-namespaces /count \n" +
-      "      /decimal-format /decimal-separator /declare /default /descendant-or-self /descendant /descending /deterministic \n" +
-      "      /digit /div /document-node /document \n" +
-      "      /element /else /empty-sequence /empty /encoding /end /eq /every /except /external \n" +
-      "      /following-sibling /following /for /function \n" +
-      "      /ge /greatest /group /grouping-separator /gt \n" +
-      "      /idiv /if /import /in /infinity /inherit /instance /intersect /is /item \n" +
-      "      /lax /le /least /let /lt /minus-sign /mod /module \n" +
-      "      /namespace-node /namespace /NaN /ne /next /no-inherit /no-preserve /node /nondeterministic \n" +
-      "      /of /only /option /or /order /ordered /ordering \n" +
-      "      /parent /pattern-separator /per-mille /percent /preceding-sibling /preceding /preserve \n" +
-      "      /previous /private /processing-instruction /public /return \n" +
-      "      /satisfies /schema-attribute /schema-element /schema /self /sliding /some /stable /start /strict /strip /switch \n" +
-      "      /text /then /to /treat /try /tumbling /typeswitch \n" +
-      "      /union /unordered /validate /variable /version \n" +
-      "      /when /where /window /xquery /zero-digit",
+      "        let $x := (/)\n" +
+      "        return $x\n" +
+      "        /NaN\n" +
+      "        /allowing\n" +
+      "        /ancestor-or-self\n" +
+      "        /ancestor\n" +
+      "        /and\n" +
+      "        /as\n" +
+      "        /ascending\n" +
+      "        /at\n" +
+      "        /attribute\n" +
+      "        /base-uri\n" +
+      "        /boundary-space\n" +
+      "        /by\n" +
+      "        /case\n" +
+      "        /cast\n" +
+      "        /castable\n" +
+      "        /catch\n" +
+      "        /child\n" +
+      "        /collation\n" +
+      "        /comment\n" +
+      "        /construction\n" +
+      "        /context\n" +
+      "        /copy-namespaces\n" +
+      "        /count\n" +
+      "        /decimal-format\n" +
+      "        /decimal-separator\n" +
+      "        /declare\n" +
+      "        /default\n" +
+      "        /descendant-or-self\n" +
+      "        /descendant\n" +
+      "        /descending\n" +
+      "        /digit\n" +
+      "        /div\n" +
+      "        /document-node\n" +
+      "        /document\n" +
+      "        /element\n" +
+      "        /else\n" +
+      "        /empty-sequence\n" +
+      "        /empty\n" +
+      "        /encoding\n" +
+      "        /end\n" +
+      "        /eq\n" +
+      "        /every\n" +
+      "        /except\n" +
+      "        /external\n" +
+      "        /following-sibling\n" +
+      "        /following\n" +
+      "        /for\n" +
+      "        /function\n" +
+      "        /ge\n" +
+      "        /greatest\n" +
+      "        /group\n" +
+      "        /grouping-separator\n" +
+      "        /gt\n" +
+      "        /idiv\n" +
+      "        /if\n" +
+      "        /import\n" +
+      "        /in\n" +
+      "        /infinity\n" +
+      "        /inherit\n" +
+      "        /instance\n" +
+      "        /intersect\n" +
+      "        /is\n" +
+      "        /item\n" +
+      "        /lax\n" +
+      "        /le\n" +
+      "        /least\n" +
+      "        /let\n" +
+      "        /lt\n" +
+      "        /minus-sign\n" +
+      "        /mod\n" +
+      "        /module\n" +
+      "        /namespace-node\n" +
+      "        /namespace\n" +
+      "        /ne\n" +
+      "        /next\n" +
+      "        /no-inherit\n" +
+      "        /no-preserve\n" +
+      "        /node\n" +
+      "        /of\n" +
+      "        /only\n" +
+      "        /option\n" +
+      "        /or\n" +
+      "        /order\n" +
+      "        /ordered\n" +
+      "        /ordering\n" +
+      "        /parent\n" +
+      "        /pattern-separator\n" +
+      "        /per-mille\n" +
+      "        /percent\n" +
+      "        /preceding-sibling\n" +
+      "        /preceding\n" +
+      "        /preserve\n" +
+      "        /previous\n" +
+      "        /processing-instruction\n" +
+      "        /return\n" +
+      "        /satisfies\n" +
+      "        /schema-attribute\n" +
+      "        /schema-element\n" +
+      "        /schema\n" +
+      "        /self\n" +
+      "        /sliding\n" +
+      "        /some\n" +
+      "        /stable\n" +
+      "        /start\n" +
+      "        /strict\n" +
+      "        /strip\n" +
+      "        /switch\n" +
+      "        /text\n" +
+      "        /then\n" +
+      "        /to\n" +
+      "        /treat\n" +
+      "        /try\n" +
+      "        /tumbling\n" +
+      "        /type\n" +
+      "        /typeswitch\n" +
+      "        /union\n" +
+      "        /unordered\n" +
+      "        /validate\n" +
+      "        /variable\n" +
+      "        /version\n" +
+      "        /when\n" +
+      "        /where\n" +
+      "        /window\n" +
+      "        /xquery\n" +
+      "        /zero-digit\n" +
+      "      ",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -1481,30 +2012,145 @@ public class ProdLetClause extends QT3TestSet {
    * Purpose : keywords can be used as element names .
    */
   @org.junit.Test
-  public void xquery11keywords3() {
+  public void xquery30keywords3() {
     final XQuery query = new XQuery(
       "\n" +
-      "      <keywords> <allowing/> <ancestor-or-self/> <ancestor/> <and/> <as/> <ascending/> <at/> <attribute/> \n" +
-      "      <base-uri/> <boundary-space/> <by/> \n" +
-      "      <case/> <cast/> <castable/> <catch/> <child/> <collation/> <comment/> <construction/> <context/> <copy-namespaces/> <count/> \n" +
-      "      <decimal-format/> <decimal-separator/> <declare/> <default/> <descendant-or-self/> <descendant/> \n" +
-      "      <descending/> <deterministic/> <digit/> <div/> <document-node/> <document/> \n" +
-      "      <element/> <else/> <empty-sequence/> <empty/> <encoding/> <end/> <eq/> <every/> <except/> <external/> \n" +
-      "      <following-sibling/> <following/> <for/> <function/> \n" +
-      "      <ge/> <greatest/> <group/> <grouping-separator/> <gt/> \n" +
-      "      <idiv/> <if/> <import/> <in/> <infinity/> <inherit/> <instance/> <intersect/> <is/> <item/> \n" +
-      "      <lax/> <le/> <least/> <let/> <lt/> <minus-sign/> <mod/> <module/> \n" +
-      "      <namespace-node/> <namespace/> <NaN/> <ne/> <next/> <no-inherit/> <no-preserve/> <node/> <nondeterministic/> \n" +
-      "      <of/> <only/> <option/> <or/> <order/> <ordered/> <ordering/> \n" +
-      "      <parent/> <pattern-separator/> <per-mille/> <percent/> <preceding-sibling/> <preceding/> <preserve/> \n" +
-      "      <previous/> <private/> <processing-instruction/> <public/> <return/> \n" +
-      "      <satisfies/> <schema-attribute/> <schema-element/> <schema/> <self/> <sliding/> <some/> <stable/> <start/> <strict/> <strip/> <switch/> \n" +
-      "      <text/> <then/> <to/> <treat/> <try/> <tumbling/> <typeswitch/> \n" +
-      "      <union/> <unordered/> <validate/> <variable/> <version/> <when/> <where/> <window/> <xquery/> <zero-digit/> </keywords>/name()",
+      "        <keywords>\n" +
+      "           <NaN/>\n" +
+      "           <allowing/>\n" +
+      "           <ancestor-or-self/>\n" +
+      "           <ancestor/>\n" +
+      "           <and/>\n" +
+      "           <as/>\n" +
+      "           <ascending/>\n" +
+      "           <at/>\n" +
+      "           <attribute/>\n" +
+      "           <base-uri/>\n" +
+      "           <boundary-space/>\n" +
+      "           <by/>\n" +
+      "           <case/>\n" +
+      "           <cast/>\n" +
+      "           <castable/>\n" +
+      "           <catch/>\n" +
+      "           <child/>\n" +
+      "           <collation/>\n" +
+      "           <comment/>\n" +
+      "           <construction/>\n" +
+      "           <context/>\n" +
+      "           <copy-namespaces/>\n" +
+      "           <count/>\n" +
+      "           <decimal-format/>\n" +
+      "           <decimal-separator/>\n" +
+      "           <declare/>\n" +
+      "           <default/>\n" +
+      "           <descendant-or-self/>\n" +
+      "           <descendant/>\n" +
+      "           <descending/>\n" +
+      "           <digit/>\n" +
+      "           <div/>\n" +
+      "           <document-node/>\n" +
+      "           <document/>\n" +
+      "           <element/>\n" +
+      "           <else/>\n" +
+      "           <empty-sequence/>\n" +
+      "           <empty/>\n" +
+      "           <encoding/>\n" +
+      "           <end/>\n" +
+      "           <eq/>\n" +
+      "           <every/>\n" +
+      "           <except/>\n" +
+      "           <external/>\n" +
+      "           <following-sibling/>\n" +
+      "           <following/>\n" +
+      "           <for/>\n" +
+      "           <function/>\n" +
+      "           <ge/>\n" +
+      "           <greatest/>\n" +
+      "           <group/>\n" +
+      "           <grouping-separator/>\n" +
+      "           <gt/>\n" +
+      "           <idiv/>\n" +
+      "           <if/>\n" +
+      "           <import/>\n" +
+      "           <in/>\n" +
+      "           <infinity/>\n" +
+      "           <inherit/>\n" +
+      "           <instance/>\n" +
+      "           <intersect/>\n" +
+      "           <is/>\n" +
+      "           <item/>\n" +
+      "           <lax/>\n" +
+      "           <le/>\n" +
+      "           <least/>\n" +
+      "           <let/>\n" +
+      "           <lt/>\n" +
+      "           <minus-sign/>\n" +
+      "           <mod/>\n" +
+      "           <module/>\n" +
+      "           <namespace-node/>\n" +
+      "           <namespace/>\n" +
+      "           <ne/>\n" +
+      "           <next/>\n" +
+      "           <no-inherit/>\n" +
+      "           <no-preserve/>\n" +
+      "           <node/>\n" +
+      "           <of/>\n" +
+      "           <only/>\n" +
+      "           <option/>\n" +
+      "           <or/>\n" +
+      "           <order/>\n" +
+      "           <ordered/>\n" +
+      "           <ordering/>\n" +
+      "           <parent/>\n" +
+      "           <pattern-separator/>\n" +
+      "           <per-mille/>\n" +
+      "           <percent/>\n" +
+      "           <preceding-sibling/>\n" +
+      "           <preceding/>\n" +
+      "           <preserve/>\n" +
+      "           <previous/>\n" +
+      "           <processing-instruction/>\n" +
+      "           <return/>\n" +
+      "           <satisfies/>\n" +
+      "           <schema-attribute/>\n" +
+      "           <schema-element/>\n" +
+      "           <schema/>\n" +
+      "           <self/>\n" +
+      "           <sliding/>\n" +
+      "           <some/>\n" +
+      "           <stable/>\n" +
+      "           <start/>\n" +
+      "           <strict/>\n" +
+      "           <strip/>\n" +
+      "           <switch/>\n" +
+      "           <text/>\n" +
+      "           <then/>\n" +
+      "           <to/>\n" +
+      "           <treat/>\n" +
+      "           <try/>\n" +
+      "           <tumbling/>\n" +
+      "           <type/>\n" +
+      "           <typeswitch/>\n" +
+      "           <union/>\n" +
+      "           <unordered/>\n" +
+      "           <validate/>\n" +
+      "           <variable/>\n" +
+      "           <version/>\n" +
+      "           <when/>\n" +
+      "           <where/>\n" +
+      "           <window/>\n" +
+      "           <xquery/>\n" +
+      "           <zero-digit/>\n" +
+      "        </keywords>/name()\n" +
+      "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "keywords")
     );

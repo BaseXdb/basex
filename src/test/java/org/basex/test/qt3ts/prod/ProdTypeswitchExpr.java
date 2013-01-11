@@ -20,9 +20,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(typeswitch((1, 2)) case xs:integer return -1 case xs:integer+ return 1 default return -2) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -36,9 +40,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(typeswitch(\"a string\") case xs:anyURI return -1 case xs:string return 1 default return -2) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(typeswitch(\"a string\") case xs:untypedAtomic return -1 case xs:string return 1 default return -2) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(typeswitch((1, \"a string\")) case xs:integer return -1 case xs:string return -2 case xs:anyAtomicType+ return 1 default return -3) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(typeswitch(((1, current-time())[1])) case element() return -1 case xs:integer return 1 default return -2) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(typeswitch(()) case xs:integer* return 1 case empty-sequence() return 1 default return -2) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,9 +140,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(typeswitch(1, 2, 3) case xs:string+ return -1 case xs:integer+ return 1 default return -2) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -132,9 +160,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(typeswitch(1, 2, current-time()) case element() return -1 case document-node() return -2 default return 1) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -148,9 +180,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "boolean(typeswitch (current-time(), 1, 3e3, \"foo\") case node() return 0 case xs:integer return 3 case xs:anyAtomicType return true() default return -1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -164,9 +200,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch (1, 2, 3) case node() return <e/> case $i as xs:integer return 3 default return 1, $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -180,9 +220,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch (1, 2, 3) case node() return <e/> default $i return 1 , typeswitch (1, 2, 3) case xs:integer* return $i default return 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -196,9 +240,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $i := (attribute name {\"content\"}, <a attr=\"content\"/>, <e/>, 1, \"str\", <!-- a comment -->); <d> { typeswitch(typeswitch($i) case $b as element(e) return concat(\"Found an element by name \", $b) case $b as element() return comment{concat(\"Found: \", $b)} case $c as attribute(doesntMatch) return $c/.. default $def return $def) case $str as xs:string return \"A string\" case $attr as attribute() return string($attr) default $def return $def } </d>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<d name=\"content\"><a attr=\"content\"/><e/>1 str<!-- a comment --></d>", false)
     );
@@ -212,9 +260,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $i := (<e/>, attribute name {\"content\"}, <a attr=\"content\"/>, <e/>, 1, \"str\", <!-- a comment -->); <d> { typeswitch(typeswitch($i) case $b as element(e) return concat(\"Found an element by name \", $b) case $b as element() return comment{concat(\"Found: \", $b)} case $c as attribute(doesntMatch) return $c/.. default $def return $def) case $str as xs:string return \"A string\" case $attr as attribute() return string($attr) default $def return $def } </d>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQTY0024")
     );
@@ -228,9 +280,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e/>/(typeswitch (self::node()) case $i as node() return . default return 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e/>", false)
     );
@@ -244,9 +300,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e/>/(typeswitch (self::node()) case $i as xs:integer return $i default $v return $v)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e/>", false)
     );
@@ -260,9 +320,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch(<e/>, <e/>) case $b as element() return concat(\"\", $b treat as element()) default return 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -276,9 +340,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch(current-time()) case node() return 0 case xs:integer return 3 case xs:anyAtomicType return true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -292,9 +360,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch 1 case node() return 0 case xs:integer return 3 default return true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -308,9 +380,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch (1, 2, 3) case $i as node() return <e/> case xs:integer* return $i default return true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -324,9 +400,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch (1, 2, 3) case node() return $i case $i as xs:integer return 1 default return true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -340,9 +420,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch (1, 2, 3) case node() return <e/> case $i as xs:integer return 1 default return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -356,9 +440,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch (1, 2, 3) case node() return <e/> case xs:integer* return $i default $i return 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -372,9 +460,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch (1, 2, 3) case node() return <e/> case xs:integer return 3 default $i as item() return 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -388,11 +480,145 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch (1, 2, 3) case node() return <e/> case xs:integer return 3 default $i return 1, $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
+    );
+  }
+
+  /**
+   *  Tests evaluateoptionalitem .
+   */
+  @org.junit.Test
+  public void cbclTypeswitch001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        upper-case(typeswitch ((1 to 10)[. mod 2 = 0]) case xs:integer+ return \"int\" default return \"false\")\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "INT")
+    );
+  }
+
+  /**
+   *  Tests evaluateOptionalItem with default clause .
+   */
+  @org.junit.Test
+  public void cbclTypeswitch002() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        upper-case(typeswitch ((1 to 10)[. div 2 = 0]) case xs:integer+ return \"int\" default return \"false\")\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "FALSE")
+    );
+  }
+
+  /**
+   *  Tests typeswitch clause which always returns the same value .
+   */
+  @org.junit.Test
+  public void cbclTypeswitch003() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        typeswitch ((1 to 10)[. mod 2 = 0]) case xs:integer+ return true() default return true()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  Tests optimization of typeswitch clause to "instance of" .
+   */
+  @org.junit.Test
+  public void cbclTypeswitch004() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        typeswitch ((1 to 10)[. mod 2 = 0]) case xs:integer+ return false() default return true()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  Tests which calls Evaluate method .
+   */
+  @org.junit.Test
+  public void cbclTypeswitch005() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        subsequence((1 to 10)[. mod 2 = 0] instance of xs:integer+,1)\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  Test which calls EvaluateToOptionalItem method .
+   */
+  @org.junit.Test
+  public void cbclTypeswitch006() {
+    final XQuery query = new XQuery(
+      "xs:string((1 to 10)[. mod 2 = 0] instance of xs:integer+)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "true")
     );
   }
 
@@ -408,9 +634,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
       "\t default $v return 0\n" +
       "\t ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("47")
@@ -433,9 +663,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
       "\t default $v return 0\n" +
       "\t ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("47")
@@ -457,9 +691,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
       "\t default $v return 0\n" +
       "\t ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("47")
@@ -482,9 +720,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
       "\t default $v return 0\n" +
       "\t ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("47")
@@ -506,9 +748,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
       "\t default $v return 0\n" +
       "\t ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("47")
@@ -531,9 +777,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
       "\t default $v return 0\n" +
       "\t ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("47")
@@ -556,9 +806,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
       "\t default $v return 0\n" +
       "\t ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("1, 1, 0")
     );
@@ -576,9 +830,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
       "\t default $v return 0\n" +
       "\t ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -596,9 +854,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
       "\t default $v return 0\n" +
       "\t ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -612,9 +874,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch (5) case $i as xs:integer return <wrap>test passed - integer data type</wrap> case $i as xs:date return <wrap>test failed</wrap> case $i as xs:time return <wrap>test failed</wrap> case $i as xs:string return <wrap>test failed</wrap> default return <wrap>test failed</wrap>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<wrap>test passed - integer data type</wrap>", false)
     );
@@ -628,9 +894,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch(xs:anyURI(\"http://example.com\")) case $i as xs:string return <wrap>test failed</wrap> case $i as xs:integer return <wrap>test failed</wrap> case $i as xs:anyURI return <wrap>test passed - xs:anyURI(\"http://www.example.com\")is of anyURI type</wrap> default return <wrap>test failed</wrap>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<wrap>test passed - xs:anyURI(\"http://www.example.com\")is of anyURI type</wrap>", false)
     );
@@ -644,9 +914,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch(123) case $i as xs:string return <wrap>test failed</wrap> case $i as xs:double return <wrap>test failed</wrap> case $i as xs:anyURI return <wrap>test failed</wrap> default return <wrap>test passed - 123 is an integer (not an option on any cases)</wrap>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<wrap>test passed - 123 is an integer (not an option on any cases)</wrap>", false)
     );
@@ -660,9 +934,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch(123) case $i as xs:string return <wrap>test failed</wrap> case $i as xs:double return <wrap>test failed</wrap> case $i as xs:integer return <wrap>test passed - If a dynamic error is generated, then test failed.</wrap> default return 12 div 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<wrap>test passed - If a dynamic error is generated, then test failed.</wrap>", false)
     );
@@ -676,9 +954,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch(if (1 lt 2) then 3 else 4.5E4) case $i as xs:string return <wrap>test failed</wrap> case $i as xs:double return <wrap>test failed</wrap> case $i as xs:integer return <wrap>test passed - \"(1 lt 2) then 3 else 4.5E4\" should evaluate to an integer</wrap> default return <wrap>test failed</wrap>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<wrap>test passed - \"(1 lt 2) then 3 else 4.5E4\" should evaluate to an integer</wrap>", false)
     );
@@ -692,9 +974,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch(fn:true() and fn:true()) case $i as xs:string return <wrap>test failed</wrap> case $i as xs:double return <wrap>test failed</wrap> case $i as xs:boolean return <wrap>test passed - \"fn:true() and fn:true()\" should evaluate to boolean type</wrap> default return <wrap>test failed</wrap>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<wrap>test passed - \"fn:true() and fn:true()\" should evaluate to boolean type</wrap>", false)
     );
@@ -708,9 +994,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch(fn:true() or fn:false()) case $i as xs:string return <wrap>test failed</wrap> case $i as xs:double return <wrap>test failed</wrap> case $i as xs:boolean return <wrap>test passed - \"fn:true() or fn:false()\" should evaluate to boolean type</wrap> default return <wrap>test failed</wrap>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<wrap>test passed - \"fn:true() or fn:false()\" should evaluate to boolean type</wrap>", false)
     );
@@ -724,9 +1014,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch(typeswitch (1) case $i as xs:integer return $i default return <a>fn:false</a> ) case $i as xs:string return <wrap>test failed</wrap> case $i as xs:double return <wrap>test failed</wrap> case $i as xs:integer return <wrap>test passed - the operand expression should evaluate to an integer type</wrap> default return <wrap>test failed</wrap>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<wrap>test passed - the operand expression should evaluate to an integer type</wrap>", false)
     );
@@ -740,9 +1034,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch (5) case $i as xs:integer return xs:integer(1 + 1) case $i as xs:date return <wrap>test failed</wrap> case $i as xs:time return <wrap>test failed</wrap> case $i as xs:string return <wrap>test failed</wrap> default return <wrap>test failed</wrap>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -756,9 +1054,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch (5.1) case $i as xs:decimal return xs:decimal(1.1 + 3.1) case $i as xs:float return <wrap>test failed</wrap> case $i as xs:integer return <wrap>test failed</wrap> case $i as xs:double return <wrap>test failed</wrap> default return <wrap>test failed</wrap>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "4.2")
     );
@@ -772,9 +1074,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch (5.1E2) case $i as xs:integer return <wrap>test failed2</wrap> case $i as xs:double return xs:double(5.1E2 + 1.1E2) default return <wrap>test failed</wrap>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("620")
     );
@@ -788,9 +1094,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch (5.1) case $i as xs:decimal return <wrap>test passed - 5.1 is a decimal type</wrap> case $i as xs:float return <wrap>test failed</wrap> case $i as xs:integer return <wrap>test failed</wrap> case $i as xs:double return <wrap>test failed</wrap> default return <wrap>test failed</wrap>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<wrap>test passed - 5.1 is a decimal type</wrap>", false)
     );
@@ -804,9 +1114,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch (\"A String\") case $i as xs:decimal return <wrap>test failed</wrap> case $i as xs:integer return <wrap>test failed</wrap> case $i as xs:string return fn:string-length($i) default return <wrap>test failed</wrap>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("8")
     );
@@ -820,9 +1134,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch (1) case $i as xs:double return <wrap>test failed</wrap> case $i as xs:integer return fn:count((1, 2, 3)) case $i as xs:string return <wrap>test failed</wrap> default return <wrap>test failed</wrap>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -836,9 +1154,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch (1) case $i as xs:double return <wrap>test failed</wrap> case $i as xs:integer return 5 - 3 case $i as xs:string return <wrap>test failed</wrap> default return <wrap>test failed</wrap>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -852,9 +1174,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch (1) case $i as xs:double return <wrap>test failed</wrap> case $i as xs:integer return 5 * 2 case $i as xs:string return <wrap>test failed</wrap> default return <wrap>test failed</wrap>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("10")
     );
@@ -868,9 +1194,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch (1) case $i as xs:double return <wrap>test failed</wrap> case $i as xs:integer return 10 div 2 case $i as xs:string return <wrap>test failed</wrap> default return <wrap>test failed</wrap>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5")
     );
@@ -884,9 +1214,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch (1) case $i as xs:double return <wrap>test failed</wrap> case $i as xs:integer return 10 idiv 2 case $i as xs:string return <wrap>test failed</wrap> default return <wrap>test failed</wrap>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5")
     );
@@ -900,9 +1234,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch (5.1E2) case $i as xs:integer return <wrap>test failed2</wrap> case $i as xs:double return <wrap>test passed - 5.1E2 is a double type</wrap> default return <wrap>test failed</wrap>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<wrap>test passed - 5.1E2 is a double type</wrap>", false)
     );
@@ -916,9 +1254,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch (\"A String\") case $i as xs:decimal return <wrap>test failed</wrap> case $i as xs:integer return <wrap>test failed</wrap> case $i as xs:string return <wrap>test passed - \"A String\" is a string type</wrap> default return <wrap>test failed</wrap>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<wrap>test passed - \"A String\" is a string type</wrap>", false)
     );
@@ -932,9 +1274,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch (1267.43233E12) case $i as xs:string return <wrap>test failed</wrap> case $i as xs:integer return <wrap>test failed</wrap> case $i as xs:double return <wrap>test passed - 1267.43233E12 is a double type</wrap> default return <wrap>test failed</wrap>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<wrap>test passed - 1267.43233E12 is a double type</wrap>", false)
     );
@@ -948,9 +1294,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch(1 > 2) case $i as xs:string return <wrap>test failed</wrap> case $i as xs:integer return <wrap>test failed</wrap> case $i as xs:boolean return <wrap>test passed - 1 > 2 is a boolean type</wrap> default return <wrap>test failed</wrap>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<wrap>test passed - 1 &gt; 2 is a boolean type</wrap>", false)
     );
@@ -964,9 +1314,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch(xs:date(\"1999-05-31\")) case $i as xs:string return <wrap>test failed</wrap> case $i as xs:integer return <wrap>test failed</wrap> case $i as xs:date return <wrap>test passed - xs:date(\"1999-05-31\")is of date type</wrap> default return <wrap>test failed</wrap>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<wrap>test passed - xs:date(\"1999-05-31\")is of date type</wrap>", false)
     );
@@ -980,9 +1334,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch(xs:time(\"12:00:00\")) case $i as xs:string return <wrap>test failed</wrap> case $i as xs:integer return <wrap>test failed</wrap> case $i as xs:time return <wrap>test passed - xs:time(\"12:00:00\")is of time type</wrap> default return <wrap>test failed</wrap>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<wrap>test passed - xs:time(\"12:00:00\")is of time type</wrap>", false)
     );
@@ -996,9 +1354,13 @@ public class ProdTypeswitchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "typeswitch(xs:dateTime(\"1999-12-31T19:20:00\")) case $i as xs:string return <wrap>test failed</wrap> case $i as xs:integer return <wrap>test failed</wrap> case $i as xs:dateTime return <wrap>test passed - xs:dateTime(\"1999-12-31T19:20:00\")is of dateTime type</wrap> default return <wrap>test failed</wrap>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<wrap>test passed - xs:dateTime(\"1999-12-31T19:20:00\")is of dateTime type</wrap>", false)
     );

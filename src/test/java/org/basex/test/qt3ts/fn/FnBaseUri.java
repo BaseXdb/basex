@@ -20,9 +20,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "base-uri((), \"wrong param\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(base-uri(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(document-uri(<!-- comment -->))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $i := <e xml:base=\"http://www.example.com/\">{processing-instruction target {\"data\"}}</e> return base-uri($i/processing-instruction()[1])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/")
     );
@@ -84,9 +100,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $i := <e xml:base=\"http://www.example.com/\"><!-- content --></e> return base-uri($i/comment()[1])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/")
     );
@@ -100,9 +120,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $i := <e xml:base=\"http://www.example.com/\">{comment {\"content\"}}</e> return base-uri($i/comment()[1])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/")
     );
@@ -116,9 +140,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://www.example.com\"; empty(base-uri(comment {\"content\"}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -132,9 +160,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://www.example.com\"; empty(base-uri(<!-- comment -->))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -148,9 +180,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://www.example.com\"; empty(base-uri(processing-instruction target {\"data\"}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -164,9 +200,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://www.example.com\"; empty(base-uri(<?target data?>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -180,9 +220,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://www.example.com\"; empty(base-uri(attribute name {\"data\"}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -196,9 +240,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://www.example.com\"; let $i := <e attr=\"foo\"></e> return base-uri($i/@attr)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com")
     );
@@ -212,9 +260,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://www.example.com/\"; let $i := <e xml:base = \"foo/../xml\" attr=\"foo\"> </e> return base-uri($i/@attr)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/xml")
     );
@@ -228,9 +280,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(document-uri(attribute name {\"content\"}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -244,9 +300,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://www.example.com/\"; let $i := <e xml:base = \"foo/../xml\" attr=\"foo\"> </e> return base-uri($i/@xml:base)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/xml")
     );
@@ -264,10 +324,14 @@ public class FnBaseUri extends QT3TestSet {
       "        case xs:integer return \"xs:integer\" \n" +
       "        default return \"FAILURE\"",
       ctx);
-    query.context(node(file("prod/AxisStep/TopMany.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TopMany.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xs:integer xs:anyURI xs:integer")
     );
@@ -281,9 +345,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://example.com/baseURI\"; empty(base-uri(<?target data?>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -297,9 +365,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://example.com/baseURI\"; empty(base-uri(processing-instruction target {\"data\"}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -313,9 +385,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(base-uri(<?target data?>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -329,9 +405,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(base-uri(processing-instruction target {\"data\"}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -345,9 +425,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(base-uri(attribute name {\"value\"}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -361,9 +445,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://example.com/BASEURI\"; base-uri(document {()})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://example.com/BASEURI")
     );
@@ -377,9 +465,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://example.com/\"; let $i := document {()} return (\"Base URI:\", base-uri($i), \"Document URI:\", document-uri($i))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Base URI: http://example.com/ Document URI:")
     );
@@ -393,9 +485,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $i := fn:base-uri(<anElement xml:base=\"http:\\\\example.com\\\\examples\">Element content</anElement>) return $i eq \"http:\\\\example.com\\\\examples\" or empty($i)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -409,9 +505,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(document-uri(<?target data?>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -425,9 +525,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:base-uri(<anElement xml:base=\"http://example.com/examples\"><b xml:base=\"\"/>Element content</anElement>/b)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://example.com/examples")
     );
@@ -441,9 +545,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:base-uri(exactly-one(<anElement xml:base=\"http://example.com/examples\"><?target data?></anElement>/processing-instruction()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://example.com/examples")
     );
@@ -457,9 +565,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:base-uri(exactly-one(<anElement xml:base=\"http://example.com/examples\"><!-- a comment --></anElement>/comment()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://example.com/examples")
     );
@@ -473,9 +585,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e xml:base=\"http://example.com/ABC/\"> <a xml:base=\"../\"> <b xml:base=\"DEF/file.test\"/> </a> </e>/a/b/base-uri()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://example.com/DEF/file.test")
     );
@@ -489,9 +605,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(document-uri(processing-instruction name {123}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -505,9 +625,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(document-uri(text {123}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -521,9 +645,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(document-uri(<elem/>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -537,9 +665,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(document-uri(<elem attr=\"f\"/>/@attr))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -553,9 +685,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(document-uri(document {1}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -570,11 +706,129 @@ public class FnBaseUri extends QT3TestSet {
       "let $i := <e xml:base=\"http://www.example.com/\"><?target data?></e> \n" +
       "        return base-uri($i/processing-instruction()[1])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/")
+    );
+  }
+
+  /**
+   * The base-uri property of the copied node, and of each of its descendants, 
+   *       is set to be the same as that of its new parent, unless it (the child node) has an xml:base attribute, 
+   *       in which case its base-uri property is set to the value of that attribute, resolved (if it is relative) 
+   *       against the base-uri property of its new parent node. 
+   *       .
+   */
+  @org.junit.Test
+  public void cbclBaseUri001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tlet $d := document { <root xml:base=\"http://www.w3.org/\"><implicit-base><child /></implicit-base><explicit-base xml:base=\"http://www.w3.org/TR/xquery\"><child /></explicit-base></root> } \n" +
+      "      \treturn let $y := <copy xml:base=\"http://www.example.org\"> { $d/root/explicit-base } </copy> return fn:base-uri(($y/explicit-base)[1])\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "http://www.w3.org/TR/xquery")
+    );
+  }
+
+  /**
+   * 
+   *       The base-uri property of the copied node, and of each of its descendants, is set to be the same as 
+   *       that of its new parent, unless it (the child node) has an xml:base attribute, in which case its 
+   *       base-uri property is set to the value of that attribute, resolved (if it is relative) against 
+   *       the base-uri property of its new parent node. 
+   * 	  .
+   */
+  @org.junit.Test
+  public void cbclBaseUri002() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      let $d := document { <root xml:base=\"http://www.w3.org/\"> <implicit-base><child /></implicit-base> <explicit-base xml:base=\"http://www.w3.org/TR/xquery\"><child /></explicit-base> </root> } \n" +
+      "      return let $y := <copy xml:base=\"http://www.example.org\"> { $d/root/explicit-base } </copy> \n" +
+      "      return fn:base-uri(($y/explicit-base/child)[1])\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "http://www.w3.org/TR/xquery")
+    );
+  }
+
+  /**
+   * 
+   *       The base-uri property of the copied node, and of each of its descendants, is set to be the 
+   *       same as that of its new parent, unless it (the child node) has an xml:base attribute, 
+   *       in which case its base-uri property is set to the value of that attribute, resolved 
+   *       (if it is relative) against the base-uri property of its new parent node. 
+   *       .
+   */
+  @org.junit.Test
+  public void cbclBaseUri003() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      let $d := document { <root xml:base=\"http://www.w3.org/\"> <implicit-base><child /></implicit-base> <explicit-base xml:base=\"http://www.w3.org/TR/xquery\"><child /></explicit-base> </root> } \n" +
+      "      return let $y := <copy xml:base=\"http://www.example.org\"> { $d/root/implicit-base } </copy> \n" +
+      "      return fn:base-uri(($y/implicit-base)[1])\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "http://www.example.org")
+    );
+  }
+
+  /**
+   * 
+   *       The base-uri property of the copied node, and of each of its descendants, is set to be the 
+   *       same as that of its new parent, unless it (the child node) has an xml:base attribute, 
+   *       in which case its base-uri property is set to the value of that attribute, resolved 
+   *       (if it is relative) against the base-uri property of its new parent node. 
+   * 	  .
+   */
+  @org.junit.Test
+  public void cbclBaseUri004() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      let $d := document { <root xml:base=\"http://www.w3.org/\"> <implicit-base><child /></implicit-base> <explicit-base xml:base=\"http://www.w3.org/TR/xquery\"><child /></explicit-base> </root> } \n" +
+      "      return let $y := <copy xml:base=\"http://www.example.org\"> { $d/root/implicit-base } </copy> \n" +
+      "      return fn:base-uri(($y/implicit-base/child)[1])\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "http://www.example.org")
     );
   }
 
@@ -586,9 +840,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace eg = \"http://example.org\"; declare function eg:noContextFunction() { fn:base-uri() }; declare variable $input-context1 external; eg:noContextFunction()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -602,9 +860,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:base-uri(<anElement xml:base=\"http://www.example.com\">Element content</anElement>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com")
     );
@@ -618,9 +880,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:base-uri(document {<aDocument>some content</aDocument>}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -639,9 +905,13 @@ public class FnBaseUri extends QT3TestSet {
       "declare base-uri \"http://example.org\"; \n" +
       "            fn:string(fn:base-uri(document {<aDocument>some content</aDocument>}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://example.org")
     );
@@ -655,9 +925,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://example.org\"; fn:string(fn:base-uri(<anElement>some content</anElement>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://example.org")
     );
@@ -671,9 +945,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:base-uri(attribute anAttribute{\"attribute value\"})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -687,9 +965,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:base-uri(<?format role=\"output\" ?>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -703,9 +985,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:base-uri(processing-instruction {\"PItarget\"} {\"PIcontent\"})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -721,9 +1007,13 @@ public class FnBaseUri extends QT3TestSet {
       "         declare base-uri \"http://example.org\"; \n" +
       "         fn:base-uri(processing-instruction {\"PItarget\"} {\"PIcontent\"})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -739,9 +1029,13 @@ public class FnBaseUri extends QT3TestSet {
       "        let $var := <anElement>With some contexnt</anElement> \n" +
       "        return fn:string(fn:base-uri($var))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://example.org")
     );
@@ -756,9 +1050,13 @@ public class FnBaseUri extends QT3TestSet {
       "let $var := <anElement xml:base=\"http://www.examples.com\">With some content</anElement> \n" +
       "        return fn:string(fn:base-uri($var))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.examples.com")
     );
@@ -772,9 +1070,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1 to 100)[fn:base-uri()]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -790,9 +1092,13 @@ public class FnBaseUri extends QT3TestSet {
       "        let $var := <anElement xml:base=\"http://www.examples.com\">With some content</anElement> \n" +
       "        return fn:string(fn:base-uri($var))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.examples.com")
     );
@@ -807,9 +1113,13 @@ public class FnBaseUri extends QT3TestSet {
       "declare base-uri \"http://example.org\"; \n" +
       "        let $var := <!-- A Comment --> return fn:base-uri($var)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -825,9 +1135,13 @@ public class FnBaseUri extends QT3TestSet {
       "        declare function eg:noContextFunction() { fn:base-uri(.) }; \n" +
       "        eg:noContextFunction()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -841,9 +1155,141 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:base-uri(<anElement xml:base=\"http://example.com/examples\">Element content</anElement>))",
       ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "http://example.com/examples")
+    );
+  }
 
-    final QT3Result res = result(query);
-    result = res;
+  /**
+   *  Evaluation of base-uri#0 function with context item set to a directly constructed comment .
+   */
+  @org.junit.Test
+  public void fnBaseUri24() {
+    final XQuery query = new XQuery(
+      "(<!-- A comment -->)/base-uri()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEmpty()
+    );
+  }
+
+  /**
+   *  Evaluation of base-uri#0 function with context item set to a computed constructed comment .
+   */
+  @org.junit.Test
+  public void fnBaseUri25() {
+    final XQuery query = new XQuery(
+      "(comment {\"A Comment Node \"})/fn:base-uri()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEmpty()
+    );
+  }
+
+  /**
+   *  Evaluation of base-uri#0 function with context item set to a computed constructed Text node. .
+   */
+  @org.junit.Test
+  public void fnBaseUri26() {
+    final XQuery query = new XQuery(
+      "(text {\"A Text Node\"})/fn:base-uri()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEmpty()
+    );
+  }
+
+  /**
+   *  Evaluation of base-uri#0 function with context item set to a computed constructed Element node with not base-xml argument. .
+   */
+  @org.junit.Test
+  public void fnBaseUri27() {
+    final XQuery query = new XQuery(
+      "fn:count((element anElement {\"An Element Node\"})/base-uri())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertEq("1")
+      ||
+        assertEq("0")
+      )
+    );
+  }
+
+  /**
+   *  Evaluation of base-uri#0 function with context item set to a directly constructed Element node with not base-xml argument. Use fn:count to avoid empty file. .
+   */
+  @org.junit.Test
+  public void fnBaseUri28() {
+    final XQuery query = new XQuery(
+      "fn:count((<anElement>Element content</anElement>)/fn:base-uri())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertEq("1")
+      ||
+        assertEq("0")
+      )
+    );
+  }
+
+  /**
+   *  Evaluation of base-uri#0 function with context item set to a directly constructed Element node with base-xml argument. Use fn:string .
+   */
+  @org.junit.Test
+  public void fnBaseUri29() {
+    final XQuery query = new XQuery(
+      "fn:string((<anElement xml:base=\"http://example.com/examples\">Element content</anElement>)/fn:base-uri())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://example.com/examples")
     );
@@ -857,11 +1303,225 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:base-uri(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
+    );
+  }
+
+  /**
+   *  Evaluation of base-uri#0 function with context item set to a directly constructed Element node with base-xml argument (no escaping). Use fn:string .
+   */
+  @org.junit.Test
+  public void fnBaseUri30() {
+    final XQuery query = new XQuery(
+      "fn:string((<anElement xml:base=\"http://www.example.com\">Element content</anElement>)/base-uri())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "http://www.example.com")
+    );
+  }
+
+  /**
+   *  Evaluation of base-uri#0 function with context item set to a computed constructed Document node with no base-xml argument. Use fn:count .
+   */
+  @org.junit.Test
+  public void fnBaseUri31() {
+    final XQuery query = new XQuery(
+      "fn:count((document {<aDocument>some content</aDocument>})/base-uri())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertEq("0")
+      ||
+        assertEq("1")
+      )
+    );
+  }
+
+  /**
+   *  Evaluation of base-uri#0 function with context item set to a computed constructed Document node argument. Uses declared base uri property Use fn:string .
+   */
+  @org.junit.Test
+  public void fnBaseUri32() {
+    final XQuery query = new XQuery(
+      "declare base-uri \"http://example.org\"; \n" +
+      "            fn:string((document {<aDocument>some content</aDocument>})/base-uri())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "http://example.org")
+    );
+  }
+
+  /**
+   *  Evaluation of base-uri#0 function with context item set to a directly constructed element node argument. Should not declared base uri property Use fn:string .
+   */
+  @org.junit.Test
+  public void fnBaseUri33() {
+    final XQuery query = new XQuery(
+      "declare base-uri \"http://example.org\"; fn:string((<anElement>some content</anElement>)/fn:base-uri())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "http://example.org")
+    );
+  }
+
+  /**
+   *  Evaluation of base-uri#0 function with context item set to a computed constructed attribute node argument. .
+   */
+  @org.junit.Test
+  public void fnBaseUri34() {
+    final XQuery query = new XQuery(
+      "(attribute anAttribute{\"attribute value\"})/fn:base-uri()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEmpty()
+    );
+  }
+
+  /**
+   *  Evaluation of base-uri#0 function with context item set to a directly constructed PI node argument. .
+   */
+  @org.junit.Test
+  public void fnBaseUri35() {
+    final XQuery query = new XQuery(
+      "(<?format role=\"output\" ?>)/fn:base-uri()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEmpty()
+    );
+  }
+
+  /**
+   *  Evaluation of base-uri#0 function with context item set to a computed constructed PI node argument. Use fn:count to avoid empty file .
+   */
+  @org.junit.Test
+  public void fnBaseUri36() {
+    final XQuery query = new XQuery(
+      "(processing-instruction {\"PItarget\"} {\"PIcontent\"})/base-uri()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEmpty()
+    );
+  }
+
+  /**
+   *  Evaluation of base-uri#0 function with context item set to a computed constructed PI node argument. Use fn:count to avoid empty file. Should not use the declare base-uri .
+   */
+  @org.junit.Test
+  public void fnBaseUri37() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "         declare base-uri \"http://example.org\"; \n" +
+      "         (processing-instruction {\"PItarget\"} {\"PIcontent\"})/base-uri()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEmpty()
+    );
+  }
+
+  /**
+   *  Evaluation of base-uri#0 function with context item set to a directly constructed element node (via FLOWR expr). Use the declare base-uri .
+   */
+  @org.junit.Test
+  public void fnBaseUri38() {
+    final XQuery query = new XQuery(
+      "declare base-uri \"http://example.org\"; \n" +
+      "        let $var := <anElement>With some contexnt</anElement> \n" +
+      "        return fn:string(($var)/base-uri())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "http://example.org")
+    );
+  }
+
+  /**
+   *  Evaluation of base-uri#0 function with context item set to a directly constructed element node (via FLOWR expr). Use the xml-base attribute .
+   */
+  @org.junit.Test
+  public void fnBaseUri39() {
+    final XQuery query = new XQuery(
+      "let $var := <anElement xml:base=\"http://www.examples.com\">With some content</anElement> \n" +
+      "        return fn:string(($var)/base-uri())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "http://www.examples.com")
     );
   }
 
@@ -873,11 +1533,100 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:base-uri(<!-- A comment -->)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
+    );
+  }
+
+  /**
+   *  Evaluation of base-uri#0 function with context item set to a directly constructed element node (via FLOWR expr). Use the xml-base attribute and should ignore declared base uri property. .
+   */
+  @org.junit.Test
+  public void fnBaseUri40() {
+    final XQuery query = new XQuery(
+      "declare base-uri \"http://example.org\"; \n" +
+      "        let $var := <anElement xml:base=\"http://www.examples.com\">With some content</anElement> \n" +
+      "        return fn:string(($var)/base-uri())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "http://www.examples.com")
+    );
+  }
+
+  /**
+   *  Evaluation of base-uri#0 function with context item set to a directly constructed comment node (via FLOWR expr). Should ignore declared base uri property. .
+   */
+  @org.junit.Test
+  public void fnBaseUri41() {
+    final XQuery query = new XQuery(
+      "declare base-uri \"http://example.org\"; \n" +
+      "        let $var := <!-- A Comment --> return ($var)/base-uri()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEmpty()
+    );
+  }
+
+  /**
+   *  Evaluation of base-uri#0 function using undefined context item. .
+   */
+  @org.junit.Test
+  public void fnBaseUri42() {
+    final XQuery query = new XQuery(
+      "declare namespace eg = \"http://example.org\"; \n" +
+      "        declare function eg:noContextFunction() { fn:base-uri() }; \n" +
+      "        eg:noContextFunction()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPDY0002")
+    );
+  }
+
+  /**
+   *  Evaluation of base-uri#0 function with context item set to a directly constructed Element node with base-xml argument that needs escaping. Uses fn:string. .
+   */
+  @org.junit.Test
+  public void fnBaseUri43() {
+    final XQuery query = new XQuery(
+      "fn:string((<anElement xml:base=\"http://example.com/examples\">Element content</anElement>)/fn:base-uri())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "http://example.com/examples")
     );
   }
 
@@ -889,9 +1638,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:base-uri(comment {\"A Comment Node \"})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -905,9 +1658,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:base-uri(text {\"A Text Node\"})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -921,9 +1678,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:base-uri(element anElement {\"An Element Node\"}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("1")
@@ -941,9 +1702,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:base-uri(<anElement>Element content</anElement>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("1")
@@ -961,9 +1726,13 @@ public class FnBaseUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:base-uri(<anElement xml:base=\"http://example.com/examples\">Element content</anElement>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://example.com/examples")
     );

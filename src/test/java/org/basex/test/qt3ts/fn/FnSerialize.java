@@ -13,136 +13,30 @@ import org.basex.test.qt3ts.QT3TestSet;
 public class FnSerialize extends QT3TestSet {
 
   /**
-   * serialize test.
-   */
-  @org.junit.Test
-  public void serializeXml001() {
-    final XQuery query = new XQuery(
-      "serialize(doc('../docs/atomic.xml'))",
-      ctx);
-
-    final QT3Result res = result(query);
-    result = res;
-    test(
-      assertQuery("contains($result,'atomic')")
-    );
-  }
-
-  /**
-   * serialize test - with invalid attribute node.
-   */
-  @org.junit.Test
-  public void serializeXml002() {
-    final XQuery query = new XQuery(
-      "serialize((doc('../docs/atomic.xml')//@*)[1])",
-      ctx);
-
-    final QT3Result res = result(query);
-    result = res;
-    test(
-      error("SENR0001")
-    );
-  }
-
-  /**
-   * serialize test - with list of params as nodes.
-   */
-  @org.junit.Test
-  public void serializeXml003() {
-    final XQuery query = new XQuery(
-      "serialize(doc('../docs/atomic.xml'),\n" +
-      "            doc('serialize/serialize-003.xml')/params/*)",
-      ctx);
-
-    final QT3Result res = result(query);
-    result = res;
-    test(
-      assertQuery("contains($result,'atomic')")
-    );
-  }
-
-  /**
-   * serialize test - with list of properties, but no Method set.
-   */
-  @org.junit.Test
-  public void serializeXml004() {
-    final XQuery query = new XQuery(
-      "serialize(doc('../docs/atomic.xml'),\n" +
-      "            doc('serialize/serialize-004.xml')/params/*)",
-      ctx);
-
-    final QT3Result res = result(query);
-    result = res;
-    test(
-      assertQuery("contains($result,'atomic')")
-    );
-  }
-
-  /**
-   * serialize test: Error - specified the use-character-map property.
-   */
-  @org.junit.Test
-  public void serializeXml005() {
-    final XQuery query = new XQuery(
-      "serialize(doc('../docs/atomic.xml'),\n" +
-      "            doc('serialize/serialize-005.xml')/params/*)",
-      ctx);
-
-    final QT3Result res = result(query);
-    result = res;
-    test(
-      error("SEPM0016")
-    );
-  }
-
-  /**
-   * serialize test: specified the cdata-section-element property, space separated
-   *             QNames.
-   */
-  @org.junit.Test
-  public void serializeXml006() {
-    final XQuery query = new XQuery(
-      "serialize(doc('../docs/atomic.xml'),\n" +
-      "            doc('serialize/serialize-006.xml')/params/*)",
-      ctx);
-
-    final QT3Result res = result(query);
-    result = res;
-    test(
-      assertQuery("contains($result,'atomic')")
-    );
-  }
-
-  /**
-   * serialize test: list of properties, but one is an unrecognized name (no error,
-   *             it is ignored).
-   */
-  @org.junit.Test
-  public void serializeXml007() {
-    final XQuery query = new XQuery(
-      "serialize(doc('../docs/atomic.xml'),\n" +
-      "            doc('serialize/serialize-007.xml')/params/*)",
-      ctx);
-
-    final QT3Result res = result(query);
-    result = res;
-    test(
-      assertQuery("contains($result,'atomic')")
-    );
-  }
-
-  /**
    * serialize test: New suppress-indentation parameter.
    */
   @org.junit.Test
   public void serializeXml008() {
     final XQuery query = new XQuery(
-      "serialize(doc('serialize/serialize-008-src.xml'),\n" +
-      "            doc('serialize/serialize-008-params.xml')/params/*)",
+      "\n" +
+      "          let $params := \n" +
+      "              <output:serialization-parameters\n" +
+      "                   xmlns:output=\"http://www.w3.org/2010/xslt-xquery-serialization\">\n" +
+      "                <output:method value=\"xml\"/>   \n" +
+      "                <output:indent value=\"yes\"/>\n" +
+      "                <output:suppress-indentation value=\"p\"/>\n" +
+      "              </output:serialization-parameters>\n" +
+      "          return serialize(., $params)\n" +
+      "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/serialize/serialize-008-src.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertQuery("matches($result,'\\n\\s+<title>')")
@@ -151,23 +45,6 @@ public class FnSerialize extends QT3TestSet {
       &&
         assertQuery("not(matches($result,'\\n\\s+<code>'))")
       )
-    );
-  }
-
-  /**
-   * serialize test: Error - bad value for indent parameter.
-   */
-  @org.junit.Test
-  public void serializeXml009() {
-    final XQuery query = new XQuery(
-      "serialize(doc('../docs/atomic.xml'),\n" +
-      "            doc('serialize/serialize-009.xml')/params/*)",
-      ctx);
-
-    final QT3Result res = result(query);
-    result = res;
-    test(
-      error("SEPM0016")
     );
   }
 }

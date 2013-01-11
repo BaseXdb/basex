@@ -20,9 +20,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare(::)variable(::)$local:var(::)as(::)item((: :))* :=3(::);(::)1(::)eq(::)1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -36,9 +40,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $prefix:var1 := 2; declare namespace prefix = \"http://example.com/myNamespace\"; true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XPST0003")
@@ -56,9 +64,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var1 := 2; declare variable $var2 := $var1; $var2 eq 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -72,9 +84,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var1 := local:myFunc(); declare function local:myFunc() { 1 }; $var1 eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -88,9 +104,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var1 as xs:string := local:myFunc(); declare function local:myFunc() as xs:integer { 1 }; $var1 eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -104,9 +124,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var1 as xs:string := local:myFunc(); declare function local:myFunc() { 1 }; $var1 eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -116,79 +140,105 @@ public class ProdVarDecl extends QT3TestSet {
    *  One prolog variable depending on itself. .
    */
   @org.junit.Test
-  public void kInternalVariablesWith15() {
+  public void kInternalVariablesWith15b() {
     final XQuery query = new XQuery(
       "declare variable $var1 := $var1; true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
   }
 
   /**
-   *  A prolog variable having a circular dependency, stretching through many functions. .
+   * Test case based on K-InternalVariablesWith-16. XQuery 3.0 error code..
    */
   @org.junit.Test
-  public void kInternalVariablesWith16() {
+  public void kInternalVariablesWith16a() {
     final XQuery query = new XQuery(
-      "declare variable $var := local:func1(); declare function local:func1() { local:func2() }; declare function local:func2() { local:func3() }; declare function local:func3() { local:func4() }; declare function local:func4() { $var }; boolean($var)",
+      "\n" +
+      "      declare variable $var := local:func1(); \n" +
+      "      declare function local:func1() { local:func2() }; \n" +
+      "      declare function local:func2() { local:func3() }; \n" +
+      "      declare function local:func3() { local:func4() }; \n" +
+      "      declare function local:func4() { $var }; \n" +
+      "      boolean($var)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XQST0054")
+      error("XQDY0054")
     );
   }
 
   /**
-   *  A prolog variable having a circular dependency, by having a variable reference in a call site argument. This is an error even though the variable isn't used, because implementations cannot skip reporting static errors. .
+   * Test case based on K-InternalVariablesWith-17. XQuery 3.0 error code..
    */
   @org.junit.Test
-  public void kInternalVariablesWith17() {
+  public void kInternalVariablesWith17a() {
     final XQuery query = new XQuery(
       "declare variable $var := local:func1(); declare function local:func1() { local:func2($var) }; declare function local:func2($arg2) { 1 }; true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XQST0054")
+      error("XQDY0054")
     );
   }
 
   /**
-   *  A prolog variable having a circular dependency, by having a variable reference in a call site argument. .
+   * Test case based on K-InternalVariablesWith-18 with XQuery 3.0 error code..
    */
   @org.junit.Test
-  public void kInternalVariablesWith18() {
+  public void kInternalVariablesWith18a() {
     final XQuery query = new XQuery(
       "declare variable $var := local:func1(); declare function local:func1() { local:func2($var) }; declare function local:func2($arg2) { $arg2 }; $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XQST0054")
+      error("XQDY0054")
     );
   }
 
   /**
-   *  A prolog variable having a circular dependency, stretching through functions and variables. .
+   * Test case based on K-InternalVariablesWith-19 with XQuery 3.0 error code..
    */
   @org.junit.Test
-  public void kInternalVariablesWith19() {
+  public void kInternalVariablesWith19a() {
     final XQuery query = new XQuery(
       "declare variable $var2 := local:func1(); declare variable $var := ($var2 treat as xs:integer) + 1; declare function local:func1() { local:func2() }; declare function local:func2() { local:func3() }; declare function local:func3() { local:func4() }; declare function local:func4() { $var }; boolean($var)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XQST0054")
+      error("XQDY0054")
     );
   }
 
@@ -200,27 +250,35 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "(::)declare(::)variable(::)$local:var(::):=(::)3;(::)1(::)eq(::)1(::)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
   }
 
   /**
-   *  A prolog variable having a circular dependency, stretching through functions and variables(#2). .
+   * Test case based on K-InternalVariablesWith-20 with XQuery 3.0 error code..
    */
   @org.junit.Test
-  public void kInternalVariablesWith20() {
+  public void kInternalVariablesWith20a() {
     final XQuery query = new XQuery(
       "declare variable $var := local:func1(); declare function local:func1() { local:func2() }; declare function local:func2() { local:func3() }; declare variable $var2 := local:func2(); declare function local:func3() { $var2 }; boolean($var)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XQST0054")
+      error("XQDY0054")
     );
   }
 
@@ -232,9 +290,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $local:var as item() *:=3; true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -248,9 +310,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $myVar as xs:integer := subsequence((1, 2, \"a string\"), 3, 1); $myVar eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -264,9 +330,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $myVar as xs:gYear := 2006; true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -284,27 +354,36 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $myVar as xs:gYear := 2006; $myVar",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
   }
 
   /**
-   *  A prolog variable depending on a variable which is not in scope, and the variable is not used. .
+   *  A prolog variable depending on a variable which is (in XQuery 3.0) in scope, 
+   *       and the variable is not used. .
    */
   @org.junit.Test
-  public void kInternalVariablesWith6() {
+  public void kInternalVariablesWith6b() {
     final XQuery query = new XQuery(
       "declare variable $var1 := $var2; declare variable $var2 := 2; true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0008")
+      assertBoolean(true)
     );
   }
 
@@ -316,9 +395,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable var1 := 1; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -332,27 +415,35 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var1 = 1; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
   }
 
   /**
-   *  A prolog variable depending on a variable which is not in scope. .
+   *  A prolog variable depending on a variable which is (in XQuery 3.0) in scope. .
    */
   @org.junit.Test
-  public void kInternalVariablesWith9() {
+  public void kInternalVariablesWith9b() {
     final XQuery query = new XQuery(
       "declare variable $var1 := $var2; declare variable $var2 := 2; $var1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0008")
+      assertEq("2")
     );
   }
 
@@ -364,31 +455,15 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var1 as xs:string := 1 treat as item(); $var1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
-    );
-  }
-
-  /**
-   *  A variable depending on a recursive function. .
-   */
-  @org.junit.Test
-  public void k2InternalVariablesWithout1() {
-    final XQuery query = new XQuery(
-      "\n" +
-      "        declare variable $local:myVar := local:myFunction(); \n" +
-      "        declare function local:myFunction() { local:myFunction(), 1, $local:myVar }; \n" +
-      "        $local:myVar\n" +
-      "      ",
-      ctx);
-
-    final QT3Result res = result(query);
-    result = res;
-    test(
-      error("XQST0054")
     );
   }
 
@@ -400,9 +475,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $local:myVar := local:myFunc(3); declare function local:myFunc($local:myVar) { $local:myVar }; local:myFunc(6)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("6")
     );
@@ -416,9 +495,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $local:myVar := local:thisFunctionDoesNotExist(); 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("1")
@@ -436,9 +519,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $local:myVar := local:thisFunctionDoesNotExist(); $local:myVar",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -452,9 +539,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $local:var1 := 1; declare variable $local:var2 := 2; declare variable $local:var3 := 3; declare variable $local:var4 := 4; declare variable $local:var5 := 5; declare variable $local:var6 := 6; declare variable $local:var7 := 7; declare variable $local:var8 := 8; declare variable $local:var9 := 9; declare variable $local:var10 := 10; declare variable $local:var11 := 11; declare variable $local:var12 := 12; declare variable $local:var13 := 13; declare variable $local:var14 := 14; declare variable $local:var15 := 15; declare variable $local:var16 := 16; declare variable $local:var17 := 17; declare variable $local:var18 := 18; declare variable $local:var19 := 19; declare variable $local:var20 := 20; deep-equal((1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20), ($local:var1, $local:var2, $local:var3, $local:var4, $local:var5, $local:var6, $local:var7, $local:var8, $local:var9, $local:var10, $local:var11, $local:var12, $local:var13, $local:var14, $local:var15, $local:var16, $local:var17, $local:var18, $local:var19, $local:var20))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -468,9 +559,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $myVar := <e>{nametest}</e>; <e/>/$myVar",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -484,143 +579,203 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var := 1 := 2; 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
   }
 
   /**
-   *  A variable depending on a recursive function. .
+   * Test case based on K2-InterVariablesWithout-1 with XQuery 3.0 error code.
    */
   @org.junit.Test
-  public void k2InternalVariablesWithout2() {
+  public void k2InternalVariablesWithout1a() {
     final XQuery query = new XQuery(
       "\n" +
-      "        declare variable $local:myVar := local:myFunction(); \n" +
-      "        declare function local:myFunction() { $local:myVar, 1, local:myFunction() }; \n" +
+      "        declare variable $local:myVar := local:myFunction();\n" +
+      "        declare function local:myFunction() { local:myFunction(), 1, $local:myVar };\n" +
       "        $local:myVar\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XQST0054")
+      error("XQDY0054")
     );
   }
 
   /**
-   *  A variable depending on a recursive function. .
+   * Test case based on K2-InterVariablesWithout-2 with XQuery 3.0 error code.
    */
   @org.junit.Test
-  public void k2InternalVariablesWithout3() {
+  public void k2InternalVariablesWithout2a() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare variable $local:myVar := local:myFunction();\n" +
+      "        declare function local:myFunction() { $local:myVar, 1, local:myFunction() };\n" +
+      "        $local:myVar\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XQDY0054")
+    );
+  }
+
+  /**
+   * Test case based on K2-InterVariablesWithout-3 with XQuery 3.0 error code.
+   */
+  @org.junit.Test
+  public void k2InternalVariablesWithout3a() {
     final XQuery query = new XQuery(
       "declare variable $local:myVar := local:myFunction(); declare function local:myFunction() { $local:myVar, 1, local:myFunction() }; $local:myVar",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XQST0054")
+      error("XQDY0054")
     );
   }
 
   /**
-   *  A variable depending on a recursive function. .
+   * Test case based on K2-InterVariablesWithout-4 with XQuery 3.0 error code.
    */
   @org.junit.Test
-  public void k2InternalVariablesWithout4() {
+  public void k2InternalVariablesWithout4a() {
     final XQuery query = new XQuery(
       "declare variable $local:myVar := local:myFunction(); declare function local:myFunction() { $local:myVar, 1, local:myFunction() }; $local:myVar",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XQST0054")
+      error("XQDY0054")
     );
   }
 
   /**
-   *  A variable depending indirectly on a recursive function. .
+   * Test case based on K2-InterVariablesWithout-5 with XQuery 3.0 error code.
    */
   @org.junit.Test
-  public void k2InternalVariablesWithout5() {
+  public void k2InternalVariablesWithout5a() {
     final XQuery query = new XQuery(
       "declare variable $local:myVar := local:myFunction(); declare function local:myFunction2() { $local:myVar, 1, local:myFunction() }; declare function local:myFunction() { local:myFunction2() }; $local:myVar",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XQST0054")
+      error("XQDY0054")
     );
   }
 
   /**
-   *  A variable depending indirectly on a recursive function. .
+   * Test case based on K2-InterVariablesWithout-6 with XQuery 3.0 error code.
    */
   @org.junit.Test
-  public void k2InternalVariablesWithout6() {
+  public void k2InternalVariablesWithout6a() {
     final XQuery query = new XQuery(
       "declare variable $local:myVar := local:myFunction(); declare function local:myFunction2() { local:myFunction(), $local:myVar }; declare function local:myFunction() { local:myFunction2() }; local:myFunction()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XQST0054")
+      error("XQDY0054")
     );
   }
 
   /**
-   *  A variable depending indirectly on a recursive function. .
+   * Test case based on K2-InterVariablesWithout-7 with XQuery 3.0 error code.
    */
   @org.junit.Test
-  public void k2InternalVariablesWithout7() {
+  public void k2InternalVariablesWithout7a() {
     final XQuery query = new XQuery(
       "declare variable $local:myVar := local:myFunction(); declare function local:myFunction2() { local:myFunction(), $local:myVar }; declare function local:myFunction4() { local:myFunction2() }; declare function local:myFunction3() { local:myFunction4() }; declare function local:myFunction() { local:myFunction3() }; local:myFunction()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XQST0054")
+      error("XQDY0054")
     );
   }
 
   /**
-   *  A variable depending indirectly on a recursive function. .
+   * Test case based on K2-InterVariablesWithout-8 with XQuery 3.0 error code.
    */
   @org.junit.Test
-  public void k2InternalVariablesWithout8() {
+  public void k2InternalVariablesWithout8a() {
     final XQuery query = new XQuery(
       "declare variable $local:myVar := local:myFunction(); declare function local:myFunction2() { local:myFunction4() }; declare function local:myFunction4() { local:myFunction2(), $local:myVar }; declare function local:myFunction3() { local:myFunction4() }; declare function local:myFunction() { local:myFunction3() }; local:myFunction()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XQST0054")
+      error("XQDY0054")
     );
   }
 
   /**
-   *  A variable depending on its self through the argument of a user function callsite. .
+   * Test case based on K2-InterVariablesWithout-9 with XQuery 3.0 error code.
    */
   @org.junit.Test
-  public void k2InternalVariablesWithout9() {
+  public void k2InternalVariablesWithout9a() {
     final XQuery query = new XQuery(
       "declare variable $local:myVar := local:myFunc(3); declare function local:myFunc($arg) { local:myFunc($local:myVar) }; $local:myVar",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XQST0054")
+      error("XQDY0054")
     );
   }
 
@@ -632,9 +787,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := \"\" ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -648,9 +807,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := '' ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -664,9 +827,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := 'a string' ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a string")
     );
@@ -680,9 +847,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := \"a string\" ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a string")
     );
@@ -696,9 +867,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := \"This is a string, isn't it?\" ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "This is a string, isn't it?")
     );
@@ -712,9 +887,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := 'This is a \"String\"' ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "This is a \"String\"")
     );
@@ -728,9 +907,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := \"a \"\" or a ' delimits a string literal\" ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a \" or a ' delimits a string literal")
     );
@@ -744,9 +927,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := 'a \" or a '' delimits a string literal' ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a \" or a ' delimits a string literal")
     );
@@ -760,9 +947,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := '&lt;bold&gt;A sample element.&lt;/bold&gt;' ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "<bold>A sample element.</bold>")
     );
@@ -776,9 +967,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := 0 ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -792,9 +987,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := 1 ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -808,9 +1007,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := -1 ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -824,9 +1027,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := +1 ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -840,9 +1047,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := 1.23 ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1.23")
     );
@@ -856,9 +1067,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := -1.23 ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-1.23")
     );
@@ -872,9 +1087,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := 1.2e5 ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("120000")
     );
@@ -888,9 +1107,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := -1.2E5 ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-120000")
     );
@@ -904,9 +1127,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := 0.0E0 ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -920,9 +1147,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := 1e-5 ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0.00001")
     );
@@ -936,9 +1167,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := 9.999999999999999; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "9.999999999999999")
     );
@@ -952,9 +1187,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := -10000000 ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-10000000")
     );
@@ -968,9 +1207,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := 1 to 10 ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3 4 5 6 7 8 9 10")
     );
@@ -984,9 +1227,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := xs:double('NaN'); $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );
@@ -1000,9 +1247,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := xs:double('INF'); $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "INF")
     );
@@ -1016,9 +1267,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := xs:double('-INF'); $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-INF")
     );
@@ -1032,9 +1287,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := fn:false() ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1048,9 +1307,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := false(); $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1064,9 +1327,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := fn:true() ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1080,9 +1347,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := true() ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1096,9 +1367,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := true(); $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1112,9 +1387,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := 2+2 ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("4")
     );
@@ -1128,9 +1407,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := 2*2 ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("4")
     );
@@ -1144,9 +1427,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := 3-2 ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1160,9 +1447,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := 3 div 2 ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1.5")
     );
@@ -1176,9 +1467,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := 3 mod 2 ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1192,9 +1487,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := 3 idiv 2 ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1208,9 +1507,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := -1.7976931348623157E308 ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-1.7976931348623157E308")
     );
@@ -1224,9 +1527,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := xs:double(\"-1.7976931348623157E308\") ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-1.7976931348623157E308")
     );
@@ -1240,9 +1547,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := -999999999999999999 ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -1256,9 +1567,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := xs:decimal(\"-999999999999999999\") ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -1272,9 +1587,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := 999999999999999999 ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -1288,9 +1607,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := xs:decimal(\"999999999999999999\") ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -1304,9 +1627,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := -3.4028235E38 ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-3.4028235E38")
     );
@@ -1320,9 +1647,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := xs:float(\"-3.4028235E38\") ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-3.4028235E38")
     );
@@ -1336,9 +1667,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := xs:date(\"1970-01-01Z\") ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1970-01-01Z")
     );
@@ -1352,9 +1687,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := xs:date(\"1970-01-01Z\") + xs:dayTimeDuration(\"P31DT23H59M59S\") ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1970-02-01Z")
     );
@@ -1368,9 +1707,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := xs:time(\"08:03:35Z\") ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "08:03:35Z")
     );
@@ -1384,9 +1727,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := xs:time(\"08:03:35Z\") + xs:dayTimeDuration(\"P0DT0H0M0S\") ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "08:03:35Z")
     );
@@ -1400,9 +1747,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := xs:dateTime(\"2030-12-31T23:59:59Z\") ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2030-12-31T23:59:59Z")
     );
@@ -1416,9 +1767,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := (1,2,3) ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3")
     );
@@ -1432,9 +1787,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := (xs:string(\"a\") , (), \"xyz\") ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a xyz")
     );
@@ -1448,9 +1807,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := (xs:string(\"a\") , xs:anyURI(\"www.example.com\")) ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a www.example.com")
     );
@@ -1464,9 +1827,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := (xs:float(\"INF\") , xs:double(\"NaN\")) ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "INF NaN")
     );
@@ -1480,9 +1847,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := (xs:boolean(\"true\") , xs:boolean(\"0\"), xs:integer(\"0\")) ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true false 0")
     );
@@ -1496,9 +1867,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := (xs:date(\"1993-03-31\") , xs:boolean(\"true\"), xs:string(\"abc\")) ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1993-03-31 true abc")
     );
@@ -1512,9 +1887,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := (xs:time(\"12:30:00\") , xs:string(\" \") , xs:decimal(\"2.000000000000002\")) ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "12:30:00   2.000000000000002")
     );
@@ -1528,9 +1907,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := ((1+1), (2-2)) ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2 0")
     );
@@ -1544,9 +1927,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := ((1,2,2),(1,2,3),(123,\"\"),(),(\"\")) ; $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 2 1 2 3 123  ")
     );
@@ -1560,10 +1947,14 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := (//book/price, (), (1)) ; $x",
       ctx);
-    query.context(node(file("docs/bib.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/bib.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<price>65.95</price><price>65.95</price><price>39.95</price><price>129.95</price>1", false)
     );
@@ -1577,10 +1968,14 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := //Price/text() ; $x",
       ctx);
-    query.context(node(file("docs/bib.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/bib.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -1594,10 +1989,14 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := /comment() ; $x",
       ctx);
-    query.context(node(file("op/union/bib2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("op/union/bib2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<!-- this file is a copy of bib.xml; just adds a few comments and PI nodes for testing --><!-- Comment 1 --><!-- Comment 2 -->", false)
     );
@@ -1611,10 +2010,14 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x := /processing-instruction() ; $x",
       ctx);
-    query.context(node(file("op/union/bib2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("op/union/bib2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<?PI1 Processing Instruction 1?><?PI2 Processing Instruction 2?>", false)
     );
@@ -1632,9 +2035,13 @@ public class ProdVarDecl extends QT3TestSet {
       "        $x + 5\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("25")
     );
@@ -1648,9 +2055,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare(::)variable(::)$var(::)as(::)item((: :))*(::):=(::)1(::);(::) 1(::)eq(::)1(::)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1664,9 +2075,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "(::)declare(::)variable(::)$var(::):=(::)1(::);(::) 1(::)eq(::)1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1676,15 +2091,24 @@ public class ProdVarDecl extends QT3TestSet {
    *  Test circularity on variable/function declaration . .
    */
   @org.junit.Test
-  public void vardeclerr() {
+  public void vardeclerr1() {
     final XQuery query = new XQuery(
-      "declare namespace foo = \"http://www..oracle.com/xquery/test\"; declare variable $var1 as xs:integer := foo:price(xs:integer(2)); declare function foo:price ($b as xs:integer) as xs:integer { $var1 + 1 }; declare variable $input-context1 external; $var1",
+      "\n" +
+      "      declare namespace foo = \"http://www..oracle.com/xquery/test\"; \n" +
+      "      declare variable $var1 as xs:integer := foo:price(xs:integer(2)); \n" +
+      "      declare function foo:price ($b as xs:integer) as xs:integer { $var1 + 1 }; \n" +
+      "      declare variable $input-context1 external; \n" +
+      "      $var1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XQST0054")
+      error("XQDY0054")
     );
   }
 
@@ -1696,9 +2120,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var as xs:string := \"abc\"; declare variable $input-context1 external; $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abc")
     );
@@ -1712,9 +2140,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var as xs:time := xs:time(\"11:12:00Z\"); declare variable $input-context1 external; $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "11:12:00Z")
     );
@@ -1728,9 +2160,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var as xs:date := xs:date(\"1999-11-28Z\"); declare variable $input-context1 external; $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1999-11-28Z")
     );
@@ -1744,9 +2180,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var as xs:date := xs:date(\"1999-11-28Z\"); declare variable $var as xs:date := xs:date(\"1999-11-28Z\"); declare variable $input-context1 external; $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0049")
     );
@@ -1760,9 +2200,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var as xs:date := fn:true() and fn:true(); declare variable $input-context1 external; $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -1776,27 +2220,39 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $x as xs:integer := 10; declare variable $var as xs:integer := $x +1; declare variable $input-context1 external; $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("11")
     );
   }
 
   /**
-   *  Evaluates an internal variable declaration with type and expression. Test usage of variable with no assigned value at time of expression definition. .
+   *  Evaluates an internal variable declaration with type and expression. 
+   *       Test usage of variable with no assigned value at time of expression definition. .
    */
   @org.junit.Test
-  public void vardeclwithtype15() {
+  public void vardeclwithtype15b() {
     final XQuery query = new XQuery(
-      "declare variable $var as xs:integer := $e +1; declare variable $e as xs:integer := 10; declare variable $input-context1 external; $var",
+      "\n" +
+      "      declare variable $var as xs:integer := $e +1; \n" +
+      "      declare variable $e as xs:integer := 10;  \n" +
+      "      $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0008")
+      assertEq("11")
     );
   }
 
@@ -1808,9 +2264,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace p1 = \"http://www.example.com\"; declare variable $p1:var as xs:integer := 10; declare variable $input-context1 external; $p1:var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("10")
     );
@@ -1824,9 +2284,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace p1 = \"http://www.example.com\"; declare namespace p2 = \"http://www.example.com/examples\"; declare variable $p1:var as xs:integer := 10; declare variable $p2:var as xs:integer := 20; declare variable $input-context1 external; $p2:var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("20")
     );
@@ -1840,9 +2304,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace p1 = \"http://www.example.com\"; declare namespace p2 = \"http://www.example.com\"; declare variable $p1:var as xs:integer := 10; declare variable $p2:var as xs:integer := 20; declare variable $input-context1 external; $p2:var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0049")
     );
@@ -1856,9 +2324,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var as xs:integer := fn:count((10,2)); declare variable $input-context1 external; $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -1872,9 +2344,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var as xs:integer := 100; declare variable $input-context1 external; $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("100")
     );
@@ -1888,9 +2364,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var as xs:integer := fn:string-length(\"ABC\"); declare variable $input-context1 external; $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -1904,9 +2384,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var as xs:boolean := fn:not(fn:true()); declare variable $input-context1 external; $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1920,9 +2404,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var as xs:boolean := fn:empty((1,2,3)); declare variable $input-context1 external; $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1936,9 +2424,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var as xs:decimal := 100; declare variable $input-context1 external; $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("100")
     );
@@ -1952,9 +2444,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var as xs:boolean := fn:true(); declare variable $input-context1 external; $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1968,9 +2464,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var as xs:boolean := fn:false(); declare variable $input-context1 external; $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1984,9 +2484,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var as xs:float := xs:float(12.5E10); declare variable $input-context1 external; $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1.25E11")
     );
@@ -2000,9 +2504,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var as xs:double := xs:double(1267.43233E12); declare variable $input-context1 external; $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1.26743233E15")
     );
@@ -2016,9 +2524,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var as xs:anyURI := xs:anyURI(\"http://example.com\"); declare variable $input-context1 external; $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://example.com")
     );
@@ -2032,9 +2544,13 @@ public class ProdVarDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var as xs:dateTime := xs:dateTime(\"1999-11-28T09:00:00Z\"); declare variable $input-context1 external; $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1999-11-28T09:00:00Z")
     );

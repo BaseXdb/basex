@@ -20,9 +20,13 @@ public class FnTimezoneFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "timezone-from-time()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnTimezoneFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "timezone-from-time((), \"Wrong param\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -52,9 +60,13 @@ public class FnTimezoneFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(timezone-from-time(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnTimezoneFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "timezone-from-time(()) instance of xs:dayTimeDuration?",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class FnTimezoneFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "timezone-from-time(xs:time(\"23:43:12.765Z\")) eq xs:dayTimeDuration(\"PT0S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class FnTimezoneFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "timezone-from-time(xs:time(\"23:43:12.765-08:23\")) eq xs:dayTimeDuration(\"-PT8H23M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,9 +140,13 @@ public class FnTimezoneFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(timezone-from-time(xs:time(\"23:43:12.765\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -132,9 +160,13 @@ public class FnTimezoneFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:timezone-from-time(xs:time(\"13:20:00-05:00\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-PT5H")
     );
@@ -148,9 +180,13 @@ public class FnTimezoneFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(fn:string(fn:timezone-from-time(xs:time(\"02:02:03Z\"))))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -164,9 +200,13 @@ public class FnTimezoneFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:timezone-from-time(xs:time(\"22:33:10+10:00\")) div fn:timezone-from-time(xs:time(\"02:11:02+05:00\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2")
     );
@@ -180,9 +220,13 @@ public class FnTimezoneFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(fn:timezone-from-time(xs:time(\"10:12:15Z\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );
@@ -196,9 +240,13 @@ public class FnTimezoneFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:boolean(fn:string(fn:timezone-from-time(xs:time(\"10:10:20Z\"))))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -212,9 +260,13 @@ public class FnTimezoneFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:timezone-from-time(xs:time(\"10:00:01Z\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PT0S")
     );
@@ -228,9 +280,13 @@ public class FnTimezoneFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:timezone-from-time(xs:time(\"10:10:01Z\"))) and fn:string(fn:timezone-from-time(xs:time(\"10:10:01Z\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -244,9 +300,13 @@ public class FnTimezoneFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:timezone-from-time(xs:time(\"10:02:01Z\")) eq fn:timezone-from-time(xs:time(\"10:02:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -260,9 +320,13 @@ public class FnTimezoneFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:timezone-from-time(xs:time(\"10:00:01Z\")) ne fn:timezone-from-time(xs:time(\"01:01:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -276,9 +340,13 @@ public class FnTimezoneFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:timezone-from-time(xs:time(\"10:00:00Z\")) le fn:timezone-from-time(xs:time(\"10:00:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -292,9 +360,13 @@ public class FnTimezoneFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:timezone-from-time(xs:time(\"10:03:01Z\")) ge fn:timezone-from-time(xs:time(\"10:04:02Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -308,9 +380,13 @@ public class FnTimezoneFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:timezone-from-time(xs:time(\"13:20:00\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -324,9 +400,13 @@ public class FnTimezoneFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:timezone-from-time(xs:time(\"10:03:01Z\"))) or fn:string(fn:timezone-from-time(xs:time(\"10:04:02Z\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -340,9 +420,13 @@ public class FnTimezoneFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:timezone-from-time(xs:time(\"01:23:02Z\")) gt fn:timezone-from-time(xs:time(\"01:23:03Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -356,9 +440,13 @@ public class FnTimezoneFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:timezone-from-time(xs:time(\"01:10:20Z\")) le fn:timezone-from-time(xs:time(\"01:20:30Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -372,9 +460,13 @@ public class FnTimezoneFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:timezone-from-time(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -388,9 +480,13 @@ public class FnTimezoneFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:timezone-from-time(xs:time(\"00:59:00+00:00\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PT0S")
     );
@@ -404,9 +500,13 @@ public class FnTimezoneFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:timezone-from-time(xs:time(\"23:20:59-00:00\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PT0S")
     );
@@ -420,9 +520,13 @@ public class FnTimezoneFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:timezone-from-time(xs:time(\"02:00:00Z\")) + fn:timezone-from-time(xs:time(\"10:00:10Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PT0S")
     );
@@ -436,9 +540,13 @@ public class FnTimezoneFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:timezone-from-time(xs:time(\"10:10:10Z\")) - fn:timezone-from-time(xs:time(\"09:02:07Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PT0S")
     );

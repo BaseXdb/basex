@@ -26,9 +26,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         local:foo()\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("bar", false)
     );
@@ -48,9 +52,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         local:foo($foo)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("0", false)
     );
@@ -72,9 +80,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         local:foo($foo)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("0", false)
     );
@@ -96,9 +108,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         local:foo($foo)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("0", false)
     );
@@ -132,9 +148,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         local:foo($foo)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("0", false)
     );
@@ -156,9 +176,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         local:foo($foo)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("0", false)
     );
@@ -177,9 +201,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         local:foo()\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0045")
     );
@@ -196,9 +224,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         $foo\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0045")
     );
@@ -217,9 +249,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         local:foo()\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0045")
     );
@@ -236,9 +272,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         $foo\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0045")
     );
@@ -257,9 +297,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         local:foo()\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0045")
     );
@@ -277,9 +321,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         $foo\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("bar", false)
     );
@@ -296,9 +344,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         $foo\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0045")
     );
@@ -317,9 +369,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         local:foo()\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0045")
     );
@@ -336,16 +392,20 @@ public class ProdAnnotation extends QT3TestSet {
       "         $foo\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0045")
     );
   }
 
   /**
-   * Annotation in a reserved namespace.
+   * Annotation in no namespace.
    */
   @org.junit.Test
   public void annotation23() {
@@ -355,9 +415,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         $foo\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0045")
     );
@@ -377,9 +441,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         local:foo()\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0045")
     );
@@ -396,9 +464,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         $foo\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0045")
     );
@@ -411,16 +483,20 @@ public class ProdAnnotation extends QT3TestSet {
   public void annotation26() {
     final XQuery query = new XQuery(
       "\n" +
-      "         declare namespace opts = \"http://www.w3.org/2011/xquery-options\";\n" +
+      "         declare namespace opts = \"http://www.w3.org/2012/xquery\";\n" +
       "         declare %opts:x function local:foo() {\n" +
       "            \"bar\"\n" +
       "         };\n" +
       "         local:foo()\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0045")
     );
@@ -433,20 +509,24 @@ public class ProdAnnotation extends QT3TestSet {
   public void annotation27() {
     final XQuery query = new XQuery(
       "\n" +
-      "         declare %Q{http://www.w3.org/2011/xquery-options}x variable $foo := \"bar\";\n" +
+      "         declare %Q{http://www.w3.org/2012/xquery}x variable $foo := \"bar\";\n" +
       "         $foo\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0045")
     );
   }
 
   /**
-   * A function annotation.
+   * A function annotation (default function namespace does not affect annotations).
    */
   @org.junit.Test
   public void annotation28() {
@@ -457,11 +537,38 @@ public class ProdAnnotation extends QT3TestSet {
       "         $foo\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertSerialization("bar", false)
+      error("XQST0045")
+    );
+  }
+
+  /**
+   * A variable annotation (per bug 16199).
+   */
+  @org.junit.Test
+  public void annotation29() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "         declare %local:x variable $foo := \"bar\";\n" +
+      "         $foo\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("\"bar\"")
     );
   }
 
@@ -476,11 +583,107 @@ public class ProdAnnotation extends QT3TestSet {
       "         %eg:sequential function () { \"bar\" } ()\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("bar", false)
+    );
+  }
+
+  /**
+   * An inline function annotation with parameters.
+   */
+  @org.junit.Test
+  public void annotation30() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "         declare namespace eg = \"http://example.com\";\n" +
+      "         %eg:sequential(\"abc\", 3) function () { \"bar\" } ()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertSerialization("bar", false)
+    );
+  }
+
+  /**
+   * An inline function annotation using an EQName.
+   */
+  @org.junit.Test
+  public void annotation31() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "         declare namespace eg = \"http://example.com\";\n" +
+      "         % Q{http://example.com}sequential(\"abc\", 3) function () { \"bar\" } ()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertSerialization("bar", false)
+    );
+  }
+
+  /**
+   * An inline function with multiple annotations .
+   */
+  @org.junit.Test
+  public void annotation32() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "         declare namespace eg = \"http://example.com\";\n" +
+      "         %eg:sequential(\"abc\", 3) %eg:memo-function function () { \"bar\" } ()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertSerialization("bar", false)
+    );
+  }
+
+  /**
+   * An inline function using true() as an annotation parameter .
+   */
+  @org.junit.Test
+  public void annotation33() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "         declare namespace eg = \"http://example.com\";\n" +
+      "         %eg:sequential(true())  function () { \"bar\" } ()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
     );
   }
 
@@ -500,9 +703,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         local:sin($max)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("0", false)
     );
@@ -524,9 +731,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         local:foo($foo)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("0", false)
     );
@@ -548,9 +759,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         local:foo($foo)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("0", false)
     );
@@ -572,9 +787,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         local:foo($foo)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("0", false)
     );
@@ -594,9 +813,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         local:foo()\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -618,9 +841,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         local:foo($foo)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("0", false)
     );
@@ -643,9 +870,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         () instance of %eg:x function(*)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -665,9 +896,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         () instance of %eg:x function(xs:integer) as xs:string\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -683,9 +918,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         () instance of %xml:x function(*) \n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0045")
     );
@@ -701,9 +940,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         () instance of %Q{http://www.w3.org/XML/1998/namespace}x function(*) \n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0045")
     );
@@ -719,9 +962,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         () instance of %xs:x function(*) \n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0045")
     );
@@ -737,9 +984,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         () instance of %Q{http://www.w3.org/2001/XMLSchema}x function(*) \n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0045")
     );
@@ -755,9 +1006,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         () instance of %xsi:x function(*) \n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0045")
     );
@@ -773,9 +1028,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         () instance of %fn:x function(*) \n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0045")
     );
@@ -792,9 +1051,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         () instance of %math:x function(*) \n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0045")
     );
@@ -807,13 +1070,17 @@ public class ProdAnnotation extends QT3TestSet {
   public void annotationAssertion18() {
     final XQuery query = new XQuery(
       "\n" +
-      "         declare namespace opts = \"http://www.w3.org/2011/xquery-options\";\n" +
+      "         declare namespace opts = \"http://www.w3.org/2012/xquery\";\n" +
       "         () instance of %opts:x function(*) \n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0045")
     );
@@ -833,9 +1100,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         () instance of %eg:x(\"foo\") function(*)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -855,9 +1126,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         () instance of %eg:x(1234) function(*)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -877,9 +1152,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         () instance of %eg:x(12.34) function(*)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -899,9 +1178,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         () instance of %eg:x(12e34) function(*)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -921,9 +1204,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         () instance of %eg:x(\"abc\", 12e34, 567) function(*)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -942,9 +1229,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         () instance of %Q{http://example.com}x function(*)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -963,9 +1254,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         () instance of %Q{http://example.com}x function(*)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -985,9 +1280,13 @@ public class ProdAnnotation extends QT3TestSet {
       "         () instance of %eg:x %eg:y%eg:z %eg:w(1) function(*)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );

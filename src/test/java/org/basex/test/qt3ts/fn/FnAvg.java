@@ -20,9 +20,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg((xs:float(1), xs:integer(0), xs:float(5))) eq 2.0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg((xs:float(1), xs:integer(0), xs:untypedAtomic(-4))) eq -1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg((xs:float(1), xs:integer(0), xs:untypedAtomic(3))) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg((xs:untypedAtomic(3), xs:integer(0), xs:decimal(1))) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(avg((3, 3, xs:double(\"NaN\")))) eq \"NaN\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,9 +140,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(avg((3, xs:double(\"NaN\"), 3))) eq \"NaN\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -132,9 +160,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(avg((xs:double(\"NaN\"), 3, 3))) eq \"NaN\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -148,9 +180,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(avg(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -164,9 +200,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(avg(((), ())))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -180,9 +220,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg((-5, -0, -3, -6)) eq -3.5",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -196,9 +240,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg(1, \"wrong param\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -212,9 +260,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(avg((1, 2, 3, xs:float(\"NaN\")))) eq \"NaN\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -228,9 +280,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(avg((1, 2, 3, xs:double(\"NaN\")))) eq \"NaN\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -244,9 +300,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(avg((xs:double(\"NaN\"), 1, 2, 3))) eq \"NaN\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -260,9 +320,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(avg((xs:float(\"NaN\"), 1, 2, 3))) eq \"NaN\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -276,9 +340,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(avg((1, 2, xs:double(\"NaN\"), 1, 2, 3))) eq \"NaN\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -292,9 +360,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(avg((1, 2, xs:float(\"NaN\"), 1, 2, 3))) eq \"NaN\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -308,9 +380,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg(xs:untypedAtomic(\"3\")) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -324,9 +400,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg((1, 2, xs:untypedAtomic(\"3\"))) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -340,9 +420,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg((1, 2, xs:untypedAtomic(\"3\"))) eq 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -356,9 +440,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg((xs:float(1), 2, xs:untypedAtomic(\"3\"))) eq 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -372,9 +460,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(avg(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -388,9 +480,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg((xs:float(1), 2, xs:untypedAtomic(\"3\"))) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -404,9 +500,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg(\"a string\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -420,9 +520,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg(xs:anyURI(\"a string\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -436,9 +540,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg((1, 2, 3, xs:anyURI(\"a string\"), xs:double(\"NaN\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -452,9 +560,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg(\"a string\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -468,9 +580,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg((xs:untypedAtomic(3), xs:integer(3), xs:string(1)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -484,9 +600,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg((xs:string(1), xs:integer(3), xs:untypedAtomic(3)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -500,9 +620,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg((xs:float(2), xs:integer(3), \"a string\", xs:double(2)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -516,9 +640,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg((xs:yearMonthDuration(\"P20Y\"), (3, 4, 5)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -532,9 +660,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg((xs:yearMonthDuration(\"P20Y\"), xs:yearMonthDuration(\"P10M\"))) eq xs:yearMonthDuration(\"P125M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -548,9 +680,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg((3, 3, 3)) eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -564,9 +700,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(avg( () ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -580,9 +720,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(avg((xs:float('INF'), xs:float('-INF')))) eq \"NaN\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -596,9 +740,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(avg(((3, 4, 5), xs:float('NaN')))) eq \"NaN\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -612,9 +760,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg((3, 4, 5)) eq 4.0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -628,9 +780,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg((-3, -3, -3)) eq -3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -644,9 +800,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg((xs:float(1), xs:integer(3), xs:float(3))) instance of xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -660,9 +820,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg((xs:float(1), xs:integer(3), xs:decimal(3))) instance of xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -676,9 +840,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg((xs:float(1), xs:integer(3), xs:double(3))) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -692,9 +860,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg((xs:integer(1), xs:integer(3), xs:decimal(3))) instance of xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -708,9 +880,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg((xs:float('NaN'), 2, 3, 4, xs:double('NaN'))) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -724,9 +900,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg((xs:float('NaN'), 2, 3.3, 4, xs:double('NaN'))) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -740,11 +920,290 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg((1, 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
+    );
+  }
+
+  /**
+   *  Testing fn:avg overflows correctly with xs:decimals .
+   */
+  @org.junit.Test
+  public void cbclAvg001() {
+    final XQuery query = new XQuery(
+      "fn:avg((xs:decimal(\"79000000000000000000000000000\"),\n" +
+      "                    xs:decimal(\"79000000000000000000000000000\")))\n" +
+      "            eq 79000000000000000000000000000\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("FOAR0002")
+      )
+    );
+  }
+
+  /**
+   *  Test fn:avg overflows correctly with xs:dayTimeDurations.
+   */
+  @org.junit.Test
+  public void cbclAvg002() {
+    final XQuery query = new XQuery(
+      "fn:avg((xs:dayTimeDuration(\"P9223372036854775807D\"), xs:dayTimeDuration(\"P1D\")))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FODT0002")
+    );
+  }
+
+  /**
+   * Test fn:avg overflows correctly with xs:yearMonthDurations .
+   */
+  @org.junit.Test
+  public void cbclAvg003() {
+    final XQuery query = new XQuery(
+      "fn:avg((xs:yearMonthDuration(\"P768614336404564650Y\"), xs:yearMonthDuration(\"P1Y\")))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FODT0002")
+    );
+  }
+
+  /**
+   * Test fn:avg on xs:dayTimeDurations .
+   */
+  @org.junit.Test
+  public void cbclAvg004() {
+    final XQuery query = new XQuery(
+      "fn:avg((xs:dayTimeDuration(\"P1DT2H\"), xs:dayTimeDuration(\"PT22H\"), xs:dayTimeDuration(\"P1D\")))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "P1D")
+    );
+  }
+
+  /**
+   * Test fn:avg raises error with xs:dayTimeDurations followed by xs:yearMonthDuration .
+   */
+  @org.junit.Test
+  public void cbclAvg005() {
+    final XQuery query = new XQuery(
+      "fn:avg((xs:dayTimeDuration(\"P1DT2H\"), xs:dayTimeDuration(\"PT22H\"), xs:yearMonthDuration(\"P1M\")))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FORG0006")
+    );
+  }
+
+  /**
+   *  Test fn:avg on xs:yearMonthDurations .
+   */
+  @org.junit.Test
+  public void cbclAvg006() {
+    final XQuery query = new XQuery(
+      "fn:avg((xs:yearMonthDuration(\"P1Y1M\"), xs:yearMonthDuration(\"P11M\"), xs:yearMonthDuration(\"P1Y\")))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "P1Y")
+    );
+  }
+
+  /**
+   * Test fn:avg raises error with xs:yearMonthDurations followed by xs:dayTimeDuration.
+   */
+  @org.junit.Test
+  public void cbclAvg007() {
+    final XQuery query = new XQuery(
+      "fn:avg((xs:yearMonthDuration(\"P1Y1M\"), xs:yearMonthDuration(\"P11M\"), xs:dayTimeDuration(\"P1D\")))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FORG0006")
+    );
+  }
+
+  /**
+   * Test fn:avg on mixed numeric types. .
+   */
+  @org.junit.Test
+  public void cbclAvg008() {
+    final XQuery query = new XQuery(
+      "typeswitch (fn:avg((xs:float(1), xs:double(2), xs:float(3)))) case $x as xs:double return $x default return \"FAIL\"",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "2")
+    );
+  }
+
+  /**
+   * Test boolean(avg) and avg(())..
+   */
+  @org.junit.Test
+  public void cbclAvg009() {
+    final XQuery query = new XQuery(
+      "boolean(avg(()))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(false)
+      ||
+        error("XPST0005")
+      )
+    );
+  }
+
+  /**
+   * Test tpe checking is performed when optimizin fn:avg to NaN. .
+   */
+  @org.junit.Test
+  public void cbclAvg010() {
+    final XQuery query = new XQuery(
+      "avg((xs:double(\"NaN\"), current-date() - xs:date(\"1997-01-01\") ))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FORG0006")
+    );
+  }
+
+  /**
+   * Test fn:avg returning double NaN..
+   */
+  @org.junit.Test
+  public void cbclAvg011() {
+    final XQuery query = new XQuery(
+      "avg((xs:double(\"NaN\"), day-from-date(current-date())))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "NaN")
+    );
+  }
+
+  /**
+   * Test fn:avg returning float NaN. .
+   */
+  @org.junit.Test
+  public void cbclAvg012() {
+    final XQuery query = new XQuery(
+      "avg((xs:float(\"NaN\"), day-from-date(current-date())))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "NaN")
+    );
+  }
+
+  /**
+   *  Test fn:avg on (). .
+   */
+  @org.junit.Test
+  public void cbclAvg013() {
+    final XQuery query = new XQuery(
+      "empty(avg(()))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("XPST0005")
+      )
     );
   }
 
@@ -756,9 +1215,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((\"a\",\"b\",\"c\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -772,9 +1235,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -788,9 +1255,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg((xs:dayTimeDuration(\"P1D\"), xs:dayTimeDuration(\"PT2H\"))) instance of xs:dayTimeDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -804,9 +1275,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg(for $x in 1 to 10 return xs:dayTimeDuration(concat(\"PT\",$x,\"H\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PT5H30M")
     );
@@ -820,9 +1295,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg((xs:yearMonthDuration(\"P1Y\"), xs:yearMonthDuration(\"P1M\"))) instance of xs:yearMonthDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -836,9 +1315,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg(for $x in 1 to 9 return xs:yearMonthDuration(concat(\"P\",$x,\"M\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P5M")
     );
@@ -852,9 +1335,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg((xs:yearMonthDuration(\"P1Y\"), xs:dayTimeDuration(\"P1D\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("FORG0006")
@@ -872,9 +1359,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "avg(xs:duration(\"P1Y1M1D\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("FORG0006")
@@ -892,9 +1383,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg( (3, 4, 5) )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("4")
     );
@@ -908,9 +1403,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( xs:yearMonthDuration(\"P20Y\") , xs:yearMonthDuration(\"P10M\") ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P10Y5M")
     );
@@ -924,9 +1423,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -940,9 +1443,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( xs:float('INF'), xs:float('-INF')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );
@@ -956,9 +1463,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (3, 4, 5), xs:float('NaN') ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );
@@ -972,9 +1483,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( fn:string-length(\"Hello\") ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5")
     );
@@ -988,9 +1503,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( fn:count(\"Hello\") ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1004,9 +1523,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg( ( ( xs:integer(\"100\"), xs:integer(\"-100\"))))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1020,9 +1543,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg( ( ( xs:decimal(\"-1.000000000001\"), xs:integer(\"-100\"))))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-50.5000000000005")
@@ -1040,9 +1567,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:decimal(\"1.01\"), xs:integer(\"12\") )))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("6.505")
     );
@@ -1056,9 +1587,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:float(\"NaN\"), 100, (), 2)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );
@@ -1072,9 +1607,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:float(\"-3.4028235E38\"), xs:decimal(\"-999999999999999999\") )))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:float(\"-1.7014117E38\")")
     );
@@ -1088,9 +1627,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:float(\"0\"), xs:decimal(\"-999999999999999999\") ))) eq xs:float(\"-4.9999999999999999E17\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1104,9 +1647,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:float(\"3.4028235E38\"), xs:decimal(\"-999999999999999999\") )))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:float(\"1.7014117E38\")")
     );
@@ -1120,9 +1667,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:float(\"-0\"), xs:decimal(\"-999999999999999999\") ))) eq xs:float(\"-4.9999999999999999E17\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1136,9 +1687,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:float(\"NaN\"), xs:decimal(\"-999999999999999999\") )))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );
@@ -1152,9 +1707,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:float(\"INF\"), xs:decimal(\"-999999999999999999\") )))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "INF")
     );
@@ -1168,9 +1727,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:float(\"1.01\"))))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1.01")
     );
@@ -1184,9 +1747,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:float(\"-INF\"), xs:decimal(\"2.34\"))))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-INF")
     );
@@ -1200,9 +1767,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:double(\"-1.7976931348623157E308\"), xs:integer(\"-999999999999999999\") ) )) eq xs:double(\"-8.988465674311579E307\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1216,9 +1787,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:double(\"0\"), xs:integer(\"-999999999999999999\") ) ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-5.0E17")
     );
@@ -1232,9 +1807,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:double(\"1.7976931348623157E308\"), xs:integer(\"-999999999999999999\") ) )) eq xs:double(\"8.988465674311579E307\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1248,9 +1827,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:double(\"-0\"), xs:integer(\"-999999999999999999\") ) ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-5.0E17")
     );
@@ -1264,9 +1847,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:double(\"-INF\"), xs:integer(\"-999999999999999999\") ) ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-INF")
     );
@@ -1280,9 +1867,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:double(\"NaN\"), xs:integer(\"-999999999999999999\") ) ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );
@@ -1296,9 +1887,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:double(\"1.34\"), xs:float(\"INF\"))))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "INF")
     );
@@ -1312,9 +1907,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:double(\"INF\"), 2, 3)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "INF")
     );
@@ -1328,9 +1927,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:yearMonthDuration(\"P20Y\") , (3, 4, 5)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1344,9 +1947,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( fn:empty(\"Hello\")) or fn:boolean(fn:count(\"Hello\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1360,9 +1967,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( concat('hi',' all') ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1376,9 +1987,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( fn:empty(\"Hello\") ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1392,9 +2007,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (\"a\", \"b\", \"c\", true()) ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1408,9 +2027,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:string(\"xyz\"), (), (), \"a\" , \"b\") ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1424,9 +2047,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:anyURI(\"www.example.com\"), \"a\", (\"\"), \"b\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1440,9 +2067,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:integer(\"100\"), xs:string(\"abc\"))))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1456,9 +2087,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:integer(\"-999999999999999999\") , \"a\", (), \"3\") ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1472,9 +2107,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:integer(\"830993497117024304\"), \"a\", (), \"3\") ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1488,9 +2127,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:integer(\"999999999999999999\"), \"a\", (), \"3\") ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1504,9 +2147,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:decimal(\"-999999999999999999\") , \"a\", (), \"3\") ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1520,9 +2167,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:decimal(\"617375191608514839\"), \"a\", (), \"3\") ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1536,9 +2187,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:decimal(\"999999999999999999\"), \"a\", (), \"3\") ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1552,9 +2207,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:decimal(\"1.01\"), xs:integer(\"12\"), xs:anyURI(\"www.example.com\"))))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1568,9 +2227,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:float(\"-3.4028235E38\"), xs:decimal(\"-999999999999999999\") , \"a\", (), \"3\") ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1584,9 +2247,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:float(\"0\"), xs:decimal(\"-999999999999999999\") , \"a\", (), \"3\") ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1600,9 +2267,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:float(\"3.4028235E38\"), xs:decimal(\"-999999999999999999\") , \"a\", (), \"3\") ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1616,9 +2287,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:float(\"-0\"), xs:decimal(\"-999999999999999999\") , \"a\", (), \"3\") ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1632,9 +2307,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:float(\"NaN\"), xs:decimal(\"-999999999999999999\") , \"a\", (), \"3\") ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "NaN")
@@ -1652,9 +2331,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:float(\"INF\"), xs:decimal(\"-999999999999999999\") , \"a\", (), \"3\") ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1668,9 +2351,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:float(\"1.01\"), xs:string(\"a\"))))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1684,9 +2371,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:float(\"-INF\"), xs:decimal(\"2.34\"), \"abc\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1700,9 +2391,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:double(\"-1.7976931348623157E308\"), xs:integer(\"-999999999999999999\") , \"a\", (), \"3\") ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1716,9 +2411,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:double(\"0\"), xs:integer(\"-999999999999999999\") , \"a\", (), \"3\") ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1732,9 +2431,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:double(\"1.7976931348623157E308\"), xs:integer(\"-999999999999999999\") , \"a\", (), \"3\") ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1748,9 +2451,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:double(\"-0\"), xs:integer(\"-999999999999999999\") , \"a\", (), \"3\") ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1764,9 +2471,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:double(\"-INF\"), xs:integer(\"-999999999999999999\") , \"a\", (), \"3\") ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1780,9 +2491,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:double(\"NaN\"), xs:integer(\"-999999999999999999\") , \"a\", (), \"3\") ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "NaN")
@@ -1800,9 +2515,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:double(\"1.34\"), xs:float(\"INF\"), true())))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1816,9 +2535,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:boolean(\"false\"), xs:string(\"xyz\"), (), (), \"a\" , \"b\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1832,9 +2555,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (true(), xs:string(\"xyz\"), (), (), \"a\" , \"b\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1848,9 +2575,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (false(), xs:string(\"xyz\"), (), (), \"a\" , \"b\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1864,9 +2595,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:boolean(\"1\"), xs:double(\"-INF\"), \"s\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1880,9 +2615,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:boolean(\"true\"), xs:date(\"1993-03-31\"), 4, \"a\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1896,9 +2635,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:date(\"1993-03-31\"), xs:string(\"xyz\"), (), (), \"a\" , \"b\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1912,9 +2655,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:dateTime(\"1972-12-31T00:00:00\"), xs:boolean(\"false\"), (), (\" \")) ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1928,9 +2675,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(( (xs:time(\"12:30:00\"), xs:decimal(\"2.000003\"), 2)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1944,10 +2695,14 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(/works/employee[1])",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0001")
     );
@@ -1961,9 +2716,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:double(\"-1.7976931348623157E308\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1.7976931348623157E308")
     );
@@ -1977,9 +2736,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:double(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1993,9 +2756,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:double(\"1.7976931348623157E308\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1.7976931348623157E308")
     );
@@ -2009,9 +2776,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:double(\"-1.7976931348623157E150\"),xs:double(\"-1.7976931348623157E150\"))) eq -1.7976931348623157E150",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2025,9 +2796,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:double(\"0\"),xs:double(\"-1.7976931348623157E308\"))) eq -8.9884656743115785E307",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2041,9 +2816,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:double(\"1.7976931348623157E308\"),xs:double(\"-1.7976931348623157E308\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2057,9 +2836,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:double(\"-1.7976931348623157E308\"),xs:double(\"0\"))) eq -8.9884656743115785E307",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2073,9 +2856,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:double(\"-1.7976931348623157E308\"),xs:double(\"1.7976931348623157E308\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2089,9 +2876,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:decimal(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -2105,9 +2896,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:decimal(\"617375191608514839\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("617375191608514839")
     );
@@ -2121,9 +2916,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:decimal(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -2137,9 +2936,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:decimal(\"-999999999999999999\"),xs:decimal(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -2153,9 +2956,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:decimal(\"617375191608514839\"),xs:decimal(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-191312404195742580")
     );
@@ -2169,9 +2976,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:decimal(\"999999999999999999\"),xs:decimal(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2185,9 +2996,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:decimal(\"-999999999999999999\"),xs:decimal(\"617375191608514839\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-191312404195742580")
     );
@@ -2201,9 +3016,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:decimal(\"-999999999999999999\"),xs:decimal(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2217,9 +3036,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:float(\"-3.4028235E38\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:float('-3.4028235E38')")
     );
@@ -2233,9 +3056,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:float(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2249,9 +3076,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:float(\"3.4028235E38\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:float(\"3.4028235E38\")")
     );
@@ -2265,9 +3096,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:float(\"-3.4028235E38\"),xs:float(\"-3.4028235E38\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "-INF")
@@ -2287,9 +3122,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:float(\"0\"),xs:float(\"-3.4028235E38\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:float('-1.7014117E38')")
     );
@@ -2303,9 +3142,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:float(\"3.4028235E38\"),xs:float(\"-3.4028235E38\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2319,9 +3162,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:float(\"-3.4028235E38\"),xs:float(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:float('-1.7014117E38')")
     );
@@ -2335,9 +3182,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:float(\"-3.4028235E38\"),xs:float(\"3.4028235E38\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2351,9 +3202,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:int(\"-2147483648\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-2147483648")
     );
@@ -2367,9 +3222,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:int(\"-1873914410\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1873914410")
     );
@@ -2383,9 +3242,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:int(\"2147483647\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2147483647")
     );
@@ -2399,9 +3262,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:int(\"-2147483648\"),xs:int(\"-2147483648\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-2147483648")
     );
@@ -2415,9 +3282,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:int(\"-1873914410\"),xs:int(\"-2147483648\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-2010699029")
     );
@@ -2431,9 +3302,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:int(\"2147483647\"),xs:int(\"-2147483648\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-0.5")
     );
@@ -2447,9 +3322,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:int(\"-2147483648\"),xs:int(\"-1873914410\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-2010699029")
     );
@@ -2463,9 +3342,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:int(\"-2147483648\"),xs:int(\"2147483647\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-0.5")
     );
@@ -2479,9 +3362,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:integer(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -2495,9 +3382,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:integer(\"830993497117024304\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("830993497117024304")
     );
@@ -2511,9 +3402,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:integer(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -2527,9 +3422,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:integer(\"-999999999999999999\"),xs:integer(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -2543,9 +3442,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:integer(\"830993497117024304\"),xs:integer(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-84503251441487847.5")
     );
@@ -2559,9 +3462,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:integer(\"999999999999999999\"),xs:integer(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2575,9 +3482,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:integer(\"-999999999999999999\"),xs:integer(\"830993497117024304\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-84503251441487847.5")
     );
@@ -2591,9 +3502,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:integer(\"-999999999999999999\"),xs:integer(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2607,9 +3522,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:long(\"-92233720368547758\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-92233720368547758")
     );
@@ -2623,9 +3542,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:long(\"-47175562203048468\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-47175562203048468")
     );
@@ -2639,9 +3562,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:long(\"92233720368547758\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("92233720368547758")
     );
@@ -2655,9 +3582,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:long(\"-92233720368547758\"),xs:long(\"-92233720368547758\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-92233720368547758")
     );
@@ -2671,9 +3602,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:long(\"-47175562203048468\"),xs:long(\"-92233720368547758\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-69704641285798113")
     );
@@ -2687,9 +3622,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:long(\"92233720368547758\"),xs:long(\"-92233720368547758\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2703,9 +3642,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:long(\"-92233720368547758\"),xs:long(\"-47175562203048468\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-69704641285798113")
     );
@@ -2719,9 +3662,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:long(\"-92233720368547758\"),xs:long(\"92233720368547758\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2735,9 +3682,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:negativeInteger(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -2751,9 +3702,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:negativeInteger(\"-297014075999096793\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-297014075999096793")
     );
@@ -2767,9 +3722,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:negativeInteger(\"-1\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -2783,9 +3742,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:negativeInteger(\"-999999999999999999\"),xs:negativeInteger(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -2799,9 +3762,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:negativeInteger(\"-297014075999096793\"),xs:negativeInteger(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-648507037999548396")
     );
@@ -2815,9 +3782,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:negativeInteger(\"-1\"),xs:negativeInteger(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-500000000000000000")
     );
@@ -2831,9 +3802,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:negativeInteger(\"-999999999999999999\"),xs:negativeInteger(\"-297014075999096793\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-648507037999548396")
     );
@@ -2847,9 +3822,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:negativeInteger(\"-999999999999999999\"),xs:negativeInteger(\"-1\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-500000000000000000")
     );
@@ -2863,9 +3842,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:nonNegativeInteger(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2879,9 +3862,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:nonNegativeInteger(\"303884545991464527\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("303884545991464527")
     );
@@ -2895,9 +3882,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:nonNegativeInteger(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -2911,9 +3902,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:nonNegativeInteger(\"0\"),xs:nonNegativeInteger(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2927,9 +3922,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:nonNegativeInteger(\"303884545991464527\"),xs:nonNegativeInteger(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("151942272995732263.5")
     );
@@ -2943,9 +3942,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:nonNegativeInteger(\"999999999999999999\"),xs:nonNegativeInteger(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("499999999999999999.5")
     );
@@ -2959,9 +3962,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:nonNegativeInteger(\"0\"),xs:nonNegativeInteger(\"303884545991464527\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("151942272995732263.5")
     );
@@ -2975,9 +3982,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:nonNegativeInteger(\"0\"),xs:nonNegativeInteger(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("499999999999999999.5")
     );
@@ -2991,9 +4002,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:nonPositiveInteger(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -3007,9 +4022,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:nonPositiveInteger(\"-475688437271870490\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-475688437271870490")
     );
@@ -3023,9 +4042,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:nonPositiveInteger(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -3039,9 +4062,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:nonPositiveInteger(\"-999999999999999999\"),xs:nonPositiveInteger(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -3055,9 +4082,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:nonPositiveInteger(\"-475688437271870490\"),xs:nonPositiveInteger(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-737844218635935244.5")
     );
@@ -3071,9 +4102,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:nonPositiveInteger(\"0\"),xs:nonPositiveInteger(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-499999999999999999.5")
     );
@@ -3087,9 +4122,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:nonPositiveInteger(\"-999999999999999999\"),xs:nonPositiveInteger(\"-475688437271870490\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-737844218635935244.5")
     );
@@ -3103,9 +4142,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:nonPositiveInteger(\"-999999999999999999\"),xs:nonPositiveInteger(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-499999999999999999.5")
     );
@@ -3119,9 +4162,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:positiveInteger(\"1\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -3135,9 +4182,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:positiveInteger(\"52704602390610033\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("52704602390610033")
     );
@@ -3151,9 +4202,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:positiveInteger(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -3167,9 +4222,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:positiveInteger(\"1\"),xs:positiveInteger(\"1\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -3183,9 +4242,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:positiveInteger(\"52704602390610033\"),xs:positiveInteger(\"1\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("26352301195305017")
     );
@@ -3199,9 +4262,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:positiveInteger(\"999999999999999999\"),xs:positiveInteger(\"1\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("500000000000000000")
     );
@@ -3215,9 +4282,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:positiveInteger(\"1\"),xs:positiveInteger(\"52704602390610033\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("26352301195305017")
     );
@@ -3231,9 +4302,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:positiveInteger(\"1\"),xs:positiveInteger(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("500000000000000000")
     );
@@ -3247,9 +4322,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:short(\"-32768\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-32768")
     );
@@ -3263,9 +4342,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:short(\"-5324\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-5324")
     );
@@ -3279,9 +4362,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:short(\"32767\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("32767")
     );
@@ -3295,9 +4382,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:short(\"-32768\"),xs:short(\"-32768\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-32768")
     );
@@ -3311,9 +4402,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:short(\"-5324\"),xs:short(\"-32768\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-19046")
     );
@@ -3327,9 +4422,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:short(\"32767\"),xs:short(\"-32768\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-0.5")
     );
@@ -3343,9 +4442,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:short(\"-32768\"),xs:short(\"-5324\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-19046")
     );
@@ -3359,9 +4462,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:short(\"-32768\"),xs:short(\"32767\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-0.5")
     );
@@ -3375,9 +4482,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:unsignedLong(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -3391,9 +4502,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:unsignedLong(\"130747108607674654\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("130747108607674654")
     );
@@ -3407,9 +4522,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:unsignedLong(\"184467440737095516\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("184467440737095516")
     );
@@ -3423,9 +4542,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:unsignedLong(\"0\"),xs:unsignedLong(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -3439,9 +4562,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:unsignedLong(\"130747108607674654\"),xs:unsignedLong(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("65373554303837327")
     );
@@ -3455,9 +4582,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:unsignedLong(\"184467440737095516\"),xs:unsignedLong(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("92233720368547758")
     );
@@ -3471,9 +4602,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:unsignedLong(\"0\"),xs:unsignedLong(\"130747108607674654\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("65373554303837327")
     );
@@ -3487,9 +4622,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:unsignedLong(\"0\"),xs:unsignedLong(\"184467440737095516\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("92233720368547758")
     );
@@ -3503,9 +4642,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:unsignedShort(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -3519,9 +4662,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:unsignedShort(\"44633\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("44633")
     );
@@ -3535,9 +4682,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:unsignedShort(\"65535\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("65535")
     );
@@ -3551,9 +4702,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:unsignedShort(\"0\"),xs:unsignedShort(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -3567,9 +4722,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:unsignedShort(\"44633\"),xs:unsignedShort(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("22316.5")
     );
@@ -3583,9 +4742,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:unsignedShort(\"65535\"),xs:unsignedShort(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("32767.5")
     );
@@ -3599,9 +4762,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:unsignedShort(\"0\"),xs:unsignedShort(\"44633\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("22316.5")
     );
@@ -3615,9 +4782,13 @@ public class FnAvg extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((xs:unsignedShort(\"0\"),xs:unsignedShort(\"65535\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("32767.5")
     );

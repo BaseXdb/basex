@@ -26,9 +26,13 @@ public class ProdSwitchExpr extends QT3TestSet {
       "            case \"Duck\" return \"Quack\" \n" +
       "            default return \"What's that odd noise?\" }</out>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<out>Meow</out>", false)
     );
@@ -48,9 +52,13 @@ public class ProdSwitchExpr extends QT3TestSet {
       "            case \"Duck\" return \"Quack\" \n" +
       "            default return \"What's that odd noise?\" }</out>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<out>What's that odd noise?</out>", false)
     );
@@ -71,9 +79,13 @@ public class ProdSwitchExpr extends QT3TestSet {
       "            case lower-case($animal) return \"Oink\" \n" +
       "            default return \"What's that odd noise?\" }</out>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<out>Oink</out>", false)
     );
@@ -94,9 +106,13 @@ public class ProdSwitchExpr extends QT3TestSet {
       "            case \"PIG\" case \"SWINE\" return \"Oink\" \n" +
       "            default return \"What's that odd noise?\" }</out>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<out>Quack</out>", false)
     );
@@ -117,9 +133,13 @@ public class ProdSwitchExpr extends QT3TestSet {
       "            case \"PIG\" case \"SWINE\" return \"Oink\" \n" +
       "            default return \"What's that odd noise?\" }</out>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<out>Quack</out>", false)
     );
@@ -138,9 +158,13 @@ public class ProdSwitchExpr extends QT3TestSet {
       "            case 42 return \"Quack\" \n" +
       "            default return 3.14159 }</out>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<out>Quack</out>", false)
     );
@@ -161,9 +185,13 @@ public class ProdSwitchExpr extends QT3TestSet {
       "            case \"42e0\" return \"Oink\" \n" +
       "            default return \"Expletive deleted\" }</out>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<out>Meow</out>", false)
     );
@@ -184,9 +212,13 @@ public class ProdSwitchExpr extends QT3TestSet {
       "            case \"42e0\" return \"Oink\" \n" +
       "            default return \"Expletive deleted\" }</out>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<out>Meow</out>", false)
     );
@@ -208,9 +240,13 @@ public class ProdSwitchExpr extends QT3TestSet {
       "            case () return \"Woof\" \n" +
       "            default return \"Expletive deleted\" }</out>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<out>Woof</out>", false)
     );
@@ -232,9 +268,13 @@ public class ProdSwitchExpr extends QT3TestSet {
       "            case () return \"Woof\" \n" +
       "            default return \"Expletive deleted\" }</out>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<out>Expletive deleted</out>", false)
     );
@@ -256,9 +296,13 @@ public class ProdSwitchExpr extends QT3TestSet {
       "            case xs:float('NaN') return \"Woof\" \n" +
       "            default return \"Expletive deleted\" }</out>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<out>Woof</out>", false)
     );
@@ -279,9 +323,13 @@ public class ProdSwitchExpr extends QT3TestSet {
       "            case 39 return $in div $zero \n" +
       "            default return \"Woof\" }</out>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<out>Baa</out>", false)
     );
@@ -302,9 +350,13 @@ public class ProdSwitchExpr extends QT3TestSet {
       "            case $in div $zero return \"Neigh\" \n" +
       "            default return \"Woof\" }</out>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<out>Baa</out>", false)
     );
@@ -325,9 +377,13 @@ public class ProdSwitchExpr extends QT3TestSet {
       "            case 4 return \"Oink\" \n" +
       "            default return \"Baa\" }</out>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -348,9 +404,13 @@ public class ProdSwitchExpr extends QT3TestSet {
       "            case ($in to 4) return \"Oink\" \n" +
       "            default return \"Baa\" }</out>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -366,9 +426,13 @@ public class ProdSwitchExpr extends QT3TestSet {
       "        declare variable $in := 2; \n" +
       "        <out>{ switch ($in) default return \"Baa\" }</out>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -388,9 +452,13 @@ public class ProdSwitchExpr extends QT3TestSet {
       "            case 3 return \"Quack\" \n" +
       "            case ($in to 4) return \"Oink\" }</out>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -410,9 +478,13 @@ public class ProdSwitchExpr extends QT3TestSet {
       "            case ($in to 4) return \"Oink\" \n" +
       "            default return \"Baa\" }</out>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -433,9 +505,13 @@ public class ProdSwitchExpr extends QT3TestSet {
       "            case 4 return \"Oink\" \n" +
       "            default return \"Baa\" }</out>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -456,9 +532,13 @@ public class ProdSwitchExpr extends QT3TestSet {
       "            case 4 return \"Oink\" \n" +
       "            default return \"Baa\" }</out>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XPST0003")
@@ -481,9 +561,13 @@ public class ProdSwitchExpr extends QT3TestSet {
       "            case 4 return \"Oink\" \n" +
       "            default return \"Baa\" } }</out>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -504,9 +588,13 @@ public class ProdSwitchExpr extends QT3TestSet {
       "            case 4: return \"Oink\" \n" +
       "            default: return \"Baa\" }</out>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );

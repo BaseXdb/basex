@@ -23,7 +23,7 @@
       <created by="Andreas Behm" on="2005-05-20"/>
       <test>comment {1,'string',3.14,xs:float('1.2345e-2'),xs:dateTime('2002-04-02T12:00:00-01:00')}</test>
       <result>
-         <assert-serialization><![CDATA[<!--1 string 3.14 0.012345 2002-04-02T12:00:00-01:00-->]]></assert-serialization>
+         <assert-xml><![CDATA[<!--1 string 3.14 0.012345 2002-04-02T12:00:00-01:00-->]]></assert-xml>
       </result>
    </test-case>
 
@@ -33,7 +33,7 @@
       <dependency type="spec" value="XQ10+"/>
       <test><![CDATA[comment {<elem>123</elem>, (<elem attr='456'/>)/@attr, (<elem>789</elem>)/text()}]]></test>
       <result>
-         <assert-serialization><![CDATA[<!--123 456 789-->]]></assert-serialization>
+         <assert-xml><![CDATA[<!--123 456 789-->]]></assert-xml>
       </result>
    </test-case>
 
@@ -42,7 +42,7 @@
       <created by="Andreas Behm" on="2005-05-20"/>
       <test>comment {1,'',2}</test>
       <result>
-         <assert-serialization><![CDATA[<!--1  2-->]]></assert-serialization>
+         <assert-xml><![CDATA[<!--1  2-->]]></assert-xml>
       </result>
    </test-case>
 
@@ -52,7 +52,7 @@
       <dependency type="spec" value="XQ10+"/>
       <test><![CDATA[comment {1,<a/>,2}]]></test>
       <result>
-         <assert-serialization><![CDATA[<!--1  2-->]]></assert-serialization>
+         <assert-xml><![CDATA[<!--1  2-->]]></assert-xml>
       </result>
    </test-case>
 
@@ -62,7 +62,7 @@
       <environment ref="DupNode"/>
       <test>comment {/root}</test>
       <result>
-         <assert-serialization><![CDATA[<!--texttext-->]]></assert-serialization>
+         <assert-xml><![CDATA[<!--texttext-->]]></assert-xml>
       </result>
    </test-case>
 
@@ -72,7 +72,7 @@
       <environment ref="DupNode"/>
       <test>comment {., .}</test>
       <result>
-         <assert-serialization><![CDATA[<!--texttext texttext-->]]></assert-serialization>
+         <assert-xml><![CDATA[<!--texttext texttext-->]]></assert-xml>
       </result>
    </test-case>
 
@@ -108,7 +108,7 @@
       <created by="Andreas Behm" on="2005-05-20"/>
       <test>comment {comment {'one', comment {'two'}}, 'three', comment {'four'}}</test>
       <result>
-         <assert-serialization><![CDATA[<!--one two three four-->]]></assert-serialization>
+         <assert-xml><![CDATA[<!--one two three four-->]]></assert-xml>
       </result>
    </test-case>
 
@@ -118,7 +118,7 @@
       <dependency type="spec" value="XQ10+"/>
       <test><![CDATA[<elem>{comment {'one'}}<a>{comment {'two'}}</a>{comment {'three'}}</elem>]]></test>
       <result>
-         <assert-serialization><![CDATA[<elem><!--one--><a><!--two--></a><!--three--></elem>]]></assert-serialization>
+         <assert-xml><![CDATA[<elem><!--one--><a><!--two--></a><!--three--></elem>]]></assert-xml>
       </result>
    </test-case>
 
@@ -128,7 +128,7 @@
       <dependency type="spec" value="XQ10+"/>
       <test><![CDATA[document {comment {'one'}, <a/>, comment {'two'}, <b/>, comment {'three'}}]]></test>
       <result>
-         <assert-serialization><![CDATA[<!--one--><a/><!--two--><b/><!--three-->]]></assert-serialization>
+         <assert-xml><![CDATA[<!--one--><a/><!--two--><b/><!--three-->]]></assert-xml>
       </result>
    </test-case>
 
@@ -215,7 +215,7 @@
       <created by="Andreas Behm" on="2005-05-20"/>
       <test>comment {'com','-','-','ment'}</test>
       <result>
-         <assert-serialization><![CDATA[<!--com - - ment-->]]></assert-serialization>
+         <assert-xml><![CDATA[<!--com - - ment-->]]></assert-xml>
       </result>
    </test-case>
 
@@ -242,7 +242,7 @@
       <created by="Frans Englich" on="2007-11-26"/>
       <test>comment {()}</test>
       <result>
-         <assert-serialization><![CDATA[<!---->]]></assert-serialization>
+         <assert-xml><![CDATA[<!---->]]></assert-xml>
       </result>
    </test-case>
 
@@ -261,6 +261,30 @@
       <test>data(comment {"content"}) instance of xs:string</test>
       <result>
          <assert-true/>
+      </result>
+   </test-case>
+   
+      <test-case name="cbcl-constr-compcomment-001">
+      <description> test detection of '--' in computed comment </description>
+      <created by="Tim Mills" on="2008-07-01"/>      
+      <dependency type="spec" value="XQ10+"/>
+      <test><![CDATA[<element> { comment { '-', '-' } } </element>]]></test>
+      <result>
+         <error code="XQDY0072"/>
+      </result>
+   </test-case>
+   
+
+   <test-case name="cbcl-constr-compcomment-002">
+      <description> test detection of '--' in computed comment </description>
+      <created by="Tim Mills" on="2008-07-01"/>      
+      <dependency type="spec" value="XQ10+"/>
+      <test><![CDATA[
+      	declare function local:tag($arg) as element() { element { 'tag' } { $arg } }; 
+      	<element> { comment { 'comment', local:tag('--') } } </element>
+      ]]></test>
+      <result>
+         <error code="XQDY0072"/>
       </result>
    </test-case>
 </test-set>

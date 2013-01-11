@@ -20,10 +20,14 @@ public class FnPath extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:path(())",
       ctx);
-    query.context(node(file("fn/path/pathdata.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/path/pathdata.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -37,10 +41,14 @@ public class FnPath extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:path(/*)",
       ctx);
-    query.context(node(file("fn/path/pathdata.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/path/pathdata.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "/Q{http://www.w3.org/2010/09/qt-fots-catalog}test-set[1]")
@@ -58,10 +66,14 @@ public class FnPath extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:path((//*:all-of)[1])",
       ctx);
-    query.context(node(file("fn/path/pathdata.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/path/pathdata.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "/Q{http://www.w3.org/2010/09/qt-fots-catalog}test-set[1]/Q{http://www.w3.org/2010/09/qt-fots-catalog}test-case[1]/Q{http://www.w3.org/2010/09/qt-fots-catalog}result[1]/Q{http://www.w3.org/2010/09/qt-fots-catalog}all-of[1]")
@@ -79,10 +91,14 @@ public class FnPath extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:path(//*[@name=\"fn-absintg1args-1\"])",
       ctx);
-    query.context(node(file("fn/path/pathdata.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/path/pathdata.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "/Q{http://www.w3.org/2010/09/qt-fots-catalog}test-set[1]/Q{http://www.w3.org/2010/09/qt-fots-catalog}test-case[4]")
@@ -100,10 +116,14 @@ public class FnPath extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:path((//@idref)[1])",
       ctx);
-    query.context(node(file("fn/path/pathdata.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/path/pathdata.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "/Q{http://www.w3.org/2010/09/qt-fots-catalog}test-set[1]/Q{http://www.w3.org/2010/09/qt-fots-catalog}link[1]/@idref")
@@ -121,10 +141,14 @@ public class FnPath extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:path((//*:source)[3]/@xml:id)",
       ctx);
-    query.context(node(file("fn/path/pathdata.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/path/pathdata.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "/Q{http://www.w3.org/2010/09/qt-fots-catalog}test-set[1]/Q{http://www.w3.org/2010/09/qt-fots-catalog}environment[3]/Q{http://www.w3.org/2010/09/qt-fots-catalog}source[1]/@Q{http://www.w3.org/XML/1998/namespace}id")
@@ -142,10 +166,14 @@ public class FnPath extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:path((//comment())[2])",
       ctx);
-    query.context(node(file("fn/path/pathdata.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/path/pathdata.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "/Q{http://www.w3.org/2010/09/qt-fots-catalog}test-set[1]/Q{http://www.w3.org/2010/09/qt-fots-catalog}test-case[2]/Q{http://www.w3.org/2010/09/qt-fots-catalog}description[1]/comment()[1]")
@@ -163,10 +191,14 @@ public class FnPath extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:path(//text()[.='2147483647'][1])",
       ctx);
-    query.context(node(file("fn/path/pathdata.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/path/pathdata.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "/Q{http://www.w3.org/2010/09/qt-fots-catalog}test-set[1]/Q{http://www.w3.org/2010/09/qt-fots-catalog}test-case[3]/Q{http://www.w3.org/2010/09/qt-fots-catalog}result[1]/Q{http://www.w3.org/2010/09/qt-fots-catalog}all-of[1]/Q{http://www.w3.org/2010/09/qt-fots-catalog}assert-eq[1]/text()[1]")
@@ -184,13 +216,17 @@ public class FnPath extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:path(//processing-instruction()[1])",
       ctx);
-    query.context(node(file("fn/path/pathdata.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/path/pathdata.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
-        assertStringValue(false, "/processing-instruction(\"xml-stylesheet\")[1]")
+        assertStringValue(false, "/processing-instruction(xml-stylesheet)[1]")
       &&
         assertType("xs:string")
       )
@@ -205,10 +241,14 @@ public class FnPath extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:path(//p)",
       ctx);
-    query.context(node(file("fn/path/pathdata.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/path/pathdata.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "/Q{http://www.w3.org/2010/09/qt-fots-catalog}test-set[1]/Q{}p[1]")
@@ -226,16 +266,20 @@ public class FnPath extends QT3TestSet {
     final XQuery query = new XQuery(
       "\n" +
       "        import module namespace copy=\"http://www.w3.org/QT3/copy\";\n" +
-      "        fn:path(copy:copy((//employee)[1]))\n" +
+      "        fn:path(copy:copy((//employee)[1])/pnum)\n" +
       "      ",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-    query.addModule("http://www.w3.org/QT3/copy", file("fn/id/copy.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      query.addModule("http://www.w3.org/QT3/copy", file("fn/id/copy.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("FODC0002")
+      assertStringValue(false, "Q{http://www.w3.org/2005/xpath-functions}root()/Q{}pnum[1]")
     );
   }
 
@@ -247,13 +291,138 @@ public class FnPath extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:path(/)",
       ctx);
-    query.context(node(file("fn/path/pathdata.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/path/pathdata.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "/")
+      &&
+        assertType("xs:string")
+      )
+    );
+  }
+
+  /**
+   * path() applied to a parentless attribute node.
+   */
+  @org.junit.Test
+  public void path016() {
+    final XQuery query = new XQuery(
+      "fn:path(attribute name {\"fred\"})",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertStringValue(false, "Q{http://www.w3.org/2005/xpath-functions}root()")
+      &&
+        assertType("xs:string")
+      )
+    );
+  }
+
+  /**
+   * path() applied to a parentless text node.
+   */
+  @org.junit.Test
+  public void path017() {
+    final XQuery query = new XQuery(
+      "fn:path(text{\"fred\"})",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertStringValue(false, "Q{http://www.w3.org/2005/xpath-functions}root()")
+      &&
+        assertType("xs:string")
+      )
+    );
+  }
+
+  /**
+   * path() applied to an attribute of an element root.
+   */
+  @org.junit.Test
+  public void path018() {
+    final XQuery query = new XQuery(
+      "fn:path(<a b=\"c\"/>/@b)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertStringValue(false, "Q{http://www.w3.org/2005/xpath-functions}root()/@b")
+      &&
+        assertType("xs:string")
+      )
+    );
+  }
+
+  /**
+   * path() applied to an element child of an element root.
+   */
+  @org.junit.Test
+  public void path019() {
+    final XQuery query = new XQuery(
+      "fn:path(<a><b/><b/></a>/(b[2]))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertStringValue(false, "Q{http://www.w3.org/2005/xpath-functions}root()/Q{}b[2]")
+      &&
+        assertType("xs:string")
+      )
+    );
+  }
+
+  /**
+   * path() with no arguments.
+   */
+  @org.junit.Test
+  public void path020() {
+    final XQuery query = new XQuery(
+      "(//*:all-of)[1] ! fn:path()",
+      ctx);
+    try {
+      query.context(node(file("fn/path/pathdata.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertStringValue(false, "/Q{http://www.w3.org/2010/09/qt-fots-catalog}test-set[1]/Q{http://www.w3.org/2010/09/qt-fots-catalog}test-case[1]/Q{http://www.w3.org/2010/09/qt-fots-catalog}result[1]/Q{http://www.w3.org/2010/09/qt-fots-catalog}all-of[1]")
       &&
         assertType("xs:string")
       )

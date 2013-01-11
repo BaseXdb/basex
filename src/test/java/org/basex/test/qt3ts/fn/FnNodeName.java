@@ -20,9 +20,13 @@ public class FnNodeName extends QT3TestSet {
     final XQuery query = new XQuery(
       "node-name()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -36,9 +40,13 @@ public class FnNodeName extends QT3TestSet {
     final XQuery query = new XQuery(
       "node-name((), \"wrong param\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -52,9 +60,13 @@ public class FnNodeName extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(node-name(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,10 +80,14 @@ public class FnNodeName extends QT3TestSet {
     final XQuery query = new XQuery(
       "node-name(/*, ())",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -85,9 +101,13 @@ public class FnNodeName extends QT3TestSet {
     final XQuery query = new XQuery(
       "node-name(\"string\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -101,10 +121,14 @@ public class FnNodeName extends QT3TestSet {
     final XQuery query = new XQuery(
       "node-name(/*) instance of xs:QName",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -118,10 +142,14 @@ public class FnNodeName extends QT3TestSet {
     final XQuery query = new XQuery(
       "node-name(3.3)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -135,10 +163,14 @@ public class FnNodeName extends QT3TestSet {
     final XQuery query = new XQuery(
       "node-name( (<a/>, <b/>))",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -152,10 +184,14 @@ public class FnNodeName extends QT3TestSet {
     final XQuery query = new XQuery(
       "node-name( (<a/>, \"mystring\"))",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -169,12 +205,36 @@ public class FnNodeName extends QT3TestSet {
     final XQuery query = new XQuery(
       "node-name( node-name(<a/>))",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
+    );
+  }
+
+  /**
+   *  Test fn:node-name on a comment(). .
+   */
+  @org.junit.Test
+  public void cbclNodeName001() {
+    final XQuery query = new XQuery(
+      "empty(node-name( comment { \"comments have no name \" } ) )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
     );
   }
 
@@ -186,9 +246,13 @@ public class FnNodeName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:node-name(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -202,9 +266,13 @@ public class FnNodeName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:local-name-from-QName(fn:node-name(element elementName { element achild {\"some text\"}}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "elementName")
     );
@@ -218,9 +286,13 @@ public class FnNodeName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:local-name-from-QName(fn:node-name(attribute attributeName {\"\"}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "attributeName")
     );
@@ -234,9 +306,13 @@ public class FnNodeName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:local-name-from-QName(fn:node-name(attribute attributeName {\"an attribute value\"}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "attributeName")
     );
@@ -250,9 +326,13 @@ public class FnNodeName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:namespace-uri-from-QName(fn:node-name(attribute attributeName {\"an attribute value\"})))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -266,9 +346,13 @@ public class FnNodeName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:local-name-from-QName(fn:node-name(document {\"\"})))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -282,9 +366,13 @@ public class FnNodeName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:namespace-uri-from-QName(fn:node-name(document {\"\"})))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -298,9 +386,13 @@ public class FnNodeName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:local-name-from-QName(fn:node-name(document {\"<element1> text </element1>\"})))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -314,9 +406,13 @@ public class FnNodeName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:namespace-uri-from-QName(fn:node-name(document {\"<element1> text </element1>\"})))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -330,9 +426,13 @@ public class FnNodeName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:local-name-from-QName(fn:node-name(text {\"\"})))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -346,9 +446,13 @@ public class FnNodeName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:namespace-uri-from-QName(fn:node-name(text {\"\"})))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -362,10 +466,14 @@ public class FnNodeName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:node-name(/works[1]/employee[2]/child::text()[last()]))",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -379,9 +487,13 @@ public class FnNodeName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:local-name-from-QName(fn:node-name(text {\"a text value\"})))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -395,9 +507,13 @@ public class FnNodeName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:namespace-uri-from-QName(fn:node-name(text {\"a text value\"})))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -411,9 +527,13 @@ public class FnNodeName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:local-name-from-QName(fn:node-name(processing-instruction piName {\"Processing Instruction content\"}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "piName")
     );
@@ -427,9 +547,13 @@ public class FnNodeName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:namespace-uri-from-QName(fn:node-name(processing-instruction piName {\"Processing Instruction content\"})))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -443,11 +567,115 @@ public class FnNodeName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:node-name(processing-instruction piName {\"Processing Instruction content\"},\"A Second Argument\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
+    );
+  }
+
+  /**
+   *  Evaluation of node-name function with no arguments on element node. .
+   */
+  @org.junit.Test
+  public void fnNodeName25() {
+    final XQuery query = new XQuery(
+      "<node xmlns=\"http://example.com/ns\"/>/node-name()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("QName(\"http://example.com/ns\", \"node\")")
+    );
+  }
+
+  /**
+   *  Evaluation of node-name function with no arguments on attribute node. .
+   */
+  @org.junit.Test
+  public void fnNodeName26() {
+    final XQuery query = new XQuery(
+      "<node xml:space=\"preserve\" xmlns=\"http://example.com/ns\"/>/@xml:space/node-name()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("QName(\"http://www.w3.org/XML/1998/namespace\", \"space\")")
+    );
+  }
+
+  /**
+   *  Evaluation of node-name function with no arguments on processing instruction node. .
+   */
+  @org.junit.Test
+  public void fnNodeName27() {
+    final XQuery query = new XQuery(
+      "<?test data?>/node-name()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("QName(\"\", \"test\")")
+    );
+  }
+
+  /**
+   *  Evaluation of node-name function with no arguments on namespace node. .
+   */
+  @org.junit.Test
+  public void fnNodeName28() {
+    final XQuery query = new XQuery(
+      "namespace{\"foo\"}{\"http://example.com/foo\"}/node-name()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("QName(\"\", \"foo\")")
+    );
+  }
+
+  /**
+   *  Evaluation of node-name function with no arguments on text node. .
+   */
+  @org.junit.Test
+  public void fnNodeName29() {
+    final XQuery query = new XQuery(
+      "<a>abc</a>/text()/node-name()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEmpty()
     );
   }
 
@@ -459,12 +687,76 @@ public class FnNodeName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:local-name-from-QName(fn:node-name(/works[1]/employee[2]))",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "employee")
+    );
+  }
+
+  /**
+   *  Evaluation of node-name function with no arguments on atomic value. .
+   */
+  @org.junit.Test
+  public void fnNodeName30() {
+    final XQuery query = new XQuery(
+      "79[node-name()]",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   *  Evaluation of node-name function with no arguments on function item. .
+   */
+  @org.junit.Test
+  public void fnNodeName31() {
+    final XQuery query = new XQuery(
+      "node-name#0!node-name()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   *  Evaluation of node-name function with no arguments with absent context. .
+   */
+  @org.junit.Test
+  public void fnNodeName32() {
+    final XQuery query = new XQuery(
+      "node-name()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPDY0002")
     );
   }
 
@@ -476,9 +768,13 @@ public class FnNodeName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:local-name-from-QName(fn:node-name(<shoe size = \"5\"/>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "shoe")
     );
@@ -492,9 +788,13 @@ public class FnNodeName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:node-name(<!-- This a comment node -->))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -508,9 +808,13 @@ public class FnNodeName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:local-name-from-QName(fn:node-name(<?format role=\"output\" ?>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "format")
     );
@@ -524,9 +828,13 @@ public class FnNodeName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:namespace-uri-from-QName(fn:node-name(<anelement xmlns = \"http://example.com/examples\"></anelement>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://example.com/examples")
     );
@@ -540,9 +848,13 @@ public class FnNodeName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:local-name-from-QName(fn:node-name(element elementName {}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "elementName")
     );
@@ -556,9 +868,13 @@ public class FnNodeName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:namespace-uri-from-QName(fn:node-name(element elementName {})))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );

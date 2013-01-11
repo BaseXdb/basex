@@ -27,9 +27,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "false() eq false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -50,9 +54,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "true() eq true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -73,9 +81,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "false() ne true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -96,9 +108,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "true() ne false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -119,9 +135,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "((((((((((((false() eq false()) eq false()) eq false()) eq false()) eq false()) eq false()) eq false()) eq false()) eq false()) eq false()) eq false()) eq false()) eq false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -142,9 +162,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"true\") eq true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -165,9 +189,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "<name>true</name> eq true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -188,11 +216,167 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "true() eq <name>true</name>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
+    );
+  }
+
+  /**
+   * 
+   *  Name: cbcl-boolean-equal-001 
+   *  Description: test equality of xs:boolean 
+   *  Author: Tim Mills 
+   *  Date: 2008-05-14 
+   * .
+   */
+  @org.junit.Test
+  public void cbclBooleanEqual001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      declare function local:is-even($arg as xs:integer) as xs:boolean { (($arg mod 2) eq 0) }; \n" +
+      "      fn:false() eq local:is-even(17)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   * 
+   *  Name: cbcl-boolean-equal-002 
+   *  Description: test equality of xs:boolean 
+   *  Author: Tim Mills 
+   *  Date: 2008-05-14 
+   * .
+   */
+  @org.junit.Test
+  public void cbclBooleanEqual002() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      declare function local:is-even($arg as xs:integer) as xs:boolean { (($arg mod 2) eq 0) }; \n" +
+      "      not(local:is-even(13) eq local:is-even(17))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   * 
+   *  Name: cbcl-boolean-equal-003 
+   *  Description: test equality of xs:boolean 
+   *  Author: Tim Mills 
+   *  Date: 2008-05-14 
+   * .
+   */
+  @org.junit.Test
+  public void cbclBooleanEqual003() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      declare function local:is-even($arg as xs:integer) as xs:boolean { (($arg mod 2) eq 0) }; \n" +
+      "      fn:true() ne local:is-even(17)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   * 
+   *  Name: cbcl-boolean-equal-004 
+   *  Description: test equality of xs:boolean 
+   *  Author: Tim Mills 
+   *  Date: 2008-05-14 
+   * .
+   */
+  @org.junit.Test
+  public void cbclBooleanEqual004() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      declare function local:is-even($arg as xs:integer) as xs:boolean { (($arg mod 2) eq 0) }; \n" +
+      "      local:is-even(17) ne fn:true()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   * test equality of xs:boolean.
+   */
+  @org.junit.Test
+  public void cbclBooleanEqual005() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      declare function local:is-even($arg as xs:integer) as xs:boolean { (($arg mod 2) eq 0) }; \n" +
+      "      local:is-even(17) ne fn:false()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   * test equal to of xs:boolean.
+   */
+  @org.junit.Test
+  public void cbclBooleanEqual006() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      declare function local:is-even($arg as xs:integer) as xs:boolean { (($arg mod 2) eq 0) }; \n" +
+      "      not(not(local:is-even(17) eq local:is-even(16)))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
     );
   }
 
@@ -213,9 +397,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:boolean(\"true\")) eq xs:boolean(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -238,9 +426,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(7 eq 7) eq xs:boolean(\"false\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -263,9 +455,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(7 lt 7) eq xs:boolean(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -287,9 +483,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(7 lt 7) and xs:boolean(\"false\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -312,9 +512,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "((7 eq 7) eq xs:boolean(\"true\")) and (xs:boolean(\"false\") eq xs:boolean(\"true\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -337,9 +541,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "((7 eq 7) eq xs:boolean(\"true\")) or (xs:boolean(\"false\") eq xs:boolean(\"true\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -361,9 +569,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:starts-with(\"Query\",\"Que\") eq xs:boolean(\"false\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -385,9 +597,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ends-with(\"Query\",\"ry\") eq xs:boolean(\"false\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -409,9 +625,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $e := (0,1) return $e eq 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -434,9 +654,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:boolean(\"true\")) eq xs:boolean(\"false\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -459,9 +683,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:boolean(\"false\")) eq xs:boolean(\"false\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -484,9 +712,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:boolean(\"true\") and xs:boolean(\"true\")) eq (xs:boolean(\"false\") and xs:boolean(\"false\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -509,9 +741,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:boolean(\"true\") and xs:boolean(\"true\")) eq xs:boolean(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -534,9 +770,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:boolean(\"false\") and xs:boolean(\"false\")) eq xs:boolean(\"false\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -559,9 +799,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:boolean(\"false\")) eq fn:not(xs:boolean(\"false\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -584,9 +828,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:boolean(\"false\") and xs:boolean(\"true\")) eq fn:not(xs:boolean(\"false\") and xs:boolean(\"true\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -608,9 +856,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(7 lt 7) eq xs:boolean(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -631,9 +883,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"false\") eq xs:boolean(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -654,9 +910,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean('false') eq xs:boolean('1')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -677,9 +937,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean('false') eq xs:boolean('0')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -700,9 +964,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"false\") eq xs:boolean('0')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -723,9 +991,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"false\") eq xs:boolean(\"1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -746,9 +1018,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"false\") eq true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -769,9 +1045,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"false\") eq false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -792,9 +1072,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") eq xs:boolean(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -815,9 +1099,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") eq xs:boolean(\"false\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -838,9 +1126,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") eq xs:boolean(\"1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -861,9 +1153,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") eq xs:boolean(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -884,9 +1180,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"1\") eq xs:boolean(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -907,9 +1207,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"0\") eq xs:boolean(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -930,9 +1234,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean('true') eq xs:boolean('1')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -953,9 +1261,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean('true') eq xs:boolean('0')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -976,9 +1288,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") eq xs:boolean('1')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -999,9 +1315,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") eq xs:boolean(\"1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1022,9 +1342,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") eq true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1045,9 +1369,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") eq false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1071,9 +1399,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"false\") eq xs:boolean(\"false\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1097,9 +1429,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"1\") eq xs:boolean(\"false\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1123,9 +1459,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"0\") eq xs:boolean(\"false\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1149,9 +1489,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"false\") eq xs:boolean(\"1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1175,9 +1519,13 @@ public class OpBooleanEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"false\") eq xs:boolean(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );

@@ -25,9 +25,13 @@ public class ProdGroupByClause extends QT3TestSet {
       "            return string(text{$x})\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\"1 11 21 31 41 51 61 71 81 91\", \"2 12 22 32 42 52 62 72 82 92\", \"3 13 23 33 43 53 63 73 83 93\", \n            \"4 14 24 34 44 54 64 74 84 94\", \"5 15 25 35 45 55 65 75 85 95\", \"6 16 26 36 46 56 66 76 86 96\", \n            \"7 17 27 37 47 57 67 77 87 97\", \"8 18 28 38 48 58 68 78 88 98\", \"9 19 29 39 49 59 69 79 89 99\", \n            \"10 20 30 40 50 60 70 80 90 100\"")
     );
@@ -45,9 +49,13 @@ public class ProdGroupByClause extends QT3TestSet {
       "            return string(text{$x})\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\"1 11 21 31 41 51 61 71 81 91\", \"2 12 22 32 42 52 62 72 82 92\", \"3 13 23 33 43 53 63 73 83 93\", \n            \"4 14 24 34 44 54 64 74 84 94\", \"5 15 25 35 45 55 65 75 85 95\", \"6 16 26 36 46 56 66 76 86 96\", \n            \"7 17 27 37 47 57 67 77 87 97\", \"8 18 28 38 48 58 68 78 88 98\", \"9 19 29 39 49 59 69 79 89 99\", \n            \"10 20 30 40 50 60 70 80 90 100\"")
     );
@@ -67,10 +75,14 @@ public class ProdGroupByClause extends QT3TestSet {
       "                   string-join(for $e in $x return $e/@name/string(), ',')) \n" +
       "      ",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\n            \"female:Jane Doe 1,Jane Doe 3,Jane Doe 5,Jane Doe 7,Jane Doe 9,Jane Doe 11,Jane Doe 13\",\n            \"male:John Doe 2,John Doe 4,John Doe 6,John Doe 8,John Doe 10,John Doe 12\"\n         ")
     );
@@ -89,10 +101,14 @@ public class ProdGroupByClause extends QT3TestSet {
       "                   string-join(for $e in $x return $e/@name/string(), ',')) \n" +
       "      ",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\n            \"female:Jane Doe 1,Jane Doe 3,Jane Doe 5,Jane Doe 7,Jane Doe 9,Jane Doe 11,Jane Doe 13\",\n            \"male:John Doe 2,John Doe 4,John Doe 6,John Doe 8,John Doe 10,John Doe 12\"\n         ")
     );
@@ -112,10 +128,14 @@ public class ProdGroupByClause extends QT3TestSet {
       "                   string-join(for $e in $x return $e/@name/string(), ',')) \n" +
       "      ",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\n            \"false:Jane Doe 1,Jane Doe 3,Jane Doe 5,Jane Doe 7,Jane Doe 9,Jane Doe 11,Jane Doe 13\",\n            \"true:John Doe 2,John Doe 4,John Doe 6,John Doe 8,John Doe 10,John Doe 12\"\n         ")
     );
@@ -135,10 +155,14 @@ public class ProdGroupByClause extends QT3TestSet {
       "                   string-join(for $e in $x return $e/@name/string(), ',')) \n" +
       "      ",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\n            \"false:Jane Doe 1,Jane Doe 3,Jane Doe 5,Jane Doe 7,Jane Doe 9,Jane Doe 11,Jane Doe 13\",\n            \"true:John Doe 2,John Doe 4,John Doe 6,John Doe 8,John Doe 10,John Doe 12\"\n         ")
     );
@@ -157,10 +181,14 @@ public class ProdGroupByClause extends QT3TestSet {
       "            return concat($key, ':', avg($x/hours)) \n" +
       "      ",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\"female:41.25\", \"male:37.75\"")
     );
@@ -179,10 +207,14 @@ public class ProdGroupByClause extends QT3TestSet {
       "            return <group hours=\"{$key}\" avHours=\"{avg($x/hours)}\"/> \n" +
       "      ",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -202,10 +234,14 @@ public class ProdGroupByClause extends QT3TestSet {
       "        }</out>\n" +
       "      ",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<out><group status=\"\" count=\"12\"/><group status=\"active\" count=\"1\"/></out>", false)
@@ -229,10 +265,14 @@ public class ProdGroupByClause extends QT3TestSet {
       "            return concat($key, ':', count($x)) \n" +
       "      ",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\"40:3\", \"80:3\", \"20:5\"")
     );
@@ -254,10 +294,14 @@ public class ProdGroupByClause extends QT3TestSet {
       "        }</out>\n" +
       "      ",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<out><group count=\"2\">Jane Doe 7|John Doe 8</group><group count=\"2\">Jane Doe 9|John Doe 10</group><group count=\"3\">Jane Doe 11|John Doe 12|Jane Doe 13</group><group count=\"6\">Jane Doe 1|John Doe 2|Jane Doe 3|John Doe 4|Jane Doe 5|John Doe 6</group></out>", false)
     );
@@ -279,10 +323,14 @@ public class ProdGroupByClause extends QT3TestSet {
       "        }</out>\n" +
       "      ",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<out><group count=\"6\" key=\"E1\">P1|P2|P3|P4|P5|P6</group><group count=\"2\" key=\"E2\">P1|P2</group><group count=\"2\" key=\"E3\">P2|P2</group><group count=\"3\" key=\"E4\">P2|P4|P5</group></out>", false)
     );
@@ -303,10 +351,14 @@ public class ProdGroupByClause extends QT3TestSet {
       "        }</out>\n" +
       "      ",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<out><group count=\"6\" key=\"E1\">P1|P2|P3|P4|P5|P6</group><group count=\"2\" key=\"E2\">P1|P2</group><group count=\"2\" key=\"E3\">P2|P2</group><group count=\"3\" key=\"E4\">P2|P4|P5</group></out>", false)
     );
@@ -327,10 +379,14 @@ public class ProdGroupByClause extends QT3TestSet {
       "        }</out>\n" +
       "      ",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<out><group key=\"NaN\" count=\"6\"/><group key=\"42\" count=\"7\"/></out>", false)
@@ -353,9 +409,13 @@ public class ProdGroupByClause extends QT3TestSet {
       "        return string-join($p!string(), ' ')  \n" +
       "     ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\"1 3 5 7 9\", \"2 4 6 8 10\"")
     );
@@ -378,12 +438,122 @@ public class ProdGroupByClause extends QT3TestSet {
       "        }</out>\n" +
       "      ",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<out/>", false)
+    );
+  }
+
+  /**
+   * Grouping by already existing variable.
+   */
+  @org.junit.Test
+  public void group013() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "       for $x in 1 to 10, $y in 1 to 4\n" +
+      "       let $org_y := $y\n" +
+      "       group by $y, $y := $x mod 2\n" +
+      "       return <grp y=\"{$org_y[1]}\" even=\"{$y}\">{$x}</grp>\n" +
+      "     ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertSerialization("<grp even=\"1\" y=\"1\">1 1 1 1 3 3 3 3 5 5 5 5 7 7 7 7 9 9 9 9</grp><grp even=\"0\" y=\"1\">2 2 2 2 4 4 4 4 6 6 6 6 8 8 8 8 10 10 10 10</grp>", false)
+      ||
+        assertSerialization("<grp even=\"0\" y=\"1\">2 2 2 2 4 4 4 4 6 6 6 6 8 8 8 8 10 10 10 10</grp><grp even=\"1\" y=\"1\">1 1 1 1 3 3 3 3 5 5 5 5 7 7 7 7 9 9 9 9</grp>", false)
+      )
+    );
+  }
+
+  /**
+   * Referenced grouping variable is not in the tuple stream. .
+   */
+  @org.junit.Test
+  public void group014() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "         let $x := 1\n" +
+      "         return\n" +
+      "           for $i in (\"a\", \"b\")\n" +
+      "           group by $x\n" +
+      "           return\n" +
+      "             ($x, count($i))\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XQST0094")
+    );
+  }
+
+  /**
+   * No value comparisons are available to compare the grouping keys..
+   */
+  @org.junit.Test
+  public void group015() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "          for $x in (true(), \"true\", xs:QName(\"true\"))\n" +
+      "          group by $x\n" +
+      "          return $x\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertSerialization("true true true", false)
+    );
+  }
+
+  /**
+   * In the first grouping spec, the grouping variable does not reference the generated let binding.  See also group-013 .
+   */
+  @org.junit.Test
+  public void group016() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "       count(\n" +
+      "         for $y in 1 to 10\n" +
+      "         group by $y := $y, $y := $y mod 2\n" +
+      "         return $y\n" +
+      "       )\n" +
+      "     ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("2")
     );
   }
 
@@ -406,13 +576,17 @@ public class ProdGroupByClause extends QT3TestSet {
       "               }</sales-qty-by-product> \n" +
       "      ",
       ctx);
-    query.bind("$products-doc", node(file("prod/GroupByClause/products.xml")));
-    query.bind("$sales-records-doc", node(file("prod/GroupByClause/sales-records.xml")));
-    query.bind("$stores-doc", node(file("prod/GroupByClause/stores.xml")));
-    query.bind("$books-doc", node(file("prod/GroupByClause/books.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("$products-doc", node(file("prod/GroupByClause/products.xml")));
+      query.bind("$sales-records-doc", node(file("prod/GroupByClause/sales-records.xml")));
+      query.bind("$stores-doc", node(file("prod/GroupByClause/stores.xml")));
+      query.bind("$books-doc", node(file("prod/GroupByClause/books.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<sales-qty-by-product><product name=\"blender\">250</product><product name=\"broiler\">20</product><product name=\"shirt\">10</product><product name=\"socks\">510</product><product name=\"toaster\">200</product></sales-qty-by-product>", false)
     );
@@ -440,13 +614,17 @@ public class ProdGroupByClause extends QT3TestSet {
       "               }</result>\n" +
       "      ",
       ctx);
-    query.bind("$products-doc", node(file("prod/GroupByClause/products.xml")));
-    query.bind("$sales-records-doc", node(file("prod/GroupByClause/sales-records.xml")));
-    query.bind("$stores-doc", node(file("prod/GroupByClause/stores.xml")));
-    query.bind("$books-doc", node(file("prod/GroupByClause/books.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("$products-doc", node(file("prod/GroupByClause/products.xml")));
+      query.bind("$sales-records-doc", node(file("prod/GroupByClause/sales-records.xml")));
+      query.bind("$stores-doc", node(file("prod/GroupByClause/stores.xml")));
+      query.bind("$books-doc", node(file("prod/GroupByClause/books.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result><group><state>CA</state><category>clothes</category><total-qty>510</total-qty></group><group><state>CA</state><category>kitchen</category><total-qty>170</total-qty></group><group><state>MA</state><category>clothes</category><total-qty>10</total-qty></group><group><state>MA</state><category>kitchen</category><total-qty>300</total-qty></group></result>", false)
     );
@@ -476,13 +654,17 @@ public class ProdGroupByClause extends QT3TestSet {
       "               }</result>\n" +
       "      ",
       ctx);
-    query.bind("$products-doc", node(file("prod/GroupByClause/products.xml")));
-    query.bind("$sales-records-doc", node(file("prod/GroupByClause/sales-records.xml")));
-    query.bind("$stores-doc", node(file("prod/GroupByClause/stores.xml")));
-    query.bind("$books-doc", node(file("prod/GroupByClause/books.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("$products-doc", node(file("prod/GroupByClause/products.xml")));
+      query.bind("$sales-records-doc", node(file("prod/GroupByClause/sales-records.xml")));
+      query.bind("$stores-doc", node(file("prod/GroupByClause/stores.xml")));
+      query.bind("$books-doc", node(file("prod/GroupByClause/books.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result><group><state>CA</state><category>clothes</category><total-revenue>2550</total-revenue></group><group><state>CA</state><category>kitchen</category><total-revenue>6500</total-revenue></group><group><state>MA</state><category>clothes</category><total-revenue>100</total-revenue></group><group><state>MA</state><category>kitchen</category><total-revenue>14000</total-revenue></group></result>", false)
     );
@@ -520,13 +702,17 @@ public class ProdGroupByClause extends QT3TestSet {
       "               }</result>\n" +
       "      ",
       ctx);
-    query.bind("$products-doc", node(file("prod/GroupByClause/products.xml")));
-    query.bind("$sales-records-doc", node(file("prod/GroupByClause/sales-records.xml")));
-    query.bind("$stores-doc", node(file("prod/GroupByClause/stores.xml")));
-    query.bind("$books-doc", node(file("prod/GroupByClause/books.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("$products-doc", node(file("prod/GroupByClause/products.xml")));
+      query.bind("$sales-records-doc", node(file("prod/GroupByClause/sales-records.xml")));
+      query.bind("$stores-doc", node(file("prod/GroupByClause/stores.xml")));
+      query.bind("$books-doc", node(file("prod/GroupByClause/books.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result><state name=\"CA\"><category name=\"clothes\"><product name=\"socks\" total-qty=\"510\"/></category><category name=\"kitchen\"><product name=\"broiler\" total-qty=\"20\"/><product name=\"toaster\" total-qty=\"150\"/></category></state><state name=\"MA\"><category name=\"clothes\"><product name=\"shirt\" total-qty=\"10\"/></category><category name=\"kitchen\"><product name=\"blender\" total-qty=\"250\"/><product name=\"toaster\" total-qty=\"50\"/></category></state><state name=\"WA\"><category name=\"clothes\"/><category name=\"kitchen\"/></state></result>", false)
     );
@@ -554,13 +740,17 @@ public class ProdGroupByClause extends QT3TestSet {
       "               }</result>\n" +
       "      ",
       ctx);
-    query.bind("$products-doc", node(file("prod/GroupByClause/products.xml")));
-    query.bind("$sales-records-doc", node(file("prod/GroupByClause/sales-records.xml")));
-    query.bind("$stores-doc", node(file("prod/GroupByClause/stores.xml")));
-    query.bind("$books-doc", node(file("prod/GroupByClause/books.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("$products-doc", node(file("prod/GroupByClause/products.xml")));
+      query.bind("$sales-records-doc", node(file("prod/GroupByClause/sales-records.xml")));
+      query.bind("$stores-doc", node(file("prod/GroupByClause/stores.xml")));
+      query.bind("$books-doc", node(file("prod/GroupByClause/books.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result><store number=\"1\"><product name=\"socks\" qty=\"500\"/><product name=\"broiler\" qty=\"20\"/></store><store number=\"2\"><product name=\"toaster\" qty=\"100\"/><product name=\"toaster\" qty=\"50\"/><product name=\"socks\" qty=\"10\"/></store><store number=\"3\"><product name=\"blender\" qty=\"150\"/><product name=\"blender\" qty=\"100\"/><product name=\"toaster\" qty=\"50\"/><product name=\"shirt\" qty=\"10\"/></store></result>", false)
     );
@@ -588,13 +778,17 @@ public class ProdGroupByClause extends QT3TestSet {
       "                }</result>\n" +
       "      ",
       ctx);
-    query.bind("$products-doc", node(file("prod/GroupByClause/products.xml")));
-    query.bind("$sales-records-doc", node(file("prod/GroupByClause/sales-records.xml")));
-    query.bind("$stores-doc", node(file("prod/GroupByClause/stores.xml")));
-    query.bind("$books-doc", node(file("prod/GroupByClause/books.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("$products-doc", node(file("prod/GroupByClause/products.xml")));
+      query.bind("$sales-records-doc", node(file("prod/GroupByClause/sales-records.xml")));
+      query.bind("$stores-doc", node(file("prod/GroupByClause/stores.xml")));
+      query.bind("$books-doc", node(file("prod/GroupByClause/books.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result><store number=\"3\" total-profit=\"7320\"/><store number=\"2\" total-profit=\"3030\"/><store number=\"1\" total-profit=\"2100\"/></result>", false)
     );
@@ -622,13 +816,17 @@ public class ProdGroupByClause extends QT3TestSet {
       "               }</result>\n" +
       "      ",
       ctx);
-    query.bind("$products-doc", node(file("prod/GroupByClause/products.xml")));
-    query.bind("$sales-records-doc", node(file("prod/GroupByClause/sales-records.xml")));
-    query.bind("$stores-doc", node(file("prod/GroupByClause/stores.xml")));
-    query.bind("$books-doc", node(file("prod/GroupByClause/books.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("$products-doc", node(file("prod/GroupByClause/products.xml")));
+      query.bind("$sales-records-doc", node(file("prod/GroupByClause/sales-records.xml")));
+      query.bind("$stores-doc", node(file("prod/GroupByClause/stores.xml")));
+      query.bind("$books-doc", node(file("prod/GroupByClause/books.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result><author name=\"Alan Simon\"><title>SQL:1999</title><title>Strategic Database Technology</title></author><author name=\"Andrew Eisenberg\"><title>Understanding SQL and Java Together</title></author><author name=\"Jim Melton\"><title>Advanced SQL:1999</title><title>Querying XML</title><title>SQL:1999</title><title>Understanding SQL and Java Together</title></author><author name=\"Stephen Buxton\"><title>Querying XML</title></author></result>", false)
     );
@@ -656,13 +854,17 @@ public class ProdGroupByClause extends QT3TestSet {
       "               }</result>\n" +
       "      ",
       ctx);
-    query.bind("$products-doc", node(file("prod/GroupByClause/products.xml")));
-    query.bind("$sales-records-doc", node(file("prod/GroupByClause/sales-records.xml")));
-    query.bind("$stores-doc", node(file("prod/GroupByClause/stores.xml")));
-    query.bind("$books-doc", node(file("prod/GroupByClause/books.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("$products-doc", node(file("prod/GroupByClause/products.xml")));
+      query.bind("$sales-records-doc", node(file("prod/GroupByClause/sales-records.xml")));
+      query.bind("$stores-doc", node(file("prod/GroupByClause/stores.xml")));
+      query.bind("$books-doc", node(file("prod/GroupByClause/books.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result><author-list names=\"Alan Simon\"><title>Strategic Database Technology</title></author-list><author-list names=\"Jim Melton\"><title>Advanced SQL:1999</title></author-list><author-list names=\"Jim Melton, Alan Simon\"><title>SQL:1999</title></author-list><author-list names=\"Jim Melton, Andrew Eisenberg\"><title>Understanding SQL and Java Together</title></author-list><author-list names=\"Jim Melton, Stephen Buxton\"><title>Querying XML</title></author-list></result>", false)
     );

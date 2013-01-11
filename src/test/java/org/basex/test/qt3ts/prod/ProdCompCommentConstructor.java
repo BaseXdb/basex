@@ -20,9 +20,13 @@ public class ProdCompCommentConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "comment {'-'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0072")
     );
@@ -36,9 +40,13 @@ public class ProdCompCommentConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "comment {'comment-'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0072")
     );
@@ -52,9 +60,13 @@ public class ProdCompCommentConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "comment {'comment&#x2D;'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0072")
     );
@@ -68,10 +80,14 @@ public class ProdCompCommentConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "comment {//*:test-case[@name=\"Constr-compcomment-dash-4\"]/*:description}",
       ctx);
-    query.context(node(file("prod/CompCommentConstructor.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/CompCommentConstructor.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0072")
     );
@@ -85,9 +101,13 @@ public class ProdCompCommentConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:data(comment {'a', element a {}, 'b'})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a  b")
     );
@@ -101,10 +121,14 @@ public class ProdCompCommentConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "comment {., .}",
       ctx);
-    query.context(node(file("prod/CompAttrConstructor/DupNode.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/CompAttrConstructor/DupNode.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<!--texttext texttext-->", false)
     );
@@ -118,9 +142,13 @@ public class ProdCompCommentConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "comment {'--'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0072")
     );
@@ -134,9 +162,13 @@ public class ProdCompCommentConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "comment {'com--ment'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0072")
     );
@@ -150,9 +182,13 @@ public class ProdCompCommentConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "comment {'com&#x2D;&#x2D;ment'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0072")
     );
@@ -166,10 +202,14 @@ public class ProdCompCommentConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "comment {//*:test-case[@name=\"Constr-compcomment-doubledash-4\"]/*:description}",
       ctx);
-    query.context(node(file("prod/CompCommentConstructor.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/CompCommentConstructor.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0072")
     );
@@ -183,9 +223,13 @@ public class ProdCompCommentConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "comment {'com','-','-','ment'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<!--com - - ment-->", false)
     );
@@ -199,9 +243,13 @@ public class ProdCompCommentConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "comment {1,'string',3.14,xs:float('1.2345e-2'),xs:dateTime('2002-04-02T12:00:00-01:00')}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<!--1 string 3.14 0.012345 2002-04-02T12:00:00-01:00-->", false)
     );
@@ -215,9 +263,13 @@ public class ProdCompCommentConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "comment {<elem>123</elem>, (<elem attr='456'/>)/@attr, (<elem>789</elem>)/text()}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<!--123 456 789-->", false)
     );
@@ -231,9 +283,13 @@ public class ProdCompCommentConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "comment {1,'',2}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<!--1  2-->", false)
     );
@@ -247,9 +303,13 @@ public class ProdCompCommentConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "comment {1,<a/>,2}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<!--1  2-->", false)
     );
@@ -263,10 +323,14 @@ public class ProdCompCommentConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "comment {/root}",
       ctx);
-    query.context(node(file("prod/CompAttrConstructor/DupNode.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/CompAttrConstructor/DupNode.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<!--texttext-->", false)
     );
@@ -280,9 +344,13 @@ public class ProdCompCommentConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "comment {comment {'one', comment {'two'}}, 'three', comment {'four'}}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<!--one two three four-->", false)
     );
@@ -296,9 +364,13 @@ public class ProdCompCommentConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem>{comment {'one'}}<a>{comment {'two'}}</a>{comment {'three'}}</elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem><!--one--><a><!--two--></a><!--three--></elem>", false)
     );
@@ -312,9 +384,13 @@ public class ProdCompCommentConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "document {comment {'one'}, <a/>, comment {'two'}, <b/>, comment {'three'}}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<!--one--><a/><!--two--><b/><!--three-->", false)
     );
@@ -328,9 +404,13 @@ public class ProdCompCommentConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "count((comment {'comment'})/..)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -344,9 +424,13 @@ public class ProdCompCommentConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(comment {'a', element a {}, 'b'})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a  b")
     );
@@ -360,9 +444,13 @@ public class ProdCompCommentConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "comment {\"name\"} {\"content\"}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -376,9 +464,13 @@ public class ProdCompCommentConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "comment name {\"content\"}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -392,9 +484,13 @@ public class ProdCompCommentConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "comment {()}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<!---->", false)
     );
@@ -408,9 +504,13 @@ public class ProdCompCommentConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "comment{}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -424,11 +524,58 @@ public class ProdCompCommentConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "data(comment {\"content\"}) instance of xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test detection of '--' in computed comment .
+   */
+  @org.junit.Test
+  public void cbclConstrCompcomment001() {
+    final XQuery query = new XQuery(
+      "<element> { comment { '-', '-' } } </element>",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XQDY0072")
+    );
+  }
+
+  /**
+   *  test detection of '--' in computed comment .
+   */
+  @org.junit.Test
+  public void cbclConstrCompcomment002() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:tag($arg) as element() { element { 'tag' } { $arg } }; \n" +
+      "      \t<element> { comment { 'comment', local:tag('--') } } </element>\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XQDY0072")
     );
   }
 }

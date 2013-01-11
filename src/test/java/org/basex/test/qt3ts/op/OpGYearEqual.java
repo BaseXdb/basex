@@ -27,9 +27,13 @@ public class OpGYearEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\" 1956 \") eq xs:gYear(\"1956\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -50,9 +54,13 @@ public class OpGYearEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:gYear(\"1956\") eq xs:gYear(\"1958\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -73,9 +81,13 @@ public class OpGYearEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"1956\") ne xs:gYear(\"1958\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -96,9 +108,13 @@ public class OpGYearEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:gYear(\"1956\") ne xs:gYear(\"1956\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -119,9 +135,13 @@ public class OpGYearEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"1956-00:00\") eq xs:gYear(\"1956Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -142,9 +162,13 @@ public class OpGYearEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"1956+00:00\") eq xs:gYear(\"1956Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -165,9 +189,13 @@ public class OpGYearEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"1956Z\") eq xs:gYear(\"1956Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -188,11 +216,295 @@ public class OpGYearEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"1956-00:00\") eq xs:gYear(\"1956+00:00\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of gYear .
+   */
+  @org.junit.Test
+  public void cbclGYearEqual001() {
+    final XQuery query = new XQuery(
+      "declare function local:gYear($year as xs:integer) { xs:gYear(string(2000 + $year)) }; not(local:gYear(7) eq xs:gYear(\"2008\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of gYear .
+   */
+  @org.junit.Test
+  public void cbclGYearEqual002() {
+    final XQuery query = new XQuery(
+      "xs:gYear(\"2008\") eq xs:gYear(\"2008+09:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gYear .
+   */
+  @org.junit.Test
+  public void cbclGYearEqual003() {
+    final XQuery query = new XQuery(
+      "xs:gYear(\"2008+09:00\") eq xs:gYear(\"2008\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gYear .
+   */
+  @org.junit.Test
+  public void cbclGYearEqual004() {
+    final XQuery query = new XQuery(
+      "xs:gYear(\"2008\") eq xs:gYear(\"2008+09:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gYear .
+   */
+  @org.junit.Test
+  public void cbclGYearEqual005() {
+    final XQuery query = new XQuery(
+      "xs:gYear(\"2008+09:00\") eq xs:gYear(\"2008\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gYear .
+   */
+  @org.junit.Test
+  public void cbclGYearEqual006() {
+    final XQuery query = new XQuery(
+      "declare function local:gYear($year as xs:integer) { xs:gYear(string(2000 + $year)) }; not(local:gYear(7) ne xs:gYear(\"2008\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gYear .
+   */
+  @org.junit.Test
+  public void cbclGYearEqual007() {
+    final XQuery query = new XQuery(
+      "xs:gYear(\"2008\") ne xs:gYear(\"2008+09:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of gYear .
+   */
+  @org.junit.Test
+  public void cbclGYearEqual008() {
+    final XQuery query = new XQuery(
+      "xs:gYear(\"2008+09:00\") ne xs:gYear(\"2008\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of gYear .
+   */
+  @org.junit.Test
+  public void cbclGYearEqual009() {
+    final XQuery query = new XQuery(
+      "xs:gYear(\"2008\") ne xs:gYear(\"2008+09:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of gYear .
+   */
+  @org.junit.Test
+  public void cbclGYearEqual010() {
+    final XQuery query = new XQuery(
+      "xs:gYear(\"2008+09:00\") ne xs:gYear(\"2008\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of gYear .
+   */
+  @org.junit.Test
+  public void cbclGYearEqual011() {
+    final XQuery query = new XQuery(
+      "declare function local:gYear($gYear as xs:gYear, $null as xs:boolean) { if ($null) then () else $gYear }; exists(local:gYear(xs:gYear(\"1972\"), fn:true()) eq xs:gYear(\"1972\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gYear .
+   */
+  @org.junit.Test
+  public void cbclGYearEqual012() {
+    final XQuery query = new XQuery(
+      "declare function local:gYear($gYear as xs:gYear, $null as xs:boolean) { if ($null) then () else $gYear }; local:gYear(xs:gYear(\"1972\"), fn:false()) ne xs:gYear(\"1972\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gYear .
+   */
+  @org.junit.Test
+  public void cbclGYearEqual013() {
+    final XQuery query = new XQuery(
+      "declare function local:gYear($gYear as xs:gYear, $null as xs:boolean) { if ($null) then () else $gYear }; exists(local:gYear(xs:gYear(\"1972\"), fn:true()) ne xs:gYear(\"1972\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gYear .
+   */
+  @org.junit.Test
+  public void cbclGYearEqual014() {
+    final XQuery query = new XQuery(
+      "declare function local:gYear($gYear as xs:gYear, $null as xs:boolean) { if ($null) then () else $gYear }; local:gYear(xs:gYear(\"1972\"), fn:false()) ne xs:gYear(\"1972\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
     );
   }
 
@@ -212,9 +524,13 @@ public class OpGYearEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gYear(\"2005-12:00\") eq xs:gYear(\"2005+12:00\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -236,9 +552,13 @@ public class OpGYearEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gYear(\"1976Z\") ne xs:gYear(\"1976Z\")) or (xs:gYear(\"1980Z\") ne xs:gYear(\"1980Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -260,9 +580,13 @@ public class OpGYearEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gYear(\"1980Z\") eq xs:gYear(\"1980Z\")) or (fn:true())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -284,9 +608,13 @@ public class OpGYearEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gYear(\"1980Z\") eq xs:gYear(\"1980Z\")) or (fn:false())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -308,9 +636,13 @@ public class OpGYearEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gYear(\"1980Z\") ne xs:gYear(\"1980Z\")) or (fn:false())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -332,9 +664,13 @@ public class OpGYearEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gYear(\"1976-05:00\") eq xs:gYear(\"1976-05:00\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -356,9 +692,13 @@ public class OpGYearEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:gYear(\"2000Z\") eq xs:gYear(\"2001Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -380,9 +720,13 @@ public class OpGYearEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gYear(\"2000Z\") ne xs:gYear(\"2000Z\")) and (xs:gYear(\"1975Z\") ne xs:gYear(\"1975Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -406,9 +750,13 @@ public class OpGYearEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"1970Z\") eq xs:gYear(\"1970Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -432,9 +780,13 @@ public class OpGYearEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"1970Z\") ne xs:gYear(\"2030Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -458,9 +810,13 @@ public class OpGYearEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"2012Z\") eq xs:gYear(\"1970Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -484,9 +840,13 @@ public class OpGYearEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"2030Z\") eq xs:gYear(\"1970Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -510,9 +870,13 @@ public class OpGYearEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"1970Z\") eq xs:gYear(\"2012Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -536,9 +900,13 @@ public class OpGYearEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"1970Z\") eq xs:gYear(\"2030Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -562,9 +930,13 @@ public class OpGYearEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"1970Z\") ne xs:gYear(\"1970Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -588,9 +960,13 @@ public class OpGYearEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"2012Z\") ne xs:gYear(\"1970Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -614,9 +990,13 @@ public class OpGYearEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"2030Z\") ne xs:gYear(\"1970Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -640,9 +1020,13 @@ public class OpGYearEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"1970Z\") ne xs:gYear(\"2012Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -664,9 +1048,13 @@ public class OpGYearEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gYear(\"2000Z\") ne xs:gYear(\"2000Z\")) or (fn:true())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -688,9 +1076,13 @@ public class OpGYearEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not((xs:gYear(\"1995Z\") eq xs:gYear(\"1995Z\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -712,9 +1104,13 @@ public class OpGYearEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:gYear(\"2005Z\") ne xs:gYear(\"2006Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -736,9 +1132,13 @@ public class OpGYearEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:gYear(\"2005Z\") ne xs:gYear(\"2005Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -760,9 +1160,13 @@ public class OpGYearEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gYear(\"2000Z\") eq xs:gYear(\"2000Z\")) and (xs:gYear(\"2001Z\") eq xs:gYear(\"2001Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -784,9 +1188,13 @@ public class OpGYearEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gYear(\"2000Z\") eq xs:gYear(\"2000Z\")) or (xs:gYear(\"1976Z\") eq xs:gYear(\"1976Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );

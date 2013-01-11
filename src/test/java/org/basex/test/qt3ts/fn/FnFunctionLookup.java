@@ -20,9 +20,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'node-name'), 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -34,13 +38,20 @@ public class FnFunctionLookup extends QT3TestSet {
   @org.junit.Test
   public void fnFunctionLookup002() {
     final XQuery query = new XQuery(
-      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'node-name'), 0)()",
+      "/root/function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'node-name'), 0)()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertStringValue(false, "root")
     );
   }
 
@@ -52,9 +63,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'node-name'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,11 +83,16 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'node-name'), 1)(/root)",
       ctx);
-    query.context(node(file("fn/function-lookup/function-lookup.xml")));
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "root")
     );
@@ -86,9 +106,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'nilled'), 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,13 +124,20 @@ public class FnFunctionLookup extends QT3TestSet {
   @org.junit.Test
   public void fnFunctionLookup006() {
     final XQuery query = new XQuery(
-      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'nilled'), 0)()",
+      "/root/function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'nilled'), 0)()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertStringValue(false, "false")
     );
   }
 
@@ -118,9 +149,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'nilled'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -134,11 +169,16 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'nilled'), 1)(/root)",
       ctx);
-    query.context(node(file("fn/function-lookup/function-lookup.xml")));
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "false")
     );
@@ -152,27 +192,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'string'), 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
-    );
-  }
-
-  /**
-   * Attempts to evaluate the "function-lookup" function with no arguments..
-   */
-  @org.junit.Test
-  public void fnFunctionLookup01() {
-    final XQuery query = new XQuery(
-      "fn:function-lookup()",
-      ctx);
-
-    final QT3Result res = result(query);
-    result = res;
-    test(
-      error("XPST0017")
     );
   }
 
@@ -182,13 +210,20 @@ public class FnFunctionLookup extends QT3TestSet {
   @org.junit.Test
   public void fnFunctionLookup010() {
     final XQuery query = new XQuery(
-      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'string'), 0)()",
+      "/root/child/function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'string'), 0)()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertStringValue(false, "1")
     );
   }
 
@@ -200,9 +235,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'string'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -216,9 +255,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'string'), 1)(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -232,9 +275,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'data'), 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -246,13 +293,20 @@ public class FnFunctionLookup extends QT3TestSet {
   @org.junit.Test
   public void fnFunctionLookup014() {
     final XQuery query = new XQuery(
-      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'data'), 0)()",
+      "/root/child/function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'data'), 0)()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertStringValue(false, "1")
     );
   }
 
@@ -264,9 +318,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'data'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -280,11 +338,16 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'data'), 1)(/root/child[1])",
       ctx);
-    query.context(node(file("fn/function-lookup/function-lookup.xml")));
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -298,9 +361,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'base-uri'), 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -312,13 +379,20 @@ public class FnFunctionLookup extends QT3TestSet {
   @org.junit.Test
   public void fnFunctionLookup018() {
     final XQuery query = new XQuery(
-      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'base-uri'), 0)()",
+      "/root/function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'base-uri'), 0)()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertStringValue(false, "http://www.w3.org/fots/fn/function-lookup/function-lookup.xml")
     );
   }
 
@@ -330,27 +404,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'base-uri'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
-    );
-  }
-
-  /**
-   * Attempts to reference the "function-lookup" function with arity zero..
-   */
-  @org.junit.Test
-  public void fnFunctionLookup02() {
-    final XQuery query = new XQuery(
-      "fn:function-lookup#0",
-      ctx);
-
-    final QT3Result res = result(query);
-    result = res;
-    test(
-      error("XPST0017")
     );
   }
 
@@ -362,11 +424,16 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'base-uri'), 1)(/)",
       ctx);
-    query.context(node(file("fn/function-lookup/function-lookup.xml")));
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.w3.org/fots/fn/function-lookup/function-lookup.xml")
     );
@@ -380,9 +447,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'document-uri'), 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -394,13 +465,20 @@ public class FnFunctionLookup extends QT3TestSet {
   @org.junit.Test
   public void fnFunctionLookup022() {
     final XQuery query = new XQuery(
-      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'document-uri'), 0)()",
+      "/function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'document-uri'), 0)()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertStringValue(false, "http://www.w3.org/fots/fn/function-lookup/function-lookup.xml")
     );
   }
 
@@ -412,9 +490,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'document-uri'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -428,11 +510,16 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'document-uri'), 1)(/)",
       ctx);
-    query.context(node(file("fn/function-lookup/function-lookup.xml")));
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.w3.org/fots/fn/function-lookup/function-lookup.xml")
     );
@@ -446,9 +533,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'error'), 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -462,9 +553,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'error'), 0)()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOER0000")
     );
@@ -478,9 +573,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'error'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -494,9 +593,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'error'), 1)(fn:QName('http://www.w3.org/2005/xqt-errors', 'foo:XXXX0000'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XXXX0000")
     );
@@ -510,27 +613,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'error'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
-    );
-  }
-
-  /**
-   * Attempts to evaluate the "function-lookup" function with one argument..
-   */
-  @org.junit.Test
-  public void fnFunctionLookup03() {
-    final XQuery query = new XQuery(
-      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'node-name'))",
-      ctx);
-
-    final QT3Result res = result(query);
-    result = res;
-    test(
-      error("XPST0017")
     );
   }
 
@@ -542,9 +633,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'error'), 2)(fn:QName('http://www.w3.org/2005/xqt-errors', 'foo:XXXX0000'), 'string')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XXXX0000")
     );
@@ -558,9 +653,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'error'), 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -574,9 +673,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'error'), 3)(fn:QName('http://www.w3.org/2005/xqt-errors', 'foo:XXXX0000'), 'string', (1, true()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XXXX0000")
     );
@@ -590,9 +693,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'trace'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -606,9 +713,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'trace'), 2)(1, 'label')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -622,9 +733,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'abs'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -638,9 +753,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'abs'), 1)(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -654,9 +773,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'ceiling'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -670,9 +793,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'ceiling'), 1)(0.9)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -686,27 +813,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'floor'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
-    );
-  }
-
-  /**
-   * Attempts to reference the "function-lookup" function with arity one..
-   */
-  @org.junit.Test
-  public void fnFunctionLookup04() {
-    final XQuery query = new XQuery(
-      "fn:function-lookup#1",
-      ctx);
-
-    final QT3Result res = result(query);
-    result = res;
-    test(
-      error("XPST0017")
     );
   }
 
@@ -718,9 +833,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'floor'), 1)(1.1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -734,9 +853,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'round'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -750,9 +873,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'round'), 1)(1.1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -766,9 +893,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'round'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -782,9 +913,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'round'), 2)(1.1, 0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -798,9 +933,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'round-half-to-even'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -814,9 +953,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'round-half-to-even'), 1)(1.1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -830,9 +973,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'round-half-to-even'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -846,9 +993,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'round-half-to-even'), 2)(1.1, 0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -862,27 +1013,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'number'), 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
-    );
-  }
-
-  /**
-   * Attempts to evaluate the "function-lookup" function with three argument..
-   */
-  @org.junit.Test
-  public void fnFunctionLookup05() {
-    final XQuery query = new XQuery(
-      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'node-name'), 1, ())",
-      ctx);
-
-    final QT3Result res = result(query);
-    result = res;
-    test(
-      error("XPST0017")
     );
   }
 
@@ -892,13 +1031,20 @@ public class FnFunctionLookup extends QT3TestSet {
   @org.junit.Test
   public void fnFunctionLookup050() {
     final XQuery query = new XQuery(
-      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'number'), 0)()",
+      "/root/child/function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'number'), 0)()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertStringValue(false, "1")
     );
   }
 
@@ -910,9 +1056,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'number'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -926,9 +1076,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'number'), 1)('1')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -942,9 +1096,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'format-integer'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -958,9 +1116,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'format-integer'), 2)(1, '0')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -974,9 +1136,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'format-integer'), 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -990,9 +1156,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'format-integer'), 3)(1, '0', 'en')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -1006,9 +1176,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'format-number'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1022,9 +1196,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'format-number'), 2)(1, '0')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -1038,27 +1216,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'format-number'), 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
-    );
-  }
-
-  /**
-   * Attempts to reference the "function-lookup" function with arity three..
-   */
-  @org.junit.Test
-  public void fnFunctionLookup06() {
-    final XQuery query = new XQuery(
-      "fn:function-lookup#3",
-      ctx);
-
-    final QT3Result res = result(query);
-    result = res;
-    test(
-      error("XPST0017")
     );
   }
 
@@ -1070,9 +1236,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'format-number'), 3)(1, '0', ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -1086,9 +1256,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions/math', 'pi'), 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1102,9 +1276,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions/math', 'pi'), 0)()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "3.141592653589793")
     );
@@ -1118,9 +1296,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions/math', 'exp'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1134,11 +1316,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions/math', 'exp'), 1)(1e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertStringValue(false, "2.718281828459045")
+      assertQuery("abs($result - 2.71828182845) lt 1e-10")
     );
   }
 
@@ -1150,9 +1336,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions/math', 'exp10'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1166,9 +1356,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions/math', 'exp10'), 1)(1e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "10")
     );
@@ -1182,9 +1376,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions/math', 'log'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1198,9 +1396,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions/math', 'log'), 1)(1e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -1214,27 +1416,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions/math', 'log10'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
-    );
-  }
-
-  /**
-   * Evaluates the "function-lookup" function with the argument set as follows: $name = () .
-   */
-  @org.junit.Test
-  public void fnFunctionLookup07() {
-    final XQuery query = new XQuery(
-      "fn:function-lookup( (), 1 )",
-      ctx);
-
-    final QT3Result res = result(query);
-    result = res;
-    test(
-      error("XPTY0004")
     );
   }
 
@@ -1246,9 +1436,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions/math', 'log10'), 1)(1e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -1262,9 +1456,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions/math', 'pow'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1278,9 +1476,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions/math', 'pow'), 2)(1e0, 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -1294,9 +1496,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions/math', 'sqrt'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1310,9 +1516,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions/math', 'sqrt'), 1)(1e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -1326,9 +1536,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions/math', 'sin'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1342,9 +1556,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions/math', 'sin'), 1)(1e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0.8414709848078965")
     );
@@ -1358,9 +1576,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions/math', 'cos'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1374,9 +1596,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions/math', 'cos'), 1)(1e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0.5403023058681398")
     );
@@ -1390,27 +1616,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions/math', 'tan'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
-    );
-  }
-
-  /**
-   * Evaluates the "function-lookup" function with the argument set as follows: $arity = () .
-   */
-  @org.junit.Test
-  public void fnFunctionLookup08() {
-    final XQuery query = new XQuery(
-      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'node-name'), ())",
-      ctx);
-
-    final QT3Result res = result(query);
-    result = res;
-    test(
-      error("XPTY0004")
     );
   }
 
@@ -1422,9 +1636,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions/math', 'tan'), 1)(1e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1.5574077246549023")
     );
@@ -1438,9 +1656,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions/math', 'asin'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1454,9 +1676,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions/math', 'asin'), 1)(1e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1.5707963267948966")
     );
@@ -1470,9 +1696,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions/math', 'acos'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1486,9 +1716,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions/math', 'acos'), 1)(1e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -1502,9 +1736,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions/math', 'atan'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1518,9 +1756,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions/math', 'atan'), 1)(1e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0.7853981633974483")
     );
@@ -1534,9 +1776,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions/math', 'atan2'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1550,9 +1796,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions/math', 'atan2'), 2)(1e0, 1e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0.7853981633974483")
     );
@@ -1566,27 +1816,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'codepoints-to-string'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
-    );
-  }
-
-  /**
-   * Attempts to evaluate the "function-lookup" function with invalid arguments..
-   */
-  @org.junit.Test
-  public void fnFunctionLookup09() {
-    final XQuery query = new XQuery(
-      "function-lookup((fn:QName('http://www.w3.org/2005/xpath-functions', 'node-name'), fn:QName('http://www.w3.org/2005/xpath-functions', 'node-name')), 1)",
-      ctx);
-
-    final QT3Result res = result(query);
-    result = res;
-    test(
-      error("XPTY0004")
     );
   }
 
@@ -1598,9 +1836,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'codepoints-to-string'), 1)((65, 66))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "AB")
     );
@@ -1614,9 +1856,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'string-to-codepoints'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1630,9 +1876,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'string-to-codepoints'), 1)('A')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "65")
     );
@@ -1646,9 +1896,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'compare'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1662,9 +1916,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'compare'), 2)('string', 'string')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -1678,9 +1936,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'compare'), 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1694,9 +1956,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'compare'), 3)('string', 'string', 'http://www.w3.org/2005/xpath-functions/collation/codepoint')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -1710,9 +1976,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'codepoint-equal'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1726,9 +1996,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'codepoint-equal'), 2)('string', 'string')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1742,27 +2016,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'concat'), 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
-    );
-  }
-
-  /**
-   * Attempts to evaluate the "function-lookup" function with invalid arguments..
-   */
-  @org.junit.Test
-  public void fnFunctionLookup10() {
-    final XQuery query = new XQuery(
-      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'node-name'), (1, 2))",
-      ctx);
-
-    final QT3Result res = result(query);
-    result = res;
-    test(
-      error("XPTY0004")
     );
   }
 
@@ -1774,9 +2036,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'concat'), 3)('a', 'bc', 'def')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abcdef")
     );
@@ -1790,9 +2056,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'string-join'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1806,9 +2076,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'string-join'), 1)(('abc', 'def'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abcdef")
     );
@@ -1822,9 +2096,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'string-join'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1838,9 +2116,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'string-join'), 2)(('abc', 'def'), '-')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abc-def")
     );
@@ -1854,9 +2136,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'substring'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1870,9 +2156,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'substring'), 2)('string', 2e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "tring")
     );
@@ -1886,9 +2176,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'substring'), 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1902,9 +2196,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'substring'), 3)('string', 1e0, 1e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "s")
     );
@@ -1918,9 +2216,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'string-length'), 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1932,13 +2234,20 @@ public class FnFunctionLookup extends QT3TestSet {
   @org.junit.Test
   public void fnFunctionLookup110() {
     final XQuery query = new XQuery(
-      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'string-length'), 0)()",
+      "/root/child/function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'string-length'), 0)()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertStringValue(false, "1")
     );
   }
 
@@ -1950,9 +2259,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'string-length'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1966,9 +2279,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'string-length'), 1)('string')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "6")
     );
@@ -1982,9 +2299,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'normalize-space'), 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1996,13 +2317,20 @@ public class FnFunctionLookup extends QT3TestSet {
   @org.junit.Test
   public void fnFunctionLookup114() {
     final XQuery query = new XQuery(
-      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'normalize-space'), 0)()",
+      "/root/child/function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'normalize-space'), 0)()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertStringValue(false, "1")
     );
   }
 
@@ -2014,9 +2342,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'normalize-space'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2030,9 +2362,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'normalize-space'), 1)(' string ')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "string")
     );
@@ -2046,9 +2382,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'normalize-unicode'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2062,9 +2402,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'normalize-unicode'), 1)('string')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "string")
     );
@@ -2078,34 +2422,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'normalize-unicode'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
-    );
-  }
-
-  /**
-   * Tests the type checking of the argument..
-   */
-  @org.junit.Test
-  public void fnFunctionLookup12() {
-    final XQuery query = new XQuery(
-      "( fn:function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'node-name'),\n" +
-      "                                 if (current-date() eq xs:date('1900-01-01'))\n" +
-      "                                 then ()\n" +
-      "                                 else 1 ),\n" +
-      "              fn:function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'node-name'),\n" +
-      "                                 if (current-date() eq xs:date('1900-01-01'))\n" +
-      "                                 then 1\n" +
-      "                                 else () ) )",
-      ctx);
-
-    final QT3Result res = result(query);
-    result = res;
-    test(
-      error("XPTY0004")
     );
   }
 
@@ -2117,9 +2442,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'normalize-unicode'), 2)('string', 'NFC')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "string")
     );
@@ -2133,9 +2462,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'upper-case'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2149,9 +2482,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'upper-case'), 1)('string')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "STRING")
     );
@@ -2165,9 +2502,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'lower-case'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2181,9 +2522,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'lower-case'), 1)('STRING')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "string")
     );
@@ -2197,9 +2542,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'translate'), 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2213,9 +2562,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'translate'), 3)('string', 'i', 'o')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "strong")
     );
@@ -2229,9 +2582,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'contains'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2245,9 +2602,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'contains'), 2)('string', 'rin')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2261,9 +2622,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'contains'), 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2277,9 +2642,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'contains'), 3)('string', 'RIN', 'http://www.w3.org/2005/xpath-functions/collation/codepoint')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2293,9 +2662,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'starts-with'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2309,9 +2682,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'starts-with'), 2)('string', 'str')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2325,9 +2702,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'starts-with'), 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2341,9 +2722,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'starts-with'), 3)('string', 'ing', 'http://www.w3.org/2005/xpath-functions/collation/codepoint')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2357,9 +2742,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'ends-with'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2373,9 +2762,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'ends-with'), 2)('string', 'ing')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2389,9 +2782,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'ends-with'), 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2405,9 +2802,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'ends-with'), 3)('string', 'str', 'http://www.w3.org/2005/xpath-functions/collation/codepoint')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2421,32 +2822,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'substring-before'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
-    );
-  }
-
-  /**
-   * Tests the type checking of the argument..
-   */
-  @org.junit.Test
-  public void fnFunctionLookup14() {
-    final XQuery query = new XQuery(
-      "( fn:function-lookup((if (current-date() eq xs:date('1900-01-01'))\n" +
-      "                                  then fn:QName('http://www.w3.org/2005/xpath-functions', 'node-name')\n" +
-      "                                  else ()), 1),\n" +
-      "              fn:function-lookup((if (current-date() eq xs:date('1900-01-01'))\n" +
-      "                                  then ()\n" +
-      "                                  else fn:QName('http://www.w3.org/2005/xpath-functions', 'node-name')), 1))",
-      ctx);
-
-    final QT3Result res = result(query);
-    result = res;
-    test(
-      error("XPTY0004")
     );
   }
 
@@ -2458,9 +2842,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'substring-before'), 2)('string', 'ing')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "str")
     );
@@ -2474,9 +2862,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'substring-before'), 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2490,9 +2882,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'substring-before'), 3)('string', 'ing', 'http://www.w3.org/2005/xpath-functions/collation/codepoint')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "str")
     );
@@ -2506,9 +2902,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'substring-after'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2522,9 +2922,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'substring-after'), 2)('string', 'str')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ing")
     );
@@ -2538,9 +2942,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'substring-after'), 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2554,9 +2962,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'substring-after'), 3)('string', 'str', 'http://www.w3.org/2005/xpath-functions/collation/codepoint')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ing")
     );
@@ -2570,9 +2982,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'matches'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2586,9 +3002,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'matches'), 2)('string', 'string')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2602,27 +3022,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'matches'), 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
-    );
-  }
-
-  /**
-   * Tests the return type of the "function-lookup" function..
-   */
-  @org.junit.Test
-  public void fnFunctionLookup15() {
-    final XQuery query = new XQuery(
-      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'node-name'), 1)",
-      ctx);
-
-    final QT3Result res = result(query);
-    result = res;
-    test(
-      assertType("function(*)")
     );
   }
 
@@ -2634,9 +3042,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'matches'), 3)('string', 'STRING', 'i')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2650,9 +3062,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'replace'), 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2666,9 +3082,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'replace'), 3)('string', 'i', 'o')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "strong")
     );
@@ -2682,9 +3102,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'replace'), 4))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2698,9 +3122,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'replace'), 4)('string', 'I', 'o', 'i')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "strong")
     );
@@ -2714,9 +3142,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'tokenize'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2730,9 +3162,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'tokenize'), 2)('string', 'i')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "str ng")
     );
@@ -2746,9 +3182,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'tokenize'), 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2762,9 +3202,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'tokenize'), 3)('string', 'i', 'i')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "str ng")
     );
@@ -2778,9 +3222,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'analyze-string'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2794,9 +3242,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'analyze-string'), 2)('', 'abc')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<fn:analyze-string-result xmlns:fn=\"http://www.w3.org/2005/xpath-functions\"/>", true)
     );
@@ -2810,9 +3262,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'analyze-string'), 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2826,9 +3282,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'analyze-string'), 3)('', 'abc', 'i')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<fn:analyze-string-result xmlns:fn=\"http://www.w3.org/2005/xpath-functions\"/>", true)
     );
@@ -2842,9 +3302,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'resolve-uri'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2858,11 +3322,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'resolve-uri'), 1)('http://www.w3.org/2005/xpath-functions')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertType("xs:anyURI")
     );
   }
 
@@ -2874,9 +3342,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'resolve-uri'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2890,9 +3362,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'resolve-uri'), 2)('/2005/xpath-functions', 'http://www.w3.org/')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.w3.org/2005/xpath-functions")
     );
@@ -2906,9 +3382,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'encode-for-uri'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2922,9 +3402,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'encode-for-uri'), 1)(' ')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "%20")
     );
@@ -2938,9 +3422,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'iri-to-uri'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2954,9 +3442,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'iri-to-uri'), 1)('http://www.example.com/')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/")
     );
@@ -2970,9 +3462,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'escape-html-uri'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2986,9 +3482,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'escape-html-uri'), 1)('http://www.example.com/')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/")
     );
@@ -3002,9 +3502,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'true'), 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3018,9 +3522,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'true'), 0)()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3034,9 +3542,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'false'), 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3050,9 +3562,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'false'), 0)()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3066,9 +3582,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'boolean'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3082,9 +3602,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'boolean'), 1)(\"string\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3098,9 +3622,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'not'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3114,9 +3642,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'not'), 1)(\"string\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3130,9 +3662,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'years-from-duration'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3146,9 +3682,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'years-from-duration'), 1)(xs:yearMonthDuration(\"P20Y15M\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "21")
     );
@@ -3162,9 +3702,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'months-from-duration'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3178,9 +3722,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'months-from-duration'), 1)(xs:yearMonthDuration(\"P20Y15M\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "3")
     );
@@ -3194,9 +3742,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'days-from-duration'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3210,9 +3762,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'days-from-duration'), 1)(xs:dayTimeDuration(\"P3DT10H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "3")
     );
@@ -3226,9 +3782,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'hours-from-duration'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3242,9 +3802,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'hours-from-duration'), 1)(xs:dayTimeDuration(\"P3DT10H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "10")
     );
@@ -3258,9 +3822,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'minutes-from-duration'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3274,9 +3842,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'minutes-from-duration'), 1)(xs:dayTimeDuration(\"P3DT10H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -3290,9 +3862,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'seconds-from-duration'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3306,9 +3882,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'seconds-from-duration'), 1)(xs:dayTimeDuration(\"P3DT10H12.5S\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "12.5")
     );
@@ -3322,9 +3902,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'dateTime'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3338,9 +3922,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'dateTime'), 2)(xs:date('2012-01-01Z'), xs:time('00:00:00Z'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2012-01-01T00:00:00Z")
     );
@@ -3354,9 +3942,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'year-from-dateTime'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3370,9 +3962,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'year-from-dateTime'), 1)(xs:dateTime('2012-04-03T02:01:00Z'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2012")
     );
@@ -3386,9 +3982,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'month-from-dateTime'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3402,9 +4002,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'month-from-dateTime'), 1)(xs:dateTime('2012-04-03T02:01:00Z'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "4")
     );
@@ -3418,9 +4022,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'day-from-dateTime'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3434,9 +4042,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'day-from-dateTime'), 1)(xs:dateTime('2012-04-03T02:01:00Z'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "3")
     );
@@ -3450,9 +4062,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'hours-from-dateTime'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3466,9 +4082,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'hours-from-dateTime'), 1)(xs:dateTime('2012-04-03T02:01:00Z'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2")
     );
@@ -3482,9 +4102,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'minutes-from-dateTime'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3498,9 +4122,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'minutes-from-dateTime'), 1)(xs:dateTime('2012-04-03T02:01:00Z'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -3514,9 +4142,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'seconds-from-dateTime'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3530,9 +4162,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'seconds-from-dateTime'), 1)(xs:dateTime('2012-04-03T02:01:00Z'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -3546,9 +4182,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'timezone-from-dateTime'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3562,9 +4202,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'timezone-from-dateTime'), 1)(xs:dateTime('2012-01-01T00:00:00Z'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PT0S")
     );
@@ -3578,9 +4222,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'year-from-date'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3594,9 +4242,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'year-from-date'), 1)(xs:date('2012-02-01Z'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2012")
     );
@@ -3610,9 +4262,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'month-from-date'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3626,9 +4282,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'month-from-date'), 1)(xs:date('2012-02-01Z'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2")
     );
@@ -3642,9 +4302,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'day-from-date'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3658,9 +4322,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'day-from-date'), 1)(xs:date('2012-02-01Z'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -3674,9 +4342,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'timezone-from-date'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3690,9 +4362,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'timezone-from-date'), 1)(xs:date('2012-01-01Z'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PT0S")
     );
@@ -3706,9 +4382,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'hours-from-time'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3722,9 +4402,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'hours-from-time'), 1)(xs:time('02:01:00Z'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2")
     );
@@ -3738,9 +4422,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'minutes-from-time'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3754,9 +4442,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'minutes-from-time'), 1)(xs:time('02:01:00Z'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -3770,9 +4462,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'seconds-from-time'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3786,9 +4482,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'seconds-from-time'), 1)(xs:time('02:01:00Z'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -3802,9 +4502,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'timezone-from-time'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3818,9 +4522,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'timezone-from-time'), 1)(xs:time('02:01:00Z'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PT0S")
     );
@@ -3834,9 +4542,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'adjust-dateTime-to-timezone'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3850,11 +4562,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'adjust-dateTime-to-timezone'), 1)(xs:dateTime('2012-01-01T00:00:00Z'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertType("xs:dateTime")
     );
   }
 
@@ -3866,9 +4582,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'adjust-dateTime-to-timezone'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3882,9 +4602,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'adjust-dateTime-to-timezone'), 2)(xs:dateTime(\"1970-01-01T00:00:00Z\"),xs:dayTimeDuration(\"-PT10H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1969-12-31T14:00:00-10:00")
     );
@@ -3898,9 +4622,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'adjust-date-to-timezone'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3914,11 +4642,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'adjust-date-to-timezone'), 1)(xs:date('2012-01-01Z'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertType("xs:date")
     );
   }
 
@@ -3930,9 +4662,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'adjust-date-to-timezone'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3946,9 +4682,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'adjust-date-to-timezone'), 2)(xs:date(\"1970-01-01Z\"),xs:dayTimeDuration(\"-PT10H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1969-12-31-10:00")
     );
@@ -3962,9 +4702,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'adjust-time-to-timezone'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3978,11 +4722,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'adjust-time-to-timezone'), 1)(xs:time('00:00:00Z'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertType("xs:time")
     );
   }
 
@@ -3994,9 +4742,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'adjust-time-to-timezone'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4010,9 +4762,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'adjust-time-to-timezone'), 2)(xs:time(\"00:00:00Z\"),xs:dayTimeDuration(\"-PT10H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "14:00:00-10:00")
     );
@@ -4026,9 +4782,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'format-dateTime'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4042,11 +4802,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'format-dateTime'), 2)(xs:dateTime('2012-01-01T00:00:00Z'), '[Y]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertType("xs:string")
     );
   }
 
@@ -4058,9 +4822,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'format-dateTime'), 5))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4074,9 +4842,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'format-dateTime'), 5)(xs:dateTime('2012-01-01T00:00:00Z'), '[Y]', 'en', (), ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2012")
     );
@@ -4090,9 +4862,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'format-date'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4106,11 +4882,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'format-date'), 2)(xs:date('2012-01-01Z'), '[Y]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertType("xs:string")
     );
   }
 
@@ -4122,9 +4902,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'format-date'), 5))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4138,9 +4922,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'format-date'), 5)(xs:date('2012-01-01Z'), '[Y]', 'en', (), ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2012")
     );
@@ -4154,9 +4942,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'format-time'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4170,11 +4962,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'format-time'), 2)(xs:time('00:00:00Z'), '[H01]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertType("xs:string")
     );
   }
 
@@ -4186,9 +4982,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'format-time'), 5))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4202,9 +5002,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'format-time'), 5)(xs:time('00:00:00Z'), '[H01]', 'en', (), ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "00")
     );
@@ -4218,9 +5022,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'resolve-QName'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4234,11 +5042,16 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'resolve-QName'), 2)('ns:local', /root/*[2])",
       ctx);
-    query.context(node(file("fn/function-lookup/function-lookup.xml")));
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ns:local")
     );
@@ -4252,9 +5065,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'QName'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4268,9 +5085,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'QName'), 2)('http://www.example.org/', 'ns:local')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ns:local")
     );
@@ -4284,9 +5105,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'prefix-from-QName'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4300,9 +5125,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'prefix-from-QName'), 1)(fn:QName('http://www.example.org', 'foo:bar'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "foo")
     );
@@ -4316,9 +5145,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'local-name-from-QName'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4332,9 +5165,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'local-name-from-QName'), 1)(fn:QName('http://www.example.org', 'foo:bar'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "bar")
     );
@@ -4348,9 +5185,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'namespace-uri-from-QName'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4364,9 +5205,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'namespace-uri-from-QName'), 1)(fn:QName('http://www.example.org', 'foo:bar'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.org")
     );
@@ -4380,9 +5225,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'namespace-uri-for-prefix'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4396,11 +5245,16 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'namespace-uri-for-prefix'), 2)('ns', /root/*[2])",
       ctx);
-    query.context(node(file("fn/function-lookup/function-lookup.xml")));
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.org/")
     );
@@ -4414,9 +5268,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'in-scope-prefixes'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4430,11 +5288,16 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'in-scope-prefixes'), 1)(/root)",
       ctx);
-    query.context(node(file("fn/function-lookup/function-lookup.xml")));
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xml")
     );
@@ -4448,9 +5311,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'name'), 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4462,13 +5329,20 @@ public class FnFunctionLookup extends QT3TestSet {
   @org.junit.Test
   public void fnFunctionLookup264() {
     final XQuery query = new XQuery(
-      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'name'), 0)()",
+      "/root/function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'name'), 0)()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertStringValue(false, "root")
     );
   }
 
@@ -4480,9 +5354,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'name'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4496,11 +5374,16 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'name'), 1)(/root)",
       ctx);
-    query.context(node(file("fn/function-lookup/function-lookup.xml")));
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "root")
     );
@@ -4514,9 +5397,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'local-name'), 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4528,13 +5415,20 @@ public class FnFunctionLookup extends QT3TestSet {
   @org.junit.Test
   public void fnFunctionLookup268() {
     final XQuery query = new XQuery(
-      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'local-name'), 0)()",
+      "/root/function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'local-name'), 0)()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertStringValue(false, "root")
     );
   }
 
@@ -4546,9 +5440,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'local-name'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4562,11 +5460,16 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'local-name'), 1)(/root)",
       ctx);
-    query.context(node(file("fn/function-lookup/function-lookup.xml")));
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "root")
     );
@@ -4580,9 +5483,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'namespace-uri'), 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4594,13 +5501,20 @@ public class FnFunctionLookup extends QT3TestSet {
   @org.junit.Test
   public void fnFunctionLookup272() {
     final XQuery query = new XQuery(
-      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'namespace-uri'), 0)()",
+      "/root/*[2]/function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'namespace-uri'), 0)()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertStringValue(false, "http://www.example.org/")
     );
   }
 
@@ -4612,9 +5526,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'namespace-uri'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4628,11 +5546,16 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'namespace-uri'), 1)(/root/*[2])",
       ctx);
-    query.context(node(file("fn/function-lookup/function-lookup.xml")));
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.org/")
     );
@@ -4646,9 +5569,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'lang'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4660,13 +5587,20 @@ public class FnFunctionLookup extends QT3TestSet {
   @org.junit.Test
   public void fnFunctionLookup276() {
     final XQuery query = new XQuery(
-      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'lang'), 1)('en')",
+      "/root/function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'lang'), 1)('en')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertBoolean(false)
     );
   }
 
@@ -4678,9 +5612,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'lang'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4694,11 +5632,16 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'lang'), 2)('en', /root)",
       ctx);
-    query.context(node(file("fn/function-lookup/function-lookup.xml")));
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4712,9 +5655,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'root'), 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4726,13 +5673,20 @@ public class FnFunctionLookup extends QT3TestSet {
   @org.junit.Test
   public void fnFunctionLookup280() {
     final XQuery query = new XQuery(
-      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'root'), 0)()",
+      "/root/function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'root'), 0)()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertType("document-node()")
     );
   }
 
@@ -4744,9 +5698,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'root'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4760,9 +5718,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'root'), 1)(())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -4776,9 +5738,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'path'), 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4790,13 +5756,20 @@ public class FnFunctionLookup extends QT3TestSet {
   @org.junit.Test
   public void fnFunctionLookup284() {
     final XQuery query = new XQuery(
-      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'path'), 0)()",
+      "/function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'path'), 0)()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertStringValue(false, "/")
     );
   }
 
@@ -4808,9 +5781,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'path'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4824,11 +5801,16 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'path'), 1)(/)",
       ctx);
-    query.context(node(file("fn/function-lookup/function-lookup.xml")));
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "/")
     );
@@ -4842,9 +5824,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'has-children'), 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4856,13 +5842,20 @@ public class FnFunctionLookup extends QT3TestSet {
   @org.junit.Test
   public void fnFunctionLookup288() {
     final XQuery query = new XQuery(
-      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'has-children'), 0)()",
+      "/function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'has-children'), 0)()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertBoolean(true)
     );
   }
 
@@ -4874,9 +5867,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'has-children'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4890,11 +5887,16 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'has-children'), 1)(/)",
       ctx);
-    query.context(node(file("fn/function-lookup/function-lookup.xml")));
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4908,9 +5910,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'innermost'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4924,9 +5930,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'innermost'), 1)(())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -4940,9 +5950,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'outermost'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4956,9 +5970,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'outermost'), 1)(())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -4972,9 +5990,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'empty'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4988,9 +6010,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'empty'), 1)((1, true()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5004,9 +6030,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'exists'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5020,9 +6050,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'exists'), 1)((1, true()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5036,9 +6070,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'head'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5052,9 +6090,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'head'), 1)((1, true()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -5068,9 +6110,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'tail'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5084,9 +6130,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'tail'), 1)((1, true()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true")
     );
@@ -5100,9 +6150,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'insert-before'), 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5116,9 +6170,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'insert-before'), 3)((1, 2, 3), 2, ('a', 'b', 'c'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 a b c 2 3")
     );
@@ -5132,9 +6190,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'remove'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5148,9 +6210,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'remove'), 2)(('a', 'b', 'c'), 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a c")
     );
@@ -5164,9 +6230,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'reverse'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5180,9 +6250,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'reverse'), 1)(1 to 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "3 2 1")
     );
@@ -5196,9 +6270,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'subsequence'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5212,9 +6290,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'subsequence'), 2)((1, true()), 2e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true")
     );
@@ -5228,9 +6310,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'subsequence'), 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5244,9 +6330,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'subsequence'), 3)((1, true()), 1e0, 1e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -5260,9 +6350,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'unordered'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5276,9 +6370,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'unordered'), 1)(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -5292,9 +6390,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'distinct-values'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5306,13 +6408,17 @@ public class FnFunctionLookup extends QT3TestSet {
   @org.junit.Test
   public void fnFunctionLookup316() {
     final XQuery query = new XQuery(
-      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'distinct-values'), 1)((1, 'string'))",
+      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'distinct-values'), 1)((1, 1, 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertStringValue(false, "1")
     );
   }
 
@@ -5324,9 +6430,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'distinct-values'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5338,13 +6448,17 @@ public class FnFunctionLookup extends QT3TestSet {
   @org.junit.Test
   public void fnFunctionLookup318() {
     final XQuery query = new XQuery(
-      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'distinct-values'), 2)((1, 'string'), 'http://www.w3.org/2005/xpath-functions/collation/codepoint')",
+      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'distinct-values'), 2)((1, 1, 1), 'http://www.w3.org/2005/xpath-functions/collation/codepoint')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertStringValue(false, "1")
     );
   }
 
@@ -5356,9 +6470,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'index-of'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5372,11 +6490,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'index-of'), 2)((1, 'string'), 'string')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertStringValue(false, "2")
     );
   }
 
@@ -5388,9 +6510,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'index-of'), 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5404,11 +6530,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'index-of'), 3)((1, 'string'), 'string', 'http://www.w3.org/2005/xpath-functions/collation/codepoint')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertStringValue(false, "2")
     );
   }
 
@@ -5420,9 +6550,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'deep-equal'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5436,11 +6570,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'deep-equal'), 2)((1, true()), (1, true()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertBoolean(true)
     );
   }
 
@@ -5452,9 +6590,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'deep-equal'), 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5468,11 +6610,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'deep-equal'), 3)((1, true()), (1, true()), 'http://www.w3.org/2005/xpath-functions/collation/codepoint')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertBoolean(true)
     );
   }
 
@@ -5484,9 +6630,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'zero-or-one'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5500,9 +6650,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'zero-or-one'), 1)(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -5516,9 +6670,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'one-or-more'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5532,9 +6690,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'one-or-more'), 1)(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -5548,9 +6710,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'exactly-one'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5564,9 +6730,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'exactly-one'), 1)(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -5580,9 +6750,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'count'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5596,9 +6770,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'count'), 1)((1, true()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2")
     );
@@ -5612,9 +6790,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'avg'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5628,9 +6810,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'avg'), 1)((1, 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2")
     );
@@ -5644,9 +6830,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'max'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5660,11 +6850,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'max'), 1)((1, 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertStringValue(false, "3")
     );
   }
 
@@ -5676,9 +6870,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'max'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5692,11 +6890,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'max'), 2)((1, 3), 'http://www.w3.org/2005/xpath-functions/collation/codepoint')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertStringValue(false, "3")
     );
   }
 
@@ -5708,9 +6910,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'min'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5724,11 +6930,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'min'), 1)((1, 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertStringValue(false, "1")
     );
   }
 
@@ -5740,9 +6950,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'min'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5756,11 +6970,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'min'), 2)((1, 3), 'http://www.w3.org/2005/xpath-functions/collation/codepoint')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertStringValue(false, "1")
     );
   }
 
@@ -5772,9 +6990,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'sum'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5788,9 +7010,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'sum'), 1)((1, 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "3")
     );
@@ -5804,9 +7030,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'sum'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5820,9 +7050,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'sum'), 2)((1, 2), 0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "3")
     );
@@ -5836,9 +7070,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'id'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5850,15 +7088,20 @@ public class FnFunctionLookup extends QT3TestSet {
   @org.junit.Test
   public void fnFunctionLookup350() {
     final XQuery query = new XQuery(
-      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'id'), 1)(('id1', 'id2'))",
+      "/function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'id'), 1)(('id1', 'id2'))",
       ctx);
-    query.context(node(file("fn/function-lookup/function-lookup.xml")));
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertEmpty()
     );
   }
 
@@ -5870,9 +7113,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'id'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5886,11 +7133,16 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'id'), 2)(('id1', 'id2'), /)",
       ctx);
-    query.context(node(file("fn/function-lookup/function-lookup.xml")));
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -5904,9 +7156,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'element-with-id'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5918,13 +7174,20 @@ public class FnFunctionLookup extends QT3TestSet {
   @org.junit.Test
   public void fnFunctionLookup354() {
     final XQuery query = new XQuery(
-      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'element-with-id'), 1)(('id1', 'id2'))",
+      "/function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'element-with-id'), 1)(('id1', 'id2'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertEmpty()
     );
   }
 
@@ -5936,9 +7199,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'element-with-id'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5952,11 +7219,16 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'element-with-id'), 2)(('id1', 'id2'), /)",
       ctx);
-    query.context(node(file("fn/function-lookup/function-lookup.xml")));
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -5970,9 +7242,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'idref'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5984,13 +7260,20 @@ public class FnFunctionLookup extends QT3TestSet {
   @org.junit.Test
   public void fnFunctionLookup358() {
     final XQuery query = new XQuery(
-      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'idref'), 1)(('id1', 'id2'))",
+      "/function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'idref'), 1)(('id1', 'id2'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertEmpty()
     );
   }
 
@@ -6002,9 +7285,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'idref'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6018,11 +7305,16 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'idref'), 2)(('id1', 'id2'), /)",
       ctx);
-    query.context(node(file("fn/function-lookup/function-lookup.xml")));
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -6036,9 +7328,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'generate-id'), 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6050,13 +7346,20 @@ public class FnFunctionLookup extends QT3TestSet {
   @org.junit.Test
   public void fnFunctionLookup362() {
     final XQuery query = new XQuery(
-      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'generate-id'), 0)()",
+      "/function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'generate-id'), 0)()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertType("xs:string")
     );
   }
 
@@ -6068,9 +7371,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'generate-id'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6084,11 +7391,16 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'generate-id'), 1)(())",
       ctx);
-    query.context(node(file("fn/function-lookup/function-lookup.xml")));
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertType("xs:string")
@@ -6106,9 +7418,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'doc'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6120,13 +7436,20 @@ public class FnFunctionLookup extends QT3TestSet {
   @org.junit.Test
   public void fnFunctionLookup366() {
     final XQuery query = new XQuery(
-      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'doc'), 1)('string')",
+      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'doc'), 1)('http://www.w3.org/fots/fn/function-lookup/function-lookup.xml')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertType("document-node()")
     );
   }
 
@@ -6138,9 +7461,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'doc-available'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6152,13 +7479,20 @@ public class FnFunctionLookup extends QT3TestSet {
   @org.junit.Test
   public void fnFunctionLookup368() {
     final XQuery query = new XQuery(
-      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'doc-available'), 1)('string')",
+      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'doc-available'), 1)('http://www.example.org/unknown-document')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertBoolean(false)
     );
   }
 
@@ -6170,9 +7504,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'collection'), 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6186,11 +7524,18 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'collection'), 0)()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertType("node()+")
     );
   }
 
@@ -6202,9 +7547,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'collection'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6216,13 +7565,20 @@ public class FnFunctionLookup extends QT3TestSet {
   @org.junit.Test
   public void fnFunctionLookup372() {
     final XQuery query = new XQuery(
-      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'collection'), 1)('string')",
+      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'collection'), 1)(())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertType("node()+")
     );
   }
 
@@ -6234,9 +7590,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'uri-collection'), 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6250,11 +7610,18 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'uri-collection'), 0)()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertType("xs:anyURI+")
     );
   }
 
@@ -6266,9 +7633,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'uri-collection'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6280,13 +7651,20 @@ public class FnFunctionLookup extends QT3TestSet {
   @org.junit.Test
   public void fnFunctionLookup376() {
     final XQuery query = new XQuery(
-      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'uri-collection'), 1)('string')",
+      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'uri-collection'), 1)(())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertType("xs:anyURI+")
     );
   }
 
@@ -6298,9 +7676,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'unparsed-text'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6314,11 +7696,18 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'unparsed-text'), 1)('http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertType("xs:string")
     );
   }
 
@@ -6330,9 +7719,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'unparsed-text'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6346,11 +7739,18 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'unparsed-text'), 2)('http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt', 'utf-8')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertType("xs:string")
     );
   }
 
@@ -6362,9 +7762,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'unparsed-text-lines'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6378,11 +7782,18 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'unparsed-text-lines'), 1)('http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertType("xs:string+")
     );
   }
 
@@ -6394,9 +7805,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'unparsed-text-lines'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6410,11 +7825,18 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'unparsed-text-lines'), 2)('http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt', 'utf-8')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertType("xs:string+")
     );
   }
 
@@ -6426,9 +7848,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'unparsed-text-available'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6442,11 +7868,18 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'unparsed-text-available'), 1)('http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertBoolean(true)
     );
   }
 
@@ -6458,9 +7891,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'unparsed-text-available'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6474,11 +7911,18 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'unparsed-text-available'), 2)('http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt', 'utf-8')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/function-lookup/function-lookup.xml")));
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      query.addCollection("", new String[] { file("fn/function-lookup/collection-1.xml"), file("fn/function-lookup/collection-2.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertBoolean(true)
     );
   }
 
@@ -6490,9 +7934,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'environment-variable'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6504,13 +7952,17 @@ public class FnFunctionLookup extends QT3TestSet {
   @org.junit.Test
   public void fnFunctionLookup390() {
     final XQuery query = new XQuery(
-      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'environment-variable'), 1)('string')",
+      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'environment-variable'), 1)('should-not-exist')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertEmpty()
     );
   }
 
@@ -6522,9 +7974,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'available-environment-variables'), 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6538,11 +7994,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'available-environment-variables'), 0)()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertType("xs:string*")
     );
   }
 
@@ -6554,9 +8014,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'parse-xml'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6570,11 +8034,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'parse-xml'), 1)('<doc />')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertType("node()")
     );
   }
 
@@ -6586,9 +8054,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'parse-xml-fragment'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6602,11 +8074,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'parse-xml-fragment'), 1)('<doc />')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertType("node()")
     );
   }
 
@@ -6618,9 +8094,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'serialize'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6634,9 +8114,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'serialize'), 1)((1, true()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 true")
     );
@@ -6650,9 +8134,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'serialize'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6666,9 +8154,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'serialize'), 2)((1, false()), ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 false")
     );
@@ -6682,9 +8174,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'position'), 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6696,13 +8192,17 @@ public class FnFunctionLookup extends QT3TestSet {
   @org.junit.Test
   public void fnFunctionLookup402() {
     final XQuery query = new XQuery(
-      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'position'), 0)()",
+      "(2, 4, 6)!function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'position'), 0)()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertStringValue(false, "1 2 3")
     );
   }
 
@@ -6714,9 +8214,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'last'), 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6728,13 +8232,17 @@ public class FnFunctionLookup extends QT3TestSet {
   @org.junit.Test
   public void fnFunctionLookup404() {
     final XQuery query = new XQuery(
-      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'last'), 0)()",
+      "(2, 4, 6)!function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'last'), 0)()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertStringValue(false, "3 3 3")
     );
   }
 
@@ -6746,9 +8254,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'current-dateTime'), 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6762,11 +8274,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'current-dateTime'), 0)()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertType("xs:dateTime")
     );
   }
 
@@ -6778,9 +8294,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'current-date'), 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6794,11 +8314,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'current-date'), 0)()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertType("xs:date")
     );
   }
 
@@ -6810,9 +8334,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'current-time'), 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6826,11 +8354,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'current-time'), 0)()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertType("xs:time")
     );
   }
 
@@ -6842,9 +8374,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'implicit-timezone'), 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6858,11 +8394,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'implicit-timezone'), 0)()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertType("xs:dayTimeDuration")
     );
   }
 
@@ -6874,9 +8414,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'default-collation'), 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6890,9 +8434,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'default-collation'), 0)()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.w3.org/2005/xpath-functions/collation/codepoint")
     );
@@ -6906,9 +8454,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'static-base-uri'), 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6922,12 +8474,16 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'static-base-uri'), 0)()",
       ctx);
-    query.baseURI("http://www.example.com");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.baseURI("http://www.example.com");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertType("xs:anyURI?")
     );
   }
 
@@ -6939,9 +8495,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'function-lookup'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6955,11 +8515,15 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'function-lookup'), 2)(fn:QName('http://www.example.org', 'foo:bar'), 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertEmpty()
     );
   }
 
@@ -6971,9 +8535,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'function-name'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6987,9 +8555,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'function-name'), 1)(fn:abs#1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("fn:QName('http://www.w3.org/2005/xpath-functions', 'fn:abs')")
     );
@@ -7003,9 +8575,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'function-arity'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7019,9 +8595,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'function-arity'), 1)(fn:abs#1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -7035,9 +8615,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'map'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7051,9 +8635,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'map'), 2)(xs:int#1, (\"23\", \"29\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("(23, 29)")
     );
@@ -7067,9 +8655,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'filter'), 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7083,9 +8675,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'filter'), 2)(function($a) {$a mod 2 = 0}, 1 to 10)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("(2, 4, 6, 8, 10)")
     );
@@ -7099,9 +8695,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'fold-left'), 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7115,9 +8715,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'fold-left'), 3)(fn:concat(?, \".\", ?), \"\", 1 to 5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, ".1.2.3.4.5")
     );
@@ -7131,9 +8735,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'fold-right'), 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7147,9 +8755,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'fold-right'), 3)(fn:concat(?, \".\", ?), \"\", 1 to 5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1.2.3.4.5.")
     );
@@ -7163,9 +8775,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'map-pairs'), 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7179,9 +8795,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'map-pairs'), 3)(concat#2, (\"a\", \"b\", \"c\"), (\"x\", \"y\", \"z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("(\"ax\", \"by\", \"cz\")")
     );
@@ -7195,9 +8815,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'untypedAtomic'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7211,9 +8835,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'untypedAtomic'), 1)('string')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "string")
     );
@@ -7227,9 +8855,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'dateTime'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7243,9 +8875,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'dateTime'), 1)('1970-01-02T04:05:06Z')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1970-01-02T04:05:06Z")
     );
@@ -7259,9 +8895,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'date'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7275,9 +8915,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'date'), 1)('1970-01-02Z')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1970-01-02Z")
     );
@@ -7291,9 +8935,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'time'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7307,9 +8955,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'time'), 1)('01:02:03Z')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "01:02:03Z")
     );
@@ -7323,9 +8975,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'duration'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7339,9 +8995,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'duration'), 1)('P5Y2M10DT15H')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P5Y2M10DT15H")
     );
@@ -7355,9 +9015,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'yearMonthDuration'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7371,9 +9035,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'yearMonthDuration'), 1)('P1Y')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P1Y")
     );
@@ -7387,9 +9055,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'dayTimeDuration'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7403,9 +9075,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'dayTimeDuration'), 1)('PT15H')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PT15H")
     );
@@ -7419,9 +9095,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'float'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7435,9 +9115,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'float'), 1)('1')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -7451,9 +9135,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'double'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7467,9 +9155,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'double'), 1)('1')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -7483,9 +9175,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'decimal'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7499,9 +9195,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'decimal'), 1)('1')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -7515,9 +9215,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'integer'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7531,9 +9235,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'integer'), 1)('1')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -7547,9 +9255,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'nonPositiveInteger'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7563,9 +9275,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'nonPositiveInteger'), 1)('-1')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-1")
     );
@@ -7579,9 +9295,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'negativeInteger'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7595,9 +9315,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'negativeInteger'), 1)('-1')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-1")
     );
@@ -7611,9 +9335,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'long'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7627,9 +9355,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'long'), 1)('1')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -7643,9 +9375,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'int'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7659,9 +9395,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'int'), 1)('1')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -7675,9 +9415,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'short'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7691,9 +9435,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'short'), 1)('1')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -7707,9 +9455,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'byte'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7723,9 +9475,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'byte'), 1)('1')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -7739,9 +9495,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'nonNegativeInteger'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7755,9 +9515,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'nonNegativeInteger'), 1)('1')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -7771,9 +9535,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'unsignedLong'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7787,9 +9555,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'unsignedLong'), 1)('1')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -7803,9 +9575,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'unsignedInt'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7819,9 +9595,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'unsignedInt'), 1)('1')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -7835,9 +9615,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'unsignedShort'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7851,9 +9635,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'unsignedShort'), 1)('1')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -7867,9 +9655,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'unsignedByte'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7883,9 +9675,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'unsignedByte'), 1)('1')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -7899,9 +9695,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'nonNegativeInteger'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7915,9 +9715,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'nonNegativeInteger'), 1)('1')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -7931,9 +9735,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'positiveInteger'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7947,9 +9755,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'positiveInteger'), 1)('1')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -7963,9 +9775,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'gYearMonth'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7979,9 +9795,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'gYearMonth'), 1)('2001-10Z')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2001-10Z")
     );
@@ -7995,9 +9815,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'gYear'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8011,9 +9835,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'gYear'), 1)('2012Z')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2012Z")
     );
@@ -8027,9 +9855,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'gMonthDay'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8043,9 +9875,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'gMonthDay'), 1)('--11-01Z')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "--11-01Z")
     );
@@ -8059,9 +9895,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'gDay'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8075,9 +9915,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'gDay'), 1)('---01Z')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "---01Z")
     );
@@ -8091,9 +9935,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'gMonth'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8107,9 +9955,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'gMonth'), 1)('--11Z')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "--11Z")
     );
@@ -8123,9 +9975,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'string'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8139,9 +9995,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'string'), 1)('string')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "string")
     );
@@ -8155,9 +10015,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'normalizedString'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8172,9 +10036,13 @@ public class FnFunctionLookup extends QT3TestSet {
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'normalizedString'), 1)('normalized\n" +
       "string')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "normalized string")
     );
@@ -8188,9 +10056,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'token'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8204,9 +10076,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'token'), 1)('token')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "token")
     );
@@ -8220,9 +10096,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'language'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8236,9 +10116,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'language'), 1)('en')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "en")
     );
@@ -8252,9 +10136,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'NMTOKEN'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8268,9 +10156,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'NMTOKEN'), 1)('NMTOKEN')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NMTOKEN")
     );
@@ -8284,9 +10176,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'Name'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8300,9 +10196,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'Name'), 1)('Name')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Name")
     );
@@ -8316,9 +10216,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'NCName'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8332,9 +10236,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'NCName'), 1)('NCName')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NCName")
     );
@@ -8348,9 +10256,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'ID'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8364,9 +10276,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'ID'), 1)('ID')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ID")
     );
@@ -8380,9 +10296,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'IDREF'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8396,9 +10316,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'IDREF'), 1)('IDREF')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "IDREF")
     );
@@ -8412,9 +10336,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'ENTITY'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8428,9 +10356,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'ENTITY'), 1)('ENTITY')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ENTITY")
     );
@@ -8444,9 +10376,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'boolean'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8460,9 +10396,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'boolean'), 1)('1')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true")
     );
@@ -8476,9 +10416,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'base64Binary'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8492,9 +10436,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'base64Binary'), 1)('D74D35D35D35')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "D74D35D35D35")
     );
@@ -8508,9 +10456,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'hexBinary'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8524,9 +10476,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'hexBinary'), 1)('0fb7')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0FB7")
     );
@@ -8540,9 +10496,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'anyURI'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8556,9 +10516,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'anyURI'), 1)('http://www.example.org/')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.org/")
     );
@@ -8572,9 +10536,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'QName'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8588,11 +10556,57 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'QName'), 1)('fn:QName')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "fn:QName")
+    );
+  }
+
+  /**
+   * Attempts to look up function xs:dateTimeStamp..
+   */
+  @org.junit.Test
+  public void fnFunctionLookup521() {
+    final XQuery query = new XQuery(
+      "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'dateTimeStamp'), 1))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertType("xs:boolean")
+    );
+  }
+
+  /**
+   * Attempts to invoke function xs:dateTimeStamp..
+   */
+  @org.junit.Test
+  public void fnFunctionLookup522() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      let $f := function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'dateTimeStamp'), 1)\n" +
+      "      return if (exists($f)) then year-from-dateTime($f('2012-05-25T11:42:00+01:00')) else 2012",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("2012")
     );
   }
 
@@ -8604,9 +10618,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'IDREFS'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8620,9 +10638,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'IDREFS'), 1)('ID1 ID2 ID3')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ID1 ID2 ID3")
     );
@@ -8636,9 +10658,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'NMTOKENS'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8652,9 +10678,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'NMTOKENS'), 1)('NMTOKEN1 NMTOKEN2 NMTOKEN3')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NMTOKEN1 NMTOKEN2 NMTOKEN3")
     );
@@ -8668,9 +10698,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'ENTITIES'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8684,9 +10718,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2001/XMLSchema', 'ENTITIES'), 1)('ENTITY1 ENTITY2 ENTITY3')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ENTITY1 ENTITY2 ENTITY3")
     );
@@ -8700,9 +10738,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(function-lookup(fn:QName('http://www.w3.org/2005/xquery-local-functions', 'missing'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8716,9 +10758,13 @@ public class FnFunctionLookup extends QT3TestSet {
     final XQuery query = new XQuery(
       "function-lookup(fn:QName('http://www.w3.org/2005/xquery-local-functions', 'missing'), 1)(\"arg\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -8728,13 +10774,17 @@ public class FnFunctionLookup extends QT3TestSet {
    * Applied to a built-in function.
    */
   @org.junit.Test
-  public void functionLookup001() {
+  public void fnFunctionLookup601() {
     final XQuery query = new XQuery(
       "function-lookup(QName(\"http://www.w3.org/2005/xpath-functions\", \"abs\"), 1)(-3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -8744,13 +10794,17 @@ public class FnFunctionLookup extends QT3TestSet {
    * Applied to a built-in function with variable arity.
    */
   @org.junit.Test
-  public void functionLookup002() {
+  public void fnFunctionLookup602() {
     final XQuery query = new XQuery(
       "function-lookup(QName(\"http://www.w3.org/2005/xpath-functions\", \"concat\"), 3)(\"a\", \"b\", \"c\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abc")
     );
@@ -8760,13 +10814,17 @@ public class FnFunctionLookup extends QT3TestSet {
    * Applied to a built-in function with zero arity.
    */
   @org.junit.Test
-  public void functionLookup003() {
+  public void fnFunctionLookup603() {
     final XQuery query = new XQuery(
       "function-lookup(QName(\"http://www.w3.org/2005/xpath-functions/math\", \"pi\"), 0)() idiv 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -8776,13 +10834,17 @@ public class FnFunctionLookup extends QT3TestSet {
    * Applied to a constructor function.
    */
   @org.junit.Test
-  public void functionLookup004() {
+  public void fnFunctionLookup604() {
     final XQuery query = new XQuery(
       "function-lookup(QName(\"http://www.w3.org/2001/XMLSchema\", \"time\"), 1)(\"12:30:00Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:time(\"12:30:00Z\")")
     );
@@ -8792,7 +10854,7 @@ public class FnFunctionLookup extends QT3TestSet {
    * Applied to a user-defined function.
    */
   @org.junit.Test
-  public void functionLookup005() {
+  public void fnFunctionLookup605() {
     final XQuery query = new XQuery(
       "\n" +
       "        xquery version \"3.0\";\n" +
@@ -8800,9 +10862,13 @@ public class FnFunctionLookup extends QT3TestSet {
       "        function-lookup(QName(\"http://www.w3.org/2005/xquery-local-functions\", \"square\"), 1)(13)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("169")
     );
@@ -8812,7 +10878,7 @@ public class FnFunctionLookup extends QT3TestSet {
    * Applied to a private user-defined function in the same module.
    */
   @org.junit.Test
-  public void functionLookup006() {
+  public void fnFunctionLookup606() {
     final XQuery query = new XQuery(
       "\n" +
       "        xquery version \"3.0\";\n" +
@@ -8820,9 +10886,13 @@ public class FnFunctionLookup extends QT3TestSet {
       "        function-lookup(QName(\"http://www.w3.org/2005/xquery-local-functions\", \"square\"), 1)(13)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("169")
     );
@@ -8832,15 +10902,19 @@ public class FnFunctionLookup extends QT3TestSet {
    * Applied to a non-existent function.
    */
   @org.junit.Test
-  public void functionLookup007() {
+  public void fnFunctionLookup607() {
     final XQuery query = new XQuery(
       "\n" +
       "        function-lookup(QName(\"http://www.w3.org/2005/xquery-local-functions\", \"cube\"), 1)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -8850,15 +10924,19 @@ public class FnFunctionLookup extends QT3TestSet {
    * Applied to a non-existent function (no namespace URI).
    */
   @org.junit.Test
-  public void functionLookup008() {
+  public void fnFunctionLookup608() {
     final XQuery query = new XQuery(
       "\n" +
       "        function-lookup(QName(\"\", \"round\"), 2)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -8868,16 +10946,20 @@ public class FnFunctionLookup extends QT3TestSet {
    * Get the name and arity of the result.
    */
   @org.junit.Test
-  public void functionLookup009() {
+  public void fnFunctionLookup609() {
     final XQuery query = new XQuery(
       "\n" +
       "        function-lookup(QName(\"http://www.w3.org/2005/xpath-functions\", \"round\"), 2) ! \n" +
       "                   (function-name(.) ! (namespace-uri-from-QName(.), local-name-from-QName(.)), function-arity(.))\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.w3.org/2005/xpath-functions round 2")
     );
@@ -8887,7 +10969,7 @@ public class FnFunctionLookup extends QT3TestSet {
    * Call the function with the wrong number of arguments.
    */
   @org.junit.Test
-  public void functionLookup010() {
+  public void fnFunctionLookup610() {
     final XQuery query = new XQuery(
       "\n" +
       "        xquery version \"3.0\";\n" +
@@ -8895,9 +10977,13 @@ public class FnFunctionLookup extends QT3TestSet {
       "        function-lookup(QName(\"http://www.w3.org/2005/xquery-local-functions\", \"square\"), 1)(13, 12)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -8907,7 +10993,7 @@ public class FnFunctionLookup extends QT3TestSet {
    * Call the function with the wrong type of argument.
    */
   @org.junit.Test
-  public void functionLookup011() {
+  public void fnFunctionLookup611() {
     final XQuery query = new XQuery(
       "\n" +
       "        xquery version \"3.0\";\n" +
@@ -8915,9 +11001,13 @@ public class FnFunctionLookup extends QT3TestSet {
       "        function-lookup(QName(\"http://www.w3.org/2005/xquery-local-functions\", \"square\"), 1)(\"banana\")\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -8927,13 +11017,17 @@ public class FnFunctionLookup extends QT3TestSet {
    * Curry the resulting function.
    */
   @org.junit.Test
-  public void functionLookup012() {
+  public void fnFunctionLookup612() {
     final XQuery query = new XQuery(
       "function-lookup(QName(\"http://www.w3.org/2005/xpath-functions\", \"round\"), 2)(?, 3)(1.2345678)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1.235")
     );
@@ -8943,7 +11037,7 @@ public class FnFunctionLookup extends QT3TestSet {
    * Function lookup creating a circular dependency (see bug 15791 - provisional outcome).
    */
   @org.junit.Test
-  public void functionLookup013() {
+  public void fnFunctionLookup613() {
     final XQuery query = new XQuery(
       "\n" +
       "        declare variable $n external := xs:QName('local:return-v');\n" +
@@ -8952,11 +11046,15 @@ public class FnFunctionLookup extends QT3TestSet {
       "        $v\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XQST0054")
+      error("XQDY0054")
     );
   }
 
@@ -8964,16 +11062,20 @@ public class FnFunctionLookup extends QT3TestSet {
    * Function lookup accessing an EXSLT extension function, with two possible results.
    */
   @org.junit.Test
-  public void functionLookup014() {
+  public void fnFunctionLookup614() {
     final XQuery query = new XQuery(
       "\n" +
       "        let $f := function-lookup(QName(\"http://exslt.org/dates-and-times\", \"month-abbreviation\"), 1)\n" +
       "        return if (exists($f)) then $f(\"2012-02-28\") else \"not-available\"\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "not-available")
@@ -8987,22 +11089,298 @@ public class FnFunctionLookup extends QT3TestSet {
    * Function lookup accessing an eXist extension function, with two possible results.
    */
   @org.junit.Test
-  public void functionLookup015() {
+  public void fnFunctionLookup615() {
     final XQuery query = new XQuery(
       "\n" +
       "        let $f := function-lookup(QName(\"http://exist-db.org/xquery/datetime\", \"days-in-month\"), 1)\n" +
       "        return if (exists($f)) then $f(xs:date(\"2012-02-28\")) else \"not-available\"\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "not-available")
       ||
         assertStringValue(false, "29")
       )
+    );
+  }
+
+  /**
+   * Attempts to evaluate the "function-lookup" function with no arguments..
+   */
+  @org.junit.Test
+  public void fnFunctionLookup701() {
+    final XQuery query = new XQuery(
+      "fn:function-lookup()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0017")
+    );
+  }
+
+  /**
+   * Attempts to reference the "function-lookup" function with arity zero..
+   */
+  @org.junit.Test
+  public void fnFunctionLookup702() {
+    final XQuery query = new XQuery(
+      "fn:function-lookup#0",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0017")
+    );
+  }
+
+  /**
+   * Attempts to evaluate the "function-lookup" function with one argument..
+   */
+  @org.junit.Test
+  public void fnFunctionLookup703() {
+    final XQuery query = new XQuery(
+      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'node-name'))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0017")
+    );
+  }
+
+  /**
+   * Attempts to reference the "function-lookup" function with arity one..
+   */
+  @org.junit.Test
+  public void fnFunctionLookup704() {
+    final XQuery query = new XQuery(
+      "fn:function-lookup#1",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0017")
+    );
+  }
+
+  /**
+   * Attempts to evaluate the "function-lookup" function with three argument..
+   */
+  @org.junit.Test
+  public void fnFunctionLookup705() {
+    final XQuery query = new XQuery(
+      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'node-name'), 1, ())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0017")
+    );
+  }
+
+  /**
+   * Attempts to reference the "function-lookup" function with arity three..
+   */
+  @org.junit.Test
+  public void fnFunctionLookup706() {
+    final XQuery query = new XQuery(
+      "fn:function-lookup#3",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0017")
+    );
+  }
+
+  /**
+   * Evaluates the "function-lookup" function with the argument set as follows: $name = () .
+   */
+  @org.junit.Test
+  public void fnFunctionLookup707() {
+    final XQuery query = new XQuery(
+      "fn:function-lookup( (), 1 )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   * Evaluates the "function-lookup" function with the argument set as follows: $arity = () .
+   */
+  @org.junit.Test
+  public void fnFunctionLookup708() {
+    final XQuery query = new XQuery(
+      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'node-name'), ())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   * Attempts to evaluate the "function-lookup" function with invalid arguments..
+   */
+  @org.junit.Test
+  public void fnFunctionLookup709() {
+    final XQuery query = new XQuery(
+      "function-lookup((fn:QName('http://www.w3.org/2005/xpath-functions', 'node-name'), fn:QName('http://www.w3.org/2005/xpath-functions', 'node-name')), 1)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   * Attempts to evaluate the "function-lookup" function with invalid arguments..
+   */
+  @org.junit.Test
+  public void fnFunctionLookup710() {
+    final XQuery query = new XQuery(
+      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'node-name'), (1, 2))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   * Tests the type checking of the argument..
+   */
+  @org.junit.Test
+  public void fnFunctionLookup712() {
+    final XQuery query = new XQuery(
+      "( fn:function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'node-name'),\n" +
+      "                                 if (current-date() eq xs:date('1900-01-01'))\n" +
+      "                                 then ()\n" +
+      "                                 else 1 ),\n" +
+      "              fn:function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'node-name'),\n" +
+      "                                 if (current-date() eq xs:date('1900-01-01'))\n" +
+      "                                 then 1\n" +
+      "                                 else () ) )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   * Tests the type checking of the argument..
+   */
+  @org.junit.Test
+  public void fnFunctionLookup714() {
+    final XQuery query = new XQuery(
+      "( fn:function-lookup((if (current-date() eq xs:date('1900-01-01'))\n" +
+      "                                  then fn:QName('http://www.w3.org/2005/xpath-functions', 'node-name')\n" +
+      "                                  else ()), 1),\n" +
+      "              fn:function-lookup((if (current-date() eq xs:date('1900-01-01'))\n" +
+      "                                  then ()\n" +
+      "                                  else fn:QName('http://www.w3.org/2005/xpath-functions', 'node-name')), 1))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   * Tests the return type of the "function-lookup" function..
+   */
+  @org.junit.Test
+  public void fnFunctionLookup715() {
+    final XQuery query = new XQuery(
+      "function-lookup(fn:QName('http://www.w3.org/2005/xpath-functions', 'node-name'), 1)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertType("function(*)")
     );
   }
 }

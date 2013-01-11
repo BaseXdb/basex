@@ -20,9 +20,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "count((element elem {1, 'string', 1,2e3})/text())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -36,10 +40,14 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "count((element elem {1, //text(), 'string'})/text())",
       ctx);
-    query.context(node(file("prod/CompAttrConstructor/DupNode.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/CompAttrConstructor/DupNode.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -53,9 +61,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "count((element elem {1, 2, <a/>, 3, 4, <b/>, 5, 6})/text())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -69,10 +81,14 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element elem {1, //west/@mark}",
       ctx);
-    query.context(node(file("prod/AxisStep/TopMany.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TopMany.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQTY0024")
     );
@@ -86,10 +102,14 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element elem {element a {}, //west/@mark}",
       ctx);
-    query.context(node(file("prod/AxisStep/TopMany.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TopMany.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQTY0024")
     );
@@ -103,10 +123,14 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element elem {//west/@mark, //west/@west-attr-1}",
       ctx);
-    query.context(node(file("prod/AxisStep/TopMany.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TopMany.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem mark=\"w0\" west-attr-1=\"w1\"/>", false)
     );
@@ -120,10 +144,14 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element elem {//west/@mark, //center/@mark}",
       ctx);
-    query.context(node(file("prod/AxisStep/TopMany.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TopMany.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0025")
     );
@@ -137,9 +165,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:base-uri(element elem {attribute xml:base {\"http://www.example.com\"}})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com")
     );
@@ -153,9 +185,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:base-uri(exactly-one((<elem xml:base=\"http://www.example.com\">{element a {}}</elem>)/a))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com")
     );
@@ -169,9 +205,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare base-uri \"http://www.example.com\"; fn:base-uri(element elem {})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com")
     );
@@ -185,9 +225,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element {()} {'text'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -201,9 +245,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element {'elem'} {'text'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem>text</elem>", false)
     );
@@ -217,9 +265,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element {'elem', ()} {'text'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem>text</elem>", false)
     );
@@ -233,9 +285,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element {(), 'elem'} {'text'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem>text</elem>", false)
     );
@@ -249,9 +305,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem xmlns:foo=\"http://www.example.com/foo\">{element {'foo:elem'} {'text'}}</elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem xmlns:foo=\"http://www.example.com/foo\"><foo:elem>text</foo:elem></elem>", false)
     );
@@ -265,9 +325,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element {'foo:elem'} {}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0074")
     );
@@ -281,9 +345,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element {xs:untypedAtomic('elem')} {'text'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem>text</elem>", false)
     );
@@ -297,9 +365,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem xmlns:foo=\"http://www.example.com/foo\">{element {xs:untypedAtomic('foo:elem')} {'text'}}</elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem xmlns:foo=\"http://www.example.com/foo\"><foo:elem>text</foo:elem></elem>", false)
     );
@@ -313,9 +385,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element {xs:untypedAtomic('foo:elem')} {'text'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0074")
     );
@@ -329,9 +405,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element {'el em'} {'text'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0074")
     );
@@ -345,9 +425,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element {xs:untypedAtomic('el em')} {'text'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0074")
     );
@@ -361,9 +445,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element {'one', 'two'} {'text'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -377,9 +465,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element {xs:untypedAtomic('one'), xs:untypedAtomic('two')} {'text'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -393,10 +485,14 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element {//a} {'text'}",
       ctx);
-    query.context(node(file("prod/CompAttrConstructor/DupNode.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/CompAttrConstructor/DupNode.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -410,9 +506,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element {1,2} {'text'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -426,9 +526,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element {123} {'text'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -442,9 +546,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element {xs:dateTime(\"1999-05-31T13:20:00\")} {'text'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -458,9 +566,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element {xs:QName('aQname')} {'text'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<aQname>text</aQname>", false)
     );
@@ -474,10 +586,14 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare construction strip; (element elem {xs:decimal((//decimal[1]))}) cast as xs:integer",
       ctx);
-    query.context(node(file("docs/atomicns.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/atomicns.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0001")
     );
@@ -491,10 +607,14 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare construction preserve; (element elem {xs:decimal((//decimal[1]))}) cast as xs:integer",
       ctx);
-    query.context(node(file("docs/atomicns.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/atomicns.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("12678967")
@@ -512,10 +632,14 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare construction strip; (element elem {//*:decimal/@*:attr})/@*:attr cast as xs:integer",
       ctx);
-    query.context(node(file("docs/atomicns.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/atomicns.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0001")
     );
@@ -529,10 +653,14 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare construction preserve; (element elem {xs:decimal(//*:decimal[1]/@*:attr)}) cast as xs:integer",
       ctx);
-    query.context(node(file("docs/atomicns.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/atomicns.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("12678967")
@@ -552,9 +680,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:data(element elem {'a', element a {}, 'b'})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ab")
     );
@@ -568,10 +700,14 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element elem {., .}",
       ctx);
-    query.context(node(file("prod/CompAttrConstructor/DupNode.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/CompAttrConstructor/DupNode.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem><root><child1><a>text</a><!--comment--><?pi content?></child1><child2><a>text</a><!--comment--><?pi content?></child2></root><root><child1><a>text</a><!--comment--><?pi content?></child1><child2><a>text</a><!--comment--><?pi content?></child2></root></elem>", false)
     );
@@ -585,9 +721,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element elem {}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem/>", false)
     );
@@ -601,9 +741,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element elem {1,'a',3.5,4e2}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem>1 a 3.5 400</elem>", false)
     );
@@ -617,10 +761,14 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element elem {1,//a,2,3,//comment(),4,5,//processing-instruction(),6,7,//text(),8}",
       ctx);
-    query.context(node(file("prod/CompAttrConstructor/DupNode.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/CompAttrConstructor/DupNode.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem>1<a>text</a><a>text</a>2 3<!--comment--><!--comment-->4 5<?pi content?><?pi content?>6 7texttext8</elem>", false)
     );
@@ -634,9 +782,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element elem {1, '', 2}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem>1  2</elem>", false)
     );
@@ -650,9 +802,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element elem {'text'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem>text</elem>", false)
     );
@@ -666,9 +822,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace foo=\"http://www.example.com/foo\"; element foo:elem {'text'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<foo:elem xmlns:foo=\"http://www.example.com/foo\">text</foo:elem>", false)
     );
@@ -682,9 +842,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element foo:elem {'text'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -698,9 +862,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element elem {1, element a {2, element b {element c {}, element d {3}}, 4}}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem>1<a>2<b><c/><d>3</d></b>4</a></elem>", false)
     );
@@ -714,10 +882,14 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element elem {}",
       ctx);
-    query.context(node(file("prod/CompAttrConstructor/DupNode.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/CompAttrConstructor/DupNode.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem/>", false)
     );
@@ -731,9 +903,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $x in <a/>, $y in element elem {$x} return exactly-one($y/a) is $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -747,9 +923,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $x in <a b=\"b\"/>, $y in element elem {$x/@b} return $y/@b is $x/@b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -763,9 +943,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $x in <!--comment-->, $y in element elem {$x} return exactly-one($y/comment()) is $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -779,9 +963,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $x in <?pi content?>, $y in element elem {$x} return exactly-one($y/processing-instruction()) is $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -795,9 +983,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $x in <a>text</a>, $y in element elem {$x/text()} return exactly-one($y/text()) is exactly-one($x/text())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -811,9 +1003,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "count((element elem {})/..)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -827,9 +1023,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(element elem {'a', element a {}, 'b'})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ab")
     );
@@ -843,9 +1043,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element \"name\" {\"content\"}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -859,9 +1063,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare construction strip; element e {\"content\"} instance of element(*, xs:untyped)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -875,9 +1083,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element e {\"content\"} instance of element(a, xs:anyType)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -891,9 +1103,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare construction strip; element e {\"content\"} instance of element(b, xs:untyped)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -907,9 +1123,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element e {element b{()}}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e><b/></e>", false)
     );
@@ -928,9 +1148,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
       "        local:addNamespace(<a><b/></a>, \"prefix\", \"http://example.com/\")\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a xmlns:prefix=\"http://example.com/\"><b/></a>", false)
     );
@@ -946,10 +1170,14 @@ public class ProdCompElemConstructor extends QT3TestSet {
       "        declare default element namespace \"http://example.com/NS\"; \n" +
       "        element {exactly-one((//*)[3])} {}",
       ctx);
-    query.context(node(file("op/union/acme_corp.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("op/union/acme_corp.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<Boston xmlns=\"http://example.com/NS\"/>", false)
     );
@@ -963,9 +1191,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem>{\"\", \"\", <e/>, <b></b>}</elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem> <e/><b/></elem>", false)
     );
@@ -979,9 +1211,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem>{<e/>, <b></b>, \"\", \"\"}</elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem><e/><b/> </elem>", false)
     );
@@ -995,9 +1231,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element {\"aPrefix:localName\"} {\"content\"}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0074")
     );
@@ -1011,9 +1251,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element {xs:untypedAtomic(\"aPrefix::localName\")} {\"content\"}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0074")
     );
@@ -1027,9 +1271,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "data(element foo {\"dsa\"}) instance of xs:untypedAtomic",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1043,9 +1291,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "data(element foo {\"dsa\"})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "dsa")
     );
@@ -1059,9 +1311,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element e {\"content\"} instance of element(*, xs:anyType)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1075,9 +1331,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element e {\"content\"} instance of element(*, xs:untyped)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(false)
@@ -1095,9 +1355,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "element {\"xmlns:error\"} {}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0096")
     );
@@ -1111,9 +1375,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "(: 3.7.3.1 Computed Element Constructor per XQ.E19 XQDY0096 if namespace URI is 'http://www.w3.org/2000/xmlns/' Mary Holstege :) element { fn:QName(\"http://www.w3.org/2000/xmlns/\",\"error\")} {}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0096")
     );
@@ -1127,9 +1395,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "(: 3.7.3.1 Computed Element Constructor per XQ.E19 XQDY0096 if namespace URI is 'http://www.w3.org/2000/xmlns/' Mary Holstege :) element { fn:QName(\"http://www.w3.org/2000/xmlns/\",\"foo:error\")} {}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0096")
     );
@@ -1143,9 +1415,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "(: 3.7.3.1 Computed Element Constructor per XQ.E19 XQDY0096 if namespace prefix is 'xml' and namespace URI is not 'http://www.w3.org/XML/1998/namespace' Mary Holstege :) element { fn:QName(\"http://example.com/not-XML-uri\",\"xml:error\") } {}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0096")
     );
@@ -1159,9 +1435,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "(: 3.7.3.1 Computed Element Constructor per XQ.E19 XQDY0096 if namespace prefix is not 'xml' and its namespace URI is 'http://www.w3.org/XML/1998/namespace' Mary Holstege :) element { fn:QName(\"http://www.w3.org/XML/1998/namespace\",\"foo:error\") } {}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0096")
     );
@@ -1175,9 +1455,13 @@ public class ProdCompElemConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "(: 3.7.3.1 Computed Element Constructor per XQ.E19 XQDY0096 if namespace prefix is 'xmlns' Mary Holstege :) element { fn:QName(\"http://example.com/some-uri\",\"xmlns:error\") } {}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0096")
     );

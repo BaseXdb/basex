@@ -8,6 +8,7 @@ import java.util.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.Set;
+import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.Compare.Flag;
@@ -32,7 +33,7 @@ public abstract class QT3TestSet {
   public final ArrayList<String> expected = new ArrayList<String>();
 
   /** QT3TS path, possibly {@code null}. */
-  public static final String QT3TS = System.getProperty("QT3TS");
+  public static final String QT3TS = System.getenv("QT3TS");
 
   /** The current query's result. */
   public QT3Result result;
@@ -219,7 +220,9 @@ public abstract class QT3TestSet {
       return fail(Util.info("% (found: %)", err, "?"));
     }
 
-    final String res = result.error.getMessage().replaceAll("\\[|\\].*\r?\n?.*", "");
+    final String msg = result.error.getMessage();
+    final String res = msg == null ? Util.name(result.error)
+                                   : msg.replaceAll("\\[|\\].*\r?\n?.*", "");
     return result(code.equals(res), Util.info("% (found: %)", code, res));
   }
 
@@ -282,6 +285,20 @@ public abstract class QT3TestSet {
   }
 
   /**
+   * Matches the serialized result against a regular expression.
+   * @param pat regex pattern
+   * @param flags matching flags
+   * @return optional expected test suite result
+   */
+  protected boolean serializationMatches(final String pat, final String flags) {
+    final XdmValue value = result.value;
+    if(value == null) return fail(Util.info("Matches: '%'", pat));
+    final XQuery match = new XQuery("fn:matches($in, $pat, $flags)", ctx);
+    match.bind("in", value.toString()).bind("pat", pat).bind("flags", flags);
+    return result(match.next().getBoolean(), Util.info("Matches: '%'", pat));
+  }
+
+  /**
    * Returns the string representation of a query result.
    * @param query query string
    * @param value optional context value
@@ -337,31 +354,31 @@ public abstract class QT3TestSet {
   }
 
   /**
-   * Executes the query and returns the result.
-   * @param query query to be executed
-   * @return result
-   */
-  protected QT3Result result(final XQuery query) {
-    final QT3Result res = new QT3Result();
-    try {
-      res.value = query.value();
-    } catch(final XQueryException xqe) {
-      res.exc = xqe;
-    } catch(final Throwable trw) {
-      res.error = trw;
-    } finally {
-      query.close();
-    }
-    return res;
-  }
-
-  /**
    * Throws an {@link AssertionError} if the test failed.
    * @param success test success
    */
   protected void test(final boolean success) {
-    if(!success)
-      Assert.fail(Util.info("Expected one of %, found: '%'", expected, result));
+    if(!success) {
+      final AssertionError err = new AssertionError(
+          Util.info("Expected one of %, found: '%'", expected, result));
+      if(result.error != null) err.setStackTrace(result.error.getStackTrace());
+      else if(result.exc != null)
+        err.setStackTrace(result.exc.getException().getStackTrace());
+      throw err;
+    }
+  }
+
+  /**
+   * Reads a query string from a file.
+   * @param uri file URI
+   * @return file contents
+   */
+  protected String queryFile(final String uri) {
+    try {
+      return Token.string(IO.get(uri).read());
+    } catch(IOException e) {
+      throw new AssertionError(e);
+    }
   }
 
   /**
@@ -423,6 +440,23 @@ public abstract class QT3TestSet {
     XQueryException exc;
     /** Query error. */
     Throwable error;
+
+    /**
+     * Constructor for successful evaluation.
+     * @param val result value
+     */
+    public QT3Result(final XdmValue val) {
+      value = val;
+    }
+
+    /**
+     * Constructor for externally thrown errors.
+     * @param th cause
+     */
+    public QT3Result(final Throwable th) {
+      if(th instanceof XQueryException) exc = (XQueryException) th;
+      else error = th;
+    }
 
     @Override
     public String toString() {

@@ -23,9 +23,13 @@ public class ProdContextItemExpr extends QT3TestSet {
       "        declare function eg:noContextFunction() { name }; \n" +
       "        eg:noContextFunction()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -39,10 +43,14 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (/works/employee[1]) return $var/(exactly-one(hours) + exactly-one(hours))",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("80")
     );
@@ -56,10 +64,14 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (/works/employee[1]) return $var/(exactly-one(hours) - exactly-one(hours))",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -73,10 +85,14 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (/works/employee[1]) return $var/(exactly-one(hours) * exactly-one(hours))",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1600")
     );
@@ -90,10 +106,14 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (/works/employee[1]) return $var/(exactly-one(hours) mod exactly-one(hours))",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -107,10 +127,14 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (/works/employee[1]) return $var/(exactly-one(hours) div exactly-one(hours))",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -124,10 +148,14 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (/works/employee[1]) return $var/(exactly-one(hours) idiv exactly-one(hours))",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -141,10 +169,14 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (/works/employee[1]) return $var/(xs:boolean(exactly-one(hours) - 39) and xs:boolean(exactly-one(hours) - 39))",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -158,10 +190,14 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (/works/employee[1]) return $var/(xs:boolean(exactly-one(hours) - 39) or xs:boolean(exactly-one(hours) - 39))",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -175,10 +211,14 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (/works/employee[1]) return $var/fn:string-length(exactly-one(hours))",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -192,10 +232,14 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (/works/employee[1]) return $var/fn:avg((hours,hours,hours))",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("40")
     );
@@ -209,10 +253,14 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in /works/employee[1] return $var/xs:string(exactly-one(empnum))",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "E1")
     );
@@ -226,10 +274,14 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (/works/employee[1]) return $var/fn:min((hours,hours,22))",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("22")
     );
@@ -243,10 +295,14 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (/works/employee[1]) return $var/fn:max((hours,exactly-one(hours) + 1,22))",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("41")
     );
@@ -260,10 +316,14 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "./works/employee[1]",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<employee name=\"Jane Doe 1\" gender=\"female\">\n   <empnum>E1</empnum>\n   <pnum>P1</pnum>\n   <hours>40</hours>\n  </employee>", false)
     );
@@ -277,9 +337,13 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "./works/employee[1]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XPDY0002")
@@ -297,10 +361,14 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "works/employee[1]",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<employee name=\"Jane Doe 1\" gender=\"female\">\n   <empnum>E1</empnum>\n   <pnum>P1</pnum>\n   <hours>40</hours>\n  </employee>", false)
     );
@@ -314,10 +382,14 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (/works/employee[1]) return $var/xs:integer(exactly-one(hours))",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("40")
     );
@@ -331,10 +403,14 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (/works/employee[1]) return $var/xs:decimal(exactly-one(hours))",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("40")
     );
@@ -348,10 +424,14 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in /works/employee[1] return $var/xs:float(exactly-one(hours))",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("40")
     );
@@ -365,10 +445,14 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (/works/employee[1]) return $var/xs:double(exactly-one(hours))",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("40")
     );
@@ -382,10 +466,14 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (/works/employee[1]) return $var/xs:boolean(exactly-one(hours) - 39)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -399,10 +487,14 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (/works/employee[1]) return $var/fn:not(xs:boolean(exactly-one(hours) - 39))",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -416,10 +508,14 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (/works/employee[1]) return $var/fn:sum((hours,hours))",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("80")
     );
@@ -433,9 +529,13 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace eg = \"http://example.org\"; declare function eg:noContextFunction() { . }; eg:noContextFunction()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -449,9 +549,13 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1,2,3)[(. + .) gt 1]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3")
     );
@@ -465,9 +569,13 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(3,4,5)[(xs:integer(5) - xs:integer(.)) gt 1]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -481,9 +589,13 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(3,4,5)[(xs:integer(.) * xs:integer(.)) gt 2]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "3 4 5")
     );
@@ -497,9 +609,13 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(6,10,14)[(xs:integer(.) mod xs:integer(3)) gt 1]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("14")
     );
@@ -513,9 +629,13 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(6,10,14)[(xs:integer(.) div xs:integer(3)) gt 2]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "10 14")
     );
@@ -529,9 +649,13 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(6,10,14)[(xs:integer(.) idiv xs:integer(3)) gt 2]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "10 14")
     );
@@ -545,9 +669,13 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:true(),fn:false(),fn:true())[xs:boolean(.) and xs:boolean(.)]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true true")
     );
@@ -561,9 +689,13 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:true(),fn:false(),fn:true())[xs:boolean(.) or xs:boolean(.)]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true true")
     );
@@ -577,9 +709,13 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(\"ABC\", \"DEF\",\"A\")[fn:string-length(.) gt 2]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ABC DEF")
     );
@@ -593,9 +729,13 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1,2,3)[fn:avg((.,2,3)) gt 2]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2 3")
     );
@@ -609,9 +749,13 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(\"A\",\"B\",\"C\")[xs:string(.)]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "A B C")
     );
@@ -625,9 +769,13 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1,2,3)[fn:min((.,2)) eq 2]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2 3")
     );
@@ -641,9 +789,13 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1,2,3)[fn:min((.,3)) eq 3]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -657,9 +809,13 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1,2,3)[xs:integer(.)]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3")
     );
@@ -673,9 +829,13 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1,2,3)[xs:decimal(.)]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3")
     );
@@ -689,9 +849,13 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1,2,3)[xs:float(.)]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3")
     );
@@ -705,9 +869,13 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1,2,3)[xs:double(.)]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3")
     );
@@ -721,9 +889,13 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:true(),fn:false(),fn:true())[xs:boolean(.)]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true true")
     );
@@ -737,9 +909,13 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:false(),fn:true(),fn:false())[fn:not(xs:boolean(.))]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "false false")
     );
@@ -753,9 +929,13 @@ public class ProdContextItemExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(((),(),())[xs:string(.)])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")

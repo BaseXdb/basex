@@ -102,19 +102,27 @@ public class ',  $class-name, ' extends QT3TestSet {
   @org.junit.Test
   public void ', qt3ts-java:method-name($name), '() {
     final XQuery query = new XQuery(
-',  qt3ts-java:string-literal($test-case('test'), '      '), ',
+',  if($test-case('is_file')) then (
+'      queryFile(
+',      qt3ts-java:string-literal($test-case('test'), '          '), '
+      )'
+    ) else qt3ts-java:string-literal($test-case('test'), '      '), ',
       ctx);
+    try {
 ',
   for $line in qt3ts-java:environment($test-case('environment'))
-  return concat('    ', $line, '&#xa;'),
+  return concat('      ', $line, '&#xa;'),
 
   let $mods := $test-case('modules')
   for $mod in map:keys($mods)
-  return concat('    query.addModule("', qt3ts-java:escape-string($mod),
+  return concat('      query.addModule("', qt3ts-java:escape-string($mod),
     '", file("', qt3ts-java:escape-string($mods($mod)), '"));&#xa;'),
-  '
-    final QT3Result res = result(query);
-    result = res;
+'      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
 ',
   for $line in qt3ts-java:result($test-case('result'), '')
@@ -156,10 +164,10 @@ declare function qt3ts-java:environment(
         else ()
     case 'collection'
       return 'query.addCollection("' || qt3ts-java:escape-string($vals('uri')) || '", ' ||
-        'new String[] { "' || string-join(
+        'new String[] { file("' || string-join(
           for $doc in map:keys($vals('docs'))
           return qt3ts-java:escape-string($vals('docs')($doc)('file'))
-        , '", "') || '" });'
+        , '"), file("') || '") });'
     case 'decimal-format'
       return '// decimal format'
     case 'resource'
@@ -177,6 +185,8 @@ declare function qt3ts-java:environment(
         'as' := $env/@as/string(),
         'declared' := $env/@declared != 'false'
       }) :)
+    case 'context-item'
+      return 'query.context(new XQuery("' || qt3ts-java:escape-string($vals) || '", ctx).value());'
     default
       return trace('', 'Unknown Java-serialization for: ')[2]
 };
@@ -210,9 +220,13 @@ declare function qt3ts-java:result(
         return $indent || 'error("' || qt3ts-java:escape-string($vals) || '")'
       case 'assert-serialization-error'
         return $indent || 'assertSerialError("' || qt3ts-java:escape-string($vals) || '")'
-      case 'assert-serialization'
+      case 'assert-xml'
         return $indent || 'assertSerialization("' ||
           qt3ts-java:escape-string($vals('result')) || '", ' || $vals('ignore-prefixes') || ')'
+      case 'serialization-matches'
+        return $indent || 'serializationMatches("' ||
+          qt3ts-java:escape-string($vals('regex')) || '", "' ||
+          qt3ts-java:escape-string($vals('flags')) || '")'
       case 'all-of' return (
           $indent || '(',
           tail(

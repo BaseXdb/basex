@@ -27,9 +27,13 @@ public class OpTimeLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"23:01:05.12\") gt xs:time(\"23:01:04.12\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -50,9 +54,13 @@ public class OpTimeLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:time(\"23:01:03.12\") gt xs:time(\"23:01:04.12\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -73,9 +81,13 @@ public class OpTimeLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:time(\"23:01:04.12\") gt xs:time(\"23:01:04.12\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -96,9 +108,13 @@ public class OpTimeLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"23:01:04.12\") ge xs:time(\"23:01:04.12\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -119,9 +135,13 @@ public class OpTimeLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"23:01:05.12\") ge xs:time(\"23:01:04.12\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -142,9 +162,307 @@ public class OpTimeLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:time(\"23:01:03.12\") ge xs:time(\"23:01:04.12\"))",
       ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
 
-    final QT3Result res = result(query);
-    result = res;
+  /**
+   *  test comparison of time .
+   */
+  @org.junit.Test
+  public void cbclTimeLessThan001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:two-digit($number as xs:integer) { let $string := string($number) return if (string-length($string) lt 2) then concat('0', $string) else $string };\n" +
+      "        declare function local:time($hours as xs:integer, $mins as xs:integer, $seconds as xs:decimal) { let $h := local:two-digit($hours), $m := local:two-digit($mins) return xs:time(concat($h, ':', $m, ':', $seconds)) };\n" +
+      "        not(local:time(12, 59, 30) lt xs:time(\"12:32:05\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of time .
+   */
+  @org.junit.Test
+  public void cbclTimeLessThan002() {
+    final XQuery query = new XQuery(
+      "xs:time(\"14:00:00-12:00\") lt xs:time(\"02:00:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of time .
+   */
+  @org.junit.Test
+  public void cbclTimeLessThan003() {
+    final XQuery query = new XQuery(
+      "xs:time(\"02:00:00\") lt xs:time(\"14:00:00-12:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of time .
+   */
+  @org.junit.Test
+  public void cbclTimeLessThan004() {
+    final XQuery query = new XQuery(
+      "xs:time(\"00:00:01+01:00\") lt xs:time(\"00:00:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of time .
+   */
+  @org.junit.Test
+  public void cbclTimeLessThan005() {
+    final XQuery query = new XQuery(
+      "xs:time(\"00:00:00\") lt xs:time(\"00:00:01+01:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of time .
+   */
+  @org.junit.Test
+  public void cbclTimeLessThan006() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:two-digit($number as xs:integer) { let $string := string($number) return if (string-length($string) lt 2) then concat('0', $string) else $string };\n" +
+      "        declare function local:time($hours as xs:integer, $mins as xs:integer, $seconds as xs:decimal) { let $h := local:two-digit($hours), $m := local:two-digit($mins) return xs:time(concat($h, ':', $m, ':', $seconds)) };\n" +
+      "        not(local:time(12, 59, 30) ge xs:time(\"12:32:05\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of time .
+   */
+  @org.junit.Test
+  public void cbclTimeLessThan007() {
+    final XQuery query = new XQuery(
+      "xs:time(\"14:00:00-12:00\") ge xs:time(\"02:00:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of time .
+   */
+  @org.junit.Test
+  public void cbclTimeLessThan008() {
+    final XQuery query = new XQuery(
+      "xs:time(\"02:00:00\") ge xs:time(\"14:00:00-12:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of time .
+   */
+  @org.junit.Test
+  public void cbclTimeLessThan009() {
+    final XQuery query = new XQuery(
+      "xs:time(\"00:00:01+01:00\") ge xs:time(\"00:00:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of time .
+   */
+  @org.junit.Test
+  public void cbclTimeLessThan010() {
+    final XQuery query = new XQuery(
+      "xs:time(\"00:00:00\") ge xs:time(\"00:00:01+01:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of time .
+   */
+  @org.junit.Test
+  public void cbclTimeLessThan011() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:time($time as xs:time, $null as xs:boolean) { if ($null) then () else $time };\n" +
+      "        exists(local:time(xs:time(\"23:58:00\"), fn:true()) lt xs:time(\"23:58:00\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of time .
+   */
+  @org.junit.Test
+  public void cbclTimeLessThan012() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:time($time as xs:time, $null as xs:boolean) { if ($null) then () else $time };\n" +
+      "        local:time(xs:time(\"23:58:00\"), fn:false()) lt xs:time(\"23:58:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of time .
+   */
+  @org.junit.Test
+  public void cbclTimeLessThan013() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:time($time as xs:time, $null as xs:boolean) { if ($null) then () else $time };\n" +
+      "        exists(local:time(xs:time(\"23:58:00\"), fn:true()) ge xs:time(\"23:58:00\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of time .
+   */
+  @org.junit.Test
+  public void cbclTimeLessThan014() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:time($time as xs:time, $null as xs:boolean) { if ($null) then () else $time };\n" +
+      "        local:time(xs:time(\"23:58:00\"), fn:false()) ge xs:time(\"23:58:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -166,9 +484,13 @@ public class OpTimeLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:time(\"12:00:00-05:00\") lt xs:time(\"23:00:00+06:00\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -190,9 +512,13 @@ public class OpTimeLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:time(\"13:00:00Z\") le xs:time(\"17:00:00Z\")) or (xs:time(\"13:00:00Z\") le xs:time(\"17:00:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -214,9 +540,13 @@ public class OpTimeLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:time(\"13:00:00Z\") lt xs:time(\"17:00:00Z\")) or (fn:true())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -238,9 +568,13 @@ public class OpTimeLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:time(\"13:00:00Z\") le xs:time(\"17:00:00Z\")) or (fn:true())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -262,9 +596,13 @@ public class OpTimeLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:time(\"13:00:00Z\") lt xs:time(\"17:00:00Z\")) or (fn:false())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -286,9 +624,13 @@ public class OpTimeLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:time(\"13:00:00Z\") le xs:time(\"17:00:00Z\")) or (fn:false())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -310,9 +652,13 @@ public class OpTimeLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"11:00:00-05:00\") lt xs:time(\"17:00:00Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -334,9 +680,13 @@ public class OpTimeLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not((xs:time(\"13:00:00Z\") lt xs:time(\"14:00:00Z\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -358,9 +708,13 @@ public class OpTimeLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:time(\"13:00:00Z\") le xs:time(\"14:00:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -382,9 +736,13 @@ public class OpTimeLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:time(\"13:00:00Z\") lt xs:time(\"10:00:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -406,9 +764,13 @@ public class OpTimeLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:time(\"13:00:00Z\") le xs:time(\"12:00:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -430,9 +792,13 @@ public class OpTimeLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:time(\"13:00:00Z\") lt xs:time(\"17:00:00Z\")) and (xs:time(\"13:00:00Z\") lt xs:time(\"17:00:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -454,9 +820,13 @@ public class OpTimeLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:time(\"13:00:00Z\") le xs:time(\"17:00:00Z\")) and (xs:time(\"13:00:00Z\") le xs:time(\"17:00:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -478,9 +848,13 @@ public class OpTimeLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:time(\"13:00:00Z\") lt xs:time(\"17:00:00Z\")) or (xs:time(\"13:00:00Z\") lt xs:time(\"17:00:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -504,9 +878,13 @@ public class OpTimeLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"00:00:00Z\") lt xs:time(\"00:00:00Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -530,9 +908,13 @@ public class OpTimeLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"00:00:00Z\") ge xs:time(\"23:59:59Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -556,9 +938,13 @@ public class OpTimeLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"08:03:35Z\") lt xs:time(\"00:00:00Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -582,9 +968,13 @@ public class OpTimeLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"23:59:59Z\") lt xs:time(\"00:00:00Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -608,9 +998,13 @@ public class OpTimeLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"00:00:00Z\") lt xs:time(\"08:03:35Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -634,9 +1028,13 @@ public class OpTimeLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"00:00:00Z\") lt xs:time(\"23:59:59Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -660,9 +1058,13 @@ public class OpTimeLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"00:00:00Z\") ge xs:time(\"00:00:00Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -686,9 +1088,13 @@ public class OpTimeLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"08:03:35Z\") ge xs:time(\"00:00:00Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -712,9 +1118,13 @@ public class OpTimeLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"23:59:59Z\") ge xs:time(\"00:00:00Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -738,9 +1148,13 @@ public class OpTimeLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"00:00:00Z\") ge xs:time(\"08:03:35Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );

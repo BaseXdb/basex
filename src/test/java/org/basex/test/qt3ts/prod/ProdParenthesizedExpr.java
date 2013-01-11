@@ -20,9 +20,13 @@ public class ProdParenthesizedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1 + 2) * 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("9")
     );
@@ -36,9 +40,13 @@ public class ProdParenthesizedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:true() or (fn:true() and fn:false())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class ProdParenthesizedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(for $x in (1) where (fn:true()) order by ($x) return ($x))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -68,9 +80,13 @@ public class ProdParenthesizedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $x in (1,2) return (if (($x eq 1)) then ($x) else ($x + 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 3")
     );
@@ -84,9 +100,13 @@ public class ProdParenthesizedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -100,9 +120,13 @@ public class ProdParenthesizedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, (2, (3, 4)), (5))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3 4 5")
     );
@@ -116,10 +140,14 @@ public class ProdParenthesizedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem>{//node() | (//node() except //comment())}</elem>",
       ctx);
-    query.context(node(file("prod/CompAttrConstructor/DupNode.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/CompAttrConstructor/DupNode.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem><root><child1><a>text</a><!--comment--><?pi content?></child1><child2><a>text</a><!--comment--><?pi content?></child2></root><child1><a>text</a><!--comment--><?pi content?></child1><a>text</a>text<!--comment--><?pi content?><child2><a>text</a><!--comment--><?pi content?></child2><a>text</a>text<!--comment--><?pi content?></elem>", false)
     );
@@ -133,10 +161,14 @@ public class ProdParenthesizedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem>{(//node() | //node()) except //comment()}</elem>",
       ctx);
-    query.context(node(file("prod/CompAttrConstructor/DupNode.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/CompAttrConstructor/DupNode.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem><root><child1><a>text</a><!--comment--><?pi content?></child1><child2><a>text</a><!--comment--><?pi content?></child2></root><child1><a>text</a><!--comment--><?pi content?></child1><a>text</a>text<?pi content?><child2><a>text</a><!--comment--><?pi content?></child2><a>text</a>text<?pi content?></elem>", false)
     );
@@ -150,9 +182,13 @@ public class ProdParenthesizedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(<elem/>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem/>", false)
     );
@@ -166,9 +202,13 @@ public class ProdParenthesizedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem attr=\"{(1)}\">{(<child/>),(<child/>)}</elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem attr=\"1\"><child/><child/></elem>", false)
     );
@@ -182,10 +222,14 @@ public class ProdParenthesizedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(.)",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Child.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Child.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertQuery("name($result/*) = \"far-north\"")
     );
@@ -199,9 +243,13 @@ public class ProdParenthesizedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 + (2 * 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("7")
     );
@@ -215,10 +263,14 @@ public class ProdParenthesizedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem>{(//(north)/(/)//(@mark)[(1)]/(.)/(..))}</elem>",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Child.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Child.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem><west mark=\"w0\"/><center mark=\"c0\"><the1child/></center><east mark=\"e0\">Text in east</east></elem>", false)
     );
@@ -232,9 +284,13 @@ public class ProdParenthesizedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "-(2 + 5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-7")
     );
@@ -248,9 +304,13 @@ public class ProdParenthesizedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(-2) + 5",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -264,9 +324,13 @@ public class ProdParenthesizedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "2 + (4 idiv 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("4")
     );
@@ -280,9 +344,13 @@ public class ProdParenthesizedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(2 + 4) idiv 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -296,9 +364,13 @@ public class ProdParenthesizedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "2 * (5 mod 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("4")
     );
@@ -312,9 +384,13 @@ public class ProdParenthesizedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(2 * 5) mod 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -328,9 +404,13 @@ public class ProdParenthesizedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:true() or fn:true()) and fn:false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );

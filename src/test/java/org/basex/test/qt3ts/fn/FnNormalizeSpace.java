@@ -20,9 +20,13 @@ public class FnNormalizeSpace extends QT3TestSet {
     final XQuery query = new XQuery(
       "normalize-space(\"a string\", \"wrong param\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnNormalizeSpace extends QT3TestSet {
     final XQuery query = new XQuery(
       "if(false()) then normalize-space() else true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -56,9 +64,13 @@ public class FnNormalizeSpace extends QT3TestSet {
     final XQuery query = new XQuery(
       "normalize-space(\"foo\") eq \"foo\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -72,9 +84,13 @@ public class FnNormalizeSpace extends QT3TestSet {
     final XQuery query = new XQuery(
       "normalize-space(\" foo\") eq \"foo\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -88,9 +104,13 @@ public class FnNormalizeSpace extends QT3TestSet {
     final XQuery query = new XQuery(
       "normalize-space(\"foo \") eq \"foo\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -104,9 +124,13 @@ public class FnNormalizeSpace extends QT3TestSet {
     final XQuery query = new XQuery(
       "normalize-space(()) eq \"\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -120,9 +144,13 @@ public class FnNormalizeSpace extends QT3TestSet {
     final XQuery query = new XQuery(
       "normalize-space(\"f o o \") eq \"f o o\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -136,9 +164,13 @@ public class FnNormalizeSpace extends QT3TestSet {
     final XQuery query = new XQuery(
       "normalize-space(\" 143 1239 fhjkls \") eq \"143 1239 fhjkls\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -152,9 +184,13 @@ public class FnNormalizeSpace extends QT3TestSet {
     final XQuery query = new XQuery(
       "normalize-space(normalize-space((\"foo\", current-time())[1])) eq \"foo\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -172,9 +208,13 @@ public class FnNormalizeSpace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:normalize-space(\" The wealthy curled darlings of our nation. \")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "The wealthy curled darlings of our nation.")
     );
@@ -188,9 +228,13 @@ public class FnNormalizeSpace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:normalize-space(\" \")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("\"\"")
@@ -208,9 +252,13 @@ public class FnNormalizeSpace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:normalize-space(\"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("\"\"")
@@ -228,9 +276,13 @@ public class FnNormalizeSpace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:normalize-space(\"\t\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("\"\"")
@@ -248,9 +300,13 @@ public class FnNormalizeSpace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:normalize-space(\"\t\t\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("\"\"")
@@ -269,9 +325,13 @@ public class FnNormalizeSpace extends QT3TestSet {
       "fn:normalize-space(\"\n" +
       "\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("\"\"")
@@ -291,9 +351,13 @@ public class FnNormalizeSpace extends QT3TestSet {
       "\r\n" +
       "\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("\"\"")
@@ -311,9 +375,13 @@ public class FnNormalizeSpace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:normalize-space(\" \t  \t \")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("\"\"")
@@ -332,9 +400,13 @@ public class FnNormalizeSpace extends QT3TestSet {
       "fn:normalize-space(\" \r  \n" +
       " \")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("\"\"")
@@ -353,9 +425,13 @@ public class FnNormalizeSpace extends QT3TestSet {
       "fn:normalize-space(\"\t\n" +
       "\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("\"\"")
@@ -373,9 +449,13 @@ public class FnNormalizeSpace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:normalize-space(\"\t12345\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "12345")
     );
@@ -389,9 +469,13 @@ public class FnNormalizeSpace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:normalize-space()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -405,9 +489,13 @@ public class FnNormalizeSpace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:normalize-space(fn:string(\" ABC \"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ABC")
     );
@@ -421,9 +509,13 @@ public class FnNormalizeSpace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:normalize-space(fn:normalize-space(\" ABC\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ABC")
     );
@@ -437,9 +529,13 @@ public class FnNormalizeSpace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:normalize-space(\"This\ttext should contains no tabs\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "This text should contains no tabs")
     );
@@ -454,9 +550,13 @@ public class FnNormalizeSpace extends QT3TestSet {
       "fn:normalize-space(\"This text should contains\n" +
       "no newline characters.\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "This text should contains no newline characters.")
     );
@@ -470,9 +570,13 @@ public class FnNormalizeSpace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:normalize-space(\"This\ttext\tshould\tcontains\tno\ttab\tcharacters.\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "This text should contains no tab characters.")
     );
@@ -492,9 +596,13 @@ public class FnNormalizeSpace extends QT3TestSet {
       "newline\n" +
       "characters.\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "This text should contains no newline characters.")
     );
@@ -509,9 +617,13 @@ public class FnNormalizeSpace extends QT3TestSet {
       "fn:normalize-space(\"This text\tshould contains no tabs or\n" +
       "newline characters.\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "This text should contains no tabs or newline characters.")
     );
@@ -526,9 +638,13 @@ public class FnNormalizeSpace extends QT3TestSet {
       "fn:normalize-space(\"This\t text\t should\t contains\n" +
       " no tabs or newline characters.\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "This text should contains no tabs or newline characters.")
     );
@@ -542,9 +658,13 @@ public class FnNormalizeSpace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:normalize-space(\"    \")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("\"\"")
@@ -562,10 +682,14 @@ public class FnNormalizeSpace extends QT3TestSet {
     final XQuery query = new XQuery(
       "//doc/normalize-space(zero-or-one(a[normalize-space() = 'Hello, How are you?']))",
       ctx);
-    query.context(node(file("fn/normalize-space/textWithSpaces.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/normalize-space/textWithSpaces.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Hello, How are you?")
     );
@@ -579,9 +703,13 @@ public class FnNormalizeSpace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:normalize-space(\"This is a charac\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "This is a charac")
     );
@@ -595,9 +723,13 @@ public class FnNormalizeSpace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:normalize-space(\"This is a ch\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "This is a ch")
     );
@@ -611,9 +743,13 @@ public class FnNormalizeSpace extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:normalize-space(\"This is a charac\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "This is a charac")
     );
@@ -627,9 +763,13 @@ public class FnNormalizeSpace extends QT3TestSet {
     final XQuery query = new XQuery(
       "normalize-space(())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("\"\"")

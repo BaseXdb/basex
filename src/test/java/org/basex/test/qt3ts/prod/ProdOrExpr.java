@@ -20,9 +20,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(\"\" or 0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -36,9 +40,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:anyURI(\"\") or 0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(0 or xs:anyURI(\"\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"a string\") or 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "0 or xs:untypedAtomic(\"a string\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "true() or (0, current-time())[1] treat as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,9 +140,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(0, current-time())[1] treat as xs:integer or true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -132,9 +160,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "current-date() or 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -148,9 +180,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "0 or current-date()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -164,9 +200,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "current-date() or current-date()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -180,9 +220,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "current-date() and current-date()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -196,9 +240,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(0 or 0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -212,9 +260,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 and current-date()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -228,9 +280,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "current-date() and 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -244,9 +300,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "count((1, 2, 3, timezone-from-time(current-time()), 4)) or false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -260,9 +320,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "false() or count((1, 2, 3, timezone-from-time(current-time()), 4))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -276,9 +340,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "count((1, 2, 3, timezone-from-time(current-time()), 4)) or count((1, 2, 3, timezone-from-time(current-time()), 4))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -292,9 +360,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "boolean((1, 2, 3, current-time())[1] treat as xs:integer) or boolean((1, 2, 3, current-time())[1] treat as xs:integer)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -308,9 +380,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "boolean((1, 2, 3, current-time())[1] treat as xs:integer) and true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -324,9 +400,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "true() or boolean((1, 2, 3, current-time())[1] treat as xs:integer)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -340,9 +420,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(\"\" and 0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -356,9 +440,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 and 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -372,9 +460,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(0 or 0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -388,9 +480,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "10.3 and \"non-zero length string\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -404,9 +500,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 and 5",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -420,9 +520,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not((1, current-time())[1] treat as xs:integer and false())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -436,9 +540,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(false() and (1, current-time())[1] treat as xs:integer)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -452,9 +560,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"example.com/\") and xs:anyURI(\"example.com/\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -468,9 +580,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:anyURI(\"example.com/\") and xs:anyURI(\"\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -484,9 +600,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:anyURI(\"\") and xs:anyURI(\"example.com/\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -500,9 +620,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"a string\") and xs:untypedAtomic(\"a string\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -516,9 +640,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:untypedAtomic(\"a string\") and xs:untypedAtomic(\"\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -532,9 +660,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "count((1, 2, 3, timezone-from-time(current-time()), 4)) and true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -548,9 +680,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(\"\" or 0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -564,9 +700,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "true() and count((1, 2, 3, timezone-from-time(current-time()), 4))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -580,9 +720,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "count((1, 2, 3, timezone-from-time(current-time()), 4)) and count((1, 2, 3, timezone-from-time(current-time()), 4))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -596,9 +740,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "boolean((1, 2, 3, current-time())[1] treat as xs:integer) and boolean((1, 2, 3, current-time())[1] treat as xs:integer)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -612,9 +760,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "boolean((1, 2, 3, current-time())[1] treat as xs:integer) and true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -628,9 +780,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "true() and boolean((1, 2, 3, current-time())[1] treat as xs:integer)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -644,9 +800,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"a string is ok\" and QName(\"\", \"local\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -660,9 +820,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"a string is ok\" or QName(\"\", \"local\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -680,9 +844,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 or 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -696,9 +864,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 or 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -712,9 +884,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 or 5",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -728,9 +904,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"example.com/\") or 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -744,9 +924,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "0 or xs:anyURI(\"example.com/\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -760,9 +944,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 OR 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -776,11 +964,115 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 AND 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
+    );
+  }
+
+  /**
+   *  test logical and .
+   */
+  @org.junit.Test
+  public void cbclLogicalAnd002() {
+    final XQuery query = new XQuery(
+      "declare function local:times-table($n as xs:integer) as xs:integer* { for $x in 1 to 12 return $x * $n }; (every $x in local:times-table(15) satisfies ($x mod 3 eq 0)) and (every $y in local:times-table(15) satisfies ($y mod 5 eq 0))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test logical and .
+   */
+  @org.junit.Test
+  public void cbclLogicalAnd003() {
+    final XQuery query = new XQuery(
+      "declare function local:factorial($n as xs:integer) as xs:integer { if ($n le 1) then 1 else $n * local:factorial($n - 1) }; declare function local:is-divisible($n as xs:integer, $d as xs:integer) { $n mod $d eq 0 }; not(local:is-divisible(local:factorial(5), 3)) and not(local:is-divisible(local:factorial(5), 2))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test logical or .
+   */
+  @org.junit.Test
+  public void cbclLogicalOr001() {
+    final XQuery query = new XQuery(
+      "declare function local:times-table($n as xs:integer) as xs:integer* { for $x in 1 to 12 return $x * $n }; (some $x in local:times-table(15) satisfies ($x mod 2 eq 0)) or (some $y in local:times-table(15) satisfies ($y mod 3 eq 0))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test logical or .
+   */
+  @org.junit.Test
+  public void cbclLogicalOr002() {
+    final XQuery query = new XQuery(
+      "declare function local:factorial($n as xs:integer) as xs:integer? { if ($n lt 1) then () else if ($n eq 1) then 1 else $n * local:factorial($n - 1) }; (every $x in local:factorial(5) satisfies ($x mod 3 eq 0)) or (every $y in local:factorial(5) satisfies ($y mod 5 eq 0))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test logical or .
+   */
+  @org.junit.Test
+  public void cbclLogicalOr003() {
+    final XQuery query = new XQuery(
+      "declare function local:factorial($n as xs:integer) as xs:integer { if ($n le 1) then 1 else $n * local:factorial($n - 1) }; declare function local:is-divisible($n as xs:integer, $d as xs:integer) { $n mod $d eq 0 }; not(local:is-divisible(local:factorial(5), 3)) or not(local:is-divisible(local:factorial(5), 2))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
     );
   }
 
@@ -792,9 +1084,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "false() and false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -808,9 +1104,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "true() and false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -824,9 +1124,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "false() and true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -840,9 +1144,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "true() and true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -856,9 +1164,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "() and ()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -872,9 +1184,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1) and ()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -888,9 +1204,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "() and (1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -904,9 +1224,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1) and (1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -920,9 +1244,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(0) and ()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -936,9 +1264,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "() and (0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -952,9 +1284,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(0) and (0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -968,9 +1304,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1) and (0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -984,9 +1324,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(0) and (1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1000,10 +1344,14 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(0) and (/bib/book/price/text())",
       ctx);
-    query.context(node(file("docs/bib.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/bib.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1017,10 +1365,14 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/bib/book/price/text()) and (1)",
       ctx);
-    query.context(node(file("docs/bib.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/bib.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1034,10 +1386,14 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/bib/book/price/text()) and (/bib/book/price/text())",
       ctx);
-    query.context(node(file("docs/bib.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/bib.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1051,9 +1407,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"\" and ''",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1067,9 +1427,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"\" and 'a'",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1083,9 +1447,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"0\" and ''",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1099,9 +1467,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"a\" and '0'",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1115,9 +1487,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"\") and xs:string('')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1131,9 +1507,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"\") and xs:string('abc')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1147,9 +1527,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"abc\") and xs:string('')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1163,9 +1547,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"0\") and xs:string('abc')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1179,9 +1567,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic('') and xs:untypedAtomic(\"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1195,9 +1587,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic('abc') and xs:untypedAtomic(\"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1211,9 +1607,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic('') and xs:untypedAtomic(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1227,9 +1627,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic('abc') and xs:untypedAtomic(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1243,9 +1647,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "0 and 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1259,9 +1667,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "0 and 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1275,9 +1687,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 and 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1291,9 +1707,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "0 and -1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1307,9 +1727,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "-1 and 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1323,9 +1747,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(0) and xs:float(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1339,9 +1767,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(0) and xs:float(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1355,9 +1787,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(-1) and xs:float(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1371,9 +1807,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(1) and xs:float(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1387,9 +1827,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float('NaN') and xs:float(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1403,9 +1847,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float('NaN') and xs:float(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1419,9 +1867,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float('NaN') and xs:float('NaN')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1435,9 +1887,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float('INF') and xs:float(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1451,9 +1907,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float('INF') and xs:float(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1467,9 +1927,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float('INF') and xs:float('NaN')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1483,9 +1947,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float('-INF') and xs:float(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1499,9 +1967,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float('-INF') and xs:float(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1515,9 +1987,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float('-INF') and xs:float('NaN')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1531,9 +2007,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float('-INF') and xs:float('INF')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1547,9 +2027,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(0) and xs:double(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1563,9 +2047,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(0) and xs:double(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1579,9 +2067,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(-1) and xs:double(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1595,9 +2087,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(1) and xs:double(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1611,9 +2107,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double('NaN') and xs:double(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1627,9 +2127,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double('NaN') and xs:double(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1643,9 +2147,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double('NaN') and xs:double('NaN')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1659,9 +2167,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double('INF') and xs:double(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1675,9 +2187,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double('INF') and xs:double(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1691,9 +2207,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double('INF') and xs:double('NaN')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1707,9 +2227,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double('-INF') and xs:double(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1723,9 +2247,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double('-INF') and xs:double(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1739,9 +2267,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double('-INF') and xs:double('NaN')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1755,9 +2287,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double('-INF') and xs:double('INF')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1771,9 +2307,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(0) and xs:decimal(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1787,9 +2327,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(0) and xs:decimal(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1803,9 +2347,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(-1) and xs:decimal(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1819,9 +2367,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(1) and xs:decimal(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1835,9 +2387,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(9.99999999999999999999999999) and xs:decimal(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(false)
@@ -1855,9 +2411,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(-123456789.123456789123456789) and xs:decimal(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1871,9 +2431,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(9.99999999999999999999999999) and xs:decimal(-123456789.123456789123456789)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -1891,9 +2455,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(0) and xs:integer(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1907,9 +2475,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(0) and xs:integer(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1923,9 +2495,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(-1) and xs:integer(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1939,9 +2515,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(1) and xs:integer(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1955,9 +2535,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(99999999999999999) and xs:integer(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1971,9 +2555,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(-99999999999999999) and xs:integer(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1987,9 +2575,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(99999999999999999) and xs:integer(-99999999999999999)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2003,9 +2595,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(0) and xs:nonPositiveInteger(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2019,9 +2615,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(0) and xs:nonPositiveInteger(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2035,9 +2635,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(-1) and xs:nonPositiveInteger(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2051,9 +2655,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(-1) and xs:nonPositiveInteger(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2067,9 +2675,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(-99999999999999999) and xs:nonPositiveInteger(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2083,9 +2695,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(-1) and xs:nonPositiveInteger(-9999999999)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2099,9 +2715,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(-99999999999999999) and xs:nonPositiveInteger(-99999999999999999)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2115,9 +2735,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(0) and xs:nonNegativeInteger(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2131,9 +2755,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(0) and xs:nonNegativeInteger(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2147,9 +2775,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(1) and xs:nonNegativeInteger(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2163,9 +2795,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(1) and xs:nonNegativeInteger(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2179,9 +2815,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(9999999999) and xs:nonNegativeInteger(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2195,9 +2835,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(1) and xs:nonNegativeInteger(99999999999999999)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2211,9 +2855,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(99999999999999999) and xs:nonNegativeInteger(99999999999999999)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2227,9 +2875,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:negativeInteger(-1) and xs:negativeInteger(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2243,9 +2895,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:negativeInteger(-99999999999999999) and xs:negativeInteger(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2259,9 +2915,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:negativeInteger(-99999999999999999) and xs:negativeInteger(-99999999999999999)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2275,9 +2935,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(1) and xs:positiveInteger(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2291,9 +2955,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(99999999999999999) and xs:positiveInteger(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2307,9 +2975,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(99999999999999999) and xs:positiveInteger(99999999999999999)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2323,9 +2995,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(0) and xs:long(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2339,9 +3015,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(0) and xs:long(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2355,9 +3035,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(-1) and xs:long(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2371,9 +3055,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(1) and xs:long(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2387,9 +3075,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(9223372036854775807) and xs:long(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2403,9 +3095,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(9223372036854775807) and xs:long(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2419,9 +3115,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(-99999999999999999) and xs:long(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2435,9 +3135,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(-99999999999999999) and xs:long(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2451,9 +3155,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(99999999999999999) and xs:long(-99999999999999999)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2467,9 +3175,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(0) and xs:unsignedLong(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2483,9 +3195,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(0) and xs:unsignedLong(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2499,9 +3215,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(1) and xs:unsignedLong(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2515,9 +3235,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(1) and xs:unsignedLong(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2531,9 +3255,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(9223372036854775807) and xs:unsignedLong(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2547,9 +3275,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(9223372036854775807) and xs:unsignedLong(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2563,9 +3295,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(99999999999999999) and xs:unsignedLong(99999999999999999)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2579,9 +3315,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(0) and xs:int(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2595,9 +3335,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(0) and xs:int(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2611,9 +3355,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(-1) and xs:int(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2627,9 +3375,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(1) and xs:int(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2643,9 +3395,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(2147483647) and xs:int(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2659,9 +3415,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(2147483647) and xs:int(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2675,9 +3435,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(-2147483648) and xs:int(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2691,9 +3455,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(-2147483648) and xs:int(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2707,9 +3475,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(2147483647) and xs:int(-2147483648)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2723,9 +3495,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedInt(0) and xs:unsignedInt(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2739,9 +3515,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedInt(0) and xs:unsignedInt(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2755,9 +3535,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedInt(1) and xs:unsignedInt(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2771,9 +3555,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedInt(1) and xs:unsignedInt(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2787,9 +3575,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedInt(4294967295) and xs:unsignedInt(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2803,9 +3595,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedInt(4294967295) and xs:unsignedInt(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2819,9 +3615,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedInt(4294967295) and xs:unsignedInt(4294967295)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2835,9 +3635,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(0) and xs:short(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2851,9 +3655,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(0) and xs:short(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2867,9 +3675,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(-1) and xs:short(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2883,9 +3695,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(1) and xs:short(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2899,9 +3715,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(32767) and xs:short(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2915,9 +3735,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(32767) and xs:short(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2931,9 +3755,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(-32768) and xs:short(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2947,9 +3775,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(-32768) and xs:short(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2963,9 +3795,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(32767) and xs:short(-32768)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2979,9 +3815,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(0) and xs:unsignedShort(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2995,9 +3835,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(0) and xs:unsignedShort(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3011,9 +3855,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(1) and xs:unsignedShort(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3027,9 +3875,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(1) and xs:unsignedShort(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3043,9 +3895,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(65535) and xs:unsignedShort(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3059,9 +3915,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(65535) and xs:unsignedShort(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3075,9 +3935,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(65535) and xs:unsignedShort(65535)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3091,9 +3955,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:byte(0) and xs:byte(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3107,9 +3975,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:byte(0) and xs:byte(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3123,9 +3995,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:byte(-1) and xs:byte(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3139,9 +4015,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:byte(1) and xs:byte(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3155,9 +4035,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:byte(127) and xs:byte(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3171,9 +4055,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:byte(127) and xs:byte(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3187,9 +4075,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:byte(-128) and xs:byte(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3203,9 +4095,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:byte(-128) and xs:byte(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3219,9 +4115,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:byte(127) and xs:byte(-128)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3235,9 +4135,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedByte(0) and xs:unsignedByte(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3251,9 +4155,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedByte(0) and xs:unsignedByte(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3267,9 +4175,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedByte(1) and xs:unsignedByte(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3283,9 +4195,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedByte(1) and xs:unsignedByte(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3299,9 +4215,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedByte(255) and xs:unsignedByte(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3315,9 +4235,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedByte(255) and xs:unsignedByte(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3331,9 +4255,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedByte(255) and xs:unsignedByte(255)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3347,9 +4275,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "false() or false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3363,9 +4295,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "true() or false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3379,9 +4315,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "false() or true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3395,9 +4335,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "true() or true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3411,9 +4355,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "() or ()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3427,9 +4375,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1) or ()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3443,9 +4395,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "() or (1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3459,9 +4415,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1) or (1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3475,9 +4435,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(0) or ()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3491,9 +4455,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "() or (0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3507,9 +4475,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(0) or (0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3523,9 +4495,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1) or (0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3539,9 +4515,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(0) or (1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3555,10 +4535,14 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(0) or (/bib/book/price/text())",
       ctx);
-    query.context(node(file("docs/bib.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/bib.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3572,10 +4556,14 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/bib/book/price/text()) or (1)",
       ctx);
-    query.context(node(file("docs/bib.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/bib.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3589,10 +4577,14 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/bib/book/price/text()) or (/bib/book/price/text())",
       ctx);
-    query.context(node(file("docs/bib.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/bib.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3606,9 +4598,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"\" or ''",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3622,9 +4618,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"\" or 'a'",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3638,9 +4638,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"0\" or ''",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3654,9 +4658,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"a\" or '0'",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3670,9 +4678,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"\") or xs:string('')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3686,9 +4698,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"\") or xs:string('abc')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3702,9 +4718,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"abc\") or xs:string('')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3718,9 +4738,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"0\") or xs:string('abc')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3734,9 +4758,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic('') or xs:untypedAtomic(\"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3750,9 +4778,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic('abc') or xs:untypedAtomic(\"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3766,9 +4798,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic('') or xs:untypedAtomic(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3782,9 +4818,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic('abc') or xs:untypedAtomic(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3798,9 +4838,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "0 or 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3814,9 +4858,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "0 or 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3830,9 +4878,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 or 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3846,9 +4898,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "0 or -1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3862,9 +4918,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "-1 or 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3878,9 +4938,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(0) or xs:float(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3894,9 +4958,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(0) or xs:float(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3910,9 +4978,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(-1) or xs:float(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3926,9 +4998,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(1) or xs:float(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3942,9 +5018,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float('NaN') or xs:float(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3958,9 +5038,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float('NaN') or xs:float(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3974,9 +5058,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float('NaN') or xs:float('NaN')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3990,9 +5078,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float('INF') or xs:float(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4006,9 +5098,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float('INF') or xs:float(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4022,9 +5118,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float('INF') or xs:float('NaN')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4038,9 +5138,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float('-INF') or xs:float(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4054,9 +5158,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float('-INF') or xs:float(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4070,9 +5178,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float('-INF') or xs:float('NaN')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4086,9 +5198,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float('-INF') or xs:float('INF')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4102,9 +5218,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(0) or xs:double(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4118,9 +5238,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(0) or xs:double(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4134,9 +5258,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(-1) or xs:double(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4150,9 +5278,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(1) or xs:double(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4166,9 +5298,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double('NaN') or xs:double(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4182,9 +5318,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double('NaN') or xs:double(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4198,9 +5338,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double('NaN') or xs:double('NaN')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4214,9 +5358,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double('INF') or xs:double(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4230,9 +5378,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double('INF') or xs:double(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4246,9 +5398,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double('INF') or xs:double('NaN')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4262,9 +5418,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double('-INF') or xs:double(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4278,9 +5438,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double('-INF') or xs:double(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4294,9 +5458,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double('-INF') or xs:double('NaN')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4310,9 +5478,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double('-INF') or xs:double('INF')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4326,9 +5498,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(0) or xs:decimal(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4342,9 +5518,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(0) or xs:decimal(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4358,9 +5538,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(-1) or xs:decimal(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4374,9 +5558,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(1) or xs:decimal(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4390,9 +5578,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(9.99999999999999999999999999) or xs:decimal(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -4410,9 +5602,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(-123456789.123456789123456789) or xs:decimal(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4426,9 +5622,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(9.99999999999999999999999999) or xs:decimal(-123456789.123456789123456789)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -4446,9 +5646,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(0) or xs:integer(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4462,9 +5666,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(0) or xs:integer(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4478,9 +5686,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(-1) or xs:integer(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4494,9 +5706,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(1) or xs:integer(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4510,9 +5726,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(99999999999999999) or xs:integer(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4526,9 +5746,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(-99999999999999999) or xs:integer(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4542,9 +5766,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(99999999999999999) or xs:integer(-99999999999999999)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4558,9 +5786,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(0) or xs:nonPositiveInteger(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4574,9 +5806,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(0) or xs:nonPositiveInteger(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4590,9 +5826,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(-1) or xs:nonPositiveInteger(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4606,9 +5846,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(-1) or xs:nonPositiveInteger(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4622,9 +5866,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(-99999999999999999) or xs:nonPositiveInteger(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4638,9 +5886,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(-1) or xs:nonPositiveInteger(-99999999999999999)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4654,9 +5906,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(-99999999999999999) or xs:nonPositiveInteger(-99999999999999999)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4670,9 +5926,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(0) or xs:nonNegativeInteger(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4686,9 +5946,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(0) or xs:nonNegativeInteger(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4702,9 +5966,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(1) or xs:nonNegativeInteger(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4718,9 +5986,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(1) or xs:nonNegativeInteger(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4734,9 +6006,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(99999999999999999) or xs:nonNegativeInteger(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4750,9 +6026,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(1) or xs:nonNegativeInteger(99999999999999999)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4766,9 +6046,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(99999999999999999) or xs:nonNegativeInteger(99999999999999999)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4782,9 +6066,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:negativeInteger(-1) or xs:negativeInteger(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4798,9 +6086,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:negativeInteger(-99999999999999999) or xs:negativeInteger(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4814,9 +6106,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:negativeInteger(-99999999999999999) or xs:negativeInteger(-99999999999999999)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4830,9 +6126,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(1) or xs:positiveInteger(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4846,9 +6146,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(99999999999999999) or xs:positiveInteger(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4862,9 +6166,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(99999999999999999) or xs:positiveInteger(99999999999999999)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4878,9 +6186,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(0) or xs:long(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4894,9 +6206,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(0) or xs:long(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4910,9 +6226,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(-1) or xs:long(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4926,9 +6246,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(1) or xs:long(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4942,9 +6266,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(9223372036854775807) or xs:long(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4958,9 +6286,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(9223372036854775807) or xs:long(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4974,9 +6306,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(-99999999999999999) or xs:long(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4990,9 +6326,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(-99999999999999999) or xs:long(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5006,9 +6346,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(99999999999999999) or xs:long(-99999999999999999)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5022,9 +6366,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(0) or xs:unsignedLong(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5038,9 +6386,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(0) or xs:unsignedLong(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5054,9 +6406,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(1) or xs:unsignedLong(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5070,9 +6426,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(1) or xs:unsignedLong(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5086,9 +6446,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(9223372036854775807) or xs:unsignedLong(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5102,9 +6466,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(9223372036854775807) or xs:unsignedLong(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5118,9 +6486,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(99999999999999999) or xs:unsignedLong(99999999999999999)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5134,9 +6506,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(0) or xs:int(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5150,9 +6526,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(0) or xs:int(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5166,9 +6546,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(-1) or xs:int(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5182,9 +6566,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(1) or xs:int(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5198,9 +6586,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(2147483647) or xs:int(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5214,9 +6606,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(2147483647) or xs:int(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5230,9 +6626,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(-2147483648) or xs:int(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5246,9 +6646,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(-2147483648) or xs:int(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5262,9 +6666,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(2147483647) or xs:int(-2147483648)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5278,9 +6686,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedInt(0) or xs:unsignedInt(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5294,9 +6706,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedInt(0) or xs:unsignedInt(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5310,9 +6726,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedInt(1) or xs:unsignedInt(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5326,9 +6746,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedInt(1) or xs:unsignedInt(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5342,9 +6766,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedInt(4294967295) or xs:unsignedInt(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5358,9 +6786,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedInt(4294967295) or xs:unsignedInt(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5374,9 +6806,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedInt(4294967295) or xs:unsignedInt(4294967295)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5390,9 +6826,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(0) or xs:short(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5406,9 +6846,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(0) or xs:short(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5422,9 +6866,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(-1) or xs:short(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5438,9 +6886,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(1) or xs:short(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5454,9 +6906,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(32767) or xs:short(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5470,9 +6926,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(32767) or xs:short(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5486,9 +6946,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(-32768) or xs:short(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5502,9 +6966,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(-32768) or xs:short(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5518,9 +6986,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(32767) or xs:short(-32768)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5534,9 +7006,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(0) or xs:unsignedShort(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5550,9 +7026,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(0) or xs:unsignedShort(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5566,9 +7046,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(1) or xs:unsignedShort(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5582,9 +7066,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(1) or xs:unsignedShort(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5598,9 +7086,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(65535) or xs:unsignedShort(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5614,9 +7106,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(65535) or xs:unsignedShort(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5630,9 +7126,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(65535) or xs:unsignedShort(65535)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5646,9 +7146,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:byte(0) or xs:byte(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5662,9 +7166,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:byte(0) or xs:byte(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5678,9 +7186,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:byte(-1) or xs:byte(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5694,9 +7206,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:byte(1) or xs:byte(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5710,9 +7226,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:byte(127) or xs:byte(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5726,9 +7246,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:byte(127) or xs:byte(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5742,9 +7266,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:byte(-128) or xs:byte(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5758,9 +7286,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:byte(-128) or xs:byte(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5774,9 +7306,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:byte(127) or xs:byte(-128)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5790,9 +7326,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedByte(0) or xs:unsignedByte(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5806,9 +7346,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedByte(0) or xs:unsignedByte(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5822,9 +7366,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedByte(1) or xs:unsignedByte(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5838,9 +7386,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedByte(1) or xs:unsignedByte(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5854,9 +7406,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedByte(255) or xs:unsignedByte(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5870,9 +7426,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedByte(255) or xs:unsignedByte(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5886,9 +7446,13 @@ public class ProdOrExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedByte(255) or xs:unsignedByte(255)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );

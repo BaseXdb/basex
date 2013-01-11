@@ -20,9 +20,13 @@ public class FnFunctionArity extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:function-arity()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnFunctionArity extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:function-arity#0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -52,9 +60,13 @@ public class FnFunctionArity extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:function-arity( fn:dateTime#2, fn:dateTime#2 )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -68,9 +80,13 @@ public class FnFunctionArity extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:function-arity#2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -84,9 +100,13 @@ public class FnFunctionArity extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(fn:function-arity#1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class FnFunctionArity extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:function-arity( () )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -116,9 +140,13 @@ public class FnFunctionArity extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:function-arity( 1 )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -132,9 +160,13 @@ public class FnFunctionArity extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:function-arity( fn:analyze-string((), \"unused\") )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -148,9 +180,13 @@ public class FnFunctionArity extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:function-arity( (fn:concat#2, fn:concat#3) )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -169,9 +205,13 @@ public class FnFunctionArity extends QT3TestSet {
       "                                 then 1\n" +
       "                                 else fn:dateTime#2 ) )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -190,9 +230,13 @@ public class FnFunctionArity extends QT3TestSet {
       "                                 then ()\n" +
       "                                 else fn:dateTime#2 ) )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -206,9 +250,13 @@ public class FnFunctionArity extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:function-arity( fn:substring#2 )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertType("xs:integer")
     );
@@ -222,9 +270,13 @@ public class FnFunctionArity extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:function-arity( fn:dateTime#2 )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2")
     );
@@ -238,9 +290,13 @@ public class FnFunctionArity extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:function-arity( fn:concat#99 )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "99")
     );
@@ -254,9 +310,13 @@ public class FnFunctionArity extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:function-arity( fn:concat#340282366920938463463374607431768211456 )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("FOAR0002")
@@ -274,9 +334,13 @@ public class FnFunctionArity extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:function-arity( function($node){name($node)} )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -291,9 +355,13 @@ public class FnFunctionArity extends QT3TestSet {
       "fn:function-arity( function($arg1, $arg2)\n" +
       "                               { subsequence($arg1, $arg2, 1) } )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2")
     );
@@ -308,9 +376,13 @@ public class FnFunctionArity extends QT3TestSet {
       "let $initial := fn:substring(?, 1, 1) \n" +
       "            return fn:function-arity( $initial )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -324,9 +396,14 @@ public class FnFunctionArity extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:function-arity( math:pow(?, 10) )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -347,9 +424,13 @@ public class FnFunctionArity extends QT3TestSet {
       "\tfn:function-arity( local:add#3 )\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "3")
     );
@@ -370,9 +451,13 @@ public class FnFunctionArity extends QT3TestSet {
       "\tfn:function-arity( local:add(1, 2, ?) )\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );

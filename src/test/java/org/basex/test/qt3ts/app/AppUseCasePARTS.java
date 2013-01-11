@@ -29,10 +29,14 @@ public class AppUseCasePARTS extends QT3TestSet {
       "                     return local:one_level($p) } </parttree>\n" +
       "      ",
       ctx);
-    query.context(node(file("docs/partlist.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/partlist.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<parttree><part partid=\"0\" name=\"car\"><part partid=\"1\" name=\"engine\"><part partid=\"3\" name=\"piston\"/></part><part partid=\"2\" name=\"door\"><part partid=\"4\" name=\"window\"/><part partid=\"5\" name=\"lock\"/></part></part><part partid=\"10\" name=\"skateboard\"><part partid=\"11\" name=\"board\"/><part partid=\"12\" name=\"wheel\"/></part><part partid=\"20\" name=\"canoe\"/></parttree>", false)

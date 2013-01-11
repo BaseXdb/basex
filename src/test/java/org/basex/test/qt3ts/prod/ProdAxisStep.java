@@ -20,10 +20,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/child::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -37,10 +41,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/child::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Child.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Child.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -54,10 +62,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/child::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeRepeat.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeRepeat.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("6")
     );
@@ -71,10 +83,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/child::south-east)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -88,10 +104,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/child::south-east)",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Child.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Child.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -105,10 +125,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/child::south-east)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -122,10 +146,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/child::south-east)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeRepeat.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeRepeat.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -139,10 +167,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/child::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -156,10 +188,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/child::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Text.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Text.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -173,10 +209,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/child::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Child.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Child.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -190,10 +230,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/child::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeRepeat.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeRepeat.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("19")
     );
@@ -207,10 +251,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -224,10 +272,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/*)",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Child.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Child.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -241,10 +293,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeRepeat.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeRepeat.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("6")
     );
@@ -258,10 +314,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/south-east)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -275,10 +335,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/south-east)",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Child.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Child.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -292,10 +356,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/south-east)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -309,10 +377,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/south-east)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeRepeat.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeRepeat.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -326,10 +398,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -343,10 +419,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/node())",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Text.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Text.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -360,10 +440,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/node())",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Child.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Child.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -377,10 +461,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeRepeat.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeRepeat.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("19")
     );
@@ -394,10 +482,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//west/attribute::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -411,10 +503,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//west/attribute::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Child.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Child.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -428,10 +524,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//west/attribute::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("4")
     );
@@ -445,10 +545,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//west/attribute::west-attr-2)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -462,10 +566,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//west/attribute::west-attr-2)",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Child.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Child.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -479,10 +587,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//west/attribute::west-attr-2)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -496,10 +608,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//west/attribute::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -513,10 +629,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//west/attribute::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Child.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Child.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -530,10 +650,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//west/attribute::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("4")
     );
@@ -547,10 +671,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//west/@*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -564,10 +692,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//west/@*)",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Child.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Child.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -581,10 +713,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//west/@*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("4")
     );
@@ -598,10 +734,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//west/@west-attr-2)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -615,10 +755,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//west/@west-attr-2)",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Child.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Child.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -632,10 +776,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//west/@west-attr-2)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -649,10 +797,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count( / )",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -666,10 +818,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/parent::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -683,10 +839,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/far-north/parent::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -700,10 +860,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/parent::near-north)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -717,10 +881,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/parent::nowhere)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -734,10 +902,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/parent::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -751,10 +923,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/far-north/parent::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -768,10 +944,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/..)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -785,10 +965,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/self::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -802,10 +986,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/self::center)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -819,10 +1007,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/self::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -836,10 +1028,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/@center-attr-3/self::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -853,10 +1049,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/text()/self::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -870,10 +1070,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/text()/self::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Text.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Text.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -887,10 +1091,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/descendant::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -904,10 +1112,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/descendant::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Text.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Text.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -921,10 +1133,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/descendant::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Child.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Child.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -938,10 +1154,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/descendant::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5")
     );
@@ -955,10 +1175,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/descendant::south)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -972,10 +1196,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/descendant::south)",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Child.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Child.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -989,10 +1217,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/descendant::south)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1006,10 +1238,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/descendant::south)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeStack.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeStack.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("8")
     );
@@ -1023,10 +1259,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/descendant::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1040,10 +1280,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/descendant::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Text.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Text.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1057,10 +1301,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/descendant::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Child.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Child.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1074,10 +1322,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/descendant::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("21")
     );
@@ -1091,10 +1343,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/descendant-or-self::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1108,10 +1364,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/descendant-or-self::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("6")
     );
@@ -1125,10 +1385,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/descendant-or-self::south)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1142,10 +1406,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/descendant-or-self::south)",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Child.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Child.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1159,10 +1427,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/descendant-or-self::south)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1176,10 +1448,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/descendant-or-self::south)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeStack.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeStack.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("8")
     );
@@ -1193,10 +1469,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/descendant-or-self::center)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1210,10 +1490,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/descendant-or-self::center)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeRepeat.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeRepeat.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("9")
     );
@@ -1227,10 +1511,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/descendant-or-self::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1244,10 +1532,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/descendant-or-self::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("22")
     );
@@ -1261,10 +1553,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/@center-attr-3/descendant-or-self::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1278,10 +1574,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/text()/descendant-or-self::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1295,10 +1595,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/text()/descendant-or-self::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Text.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Text.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1312,10 +1616,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/child::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1329,10 +1637,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/child::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TopMany.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TopMany.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1346,10 +1658,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/child::far-north)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1363,10 +1679,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/child::far-north)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1380,10 +1700,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/child::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1397,10 +1721,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/child::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TopMany.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TopMany.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("7")
     );
@@ -1414,10 +1742,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1431,10 +1763,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TopMany.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TopMany.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1448,10 +1784,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/far-north)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1465,10 +1805,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/far-north)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1482,10 +1826,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1499,10 +1847,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TopMany.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TopMany.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("7")
     );
@@ -1516,10 +1868,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/self::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TopMany.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TopMany.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1533,10 +1889,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/descendant::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1550,10 +1910,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/descendant::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("15")
     );
@@ -1567,10 +1931,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/descendant::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TopMany.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TopMany.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("16")
     );
@@ -1584,10 +1952,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/descendant::south)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1601,10 +1973,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/descendant::south)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1618,10 +1994,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/descendant::south)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1635,10 +2015,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/descendant::south)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeStack.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeStack.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("8")
     );
@@ -1652,10 +2036,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/descendant::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1669,10 +2057,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/descendant::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("56")
     );
@@ -1686,10 +2078,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/descendant::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TopMany.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TopMany.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("58")
     );
@@ -1703,10 +2099,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/descendant-or-self::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1720,10 +2120,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/descendant-or-self::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("15")
     );
@@ -1737,10 +2141,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/descendant-or-self::south)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1754,10 +2162,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/descendant-or-self::south)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1771,10 +2183,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/descendant-or-self::south)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1788,10 +2204,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/descendant-or-self::south)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeStack.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeStack.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("8")
     );
@@ -1805,10 +2225,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/descendant-or-self::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("57")
     );
@@ -1822,10 +2246,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/descendant-or-self::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TopMany.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TopMany.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("59")
     );
@@ -1839,10 +2267,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//child::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1856,10 +2288,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//child::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("15")
     );
@@ -1873,10 +2309,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//child::south)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1890,10 +2330,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//child::south)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1907,10 +2351,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//child::south)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1924,10 +2372,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//child::south)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeStack.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeStack.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("8")
     );
@@ -1941,10 +2393,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//child::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1958,10 +2414,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//child::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("56")
     );
@@ -1975,10 +2435,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//child::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TopMany.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TopMany.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("58")
     );
@@ -1992,10 +2456,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2009,10 +2477,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("15")
     );
@@ -2026,10 +2498,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//south)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2043,10 +2519,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//south)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2060,10 +2540,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//south)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2077,10 +2561,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//south)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeStack.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeStack.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("8")
     );
@@ -2094,10 +2582,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2111,10 +2603,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("56")
     );
@@ -2128,10 +2624,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TopMany.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TopMany.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("58")
     );
@@ -2145,10 +2645,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//attribute::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2162,10 +2666,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//attribute::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2179,10 +2687,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//attribute::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("14")
     );
@@ -2196,10 +2708,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//attribute::mark)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2213,10 +2729,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//attribute::mark)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2230,10 +2750,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//attribute::mark)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("6")
     );
@@ -2247,10 +2771,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//@*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2264,10 +2792,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//@*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2281,10 +2813,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//@*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("14")
     );
@@ -2298,10 +2834,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//@mark)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2315,10 +2855,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//@mark)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2332,10 +2876,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//@mark)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("6")
     );
@@ -2349,10 +2897,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//self::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2366,10 +2918,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//self::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("15")
     );
@@ -2383,10 +2939,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//self::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("57")
     );
@@ -2400,10 +2960,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//self::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TopMany.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TopMany.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("59")
     );
@@ -2417,10 +2981,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center//child::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2434,10 +3002,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center//child::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Text.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Text.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2451,10 +3023,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center//child::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Child.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Child.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2468,10 +3044,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center//child::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeRepeat.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeRepeat.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("12")
     );
@@ -2485,10 +3065,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center//child::south)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2502,10 +3086,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center//child::south)",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Child.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Child.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2519,10 +3107,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center//child::south)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2536,10 +3128,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center//child::south)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeStack.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeStack.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("8")
     );
@@ -2553,10 +3149,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center//child::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2570,10 +3170,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center//child::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Child.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Child.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2587,10 +3191,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center//child::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Text.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Text.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2604,10 +3212,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center//child::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeRepeat.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeRepeat.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("37")
     );
@@ -2621,10 +3233,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center//*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2638,10 +3254,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center//*)",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Child.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Child.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2655,10 +3275,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center//*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeRepeat.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeRepeat.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("12")
     );
@@ -2672,10 +3296,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center//south)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2689,10 +3317,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center//south)",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Child.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Child.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2706,10 +3338,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center//south)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2723,10 +3359,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center//south)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeStack.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeStack.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("8")
     );
@@ -2740,10 +3380,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center//node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2757,10 +3401,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center//node())",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Child.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Child.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2774,10 +3422,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center//node())",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Text.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Text.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2791,10 +3443,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center//node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeRepeat.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeRepeat.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("37")
     );
@@ -2808,10 +3464,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//west//attribute::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2825,10 +3485,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//west//attribute::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Child.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Child.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2842,10 +3506,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//west//attribute::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("4")
     );
@@ -2859,10 +3527,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center//attribute::center-attr-2)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2876,10 +3548,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center//attribute::center-attr-2)",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Child.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Child.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2893,10 +3569,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center//attribute::center-attr-2)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2910,10 +3590,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center//attribute::center-attr-2)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeRepeat.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeRepeat.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("4")
     );
@@ -2927,10 +3611,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//west//attribute::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2944,10 +3632,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//west//attribute::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Child.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Child.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2961,10 +3653,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//west//attribute::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("4")
     );
@@ -2978,10 +3674,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//west//@*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2995,10 +3695,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//west//@*)",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Child.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Child.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -3012,10 +3716,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//west//@*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("4")
     );
@@ -3029,10 +3737,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center//@center-attr-2)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -3046,10 +3758,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center//@center-attr-2)",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Child.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Child.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -3063,10 +3779,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center//@center-attr-2)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeCompass.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -3080,10 +3800,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center//@center-attr-2)",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeRepeat.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeRepeat.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("4")
     );
@@ -3097,10 +3821,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "<root> {//Customers} </root>",
       ctx);
-    query.context(node(file("prod/AxisStep/nw_Customers.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/nw_Customers.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<root><Customers CustomerID=\"ALFKI\">\n\t\t<CompanyName>Alfreds Futterkiste</CompanyName>\n\t\t<ContactName>Maria Anders</ContactName>\n\t\t<ContactTitle>Sales Representative</ContactTitle>\n\t\t<Phone>030-0074321</Phone>\n\t\t<Fax>030-0076545</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Obere Str. 57</Address>\n\t\t\t<City>Berlin</City>\n\t\t\t<PostalCode>12209</PostalCode>\n\t\t\t<Country>Germany</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"ANATR\">\n\t\t<CompanyName>Ana Trujillo Emparedados y helados</CompanyName>\n\t\t<ContactName>Ana Trujillo</ContactName>\n\t\t<ContactTitle>Owner</ContactTitle>\n\t\t<Phone>(5) 555-4729</Phone>\n\t\t<Fax>(5) 555-3745</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Avda. de la Constituci&#243;n 2222</Address>\n\t\t\t<City>M&#233;xico D.F.</City>\n\t\t\t<PostalCode>05021</PostalCode>\n\t\t\t<Country>Mexico</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"ANTON\">\n\t\t<CompanyName>Antonio Moreno Taquer&#237;a</CompanyName>\n\t\t<ContactName>Antonio Moreno</ContactName>\n\t\t<ContactTitle>Owner</ContactTitle>\n\t\t<Phone>(5) 555-3932</Phone>\n\t\t<FullAddress>\n\t\t\t<Address>Mataderos  2312</Address>\n\t\t\t<City>M&#233;xico D.F.</City>\n\t\t\t<PostalCode>05023</PostalCode>\n\t\t\t<Country>Mexico</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"AROUT\">\n\t\t<CompanyName>Around the Horn</CompanyName>\n\t\t<ContactName>Thomas Hardy</ContactName>\n\t\t<ContactTitle>Sales Representative</ContactTitle>\n\t\t<Phone>(171) 555-7788</Phone>\n\t\t<Fax>(171) 555-6750</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>120 Hanover Sq.</Address>\n\t\t\t<City>London</City>\n\t\t\t<PostalCode>WA1 1DP</PostalCode>\n\t\t\t<Country>UK</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"BERGS\">\n\t\t<CompanyName>Berglunds snabbk&#246;p</CompanyName>\n\t\t<ContactName>Christina Berglund</ContactName>\n\t\t<ContactTitle>Order Administrator</ContactTitle>\n\t\t<Phone>0921-12 34 65</Phone>\n\t\t<Fax>0921-12 34 67</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Berguvsv&#228;gen  8</Address>\n\t\t\t<City>Lule&#229;</City>\n\t\t\t<PostalCode>S-958 22</PostalCode>\n\t\t\t<Country>Sweden</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"BLAUS\">\n\t\t<CompanyName>Blauer See Delikatessen</CompanyName>\n\t\t<ContactName>Hanna Moos</ContactName>\n\t\t<ContactTitle>Sales Representative</ContactTitle>\n\t\t<Phone>0621-08460</Phone>\n\t\t<Fax>0621-08924</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Forsterstr. 57</Address>\n\t\t\t<City>Mannheim</City>\n\t\t\t<PostalCode>68306</PostalCode>\n\t\t\t<Country>Germany</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"BLONP\">\n\t\t<CompanyName>Blondesddsl p&#232;re et fils</CompanyName>\n\t\t<ContactName>Fr&#233;d&#233;rique Citeaux</ContactName>\n\t\t<ContactTitle>Marketing Manager</ContactTitle>\n\t\t<Phone>88.60.15.31</Phone>\n\t\t<Fax>88.60.15.32</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>24, place Kl&#233;ber</Address>\n\t\t\t<City>Strasbourg</City>\n\t\t\t<PostalCode>67000</PostalCode>\n\t\t\t<Country>France</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"BOLID\">\n\t\t<CompanyName>B&#243;lido Comidas preparadas</CompanyName>\n\t\t<ContactName>Mart&#237;n Sommer</ContactName>\n\t\t<ContactTitle>Owner</ContactTitle>\n\t\t<Phone>(91) 555 22 82</Phone>\n\t\t<Fax>(91) 555 91 99</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>C/ Araquil, 67</Address>\n\t\t\t<City>Madrid</City>\n\t\t\t<PostalCode>28023</PostalCode>\n\t\t\t<Country>Spain</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"BONAP\">\n\t\t<CompanyName>Bon app'</CompanyName>\n\t\t<ContactName>Laurence Lebihan</ContactName>\n\t\t<ContactTitle>Owner</ContactTitle>\n\t\t<Phone>91.24.45.40</Phone>\n\t\t<Fax>91.24.45.41</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>12, rue des Bouchers</Address>\n\t\t\t<City>Marseille</City>\n\t\t\t<PostalCode>13008</PostalCode>\n\t\t\t<Country>France</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"BOTTM\">\n\t\t<CompanyName>Bottom-Dollar Markets</CompanyName>\n\t\t<ContactName>Elizabeth Lincoln</ContactName>\n\t\t<ContactTitle>Accounting Manager</ContactTitle>\n\t\t<Phone>(604) 555-4729</Phone>\n\t\t<Fax>(604) 555-3745</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>23 Tsawassen Blvd.</Address>\n\t\t\t<City>Tsawassen</City>\n\t\t\t<Region>BC</Region>\n\t\t\t<PostalCode>T2F 8M4</PostalCode>\n\t\t\t<Country>Canada</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"BSBEV\">\n\t\t<CompanyName>B's Beverages</CompanyName>\n\t\t<ContactName>Victoria Ashworth</ContactName>\n\t\t<ContactTitle>Sales Representative</ContactTitle>\n\t\t<Phone>(171) 555-1212</Phone>\n\t\t<FullAddress>\n\t\t\t<Address>Fauntleroy Circus</Address>\n\t\t\t<City>London</City>\n\t\t\t<PostalCode>EC2 5NT</PostalCode>\n\t\t\t<Country>UK</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"CACTU\">\n\t\t<CompanyName>Cactus Comidas para llevar</CompanyName>\n\t\t<ContactName>Patricio Simpson</ContactName>\n\t\t<ContactTitle>Sales Agent</ContactTitle>\n\t\t<Phone>(1) 135-5555</Phone>\n\t\t<Fax>(1) 135-4892</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Cerrito 333</Address>\n\t\t\t<City>Buenos Aires</City>\n\t\t\t<PostalCode>1010</PostalCode>\n\t\t\t<Country>Argentina</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"CENTC\">\n\t\t<CompanyName>Centro comercial Moctezuma</CompanyName>\n\t\t<ContactName>Francisco Chang</ContactName>\n\t\t<ContactTitle>Marketing Manager</ContactTitle>\n\t\t<Phone>(5) 555-3392</Phone>\n\t\t<Fax>(5) 555-7293</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Sierras de Granada 9993</Address>\n\t\t\t<City>M&#233;xico D.F.</City>\n\t\t\t<PostalCode>05022</PostalCode>\n\t\t\t<Country>Mexico</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"CHOPS\">\n\t\t<CompanyName>Chop-suey Chinese</CompanyName>\n\t\t<ContactName>Yang Wang</ContactName>\n\t\t<ContactTitle>Owner</ContactTitle>\n\t\t<Phone>0452-076545</Phone>\n\t\t<FullAddress>\n\t\t\t<Address>Hauptstr. 29</Address>\n\t\t\t<City>Bern</City>\n\t\t\t<PostalCode>3012</PostalCode>\n\t\t\t<Country>Switzerland</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"COMMI\">\n\t\t<CompanyName>Com&#233;rcio Mineiro</CompanyName>\n\t\t<ContactName>Pedro Afonso</ContactName>\n\t\t<ContactTitle>Sales Associate</ContactTitle>\n\t\t<Phone>(11) 555-7647</Phone>\n\t\t<FullAddress>\n\t\t\t<Address>Av. dos Lus&#237;adas, 23</Address>\n\t\t\t<City>Sao Paulo</City>\n\t\t\t<Region>SP</Region>\n\t\t\t<PostalCode>05432-043</PostalCode>\n\t\t\t<Country>Brazil</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"CONSH\">\n\t\t<CompanyName>Consolidated Holdings</CompanyName>\n\t\t<ContactName>Elizabeth Brown</ContactName>\n\t\t<ContactTitle>Sales Representative</ContactTitle>\n\t\t<Phone>(171) 555-2282</Phone>\n\t\t<Fax>(171) 555-9199</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Berkeley Gardens 12  Brewery</Address>\n\t\t\t<City>London</City>\n\t\t\t<PostalCode>WX1 6LT</PostalCode>\n\t\t\t<Country>UK</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"DRACD\">\n\t\t<CompanyName>Drachenblut Delikatessen</CompanyName>\n\t\t<ContactName>Sven Ottlieb</ContactName>\n\t\t<ContactTitle>Order Administrator</ContactTitle>\n\t\t<Phone>0241-039123</Phone>\n\t\t<Fax>0241-059428</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Walserweg 21</Address>\n\t\t\t<City>Aachen</City>\n\t\t\t<PostalCode>52066</PostalCode>\n\t\t\t<Country>Germany</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"DUMON\">\n\t\t<CompanyName>Du monde entier</CompanyName>\n\t\t<ContactName>Janine Labrune</ContactName>\n\t\t<ContactTitle>Owner</ContactTitle>\n\t\t<Phone>40.67.88.88</Phone>\n\t\t<Fax>40.67.89.89</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>67, rue des Cinquante Otages</Address>\n\t\t\t<City>Nantes</City>\n\t\t\t<PostalCode>44000</PostalCode>\n\t\t\t<Country>France</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"EASTC\">\n\t\t<CompanyName>Eastern Connection</CompanyName>\n\t\t<ContactName>Ann Devon</ContactName>\n\t\t<ContactTitle>Sales Agent</ContactTitle>\n\t\t<Phone>(171) 555-0297</Phone>\n\t\t<Fax>(171) 555-3373</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>35 King George</Address>\n\t\t\t<City>London</City>\n\t\t\t<PostalCode>WX3 6FW</PostalCode>\n\t\t\t<Country>UK</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"ERNSH\">\n\t\t<CompanyName>Ernst Handel</CompanyName>\n\t\t<ContactName>Roland Mendel</ContactName>\n\t\t<ContactTitle>Sales Manager</ContactTitle>\n\t\t<Phone>7675-3425</Phone>\n\t\t<Fax>7675-3426</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Kirchgasse 6</Address>\n\t\t\t<City>Graz</City>\n\t\t\t<PostalCode>8010</PostalCode>\n\t\t\t<Country>Austria</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"FAMIA\">\n\t\t<CompanyName>Familia Arquibaldo</CompanyName>\n\t\t<ContactName>Aria Cruz</ContactName>\n\t\t<ContactTitle>Marketing Assistant</ContactTitle>\n\t\t<Phone>(11) 555-9857</Phone>\n\t\t<FullAddress>\n\t\t\t<Address>Rua Or&#243;s, 92</Address>\n\t\t\t<City>Sao Paulo</City>\n\t\t\t<Region>SP</Region>\n\t\t\t<PostalCode>05442-030</PostalCode>\n\t\t\t<Country>Brazil</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"FISSA\">\n\t\t<CompanyName>FISSA Fabrica Inter. Salchichas S.A.</CompanyName>\n\t\t<ContactName>Diego Roel</ContactName>\n\t\t<ContactTitle>Accounting Manager</ContactTitle>\n\t\t<Phone>(91) 555 94 44</Phone>\n\t\t<Fax>(91) 555 55 93</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>C/ Moralzarzal, 86</Address>\n\t\t\t<City>Madrid</City>\n\t\t\t<PostalCode>28034</PostalCode>\n\t\t\t<Country>Spain</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"FOLIG\">\n\t\t<CompanyName>Folies gourmandes</CompanyName>\n\t\t<ContactName>Martine Ranc&#233;</ContactName>\n\t\t<ContactTitle>Assistant Sales Agent</ContactTitle>\n\t\t<Phone>20.16.10.16</Phone>\n\t\t<Fax>20.16.10.17</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>184, chauss&#233;e de Tournai</Address>\n\t\t\t<City>Lille</City>\n\t\t\t<PostalCode>59000</PostalCode>\n\t\t\t<Country>France</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"FOLKO\">\n\t\t<CompanyName>Folk och f&#228; HB</CompanyName>\n\t\t<ContactName>Maria Larsson</ContactName>\n\t\t<ContactTitle>Owner</ContactTitle>\n\t\t<Phone>0695-34 67 21</Phone>\n\t\t<FullAddress>\n\t\t\t<Address>&#197;kergatan 24</Address>\n\t\t\t<City>Br&#228;cke</City>\n\t\t\t<PostalCode>S-844 67</PostalCode>\n\t\t\t<Country>Sweden</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"FRANK\">\n\t\t<CompanyName>Frankenversand</CompanyName>\n\t\t<ContactName>Peter Franken</ContactName>\n\t\t<ContactTitle>Marketing Manager</ContactTitle>\n\t\t<Phone>089-0877310</Phone>\n\t\t<Fax>089-0877451</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Berliner Platz 43</Address>\n\t\t\t<City>M&#252;nchen</City>\n\t\t\t<PostalCode>80805</PostalCode>\n\t\t\t<Country>Germany</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"FRANR\">\n\t\t<CompanyName>France restauration</CompanyName>\n\t\t<ContactName>Carine Schmitt</ContactName>\n\t\t<ContactTitle>Marketing Manager</ContactTitle>\n\t\t<Phone>40.32.21.21</Phone>\n\t\t<Fax>40.32.21.20</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>54, rue Royale</Address>\n\t\t\t<City>Nantes</City>\n\t\t\t<PostalCode>44000</PostalCode>\n\t\t\t<Country>France</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"FRANS\">\n\t\t<CompanyName>Franchi S.p.A.</CompanyName>\n\t\t<ContactName>Paolo Accorti</ContactName>\n\t\t<ContactTitle>Sales Representative</ContactTitle>\n\t\t<Phone>011-4988260</Phone>\n\t\t<Fax>011-4988261</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Via Monte Bianco 34</Address>\n\t\t\t<City>Torino</City>\n\t\t\t<PostalCode>10100</PostalCode>\n\t\t\t<Country>Italy</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"FURIB\">\n\t\t<CompanyName>Furia Bacalhau e Frutos do Mar</CompanyName>\n\t\t<ContactName>Lino Rodriguez</ContactName>\n\t\t<ContactTitle>Sales Manager</ContactTitle>\n\t\t<Phone>(1) 354-2534</Phone>\n\t\t<Fax>(1) 354-2535</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Jardim das rosas n. 32</Address>\n\t\t\t<City>Lisboa</City>\n\t\t\t<PostalCode>1675</PostalCode>\n\t\t\t<Country>Portugal</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"GALED\">\n\t\t<CompanyName>Galer&#237;a del gastr&#243;nomo</CompanyName>\n\t\t<ContactName>Eduardo Saavedra</ContactName>\n\t\t<ContactTitle>Marketing Manager</ContactTitle>\n\t\t<Phone>(93) 203 4560</Phone>\n\t\t<Fax>(93) 203 4561</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Rambla de Catalu&#241;a, 23</Address>\n\t\t\t<City>Barcelona</City>\n\t\t\t<PostalCode>08022</PostalCode>\n\t\t\t<Country>Spain</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"GODOS\">\n\t\t<CompanyName>Godos Cocina T&#237;pica</CompanyName>\n\t\t<ContactName>Jos&#233; Pedro Freyre</ContactName>\n\t\t<ContactTitle>Sales Manager</ContactTitle>\n\t\t<Phone>(95) 555 82 82</Phone>\n\t\t<FullAddress>\n\t\t\t<Address>C/ Romero, 33</Address>\n\t\t\t<City>Sevilla</City>\n\t\t\t<PostalCode>41101</PostalCode>\n\t\t\t<Country>Spain</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"GOURL\">\n\t\t<CompanyName>Gourmet Lanchonetes</CompanyName>\n\t\t<ContactName>Andr&#233; Fonseca</ContactName>\n\t\t<ContactTitle>Sales Associate</ContactTitle>\n\t\t<Phone>(11) 555-9482</Phone>\n\t\t<FullAddress>\n\t\t\t<Address>Av. Brasil, 442</Address>\n\t\t\t<City>Campinas</City>\n\t\t\t<Region>SP</Region>\n\t\t\t<PostalCode>04876-786</PostalCode>\n\t\t\t<Country>Brazil</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"GREAL\">\n\t\t<CompanyName>Great Lakes Food Market</CompanyName>\n\t\t<ContactName>Howard Snyder</ContactName>\n\t\t<ContactTitle>Marketing Manager</ContactTitle>\n\t\t<Phone>(503) 555-7555</Phone>\n\t\t<FullAddress>\n\t\t\t<Address>2732 Baker Blvd.</Address>\n\t\t\t<City>Eugene</City>\n\t\t\t<Region>OR</Region>\n\t\t\t<PostalCode>97403</PostalCode>\n\t\t\t<Country>USA</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"GROSR\">\n\t\t<CompanyName>GROSELLA-Restaurante</CompanyName>\n\t\t<ContactName>Manuel Pereira</ContactName>\n\t\t<ContactTitle>Owner</ContactTitle>\n\t\t<Phone>(2) 283-2951</Phone>\n\t\t<Fax>(2) 283-3397</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>5&#170; Ave. Los Palos Grandes</Address>\n\t\t\t<City>Caracas</City>\n\t\t\t<Region>DF</Region>\n\t\t\t<PostalCode>1081</PostalCode>\n\t\t\t<Country>Venezuela</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"HANAR\">\n\t\t<CompanyName>Hanari Carnes</CompanyName>\n\t\t<ContactName>Mario Pontes</ContactName>\n\t\t<ContactTitle>Accounting Manager</ContactTitle>\n\t\t<Phone>(21) 555-0091</Phone>\n\t\t<Fax>(21) 555-8765</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Rua do Pa&#231;o, 67</Address>\n\t\t\t<City>Rio de Janeiro</City>\n\t\t\t<Region>RJ</Region>\n\t\t\t<PostalCode>05454-876</PostalCode>\n\t\t\t<Country>Brazil</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"HILAA\">\n\t\t<CompanyName>HILARION-Abastos</CompanyName>\n\t\t<ContactName>Carlos Hern&#225;ndez</ContactName>\n\t\t<ContactTitle>Sales Representative</ContactTitle>\n\t\t<Phone>(5) 555-1340</Phone>\n\t\t<Fax>(5) 555-1948</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Carrera 22 con Ave. Carlos Soublette #8-35</Address>\n\t\t\t<City>San Crist&#243;bal</City>\n\t\t\t<Region>T&#225;chira</Region>\n\t\t\t<PostalCode>5022</PostalCode>\n\t\t\t<Country>Venezuela</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"HUNGC\">\n\t\t<CompanyName>Hungry Coyote Import Store</CompanyName>\n\t\t<ContactName>Yoshi Latimer</ContactName>\n\t\t<ContactTitle>Sales Representative</ContactTitle>\n\t\t<Phone>(503) 555-6874</Phone>\n\t\t<Fax>(503) 555-2376</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>City Center Plaza 516 Main St.</Address>\n\t\t\t<City>Elgin</City>\n\t\t\t<Region>OR</Region>\n\t\t\t<PostalCode>97827</PostalCode>\n\t\t\t<Country>USA</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"HUNGO\">\n\t\t<CompanyName>Hungry Owl All-Night Grocers</CompanyName>\n\t\t<ContactName>Patricia McKenna</ContactName>\n\t\t<ContactTitle>Sales Associate</ContactTitle>\n\t\t<Phone>2967 542</Phone>\n\t\t<Fax>2967 3333</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>8 Johnstown Road</Address>\n\t\t\t<City>Cork</City>\n\t\t\t<Region>Co. Cork</Region>\n\t\t\t<Country>Ireland</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"ISLAT\">\n\t\t<CompanyName>Island Trading</CompanyName>\n\t\t<ContactName>Helen Bennett</ContactName>\n\t\t<ContactTitle>Marketing Manager</ContactTitle>\n\t\t<Phone>(198) 555-8888</Phone>\n\t\t<FullAddress>\n\t\t\t<Address>Garden House Crowther Way</Address>\n\t\t\t<City>Cowes</City>\n\t\t\t<Region>Isle of Wight</Region>\n\t\t\t<PostalCode>PO31 7PJ</PostalCode>\n\t\t\t<Country>UK</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"KOENE\">\n\t\t<CompanyName>K&#246;niglich Essen</CompanyName>\n\t\t<ContactName>Philip Cramer</ContactName>\n\t\t<ContactTitle>Sales Associate</ContactTitle>\n\t\t<Phone>0555-09876</Phone>\n\t\t<FullAddress>\n\t\t\t<Address>Maubelstr. 90</Address>\n\t\t\t<City>Brandenburg</City>\n\t\t\t<PostalCode>14776</PostalCode>\n\t\t\t<Country>Germany</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"LACOR\">\n\t\t<CompanyName>La corne d'abondance</CompanyName>\n\t\t<ContactName>Daniel Tonini</ContactName>\n\t\t<ContactTitle>Sales Representative</ContactTitle>\n\t\t<Phone>30.59.84.10</Phone>\n\t\t<Fax>30.59.85.11</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>67, avenue de l'Europe</Address>\n\t\t\t<City>Versailles</City>\n\t\t\t<PostalCode>78000</PostalCode>\n\t\t\t<Country>France</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"LAMAI\">\n\t\t<CompanyName>La maison d'Asie</CompanyName>\n\t\t<ContactName>Annette Roulet</ContactName>\n\t\t<ContactTitle>Sales Manager</ContactTitle>\n\t\t<Phone>61.77.61.10</Phone>\n\t\t<Fax>61.77.61.11</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>1 rue Alsace-Lorraine</Address>\n\t\t\t<City>Toulouse</City>\n\t\t\t<PostalCode>31000</PostalCode>\n\t\t\t<Country>France</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"LAUGB\">\n\t\t<CompanyName>Laughing Bacchus Wine Cellars</CompanyName>\n\t\t<ContactName>Yoshi Tannamuri</ContactName>\n\t\t<ContactTitle>Marketing Assistant</ContactTitle>\n\t\t<Phone>(604) 555-3392</Phone>\n\t\t<Fax>(604) 555-7293</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>1900 Oak St.</Address>\n\t\t\t<City>Vancouver</City>\n\t\t\t<Region>BC</Region>\n\t\t\t<PostalCode>V3F 2K1</PostalCode>\n\t\t\t<Country>Canada</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"LAZYK\">\n\t\t<CompanyName>Lazy K Kountry Store</CompanyName>\n\t\t<ContactName>John Steel</ContactName>\n\t\t<ContactTitle>Marketing Manager</ContactTitle>\n\t\t<Phone>(509) 555-7969</Phone>\n\t\t<Fax>(509) 555-6221</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>12 Orchestra Terrace</Address>\n\t\t\t<City>Walla Walla</City>\n\t\t\t<Region>WA</Region>\n\t\t\t<PostalCode>99362</PostalCode>\n\t\t\t<Country>USA</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"LEHMS\">\n\t\t<CompanyName>Lehmanns Marktstand</CompanyName>\n\t\t<ContactName>Renate Messner</ContactName>\n\t\t<ContactTitle>Sales Representative</ContactTitle>\n\t\t<Phone>069-0245984</Phone>\n\t\t<Fax>069-0245874</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Magazinweg 7</Address>\n\t\t\t<City>Frankfurt a.M.</City>\n\t\t\t<PostalCode>60528</PostalCode>\n\t\t\t<Country>Germany</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"LETSS\">\n\t\t<CompanyName>Let's Stop N Shop</CompanyName>\n\t\t<ContactName>Jaime Yorres</ContactName>\n\t\t<ContactTitle>Owner</ContactTitle>\n\t\t<Phone>(415) 555-5938</Phone>\n\t\t<FullAddress>\n\t\t\t<Address>87 Polk St. Suite 5</Address>\n\t\t\t<City>San Francisco</City>\n\t\t\t<Region>CA</Region>\n\t\t\t<PostalCode>94117</PostalCode>\n\t\t\t<Country>USA</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"LILAS\">\n\t\t<CompanyName>LILA-Supermercado</CompanyName>\n\t\t<ContactName>Carlos Gonz&#225;lez</ContactName>\n\t\t<ContactTitle>Accounting Manager</ContactTitle>\n\t\t<Phone>(9) 331-6954</Phone>\n\t\t<Fax>(9) 331-7256</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Carrera 52 con Ave. Bol&#237;var #65-98 Llano Largo</Address>\n\t\t\t<City>Barquisimeto</City>\n\t\t\t<Region>Lara</Region>\n\t\t\t<PostalCode>3508</PostalCode>\n\t\t\t<Country>Venezuela</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"LINOD\">\n\t\t<CompanyName>LINO-Delicateses</CompanyName>\n\t\t<ContactName>Felipe Izquierdo</ContactName>\n\t\t<ContactTitle>Owner</ContactTitle>\n\t\t<Phone>(8) 34-56-12</Phone>\n\t\t<Fax>(8) 34-93-93</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Ave. 5 de Mayo Porlamar</Address>\n\t\t\t<City>I. de Margarita</City>\n\t\t\t<Region>Nueva Esparta</Region>\n\t\t\t<PostalCode>4980</PostalCode>\n\t\t\t<Country>Venezuela</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"LONEP\">\n\t\t<CompanyName>Lonesome Pine Restaurant</CompanyName>\n\t\t<ContactName>Fran Wilson</ContactName>\n\t\t<ContactTitle>Sales Manager</ContactTitle>\n\t\t<Phone>(503) 555-9573</Phone>\n\t\t<Fax>(503) 555-9646</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>89 Chiaroscuro Rd.</Address>\n\t\t\t<City>Portland</City>\n\t\t\t<Region>OR</Region>\n\t\t\t<PostalCode>97219</PostalCode>\n\t\t\t<Country>USA</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"MAGAA\">\n\t\t<CompanyName>Magazzini Alimentari Riuniti</CompanyName>\n\t\t<ContactName>Giovanni Rovelli</ContactName>\n\t\t<ContactTitle>Marketing Manager</ContactTitle>\n\t\t<Phone>035-640230</Phone>\n\t\t<Fax>035-640231</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Via Ludovico il Moro 22</Address>\n\t\t\t<City>Bergamo</City>\n\t\t\t<PostalCode>24100</PostalCode>\n\t\t\t<Country>Italy</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"MAISD\">\n\t\t<CompanyName>Maison Dewey</CompanyName>\n\t\t<ContactName>Catherine Dewey</ContactName>\n\t\t<ContactTitle>Sales Agent</ContactTitle>\n\t\t<Phone>(02) 201 24 67</Phone>\n\t\t<Fax>(02) 201 24 68</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Rue Joseph-Bens 532</Address>\n\t\t\t<City>Bruxelles</City>\n\t\t\t<PostalCode>B-1180</PostalCode>\n\t\t\t<Country>Belgium</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"MEREP\">\n\t\t<CompanyName>M&#232;re Paillarde</CompanyName>\n\t\t<ContactName>Jean Fresni&#232;re</ContactName>\n\t\t<ContactTitle>Marketing Assistant</ContactTitle>\n\t\t<Phone>(514) 555-8054</Phone>\n\t\t<Fax>(514) 555-8055</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>43 rue St. Laurent</Address>\n\t\t\t<City>Montr&#233;al</City>\n\t\t\t<Region>Qu&#233;bec</Region>\n\t\t\t<PostalCode>H1J 1C3</PostalCode>\n\t\t\t<Country>Canada</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"MORGK\">\n\t\t<CompanyName>Morgenstern Gesundkost</CompanyName>\n\t\t<ContactName>Alexander Feuer</ContactName>\n\t\t<ContactTitle>Marketing Assistant</ContactTitle>\n\t\t<Phone>0342-023176</Phone>\n\t\t<FullAddress>\n\t\t\t<Address>Heerstr. 22</Address>\n\t\t\t<City>Leipzig</City>\n\t\t\t<PostalCode>04179</PostalCode>\n\t\t\t<Country>Germany</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"NORTS\">\n\t\t<CompanyName>North/South</CompanyName>\n\t\t<ContactName>Simon Crowther</ContactName>\n\t\t<ContactTitle>Sales Associate</ContactTitle>\n\t\t<Phone>(171) 555-7733</Phone>\n\t\t<Fax>(171) 555-2530</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>South House 300 Queensbridge</Address>\n\t\t\t<City>London</City>\n\t\t\t<PostalCode>SW7 1RZ</PostalCode>\n\t\t\t<Country>UK</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"OCEAN\">\n\t\t<CompanyName>Oc&#233;ano Atl&#225;ntico Ltda.</CompanyName>\n\t\t<ContactName>Yvonne Moncada</ContactName>\n\t\t<ContactTitle>Sales Agent</ContactTitle>\n\t\t<Phone>(1) 135-5333</Phone>\n\t\t<Fax>(1) 135-5535</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Ing. Gustavo Moncada 8585 Piso 20-A</Address>\n\t\t\t<City>Buenos Aires</City>\n\t\t\t<PostalCode>1010</PostalCode>\n\t\t\t<Country>Argentina</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"OLDWO\">\n\t\t<CompanyName>Old World Delicatessen</CompanyName>\n\t\t<ContactName>Rene Phillips</ContactName>\n\t\t<ContactTitle>Sales Representative</ContactTitle>\n\t\t<Phone>(907) 555-7584</Phone>\n\t\t<Fax>(907) 555-2880</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>2743 Bering St.</Address>\n\t\t\t<City>Anchorage</City>\n\t\t\t<Region>AK</Region>\n\t\t\t<PostalCode>99508</PostalCode>\n\t\t\t<Country>USA</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"OTTIK\">\n\t\t<CompanyName>Ottilies K&#228;seladen</CompanyName>\n\t\t<ContactName>Henriette Pfalzheim</ContactName>\n\t\t<ContactTitle>Owner</ContactTitle>\n\t\t<Phone>0221-0644327</Phone>\n\t\t<Fax>0221-0765721</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Mehrheimerstr. 369</Address>\n\t\t\t<City>K&#246;ln</City>\n\t\t\t<PostalCode>50739</PostalCode>\n\t\t\t<Country>Germany</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"PARIS\">\n\t\t<CompanyName>Paris sp&#233;cialit&#233;s</CompanyName>\n\t\t<ContactName>Marie Bertrand</ContactName>\n\t\t<ContactTitle>Owner</ContactTitle>\n\t\t<Phone>(1) 42.34.22.66</Phone>\n\t\t<Fax>(1) 42.34.22.77</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>265, boulevard Charonne</Address>\n\t\t\t<City>Paris</City>\n\t\t\t<PostalCode>75012</PostalCode>\n\t\t\t<Country>France</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"PERIC\">\n\t\t<CompanyName>Pericles Comidas cl&#225;sicas</CompanyName>\n\t\t<ContactName>Guillermo Fern&#225;ndez</ContactName>\n\t\t<ContactTitle>Sales Representative</ContactTitle>\n\t\t<Phone>(5) 552-3745</Phone>\n\t\t<Fax>(5) 545-3745</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Calle Dr. Jorge Cash 321</Address>\n\t\t\t<City>M&#233;xico D.F.</City>\n\t\t\t<PostalCode>05033</PostalCode>\n\t\t\t<Country>Mexico</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"PICCO\">\n\t\t<CompanyName>Piccolo und mehr</CompanyName>\n\t\t<ContactName>Georg Pipps</ContactName>\n\t\t<ContactTitle>Sales Manager</ContactTitle>\n\t\t<Phone>6562-9722</Phone>\n\t\t<Fax>6562-9723</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Geislweg 14</Address>\n\t\t\t<City>Salzburg</City>\n\t\t\t<PostalCode>5020</PostalCode>\n\t\t\t<Country>Austria</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"PRINI\">\n\t\t<CompanyName>Princesa Isabel Vinhos</CompanyName>\n\t\t<ContactName>Isabel de Castro</ContactName>\n\t\t<ContactTitle>Sales Representative</ContactTitle>\n\t\t<Phone>(1) 356-5634</Phone>\n\t\t<FullAddress>\n\t\t\t<Address>Estrada da sa&#250;de n. 58</Address>\n\t\t\t<City>Lisboa</City>\n\t\t\t<PostalCode>1756</PostalCode>\n\t\t\t<Country>Portugal</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"QUEDE\">\n\t\t<CompanyName>Que Del&#237;cia</CompanyName>\n\t\t<ContactName>Bernardo Batista</ContactName>\n\t\t<ContactTitle>Accounting Manager</ContactTitle>\n\t\t<Phone>(21) 555-4252</Phone>\n\t\t<Fax>(21) 555-4545</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Rua da Panificadora, 12</Address>\n\t\t\t<City>Rio de Janeiro</City>\n\t\t\t<Region>RJ</Region>\n\t\t\t<PostalCode>02389-673</PostalCode>\n\t\t\t<Country>Brazil</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"QUEEN\">\n\t\t<CompanyName>Queen Cozinha</CompanyName>\n\t\t<ContactName>L&#250;cia Carvalho</ContactName>\n\t\t<ContactTitle>Marketing Assistant</ContactTitle>\n\t\t<Phone>(11) 555-1189</Phone>\n\t\t<FullAddress>\n\t\t\t<Address>Alameda dos Can&#224;rios, 891</Address>\n\t\t\t<City>Sao Paulo</City>\n\t\t\t<Region>SP</Region>\n\t\t\t<PostalCode>05487-020</PostalCode>\n\t\t\t<Country>Brazil</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"QUICK\">\n\t\t<CompanyName>QUICK-Stop</CompanyName>\n\t\t<ContactName>Horst Kloss</ContactName>\n\t\t<ContactTitle>Accounting Manager</ContactTitle>\n\t\t<Phone>0372-035188</Phone>\n\t\t<FullAddress>\n\t\t\t<Address>Taucherstra&#223;e 10</Address>\n\t\t\t<City>Cunewalde</City>\n\t\t\t<PostalCode>01307</PostalCode>\n\t\t\t<Country>Germany</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"RANCH\">\n\t\t<CompanyName>Rancho grande</CompanyName>\n\t\t<ContactName>Sergio Guti&#233;rrez</ContactName>\n\t\t<ContactTitle>Sales Representative</ContactTitle>\n\t\t<Phone>(1) 123-5555</Phone>\n\t\t<Fax>(1) 123-5556</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Av. del Libertador 900</Address>\n\t\t\t<City>Buenos Aires</City>\n\t\t\t<PostalCode>1010</PostalCode>\n\t\t\t<Country>Argentina</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"RATTC\">\n\t\t<CompanyName>Rattlesnake Canyon Grocery</CompanyName>\n\t\t<ContactName>Paula Wilson</ContactName>\n\t\t<ContactTitle>Assistant Sales Representative</ContactTitle>\n\t\t<Phone>(505) 555-5939</Phone>\n\t\t<Fax>(505) 555-3620</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>2817 Milton Dr.</Address>\n\t\t\t<City>Albuquerque</City>\n\t\t\t<Region>NM</Region>\n\t\t\t<PostalCode>87110</PostalCode>\n\t\t\t<Country>USA</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"REGGC\">\n\t\t<CompanyName>Reggiani Caseifici</CompanyName>\n\t\t<ContactName>Maurizio Moroni</ContactName>\n\t\t<ContactTitle>Sales Associate</ContactTitle>\n\t\t<Phone>0522-556721</Phone>\n\t\t<Fax>0522-556722</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Strada Provinciale 124</Address>\n\t\t\t<City>Reggio Emilia</City>\n\t\t\t<PostalCode>42100</PostalCode>\n\t\t\t<Country>Italy</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"RICAR\">\n\t\t<CompanyName>Ricardo Adocicados</CompanyName>\n\t\t<ContactName>Janete Limeira</ContactName>\n\t\t<ContactTitle>Assistant Sales Agent</ContactTitle>\n\t\t<Phone>(21) 555-3412</Phone>\n\t\t<FullAddress>\n\t\t\t<Address>Av. Copacabana, 267</Address>\n\t\t\t<City>Rio de Janeiro</City>\n\t\t\t<Region>RJ</Region>\n\t\t\t<PostalCode>02389-890</PostalCode>\n\t\t\t<Country>Brazil</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"RICSU\">\n\t\t<CompanyName>Richter Supermarkt</CompanyName>\n\t\t<ContactName>Michael Holz</ContactName>\n\t\t<ContactTitle>Sales Manager</ContactTitle>\n\t\t<Phone>0897-034214</Phone>\n\t\t<FullAddress>\n\t\t\t<Address>Grenzacherweg 237</Address>\n\t\t\t<City>Gen&#232;ve</City>\n\t\t\t<PostalCode>1203</PostalCode>\n\t\t\t<Country>Switzerland</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"ROMEY\">\n\t\t<CompanyName>Romero y tomillo</CompanyName>\n\t\t<ContactName>Alejandra Camino</ContactName>\n\t\t<ContactTitle>Accounting Manager</ContactTitle>\n\t\t<Phone>(91) 745 6200</Phone>\n\t\t<Fax>(91) 745 6210</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Gran V&#237;a, 1</Address>\n\t\t\t<City>Madrid</City>\n\t\t\t<PostalCode>28001</PostalCode>\n\t\t\t<Country>Spain</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"SANTG\">\n\t\t<CompanyName>Sant&#233; Gourmet</CompanyName>\n\t\t<ContactName>Jonas Bergulfsen</ContactName>\n\t\t<ContactTitle>Owner</ContactTitle>\n\t\t<Phone>07-98 92 35</Phone>\n\t\t<Fax>07-98 92 47</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Erling Skakkes gate 78</Address>\n\t\t\t<City>Stavern</City>\n\t\t\t<PostalCode>4110</PostalCode>\n\t\t\t<Country>Norway</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"SAVEA\">\n\t\t<CompanyName>Save-a-lot Markets</CompanyName>\n\t\t<ContactName>Jose Pavarotti</ContactName>\n\t\t<ContactTitle>Sales Representative</ContactTitle>\n\t\t<Phone>(208) 555-8097</Phone>\n\t\t<FullAddress>\n\t\t\t<Address>187 Suffolk Ln.</Address>\n\t\t\t<City>Boise</City>\n\t\t\t<Region>ID</Region>\n\t\t\t<PostalCode>83720</PostalCode>\n\t\t\t<Country>USA</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"SEVES\">\n\t\t<CompanyName>Seven Seas Imports</CompanyName>\n\t\t<ContactName>Hari Kumar</ContactName>\n\t\t<ContactTitle>Sales Manager</ContactTitle>\n\t\t<Phone>(171) 555-1717</Phone>\n\t\t<Fax>(171) 555-5646</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>90 Wadhurst Rd.</Address>\n\t\t\t<City>London</City>\n\t\t\t<PostalCode>OX15 4NB</PostalCode>\n\t\t\t<Country>UK</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"SIMOB\">\n\t\t<CompanyName>Simons bistro</CompanyName>\n\t\t<ContactName>Jytte Petersen</ContactName>\n\t\t<ContactTitle>Owner</ContactTitle>\n\t\t<Phone>31 12 34 56</Phone>\n\t\t<Fax>31 13 35 57</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Vinb&#230;ltet 34</Address>\n\t\t\t<City>Kobenhavn</City>\n\t\t\t<PostalCode>1734</PostalCode>\n\t\t\t<Country>Denmark</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"SPECD\">\n\t\t<CompanyName>Sp&#233;cialit&#233;s du monde</CompanyName>\n\t\t<ContactName>Dominique Perrier</ContactName>\n\t\t<ContactTitle>Marketing Manager</ContactTitle>\n\t\t<Phone>(1) 47.55.60.10</Phone>\n\t\t<Fax>(1) 47.55.60.20</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>25, rue Lauriston</Address>\n\t\t\t<City>Paris</City>\n\t\t\t<PostalCode>75016</PostalCode>\n\t\t\t<Country>France</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"SPLIR\">\n\t\t<CompanyName>Split Rail Beer &amp; Ale</CompanyName>\n\t\t<ContactName>Art Braunschweiger</ContactName>\n\t\t<ContactTitle>Sales Manager</ContactTitle>\n\t\t<Phone>(307) 555-4680</Phone>\n\t\t<Fax>(307) 555-6525</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>P.O. Box 555</Address>\n\t\t\t<City>Lander</City>\n\t\t\t<Region>WY</Region>\n\t\t\t<PostalCode>82520</PostalCode>\n\t\t\t<Country>USA</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"SUPRD\">\n\t\t<CompanyName>Supr&#234;mes d&#233;lices</CompanyName>\n\t\t<ContactName>Pascale Cartrain</ContactName>\n\t\t<ContactTitle>Accounting Manager</ContactTitle>\n\t\t<Phone>(071) 23 67 22 20</Phone>\n\t\t<Fax>(071) 23 67 22 21</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Boulevard Tirou, 255</Address>\n\t\t\t<City>Charleroi</City>\n\t\t\t<PostalCode>B-6000</PostalCode>\n\t\t\t<Country>Belgium</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"THEBI\">\n\t\t<CompanyName>The Big Cheese</CompanyName>\n\t\t<ContactName>Liz Nixon</ContactName>\n\t\t<ContactTitle>Marketing Manager</ContactTitle>\n\t\t<Phone>(503) 555-3612</Phone>\n\t\t<FullAddress>\n\t\t\t<Address>89 Jefferson Way Suite 2</Address>\n\t\t\t<City>Portland</City>\n\t\t\t<Region>OR</Region>\n\t\t\t<PostalCode>97201</PostalCode>\n\t\t\t<Country>USA</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"THECR\">\n\t\t<CompanyName>The Cracker Box</CompanyName>\n\t\t<ContactName>Liu Wong</ContactName>\n\t\t<ContactTitle>Marketing Assistant</ContactTitle>\n\t\t<Phone>(406) 555-5834</Phone>\n\t\t<Fax>(406) 555-8083</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>55 Grizzly Peak Rd.</Address>\n\t\t\t<City>Butte</City>\n\t\t\t<Region>MT</Region>\n\t\t\t<PostalCode>59801</PostalCode>\n\t\t\t<Country>USA</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"TOMSP\">\n\t\t<CompanyName>Toms Spezialit&#228;ten</CompanyName>\n\t\t<ContactName>Karin Josephs</ContactName>\n\t\t<ContactTitle>Marketing Manager</ContactTitle>\n\t\t<Phone>0251-031259</Phone>\n\t\t<Fax>0251-035695</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Luisenstr. 48</Address>\n\t\t\t<City>M&#252;nster</City>\n\t\t\t<PostalCode>44087</PostalCode>\n\t\t\t<Country>Germany</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"TORTU\">\n\t\t<CompanyName>Tortuga Restaurante</CompanyName>\n\t\t<ContactName>Miguel Angel Paolino</ContactName>\n\t\t<ContactTitle>Owner</ContactTitle>\n\t\t<Phone>(5) 555-2933</Phone>\n\t\t<FullAddress>\n\t\t\t<Address>Avda. Azteca 123</Address>\n\t\t\t<City>M&#233;xico D.F.</City>\n\t\t\t<PostalCode>05033</PostalCode>\n\t\t\t<Country>Mexico</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"TRADH\">\n\t\t<CompanyName>Tradi&#231;&#227;o Hipermercados</CompanyName>\n\t\t<ContactName>Anabela Domingues</ContactName>\n\t\t<ContactTitle>Sales Representative</ContactTitle>\n\t\t<Phone>(11) 555-2167</Phone>\n\t\t<Fax>(11) 555-2168</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Av. In&#234;s de Castro, 414</Address>\n\t\t\t<City>Sao Paulo</City>\n\t\t\t<Region>SP</Region>\n\t\t\t<PostalCode>05634-030</PostalCode>\n\t\t\t<Country>Brazil</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"TRAIH\">\n\t\t<CompanyName>Trail's Head Gourmet Provisioners</CompanyName>\n\t\t<ContactName>Helvetius Nagy</ContactName>\n\t\t<ContactTitle>Sales Associate</ContactTitle>\n\t\t<Phone>(206) 555-8257</Phone>\n\t\t<Fax>(206) 555-2174</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>722 DaVinci Blvd.</Address>\n\t\t\t<City>Kirkland</City>\n\t\t\t<Region>WA</Region>\n\t\t\t<PostalCode>98034</PostalCode>\n\t\t\t<Country>USA</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"VAFFE\">\n\t\t<CompanyName>Vaffeljernet</CompanyName>\n\t\t<ContactName>Palle Ibsen</ContactName>\n\t\t<ContactTitle>Sales Manager</ContactTitle>\n\t\t<Phone>86 21 32 43</Phone>\n\t\t<Fax>86 22 33 44</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Smagsloget 45</Address>\n\t\t\t<City>&#197;rhus</City>\n\t\t\t<PostalCode>8200</PostalCode>\n\t\t\t<Country>Denmark</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"VICTE\">\n\t\t<CompanyName>Victuailles en stock</CompanyName>\n\t\t<ContactName>Mary Saveley</ContactName>\n\t\t<ContactTitle>Sales Agent</ContactTitle>\n\t\t<Phone>78.32.54.86</Phone>\n\t\t<Fax>78.32.54.87</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>2, rue du Commerce</Address>\n\t\t\t<City>Lyon</City>\n\t\t\t<PostalCode>69004</PostalCode>\n\t\t\t<Country>France</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"VINET\">\n\t\t<CompanyName>Vins et alcools Chevalier</CompanyName>\n\t\t<ContactName>Paul Henriot</ContactName>\n\t\t<ContactTitle>Accounting Manager</ContactTitle>\n\t\t<Phone>26.47.15.10</Phone>\n\t\t<Fax>26.47.15.11</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>59 rue de l'Abbaye</Address>\n\t\t\t<City>Reims</City>\n\t\t\t<PostalCode>51100</PostalCode>\n\t\t\t<Country>France</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"WANDK\">\n\t\t<CompanyName>Die Wandernde Kuh</CompanyName>\n\t\t<ContactName>Rita M&#252;ller</ContactName>\n\t\t<ContactTitle>Sales Representative</ContactTitle>\n\t\t<Phone>0711-020361</Phone>\n\t\t<Fax>0711-035428</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Adenauerallee 900</Address>\n\t\t\t<City>Stuttgart</City>\n\t\t\t<PostalCode>70563</PostalCode>\n\t\t\t<Country>Germany</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"WARTH\">\n\t\t<CompanyName>Wartian Herkku</CompanyName>\n\t\t<ContactName>Pirkko Koskitalo</ContactName>\n\t\t<ContactTitle>Accounting Manager</ContactTitle>\n\t\t<Phone>981-443655</Phone>\n\t\t<Fax>981-443655</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Torikatu 38</Address>\n\t\t\t<City>Oulu</City>\n\t\t\t<PostalCode>90110</PostalCode>\n\t\t\t<Country>Finland</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"WELLI\">\n\t\t<CompanyName>Wellington Importadora</CompanyName>\n\t\t<ContactName>Paula Parente</ContactName>\n\t\t<ContactTitle>Sales Manager</ContactTitle>\n\t\t<Phone>(14) 555-8122</Phone>\n\t\t<FullAddress>\n\t\t\t<Address>Rua do Mercado, 12</Address>\n\t\t\t<City>Resende</City>\n\t\t\t<Region>SP</Region>\n\t\t\t<PostalCode>08737-363</PostalCode>\n\t\t\t<Country>Brazil</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"WHITC\">\n\t\t<CompanyName>White Clover Markets</CompanyName>\n\t\t<ContactName>Karl Jablonski</ContactName>\n\t\t<ContactTitle>Owner</ContactTitle>\n\t\t<Phone>(206) 555-4112</Phone>\n\t\t<Fax>(206) 555-4115</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>305 - 14th Ave. S. Suite 3B</Address>\n\t\t\t<City>Seattle</City>\n\t\t\t<Region>WA</Region>\n\t\t\t<PostalCode>98128</PostalCode>\n\t\t\t<Country>USA</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"WILMK\">\n\t\t<CompanyName>Wilman Kala</CompanyName>\n\t\t<ContactName>Matti Karttunen</ContactName>\n\t\t<ContactTitle>Owner/Marketing Assistant</ContactTitle>\n\t\t<Phone>90-224 8858</Phone>\n\t\t<Fax>90-224 8858</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>Keskuskatu 45</Address>\n\t\t\t<City>Helsinki</City>\n\t\t\t<PostalCode>21240</PostalCode>\n\t\t\t<Country>Finland</Country>\n\t\t</FullAddress>\n\t</Customers><Customers CustomerID=\"WOLZA\">\n\t\t<CompanyName>Wolski  Zajazd</CompanyName>\n\t\t<ContactName>Zbyszek Piestrzeniewicz</ContactName>\n\t\t<ContactTitle>Owner</ContactTitle>\n\t\t<Phone>(26) 642-7012</Phone>\n\t\t<Fax>(26) 642-7012</Fax>\n\t\t<FullAddress>\n\t\t\t<Address>ul. Filtrowa 68</Address>\n\t\t\t<City>Warszawa</City>\n\t\t\t<PostalCode>01-012</PostalCode>\n\t\t\t<Country>Poland</Country>\n\t\t</FullAddress>\n\t</Customers></root>", false)
     );
@@ -3114,10 +3842,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "<root> {//@*/..} </root>",
       ctx);
-    query.context(node(file("prod/AxisStep/Tree1Text.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Text.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<root><west mark=\"w0\" /><center mark=\"c0\">Text in center</center><east mark=\"e0\">Text in east</east></root>", false)
     );
@@ -3131,10 +3863,14 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "<root> {/doc/part/*/text()/..} </root>",
       ctx);
-    query.context(node(file("prod/AxisStep/xq311B.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/xq311B.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<root><retail>62.50 USD</retail><wholesale>55.00 USD</wholesale><internal>31.25 USD</internal></root>", false)
     );
@@ -3148,9 +3884,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "/*/",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -3164,9 +3904,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "xquery version \"1.0\"; declare namespace saxon=\"http://example.com/VendorNamespace\"; declare namespace tour=\"http://example.com/Knight'sTour\"; (: XQuery program to perform a knight's tour of the chessboard. Author: Michael H. Kay Date: 26 June 2003 This version modified to use XQuery 1.0, with sequences and functions. This query does not use a source document. There is an optional parameter, start, which can be set to any square on the chessboard, e.g. a3 or h5. XQuery does not allow parameters to be given a default value, so the parameter is mandatory. There is a second optional parameter, end, which indicates that the processing should stop after a given number of steps. This can be used to animate the display of the tour. This works especially well when the query is compiled into a Java servlet. The output is an HTML display of the completed tour. Internally, the following data representations are used: * A square on the chessboard: represented as a number in the range 0 to 63 * A state of the chessboard: a sequence of 64 integers, each containing a move number. A square that has not been visited yet is represented by a zero. * A set of possible moves: represented as a sequence of integers, * each integer representing the number of the destination square :) declare option saxon:default \"'a1'\"; declare variable $start as xs:string := 'a1'; declare option saxon:default \"'64'\"; declare variable $end as xs:string := '64'; declare variable $endd as xs:integer := xs:integer($end); declare variable $start-column as xs:integer := xs:integer(translate(substring($start, 1, 1), 'abcdefgh', '01234567')); declare variable $start-row as xs:integer := 8 - xs:integer(substring($start, 2, 1)); declare function tour:main () as element() { if (not(string-length($start)=2) or not(translate(substring($start,1,1), 'abcdefgh', 'aaaaaaaa')='a') or not(translate(substring($start,2,1), '12345678', '11111111')='1')) then error((), \"Invalid start parameter: try say 'a1' or 'g6'\") else if (not($endd = 1 to 64)) then error((), \"Invalid end parameter: must be in range 1 to 64\") else let $empty-board as xs:integer* := for $i in (1 to 64) return 0 let $initial-board as xs:integer* := tour:place-knight(1, $empty-board, $start-row * 8 + $start-column) let $final-board as xs:integer* := tour:make-moves(2, $initial-board, $start-row * 8 + $start-column) return tour:print-board($final-board) }; declare function tour:place-knight ( $move as xs:integer, $board as xs:integer*, $square as xs:integer ) as xs:integer* { (: This function places a knight on the board at a given square. The returned value is the supplied board, modified to indicate that the knight reached a given square at a given move :) for $i in 1 to 64 return if ($i = $square + 1) then $move else $board[$i] }; declare function tour:make-moves ( $move as xs:integer, $board as xs:integer*, $square as xs:integer ) as xs:integer* { (: This function takes the board in a given state, decides on the next move to make, and then calls itself recursively to make further moves, until the knight has completed his tour of the board. It returns the board in its final state. :) let $possible-move-list as xs:integer* := tour:list-possible-moves($board, $square) return tour:try-possible-moves($move, $board, $square, $possible-move-list) }; declare function tour:try-possible-moves ( $move as xs:integer, $board as xs:integer*, $square as xs:integer, $possible-moves as xs:integer* ) as xs:integer* { (: This function tries a set of possible moves that the knight can make from a given position. It determines the best move as the one to the square with fewest exits. If this is unsuccessful then it can backtrack and try another move; however this turns out rarely to be necessary. The function makes the selected move, and then calls make-moves() to make subsequent moves, returning the final state of the board. :) if (count($possible-moves)!=0) then tour:make-best-move($move, $board, $square, one-or-more($possible-moves)) else () (: if there is no possible move, we return the special value () as the final state of the board, to indicate to the caller that we got stuck :) }; declare function tour:make-best-move ( $move as xs:integer, $board as xs:integer*, $square as xs:integer, $possible-moves as xs:integer+ ) as xs:integer* { (: this function, given the state of the board and a set of possible moves, determines which of the moves is the best one. It then makes this move, and proceeds recursively to make further moves, eventually returning the final state of the board. :) let $best-move as xs:integer := tour:find-best-move($board, $possible-moves, 9, 999) let $other-possible-moves as xs:integer* := $possible-moves[. != $best-move] let $next-board as xs:integer* := tour:place-knight($move, $board, $best-move) let $final-board as xs:integer* := if ($move < $endd) then tour:make-moves($move+1, $next-board, $best-move) else $next-board (: if the final board has the special value '()', we got stuck, and have to choose the next best of the possible moves. This is done by a recursive call. I thought that the knight never did get stuck, but it does: if the starting square is f1, the wrong choice is made at move 58, and needs to be reversed. :) return if (empty($final-board)) then tour:try-possible-moves($move, $board, $square, $other-possible-moves) else $final-board }; declare function tour:find-best-move ( $board as xs:integer*, $possible-moves as xs:integer+, $fewest-exits as xs:integer, $best-so-far as xs:integer ) as xs:integer { (: This function finds from among the possible moves, the one with fewest exits. It calls itself recursively. :) let $trial-move as xs:integer := $possible-moves[1] let $other-possible-moves as xs:integer* := $possible-moves[position() > 1] let $trial-board as xs:integer* := tour:place-knight(99, $board, $trial-move) let $trial-move-exit-list as xs:integer* := tour:list-possible-moves($trial-board, $trial-move) let $number-of-exits as xs:integer := count($trial-move-exit-list) let $minimum-exits as xs:integer := min(($number-of-exits, $fewest-exits)) let $new-best-so-far as xs:integer := if ($number-of-exits < $fewest-exits) then $trial-move else $best-so-far (: if there are other possible moves, consider them too, using a recursive call. Otherwise return the best move found. :) return if (count($other-possible-moves)!=0) then tour:find-best-move($board, one-or-more($other-possible-moves), $minimum-exits, $new-best-so-far) else $new-best-so-far }; declare function tour:list-possible-moves ( $board as xs:integer*, $square as xs:integer ) as xs:integer* { (: This function, given the knight's position on the board, returns the set of squares he can move to. The squares will be ones that have not been visited before :) let $row as xs:integer := $square idiv 8 let $column as xs:integer := $square mod 8 return (if ($row > 1 and $column > 0 and $board[($square - 17) + 1]=0) then $square - 17 else (), if ($row > 1 and $column < 7 and $board[($square - 15) + 1]=0) then $square - 15 else (), if ($row > 0 and $column > 1 and $board[($square - 10) + 1]=0) then $square - 10 else (), if ($row > 0 and $column < 6 and $board[($square - 6) + 1]=0) then $square - 6 else (), if ($row < 6 and $column > 0 and $board[($square + 15) + 1]=0) then $square + 15 else (), if ($row < 6 and $column < 7 and $board[($square + 17) + 1]=0) then $square + 17 else (), if ($row < 7 and $column > 1 and $board[($square + 6) + 1]=0) then $square + 6 else (), if ($row < 7 and $column < 6 and $board[($square + 10) + 1]=0) then $square + 10 else () ) }; declare function tour:print-board ( $board as xs:integer* ) as element() { <html> <head> <title>Knight's tour</title> </head> <body> <div align=\"center\"> <h1>Knight's tour starting at {$start}</h1> <table border=\"1\" cellpadding=\"4\"> {for $row in 0 to 7 return <tr> {for $column in 0 to 7 let $color := if ((($row + $column) mod 2)=1) then 'xffff44' else 'white' return <td align=\"center\" bgcolor=\"{$color}\" width=\"22\">{ let $n := $board[$row * 8 + $column + 1] return if ($endd != 64 and $n = $endd) then <b>{$n}</b> else if ($n = 0) then \"&#xa0;\" else $n }</td> } </tr> } </table> <p>{ if ($endd != 64) then <a href=\"Tour?start={$start}&amp;end={$endd+1}\">Step</a> else () }</p> </div> </body> </html> }; tour:main()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<html><head><title>Knight's tour</title></head><body><div align=\"center\"><h1>Knight's tour starting at a1</h1><table border=\"1\" cellpadding=\"4\"><tr><td width=\"22\" align=\"center\" bgcolor=\"white\">36</td><td width=\"22\" align=\"center\" bgcolor=\"xffff44\">19</td><td width=\"22\" align=\"center\" bgcolor=\"white\">22</td><td width=\"22\" align=\"center\" bgcolor=\"xffff44\">5</td><td width=\"22\" align=\"center\" bgcolor=\"white\">38</td><td width=\"22\" align=\"center\" bgcolor=\"xffff44\">9</td><td width=\"22\" align=\"center\" bgcolor=\"white\">24</td><td width=\"22\" align=\"center\" bgcolor=\"xffff44\">7</td></tr><tr><td width=\"22\" align=\"center\" bgcolor=\"xffff44\">21</td><td width=\"22\" align=\"center\" bgcolor=\"white\">4</td><td width=\"22\" align=\"center\" bgcolor=\"xffff44\">37</td><td width=\"22\" align=\"center\" bgcolor=\"white\">42</td><td width=\"22\" align=\"center\" bgcolor=\"xffff44\">23</td><td width=\"22\" align=\"center\" bgcolor=\"white\">6</td><td width=\"22\" align=\"center\" bgcolor=\"xffff44\">39</td><td width=\"22\" align=\"center\" bgcolor=\"white\">10</td></tr><tr><td width=\"22\" align=\"center\" bgcolor=\"white\">18</td><td width=\"22\" align=\"center\" bgcolor=\"xffff44\">35</td><td width=\"22\" align=\"center\" bgcolor=\"white\">20</td><td width=\"22\" align=\"center\" bgcolor=\"xffff44\">49</td><td width=\"22\" align=\"center\" bgcolor=\"white\">44</td><td width=\"22\" align=\"center\" bgcolor=\"xffff44\">41</td><td width=\"22\" align=\"center\" bgcolor=\"white\">8</td><td width=\"22\" align=\"center\" bgcolor=\"xffff44\">25</td></tr><tr><td width=\"22\" align=\"center\" bgcolor=\"xffff44\">3</td><td width=\"22\" align=\"center\" bgcolor=\"white\">50</td><td width=\"22\" align=\"center\" bgcolor=\"xffff44\">43</td><td width=\"22\" align=\"center\" bgcolor=\"white\">46</td><td width=\"22\" align=\"center\" bgcolor=\"xffff44\">55</td><td width=\"22\" align=\"center\" bgcolor=\"white\">62</td><td width=\"22\" align=\"center\" bgcolor=\"xffff44\">11</td><td width=\"22\" align=\"center\" bgcolor=\"white\">40</td></tr><tr><td width=\"22\" align=\"center\" bgcolor=\"white\">34</td><td width=\"22\" align=\"center\" bgcolor=\"xffff44\">17</td><td width=\"22\" align=\"center\" bgcolor=\"white\">54</td><td width=\"22\" align=\"center\" bgcolor=\"xffff44\">59</td><td width=\"22\" align=\"center\" bgcolor=\"white\">48</td><td width=\"22\" align=\"center\" bgcolor=\"xffff44\">45</td><td width=\"22\" align=\"center\" bgcolor=\"white\">26</td><td width=\"22\" align=\"center\" bgcolor=\"xffff44\">63</td></tr><tr><td width=\"22\" align=\"center\" bgcolor=\"xffff44\">51</td><td width=\"22\" align=\"center\" bgcolor=\"white\">2</td><td width=\"22\" align=\"center\" bgcolor=\"xffff44\">47</td><td width=\"22\" align=\"center\" bgcolor=\"white\">56</td><td width=\"22\" align=\"center\" bgcolor=\"xffff44\">61</td><td width=\"22\" align=\"center\" bgcolor=\"white\">58</td><td width=\"22\" align=\"center\" bgcolor=\"xffff44\">29</td><td width=\"22\" align=\"center\" bgcolor=\"white\">12</td></tr><tr><td width=\"22\" align=\"center\" bgcolor=\"white\">16</td><td width=\"22\" align=\"center\" bgcolor=\"xffff44\">33</td><td width=\"22\" align=\"center\" bgcolor=\"white\">60</td><td width=\"22\" align=\"center\" bgcolor=\"xffff44\">53</td><td width=\"22\" align=\"center\" bgcolor=\"white\">14</td><td width=\"22\" align=\"center\" bgcolor=\"xffff44\">31</td><td width=\"22\" align=\"center\" bgcolor=\"white\">64</td><td width=\"22\" align=\"center\" bgcolor=\"xffff44\">27</td></tr><tr><td width=\"22\" align=\"center\" bgcolor=\"xffff44\">1</td><td width=\"22\" align=\"center\" bgcolor=\"white\">52</td><td width=\"22\" align=\"center\" bgcolor=\"xffff44\">15</td><td width=\"22\" align=\"center\" bgcolor=\"white\">32</td><td width=\"22\" align=\"center\" bgcolor=\"xffff44\">57</td><td width=\"22\" align=\"center\" bgcolor=\"white\">28</td><td width=\"22\" align=\"center\" bgcolor=\"xffff44\">13</td><td width=\"22\" align=\"center\" bgcolor=\"white\">30</td></tr></table><p/></div></body></html>", false)
     );
@@ -3180,9 +3924,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $element as element(foo) := <foo/> return count($element/self::bar)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -3200,9 +3948,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $element as element(foo) := <foo/> return count($element/self::*:bar)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -3220,9 +3972,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ns1 = \"http://www.example.org/ns1\"; declare namespace ns2 = \"http://www.example.org/ns2\"; let $element as element(ns1:foo) := <ns1:foo/> return count($element/self::ns2:*)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -3240,9 +3996,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $attribute as attribute(foo) := attribute foo { } return count($attribute/self::bar)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -3262,9 +4022,13 @@ public class ProdAxisStep extends QT3TestSet {
       "            return count($attribute/self::*:bar)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -3287,9 +4051,13 @@ public class ProdAxisStep extends QT3TestSet {
       "        return count($attribute/self::ns2:*)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -3307,9 +4075,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $element as element(*) := <foo/> return count($element/self::bar)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -3327,9 +4099,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $element as element(*) := <foo/> return count($element/self::*:bar)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -3351,9 +4127,13 @@ public class ProdAxisStep extends QT3TestSet {
       "        let $element as element(*) := <ns1:foo/> \n" +
       "        return count($element/self::ns2:*)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -3371,9 +4151,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $attribute as attribute(*) := attribute foo { } return count($attribute/self::bar)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -3391,9 +4175,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $attribute as attribute(*) := attribute foo { } return count($attribute/self::*:bar)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -3415,9 +4203,13 @@ public class ProdAxisStep extends QT3TestSet {
       "        let $attribute as attribute(*) := attribute ns1:foo { } \n" +
       "        return count($attribute/self::ns2:*)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -3442,9 +4234,13 @@ public class ProdAxisStep extends QT3TestSet {
       "        return count($element)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -3458,9 +4254,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $comment as comment() := <!--comment--> return count($comment/self::*)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -3478,9 +4278,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $comment as comment() := <!--comment--> return count($comment/self::foo)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -3498,9 +4302,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $comment as comment() := <!--comment--> return count($comment/self::*:foo)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -3521,9 +4329,13 @@ public class ProdAxisStep extends QT3TestSet {
       "        let $comment as comment() := <!--comment--> \n" +
       "        return count($comment/self::ns1:*)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -3543,9 +4355,13 @@ public class ProdAxisStep extends QT3TestSet {
       "        let $processing-instruction as processing-instruction() := <?processing instruction?> \n" +
       "        return count($processing-instruction/self::*)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -3565,9 +4381,13 @@ public class ProdAxisStep extends QT3TestSet {
       "        let $processing-instruction as processing-instruction() := <?processing instruction?> \n" +
       "        return count($processing-instruction/self::processing)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -3587,9 +4407,13 @@ public class ProdAxisStep extends QT3TestSet {
       "        let $processing-instruction as processing-instruction() := <?processing instruction?> \n" +
       "        return count($processing-instruction/self::*:processing)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -3610,9 +4434,13 @@ public class ProdAxisStep extends QT3TestSet {
       "        let $processing-instruction as processing-instruction() := <?processing instruction?> \n" +
       "        return count($processing-instruction/self::ns1:*)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -3635,11 +4463,85 @@ public class ProdAxisStep extends QT3TestSet {
       "        let $attribute as attribute(*, xs:untypedAtomic)* := $element/attribute::* \n" +
       "        return count($attribute)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
+    );
+  }
+
+  /**
+   *  The namespace axis is not recognized in XQuery..
+   */
+  @org.junit.Test
+  public void axes112() {
+    final XQuery query = new XQuery(
+      "/*/namespace-node()",
+      ctx);
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
+   *  Use kind-test namespace-node() in an axis step for the attribute axis. Note: applies to both XPath and XQuery..
+   */
+  @org.junit.Test
+  public void axes115() {
+    final XQuery query = new XQuery(
+      "/*/attribute::namespace-node()",
+      ctx);
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEmpty()
+    );
+  }
+
+  /**
+   *  Use kind-test namespace-node() with the self axis.
+   */
+  @org.junit.Test
+  public void axes117() {
+    final XQuery query = new XQuery(
+      "namespace {\"xsl\"}{\"http://www.w3.org/1999/XSL/Transform\"} / self::namespace-node()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertCount(1)
+      &&
+        assertType("namespace-node()")
+      &&
+        assertStringValue(false, "http://www.w3.org/1999/XSL/Transform")
+      &&
+        assertQuery("name($result) = \"xsl\"")
+      )
     );
   }
 
@@ -3651,9 +4553,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var := document{<e><f>f's value</f></e>}; $var/(/)/(/)//f",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<f>f's value</f>", false)
     );
@@ -3667,9 +4573,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "name(:hey:):*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -3683,9 +4593,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<a> <b/> <c/> </a>[self::b][last()])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -3703,9 +4617,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "<b/>[self::b][last()]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<b/>", false)
@@ -3735,10 +4653,14 @@ public class ProdAxisStep extends QT3TestSet {
       "        for $b in /site/people/person where $b/@id=\"person0\" return $b/name, \n" +
       "        /site/people/person[@id eq \"person0\"]/name",
       ctx);
-    query.context(node(file("app/XMark/XMarkAuction.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/XMark/XMarkAuction.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<name>Seongtaek Mattern</name><name>Seongtaek Mattern</name><name>Seongtaek Mattern</name>", false)
     );
@@ -3754,10 +4676,14 @@ public class ProdAxisStep extends QT3TestSet {
       "        declare function local:isComplexType($typeID) { string($typeID) }; \n" +
       "        \"|\", //*/local:isComplexType(@type), \"|\"",
       ctx);
-    query.context(node(file("prod/AxisStep/CPPGlobals.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/CPPGlobals.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "|       _17 _17  _11c _11c _11 _11  _17c _17c _17 _17   _11   _23  _17 _11c  |")
     );
@@ -3771,9 +4697,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a/>/<b>{.}</b>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<b><a/></b>", false)
     );
@@ -3787,9 +4717,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "* :ncname",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -3803,9 +4737,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "ncname: *",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -3819,9 +4757,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "*(:hey:):ncname",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -3835,9 +4777,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "ncname:(:hey:)*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -3851,9 +4797,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "*(:hey:):(:hey:) ncname",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -3867,9 +4817,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "*:(:hey:)ncname",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -3883,9 +4837,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "*:",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -3899,9 +4857,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(text {\"some text\"}/..)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3915,9 +4877,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(processing-instruction theName {\"some text\"}/..)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3931,9 +4897,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var := <e><f>f's value</f></e>; $var/(/)/(/)//f",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0050")
     );
@@ -3947,9 +4917,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(attribute theName {\"some text\"}/..)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3963,9 +4937,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(element theName {\"some text\"}/..)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3979,9 +4957,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(comment {\"some text\"}/..)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3995,9 +4977,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<elem/>/..)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4011,9 +4997,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e>some text</e>/text()/..",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e>some text</e>", false)
     );
@@ -4027,9 +5017,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e><b/></e>/b/..",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e><b/></e>", false)
     );
@@ -4043,9 +5037,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e attr=\"c\"/>/@attr/..",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e attr=\"c\"/>", false)
     );
@@ -4059,9 +5057,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e><?name data?></e>/processing-instruction()/..",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e><?name data?></e>", false)
     );
@@ -4075,9 +5077,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e><!--data --></e>/comment()/..",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e><!--data --></e>", false)
     );
@@ -4091,9 +5097,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "preceding-or-ancestor::*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -4107,9 +5117,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $v := <a><b/><b/><b/></a>; deep-equal($v//45, (45, 45, 45, 45))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4123,9 +5137,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(fn:root(<e/>)/..)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -4143,9 +5161,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/..)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -4163,9 +5185,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $myVar := <e/>; empty(fn:root($myVar/(/)/..))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -4185,9 +5211,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $myVar := document { <e/>}; empty($myVar/(/)/..)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -4205,9 +5235,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "nametest//",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XPST0003")
@@ -4225,9 +5259,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "nametest/",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XPST0003")
@@ -4245,9 +5283,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $myVar := <e/>; $myVar/(/)/",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -4261,9 +5303,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "parent::self()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -4277,9 +5323,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "123[..]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0020")
     );
@@ -4293,9 +5343,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "1[element()]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0020")
     );
@@ -4309,9 +5363,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $v := <a><b/><b/><b/></a>; $v//45",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "45 45 45 45")
     );
@@ -4325,9 +5383,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, <e/>)[..]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0020")
     );
@@ -4341,9 +5403,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "(<e/>, 1)[..]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0020")
     );
@@ -4357,9 +5423,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>[parent::node()])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4373,9 +5443,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 5 * /)[1]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("1")
@@ -4393,9 +5467,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, /)[1]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("1")
@@ -4413,9 +5491,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/, 1)[2]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("1")
@@ -4433,9 +5515,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "//",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -4449,9 +5535,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $myVar := <e/>; empty($myVar/descendant-or-self::text())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4465,9 +5555,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $myVar := <e/>; $myVar/(<a/>, <b/>, <?d ?>, <!-- e-->, attribute name {}, document {()})/3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "3 3 3 3 3 3")
     );
@@ -4481,9 +5575,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $myVar := <e/>; $myVar/(<a/>, <b/>, <?d ?>, <!-- e-->, attribute name {}, document {()})/number()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN NaN NaN NaN NaN NaN")
     );
@@ -4497,9 +5595,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "*:(:hey:)ncname",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -4513,9 +5615,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "1/3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0019")
     );
@@ -4529,9 +5635,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(<e/>)/3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0019")
     );
@@ -4547,9 +5657,13 @@ public class ProdAxisStep extends QT3TestSet {
       "        declare variable $myVar := <e/>; \n" +
       "        empty($myVar/preceding-sibling::comment()/a/b/c/1/@*)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -4571,9 +5685,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3)[1]/(1, 2)[last()]/\"a string\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0019")
     );
@@ -4587,9 +5705,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "namespace::*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -4603,9 +5725,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(()/@attr)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -4623,9 +5749,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(()/name)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -4643,9 +5773,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var := <a> <b/> <c/> <d/> </a>; ($var/*, $var/*)/.",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<b/><c/><d/>", false)
     );
@@ -4659,9 +5793,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $var := <a> <b/> <c/> <d/> </a>; ($var/*, $var/*)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<b/><c/><d/><b/><c/><d/>", false)
     );
@@ -4675,9 +5813,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $i := <root> <child/> <child/> <child> <child2> <child3> <leaf/> </child3> </child2> </child> </root>; 1, root($i)//leaf/child::node(), 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "1 1")
@@ -4695,9 +5837,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "*(:hey:):ncname",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -4711,9 +5857,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<element attr=\"foo\" attr2=\"foo\"/>/*)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -4731,9 +5881,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<element attr=\"foo\" attr2=\"foo\"/>/*)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -4751,9 +5905,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e> <b attr=\"fo\"/> <b/> </e>/descendant-or-self::node()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e><b attr=\"fo\"/><b/></e><b attr=\"fo\"/><b/>", false)
     );
@@ -4767,9 +5925,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "1, <b attr=\"fo\"/>/child::node(), 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 1")
     );
@@ -4783,9 +5945,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e> <b/> <b a=\"\"/> </e>/b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<b/><b a=\"\"/>", false)
     );
@@ -4799,9 +5965,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e> <b a=\"\"/> <b/> </e>/b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<b a=\"\"/><b/>", false)
     );
@@ -4815,9 +5985,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e> <!-- comment --> <?PA ?>text<b/> <?PB ?> <b/> <?PC ?> </e>/child::node()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<!-- comment --><?PA ?>text<b/><?PB ?><b/><?PC ?>", false)
     );
@@ -4831,9 +6005,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "1, <e/>/descendant::node(), 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 1")
     );
@@ -4847,9 +6025,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "1, <e/>/descendant-or-self::node(), 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("1<e/>1", false)
     );
@@ -4863,9 +6045,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "1, <e attr=\"\"/>/descendant::node(), 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 1")
     );
@@ -4879,9 +6065,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "* :ncname",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -4895,9 +6085,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "1, <e attr=\"\"/>/descendant-or-self::node(), 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("1<e attr=\"\"/>1", false)
     );
@@ -4911,9 +6105,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/descendant::node())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4927,9 +6125,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/descendant-or-self::node())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4943,9 +6145,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e attr=\"\"/>/descendant::node())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4959,9 +6165,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e attr=\"\"/>/descendant-or-self::node())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4975,9 +6185,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a> <b c=\"\"/> <d/> </a>/descendant-or-self::node()[last()]/ancestor::*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a><b c=\"\"/><d/></a>", false)
     );
@@ -4991,9 +6205,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a> <b c=\"\"/> <d/> </a>/descendant-or-self::node()[last()]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<d/>", false)
     );
@@ -5007,9 +6225,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "preceeding::node()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -5023,9 +6245,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a> <b c=\"\"/> <d/> </a>//node()/../count(.)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -5039,9 +6265,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(<a> <b c=\"\"/> <d/> </a>//node())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -5055,9 +6285,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "*(:hey:):ncname",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -5071,9 +6305,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(<a> <b c=\"\"/> <d/> </a>/descendant-or-self::node())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -5087,9 +6325,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a> <b id=\"person0\"> <c/> </b> </a>/*[attribute::id eq \"person0\"]/c",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<c/>", false)
     );
@@ -5103,9 +6345,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a> <b id=\"person0\"> <c/> </b> </a>/*[@id eq \"person0\"]/c",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<c/>", false)
     );
@@ -5119,9 +6365,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/attribute::attribute())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5135,9 +6385,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e/>/attribute::schema-attribute(foo)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -5151,9 +6405,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e/>/attribute::schema-attribute()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -5260,10 +6518,14 @@ public class ProdAxisStep extends QT3TestSet {
       "             $root//document-node()/self::comment() } </empty>, \n" +
       "             exists($root//*/attribute()/descendant-or-self::node())",
       ctx);
-    query.context(node(file("prod/AxisStep/TopMany.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TopMany.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<empty/>true", false)
@@ -5281,9 +6543,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "<result> { <e> <a>1</a> <b>2</b> </e>/(b, a)/. } </result>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result><a>1</a><b>2</b></result>", false)
     );
@@ -5297,9 +6563,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $i := <e> <a>1</a> <b>2</b> </e>; <result> { ($i/b, $i/a)/. } </result>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result><a>1</a><b>2</b></result>", false)
     );
@@ -5313,9 +6583,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare default element namespace \"http://typedecl\"; <r> { <e attr=\"foo\"/>/@attr } </r>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<r xmlns=\"http://typedecl\" attr=\"foo\"/>", false)
     );
@@ -5329,9 +6603,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "ncname :*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -5345,9 +6623,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "prefix:",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -5361,9 +6643,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "prefix:",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -5377,9 +6663,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(gt gt gt))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -5397,9 +6687,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "< asd />",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -5413,9 +6707,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -5429,9 +6727,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "eclare function",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -5445,9 +6747,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function name",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -5461,9 +6767,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:foo() external;",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XPST0003")
@@ -5481,9 +6791,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "xquery, version, encoding, default, declare, function, option, collation, schema, import",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -5497,9 +6811,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function foo() external; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XQST0045")
@@ -5517,11 +6835,223 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := <anElement>Some content</anElement> return $var/20[child::text()]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0020")
+    );
+  }
+
+  /**
+   *  Tests to child::attribute(b) .
+   */
+  @org.junit.Test
+  public void cbclChildAxis001() {
+    final XQuery query = new XQuery(
+      "count(<a b=\"blah\"/>/child::attribute(b))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "0")
+    );
+  }
+
+  /**
+   *  Tests Equals method on NodeOperator tests .
+   */
+  @org.junit.Test
+  public void cbclExcept001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      let $x := <a><b/><c/><d/></a> return count(($x/(node() except b) | $x/(node() except b)))\n" +
+      "   ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "2")
+    );
+  }
+
+  /**
+   *  Tests for following-sibling::* .
+   */
+  @org.junit.Test
+  public void cbclFollowingAxis001() {
+    final XQuery query = new XQuery(
+      "count(<a><b/><b/></a>/b[1]/following-sibling::*)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "1")
+    );
+  }
+
+  /**
+   *  A test with both nodes and atomics appearing in a (not last) step .
+   */
+  @org.junit.Test
+  public void cbclPathNodesAndAtomics() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x mod 2 = 1) then <a/> else \"a\" };\n" +
+      "        let $y := for $x in (1 to 10) return <e>{$x}</e> return $y/local:f(.)/a",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0019")
+    );
+  }
+
+  /**
+   *  Tests for preceding-sibling::* .
+   */
+  @org.junit.Test
+  public void cbclPrecedingAxis001() {
+    final XQuery query = new XQuery(
+      "count(<a><b/><b/></a>/b[2]/preceding-sibling::*)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "1")
+    );
+  }
+
+  /**
+   *  Test for preceding-sibling::b .
+   */
+  @org.junit.Test
+  public void cbclPrecedingAxis002() {
+    final XQuery query = new XQuery(
+      "count(<a><b/><b/></a>/b[2]/preceding-sibling::b)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "1")
+    );
+  }
+
+  /**
+   *  Test for preceding-sibling::b .
+   */
+  @org.junit.Test
+  public void cbclPrecedingAxis003() {
+    final XQuery query = new XQuery(
+      "count(<a><b/><b/></a>/b[1]/preceding-sibling::b)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "0")
+    );
+  }
+
+  /**
+   *  Tests self attribute test .
+   */
+  @org.junit.Test
+  public void cbclSelfAxis001() {
+    final XQuery query = new XQuery(
+      "<a> { <a b=\"blah\"/>/@*/self::attribute(b) } </a>",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertSerialization("<a b=\"blah\"/>", false)
+    );
+  }
+
+  /**
+   *  Tests Equals function on wild localname tests .
+   */
+  @org.junit.Test
+  public void cbclWild001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare namespace foo=\"test\";\n" +
+      "        let $x := <a><foo:b/><c/><d/></a> return count($x/foo:* | $x/foo:*)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "1")
+    );
+  }
+
+  /**
+   *  Tests the typing of a test foo:bar/foo:* .
+   */
+  @org.junit.Test
+  public void cbclWild002() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare namespace foo=\"http://localhost/\";\n" +
+      "        <a><foo:b/><foo:c/></a>/foo:b/self::foo:*",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertSerialization("<foo:b xmlns:foo=\"http://localhost/\"/>", false)
     );
   }
 
@@ -5533,9 +7063,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "(10)/child::*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0019")
     );
@@ -5549,9 +7083,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "(10)/self::*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0019")
     );
@@ -5565,9 +7103,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "(10)/attribute::*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0019")
     );
@@ -5581,9 +7123,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "(10)/parent::*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0019")
     );
@@ -5597,9 +7143,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "(10)/descendant::*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0019")
     );
@@ -5613,9 +7163,13 @@ public class ProdAxisStep extends QT3TestSet {
     final XQuery query = new XQuery(
       "(10)/descendant-or-self::*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0019")
     );

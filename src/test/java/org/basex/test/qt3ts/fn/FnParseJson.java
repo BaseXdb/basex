@@ -25,9 +25,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json(\"{}\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("map{}")
     );
@@ -41,9 +45,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('{\"abc\":12}')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("map{\"abc\":=12e0}")
     );
@@ -57,9 +65,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('{\"abc\":12e0}')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("map{\"abc\":=12e0}")
     );
@@ -73,9 +85,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('{\"abc\":-1.2e0}')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("map{\"abc\":=-1.2e0}")
     );
@@ -89,9 +105,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('{\"abc\":true}')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("map{\"abc\":=true()}")
     );
@@ -105,9 +125,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('{\"abc\":false}')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("map{\"abc\":=false()}")
     );
@@ -121,9 +145,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('{\"abc\":null}')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("map{\"abc\":=()}")
     );
@@ -137,9 +165,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('{\"abc\":true,\"xyz\":false}')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("map{\"abc\":=true(),\"xyz\":=false()}")
     );
@@ -153,9 +185,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json(' { \"abc\" : true , \"xyz\" : false } ')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("map{\"abc\":=true(),\"xyz\":=false()}")
     );
@@ -171,9 +207,13 @@ public class FnParseJson extends QT3TestSet {
       "            \"xyz\"   :   false   \n" +
       "            }   ')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("map{\"abc\":=true(),\"xyz\":=false()}")
     );
@@ -187,9 +227,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json(\"[]\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertType("map(*)")
@@ -211,9 +255,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json(\"[12345]\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertType("map(*)")
@@ -235,9 +283,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[\"abcd\"]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertType("map(*)")
@@ -259,9 +311,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json(\"[true]\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertType("map(*)")
@@ -283,9 +339,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json(\"[false]\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertType("map(*)")
@@ -307,9 +367,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json(\"[null]\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertType("map(*)")
@@ -331,9 +395,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[1,2,3, \"abc\", \"def\", true, false, null]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertType("map(*)")
@@ -365,9 +433,13 @@ public class FnParseJson extends QT3TestSet {
       "        false,  null ]\n" +
       "        ')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertType("map(*)")
@@ -395,9 +467,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json(\"[[[],[]]]\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertType("map(xs:integer, map(xs:integer, map(*)))")
@@ -421,9 +497,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[1, 2, [], [1], [1,2], [1,2,3]]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertQuery("map:size($result) = 6")
@@ -441,9 +521,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[{\"x\":12,\"y\":5}, {\"x\":13,\"y\":6}]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertQuery("map:size($result) = 2")
@@ -461,9 +545,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('{\"x\":[12,3], \"y\":[14,9]}')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertQuery("map:size($result) = 2")
@@ -481,9 +569,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[0.123]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertQuery("$result(1) = 0.123e0")
@@ -501,9 +593,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[-0.123]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertQuery("$result(1) = -0.123e0")
@@ -521,9 +617,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[-0.123e2]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertQuery("$result(1) = -0.123e2")
@@ -541,9 +641,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[-0.123e+2]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertQuery("$result(1) = -0.123e+2")
@@ -561,9 +665,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[-0.123e-2]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertQuery("$result(1) = -0.123e-2")
@@ -581,9 +689,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[\"\\\\\"]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertQuery("$result(1) = \"\\\"")
@@ -601,9 +713,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[\"\\\"\"]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertQuery("$result(1) = '\"'")
@@ -621,9 +737,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[\"\\r\"]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertQuery("$result(1) = '\r'")
@@ -641,9 +761,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[\"\\n\"]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertQuery("$result(1) = '\n'")
@@ -661,9 +785,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[\"\\/\"]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertQuery("$result(1) = '/'")
@@ -681,9 +809,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[\"aa\\u0030aa\"]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertQuery("$result(1) = 'aa0aa'")
@@ -701,9 +833,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[\"\\uD834\\udD1E\"]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertQuery("$result(1) = '𝄞'")
@@ -721,9 +857,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[\"\\r\"]', map{'unescape':=false()})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertQuery("$result(1) = '\\r'")
     );
@@ -737,9 +877,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[\"\\r\"]', map{'unescape':=true()})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertQuery("$result(1) = '\r'")
     );
@@ -753,9 +897,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[\"\\u0000\"]', map{'unescape':=false()})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertQuery("$result(1) = '\\u0000'")
     );
@@ -769,9 +917,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('true', map{'spec':='ECMA-262'})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -785,9 +937,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('false', map{'spec':='ECMA-262'})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -801,9 +957,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('null', map{'spec':='ECMA-262'})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -817,9 +977,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('93.7', map{'spec':='ECMA-262'})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("93.7e0")
@@ -837,9 +1001,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('\"abcd\\n\"', map{'spec':='ECMA-262','unescape':=false()})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("'abcd\\n'")
@@ -857,9 +1025,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json(unparsed-text('parse-json/data001.json'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertCount(1)
     );
@@ -873,9 +1045,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json(unparsed-text('parse-json/data002.json'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertCount(1)
     );
@@ -889,9 +1065,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json(unparsed-text('parse-json/data003.json'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertCount(1)
     );
@@ -905,9 +1085,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json(unparsed-text('parse-json/data004.json'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertCount(1)
     );
@@ -921,9 +1105,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json(unparsed-text('parse-json/data005.json'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertCount(1)
     );
@@ -937,9 +1125,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[-0.123e-2[')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0001")
     );
@@ -953,9 +1145,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[false')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0001")
     );
@@ -969,9 +1165,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[falsehood]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0001")
     );
@@ -985,9 +1185,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[(5)]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0001")
     );
@@ -1001,9 +1205,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[{5}]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0001")
     );
@@ -1017,9 +1225,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[{x:23}]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0001")
     );
@@ -1033,9 +1245,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('23,24')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0001")
     );
@@ -1049,9 +1265,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[\"abc]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0001")
     );
@@ -1065,9 +1285,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[1,2,3,]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0001")
     );
@@ -1081,9 +1305,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('{\"a\":=13}')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0001")
     );
@@ -1097,9 +1325,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('{\"a\":13,,\"b\":15}')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0001")
     );
@@ -1113,9 +1345,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('{\"a\":13')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0001")
     );
@@ -1129,9 +1365,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('{\"a\":{\"b\":12}')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0001")
     );
@@ -1145,9 +1385,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('{\"a\":{\"b\":12}}}')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0001")
     );
@@ -1161,9 +1405,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[\"\\\"]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0001")
     );
@@ -1177,9 +1425,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[\"\\1\"]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0001")
     );
@@ -1193,9 +1445,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[\"\\u2\"]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0001")
     );
@@ -1209,9 +1465,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[\"\\u123u\"]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0001")
     );
@@ -1225,9 +1485,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[\"\\b\"]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0001")
     );
@@ -1241,9 +1505,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[\"\\x20\"]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0001")
     );
@@ -1257,9 +1525,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[\"\\s\"]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0001")
     );
@@ -1273,9 +1545,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[\"\\uD834\"]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0001")
     );
@@ -1289,9 +1565,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[\"\\udD1E\"]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0001")
     );
@@ -1305,9 +1585,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[\"\\u0000\"]', map{'unescape':=true()})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0001")
     );
@@ -1321,9 +1605,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('true', map{'spec':='RFC4627'})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0001")
     );
@@ -1337,9 +1625,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('false', map{'spec':='RFC4627'})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0001")
     );
@@ -1353,9 +1645,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('null', map{'spec':='RFC4627'})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0001")
     );
@@ -1369,9 +1665,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('93.7', map{'spec':='RFC4627'})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0001")
     );
@@ -1385,9 +1685,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('\"abcd\\n\"', map{'spec':='RFC4627','unescape':=false()})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0001")
     );
@@ -1401,9 +1705,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[.3]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0001")
     );
@@ -1417,9 +1725,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[01]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0001")
     );
@@ -1433,9 +1745,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[00.00]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0001")
     );
@@ -1449,9 +1765,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[+23]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0001")
     );
@@ -1465,9 +1785,13 @@ public class FnParseJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json('[1.234f0]')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0001")
     );

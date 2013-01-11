@@ -20,9 +20,13 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines#0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -50,13 +58,17 @@ public class FnUnparsedTextLines extends QT3TestSet {
   @org.junit.Test
   public void fnUnparsedTextLines003() {
     final XQuery query = new XQuery(
-      "fn:unparsed-text-lines#1",
+      "fn:exists(fn:unparsed-text-lines#1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertBoolean(true)
     );
   }
 
@@ -66,13 +78,17 @@ public class FnUnparsedTextLines extends QT3TestSet {
   @org.junit.Test
   public void fnUnparsedTextLines004() {
     final XQuery query = new XQuery(
-      "fn:unparsed-text-lines#2",
+      "fn:exists(fn:unparsed-text-lines#2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertBoolean(true)
     );
   }
 
@@ -84,9 +100,13 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(static-base-uri(), \"utf-8\", \"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -100,9 +120,13 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines#3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -123,9 +147,13 @@ public class FnUnparsedTextLines extends QT3TestSet {
       "                then 1\n" +
       "                else \"http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt\") )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -148,9 +176,13 @@ public class FnUnparsedTextLines extends QT3TestSet {
       "                then 1\n" +
       "                else \"utf-8\") )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -173,9 +205,13 @@ public class FnUnparsedTextLines extends QT3TestSet {
       "              then ()\n" +
       "              else \"utf-8\") )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -189,9 +225,13 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\"http://www.example.org/#fragment\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOUT1170")
     );
@@ -205,9 +245,13 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\"http://www.example.org/#fragment\", \"utf-8\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOUT1170")
     );
@@ -221,9 +265,13 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\"http://www.example.org/%gg\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOUT1170")
     );
@@ -237,9 +285,13 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\"http://www.example.org/%gg\", \"utf-8\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOUT1170")
     );
@@ -253,9 +305,13 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\":/\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOUT1170")
     );
@@ -269,9 +325,13 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\":/\", \"utf-8\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOUT1170")
     );
@@ -285,9 +345,13 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines( \"http://www.w3.org/fots/unparsed-text/does-not-exist.txt\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOUT1170")
     );
@@ -301,9 +365,13 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines( \"http://www.w3.org/fots/unparsed-text/does-not-exist.txt\", \"utf-8\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOUT1170")
     );
@@ -317,9 +385,13 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\"surely-nobody-supports-this:/path.txt\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOUT1170")
     );
@@ -333,9 +405,13 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\"surely-nobody-supports-this:/path.txt\", \"utf-8\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOUT1170")
     );
@@ -349,10 +425,14 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\"unparsed-text/text-plain-utf-8.txt\")",
       ctx);
-    query.baseURI("#UNDEFINED");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.baseURI("#UNDEFINED");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0001")
     );
@@ -366,10 +446,14 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\"unparsed-text/text-plain-utf-8.txt\", \"utf-8\")",
       ctx);
-    query.baseURI("#UNDEFINED");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.baseURI("#UNDEFINED");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0001")
     );
@@ -383,10 +467,14 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\"does-not-exist.txt\")",
       ctx);
-    query.baseURI("http://www.w3.org/fots/unparsed-text/");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.baseURI("http://www.w3.org/fots/unparsed-text/");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOUT1170")
     );
@@ -400,10 +488,14 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\"does-not-exist.txt\", \"utf-8\")",
       ctx);
-    query.baseURI("http://www.w3.org/fots/unparsed-text/");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.baseURI("http://www.w3.org/fots/unparsed-text/");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOUT1170")
     );
@@ -417,11 +509,15 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\"text-plain-utf-8.txt\")",
       ctx);
-    query.baseURI("http://www.w3.org/fots/unparsed-text/");
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.baseURI("http://www.w3.org/fots/unparsed-text/");
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "hello world")
     );
@@ -435,11 +531,15 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\"text-plain-utf-8.txt\", \"utf-8\")",
       ctx);
-    query.baseURI("http://www.w3.org/fots/unparsed-text/");
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.baseURI("http://www.w3.org/fots/unparsed-text/");
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "hello world")
     );
@@ -453,11 +553,15 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\"C:\\file-might-exist.txt\")",
       ctx);
-    query.baseURI("http://www.w3.org/fots/unparsed-text/");
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.baseURI("http://www.w3.org/fots/unparsed-text/");
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOUT1170")
     );
@@ -471,11 +575,15 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\"C:\\file-might-exist.txt\", \"utf-8\")",
       ctx);
-    query.baseURI("http://www.w3.org/fots/unparsed-text/");
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.baseURI("http://www.w3.org/fots/unparsed-text/");
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOUT1170")
     );
@@ -489,11 +597,15 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\"\")",
       ctx);
-    query.baseURI("http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt");
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.baseURI("http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt");
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "hello world")
     );
@@ -507,11 +619,15 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\"\", \"utf-8\")",
       ctx);
-    query.baseURI("http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt");
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.baseURI("http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt");
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "hello world")
     );
@@ -525,10 +641,14 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\"\")",
       ctx);
-    query.baseURI("http://www.w3.org/fots/unparsed-text/does-not-exists.txt");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.baseURI("http://www.w3.org/fots/unparsed-text/does-not-exists.txt");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOUT1170")
     );
@@ -542,10 +662,14 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\"\", \"utf-8\")",
       ctx);
-    query.baseURI("http://www.w3.org/fots/unparsed-text/does-not-exists.txt");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.baseURI("http://www.w3.org/fots/unparsed-text/does-not-exists.txt");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOUT1170")
     );
@@ -559,27 +683,31 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, fn:unparsed-text-lines(\"http://www.w3.org/fots/unparsed-text/does-not-exist.txt\"))[1]",
       ctx);
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
-    // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
-    // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
-    // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
+      // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
+      // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
+      // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "1")
@@ -597,27 +725,31 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\"http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt\", \"123\")",
       ctx);
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
-    // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
-    // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
-    // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
+      // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
+      // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
+      // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOUT1190")
     );
@@ -631,27 +763,31 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\"http://www.w3.org/fots/unparsed-text/unknown-encoding.txt\")",
       ctx);
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
-    // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
-    // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
-    // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
+      // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
+      // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
+      // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOUT1200")
     );
@@ -665,27 +801,31 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\"http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt\")",
       ctx);
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
-    // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
-    // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
-    // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
+      // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
+      // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
+      // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOUT1190")
     );
@@ -699,63 +839,75 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\"http://www.w3.org/fots/unparsed-text/non-xml-character.txt\")",
       ctx);
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
-    // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
-    // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
-    // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
+      // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
+      // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
+      // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOUT1190")
     );
   }
 
   /**
-   * Evaluates the "unparsed-text-lines" function with the argument set as follows: $href refers to a file which does not contain well-formed XML..
+   * Evaluates the "unparsed-text-lines" function with the argument set as follows: $href refers to a file which does not contain well-formed XML.  A processor is not required to support utf-16..
    */
   @org.junit.Test
   public void fnUnparsedTextLines040() {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\"http://www.w3.org/fots/unparsed-text/invalid-xml.xml\")",
       ctx);
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
-    // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
-    // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
-    // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
+      // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
+      // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
+      // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertDeepEq("'<?xml version=\"1.0\" encoding=\"utf-16\"?><text>hello world'")
+      (
+        assertDeepEq("'<?xml version=\"1.0\" encoding=\"utf-16\"?><text>hello world'")
+      ||
+        error("FOUT1200")
+      )
     );
   }
 
@@ -767,27 +919,31 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\"http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt\")",
       ctx);
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
-    // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
-    // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
-    // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
+      // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
+      // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
+      // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "hello world")
     );
@@ -801,27 +957,31 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text(\"http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt\")",
       ctx);
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
-    // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
-    // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
-    // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
+      // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
+      // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
+      // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "hello world")
     );
@@ -835,27 +995,31 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text(\"http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt\")",
       ctx);
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
-    // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
-    // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
-    // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
+      // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
+      // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
+      // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "hello world")
     );
@@ -869,27 +1033,31 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\"http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt\")",
       ctx);
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
-    // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
-    // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
-    // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
+      // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
+      // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
+      // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "hello world")
     );
@@ -903,27 +1071,31 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\"http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt\")",
       ctx);
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
-    // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
-    // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
-    // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
+      // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
+      // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
+      // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "hello world")
@@ -941,95 +1113,115 @@ public class FnUnparsedTextLines extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\"http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml\")",
       ctx);
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
-    // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
-    // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
-    // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
+      // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
+      // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
+      // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "<?xml version=\"1.0\" encoding=\"utf-8\"?><text>hello world</text>")
     );
   }
 
   /**
-   * Evaluates the "unparsed-text-lines" function with the argument set as follows: $href refers to a file whose encoding is valid utf-16..
+   * 
+   *          Evaluates the "unparsed-text-lines" function with the argument set as follows: 
+   *          $href refers to a file whose encoding is valid utf-16.  A processor is not required to support utf-16..
    */
   @org.junit.Test
   public void fnUnparsedTextLines047() {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\"http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml\")",
       ctx);
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
-    // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
-    // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
-    // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
+      // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
+      // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
+      // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertStringValue(false, "<?xml version=\"1.0\" encoding=\"utf-16\"?><text>hello world</text>")
+      (
+        assertStringValue(false, "<?xml version=\"1.0\" encoding=\"utf-16\"?><text>hello world</text>")
+      ||
+        error("FOUT1200")
+      )
     );
   }
 
   /**
-   * Evaluates the "unparsed-text-lines" function with the argument set as follows: $href refers to a file whose encoding is valid iso-8859-1..
+   * 
+   *          Evaluates the "unparsed-text-lines" function with the argument set as follows: 
+   *          $href refers to a file whose encoding is valid iso-8859-1..
    */
   @org.junit.Test
   public void fnUnparsedTextLines048() {
     final XQuery query = new XQuery(
       "fn:unparsed-text(\"http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml\")",
       ctx);
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
-    // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
-    // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
-    // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
+      // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
+      // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
+      // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?><text>hello world</text>")
@@ -1040,204 +1232,253 @@ public class FnUnparsedTextLines extends QT3TestSet {
   }
 
   /**
-   * Evaluates the "unparsed-text-lines" function with the argument set as follows: $href refers to a file containing various line endings of the form 0A, x0D, and x0Dx0A..
+   * 
+   *          Evaluates the "unparsed-text-lines" function with the argument set as follows: 
+   *          $href refers to a file containing various line endings of the form 0A, x0D, and x0Dx0A..
    */
   @org.junit.Test
   public void fnUnparsedTextLines049() {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\"http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt\") ! string-length(.)",
       ctx);
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
-    // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
-    // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
-    // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
+      // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
+      // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
+      // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("(53, 54, 179, 77, 32)")
     );
   }
 
   /**
-   * Evaluates the "unparsed-text-lines" function with the argument set as follows: $href refers to a file containing various line endings of the form 0A, x0D, and x0Dx0A..
+   * 
+   *          Evaluates the "unparsed-text-lines" function with the argument set as follows: 
+   *          $href refers to a file containing various line endings of the form 0A, x0D, and x0Dx0A.
+   *       .
    */
   @org.junit.Test
   public void fnUnparsedTextLines050() {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\"http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt\") ! string-length(.)",
       ctx);
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
-    // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
-    // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
-    // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
+      // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
+      // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
+      // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("(53, 54, 179, 77, 32)")
     );
   }
 
   /**
-   * Evaluates the "unparsed-text-lines" function with the argument set as follows: $href refers to a file containing various line endings of the form 0A, x0D, and x0Dx0A..
+   * 
+   *          Evaluates the "unparsed-text-lines" function with the argument set as follows: 
+   *          $href refers to a file containing various line endings of the form 0A, x0D, and x0Dx0A.  A processor is not required to support utf-16.
+   *       .
    */
   @org.junit.Test
   public void fnUnparsedTextLines051() {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\"http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt\") ! string-length(.)",
       ctx);
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
-    // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
-    // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
-    // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
+      // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
+      // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
+      // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertDeepEq("(53, 54, 179, 77, 32)")
+      (
+        assertDeepEq("(53, 54, 179, 77, 32)")
+      ||
+        error("FOUT1200")
+      )
     );
   }
 
   /**
-   * Evaluates the "unparsed-text-lines" function with the argument set as follows: $href refers to a file containing various line endings of the form 0A, x0D, and x0Dx0A..
+   * 
+   *          Evaluates the "unparsed-text-lines" function with the argument set as follows: 
+   *          $href refers to a file containing various line endings of the form 0A, x0D, and x0Dx0A.  A processor is not required to support utf-16.
+   *       .
    */
   @org.junit.Test
   public void fnUnparsedTextLines052() {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\"http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt\") ! string-length(.)",
       ctx);
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
-    // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
-    // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
-    // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
+      // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
+      // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
+      // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertDeepEq("(53, 54, 179, 77, 32)")
+      (
+        assertDeepEq("(53, 54, 179, 77, 32)")
+      ||
+        error("FOUT1200")
+      )
     );
   }
 
   /**
-   * Evaluates the "unparsed-text-lines" function with the argument set as follows: $href refers to a file containing various line endings of the form 0A, x0D, and x0Dx0A..
+   * 
+   *          Evaluates the "unparsed-text-lines" function with the argument set as follows: 
+   *          $href refers to a file containing various line endings of the form 0A, x0D, and x0Dx0A.
+   *       .
    */
   @org.junit.Test
   public void fnUnparsedTextLines053() {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\"http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt\") ! string-length(.)",
       ctx);
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
-    // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
-    // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
-    // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
+      // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
+      // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
+      // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("(50, 0, 0, 50, 0, 0)")
     );
   }
 
   /**
-   * Evaluates the "unparsed-text-lines" function with the argument set as follows: $href refers to a file containing various line endings of the form 0A, x0D, and x0Dx0A..
+   * 
+   *          Evaluates the "unparsed-text-lines" function with the argument set as follows: 
+   *          $href refers to a file containing various line endings of the form 0A, x0D, and x0Dx0A.
+   *       .
    */
   @org.junit.Test
   public void fnUnparsedTextLines054() {
     final XQuery query = new XQuery(
       "fn:unparsed-text-lines(\"http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt\") ! string-length(.)",
       ctx);
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
-    // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
-    // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
-    // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
-    // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
-    // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-iso-8859-1.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-invalid.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-8.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-utf-16.xml
+      // resource: http://www.w3.org/fots/unparsed-text/text-xml-iso-8859-1.xml
+      // resource: http://www.w3.org/fots/unparsed-text/non-xml-character.txt
+      // resource: http://www.w3.org/fots/unparsed-text/invalid-xml.xml
+      // resource: http://www.w3.org/fots/unparsed-text/unknown-encoding.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-2.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines-3.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-8-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16le-bom-lines.txt
+      // resource: http://www.w3.org/fots/unparsed-text/text-plain-utf-16be-bom-lines.txt
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("(46, 0, 20)")
     );

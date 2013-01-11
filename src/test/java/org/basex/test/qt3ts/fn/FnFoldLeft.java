@@ -20,9 +20,13 @@ public class FnFoldLeft extends QT3TestSet {
     final XQuery query = new XQuery(
       "fold-left(function($a, $b) { $a + $b }, 0, 1 to 5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("15")
     );
@@ -36,9 +40,13 @@ public class FnFoldLeft extends QT3TestSet {
     final XQuery query = new XQuery(
       "fold-left(function($a, $b) { $a * $b }, 1, (2,3,5,7))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("210")
     );
@@ -52,9 +60,13 @@ public class FnFoldLeft extends QT3TestSet {
     final XQuery query = new XQuery(
       "fold-left(function($a, $b) { $a or $b }, false(), (true(), false(), false()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnFoldLeft extends QT3TestSet {
     final XQuery query = new XQuery(
       "fold-left(function($a, $b) { $a and $b }, false(), (true(), false(), false()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -84,9 +100,13 @@ public class FnFoldLeft extends QT3TestSet {
     final XQuery query = new XQuery(
       "fold-left(function($a, $b) {($b, $a)}, (), 1 to 5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("5, 4, 3, 2, 1")
     );
@@ -100,9 +120,13 @@ public class FnFoldLeft extends QT3TestSet {
     final XQuery query = new XQuery(
       "fold-left(fn:concat(?, \".\", ?), \"\", 1 to 5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'.1.2.3.4.5'")
     );
@@ -116,9 +140,13 @@ public class FnFoldLeft extends QT3TestSet {
     final XQuery query = new XQuery(
       "fold-left(fn:concat(\"$f(\", ?, \", \", ?, \")\"), \"$zero\", 1 to 5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "$f($f($f($f($f($zero, 1), 2), 3), 4), 5)")
     );
@@ -150,10 +178,14 @@ public class FnFoldLeft extends QT3TestSet {
       "            return $highest($hours, /works/employee) \n" +
       "        ",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertCount(1)
@@ -183,9 +215,13 @@ public class FnFoldLeft extends QT3TestSet {
       "            return local:distinct-nodes-stable($perm)/local-name()\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a b d c")
     );
@@ -199,9 +235,13 @@ public class FnFoldLeft extends QT3TestSet {
     final XQuery query = new XQuery(
       "fold-left(function($a, $b, $c){ $a + $b + $c }, 1, 1 to 5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -215,9 +255,13 @@ public class FnFoldLeft extends QT3TestSet {
     final XQuery query = new XQuery(
       "fold-left(function($a, $b) as element(foo) { $a + $b }, 1, 1 to 5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -231,9 +275,13 @@ public class FnFoldLeft extends QT3TestSet {
     final XQuery query = new XQuery(
       "fold-left(function($a, $b) { $a + $b }, \"\", 1 to 5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -247,9 +295,13 @@ public class FnFoldLeft extends QT3TestSet {
     final XQuery query = new XQuery(
       "fold-left(function($a, $b as element(foo)) { $a + $b }, 1, 1 to 5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -263,9 +315,13 @@ public class FnFoldLeft extends QT3TestSet {
     final XQuery query = new XQuery(
       "fold-left(function($a as element(bar), $b) { $a + $b }, 1, 1 to 5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -279,9 +335,13 @@ public class FnFoldLeft extends QT3TestSet {
     final XQuery query = new XQuery(
       "fold-left(function($a, $b){ ($a, $b) }, 1, 1 to 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("1, 1, 2")
     );
@@ -317,9 +377,13 @@ public class FnFoldLeft extends QT3TestSet {
       "  $result/text()\n" +
       "\t ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Hello World!")
     );
@@ -333,9 +397,13 @@ public class FnFoldLeft extends QT3TestSet {
     final XQuery query = new XQuery(
       "fold-left(concat(\"(\", ?, \"+\", ?, \")\"), 0, 1 to 13)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "(((((((((((((0+1)+2)+3)+4)+5)+6)+7)+8)+9)+10)+11)+12)+13)")
     );
@@ -369,9 +437,13 @@ public class FnFoldLeft extends QT3TestSet {
       ")\n" +
       "",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("2, 2, 2")
     );
@@ -385,9 +457,13 @@ public class FnFoldLeft extends QT3TestSet {
     final XQuery query = new XQuery(
       "fold-left(function($a, $b){ if(empty($a)) then $b else ($a + $b) div 2 }, (), (13, 14, 9, 6))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "8.625")
     );
@@ -401,9 +477,13 @@ public class FnFoldLeft extends QT3TestSet {
     final XQuery query = new XQuery(
       "fold-left(function($a, $b){ $a + 1}, 0, 1 to 1000000)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1000000")
     );

@@ -20,9 +20,13 @@ public class ProdConstructionDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "(::)declare(::)construction(::)preserve(::);(::)1(::)eq(::)1(::)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -36,9 +40,13 @@ public class ProdConstructionDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare(::)construction(::)Preserve;(::)1(::)eq(::)1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -52,9 +60,13 @@ public class ProdConstructionDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare(::)construction(::)strip;(::)1(::)eq(::)1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class ProdConstructionDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare(::)construction(::)strip; declare(::)construction(::)strip;1(::)eq(::)1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0067")
     );
@@ -84,9 +100,13 @@ public class ProdConstructionDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "construction gt construction",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -103,9 +123,13 @@ public class ProdConstructionDecl extends QT3TestSet {
       "        declare construction strip; \n" +
       "        \"abc\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0067")
     );
@@ -123,9 +147,13 @@ public class ProdConstructionDecl extends QT3TestSet {
       "        return fn:not($anElement instance of element(*,xs:anyType))\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -143,9 +171,13 @@ public class ProdConstructionDecl extends QT3TestSet {
       "        return fn:not($anElement instance of element(*,xs:anyType))\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -162,9 +194,13 @@ public class ProdConstructionDecl extends QT3TestSet {
       "        fn:not(<someElement>some content</someElement> instance of element(*,xs:untyped))\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -181,9 +217,13 @@ public class ProdConstructionDecl extends QT3TestSet {
       "        fn:not(element someElement{\"some content\"} instance of element(*,xs:anyType))\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -201,9 +241,13 @@ public class ProdConstructionDecl extends QT3TestSet {
       "        return ($var instance of element(*,xs:untyped)) and fn:true()\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -221,9 +265,13 @@ public class ProdConstructionDecl extends QT3TestSet {
       "        return ($anElement instance of element(*,xs:untyped)) and fn:true()\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -241,9 +289,13 @@ public class ProdConstructionDecl extends QT3TestSet {
       "        return ($anElement instance of element(*,xs:anyType)) and fn:true()\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -261,9 +313,13 @@ public class ProdConstructionDecl extends QT3TestSet {
       "        return ($anElement instance of element(*,xs:anyType)) and fn:true()\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -281,9 +337,13 @@ public class ProdConstructionDecl extends QT3TestSet {
       "        return ($var instance of element(*,xs:untyped)) or fn:false()\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -301,9 +361,13 @@ public class ProdConstructionDecl extends QT3TestSet {
       "        return ($anElement instance of element(*,xs:untyped)) or fn:false()\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -321,9 +385,13 @@ public class ProdConstructionDecl extends QT3TestSet {
       "        return $anElement instance of element(*,xs:untyped)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -341,9 +409,13 @@ public class ProdConstructionDecl extends QT3TestSet {
       "        return ($anElement instance of element(*,xs:anyType)) or fn:false()\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -361,9 +433,13 @@ public class ProdConstructionDecl extends QT3TestSet {
       "        return ($anElement instance of element(*,xs:anyType)) or fn:false()\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -381,9 +457,13 @@ public class ProdConstructionDecl extends QT3TestSet {
       "        return $anElement instance of element(*,xs:untyped)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -400,9 +480,13 @@ public class ProdConstructionDecl extends QT3TestSet {
       "        let $anElement := <anElement>some content</anElement> \n" +
       "        return $anElement instance of element(*,xs:anyType)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -419,9 +503,13 @@ public class ProdConstructionDecl extends QT3TestSet {
       "        let $anElement := element anElement {\"someContent\"} \n" +
       "        return $anElement instance of element(*,xs:anyType)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -439,9 +527,13 @@ public class ProdConstructionDecl extends QT3TestSet {
       "        return $anElement instance of element(*,xs:anyType)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -459,9 +551,13 @@ public class ProdConstructionDecl extends QT3TestSet {
       "        return $anElement instance of element(*,xs:anyType)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -478,9 +574,13 @@ public class ProdConstructionDecl extends QT3TestSet {
       "        let $anElement := <someElement>some content</someElement> \n" +
       "        return fn:not($anElement instance of element(*,xs:untyped))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -497,9 +597,13 @@ public class ProdConstructionDecl extends QT3TestSet {
       "        let $anElement := element someElement{\"some content\"} \n" +
       "        return fn:not($anElement instance of element(*,xs:untyped))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );

@@ -20,9 +20,13 @@ public class MiscSurrogates extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-length(\"abc&#x1D156;def\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("7")
     );
@@ -36,9 +40,13 @@ public class MiscSurrogates extends QT3TestSet {
     final XQuery query = new XQuery(
       "substring(\"abc&#x1D156;def\", 5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "def")
     );
@@ -52,9 +60,13 @@ public class MiscSurrogates extends QT3TestSet {
     final XQuery query = new XQuery(
       "substring(\"abc&#x1D156;def\", 4)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "𝅖def")
     );
@@ -68,9 +80,13 @@ public class MiscSurrogates extends QT3TestSet {
     final XQuery query = new XQuery(
       "translate(\"abc&#x1D156;def\", \"&#x1D156;\", \"#\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abc#def")
     );
@@ -84,9 +100,13 @@ public class MiscSurrogates extends QT3TestSet {
     final XQuery query = new XQuery(
       "translate(\"abc&#x1D156;def\", \"&#x1D156;de\", \"#DE\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abc#DEf")
     );
@@ -100,9 +120,13 @@ public class MiscSurrogates extends QT3TestSet {
     final XQuery query = new XQuery(
       "translate(\"abc&#x1D156;def\", \"def\", \"&#x1D156;EF\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abc𝅖𝅖EF")
     );
@@ -116,9 +140,13 @@ public class MiscSurrogates extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-to-codepoints(\"abc&#x1D156;def\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "97 98 99 119126 100 101 102")
     );
@@ -132,9 +160,13 @@ public class MiscSurrogates extends QT3TestSet {
     final XQuery query = new XQuery(
       "codepoints-to-string((97, 98, 99, 119126, 100, 101, 102))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abc𝅖def")
     );
@@ -148,9 +180,13 @@ public class MiscSurrogates extends QT3TestSet {
     final XQuery query = new XQuery(
       "codepoints-to-string((97, 98, 99, 119126, 100, 101, 102))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abc𝅖def")
     );
@@ -164,9 +200,13 @@ public class MiscSurrogates extends QT3TestSet {
     final XQuery query = new XQuery(
       "substring-before(\"abc&#x1D156;def\", \"&#x1D156;\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abc")
     );
@@ -180,9 +220,13 @@ public class MiscSurrogates extends QT3TestSet {
     final XQuery query = new XQuery(
       "substring-before(\"abc&#x1D156;def\", \"f\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abc𝅖de")
     );
@@ -196,9 +240,13 @@ public class MiscSurrogates extends QT3TestSet {
     final XQuery query = new XQuery(
       "substring-after(\"abc&#x1D156;def\", \"&#x1D156;\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "def")
     );
@@ -212,9 +260,13 @@ public class MiscSurrogates extends QT3TestSet {
     final XQuery query = new XQuery(
       "matches(\"abc&#x1D157;def\", \"abc[&#x1D156;-&#x1D158;]def\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -228,9 +280,13 @@ public class MiscSurrogates extends QT3TestSet {
     final XQuery query = new XQuery(
       "matches(\"abc&#x1D157;def\", \"abc.def\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -244,9 +300,13 @@ public class MiscSurrogates extends QT3TestSet {
     final XQuery query = new XQuery(
       "replace(\"abc&#119130;def\", \"[&#119120;-&#119135;]\", \"&#119135;\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abc𝅘𝅥def")
     );
@@ -260,9 +320,13 @@ public class MiscSurrogates extends QT3TestSet {
     final XQuery query = new XQuery(
       "replace(\"abc&#x1D157;def\", \"[^a-f]\", \"###\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abc###def")
     );
@@ -276,9 +340,13 @@ public class MiscSurrogates extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-to-codepoints(substring(\"&#x10FC00;A\", 2, 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("65")
     );

@@ -20,9 +20,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $a as item()* in (1, 2), $b as item()* in $a satisfies $b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -36,9 +40,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $a as xs:anyURI in 1 satisfies count($a)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -52,9 +60,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $a as empty-sequence() in (1, 2), $b as xs:integer in $a satisfies $b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -68,9 +80,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $a as empty-sequence() in (1, 2), $b as xs:integer in $a satisfies $b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -84,9 +100,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $a as xs:integer+ in (1, 2), $b as xs:string* in $a satisfies $b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -100,9 +120,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $a as xs:integer+ in (1, 2), $b as xs:string* in $a satisfies $b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -116,9 +140,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $a as item()* in (1, 2), $b as xs:string in $a satisfies $b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -132,9 +160,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $a as item()* in (1, 2), $b as xs:string in $a satisfies $b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -148,9 +180,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $a as xs:integer+ in (1, 2), $b as xs:integer in $a satisfies $b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -164,9 +200,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $a as item()* in (1, 2), $b as xs:integer in $a satisfies $b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -180,9 +220,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $a as item() at $p in (1, 2) satisfies $a",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -196,9 +240,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $a as item()* in (1, 2), $b as item()* in $a satisfies $b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -212,9 +260,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $a as item() at $p in (1, 2) satisfies $a",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -228,9 +280,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $a as empty-sequence() in (), $b as xs:integer in $a satisfies $b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -248,9 +304,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(some $a as empty-sequence() in (), $b as xs:integer in $a satisfies $b)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -268,9 +328,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $a as xs:integer in (1, 2), $b as xs:integer in $a satisfies $b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -284,9 +348,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $a as xs:integer in (1, 2), $b as xs:integer in $a satisfies $b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -300,9 +368,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $a as item()? in (1, 2), $b as item()? in $a satisfies $b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -316,9 +388,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $a as item()? in (1, 2), $b as item()? in $a satisfies $b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -332,9 +408,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $a as item()+ in (1, 2), $b as item()+ in $a satisfies $b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -348,9 +428,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $a as item()+ in (1, 2), $b as item()+ in $a satisfies $b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -364,9 +448,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $a as empty-sequence()? in (1, 2) satisfies $a",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -380,9 +468,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $a as empty-sequence()? in (1, 2) satisfies $a",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -396,9 +488,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $a as xs:anyURI in 1 satisfies count($a)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -412,9 +508,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $foo in 1 satisfies QName(\"example.com/\", \"ncname\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -428,9 +528,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(some $i in () satisfies $i)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -444,9 +548,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $foo in 1 satisfies true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -460,9 +568,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $foo in 1 satisfies true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -476,9 +588,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(some $foo in 1 satisfies false())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -492,9 +608,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(every $foo in 1 satisfies false())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -508,9 +628,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $foo in 1 satisfies 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -524,9 +648,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $foo in 1 satisfies 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -540,9 +668,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $foo in 1 satisfies \"a string\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -556,9 +688,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $foo in 1 satisfies \"a string\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -572,9 +708,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $var in (true(), true(), true()) satisfies $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -588,9 +728,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $foo in 1 satisfies QName(\"example.com/\", \"ncname\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -604,9 +748,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(every $var in (true(), false(), true()) satisfies $var)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -620,9 +768,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(every $var in (false(), true(), true()) satisfies $var)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -636,9 +788,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(every $var in (true(), true(), false()) satisfies $var)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -652,9 +808,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $var in (true(), true(), true()) satisfies $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -668,9 +828,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $var in (true(), false(), true()) satisfies $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -684,9 +848,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $var in (false(), true(), true()) satisfies $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -700,9 +868,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $var in (true(), true(), false()) satisfies $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -716,9 +888,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(some $var in (false(), false(), false()) satisfies $var)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -732,9 +908,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $var in (xs:hexBinary(\"FF\"), true(), true()) satisfies $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -748,9 +928,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $var in (true(), xs:hexBinary(\"FF\"), true()) satisfies $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -764,9 +948,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $foo in 1 satisfies $foo eq \"1\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -780,9 +968,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $var in (true(), true(), xs:hexBinary(\"FF\")) satisfies $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -796,9 +988,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $var in (xs:hexBinary(\"FF\"), false(), true()) satisfies $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -812,9 +1008,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $var in (false(), xs:hexBinary(\"FF\"), true()) satisfies $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -828,9 +1028,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $var in (true(), true(), xs:hexBinary(\"FF\")) satisfies $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -848,9 +1052,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(every $var in (false(), true(), true()) satisfies $var)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -864,9 +1072,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(every $var in (true(), false(), true()) satisfies $var)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -880,9 +1092,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(every $var in (true(), true(), false()) satisfies $var)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -896,9 +1112,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $var in (true(), true(), true()) satisfies $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -912,9 +1132,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $var in (true(), false(), true()) satisfies $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -928,9 +1152,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $var in (false(), true(), true()) satisfies $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -944,9 +1172,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $foo in 1 satisfies $foo eq \"1\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -960,9 +1192,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $var in (true(), true(), false()) satisfies $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -976,9 +1212,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(some $var in (false(), false(), false()) satisfies $var)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -994,9 +1234,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
       "        declare variable $i := false(); \n" +
       "        some $i in (true(), true(), true()) satisfies $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1013,9 +1257,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
       "        declare variable $t := false(); \n" +
       "        some $i in (true(), true()), $t in (true(), true()) satisfies $i eq $t",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1032,9 +1280,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
       "        declare variable $t := false(); \n" +
       "        some $i in (true(), true()), $t in (true(), true()) satisfies ($i eq $t)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1050,9 +1302,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
       "        declare variable $i := false(); \n" +
       "        every $i in (true(), true()) satisfies $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1066,9 +1322,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $var in (1, 2, 3) satisfies $var eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1082,9 +1342,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(every $var in (1, 2, 3) satisfies $var eq 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1098,9 +1362,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $var in (1, 2, 3) satisfies $var eq 1 or $var eq 2 or $var eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1114,9 +1382,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $var in (1, 2, 3) satisfies $var eq 1 or $var eq 2 or $var eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1130,9 +1402,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $i in (0, 2, 3) satisfies count($i)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1146,9 +1422,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $aaa in (1, 2, 3), $bbb in (3, 2, 1) satisfies $aaa + $bbb eq 4",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1162,9 +1442,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $aaa in (3, 3, 3), $bbb in (3, 3, 3) satisfies $aaa + $bbb eq 6",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1178,9 +1462,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(every $var in (1, 2, 3) satisfies $var eq 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1194,9 +1482,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $var in (1, 2, 3) satisfies $var eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1210,9 +1502,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "true() eq (some $a in 1 satisfies $a)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1226,9 +1522,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "true() eq (every $a in 1 satisfies $a)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1242,9 +1542,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "true() eq (some $fn:name in (1, 2) satisfies $fn:name)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1258,9 +1562,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "true() eq (some $xs:name in (1, 2) satisfies $xs:name)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1274,9 +1582,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "true() eq (every $fn:name in (1, 2) satisfies $fn:name)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1290,9 +1602,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "true() eq (every $xs:name in (1, 2) satisfies $xs:name)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1306,9 +1622,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $i in (1, 2, 3) satisfies count($i)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1322,9 +1642,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $foo in 1 satisfies $NOTEXIST",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1338,9 +1662,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $foo in 1 satisfies $NOTEXIST",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1354,9 +1682,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $foo in (1, $foo) satisfies 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1370,9 +1702,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $foo in (1, $foo) satisfies 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1386,9 +1722,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $foo in 1 satisfies $bar + (some $bar in 2 satisfies $bar)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1402,9 +1742,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $foo in 1 satisfies $bar + (some $bar in 2 satisfies $bar)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1418,9 +1762,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $foo in 1 satisfies $bar + (every $bar in 2 satisfies $bar)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1434,9 +1782,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $foo in 1 satisfies $bar + (every $bar in 2 satisfies $bar)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1450,9 +1802,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $a in (1, 2), $b in (1, 2), $c in (1, 2) satisfies 1, $a",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1466,9 +1822,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $a in (1, 2), $b in (1, 2), $c in (1, 2) satisfies 1, $b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1482,9 +1842,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $i in subsequence((0, 1, 2, current-time()), 1, 3) satisfies boolean($i treat as xs:integer)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1498,9 +1862,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $a in (1, 2), $b in (1, 2), $c in (1, 2) satisfies 1, $c",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1514,9 +1882,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $a in (1, 2), $b in (1, 2), $c in (1, 2) satisfies 1, $a",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1530,9 +1902,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $a in (1, 2), $b in (1, 2), $c in (1, 2) satisfies 1, $b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1546,9 +1922,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $a in (1, 2), $b in (1, 2), $c in (1, 2) satisfies 1, $c",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1562,9 +1942,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $foo in (1, $2) return 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1578,9 +1962,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $foo in (1, $2) return 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1594,9 +1982,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $foo in (1, 2, $foo) satisfies 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1610,9 +2002,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $foo in (1, $foo, 3) satisfies 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1626,9 +2022,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $foo in ($foo, 2, 3) satisfies 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1642,9 +2042,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $foo in $foo satisfies 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1658,9 +2062,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $i in subsequence((1, 2, 3, current-time()), 1, 3) satisfies boolean($i treat as xs:integer)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1674,9 +2082,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $foo in (1, 2, $foo) satisfies 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1690,9 +2102,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $foo in (1, $foo, 3) satisfies 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1706,9 +2122,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $foo in ($foo, 2, 3) satisfies 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1722,9 +2142,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $foo in $foo satisfies 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1738,9 +2162,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $a in 1, $b in $b satisfies 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1754,9 +2182,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $a in (1, 2, 3), $b in (1, 2, 3, $b) satisfies $a eq $b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1770,9 +2202,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $a in (1, 2, 3), $b in (1, 2, 3, $b) satisfies ($a eq $b)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1786,9 +2222,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $a in (1, 2), $b in (1, 2) satisfies 1, $b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1802,9 +2242,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $a in (1, 2), $b in (1, 2) satisfies 1, $b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1818,9 +2262,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $a in (1, 2, 3), $b in ($a, 4) satisfies $b gt 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1834,9 +2282,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $i in () satisfies $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1850,9 +2302,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $a in (1, 2, 3), $b in ($a, 4) satisfies $b gt 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1866,9 +2322,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $a in (1, 2), $b in $a satisfies $b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1882,9 +2342,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $a in (1, 2), $b in $a satisfies $b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1898,9 +2362,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((for $a in 1, $b in $a, $c in $a, $d in $c return ($a, $b, $c, $d)), (1, 1, 1, 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1914,9 +2382,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $i in (1, 2, 3) satisfies ($i, $i)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1930,9 +2402,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $i in (1, 2, 3) satisfies ($i, $i)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1946,9 +2422,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $i in (1, 2, 3) satisfies ($i, $i)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1962,9 +2442,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $i in (1, 2, 3) satisfies ($i, $i)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -1978,9 +2462,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $a at $p in (1, 2) satisfies $a",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1994,9 +2482,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $a at $p in (1, 2) satisfies $a",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -2010,9 +2502,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "SOME $i in (1, 2, 3) satisfies $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -2026,9 +2522,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "EVERY $i in (1, 2, 3) satisfies $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -2042,9 +2542,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "<people id=\"\"/>/(some $id in @id satisfies true())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2058,9 +2562,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $id in attribute::id satisfies $id",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -2074,9 +2582,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e/>/(some $v in self::node() satisfies $v)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2090,9 +2602,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e/>/(every $v in self::node() satisfies $v)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2106,9 +2622,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e/>/(every $b in 1, $v in self::node() satisfies $v)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2122,9 +2642,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e/>/(some $b in 1, $v in self::node() satisfies $v)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2138,11 +2662,75 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $firstSeq := (<a/>, <b/>, <e><c/></e>) let $secondSeq := (<a attr=\"\"/>, <b>text</b>, <e><c/></e>) return some $i in $firstSeq satisfies $secondSeq[deep-equal(.,$i)]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
+    );
+  }
+
+  /**
+   *  Test optimization when the domain may be empty and return type is a value .
+   */
+  @org.junit.Test
+  public void cbclEvery001() {
+    final XQuery query = new XQuery(
+      "every $x in (1 to 10)[. div 2 = 11] satisfies false()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  Tests optimization of every $x in .... satisfies true() .
+   */
+  @org.junit.Test
+  public void cbclEvery002() {
+    final XQuery query = new XQuery(
+      "every $x in (1 to 10)[. mod 2 = 0] satisfies true()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  Test optimization where the domain may be empty and the return type a value .
+   */
+  @org.junit.Test
+  public void cbclSome001() {
+    final XQuery query = new XQuery(
+      "some $x in (1 to 10)[. div 2 = 11] satisfies true()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
     );
   }
 
@@ -2154,9 +2742,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $x in (1, 2) satisfies $x + $x = 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2170,9 +2762,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $x in (1, 2) satisfies fn:string-length(xs:string($x)) = 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2186,9 +2782,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $x in (1, 2) satisfies fn:count(($x)) = 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2202,9 +2802,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $x in (1, 2) satisfies fn:true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2218,9 +2822,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $x in (1, 2) satisfies fn:false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2234,9 +2842,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $x in (1, 2) satisfies fn:not($x)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2250,9 +2862,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $x in (1, 2) satisfies $x = 1 or $x = 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2266,9 +2882,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $x in (1, 2) satisfies $x = 1 and ($x +1) = 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2282,9 +2902,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $x in (\"A\",\"B\",\"C\") satisfies $x = \"A\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2298,9 +2922,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $x in (1,2,3), $y in (4,5,6) satisfies $x + $y = 5",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2314,9 +2942,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $x in (1, 2) satisfies $x + $x = 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2330,9 +2962,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $x in (1,2,3), $y in (4,5,6) satisfies $x * $y = 10",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2346,9 +2982,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $x in (1,2,3), $y in (4,5,6) satisfies $x div $y = 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2362,9 +3002,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $x in (1,2,3), $y in (4,5,6) satisfies $x idiv $y = 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2378,9 +3022,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $x in (1,2,3), $y in (4,5,6) satisfies fn:string($x) = fn:string($y)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2394,9 +3042,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $x in (1,2,3), $y in (4,5,6) satisfies xs:integer($x) = xs:integer($y)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2410,9 +3062,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $x in (1,2,3), $y in (4,5,6) satisfies xs:decimal($x) = xs:decimal($y)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2426,9 +3082,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $x in (1,2,3), $y in (4,5,6) satisfies xs:float($x) = xs:float($y)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2442,9 +3102,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $x in (1,2,3), $y in (4,5,6) satisfies xs:double($x) = xs:double($y)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2458,9 +3122,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $x in (\"true\", \"false\"), $y in (\"false\",\"true\") satisfies xs:boolean($x) = xs:boolean($y)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2474,9 +3142,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $x in (\"1980-05-05T13:13:13Z\", \"1980-05-05T13:13:13Z\"), $y in (\"1980-05-05T13:13:13Z\",\"1980-05-05T13:13:13Z\") satisfies xs:dateTime($x) = xs:dateTime($y)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2490,9 +3162,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $x in (1, 2) satisfies $x - 2 = 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2506,9 +3182,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $x in (\"1985-07-05Z\", \"1985-07-05Z\"), $y in (\"1985-07-05Z\",\"1985-07-05Z\") satisfies xs:date($x) = xs:date($y)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2522,9 +3202,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $x in (1, 2) satisfies $x - 2 = 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2538,9 +3222,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $x in (1, 2) satisfies $x - 2 = 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2554,9 +3242,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $x in (1, 2) satisfies $x * 2 = 4",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2570,9 +3262,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $x in (1, 2) satisfies $x div 2 = 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2586,9 +3282,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $x in (\"1985-07-05Z\", \"1985-07-05Z\"), $y in (\"1985-07-05Z\",\"1985-07-05Z\") satisfies xs:date($x) = xs:date($y)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2602,9 +3302,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $x in (1, 2) satisfies $x idiv 2 = 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2618,9 +3322,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $x in (1, 2) satisfies fn:avg(($x, 1)) = 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2634,9 +3342,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $x in (1, 2) satisfies fn:string($x) = \"1\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2650,9 +3362,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $x in (1,2,3), $y in (4,5,6) satisfies $x - $y = 5",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2666,9 +3382,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $x in (1, 2) satisfies $x + $x = 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2682,9 +3402,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $x in (1, 1) satisfies $x + $x = 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2698,9 +3422,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $x in (2, 2) satisfies $x - 2 = 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2714,9 +3442,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $x in (1, 2) satisfies $x * 2 = 4",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2730,9 +3462,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $x in (1, 2) satisfies $x div 2 = 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2746,9 +3482,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $x in (1, 2) satisfies $x idiv 2 = 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2762,9 +3502,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $x in (1, 2) satisfies fn:avg(($x, 1)) = 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2778,9 +3522,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $x in (1, 2) satisfies fn:string($x) = \"1\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2794,9 +3542,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $x in (1, 2) satisfies fn:string-length(xs:string($x)) = 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2810,9 +3562,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $x in (1, 2) satisfies fn:count(($x)) = 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2826,9 +3582,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $x in (1, 2) satisfies fn:true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2842,9 +3602,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $x in (1, 2) satisfies fn:false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2858,9 +3622,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $x in (1, 2) satisfies fn:not($x)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2874,9 +3642,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $x in (1, 2) satisfies $x = 1 or $x = 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2890,9 +3662,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $x in (1, 2) satisfies $x = 1 and ($x +1) = 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2906,9 +3682,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $x in (\"A\",\"B\",\"C\") satisfies $x = \"A\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2922,9 +3702,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $x in (1,2,3), $y in (4,5,6) satisfies $x + $y = 5",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2938,9 +3722,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $x in (1,2,3), $y in (4,5,6) satisfies $x - $y = 5",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2954,9 +3742,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $x in (1,2,3), $y in (4,5,6) satisfies $x * $y = 10",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2970,9 +3762,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $x in (1,2,3), $y in (4,5,6) satisfies $x div $y = 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2986,9 +3782,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $x in (1,2,3), $y in (4,5,6) satisfies $x idiv $y = 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3002,9 +3802,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $x in (1,2,3), $y in (4,5,6) satisfies fn:string($x) = fn:string($y)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3018,9 +3822,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $x in (1,2,3), $y in (4,5,6) satisfies xs:integer($x) = xs:integer($y)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3034,9 +3842,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $x in (1,2,3), $y in (4,5,6) satisfies xs:decimal($x) = xs:decimal($y)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3050,9 +3862,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $x in (1,2,3), $y in (4,5,6) satisfies xs:float($x) = xs:float($y)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3066,9 +3882,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $x in (1,2,3), $y in (4,5,6) satisfies xs:double($x) = xs:double($y)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3082,9 +3902,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $x in (\"true\", \"false\"), $y in (\"false\",\"true\") satisfies xs:boolean($x) = xs:boolean($y)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3098,9 +3922,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $x in (\"1980-05-05T13:13:13Z\", \"1980-05-05T13:13:13Z\"), $y in (\"1980-05-05T13:13:13Z\",\"1980-05-05T13:13:13Z\") satisfies xs:dateTime($x) = xs:dateTime($y)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3114,9 +3942,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $x as xs:integer in (1, 2, 3) , $y as xs:integer in (2, 3, 4) satisfies $x + $y = 4",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3130,9 +3962,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $x as xs:string in (\"cat\",\"dog\",\"rat\") satisfies fn:string-length($x) = 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3146,9 +3982,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $x as xs:string in (\"cat\",\"dog\",\"rat\") satisfies fn:string-length($x) = 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3162,9 +4002,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "every $x as xs:string in (\"cat\",\"dog\",\"rat\"), $y as xs:integer in (3, 3, 3) satisfies fn:string-length($x) = $y",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3178,9 +4022,13 @@ public class ProdQuantifiedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "some $x as xs:integer in (1, 2, 3), $y as xs:float in (xs:float(2), xs:float(3)) satisfies $x + $y = 5",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );

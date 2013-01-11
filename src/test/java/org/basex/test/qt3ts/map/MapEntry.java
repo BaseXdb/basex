@@ -20,9 +20,13 @@ public class MapEntry extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:entry(3, 5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertCount(1)
@@ -52,9 +56,13 @@ public class MapEntry extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:entry(3, ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertCount(1)
@@ -82,9 +90,13 @@ public class MapEntry extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:entry(\"foo\", (\"x\", \"y\", \"z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertCount(1)
@@ -118,9 +130,13 @@ public class MapEntry extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:entry(xs:untypedAtomic(\"foo\"), map{})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertCount(1)
@@ -148,9 +164,13 @@ public class MapEntry extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:entry(number('NaN'), 'NaN')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertCount(1)
@@ -172,9 +192,13 @@ public class MapEntry extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:entry(xs:float('NaN'), 'NaN')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertCount(1)
@@ -194,9 +218,13 @@ public class MapEntry extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:collation(map:entry(0,1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.w3.org/2005/xpath-functions/collation/codepoint")
     );

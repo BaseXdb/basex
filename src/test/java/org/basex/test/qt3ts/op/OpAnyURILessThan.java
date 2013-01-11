@@ -20,9 +20,13 @@ public class OpAnyURILessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://example.com/A\") lt xs:anyURI(\"http://example.com/B\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -36,9 +40,13 @@ public class OpAnyURILessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:anyURI(\"http://example.com/B\") lt xs:anyURI(\"http://example.com/A\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class OpAnyURILessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"http://example.com/A\") lt xs:anyURI(\"http://example.com/B\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class OpAnyURILessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:anyURI(\"http://example.com/B\") lt xs:string(\"http://example.com/A\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class OpAnyURILessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:anyURI(\"http://example.com/A\") gt xs:anyURI(\"http://example.com/B\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class OpAnyURILessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:string(\"http://example.com/A\") gt xs:anyURI(\"http://example.com/B\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,9 +140,13 @@ public class OpAnyURILessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://example.com/B\") gt xs:anyURI(\"http://example.com/A\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -132,9 +160,13 @@ public class OpAnyURILessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://example.com/B\") gt xs:string(\"http://example.com/A\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );

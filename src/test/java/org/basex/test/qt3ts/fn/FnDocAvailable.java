@@ -20,14 +20,106 @@ public class FnDocAvailable extends QT3TestSet {
     final XQuery query = new XQuery(
       "doc-available(':/')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(false)
       ||
         error("FODC0005")
+      )
+    );
+  }
+
+  /**
+   *  test fn:doc-available on () .
+   */
+  @org.junit.Test
+  public void cbclDocAvailable001() {
+    final XQuery query = new XQuery(
+      "fn:doc-available( () )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test fn:doc-available on invalid input .
+   */
+  @org.junit.Test
+  public void cbclDocAvailable002() {
+    final XQuery query = new XQuery(
+      "fn:doc-available( '%gg' )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        error("FODC0005")
+      ||
+        assertBoolean(false)
+      )
+    );
+  }
+
+  /**
+   *  test fn:doc-available on a URI which is not that of a document .
+   */
+  @org.junit.Test
+  public void cbclDocAvailable003() {
+    final XQuery query = new XQuery(
+      "fn:doc-available( 'collection1' )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  Test doc-available with a URL .
+   */
+  @org.junit.Test
+  public void cbclDocAvailable004() {
+    final XQuery query = new XQuery(
+      "doc-available(\"%gg\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        error("FODC0005")
+      ||
+        assertBoolean(false)
       )
     );
   }
@@ -40,9 +132,13 @@ public class FnDocAvailable extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:doc-available(\"http://example.com\",\"string 2\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -56,9 +152,13 @@ public class FnDocAvailable extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:doc-available(xs:integer(2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -72,11 +172,15 @@ public class FnDocAvailable extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:doc-available($uri)",
       ctx);
-    query.addDocument("id/XMLIdDuplicated.xml", file("fn/id/XMLIdDuplicated.xml"));
-    query.bind("uri", new XQuery("'id/XMLIdDuplicated.xml'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addDocument("id/XMLIdDuplicated.xml", file("fn/id/XMLIdDuplicated.xml"));
+      query.bind("uri", new XQuery("'id/XMLIdDuplicated.xml'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(false)
@@ -94,11 +198,15 @@ public class FnDocAvailable extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:doc-available($uri)",
       ctx);
-    query.addDocument("id/InvalidXMLId.xml", file("fn/id/InvalidXMLId.xml"));
-    query.bind("uri", new XQuery("'id/InvalidXMLId.xml'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addDocument("id/InvalidXMLId.xml", file("fn/id/InvalidXMLId.xml"));
+      query.bind("uri", new XQuery("'id/InvalidXMLId.xml'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -116,10 +224,14 @@ public class FnDocAvailable extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:doc-available(document-uri(/))",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -133,9 +245,13 @@ public class FnDocAvailable extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:doc-available(\"file:///a/b/c/wefdobqciyvdsoihnfcpinads.xml\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -149,9 +265,13 @@ public class FnDocAvailable extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:doc-available(())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -165,9 +285,13 @@ public class FnDocAvailable extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:doc-available(\"../prod/ModuleImport/module1-lib.xq\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );

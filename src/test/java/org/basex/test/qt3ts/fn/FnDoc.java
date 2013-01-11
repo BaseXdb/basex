@@ -20,9 +20,13 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(fn:doc(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -36,10 +40,14 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "doc(\"\")",
       ctx);
-    query.baseURI("file:///directory/directory/example.com/www.example.com/thisFileDoesNotExist.xml");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.baseURI("file:///directory/directory/example.com/www.example.com/thisFileDoesNotExist.xml");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FODC0002")
     );
@@ -53,10 +61,14 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "doc(\"\")",
       ctx);
-    query.baseURI("file:///directory/directory/example.com/");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.baseURI("file:///directory/directory/example.com/");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FODC0002")
     );
@@ -73,9 +85,13 @@ public class FnDoc extends QT3TestSet {
       "        empty($fileToOpen//*[let $i := @type return doc($fileToOpen)//*[$i]])\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -97,9 +113,13 @@ public class FnDoc extends QT3TestSet {
       "        for $i in doc(\"localFile.xml\") \n" +
       "        return (1, 2, 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "1 2 3")
@@ -117,9 +137,13 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "doc(':/')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FODC0005")
     );
@@ -133,9 +157,13 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e>{fn:doc(())}</e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e/>", false)
     );
@@ -149,9 +177,13 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:doc(xs:untypedAtomic(\"file:///example.com/does/not/exist/xqts-testing.xml\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FODC0002")
     );
@@ -165,9 +197,13 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "doc(\"/example.com/example.org/does/not/exist/doesNotExist/works-mod.xml\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("FODC0002")
@@ -185,10 +221,14 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "doc(\"/example.com/example.org/does/not/exist/doesNotExist/works-mod.xml\")",
       ctx);
-    query.baseURI("http://www.example.com");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.baseURI("http://www.example.invalid");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FODC0002")
     );
@@ -202,10 +242,14 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "doc(\"/example.com/example.org/does/not/exist/doesNotExist/works-mod.xml\")",
       ctx);
-    query.baseURI("file:///");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.baseURI("file:///");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FODC0002")
     );
@@ -219,9 +263,13 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "doc(\"example.com\\example.org\\does\\not\\exist\\doesNotExist\\works-mod.xml\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FODC0002")
     );
@@ -235,9 +283,13 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "doc(\"\\example.com\\example.org\\does\\not\\exist\\doesNotExist\\works-mod.xml\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FODC0002")
     );
@@ -251,9 +303,13 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "doc(\"C:\\example.com\\example.org\\does\\not\\exist\\doesNotExist\\works-mod.xml\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("FODC0002")
@@ -271,9 +327,13 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:doc(\"http:\\\\invalid>URI\\someURI\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("FODC0005")
@@ -291,11 +351,15 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:nilled(fn:doc($uri)))",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-    query.bind("uri", new XQuery("'http://www.w3.org/fots/docs/works-mod.xml'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      query.bind("uri", new XQuery("'http://www.w3.org/fots/docs/works-mod.xml'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -309,11 +373,15 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:node-name(fn:doc($uri)))",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-    query.bind("uri", new XQuery("'http://www.w3.org/fots/docs/works-mod.xml'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      query.bind("uri", new XQuery("'http://www.w3.org/fots/docs/works-mod.xml'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -327,9 +395,13 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:doc(\"%gg\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("FODC0002")
@@ -347,11 +419,15 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(fn:doc($uri) is fn:doc($uri))",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-    query.bind("uri", new XQuery("'http://www.w3.org/fots/docs/works-mod.xml'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      query.bind("uri", new XQuery("'http://www.w3.org/fots/docs/works-mod.xml'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -365,11 +441,15 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:doc($uri) is fn:doc($uri)) and fn:true()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-    query.bind("uri", new XQuery("'http://www.w3.org/fots/docs/works-mod.xml'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      query.bind("uri", new XQuery("'http://www.w3.org/fots/docs/works-mod.xml'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -383,9 +463,13 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:doc(\"argument1\",\"argument2\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -399,11 +483,15 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:doc($uri) is fn:doc($uri)) and fn:false()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-    query.bind("uri", new XQuery("'http://www.w3.org/fots/docs/works-mod.xml'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      query.bind("uri", new XQuery("'http://www.w3.org/fots/docs/works-mod.xml'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -417,11 +505,15 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:doc($uri) is fn:doc($uri)) or fn:true()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-    query.bind("uri", new XQuery("'http://www.w3.org/fots/docs/works-mod.xml'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      query.bind("uri", new XQuery("'http://www.w3.org/fots/docs/works-mod.xml'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -435,11 +527,15 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:doc($uri) is fn:doc($uri)) or fn:false()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-    query.bind("uri", new XQuery("'http://www.w3.org/fots/docs/works-mod.xml'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      query.bind("uri", new XQuery("'http://www.w3.org/fots/docs/works-mod.xml'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -453,11 +549,15 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:doc($uri)",
       ctx);
-    query.addDocument("id/SpaceBracket.xml", file("fn/id/SpaceBracket.xml"));
-    query.bind("uri", new XQuery("'id/SpaceBracket.xml'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addDocument("id/SpaceBracket.xml", file("fn/id/SpaceBracket.xml"));
+      query.bind("uri", new XQuery("'id/SpaceBracket.xml'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<p> ]</p>", false)
     );
@@ -471,11 +571,15 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:doc($uri)",
       ctx);
-    query.addDocument("id/HighUnicode.xml", file("fn/id/HighUnicode.xml"));
-    query.bind("uri", new XQuery("'id/HighUnicode.xml'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addDocument("id/HighUnicode.xml", file("fn/id/HighUnicode.xml"));
+      query.bind("uri", new XQuery("'id/HighUnicode.xml'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<เจมส์></เจมส์>", false)
     );
@@ -489,11 +593,15 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:doc($uri)",
       ctx);
-    query.addDocument("id/HighUnicode2.xml", file("fn/id/HighUnicode2.xml"));
-    query.bind("uri", new XQuery("'id/HighUnicode2.xml'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addDocument("id/HighUnicode2.xml", file("fn/id/HighUnicode2.xml"));
+      query.bind("uri", new XQuery("'id/HighUnicode2.xml'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<เจมส์/>", false)
     );
@@ -507,11 +615,15 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:doc($uri)",
       ctx);
-    query.addDocument("id/BCisInvalid.xml", file("fn/id/BCisInvalid.xml"));
-    query.bind("uri", new XQuery("'id/BCisInvalid.xml'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addDocument("id/BCisInvalid.xml", file("fn/id/BCisInvalid.xml"));
+      query.bind("uri", new XQuery("'id/BCisInvalid.xml'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FODC0002")
     );
@@ -525,11 +637,15 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:doc($uri)",
       ctx);
-    query.addDocument("id/InvalidUmlaut.xml", file("fn/id/InvalidUmlaut.xml"));
-    query.bind("uri", new XQuery("'id/InvalidUmlaut.xml'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addDocument("id/InvalidUmlaut.xml", file("fn/id/InvalidUmlaut.xml"));
+      query.bind("uri", new XQuery("'id/InvalidUmlaut.xml'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FODC0002")
     );
@@ -543,11 +659,15 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:doc($uri)",
       ctx);
-    query.addDocument("id/NamespaceSuppliedInternally.xml", file("fn/id/NamespaceSuppliedInternally.xml"));
-    query.bind("uri", new XQuery("'id/NamespaceSuppliedInternally.xml'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addDocument("id/NamespaceSuppliedInternally.xml", file("fn/id/NamespaceSuppliedInternally.xml"));
+      query.bind("uri", new XQuery("'id/NamespaceSuppliedInternally.xml'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\"/>", false)
     );
@@ -561,9 +681,13 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:doc(\"thisfileshouldnotexists.xml\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FODC0002")
     );
@@ -577,11 +701,15 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "local-name(fn:doc($uri)/*)",
       ctx);
-    query.addDocument("id/XMLIdDuplicated.xml", file("fn/id/XMLIdDuplicated.xml"));
-    query.bind("uri", new XQuery("'id/XMLIdDuplicated.xml'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addDocument("id/XMLIdDuplicated.xml", file("fn/id/XMLIdDuplicated.xml"));
+      query.bind("uri", new XQuery("'id/XMLIdDuplicated.xml'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "schema")
@@ -599,11 +727,15 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "local-name(fn:doc($uri)/*)",
       ctx);
-    query.addDocument("id/InvalidXMLId.xml", file("fn/id/InvalidXMLId.xml"));
-    query.bind("uri", new XQuery("'id/InvalidXMLId.xml'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addDocument("id/InvalidXMLId.xml", file("fn/id/InvalidXMLId.xml"));
+      query.bind("uri", new XQuery("'id/InvalidXMLId.xml'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "schema")
@@ -621,11 +753,15 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(fn:doc($uri)), string(exactly-one(fn:doc($uri)/*))",
       ctx);
-    query.addDocument("id/Books2.xml", file("fn/id/Books2.xml"));
-    query.bind("uri", new XQuery("'id/Books2.xml'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addDocument("id/Books2.xml", file("fn/id/Books2.xml"));
+      query.bind("uri", new XQuery("'id/Books2.xml'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "\n  Everyday Italian\n  Giada De Laurentiis\n \n  Everyday Italian\n  Giada De Laurentiis\n")
     );
@@ -659,11 +795,15 @@ public class FnDoc extends QT3TestSet {
       "        } </s:svg>\n" +
       "     ",
       ctx);
-    query.addDocument("id/QObject.xml", file("fn/id/QObject.xml"));
-    query.bind("uri", new XQuery("'id/QObject.xml'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addDocument("id/QObject.xml", file("fn/id/QObject.xml"));
+      query.bind("uri", new XQuery("'id/QObject.xml'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<s:svg xmlns:s=\"http://www.w3.org/2000/svg\"><s:rect stroke-width=\"2\" width=\"500\" fill=\"none\" height=\"300\" stroke=\"blue\" y=\"1\" x=\"1\"/><s:rect stroke-width=\"10\" width=\"400\" fill=\"yellow\" height=\"200\" stroke=\"navy\" y=\"100\" x=\"400\"/><s:g xml:id=\"_layout\"/><s:g/><s:g xml:id=\"qt_tabwidget_stackedwidget\"/><s:g xml:id=\"verticalLayout_2\"/><s:g xml:id=\"htmlQueryEdit\"/><s:g/><s:g/><s:g/><s:g/><s:g/><s:g/><s:g/><s:g xml:id=\"htmlOutput\"/><s:g/><s:g/><s:g/><s:g/><s:g xml:id=\"verticalLayout\"/><s:g xml:id=\"wholeTree\"/><s:g/><s:g/><s:g/><s:g/><s:g/><s:g/><s:g/><s:g xml:id=\"wholeTreeOutput\"/><s:g/><s:g/><s:g/><s:g/><s:g/><s:g/><s:g/><s:g xml:id=\"verticalLayout_3\"/><s:g xml:id=\"diagramQuery\"/><s:g/><s:g/><s:g/><s:g/><s:g/><s:g/><s:g/><s:g xml:id=\"qt_tabwidget_tabbar\"/><s:g xml:id=\"menubar\"/><s:g xml:id=\"statusbar\"/><s:g/><s:g><s:text font-family=\"Verdana\" fill=\"blue\" font-size=\"55\" y=\"10\" x=\"10\">QBoxLayout</s:text></s:g><s:g><s:text font-family=\"Verdana\" fill=\"blue\" font-size=\"55\" y=\"10\" x=\"10\">QBoxLayout</s:text></s:g><s:g><s:text font-family=\"Verdana\" fill=\"blue\" font-size=\"55\" y=\"10\" x=\"10\">QBoxLayout</s:text></s:g><s:g><s:text font-family=\"Verdana\" fill=\"blue\" font-size=\"55\" y=\"10\" x=\"10\">QBoxLayout</s:text></s:g><s:g><s:text font-family=\"Verdana\" fill=\"blue\" font-size=\"55\" y=\"10\" x=\"10\">QBoxLayout</s:text></s:g><s:g><s:text font-family=\"Verdana\" fill=\"blue\" font-size=\"55\" y=\"10\" x=\"10\">QBoxLayout</s:text></s:g><s:g><s:text font-family=\"Verdana\" fill=\"blue\" font-size=\"55\" y=\"10\" x=\"10\">QBoxLayout</s:text></s:g><s:g><s:text font-family=\"Verdana\" fill=\"blue\" font-size=\"55\" y=\"10\" x=\"10\">QBoxLayout</s:text></s:g><s:g xml:id=\"horizontalLayout\"><s:text font-family=\"Verdana\" fill=\"blue\" font-size=\"55\" y=\"10\" x=\"10\">QHBoxLayout</s:text></s:g><s:g><s:text font-family=\"Verdana\" fill=\"blue\" font-size=\"55\" y=\"10\" x=\"10\">QHBoxLayout</s:text></s:g><s:g><s:text font-family=\"Verdana\" fill=\"blue\" font-size=\"55\" y=\"10\" x=\"10\">QHBoxLayout</s:text></s:g><s:g><s:text font-family=\"Verdana\" fill=\"blue\" font-size=\"55\" y=\"10\" x=\"10\">QSizeGrip</s:text></s:g><s:g xml:id=\"inheritanceTab\"><s:text font-family=\"Verdana\" fill=\"blue\" font-size=\"55\" y=\"10\" x=\"10\">QTabWidget</s:text></s:g><s:g><s:text font-family=\"Verdana\" fill=\"blue\" font-size=\"55\" y=\"10\" x=\"10\">QTimer</s:text></s:g><s:g><s:text font-family=\"Verdana\" fill=\"blue\" font-size=\"55\" y=\"10\" x=\"10\">QTimer</s:text></s:g><s:g><s:text font-family=\"Verdana\" fill=\"blue\" font-size=\"55\" y=\"10\" x=\"10\">QToolButton</s:text></s:g><s:g><s:text font-family=\"Verdana\" fill=\"blue\" font-size=\"55\" y=\"10\" x=\"10\">QToolButton</s:text></s:g><s:g xml:id=\"qt_menubar_ext_button\"><s:text font-family=\"Verdana\" fill=\"blue\" font-size=\"55\" y=\"10\" x=\"10\">QToolButton</s:text></s:g><s:g xml:id=\"centralwidget\"><s:text font-family=\"Verdana\" fill=\"blue\" font-size=\"55\" y=\"10\" x=\"10\">QWidget</s:text></s:g><s:g xml:id=\"htmlTab\"><s:text font-family=\"Verdana\" fill=\"blue\" font-size=\"55\" y=\"10\" x=\"10\">QWidget</s:text></s:g><s:g xml:id=\"qt_scrollarea_hcontainer\"><s:text font-family=\"Verdana\" fill=\"blue\" font-size=\"55\" y=\"10\" x=\"10\">QWidget</s:text></s:g><s:g xml:id=\"qt_scrollarea_vcontainer\"><s:text font-family=\"Verdana\" fill=\"blue\" font-size=\"55\" y=\"10\" x=\"10\">QWidget</s:text></s:g><s:g xml:id=\"qt_scrollarea_viewport\"><s:text font-family=\"Verdana\" fill=\"blue\" font-size=\"55\" y=\"10\" x=\"10\">QWidget</s:text></s:g><s:g xml:id=\"wholeTreeTab\"><s:text font-family=\"Verdana\" fill=\"blue\" font-size=\"55\" y=\"10\" x=\"10\">QWidget</s:text></s:g><s:g xml:id=\"qt_scrollarea_hcontainer\"><s:text font-family=\"Verdana\" fill=\"blue\" font-size=\"55\" y=\"10\" x=\"10\">QWidget</s:text></s:g><s:g xml:id=\"qt_scrollarea_vcontainer\"><s:text font-family=\"Verdana\" fill=\"blue\" font-size=\"55\" y=\"10\" x=\"10\">QWidget</s:text></s:g><s:g xml:id=\"qt_scrollarea_viewport\"><s:text font-family=\"Verdana\" fill=\"blue\" font-size=\"55\" y=\"10\" x=\"10\">QWidget</s:text></s:g><s:g xml:id=\"qt_scrollarea_hcontainer\"><s:text font-family=\"Verdana\" fill=\"blue\" font-size=\"55\" y=\"10\" x=\"10\">QWidget</s:text></s:g><s:g xml:id=\"qt_scrollarea_vcontainer\"><s:text font-family=\"Verdana\" fill=\"blue\" font-size=\"55\" y=\"10\" x=\"10\">QWidget</s:text></s:g><s:g xml:id=\"qt_scrollarea_viewport\"><s:text font-family=\"Verdana\" fill=\"blue\" font-size=\"55\" y=\"10\" x=\"10\">QWidget</s:text></s:g><s:g xml:id=\"svgTab\"><s:text font-family=\"Verdana\" fill=\"blue\" font-size=\"55\" y=\"10\" x=\"10\">QWidget</s:text></s:g><s:g xml:id=\"qt_scrollarea_hcontainer\"><s:text font-family=\"Verdana\" fill=\"blue\" font-size=\"55\" y=\"10\" x=\"10\">QWidget</s:text></s:g><s:g xml:id=\"qt_scrollarea_vcontainer\"><s:text font-family=\"Verdana\" fill=\"blue\" font-size=\"55\" y=\"10\" x=\"10\">QWidget</s:text></s:g><s:g xml:id=\"qt_scrollarea_viewport\"><s:text font-family=\"Verdana\" fill=\"blue\" font-size=\"55\" y=\"10\" x=\"10\">QWidget</s:text></s:g><s:g><s:text font-family=\"Verdana\" fill=\"blue\" font-size=\"55\" y=\"10\" x=\"10\">QWidgetAnimator</s:text></s:g></s:svg>", false)
     );
@@ -677,11 +817,15 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "doc($uri)",
       ctx);
-    query.addDocument("id/0x010D.xml", file("fn/id/0x010D.xml"));
-    query.bind("uri", new XQuery("'id/0x010D.xml'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addDocument("id/0x010D.xml", file("fn/id/0x010D.xml"));
+      query.bind("uri", new XQuery("'id/0x010D.xml'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<project čreated-by=\"{{build_number}}\"/>", false)
     );
@@ -695,9 +839,13 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "doc('id/badxml.xml')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FODC0002")
     );
@@ -711,11 +859,15 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(doc($uri)//text())",
       ctx);
-    query.addDocument("id/builtinEntities.xml", file("fn/id/builtinEntities.xml"));
-    query.bind("uri", new XQuery("'id/builtinEntities.xml'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addDocument("id/builtinEntities.xml", file("fn/id/builtinEntities.xml"));
+      query.bind("uri", new XQuery("'id/builtinEntities.xml'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("9")
     );
@@ -729,11 +881,15 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $result := id(\"idABC\", doc($uri)) return (empty($result), $result)",
       ctx);
-    query.addDocument("id/XMLIdWhitespace.xml", file("fn/id/XMLIdWhitespace.xml"));
-    query.bind("uri", new XQuery("'id/XMLIdWhitespace.xml'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addDocument("id/XMLIdWhitespace.xml", file("fn/id/XMLIdWhitespace.xml"));
+      query.bind("uri", new XQuery("'id/XMLIdWhitespace.xml'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -751,9 +907,13 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:doc(())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -767,11 +927,15 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:doc($uri) is fn:doc($uri)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-    query.bind("uri", new XQuery("'http://www.w3.org/fots/docs/works-mod.xml'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      query.bind("uri", new XQuery("'http://www.w3.org/fots/docs/works-mod.xml'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -785,13 +949,17 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:doc($works) is fn:doc($staff)",
       ctx);
-    query.addDocument("http://www.w3.org/fots/docs/works.xml", file("docs/works.xml"));
-    query.addDocument("http://www.w3.org/fots/docs/staff.xml", file("docs/staff.xml"));
-    query.bind("works", new XQuery("'http://www.w3.org/fots/docs/works.xml'", ctx).value());
-    query.bind("staff", new XQuery("'http://www.w3.org/fots/docs/staff.xml'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addDocument("http://www.w3.org/fots/docs/works.xml", file("docs/works.xml"));
+      query.addDocument("http://www.w3.org/fots/docs/staff.xml", file("docs/staff.xml"));
+      query.bind("works", new XQuery("'http://www.w3.org/fots/docs/works.xml'", ctx).value());
+      query.bind("staff", new XQuery("'http://www.w3.org/fots/docs/staff.xml'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -805,11 +973,15 @@ public class FnDoc extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:doc($uri)//day/string()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-    query.bind("uri", new XQuery("'http://www.w3.org/fots/docs/works-mod.xml'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      query.bind("uri", new XQuery("'http://www.w3.org/fots/docs/works-mod.xml'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"Monday\", \"Tuesday\"")
     );

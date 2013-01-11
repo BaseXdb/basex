@@ -20,9 +20,13 @@ public class FnOutermost extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:outermost()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnOutermost extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:outermost#0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -52,9 +60,13 @@ public class FnOutermost extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:outermost( (), 1 )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -68,9 +80,13 @@ public class FnOutermost extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:outermost#2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -84,9 +100,13 @@ public class FnOutermost extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:exists( fn:outermost#1 )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class FnOutermost extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:outermost( 1 )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -116,9 +140,13 @@ public class FnOutermost extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:outermost( fn:dateTime#2 )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -137,12 +165,16 @@ public class FnOutermost extends QT3TestSet {
       "                                 then 1\n" +
       "                                 else . ) )",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -161,12 +193,16 @@ public class FnOutermost extends QT3TestSet {
       "                                 then fn:dateTime#2\n" +
       "                                 else . ) )",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -180,12 +216,16 @@ public class FnOutermost extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:outermost( / )",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertCount(1)
     );
@@ -199,12 +239,16 @@ public class FnOutermost extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal(fn:outermost( / ), / )",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -218,12 +262,16 @@ public class FnOutermost extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:outermost( //*/@* )",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertCount(7)
     );
@@ -237,12 +285,16 @@ public class FnOutermost extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:outermost( //*/@* ) ! string()",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("('0a','00a','000a','01a','010a','02a','020a')")
     );
@@ -256,12 +308,16 @@ public class FnOutermost extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(fn:outermost( //*/@* ), //*/@*)",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -275,12 +331,16 @@ public class FnOutermost extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:outermost( //processing-instruction() )",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertCount(7)
     );
@@ -294,12 +354,16 @@ public class FnOutermost extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:outermost( //processing-instruction() ) ! local-name() ",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("('level-0','level-00','level-000','level-01','level-010','level-02','level-020')")
     );
@@ -314,12 +378,16 @@ public class FnOutermost extends QT3TestSet {
       "fn:deep-equal( fn:outermost( //processing-instruction() ), \n" +
       "                          //processing-instruction() )",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -333,12 +401,16 @@ public class FnOutermost extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:outermost( //comment() )",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertCount(7)
     );
@@ -352,12 +424,16 @@ public class FnOutermost extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:outermost( //comment() ) ! string()",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("('0c','00c','000c','01c','010c','02c','020c')")
     );
@@ -372,12 +448,16 @@ public class FnOutermost extends QT3TestSet {
       "fn:deep-equal( fn:outermost( //comment() ),\n" +
       "                           //comment() )",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -391,12 +471,16 @@ public class FnOutermost extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:outermost( //text() )",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertCount(14)
     );
@@ -410,12 +494,16 @@ public class FnOutermost extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:outermost( //text() ) ! string() ",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("('0t',' ',\n                         '00t',' ','000t',' ',\n                         '01t',' ','010t',' ',\n                         '02t',' ','020t',' ')")
     );
@@ -430,12 +518,16 @@ public class FnOutermost extends QT3TestSet {
       "fn:deep-equal( fn:outermost( //text() ),\n" +
       "                           //text() )",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -449,12 +541,16 @@ public class FnOutermost extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:outermost( //* )",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertCount(1)
     );
@@ -468,12 +564,16 @@ public class FnOutermost extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:outermost( //* ) ! local-name(.)",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("('root')")
     );
@@ -489,12 +589,16 @@ public class FnOutermost extends QT3TestSet {
       "                           let $nodes := //*\n" +
       "                           return $nodes except $nodes/descendant::node() )",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -508,12 +612,16 @@ public class FnOutermost extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:outermost( //node() )",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertCount(1)
     );
@@ -529,12 +637,16 @@ public class FnOutermost extends QT3TestSet {
       "                           let $nodes := //node()\n" +
       "                           return $nodes except $nodes/descendant::node() )",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -548,12 +660,16 @@ public class FnOutermost extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:outermost( /root/node() )",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertCount(8)
     );
@@ -569,12 +685,16 @@ public class FnOutermost extends QT3TestSet {
       "                           let $nodes := /root/node()\n" +
       "                           return $nodes except $nodes/descendant::node() )",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -588,12 +708,16 @@ public class FnOutermost extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:outermost( /root/descendant::node() )",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertCount(8)
     );
@@ -609,12 +733,16 @@ public class FnOutermost extends QT3TestSet {
       "                           let $nodes := /root/descendant::node()\n" +
       "                           return $nodes except $nodes/descendant::node() )",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -628,12 +756,16 @@ public class FnOutermost extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:outermost( /root/level[1]/level[1]/ancestor::node() )",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertCount(1)
     );
@@ -649,12 +781,16 @@ public class FnOutermost extends QT3TestSet {
       "                           let $nodes := /root/level[1]/level[1]/ancestor::node()\n" +
       "                           return $nodes except $nodes/descendant::node() )",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -668,12 +804,16 @@ public class FnOutermost extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:outermost( /root/level[1]/level[last()]/preceding-sibling::node() )",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertCount(5)
     );
@@ -689,12 +829,16 @@ public class FnOutermost extends QT3TestSet {
       "                           let $nodes := /root/level[1]/level[last()]/preceding-sibling::node()\n" +
       "                           return $nodes except $nodes/descendant::node() )",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -708,12 +852,16 @@ public class FnOutermost extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:outermost( /root/level[1]/level[last()]/preceding::node() )",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertCount(10)
     );
@@ -729,12 +877,16 @@ public class FnOutermost extends QT3TestSet {
       "                           let $nodes := /root/level[1]/level[last()]/preceding::node()\n" +
       "                           return $nodes except $nodes/descendant::node() )",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -748,12 +900,16 @@ public class FnOutermost extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:outermost( /root/level[1]/following-sibling::node() )",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertCount(2)
     );
@@ -769,12 +925,16 @@ public class FnOutermost extends QT3TestSet {
       "                           let $nodes := /root/level[1]/following-sibling::node()\n" +
       "                           return $nodes except $nodes/descendant::node() )",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -788,12 +948,16 @@ public class FnOutermost extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:outermost( /root/level[1]/level[1]/following::node() )",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertCount(2)
     );
@@ -809,12 +973,16 @@ public class FnOutermost extends QT3TestSet {
       "                           let $nodes := /root/level[1]/level[1]/following::node()\n" +
       "                           return $nodes except $nodes/descendant::node() )",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -828,12 +996,16 @@ public class FnOutermost extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:outermost( /root/node()/.. )",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertCount(1)
     );
@@ -849,12 +1021,16 @@ public class FnOutermost extends QT3TestSet {
       "                           let $nodes := /root/node()/..\n" +
       "                           return $nodes except $nodes/descendant::node() )",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -868,12 +1044,16 @@ public class FnOutermost extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:outermost( ($doc1//node(), $doc2//node()) )",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertCount(2)
     );
@@ -889,14 +1069,112 @@ public class FnOutermost extends QT3TestSet {
       "                           let $nodes := ($doc1//node(), $doc2//node())\n" +
       "                           return $nodes except $nodes/descendant::node() )",
       ctx);
-    query.context(node(file("fn/innermost/innermost.xml")));
-    query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
-    query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
+    );
+  }
+
+  /**
+   * Evaluates the "outermost" function with the input sequence not in document order .
+   */
+  @org.junit.Test
+  public void fnOutermost055() {
+    final XQuery query = new XQuery(
+      "let $in := for $x in //* order by local-name($x) return $x\n" +
+      "            return deep-equal(fn:outermost($in)/local-name(), fn:outermost(//*)/local-name())",
+      ctx);
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   * Evaluates the "outermost" function with the input sequence containing duplicates .
+   */
+  @org.junit.Test
+  public void fnOutermost056() {
+    final XQuery query = new XQuery(
+      "let $in := for $x in //* order by local-name($x) return $x\n" +
+      "            return deep-equal(fn:outermost(($in, $in))/local-name(), fn:outermost(//*)/local-name())",
+      ctx);
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   * Evaluates the "outermost" function with the input sequence empty .
+   */
+  @org.junit.Test
+  public void fnOutermost057() {
+    final XQuery query = new XQuery(
+      "outermost(//rubbish)",
+      ctx);
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEmpty()
+    );
+  }
+
+  /**
+   * Check that "outermost" doesn't change node identity .
+   */
+  @org.junit.Test
+  public void fnOutermost058() {
+    final XQuery query = new XQuery(
+      "outermost(//*) except //*",
+      ctx);
+    try {
+      query.context(node(file("fn/innermost/innermost.xml")));
+      query.bind("$doc1", node(file("fn/innermost/doc1.xml")));
+      query.bind("$doc2", node(file("fn/innermost/doc2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEmpty()
     );
   }
 }

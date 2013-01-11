@@ -20,9 +20,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "distinct-values()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(distinct-values((1, 2.0, 3, 2)), (1, 2.0, 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(distinct-values((1, 2, 3, 1)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(empty(distinct-values((1, 1))))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(distinct-values((1, 2, 2, current-time()))) eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(distinct-values(())) eq 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -120,9 +144,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(distinct-values(current-time())) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -136,9 +164,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(distinct-values((1, 2, 3), \"http://www.example.com/COLLATION/NOT/SUPPORTED\"), (1, 2, 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -156,9 +188,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "distinct-values(\"a string\", \"http://www.w3.org/2005/xpath-functions/collation/codepoint\", \"wrong param\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -172,9 +208,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "distinct-values(\"a string\", \"http://www.w3.org/2005/xpath-functions/collation/codepoint\") eq \"a string\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -188,9 +228,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(distinct-values(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -220,9 +264,13 @@ public class FnDistinctValues extends QT3TestSet {
       "            local:canon((\"1\", 1, 2, 3, xs:anyURI(\"example.com/\"))))\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -236,9 +284,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "distinct-values((1, 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("1")
@@ -256,9 +308,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "distinct-values((-3, -3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-3")
@@ -276,9 +332,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(distinct-values((1, 2.0, 3, 2))) eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -292,11 +352,319 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((\"1\", \"2\", \"3\"), \"http://www.example.com/COLLATION/NOT/SUPPORTED\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOCH0002")
+    );
+  }
+
+  /**
+   *  Test fn:distinct-values on a mixture of numeric types containing several NaN values. .
+   */
+  @org.junit.Test
+  public void cbclDistinctValues001() {
+    final XQuery query = new XQuery(
+      "count(distinct-values((xs:integer(\"3\"), xs:float(\"3\"), xs:float(\"NaN\"), xs:double(\"3\"), xs:double(\"NaN\"), xs:decimal(\"3\"), xs:float(\"3\"))))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "2")
+    );
+  }
+
+  /**
+   *  test fn:distinct-values with a mix of types .
+   */
+  @org.junit.Test
+  public void cbclDistinctValues002b() {
+    final XQuery query = new XQuery(
+      "declare function local:create($arg) as xs:anyAtomicType* { ( if ($arg castable as xs:untypedAtomic) then $arg cast as xs:untypedAtomic else () ), ( if ($arg castable as xs:dateTime) then $arg cast as xs:dateTime else () ), ( if ($arg castable as xs:date) then $arg cast as xs:date else () ), ( if ($arg castable as xs:time) then $arg cast as xs:time else () ), ( if ($arg castable as xs:time) then $arg cast as xs:time else () ), ( if ($arg castable as xs:duration) then $arg cast as xs:duration else () ), ( if ($arg castable as xs:yearMonthDuration) then $arg cast as xs:yearMonthDuration else () ), ( if ($arg castable as xs:dayTimeDuration) then $arg cast as xs:dayTimeDuration else () ), ( if ($arg castable as xs:float) then $arg cast as xs:float else () ), ( if ($arg castable as xs:double) then $arg cast as xs:double else () ), ( if ($arg castable as xs:decimal) then $arg cast as xs:decimal else () ), ( if ($arg castable as xs:integer) then $arg cast as xs:integer else () ), ( if ($arg castable as xs:nonPositiveInteger) then $arg cast as xs:nonPositiveInteger else () ), ( if ($arg castable as xs:negativeInteger) then $arg cast as xs:negativeInteger else () ), ( if ($arg castable as xs:long) then $arg cast as xs:long else () ), ( if ($arg castable as xs:int) then $arg cast as xs:int else () ), ( if ($arg castable as xs:short) then $arg cast as xs:short else () ), ( if ($arg castable as xs:byte) then $arg cast as xs:byte else () ), ( if ($arg castable as xs:byte) then $arg cast as xs:byte else () ), ( if ($arg castable as xs:nonNegativeInteger) then $arg cast as xs:nonNegativeInteger else () ), ( if ($arg castable as xs:unsignedLong) then $arg cast as xs:unsignedLong else () ), ( if ($arg castable as xs:unsignedInt) then $arg cast as xs:unsignedInt else () ), ( if ($arg castable as xs:unsignedShort) then $arg cast as xs:unsignedShort else () ), ( if ($arg castable as xs:unsignedByte) then $arg cast as xs:unsignedByte else () ), ( if ($arg castable as xs:positiveInteger) then $arg cast as xs:positiveInteger else () ), ( if ($arg castable as xs:gYearMonth) then $arg cast as xs:gYearMonth else () ), ( if ($arg castable as xs:gYear) then $arg cast as xs:gYear else () ), ( if ($arg castable as xs:gMonthDay) then $arg cast as xs:gMonthDay else () ), ( if ($arg castable as xs:gDay) then $arg cast as xs:gDay else () ), ( if ($arg castable as xs:gMonth) then $arg cast as xs:gMonth else () ), ( if ($arg castable as xs:string) then $arg cast as xs:string else () ), ( if ($arg castable as xs:normalizedString) then $arg cast as xs:normalizedString else () ), ( if ($arg castable as xs:token) then $arg cast as xs:token else () ), ( if ($arg castable as xs:language) then $arg cast as xs:language else () ), ( if ($arg castable as xs:NMTOKEN) then $arg cast as xs:NMTOKEN else () ), ( if ($arg castable as xs:Name) then $arg cast as xs:Name else () ), ( if ($arg castable as xs:NCName) then $arg cast as xs:NCName else () ), ( if ($arg castable as xs:ID) then $arg cast as xs:ID else () ), ( if ($arg castable as xs:IDREF) then $arg cast as xs:IDREF else () ), ( if ($arg castable as xs:ENTITY) then $arg cast as xs:ENTITY else () ), ( if ($arg castable as xs:boolean) then $arg cast as xs:boolean else () ), ( if ($arg castable as xs:base64Binary) then $arg cast as xs:base64Binary else () ), ( if ($arg castable as xs:hexBinary) then $arg cast as xs:hexBinary else () ), ( if ($arg castable as xs:QName) then $arg cast as xs:QName else () ) }; for $value in fn:distinct-values( ( local:create(0), local:create(-1), local:create(1), local:create(3.141), local:create(3.141e0), local:create(3.333), local:create(3.141e0), local:create(3.333e2), local:create('NaN'), local:create('zero'), local:create('false'), local:create('true'), local:create('http://www.example.com/'), local:create('2008-06-01'), local:create('1972-06-01Z'), local:create('2008-06-01T12:00:00'), local:create('1972-06-01T12:00:00+01:00'), local:create('00:00:00'), local:create('12:00:00'), local:create('2008'), local:create('1972Z'), local:create('--06'), local:create('--12Z'), local:create('2008-06'), local:create('1972-12Z'), local:create('--06-01'), local:create('--12-15Z'), local:create('---01'), local:create('---15Z'), local:create('P20Y15M'), local:create('P10Y15M'), local:create('-P2DT15H0M0S'), local:create('-P1DT15H0M0S'), local:create(fn:QName(\"http://www.example.com/example\", \"person\")), local:create(fn:QName(\"http://www.example.com/example\", \"ht:person\")), local:create('-P2DT15H0M0S'), local:create('FFFEFDFC'), local:create('aGVsbG8=') )) order by string($value) return $value",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "---01 ---01 ---15Z ---15Z --06 --06 --06-01 --06-01 --12-15Z --12-15Z --12Z --12Z -1 -1 -P1DT15H -P1DT15H0M0S -P2DT15H -P2DT15H0M0S 0 0 00:00:00 00:00:00 1 1 12:00:00 12:00:00 1972-06-01T12:00:00+01:00 1972-06-01T12:00:00+01:00 1972-06-01Z 1972-06-01Z 1972-12Z 1972-12Z 1972Z 1972Z 2008 2008 2008 2008 2008 2008-06 2008-06 2008-06-01 2008-06-01 2008-06-01T12:00:00 2008-06-01T12:00:00 3 3.141 3.141 3.141 3.333 3.333 3.333 333 333.3 333.3 333.3 FFFEFDFC FFFEFDFC FFFEFDFC FFFEFDFC NaN NaN NaN P10Y15M P10Y15M P11Y3M P20Y15M P20Y15M P21Y3M aGVsbG8= aGVsbG8= false false false ht:person http://www.example.com/ person person true true true true zero zero zero")
+    );
+  }
+
+  /**
+   *  Test with static context dependant values .
+   */
+  @org.junit.Test
+  public void cbclDistinctValues003() {
+    final XQuery query = new XQuery(
+      "distinct-values((xs:dateTime(\"2008-01-01T13:00:00\"),xs:dateTime(\"2008-01-01T13:00:00+00:00\")))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "2008-01-01T13:00:00")
+    );
+  }
+
+  /**
+   *  test fn:distinct-values with xs:date .
+   */
+  @org.junit.Test
+  public void cbclDistinctValues004() {
+    final XQuery query = new XQuery(
+      "for $value in fn:distinct-values(( xs:date('2008-06-01'), xs:date('2008-06-01'), xs:date('2012-06-01'), xs:date('1918-11-11Z'), xs:date('1972-06-01Z'), xs:date('1972-06-01Z') )) order by $value return $value",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "1918-11-11Z 1972-06-01Z 2008-06-01 2012-06-01")
+    );
+  }
+
+  /**
+   *  test fn:distinct-values with xs:dateTime .
+   */
+  @org.junit.Test
+  public void cbclDistinctValues005() {
+    final XQuery query = new XQuery(
+      "for $value in fn:distinct-values(( xs:dateTime('2008-06-01T12:00:00'), xs:dateTime('2008-06-01T12:00:00'), xs:dateTime('2008-06-01T00:00:00'), xs:dateTime('2008-06-02T00:00:00'), xs:dateTime('1918-11-11T11:00:00Z'), xs:dateTime('1972-06-01T13:00:00Z'), xs:dateTime('1972-06-01T13:00:00Z') )) order by $value return $value",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "1918-11-11T11:00:00Z 1972-06-01T13:00:00Z 2008-06-01T00:00:00 2008-06-01T12:00:00 2008-06-02T00:00:00")
+    );
+  }
+
+  /**
+   *  test fn:distinct-values with xs:time .
+   */
+  @org.junit.Test
+  public void cbclDistinctValues006() {
+    final XQuery query = new XQuery(
+      "for $value in fn:distinct-values(( xs:time('12:00:00'), xs:time('11:00:00'), xs:time('12:00:00'))) order by $value return $value",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "11:00:00 12:00:00")
+    );
+  }
+
+  /**
+   *  test fn:distinct-values with xs:time .
+   */
+  @org.junit.Test
+  public void cbclDistinctValues007() {
+    final XQuery query = new XQuery(
+      "for $value at $p in ( for $time in fn:distinct-values(( xs:time('12:00:00'), xs:time('12:00:00'), xs:time('20:00:00'), xs:time('01:00:00+12:00'), xs:time('02:00:00+13:00'))) order by $time return $time ) return adjust-time-to-timezone($value, (xs:dayTimeDuration(\"PT0S\")[$p]))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "13:00:00Z 12:00:00 20:00:00")
+    );
+  }
+
+  /**
+   *  test fn:distinct-values with xs:hexBinary .
+   */
+  @org.junit.Test
+  public void cbclDistinctValues008() {
+    final XQuery query = new XQuery(
+      "for $value in fn:distinct-values(( xs:hexBinary('FFFF'), xs:hexBinary('FFFF'), xs:hexBinary('FFFE'), xs:hexBinary('FF'))) order by string($value) return $value",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "FF FFFE FFFF")
+    );
+  }
+
+  /**
+   *  test fn:distinct-values with xs:base64Binary .
+   */
+  @org.junit.Test
+  public void cbclDistinctValues009() {
+    final XQuery query = new XQuery(
+      "for $value in fn:distinct-values(( xs:base64Binary('aGVsbG8NCg=='), xs:base64Binary('aGVsbG8NCg=='), xs:base64Binary('aGFsbG8NCg=='), xs:base64Binary('aGkNCg=='))) order by string($value) return $value",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "aGFsbG8NCg== aGVsbG8NCg== aGkNCg==")
+    );
+  }
+
+  /**
+   *  test fn:distinct-values with xs:untypedAtomic .
+   */
+  @org.junit.Test
+  public void cbclDistinctValues010() {
+    final XQuery query = new XQuery(
+      "for $value in fn:distinct-values(( xs:untypedAtomic('a'), xs:untypedAtomic('a'), xs:untypedAtomic('b'), xs:untypedAtomic(''))) order by string($value) return $value",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, " a b")
+    );
+  }
+
+  /**
+   *  test fn:distinct-values with xs:string .
+   */
+  @org.junit.Test
+  public void cbclDistinctValues011() {
+    final XQuery query = new XQuery(
+      "for $value in fn:distinct-values(( xs:string('a'), xs:string('a'), xs:string('b'), xs:string(''))) order by string($value) return $value",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, " a b")
+    );
+  }
+
+  /**
+   *  test fn:distinct-values with xs:gYear .
+   */
+  @org.junit.Test
+  public void cbclDistinctValues012() {
+    final XQuery query = new XQuery(
+      "for $value in fn:distinct-values(( xs:gYear('2008'), xs:gYear('2008'), xs:gYear('1972'))) order by string($value) return $value",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "1972 2008")
+    );
+  }
+
+  /**
+   *  test fn:distinct-values with durations .
+   */
+  @org.junit.Test
+  public void cbclDistinctValues013() {
+    final XQuery query = new XQuery(
+      "for $value in fn:distinct-values(( xs:dayTimeDuration('P0D'), xs:yearMonthDuration('P0Y'), xs:duration('P0Y'), xs:duration('P0Y'), xs:yearMonthDuration('P0Y'), xs:dayTimeDuration('P0D'), xs:dayTimeDuration('P1D'), xs:yearMonthDuration('P1Y'), xs:duration('P1Y'))) order by string($value) return $value",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "P1D P1Y PT0S")
+    );
+  }
+
+  /**
+   *  test fn:distinct-values with xs:gMnnthDay .
+   */
+  @org.junit.Test
+  public void cbclDistinctValues014() {
+    final XQuery query = new XQuery(
+      "for $value in fn:distinct-values(( xs:gMonthDay('--06-16'), xs:gMonthDay('--06-16'), xs:gMonthDay('--12-15'))) order by string($value) return $value",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "--06-16 --12-15")
+    );
+  }
+
+  /**
+   *  Tests distinct values with unknown, but unneeded collation .
+   */
+  @org.junit.Test
+  public void cbclDistinctValues016() {
+    final XQuery query = new XQuery(
+      "for $x in 65 to 75 return distinct-values(1 to 10,codepoints-to-string($x to $x+10))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertStringValue(false, "1 2 3 4 5 6 7 8 9 10 1 2 3 4 5 6 7 8 9 10 1 2 3 4 5 6 7 8 9 10 1 2 3 4 5 6 7 8 9 10 1 2 3 4 5 6 7 8 9 10 1 2 3 4 5 6 7 8 9 10 1 2 3 4 5 6 7 8 9 10 1 2 3 4 5 6 7 8 9 10 1 2 3 4 5 6 7 8 9 10 1 2 3 4 5 6 7 8 9 10 1 2 3 4 5 6 7 8 9 10")
+      ||
+        error("FOCH0002")
+      )
     );
   }
 
@@ -314,9 +682,13 @@ public class FnDistinctValues extends QT3TestSet {
       "        return ( (every $n in $input satisfies $n = $distinct) and \n" +
       "        (every $bool in (for $d1 at $p in $distinct, $d2 in $distinct [position() > $p] return $d1 eq $d2) satisfies not($bool)) )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -330,9 +702,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "distinct-values((1 to 300, 100 to 400, 29, 145, 20 to 50, for $x in (30 to 40) return xs:string($x), \"foo\", \"bar\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("1 to 400, \"30\", \"31\", \"32\", \"33\", \"34\", \"35\", \"36\", \"37\", \"38\", \"39\", \"40\", \"foo\", \"bar\"")
     );
@@ -346,9 +722,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((1, 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "2 1")
@@ -366,9 +746,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values(( 1, (1), ((1)) ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -382,9 +766,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values(( 1, 1.0e0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertCount(1)
@@ -408,9 +796,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values(( xs:integer(1), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -424,9 +816,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values(( 0e0, -0, 0, 1 ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("1, 0")
     );
@@ -440,9 +836,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values(( \"cat\", 'CAT' ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\"cat\", \"CAT\"")
     );
@@ -456,9 +856,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values(( xs:string(\"hello\"), \"hello\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "hello")
     );
@@ -472,9 +876,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values(( xs:string(\"\"), \"\", ''))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -488,9 +896,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((1, true(), true(), ()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("1, true()")
     );
@@ -504,9 +916,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:decimal('1.2'), xs:decimal('1.2000000000000001')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("1.2000000000000001, 1.2")
     );
@@ -520,9 +936,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:decimal('1.2'), '1.2'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\"1.2\", 1.2")
     );
@@ -536,9 +956,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:decimal('1.2'), xs:float('1.2')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1.2")
     );
@@ -552,9 +976,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:decimal('1.2'), xs:double('1.2')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1.2")
     );
@@ -568,9 +996,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:float('NaN'), 'NaN'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN NaN")
     );
@@ -584,9 +1016,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:float('INF'), 'INF'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "INF INF")
     );
@@ -600,9 +1036,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:float('-INF'), '-INF'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-INF -INF")
     );
@@ -616,9 +1056,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:float('INF'), xs:float('INF')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "INF")
     );
@@ -632,9 +1076,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:float('-INF'), xs:float('INF')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("xs:float('-INF'), xs:float('INF')")
     );
@@ -648,9 +1096,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:float('NaN'), xs:float('NaN')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );
@@ -664,9 +1116,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:float('NaN'), xs:float('NaN')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );
@@ -680,9 +1136,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:float('NaN'), xs:double('NaN')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );
@@ -696,9 +1156,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:float('INF'), xs:double('INF')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "INF")
     );
@@ -712,9 +1176,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:float('-INF'), xs:double('-INF')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-INF")
     );
@@ -728,9 +1196,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:double('-INF'), xs:double('INF')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "INF -INF")
@@ -748,9 +1220,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:double('NaN'), xs:double('NaN')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );
@@ -764,9 +1240,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:double('NaN'), xs:double('NaN')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );
@@ -780,9 +1260,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((\"NaN\", \"-NaN\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "NaN -NaN")
@@ -800,9 +1284,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((\"-INF\", \"INF\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "INF -INF")
@@ -820,9 +1308,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:boolean('true'), true()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -836,9 +1328,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:boolean('true'), xs:boolean('1')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -852,9 +1348,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:boolean('false'), xs:boolean('0')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -868,9 +1368,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values(( true(), false(), () ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("true(), false()")
     );
@@ -884,9 +1388,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:double(\"-1.7976931348623157E308\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1.7976931348623157E308")
     );
@@ -900,9 +1408,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:double(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -916,9 +1428,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:double(\"1.7976931348623157E308\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1.7976931348623157E308")
     );
@@ -932,9 +1448,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:decimal(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -948,9 +1468,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:decimal(\"617375191608514839\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("617375191608514839")
     );
@@ -964,9 +1488,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:decimal(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -980,9 +1508,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:float(\"-3.4028235E38\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:float(\"-3.4028235E38\")")
     );
@@ -996,9 +1528,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:float(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1012,9 +1548,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:float(\"3.4028235E38\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:float(\"3.4028235E38\")")
     );
@@ -1028,9 +1568,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:int(\"-2147483648\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-2147483648")
     );
@@ -1044,9 +1588,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:int(\"-1873914410\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1873914410")
     );
@@ -1060,9 +1608,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:int(\"2147483647\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2147483647")
     );
@@ -1076,9 +1628,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:integer(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -1092,9 +1648,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:integer(\"830993497117024304\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("830993497117024304")
     );
@@ -1108,9 +1668,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:integer(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -1124,9 +1688,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:long(\"-92233720368547758\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-92233720368547758")
     );
@@ -1140,9 +1708,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:long(\"-47175562203048468\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-47175562203048468")
     );
@@ -1156,9 +1728,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:long(\"92233720368547758\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("92233720368547758")
     );
@@ -1172,9 +1748,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:negativeInteger(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -1188,9 +1768,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:negativeInteger(\"-297014075999096793\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-297014075999096793")
     );
@@ -1204,9 +1788,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:negativeInteger(\"-1\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1220,9 +1808,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:nonNegativeInteger(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1236,9 +1828,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:nonNegativeInteger(\"303884545991464527\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("303884545991464527")
     );
@@ -1252,9 +1848,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:nonNegativeInteger(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -1268,9 +1868,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:nonPositiveInteger(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -1284,9 +1888,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:nonPositiveInteger(\"-475688437271870490\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-475688437271870490")
     );
@@ -1300,9 +1908,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:nonPositiveInteger(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1316,9 +1928,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:positiveInteger(\"1\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1332,9 +1948,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:positiveInteger(\"52704602390610033\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("52704602390610033")
     );
@@ -1348,9 +1968,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:positiveInteger(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -1364,9 +1988,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:short(\"-32768\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-32768")
     );
@@ -1380,9 +2008,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:short(\"-5324\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-5324")
     );
@@ -1396,9 +2028,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:short(\"32767\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("32767")
     );
@@ -1412,9 +2048,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:unsignedLong(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1428,9 +2068,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:unsignedLong(\"130747108607674654\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("130747108607674654")
     );
@@ -1444,9 +2088,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:unsignedLong(\"184467440737095516\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("184467440737095516")
     );
@@ -1460,9 +2108,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:unsignedShort(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1476,9 +2128,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:unsignedShort(\"44633\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("44633")
     );
@@ -1492,9 +2148,13 @@ public class FnDistinctValues extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:unsignedShort(\"65535\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("65535")
     );
