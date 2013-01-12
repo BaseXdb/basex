@@ -30,6 +30,15 @@ public class StringList extends ElementList implements Iterable<String> {
   }
 
   /**
+   * Constructor, specifying an initial array.
+   * @param l initial array
+   */
+  public StringList(final String[] l) {
+    list = Array.copyOf(l, l.length);
+    size = l.length;
+  }
+
+  /**
    * Adds an element to the array.
    * @param e element to be added
    * @return self reference
@@ -78,6 +87,23 @@ public class StringList extends ElementList implements Iterable<String> {
   public final boolean contains(final String e) {
     for(int i = 0; i < size; ++i) if(list[i].equals(e)) return true;
     return false;
+  }
+
+  /**
+   * Check if other list is fully contained in this list. Both lists must be sorted!
+   * @param l sorted list
+   * @return is l contained in this list?
+   */
+  public final boolean containsAll(final StringList l) {
+    if (isEmpty() && !l.isEmpty()) return false;
+    int i = 0;
+    for (String e : l) {
+      int result;
+      while (0 != (result = list[i].compareTo(e))) {
+        if (++i >= size() || result > 0) return false;
+      }
+    }
+    return true;
   }
 
   /**

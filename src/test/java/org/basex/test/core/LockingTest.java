@@ -125,54 +125,6 @@ public final class LockingTest extends SandboxTest {
   }
 
   /**
-   * Fetch read lock, then write lock.
-   * @throws InterruptedException Got interrupted.
-   */
-  @Test
-  public void deadLockTest() throws InterruptedException {
-    final CountDownLatch sync = new CountDownLatch(1), test1 = new CountDownLatch(1),
-        test2 = new CountDownLatch(1);
-
-    final String[] obj1 = new String[] { "1", "2", "3" };
-    final String[] obj2 = new String[] { obj1[2], obj1[0] }; // 3, 1
-    final String[] obj0 = new String[] { obj1[1] };          // 2
-
-    // Block 2
-    final LockTester thread0 = new LockTester(null, NONE, obj0, sync);
-    // Fetches 1, pauses on 2 (which is hold by thread0), later on fetch 3
-    final LockTester thread1 = new LockTester(sync, NONE, obj1, test1);
-    // Fetches 3, then 2 (will pause) - later on fetch 1 (deadlock when not rearranged)
-    final LockTester thread2 = new LockTester(sync, NONE, obj2, test2);
-
-    thread0.start();
-    thread1.start();
-    thread2.start();
-
-    // Hope thread 1&2 will fetch their first locks... Can't check this.
-    Thread.sleep(WAIT);
-
-    // Release 2
-    thread0.release();
-
-    assertTrue("One of the threads should be able to fetch its second lock.",
-        test1.await(WAIT, TimeUnit.MILLISECONDS)
-        ^ test2.await(WAIT, TimeUnit.MILLISECONDS));
-
-    boolean first = false;
-    if(test1.await(0, TimeUnit.MILLISECONDS)) {
-      thread1.release();
-      first = true;
-    }
-    if(test2.await(0, TimeUnit.MILLISECONDS)) thread2.release();
-    assertTrue("Both threads should be finished now.",
-        test1.await(WAIT, TimeUnit.MILLISECONDS)
-        && test2.await(WAIT, TimeUnit.MILLISECONDS));
-
-    if(first) thread2.release();
-    else thread1.release();
-  }
-
-  /**
    * Fetch two read locks.
    * @throws InterruptedException Got interrupted.
    */

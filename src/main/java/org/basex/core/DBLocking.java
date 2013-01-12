@@ -27,6 +27,9 @@ import org.basex.util.list.*;
  * @author Jens Erat
  */
 public final class DBLocking implements ILocking {
+  /** Fair scheduling; prevents starvation, but reduces parallelism. */
+  private static final boolean FAIR = true;
+
   /** Lock for running thread counters. */
   private final Object globalLock = new Object();
   /** Number of running local writers. Guarded by {@code globalLock}. */
@@ -144,29 +147,12 @@ public final class DBLocking implements ILocking {
     while (r < readObjects.length || w < writeObjects.length) {
       // Look what token comes earlier in alphabet, prefer writing against reading
       if(w < writeObjects.length && (r >= readObjects.length
-          || writeObjects[w].compareTo(readObjects[r]) <= 0)) {
-        ReentrantReadWriteLock lock;
-        synchronized(locks) { // Make sure each object lock is a singleton
-          lock = locks.get(writeObjects[w]);
-          if(null == lock) { // Create lock if needed
-            lock = new ReentrantReadWriteLock();
-            locks.put(writeObjects[w], lock);
-          }
-        }
-        lock.writeLock().lock();
-        w++; // Set pointer to next token
-      } else {
-        ReentrantReadWriteLock lock;
-        synchronized(locks) {
-          lock = locks.get(readObjects[r]);
-          if(null == lock) {
-            lock = new ReentrantReadWriteLock();
-            locks.put(readObjects[r], lock);
-          }
-        }
-        lock.readLock().lock();
-        r++;
-      }
+          || writeObjects[w].compareTo(readObjects[r]) <= 0))
+        getOrCreateLock(writeObjects[w++]).writeLock().lock();
+      else
+        // Read lock only if not global writelocking; otherwise no lock downgrading from
+        // global write lock is possible
+        if (null != write) getOrCreateLock(readObjects[r++]).readLock().lock();
     }
   }
 
@@ -187,25 +173,16 @@ public final class DBLocking implements ILocking {
     final StringList newReadObjects = new StringList();
     if (null != readObjects) newReadObjects.add(readObjects);
 
-    // Downgrade from global write lock to global read lock
-    if (writeAll.isWriteLocked()) {
-      writeAll.readLock().lock();
-      writeAll.writeLock().unlock();
-
-      synchronized(globalLock) {
-        if (downgrade.isEmpty())
-          localWriters++;
-        globalReaders++;
-        globalLock.notifyAll();
-      }
-    }
+    if (null != writeObjects && !(new StringList(writeObjects)).containsAll(downgrade))
+      throw new IllegalMonitorStateException("Cannot downgrade write lock not aquired.");
 
     // Perform downgrades
     for(String object : writeObjects) {
       if (downgrade.contains(object))
         newWriteObjects.add(object);
       else {
-        final ReentrantReadWriteLock lock = locks.get(object);
+        ReentrantReadWriteLock lock;
+        lock = getOrCreateLock(object);
         assert 1 == lock.getWriteHoldCount() : "Unexpected write lock count: "
             + lock.getWriteHoldCount();
         lock.readLock().lock();
@@ -214,9 +191,43 @@ public final class DBLocking implements ILocking {
       }
     }
 
+    // Downgrade from global write lock to global read lock
+    if (writeAll.isWriteLocked()) {
+      // Fetch not yet claimed read locks before releasing global write lock
+      for (String object : readObjects) {
+        getOrCreateLock(object).readLock().lock();
+      }
+      writeAll.readLock().lock();
+      writeAll.writeLock().unlock();
+
+      synchronized(globalLock) {
+        if (!downgrade.isEmpty())
+          localWriters++;
+        globalReaders++;
+        globalLock.notifyAll();
+      }
+    }
+
     // Write back new locking lists
     writeLocked.put(threadID, newWriteObjects.toArray());
     readLocked.put(threadID, newReadObjects.toArray());
+  }
+
+  /**
+   * Gets or creates lock on object.
+   * @param object to fetch lock for
+   * @return lock on object
+   */
+  private ReentrantReadWriteLock getOrCreateLock(final String object) {
+    ReentrantReadWriteLock lock;
+    synchronized(locks) { // Make sure each object lock is a singleton
+      lock = locks.get(object);
+      if(null == lock) { // Create lock if needed
+        lock = new ReentrantReadWriteLock(FAIR);
+        locks.put(object, lock);
+      }
+    }
+    return lock;
   }
 
   @Override
@@ -224,18 +235,19 @@ public final class DBLocking implements ILocking {
     // Release all write locks
     final String[] writeObjects = writeLocked.remove(Thread.currentThread().getId());
     if(null != writeObjects) for(final String object : writeObjects) {
-      final ReentrantReadWriteLock lock = locks.get(object);
+      final ReentrantReadWriteLock lock = getOrCreateLock(object);
       assert 1 == lock.getWriteHoldCount() : "Unexpected write lock count: "
           + lock.getWriteHoldCount();
       lock.writeLock().unlock();
     }
 
     // Release all read locks
-    final Object[] readObjects = readLocked.remove(Thread.currentThread().getId());
-    if(null != readObjects) for(final Object object : readObjects) {
-      final ReentrantReadWriteLock lock = locks.get(object);
-      lock.readLock().unlock();
-    }
+    final String[] readObjects = readLocked.remove(Thread.currentThread().getId());
+    if(!writeAll.isWriteLocked() && null != readObjects)
+      for(final String object : readObjects) {
+        final ReentrantReadWriteLock lock = getOrCreateLock(object);
+        lock.readLock().unlock();
+      }
 
     // Release global locks
     (writeAll.isWriteLocked() ? writeAll.writeLock() : writeAll.readLock()).unlock();
