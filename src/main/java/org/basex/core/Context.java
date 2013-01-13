@@ -106,7 +106,8 @@ public final class Context {
     sessions = new Sessions();
     blocker = new ClientBlocker();
     databases = new Databases(this);
-    locks = mp.is(MainProp.DBLOCKING) ? new DBLocking(mp) : new ProcessLocking(this);
+    locks = mp.is(MainProp.DBLOCKING) && !Prop.gui ? new DBLocking(mp)
+                                                  : new ProcessLocking(this);
     users = new Users(this);
     repo = new Repo(this);
     log = new Log(this);
