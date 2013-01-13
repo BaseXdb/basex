@@ -33,8 +33,7 @@ public final class B64Stream extends B64 {
 
   @Override
   public boolean eq(final InputInfo ii, final Item it) throws QueryException {
-    return it instanceof B64Stream ? input.eq(((B64Stream) it).input) :
-      super.eq(ii, it);
+    return it instanceof B64Stream ? input.eq(((B64Stream) it).input) : super.eq(ii, it);
   }
 
   @Override

@@ -1,7 +1,6 @@
 package org.basex.io;
 
 import java.io.*;
-import java.util.regex.*;
 import java.util.zip.*;
 
 import org.basex.core.*;
@@ -94,12 +93,12 @@ public final class Zip extends Progress {
   }
 
   /**
-   * Zips the specified directory.
-   * @param source directory to be zipped
-   * @param pattern regular expression pattern
+   * Zips the specified files.
+   * @param root root directory
+   * @param files files to add
    * @throws IOException I/O exception
    */
-  public void zip(final IOFile source, final Pattern pattern) throws IOException {
+  public void zip(final IOFile root, final StringList files) throws IOException {
     if(!(archive instanceof IOFile)) throw new FileNotFoundException(archive.path());
 
     final byte[] data = new byte[IO.BLOCKSIZE];
@@ -108,21 +107,15 @@ public final class Zip extends Progress {
     curr = 0;
 
     try {
-      // create output stream for zipping; use fast compression
+      // use simple, fast compression
       out.setLevel(1);
-      out.putNextEntry(new ZipEntry(source.name() + '/'));
-      out.closeEntry();
-
       // loop through all files
-      final StringList files = source.descendants();
       total = files.size();
-      for(final String io : files) {
+      for(final String file : files) {
         curr++;
-        if(pattern != null && !pattern.matcher(io).matches()) continue;
-
-        final FileInputStream in = new FileInputStream(new File(source.file(), io));
+        final FileInputStream in = new FileInputStream(new File(root.file(), file));
         try {
-          out.putNextEntry(new ZipEntry(source.name() + '/' + io));
+          out.putNextEntry(new ZipEntry(root.name() + '/' + file));
           for(int c; (c = in.read(data)) != -1;) out.write(data, 0, c);
           out.closeEntry();
         } finally {

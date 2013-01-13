@@ -15,8 +15,8 @@ public final class HTMLProp extends AProp {
   public static final Object[] HTML = { "html", false };
   /** TagSoup option: omit-xml-declaration. */
   public static final Object[] OMITXML = { "omit-xml-declaration", false };
-  /** TagSoup option: method=html. */
-  public static final Object[] METHOD = { "method", "xml" };
+  /** TagSoup option: method (html). */
+  public static final Object[] METHOD = { "method", "" };
   /** TagSoup option: nons. */
   public static final Object[] NONS = { "nons", false };
   /** TagSoup option: nobogons. */

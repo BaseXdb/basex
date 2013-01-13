@@ -52,12 +52,16 @@ public final class Lang {
             if(i == -1 || line.startsWith("#")) continue;
             final String key = line.substring(0, i).trim();
             String val = line.substring(i + 1).trim();
-            if(val.contains("\\n")) val = val.replaceAll("\\\\n", Prop.NL);
-            if(Prop.langkeys) val = '[' + key + ": " + val + ']';
-            if(TEXTS.put(key, val) != null) {
-              Util.errln("%." + SUFFIX + ": '%' is declared twice", lang, key);
+            if(key.equals("langright")) {
+              Prop.langright = val.equals("true");
+            } else {
+              if(val.contains("\\n")) val = val.replaceAll("\\\\n", Prop.NL);
+              if(Prop.langkeys) val = '[' + key + ": " + val + ']';
+              if(TEXTS.put(key, val) != null) {
+                Util.errln("%." + SUFFIX + ": '%' is declared twice", lang, key);
+              }
+              CHECK.put(key, true);
             }
-            CHECK.put(key, true);
           }
         } finally {
           nli.close();

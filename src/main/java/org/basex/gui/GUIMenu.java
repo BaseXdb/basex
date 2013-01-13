@@ -7,6 +7,7 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
+import org.basex.core.*;
 import org.basex.gui.layout.*;
 import org.basex.util.*;
 
@@ -30,6 +31,7 @@ public final class GUIMenu extends JMenuBar {
    */
   GUIMenu(final GUI main) {
     gui = main;
+    if(Prop.langright) setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
 
     final String sm = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() ==
       Event.META_MASK ? "meta" : "ctrl";
@@ -63,6 +65,9 @@ public final class GUIMenu extends JMenuBar {
             item.setAccelerator(KeyStroke.getKeyStroke(Util.info(sc, sm)));
           }
           items[c++] = item;
+          if(Prop.langright) {
+            item.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+          }
           menu.add(item);
         }
       }
