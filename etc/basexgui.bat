@@ -13,4 +13,4 @@ REM Options for virtual machine
 set VM=-Xmx512m
 
 REM Run code
-javaw -cp "%CP%" %VM% org.basex.BaseXGUI %*
+start javaw -cp "%CP%" %VM% org.basex.BaseXGUI %*
