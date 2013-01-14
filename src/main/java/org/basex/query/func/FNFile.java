@@ -185,7 +185,7 @@ public final class FNFile extends StandardFunc {
     final boolean rec = optionalBool(1, ctx);
     final Pattern pat = expr.length != 3 ? null :
       Pattern.compile(IOFile.regex(string(checkStr(expr[2], ctx))),
-        Prop.WIN ? Pattern.CASE_INSENSITIVE : 0);
+        Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE);
 
     final StringList list = new StringList();
     final String p = dir.getPath();
@@ -241,7 +241,7 @@ public final class FNFile extends StandardFunc {
     try {
       final String p1 = f.getAbsolutePath();
       final String p2 = f.getCanonicalPath();
-      return !(Prop.WIN ? p1.equalsIgnoreCase(p2) : p1.equals(p2));
+      return !(Prop.CASE ? p1.equals(p2) : p1.equalsIgnoreCase(p2));
     } catch(final IOException ex) {
       throw FILE_PATH.thrw(info, f);
     }
@@ -503,11 +503,15 @@ public final class FNFile extends StandardFunc {
     }
 
     // ignore operations on same source and target path
-    if(!src.equals(trg)) {
+    final String spath = src.getAbsolutePath();
+    final String tpath = trg.getAbsolutePath();
+    if(!spath.equals(tpath)) {
       if(copy) {
         copy(src, trg);
       } else {
-        if(trg.exists() && !trg.delete()) FILE_DEL.thrw(info, src, trg);
+        // delete target if it is equal to source (case is ignored on Windows and Mac)
+        if(trg.exists() && (Prop.CASE || !spath.equalsIgnoreCase(tpath)) && !trg.delete())
+          FILE_DEL.thrw(info, src, trg);
         if(!src.renameTo(trg)) FILE_MOVE.thrw(info, src, trg);
       }
     }
