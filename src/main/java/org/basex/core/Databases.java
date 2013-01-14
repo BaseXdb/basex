@@ -69,7 +69,7 @@ public final class Databases {
   private StringList list(final boolean db, final boolean backup, final String name) {
     final Pattern pt = name == null ? null : Pattern.compile(
         REGEX.matcher(name).matches() ? IOFile.regex(name) : name,
-        Prop.WIN ? Pattern.CASE_INSENSITIVE : 0);
+        Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE);
 
     final IOFile[] children = mprop.dbpath().children();
     final StringList list = new StringList(children.length);

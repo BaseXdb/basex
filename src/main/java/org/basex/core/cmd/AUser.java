@@ -43,7 +43,7 @@ abstract class AUser extends Command {
   private String[] users(final String name) {
     final String pat = name.matches(".*[*?,].*") ? IOFile.regex(name) : name;
     return context.users.find(Pattern.compile(pat,
-        Prop.WIN ? Pattern.CASE_INSENSITIVE : 0));
+        Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE));
   }
 
   /**

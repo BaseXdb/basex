@@ -138,8 +138,7 @@ public final class DirParser extends Parser {
     // check if file passes the name filter pattern
     boolean exclude = false;
     if(filter != null) {
-      String nm = src.name();
-      if(Prop.WIN) nm = name.toLowerCase(Locale.ENGLISH);
+      final String nm = Prop.CASE ? src.name() : src.name().toLowerCase(Locale.ENGLISH);
       exclude = !filter.matcher(nm).matches();
     }
 

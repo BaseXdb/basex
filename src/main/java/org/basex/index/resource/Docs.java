@@ -337,6 +337,6 @@ final class Docs {
    * @return canonical path
    */
   private static byte[] normalize(final byte[] path) {
-    return concat(SLASH, Prop.WIN ? lc(path) : path);
+    return concat(SLASH, Prop.CASE ? path : lc(path));
   }
 }

@@ -164,7 +164,7 @@ public final class IOFile extends IO {
     if(ch == null) return new IOFile[] {};
 
     final ArrayList<IOFile> io = new ArrayList<IOFile>(ch.length);
-    final Pattern p = Pattern.compile(regex, Prop.WIN ? Pattern.CASE_INSENSITIVE : 0);
+    final Pattern p = Pattern.compile(regex, Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE);
     for(final File f : ch) {
       if(p.matcher(f.getName()).matches()) io.add(new IOFile(f));
     }
@@ -355,7 +355,7 @@ public final class IOFile extends IO {
       }
       if(!suf && sub) sb.append(".*");
     }
-    return Prop.WIN ? sb.toString().toLowerCase(Locale.ENGLISH) : sb.toString();
+    return Prop.CASE ? sb.toString() : sb.toString().toLowerCase(Locale.ENGLISH);
   }
 
   /**

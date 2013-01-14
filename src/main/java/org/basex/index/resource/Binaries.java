@@ -39,13 +39,13 @@ final class Binaries {
     final String np = MetaData.normPath(path);
     if(np == null || data.inMemory()) return tl;
 
-    final String exct = Prop.WIN ? np.toLowerCase(Locale.ENGLISH) : np;
+    final String exct = Prop.CASE ? np : np.toLowerCase(Locale.ENGLISH);
     final String pref = exct + '/';
     for(final String f : data.meta.binaries().descendants()) {
-      final String lc = Prop.WIN ? f.toLowerCase(Locale.ENGLISH) : f;
+      final String lc = Prop.CASE ? f : f.toLowerCase(Locale.ENGLISH);
       if(exct.isEmpty() || lc.equals(exct) || lc.startsWith(pref)) tl.add(f);
     }
-    return tl.sort(!Prop.WIN);
+    return tl.sort(Prop.CASE);
   }
 
   /**

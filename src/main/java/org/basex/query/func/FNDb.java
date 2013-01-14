@@ -250,7 +250,7 @@ public final class FNDb extends StandardFunc {
       // add binary resources
       for(final byte[] file : res.binaries(path)) tl.add(file);
     }
-    tl.sort(!Prop.WIN);
+    tl.sort(Prop.CASE);
 
     return new Iter() {
       int pos;

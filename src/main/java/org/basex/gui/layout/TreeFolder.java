@@ -54,7 +54,7 @@ public class TreeFolder extends TreeNode {
   private static byte[][] folders(final TreeFolder node) {
     final Resources res = node.data.resources;
     final TokenBoolMap ts = res.children(node.subfolder(), true);
-    return new TokenList(ts.keys()).sort(!Prop.WIN).toArray();
+    return new TokenList(ts.keys()).sort(Prop.CASE).toArray();
   }
 
   /**
@@ -81,7 +81,7 @@ public class TreeFolder extends TreeNode {
       public int compare(final TreeLeaf l1, final TreeLeaf l2) {
         final byte[] n1 = l1.name;
         final byte[] n2 = l2.name;
-        return Prop.WIN ? diff(lc(n1), lc(n2)) : diff(n1, n2);
+        return Prop.CASE ? diff(n1, n2) : diff(lc(n1), lc(n2));
       }
     });
     return leaves;

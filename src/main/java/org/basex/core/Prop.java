@@ -35,6 +35,8 @@ public final class Prop extends AProp {
   public static final boolean MAC = OS.startsWith("Mac");
   /** Flag denoting if OS belongs to Windows family. */
   public static final boolean WIN = OS.startsWith("Windows");
+  /** Respect lower/upper case when doing file comparisons. */
+  public static final boolean CASE = !(MAC || WIN);
 
   /** Prefix for project specific properties. */
   public static final String DBPREFIX = "org.basex.";

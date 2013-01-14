@@ -172,7 +172,7 @@ public final class EditorView extends View {
         final StringList sl = new StringList();
         for(final EditorArea ea : editors()) sl.add(ea.file.path());
         for(final String en : new StringList().add(
-            gui.gprop.strings(GUIProp.EDITOR)).sort(!Prop.WIN, true)) {
+            gui.gprop.strings(GUIProp.EDITOR)).sort(Prop.CASE, true)) {
           final JMenuItem it = new JMenuItem(en);
           it.setEnabled(!sl.contains(en));
           pm.add(it).addActionListener(al);
