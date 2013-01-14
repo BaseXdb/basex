@@ -5,8 +5,8 @@ import org.xmldb.api.base.*;
 import org.xmldb.api.modules.*;
 
 /**
- * This class serves as an example for executing XPath requests with the XML:DB
- * API.
+ * This class serves as an example for executing XPath requests with the XML:DB API.
+ * You first need to run {@link XMLDBCreate} in order to create the addressed database.
  *
  * @author BaseX Team 2005-12, BSD License
  */
