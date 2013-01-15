@@ -15,9 +15,10 @@ public interface ILocking {
    *
    * Store and return the {@code token} for unlocking these objects again.
    * @param pr progress
-   * @param db names of databases to put read locks on
+   * @param read names of databases to put read locks on
+   * @param write names of databases to put write locks on
    */
-  void acquire(final Progress pr, final StringList db);
+  void acquire(final Progress pr, final StringList read, final StringList write);
 
   /**
    * Unlock all objects a transaction locked.
