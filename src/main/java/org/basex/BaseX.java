@@ -105,6 +105,10 @@ public class BaseX extends Main {
           session().setOutputStream(out);
         } else if(c == 'q') {
           // evaluate query
+          execute(new XQuery(val), verbose);
+          console = false;
+        } else if(c == 'Q') {
+          // evaluate file contents or string as query
           final IO io = IO.get(val);
           if(io.exists() && !io.isDir()) {
             query(io);
@@ -232,7 +236,7 @@ public class BaseX extends Main {
       } else {
         v = arg.string().trim();
         // interpret at commands if input starts with < or ends with command script suffix
-        c = v.startsWith("<") || v.endsWith(IO.BXSSUFFIX) ? 'c' : 'q';
+        c = v.startsWith("<") || v.endsWith(IO.BXSSUFFIX) ? 'c' : 'Q';
       }
       if(v != null) {
         ops.add(c);
