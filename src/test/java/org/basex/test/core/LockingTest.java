@@ -38,7 +38,7 @@ public final class LockingTest extends SandboxTest {
    */
   @Parameters
   public static Collection<Object[]> generateParams() {
-    List<Object[]> params = new ArrayList<Object[]>();
+    final List<Object[]> params = new ArrayList<Object[]>();
     for(int i = 1; i <= REPEAT; i++) {
       params.add(new Object[0]);
     }
@@ -459,7 +459,7 @@ public final class LockingTest extends SandboxTest {
         test2.await(WAIT, TimeUnit.MILLISECONDS)
             || test3.await(WAIT, TimeUnit.MILLISECONDS));
     boolean which = false;
-    if (test2.getCount() == 0) {
+    if(test2.getCount() == 0) {
       th2.release();
       which = true;
     } else th3.release();
@@ -467,7 +467,7 @@ public final class LockingTest extends SandboxTest {
         "The other thread should be able to acquire its locks now.",
         test2.await(WAIT, TimeUnit.MILLISECONDS)
             && test3.await(WAIT, TimeUnit.MILLISECONDS));
-    if (which) th3.release();
+    if(which) th3.release();
     else th2.release();
   }
 
@@ -480,16 +480,16 @@ public final class LockingTest extends SandboxTest {
   public void fuzzingTest() throws InterruptedException {
     assertTrue("Increase {@code objects.length}!", objects.length > 1);
 
-    Thread[] threads = new Thread[FUZZING_THREADS];
+    final Thread[] threads = new Thread[FUZZING_THREADS];
     final CountDownLatch allDone = new CountDownLatch(FUZZING_THREADS * FUZZING_REPEATS);
     for(int i = 0; i < FUZZING_THREADS; i++) {
       threads[i] = new Thread() {
         private String[] randomSubset(final String[] set, final boolean nullAllowed) {
           if(nullAllowed && Math.random() * set.length == 0) return null;
 
-          int start = (int) (Math.random() * set.length);
-          int end = (int) (Math.random() * (set.length - start)) + start;
-          String[] subset = Arrays.copyOfRange(set, start, end);
+          final int start = (int) (Math.random() * set.length);
+          final int end = (int) (Math.random() * (set.length - start)) + start;
+          final String[] subset = Arrays.copyOfRange(set, start, end);
           return subset;
         }
 
@@ -497,8 +497,8 @@ public final class LockingTest extends SandboxTest {
         public void run() {
           for(int j = 0; j < FUZZING_REPEATS; j++) {
             final CountDownLatch latch = new CountDownLatch(1);
-            String[] read = randomSubset(objects, true);
-            String[] write = randomSubset(objects, true);
+            final String[] read = randomSubset(objects, true);
+            final String[] write = randomSubset(objects, true);
             final LockTester th = new LockTester(null, read,
                 write, latch);
             th.start();
@@ -508,7 +508,7 @@ public final class LockingTest extends SandboxTest {
               Thread.sleep(HOLD_TIME);
               if(!latch.await(FUZZING_THREADS * HOLD_TIME + WAIT, TimeUnit.MILLISECONDS))
                 throw new RuntimeException("Looks like thread is stuck in a deadlock.");
-            } catch(InterruptedException e) {
+            } catch(final InterruptedException e) {
               throw new RuntimeException(e);
             }
             th.release();

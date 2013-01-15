@@ -22,7 +22,7 @@ final class MapList extends IntList {
   }
 
   /**
-   * Constructor, specifying an initial array.
+   * Constructor, assigning the specified array.
    * @param v initial list values
    */
   MapList(final int[] v) {

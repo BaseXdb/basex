@@ -62,7 +62,7 @@ public final class LockingTest extends SandboxTest {
    */
   @Parameters
   public static Collection<Object[]> generateParams() {
-    List<Object[]> params = new ArrayList<Object[]>();
+    final List<Object[]> params = new ArrayList<Object[]>();
     for(int i = 1; i <= REPEAT; i++) {
       params.add(new Object[0]);
     }
@@ -76,7 +76,7 @@ public final class LockingTest extends SandboxTest {
   @BeforeClass
   public static void start() throws Exception {
     server = createServer();
-    CountDownLatch latch = new CountDownLatch(2);
+    final CountDownLatch latch = new CountDownLatch(2);
     new Client(new CreateDB(NAME, DOC), null, latch);
     new Client(new CreateDB(NAME + "1", DOC), null, latch);
     // Wait for both databases being created
@@ -104,7 +104,7 @@ public final class LockingTest extends SandboxTest {
    */
   public static void countDownAndWait() throws Exception {
     sync.countDown();
-    if (sync.await(SLEEP, TimeUnit.MILLISECONDS)) {
+    if(sync.await(SLEEP, TimeUnit.MILLISECONDS)) {
       test.countDown();
     }
   }
@@ -120,9 +120,9 @@ public final class LockingTest extends SandboxTest {
       final boolean parallel) throws Exception {
     sync = new CountDownLatch(2);
     test = new CountDownLatch(2);
-    Client cl1 = new Client(c1, null, null);
-    Client cl2 = new Client(c2, null, null);
-    boolean await = test.await(2 * SLEEP + SYNC, TimeUnit.MILLISECONDS);
+    final Client cl1 = new Client(c1, null, null);
+    final Client cl2 = new Client(c2, null, null);
+    final boolean await = test.await(2 * SLEEP + SYNC, TimeUnit.MILLISECONDS);
     assertTrue(cl1.error, cl1.error == null);
     assertTrue(cl2.error, cl2.error == null);
     assertTrue(parallel ? "Parallel execution expected" : "Serial execution expected",
@@ -203,11 +203,11 @@ public final class LockingTest extends SandboxTest {
     final CountDownLatch allDone = new CountDownLatch(totalQueries);
 
     for(int i = 0; i < RUN_COUNT; i++)
-      for(String query : QUERIES)
+      for(final String query : QUERIES)
         clients.add(new Client(new XQuery(f(query, NAME, "1")), null, allDone));
 
     allDone.await(totalQueries * SLEEP, TimeUnit.MILLISECONDS);
-    for (Client client : clients)
+    for(final Client client : clients)
         assertTrue(client.error, client.error == null);
   }
 }

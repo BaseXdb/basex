@@ -36,7 +36,7 @@ public final class NodeSeqBuilder extends AxisIter {
   }
 
   /**
-   * Constructor, specifying an initial array of sorted nodes.
+   * Lightweight constructor, assigning the specified array of sorted nodes.
    * @param it node array
    * @param s size
    */

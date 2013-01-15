@@ -39,7 +39,7 @@ public class IntList extends ElementList {
   }
 
   /**
-   * Constructor, specifying an initial array.
+   * Lightweight constructor, assigning the specified array.
    * @param a initial array
    */
   public IntList(final int[] a) {

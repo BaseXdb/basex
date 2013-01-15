@@ -216,7 +216,7 @@ public final class Context {
     if(!user.has(Perm.ADMIN)) pr.startTimeout(mprop.num(MainProp.TIMEOUT));
 
     // get touched databases
-    StringList sl = new StringList();
+    StringList sl = new StringList(1);
     if(!pr.databases(sl)) {
       // databases cannot be determined... pass null reference
       sl = null;
@@ -226,8 +226,8 @@ public final class Context {
         if(sl.get(d).isEmpty()) sl.set(d, data.meta.name);
       }
     }
-    locks.acquire(pr, pr.updating ? new StringList() : sl,
-                                  pr.updating ? sl : new StringList());
+    locks.acquire(pr, pr.updating ? new StringList(0) : sl,
+                                  pr.updating ? sl : new StringList(0));
   }
 
   /**

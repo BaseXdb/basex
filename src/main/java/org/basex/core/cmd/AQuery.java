@@ -239,7 +239,7 @@ abstract class AQuery extends Command {
     info(TOTAL_TIME_CC + Performance.getTime(total, runs) + NL);
     if(context.mprop.is(MainProp.DBLOCKING)) {
       info(LOCKING_CC + (locked == null ? "global" :
-        ("local " + (locked.isEmpty() ? "" : Arrays.toString(locked.toArray())))));
+        "local " + (locked.isEmpty() ? "" : Arrays.toString(locked.toArray()))));
     }
     info(HITS_X_CC + hits + ' ' + (hits == 1 ? ITEM : ITEMS));
     info(UPDATED_CC + updates + ' ' + (updates == 1 ? ITEM : ITEMS));

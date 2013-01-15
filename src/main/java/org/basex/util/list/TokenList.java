@@ -41,7 +41,7 @@ public class TokenList extends ElementList implements Iterable<byte[]> {
   }
 
   /**
-   * Constructor, specifying an initial array.
+   * Lightweight constructor, assigning the specified array.
    * @param a initial array
    */
   public TokenList(final byte[][] a) {
