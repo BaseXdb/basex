@@ -64,6 +64,7 @@ public interface Text {
     "  -i<input>   Open initial file or database" + NL +
     "  -L          Append newlines to query results" + NL +
     "  -o<output>  Write output to file" + NL +
+    "  -q<expr>    Execute XQuery expression" + NL +
     "  -s<pars>    Set serialization parameter(s)" + NL +
     "  -u          Write updates back to original files" + NL +
     "  -v/V        Show (all) process info" + NL +
@@ -86,6 +87,7 @@ public interface Text {
     "  -o<output>  Write output to file" + NL +
     "  -p<port>    Set server port" + NL +
     "  -P<pass>    Specify user password" + NL +
+    "  -q<expr>    Execute XQuery expression" + NL +
     "  -s<pars>    Set serialization parameter(s)" + NL +
     "  -U<name>    Specify user name" + NL +
     "  -v/V        Show (all) process info" + NL +
