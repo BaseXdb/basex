@@ -154,6 +154,8 @@ public final class SeqType {
   public static final SeqType TIM_ZO = new SeqType(AtomType.TIM, Occ.ZERO_ONE);
   /** Zero or one duration. */
   public static final SeqType DUR_ZO = new SeqType(AtomType.DUR, Occ.ZERO_ONE);
+  /** Zero of single function. */
+  public static final SeqType FUN_OZ = new SeqType(FuncType.ANY_FUN, Occ.ZERO_ONE);
   /** Single function. */
   public static final SeqType FUN_O = FuncType.ANY_FUN.seqType();
   /** Zero or more bytes. */

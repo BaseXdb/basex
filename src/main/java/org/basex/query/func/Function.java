@@ -152,7 +152,7 @@ public enum Function {
   /** XQuery function. */
   FUNCTION_ARITY(FNFunc.class, "function-arity(function)", ITR, FUN_O),
   /** XQuery function. */
-  FUNCTION_LOOKUP(FNFunc.class, "function-lookup(name,arity)", FUN_O, QNM, ITR),
+  FUNCTION_LOOKUP(FNFunc.class, "function-lookup(name,arity)", FUN_OZ, QNM, ITR),
   /** XQuery function. */
   MAP(FNFunc.class, "map(function,seq)", ITEM_ZM,
       FuncType.get(ITEM_ZM, ITEM).seqType(), ITEM_ZM),
