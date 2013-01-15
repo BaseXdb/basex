@@ -155,13 +155,13 @@ public abstract class SandboxTest {
     @Override
     public void run() {
       try {
-        startSignal.await();
+        if(null != startSignal) startSignal.await();
         session.execute(cmd);
         session.close();
       } catch(final Throwable ex) {
         error = "\n" + cmd + "\n" + ex;
       } finally {
-        stopSignal.countDown();
+        if(null != stopSignal) stopSignal.countDown();
       }
     }
   }

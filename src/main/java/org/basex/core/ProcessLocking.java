@@ -38,7 +38,7 @@ final class ProcessLocking implements ILocking {
   }
 
   @Override
-  public void acquire(final Progress pr, final StringList db) {
+  public void acquire(final Progress pr, final StringList read, final StringList write) {
     final Object o = new Object();
 
     synchronized(mutex) {
