@@ -48,8 +48,8 @@ public abstract class HTTPTest extends SandboxTest {
 
     final StringList sl = new StringList();
     if(local) sl.add("-l");
-    sl.add(new String[] { "-p9996", "-e9997", "-h9998", "-s9999", "-z",
-        "-U" + Text.ADMIN, "-P" + Text.ADMIN });
+    sl.add("-p9996", "-e9997", "-h9998", "-s9999", "-z",
+        "-U" + Text.ADMIN, "-P" + Text.ADMIN);
     System.setOut(NULL);
     try {
       http = new BaseXHTTP(sl.toArray());
