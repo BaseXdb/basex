@@ -62,6 +62,7 @@ public final class DialogExport extends BaseXDialog {
     BaseXBack pp = new BaseXBack(new TableLayout(1, 2, 8, 0));
 
     path = new BaseXTextField(main.gprop.get(GUIProp.INPUTPATH), this);
+    path.history(gui, GUIProp.INPUTS);
     pp.add(path);
 
     final BaseXButton browse = new BaseXButton(BROWSE_D, this);
@@ -216,6 +217,9 @@ public final class DialogExport extends BaseXDialog {
 
   @Override
   public void close() {
-    if(ok) super.close();
+    if(!ok) return;
+
+    super.close();
+    path.store();
   }
 }

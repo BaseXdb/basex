@@ -132,8 +132,8 @@ public final class DialogNew extends BaseXDialog {
   @Override
   public void close() {
     if(!ok) return;
-    super.close();
 
+    super.close();
     gui.set(Prop.TEXTINDEX, txtindex.isSelected());
     gui.set(Prop.ATTRINDEX, atvindex.isSelected());
     gui.set(Prop.FTINDEX,   ftxindex.isSelected());
