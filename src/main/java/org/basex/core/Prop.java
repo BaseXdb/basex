@@ -47,8 +47,10 @@ public final class Prop extends AProp {
   /** Directory for storing the property files, database directory, etc. */
   public static final String HOME = homePath();
 
-  /** Property information. */
+  /** Comment in configuration file. */
   static final String PROPHEADER = "# " + NAME + " Property File." + NL;
+  /** Comment in configuration file. */
+  static final String PROPUSER = "# Local Options";
 
   // STATIC OPTIONS =====================================================================
 

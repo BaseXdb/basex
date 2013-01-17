@@ -20,6 +20,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public abstract class AProp implements Iterable<String> {
+  /** Cached user properties. */
+  private final StringBuilder user = new StringBuilder();
   /** Properties. */
   protected final TreeMap<String, Object> props = new TreeMap<String, Object>();
   /** Property file. */
@@ -48,6 +50,7 @@ public abstract class AProp implements Iterable<String> {
       Util.notexpected(ex);
     }
     if(suffix != null) read(suffix);
+    // sets options stored in system properties
     setSystem();
   }
 
@@ -89,6 +92,8 @@ public abstract class AProp implements Iterable<String> {
           bw.write(key + " = " + val + NL);
         }
       }
+      bw.write(NL + PROPUSER + NL);
+      bw.write(user.toString());
     } catch(final Exception ex) {
       Util.errln("% could not be written.", file);
       Util.debug(ex);
@@ -392,6 +397,7 @@ public abstract class AProp implements Iterable<String> {
 
     final StringList read = new StringList();
     final TokenBuilder err = new TokenBuilder();
+    boolean local = false;
     if(!file.exists()) {
       err.addExt("Saving properties in \"%\"..." + NL, file);
     } else {
@@ -400,6 +406,14 @@ public abstract class AProp implements Iterable<String> {
         br = new BufferedReader(new FileReader(file.file()));
         for(String line; (line = br.readLine()) != null;) {
           line = line.trim();
+
+          // start of local options
+          if(line.equals(PROPUSER)) {
+            local = true;
+            continue;
+          }
+          if(local) user.append(line).append(NL);
+
           if(line.isEmpty() || line.charAt(0) == '#') continue;
           final int d = line.indexOf('=');
           if(d < 0) {
@@ -420,7 +434,11 @@ public abstract class AProp implements Iterable<String> {
               break;
             }
           }
-          read.add(key);
+          // cache local options as system properties
+          if(local) {
+            setSystem(key, val);
+            continue;
+          }
 
           final Object entry = props.get(key);
           if(entry == null) {
@@ -440,6 +458,8 @@ public abstract class AProp implements Iterable<String> {
           } else if(entry instanceof int[]) {
             ((int[]) entry)[num] = Integer.parseInt(val);
           }
+          // add key for final check
+          read.add(key);
         }
       } catch(final Exception ex) {
         err.addExt("% could not be parsed." + NL, file);
