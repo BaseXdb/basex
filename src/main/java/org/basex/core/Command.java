@@ -227,7 +227,7 @@ public abstract class Command extends Progress {
    * @return {@code true}
    */
   protected final boolean info(final String str, final Object... ext) {
-    info.addExt(str, ext).add(NL);
+    if(!str.isEmpty()) info.addExt(str, ext).add(NL);
     return true;
   }
 

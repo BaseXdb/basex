@@ -143,7 +143,7 @@ public final class InfoView extends View {
     final StringList sl = new StringList();
     final StringList stats = new StringList();
     final IntList il = new IntList();
-    String err = "";
+    final StringList err = new StringList();
     String qu = "";
     String res = "";
 
@@ -160,20 +160,20 @@ public final class InfoView extends View {
       } else if(line.startsWith(QUERY_C)) {
         qu = line.substring(s + 1).trim();
       } else if(line.startsWith(QUERY_PLAN_C)) {
-        while(++i < split.length && !split[i].isEmpty()) plan.add(split[i]);
-        --i;
+        while(i + 1 < split.length && !split[++i].isEmpty()) plan.add(split[i]);
       } else if(line.startsWith(COMPILING_C)) {
         while(++i < split.length && !split[i].isEmpty()) comp.add(split[i]);
       } else if(line.startsWith(RESULT_C)) {
         res = line.substring(s + 1).trim();
       } else if(line.startsWith(EVALUATING_C)) {
-        while(++i < split.length && split[i].startsWith(QUERYSEP)) eval.add(split[i]);
-        --i;
-      } else if(!ok) {
-        err += line + NL;
+        while(i + 1 < split.length && split[++i].startsWith(QUERYSEP)) eval.add(split[i]);
       } else if(line.startsWith(HITS_X_CC) || line.startsWith(UPDATED_CC) ||
           line.startsWith(PRINTED_CC) || line.startsWith(LOCKING_CC)) {
         stats.add(LI + line);
+      } else if(line.startsWith(ERROR_C)) {
+        while(i + 1 < split.length && !split[++i].isEmpty()) err.add(split[i]);
+      } else if(!ok && !line.isEmpty()) {
+        err.add(line);
       }
     }
 
@@ -181,14 +181,14 @@ public final class InfoView extends View {
     strings = sl;
     String total = time;
 
-    if(ok && cmd instanceof XQuery && !il.isEmpty()) {
+    if(!il.isEmpty()) {
       text.reset();
       add(EVALUATING_C, eval);
       add(QUERY_C + ' ', qu);
       add(COMPILING_C, comp);
       if(!comp.isEmpty()) add(RESULT_C, res);
-      add(TIMING_C, sl);
       add(RESULT_C, stats);
+      add(TIMING_C, sl);
       add(QUERY_PLAN_C, plan);
       final int runs = Math.max(1, gui.context.prop.num(Prop.RUNS));
       total = Performance.getTime(il.get(il.size() - 1) * 10000L * runs, runs);
@@ -198,8 +198,10 @@ public final class InfoView extends View {
         text.add(info).nline();
       } else {
         add(ERROR_C, err);
+        add(EVALUATING_C, eval);
         add(cmd);
         add(COMPILING_C, comp);
+        if(!comp.isEmpty()) add(RESULT_C, res);
         add(QUERY_PLAN_C, plan);
       }
     }

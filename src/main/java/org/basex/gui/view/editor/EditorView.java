@@ -451,14 +451,16 @@ public final class EditorView extends View {
     errFile = null;
     getEditor().resetError();
 
-    final String m = msg.replaceAll("^.*\r?\n\\[.*?\\]", "").
-        replaceAll(".*" + LINE_X.replaceAll("%", ".*?") + COL, "");
     if(ok) {
       info.setCursor(GUIConstants.CURSORARROW);
-      info.setText(m, Msg.SUCCESS).setToolTipText(null);
+      info.setText(msg, Msg.SUCCESS).setToolTipText(null);
     } else {
       info.setCursor(error(msg) ? GUIConstants.CURSORHAND : GUIConstants.CURSORARROW);
-      info.setText(m, Msg.ERROR).setToolTipText(msg);
+      final Pattern pi = Pattern.compile("^.*\r?\n\\[.*?\\] |" +
+          LINE_X.replaceAll("%", ".*?") + COLS, Pattern.DOTALL);
+      info.setText(pi.matcher(msg).replaceAll(""), Msg.ERROR);
+      final Pattern pt = Pattern.compile(".*\r?\n" + STOPPED_AT, Pattern.DOTALL);
+      info.setToolTipText(pt.matcher(msg).replaceAll(STOPPED_AT));
     }
 
     if(up) {

@@ -398,11 +398,12 @@ public final class GUI extends AGUI {
       final String time = perf.getTime();
 
       // show query info
+
       if(info.visible()) info.setInfo(inf, cmd, time, ok);
       info.reset();
 
       // sends feedback to the query editor
-      final boolean interrupted = inf.startsWith(INTERRUPTED);
+      final boolean interrupted = inf.endsWith(INTERRUPTED);
       if(edit) {
         editor.info(interrupted ? INTERRUPTED : ok ? OK : inf, ok || interrupted, true);
       }

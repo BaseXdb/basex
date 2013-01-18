@@ -63,7 +63,6 @@ abstract class AQuery extends Command {
   final boolean query(final String query) {
     final Performance p = new Performance();
     String err;
-    String inf = "";
     if(qe != null) {
       err = qe.getMessage();
     } else {
@@ -125,9 +124,8 @@ abstract class AQuery extends Command {
       } catch(final ProgressException ex) {
         err = INTERRUPTED;
         // store any useful info (e.g. query plan):
-        inf = info();
       } catch(final RuntimeException ex) {
-        Util.debug(qp.info());
+        Util.debug(info() + NL + qp.info());
         throw ex;
       } catch(final StackOverflowError ex) {
         Util.debug(ex);
@@ -138,14 +136,16 @@ abstract class AQuery extends Command {
       }
     }
 
-    error(err);
-    if(Prop.debug || err.startsWith(INTERRUPTED)) {
-      info(NL);
-      info(QUERY_CC + query);
-      info(qp.info());
-      info(inf);
+    if(prop.is(Prop.QUERYINFO)) {
+      final StringBuilder sb = new StringBuilder();
+      final String info = info();
+      if(!info.isEmpty()) sb.append(info);
+      sb.append(NL + QUERY_CC + query);
+      final String i = qp.info();
+      if(!i.isEmpty()) sb.append(i);
+      err = sb.append(NL + ERROR_C + NL + err).toString();
     }
-    return false;
+    return error(err);
   }
 
   /**
@@ -229,8 +229,7 @@ abstract class AQuery extends Command {
       final int runs) {
 
     final long total = pars + comp + eval + prnt;
-    info(NL);
-    info(QUERY_CC + QueryProcessor.removeComments(query, Integer.MAX_VALUE));
+    info(NL + QUERY_CC + QueryProcessor.removeComments(query, Integer.MAX_VALUE));
     info(qp.info());
     info(PARSING_CC + Performance.getTime(pars, runs));
     info(COMPILING_CC + Performance.getTime(comp, runs));
