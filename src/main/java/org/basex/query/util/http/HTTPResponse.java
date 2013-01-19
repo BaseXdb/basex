@@ -48,20 +48,19 @@ public final class HTTPResponse {
    * Constructs http:response element and reads HTTP response content.
    * @param conn HTTP connection
    * @param status indicates if content is required
-   * @param mediaTypeOvr content type provided by the user to interpret the
+   * @param ctype content type provided by the user to interpret the
    *          response content
    * @return result sequence of <http:response/> and content items
    * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
   public ValueIter getResponse(final HttpURLConnection conn, final byte[] status,
-      final byte[] mediaTypeOvr) throws IOException, QueryException {
+      final byte[] ctype) throws IOException, QueryException {
 
     final ANodeList attrs = extractAttrs(conn);
     final ANodeList hdrs = extractHdrs(conn);
     final String type = conn.getContentType();
-    final String cType = mediaTypeOvr == null ? extractContentType(type) :
-      string(mediaTypeOvr);
+    final String cType = ctype == null ? extractContentType(type) : string(ctype);
     final ValueBuilder payloads = new ValueBuilder();
     final boolean s = status != null && Bln.parse(status, info);
 

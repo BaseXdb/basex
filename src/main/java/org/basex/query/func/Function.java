@@ -603,9 +603,11 @@ public enum Function {
   /* FNFetch functions. */
 
   /** XQuery function. */
-  _FETCH_CONTENT(FNFetch.class, "content(uri[,encoding)", STR, 1, STR, STR),
+  _FETCH_TEXT(FNFetch.class, "text(uri[,encoding)", STR, 1, STR, STR),
   /** XQuery function. */
-  _FETCH_CONTENT_BINARY(FNFetch.class, "content-binary(uri)", STR, STR),
+  _FETCH_BINARY(FNFetch.class, "binary(uri)", B64, STR),
+  /** XQuery function. */
+  _FETCH_CONTENT_TYPE(FNFetch.class, "content-type(uri)", STR, STR),
 
   /* FNHTML functions. */
 

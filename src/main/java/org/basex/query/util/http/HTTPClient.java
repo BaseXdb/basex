@@ -61,8 +61,7 @@ public final class HTTPClient {
         if(href == null || href.length == 0) HC_PARAMS.thrw(info);
         final HttpURLConnection conn = openConnection(string(href));
         try {
-          return new HTTPResponse(info, prop).getResponse(
-              conn, Bln.FALSE.string(), null);
+          return new HTTPResponse(info, prop).getResponse(conn, Bln.FALSE.string(), null);
         } finally {
           conn.disconnect();
         }
@@ -141,24 +140,23 @@ public final class HTTPClient {
    * @param conn HTTP connection
    * @param r request data
    */
-  private static void setContentType(final HttpURLConnection conn,
-      final HTTPRequest r) {
-
+  private static void setContentType(final HttpURLConnection conn, final HTTPRequest r) {
+    String mt = null;
     final byte[] contTypeHdr = r.headers.get(lc(token(CONTENT_TYPE)));
-    // if header "Content-Type" is set explicitly by the user, its value is used
     if(contTypeHdr != null) {
-      conn.setRequestProperty(CONTENT_TYPE, string(contTypeHdr));
-      // otherwise @media-type of <http:body/> is considered
+      // if header "Content-Type" is set explicitly by the user, its value is used
+      mt = string(contTypeHdr);
     } else {
-      String mt = string(r.payloadAttrs.get(MEDIA_TYPE));
+      // otherwise @media-type of <http:body/> is considered
+      mt = string(r.payloadAttrs.get(MEDIA_TYPE));
       if(r.isMultipart) {
         final byte[] b = r.payloadAttrs.get(BOUNDARY);
         final byte[] boundary = b != null ? b : DEFAULT_BOUND;
         final TokenBuilder tb = new TokenBuilder();
         mt = tb.add(mt).add("; ").add(BOUNDARY).add('=').add(boundary).toString();
       }
-      conn.setRequestProperty(CONTENT_TYPE, mt);
     }
+    conn.setRequestProperty(CONTENT_TYPE, mt);
   }
 
   /**
@@ -167,8 +165,8 @@ public final class HTTPClient {
    * @param r request data
    * @throws QueryException query exception
    */
-  private void setRequestHeaders(final HttpURLConnection conn,
-      final HTTPRequest r) throws QueryException {
+  private void setRequestHeaders(final HttpURLConnection conn, final HTTPRequest r)
+      throws QueryException {
 
     final byte[][] headerNames = r.headers.keys();
     for(final byte[] headerName : headerNames)

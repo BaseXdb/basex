@@ -18,16 +18,23 @@ public final class FNFetchTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test
-  public void content() {
-    query(_FETCH_CONTENT.args(FILE));
-    error(_FETCH_CONTENT.args(FILE + 'x'), Err.BXFE_IO);
-    error(_FETCH_CONTENT.args(FILE, "xxx"), Err.BXFE_ENCODING);
+  public void text() {
+    query(_FETCH_TEXT.args(FILE));
+    error(_FETCH_TEXT.args(FILE + 'x'), Err.BXFE_IO);
+    error(_FETCH_TEXT.args(FILE, "xxx"), Err.BXFE_ENCODING);
   }
 
   /** Test method. */
   @Test
-  public void contentBinary() {
-    query(_FETCH_CONTENT_BINARY.args(FILE));
-    error(_FETCH_CONTENT_BINARY.args(FILE + 'x'), Err.BXFE_IO);
+  public void binary() {
+    query(_FETCH_BINARY.args(FILE));
+    error(_FETCH_BINARY.args(FILE + 'x'), Err.BXFE_IO);
+  }
+
+  /** Test method. */
+  @Test
+  public void contentType() {
+    query(_FETCH_CONTENT_TYPE.args(FILE));
+    error(_FETCH_CONTENT_TYPE.args(FILE + 'x'), Err.BXFE_IO);
   }
 }

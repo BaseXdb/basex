@@ -118,8 +118,8 @@ abstract class AQuery extends Command {
 
       } catch(final QueryException ex) {
         Util.debug(ex);
-        final String stack = ex.getStack();
         err = ex.getMessage();
+        final String stack = ex.getStack();
         if(!stack.isEmpty()) err += NL + NL + STACK_TRACE_C + stack;
       } catch(final IOException ex) {
         Util.debug(ex);
