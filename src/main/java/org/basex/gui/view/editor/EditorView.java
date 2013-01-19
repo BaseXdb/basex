@@ -40,11 +40,18 @@ public final class EditorView extends View {
   private static final String ERRSTRING = STOPPED_AT + ' ' +
       (LINE_X + ", " + COLUMN_X).replaceAll("%", "([0-9]+)");
   /** XQuery error pattern. */
-  private static final Pattern XQERROR =
-    Pattern.compile(ERRSTRING + ' ' + IN_FILE_X.replaceAll("%", "(.*?)") + COL);
+  private static final Pattern XQERROR = Pattern.compile(
+      ".*" + ERRSTRING + ' ' + IN_FILE_X.replaceAll("%", "(.*?)") + COL +
+      "\r?\n.*", Pattern.DOTALL);
   /** XML error pattern. */
-  private static final Pattern XMLERROR =
-    Pattern.compile(LINE_X.replaceAll("%", "(.*?)") + COL + ".*");
+  private static final Pattern XMLERROR = Pattern.compile(
+      LINE_X.replaceAll("%", "(.*?)") + COL + ".*");
+  /** Error information pattern. */
+  private static final Pattern ERRORINFO = Pattern.compile(
+      "^.*\r?\n\\[.*?\\] |" + LINE_X.replaceAll("%", ".*?") + COLS, Pattern.DOTALL);
+  /** Error tooltip pattern. */
+  private static final Pattern ERRORTT = Pattern.compile(
+      ".*\r?\n" + STOPPED_AT, Pattern.DOTALL);
 
   /** History Button. */
   final BaseXButton hist;
@@ -456,11 +463,8 @@ public final class EditorView extends View {
       info.setText(msg, Msg.SUCCESS).setToolTipText(null);
     } else {
       info.setCursor(error(msg) ? GUIConstants.CURSORHAND : GUIConstants.CURSORARROW);
-      final Pattern pi = Pattern.compile("^.*\r?\n\\[.*?\\] |" +
-          LINE_X.replaceAll("%", ".*?") + COLS, Pattern.DOTALL);
-      info.setText(pi.matcher(msg).replaceAll(""), Msg.ERROR);
-      final Pattern pt = Pattern.compile(".*\r?\n" + STOPPED_AT, Pattern.DOTALL);
-      info.setToolTipText(pt.matcher(msg).replaceAll(STOPPED_AT));
+      info.setText(ERRORINFO.matcher(msg).replaceAll(""), Msg.ERROR);
+      info.setToolTipText(ERRORTT.matcher(msg).replaceAll(STOPPED_AT));
     }
 
     if(up) {
@@ -475,11 +479,10 @@ public final class EditorView extends View {
    * @return true if error was found
    */
   private boolean error(final String msg) {
-    final String line = msg.replaceAll("[\\r\\n].*", "");
-    Matcher m = XQERROR.matcher(line);
+    Matcher m = XQERROR.matcher(msg);
     int el, ec = 2;
     if(!m.matches()) {
-      m = XMLERROR.matcher(line);
+      m = XMLERROR.matcher(msg);
       if(!m.matches()) return true;
       el = Integer.parseInt(m.group(1));
       errFile = getEditor().file.path();
