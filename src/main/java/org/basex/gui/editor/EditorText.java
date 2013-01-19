@@ -201,7 +201,7 @@ public final class EditorText {
 
   /**
    * Moves one character forward.
-   * @return character
+   * @return current character
    */
   int next() {
     final int c = curr();
@@ -399,8 +399,11 @@ public final class EditorText {
     if(selected()) {
       min = ps < ms ? ps : ms;
       max = ps > ms ? ps : ms;
+      if(max > min && text[max - 1] == '\n') max--;
+
       // selected
       final int mn = Math.max(min + st.length, max - en.length);
+      // check if selected area already has a comment
       if(indexOf(text, st, min) == min && indexOf(text, en, mn) == mn) {
         final TokenBuilder tb = new TokenBuilder();
         tb.add(text, 0, min);
