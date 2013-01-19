@@ -90,24 +90,20 @@ public class GeoModule extends QueryModule {
         Err.FUNCMP.thrw(null, this, NodeType.ELM, node.type);
      // Retrieve element name
        QNm qname = node.qname();
-       boolean eq = false;
        
       if (geoName.length == 0) {
         if (qname.eq(Q_GML_POINT) || qname.eq(Q_GML_LINESTRING)
             || qname.eq(Q_GML_POLYGON) || qname.eq(Q_GML_MULTIPOINT)
             || qname.eq(Q_GML_MULTILINESTRING) || qname.eq(Q_GML_MULTIPOLYGON)
-            || qname.eq(Q_GML_LINEARRING)) {
-          eq = true;
-          return eq;
-        }  
+            || qname.eq(Q_GML_LINEARRING)) 
+          return true;
+           
         throw GeoErrors.unrecognizedGeo(qname.local());
       }
      
       for (QNm geo: geoName) 
-        if (qname.eq(geo)) {
-          eq = true;
-          return eq;
-        }  
+        if (qname.eq(geo)) 
+          return true;
       return false;
     }
 
@@ -720,7 +716,7 @@ public class GeoModule extends QueryModule {
 			  }
 			if (checkNode(node, other))
 				  throw GeoErrors.pointNeeded(node.qname().local());
-			return null;
+			throw GeoErrors.unrecognizedGeo(node.qname().local());
 		}
 
 		/**
@@ -741,7 +737,7 @@ public class GeoModule extends QueryModule {
         }
       if (checkNode(node, other))
           throw GeoErrors.pointNeeded(node.qname().local());
-      return null;
+      throw GeoErrors.unrecognizedGeo(node.qname().local());
 		}
 
 		/**
@@ -762,7 +758,7 @@ public class GeoModule extends QueryModule {
         }
       if (checkNode(node, other))
           throw GeoErrors.pointNeeded(node.qname().local());
-      return null;
+      throw GeoErrors.unrecognizedGeo(node.qname().local());
 		}
 		
 		/**
@@ -809,7 +805,7 @@ public class GeoModule extends QueryModule {
 			}
       if(checkNode(node, other)) 
         throw GeoErrors.lineNeeded(node.qname().local());
-			return null;
+      throw GeoErrors.unrecognizedGeo(node.qname().local());
 		 }
 
 		/**
@@ -839,7 +835,7 @@ public class GeoModule extends QueryModule {
       }
       if(checkNode(node, other)) 
         throw GeoErrors.lineNeeded(node.qname().local());
-      return null;
+      throw GeoErrors.unrecognizedGeo(node.qname().local());
 		 }
 
 		/**
@@ -852,7 +848,8 @@ public class GeoModule extends QueryModule {
 			
       // Check QName
       QNm[] line = {Q_GML_LINEARRING, Q_GML_LINESTRING, Q_GML_MULTILINESTRING};
-      QNm[] other = {Q_GML_POLYGON, Q_GML_MULTIPOINT, Q_GML_MULTIPOLYGON};
+      QNm[] other = {Q_GML_POLYGON, Q_GML_MULTIPOINT, Q_GML_MULTIPOLYGON,
+                      Q_GML_POINT};
       if(checkNode(node, line)) {
         Geometry geom = gmlReader(node);
 				if (geom instanceof LineString) 
@@ -866,7 +863,7 @@ public class GeoModule extends QueryModule {
 			}
 			if (checkNode(node, other))
 			 throw GeoErrors.lineNeeded(node.qname().local());
-			return null;
+			throw GeoErrors.unrecognizedGeo(node.qname().local());
 		}
 
 		/**
@@ -892,7 +889,7 @@ public class GeoModule extends QueryModule {
 			}
       if (checkNode(node, other))
 				  throw GeoErrors.lineNeeded(node.qname().local());
-			return null;
+      throw GeoErrors.unrecognizedGeo(node.qname().local());
 		}
 
 		/**
@@ -948,7 +945,7 @@ public class GeoModule extends QueryModule {
 			}
       if (checkNode(node, other)) 
 				  throw GeoErrors.lineNeeded(node.qname().local());
-			return null;
+      throw GeoErrors.unrecognizedGeo(node.qname().local());
 		}
 
 		/**
@@ -1023,7 +1020,7 @@ public class GeoModule extends QueryModule {
 			}
 			if (checkNode(node, other))
 			  throw GeoErrors.polygonNeeded(node);
-			return null;
+			throw GeoErrors.unrecognizedGeo(node.qname().local());
 		}
 
 		/**
@@ -1044,7 +1041,7 @@ public class GeoModule extends QueryModule {
 			}
       if (checkNode(node, other))
 				throw GeoErrors.polygonNeeded(node.qname().local());
-      return null;
+      throw GeoErrors.unrecognizedGeo(node.qname().local());
 		}
 
 		/**

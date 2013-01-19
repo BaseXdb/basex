@@ -147,18 +147,18 @@ public final class GeoModuleTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test
-  public void isEqual() {
-	  runQuery("geo:isEqual(<gml:LinearRing><gml:coordinates>1,1 2,1 5,3 1,1</gml:coordinates>" +
+  public void equals() {
+	  runQuery("geo:equals(<gml:LinearRing><gml:coordinates>1,1 2,1 5,3 1,1</gml:coordinates>" +
 	  		"</gml:LinearRing>, <gml:Polygon><gml:outerBoundaryIs><gml:LinearRing>" +
 	  		"<gml:coordinates>1,1 2,1 5,3 1,1</gml:coordinates></gml:LinearRing>" +
 	  		"</gml:outerBoundaryIs></gml:Polygon>)",
 	  		"false");
 
-	  runError("geo:isEqual(text {'a'}, a)", new QNm("XPDY0002"));
-	  runError("geo:isEqual(<gml:unknown/>, " +
+	  runError("geo:equals(text {'a'}, a)", new QNm("XPDY0002"));
+	  runError("geo:equals(<gml:unknown/>, " +
 	  		"<gml:LinearRing><gml:coordinates>1,1 2,1 5,3 1,1</gml:coordinates></gml:LinearRing>)",
 	  		new QNm("GEO0001"));
-	  runError("geo:isEqual(<gml:LinearRing><gml:coordinates>1,1 55,99 2,1</gml:coordinates></gml:LinearRing>," +
+	  runError("geo:equals(<gml:LinearRing><gml:coordinates>1,1 55,99 2,1</gml:coordinates></gml:LinearRing>," +
 	  		"<gml:LineString><gml:coordinates>1,1 55,99 2,1</gml:coordinates></gml:LineString>)",
 			  new QNm("GEO0002"));
   }
@@ -615,8 +615,8 @@ public final class GeoModuleTest extends AdvancedQueryTest {
 			  		new QNm("GEO0002"));
 	  runError("geo:isClosed()", new QNm("XPST0017"));
 	  runError("geo:isClosed(text {'gml:Point'})", new QNm("FORG0006"));
-	  runError("geo:isClosed(<Point><gml:coordinates>2,1</gml:coordinates></Point>)",
-		  		new QNm("GEO0001"));
+	  runError("geo:isClosed(<gml:Point><gml:coordinates>2,1</gml:coordinates></gml:Point>)",
+		  		new QNm("GEO0004"));
   }
   
   /** Test method. */
