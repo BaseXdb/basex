@@ -2,6 +2,8 @@ package org.basex.query;
 
 import static org.basex.core.Text.*;
 
+import java.util.*;
+
 import org.basex.core.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -17,6 +19,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class QueryException extends Exception {
+  /** Stack. */
+  private ArrayList<InputInfo> stack = new ArrayList<InputInfo>();
   /** Error QName. */
   private final QNm name;
   /** Error value. */
@@ -128,6 +132,14 @@ public final class QueryException extends Exception {
   }
 
   /**
+   * Adds an input info to the stack.
+   * @param ii input info
+   */
+  public void add(final InputInfo ii) {
+    stack.add(ii);
+  }
+
+  /**
    * Sets input info.
    * @param ii input info
    * @return self reference
@@ -183,6 +195,16 @@ public final class QueryException extends Exception {
     return value;
   }
 
+  /**
+   * Returns a string representation of the XQuery error stack.
+   * @return error stack
+   */
+  public String getStack() {
+    final TokenBuilder tb = new TokenBuilder();
+    for(final InputInfo ii : stack) tb.add(NL).add(LI).add(ii.toString());
+    return tb.toString();
+  }
+
   @Override
   public String getLocalizedMessage() {
     return super.getMessage();
@@ -194,6 +216,7 @@ public final class QueryException extends Exception {
     if(info != null) tb.add(STOPPED_AT).add(' ').add(info.toString()).add(COL).add(NL);
     final byte[] code = name.local();
     if(code.length != 0) tb.add('[').add(code).add("] ");
-    return tb.add(getLocalizedMessage()).toString();
+    tb.add(getLocalizedMessage());
+    return tb.toString();
   }
 }

@@ -48,10 +48,11 @@ public final class EditorView extends View {
       LINE_X.replaceAll("%", "(.*?)") + COL + ".*");
   /** Error information pattern. */
   private static final Pattern ERRORINFO = Pattern.compile(
-      "^.*\r?\n\\[.*?\\] |" + LINE_X.replaceAll("%", ".*?") + COLS, Pattern.DOTALL);
+      "^.*\r?\n\\[.*?\\] |" + LINE_X.replaceAll("%", ".*?") + COLS +
+      "|\r?\n" + STACK_TRACE_C + ".*", Pattern.DOTALL);
   /** Error tooltip pattern. */
   private static final Pattern ERRORTT = Pattern.compile(
-      ".*\r?\n" + STOPPED_AT, Pattern.DOTALL);
+      ".*\r?\n" + STOPPED_AT + "|\r?\n" + STACK_TRACE_C + ".*", Pattern.DOTALL);
 
   /** History Button. */
   final BaseXButton hist;
@@ -464,7 +465,9 @@ public final class EditorView extends View {
     } else {
       info.setCursor(error(msg) ? GUIConstants.CURSORHAND : GUIConstants.CURSORARROW);
       info.setText(ERRORINFO.matcher(msg).replaceAll(""), Msg.ERROR);
-      info.setToolTipText(ERRORTT.matcher(msg).replaceAll(STOPPED_AT));
+      info.setToolTipText(
+          "<html>" + STOPPED_AT + ERRORTT.matcher(msg).replaceAll("").
+          replaceAll("\r?\n", "<br/>") + "</html>");
     }
 
     if(up) {

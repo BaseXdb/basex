@@ -1049,6 +1049,9 @@ public interface Text {
   /** File description: Command scripts. */
   String BXS_FILES = "Command Scripts";
 
+  /** "Stack Trace". */
+  String STACK_TRACE_C = "Stack Trace" + COL;
+
   /** Dialog title for database options. */
   String CREATE_DATABASE = lang("create_database");
   /** Chop whitespaces. */
@@ -1260,7 +1263,7 @@ public interface Text {
   /** Contributors info. */
   String TEAM1 = lang("team") + ": Alexander Holupirek, Michael Seiferle,";
   /** Developer names. */
-  String TEAM2 = "Leo W\u00F6rteler, Lukas Kircher, Dimitar Popov";
+  String TEAM2 = "Lukas Kircher, Leo W\u00F6rteler";
   /** Developer names. */
   String AND_OTHERS = lang("and_others");
   /** Translation. */

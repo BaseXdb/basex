@@ -45,6 +45,9 @@ public final class BaseFuncCall extends UserFuncCall {
           ctx.vars.reset(cs);
         }
       } while(true);
+    } catch(final QueryException ex) {
+      ex.add(info);
+      throw ex;
     } finally {
       ctx.tailCalls = calls;
     }
@@ -70,6 +73,9 @@ public final class BaseFuncCall extends UserFuncCall {
           ctx.vars.reset(cs);
         }
       } while(true);
+    } catch(final QueryException ex) {
+      ex.add(info);
+      throw ex;
     } finally {
       ctx.tailCalls = calls;
     }

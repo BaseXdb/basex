@@ -142,7 +142,8 @@ public final class InfoView extends View {
     final StringList plan = new StringList();
     final StringList sl = new StringList();
     final StringList stats = new StringList();
-    final IntList il = new IntList();
+    final StringList stack = new StringList();
+       final IntList il = new IntList();
     final StringList err = new StringList();
     String qu = "";
     String res = "";
@@ -172,6 +173,8 @@ public final class InfoView extends View {
         stats.add(LI + line);
       } else if(line.startsWith(ERROR_C)) {
         while(i + 1 < split.length && !split[++i].isEmpty()) err.add(split[i]);
+      } else if(line.startsWith(STACK_TRACE_C)) {
+        while(i + 1 < split.length && !split[++i].isEmpty()) stack.add(split[i]);
       } else if(!ok && !line.isEmpty()) {
         err.add(line);
       }
@@ -198,6 +201,7 @@ public final class InfoView extends View {
         text.add(info).nline();
       } else {
         add(ERROR_C, err);
+        add(STACK_TRACE_C, stack);
         add(EVALUATING_C, eval);
         add(cmd);
         add(COMPILING_C, comp);

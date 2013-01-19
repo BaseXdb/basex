@@ -49,6 +49,9 @@ public final class TailFuncCall extends UserFuncCall {
     final VarStack cs = addArgs(ctx, args(ctx));
     try {
       return ctx.value(func);
+    } catch(final QueryException ex) {
+      ex.add(info);
+      throw ex;
     } finally {
       ctx.vars.reset(cs);
       ctx.tailCalls = calls;

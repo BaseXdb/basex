@@ -115,9 +115,12 @@ abstract class AQuery extends Command {
         out.flush();
         final long time = pars + comp + eval + prnt;
         return info(NL + QUERY_EXECUTED_X, Performance.getTime(time, runs));
+
       } catch(final QueryException ex) {
         Util.debug(ex);
+        final String stack = ex.getStack();
         err = ex.getMessage();
+        if(!stack.isEmpty()) err += NL + NL + STACK_TRACE_C + stack;
       } catch(final IOException ex) {
         Util.debug(ex);
         err = Util.message(ex);
@@ -136,6 +139,7 @@ abstract class AQuery extends Command {
       }
     }
 
+    // will only be evaluated when an error has occurred
     if(prop.is(Prop.QUERYINFO)) {
       final StringBuilder sb = new StringBuilder();
       final String info = info();
