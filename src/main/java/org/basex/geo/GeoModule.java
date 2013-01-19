@@ -68,7 +68,6 @@ public class GeoModule extends QueryModule {
 	  /** QName gml:MultiPolygon. */
 	  private static final QNm Q_GML_MULTIPOLYGON = new QNm("gml:MultiPolygon", GMLURI);
 	  
-	
 	  	  
 	  /**
 	   * @param args args
@@ -78,6 +77,40 @@ public class GeoModule extends QueryModule {
 		  new BaseXGUI();
 	  }
 	  
+    /**
+     * Checks if the node is an element with a valid QName
+     * @param  node xml element containing gml object(s)
+     * @param geoName the geometry type to be used to validate the node qname.
+     * @return boolean value
+     * @throws QueryException exception
+     */
+    public boolean checkNode(final ANode node, final QNm[] geoName) throws QueryException {
+      
+      if(node.type != NodeType.ELM) 
+        Err.FUNCMP.thrw(null, this, NodeType.ELM, node.type);
+     // Retrieve element name
+       QNm qname = node.qname();
+       boolean eq = false;
+       
+      if (geoName.length == 0) {
+        if (qname.eq(Q_GML_POINT) || qname.eq(Q_GML_LINESTRING)
+            || qname.eq(Q_GML_POLYGON) || qname.eq(Q_GML_MULTIPOINT)
+            || qname.eq(Q_GML_MULTILINESTRING) || qname.eq(Q_GML_MULTIPOLYGON)
+            || qname.eq(Q_GML_LINEARRING)) {
+          eq = true;
+          return eq;
+        }  
+        throw GeoErrors.unrecognizedGeo(qname.local());
+      }
+     
+      for (QNm geo: geoName) 
+        if (qname.eq(geo)) {
+          eq = true;
+          return eq;
+        }  
+      return false;
+    }
+
 	  /**
 	   * Reads an element as a gml node and returns the geometry.
 	   * @param element xml node containing gml object(s) 
@@ -138,22 +171,12 @@ public class GeoModule extends QueryModule {
 	   */
 	  public Int dimension(final ANode node) throws QueryException {
 
-		 if(node.type != NodeType.ELM) 
-			 Err.FUNCMP.thrw(null, this, NodeType.ELM, node.type);
-		// Retrieve element name
-		  QNm qname = node.qname();
-
-	    // Check QName
-	    if(qname.eq(Q_GML_POINT) || qname.eq(Q_GML_LINESTRING)
-	       || qname.eq(Q_GML_POLYGON) || qname.eq(Q_GML_MULTIPOINT)
-	       || qname.eq(Q_GML_MULTILINESTRING) || qname.eq(Q_GML_MULTIPOLYGON)
-	       || qname.eq(Q_GML_LINEARRING)) {
-	    	
-	    	Geometry geom = gmlReader(node);
-		    return Int.get(geom.getDimension());
-	    }
-	    throw GeoErrors.unrecognizedGeo(node);
-	
+	    // Check node and read the valid geometry
+	      if (checkNode(node, new QNm[0])) {
+	        Geometry geom = gmlReader(node);
+	        return Int.get(geom.getDimension());
+	      }
+	      return null;  
 	  }
 	  
 	  /**
@@ -165,21 +188,12 @@ public class GeoModule extends QueryModule {
 
 	  public QNm geometryType(final ANode node) throws QueryException {
 		
-		  if(node.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node.type);
-		// Retrieve element name
-		  QNm qname = node.qname();
-
-	  // Check QName
-	    if(qname.eq(Q_GML_POINT) || qname.eq(Q_GML_LINESTRING) || qname.eq(Q_GML_POLYGON)
-	        || qname.eq(Q_GML_MULTIPOINT) || qname.eq(Q_GML_MULTILINESTRING)
-	        || qname.eq(Q_GML_MULTIPOLYGON) || qname.eq(Q_GML_LINEARRING)) {
-	    	
-	    	Geometry geom = gmlReader(node);      
-		    QNm geomType = new QNm("gml:" + geom.getGeometryType());
-		    return geomType;
+	    // Check QName
+      if(checkNode(node, new QNm[0])) {
+        Geometry geom = gmlReader(node);
+		    return new QNm("gml:" + geom.getGeometryType());
 	    }
-	    throw GeoErrors.unrecognizedGeo(node);
+	    return null;
 	  }
 
 	  /**
@@ -190,20 +204,12 @@ public class GeoModule extends QueryModule {
 	   */
 	  public Int SRID(final ANode node) throws QueryException {
 		
-		  if(node.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node.type);
-		// Retrieve element name
-		  QNm qname = node.qname();
-
-	  // Check QName
-	    if(qname.eq(Q_GML_POINT) || qname.eq(Q_GML_LINESTRING) || qname.eq(Q_GML_POLYGON)
-	        || qname.eq(Q_GML_MULTIPOINT) || qname.eq(Q_GML_MULTILINESTRING)
-	        || qname.eq(Q_GML_MULTIPOLYGON) || qname.eq(Q_GML_LINEARRING)) {
-	    	
-	    	Geometry geom = gmlReader(node);      
+	 // Check QName
+      if(checkNode(node, new QNm[0])) {
+        Geometry geom = gmlReader(node);      
 		    return Int.get(geom.getSRID());
 	    }
-	    throw GeoErrors.unrecognizedGeo(node);
+	    return null;
 	  }
 	  
 	  /**
@@ -214,22 +220,13 @@ public class GeoModule extends QueryModule {
 	   */
 	  public Value envelope(final ANode node) throws QueryException {
 	    
-		  if(node.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node.type);
-		// Retrieve element name
-		  QNm qname = node.qname();
-
-	  // Check QName
-	    if(qname.eq(Q_GML_POINT) || qname.eq(Q_GML_LINESTRING) || qname.eq(Q_GML_POLYGON)
-	       || qname.eq(Q_GML_MULTIPOINT) || qname.eq(Q_GML_MULTILINESTRING)
-	       || qname.eq(Q_GML_MULTIPOLYGON) || qname.eq(Q_GML_LINEARRING)) {
-	    	
-	    	Geometry geom = gmlReader(node);
-	    	Geometry env = geom.getEnvelope();
+	 // Check QName
+      if(checkNode(node, new QNm[0])) {
+        Geometry geom = gmlReader(node);
 	    	// Write the Geometry in GML2 format
-		    return gmlWriter(env);
+		    return gmlWriter(geom.getEnvelope());
 	    }
-	    throw GeoErrors.unrecognizedGeo(node);
+	    return null;
 	  }
 
 	  /**
@@ -240,21 +237,13 @@ public class GeoModule extends QueryModule {
 	   */
 	  public Str asText(final ANode node) throws QueryException {
 		  
-		  if(node.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node.type);
-		// Retrieve element name
-		  QNm qname = node.qname();
-
 	    // Check QName
-		  if(qname.eq(Q_GML_POINT) || qname.eq(Q_GML_LINESTRING) || qname.eq(Q_GML_POLYGON)
-		        || qname.eq(Q_GML_MULTIPOINT) || qname.eq(Q_GML_MULTILINESTRING)
-		        || qname.eq(Q_GML_MULTIPOLYGON) || qname.eq(Q_GML_LINEARRING)) {
-		    	
-		    	Geometry geom = gmlReader(node);
-			    WKTWriter wktWriter = new WKTWriter();
-			    return Str.get(wktWriter.write(geom));
+      if(checkNode(node, new QNm[0])) { 
+        Geometry geom = gmlReader(node);
+			  WKTWriter wktWriter = new WKTWriter();
+			  return Str.get(wktWriter.write(geom));
 		    }
-		   throw GeoErrors.unrecognizedGeo(node);
+		   return null;
 	  	}
 
 		 /**
@@ -265,23 +254,14 @@ public class GeoModule extends QueryModule {
 		 */
 		public B64 asBinary(final ANode node) throws QueryException {
 		  
-			if(node.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node.type);
-			// Retrieve element name
-			QNm qname = node.qname();
-		
 		  // Check QName
-			if (qname.eq(Q_GML_POINT) || qname.eq(Q_GML_LINESTRING) || qname.eq(Q_GML_POLYGON)
-					|| qname.eq(Q_GML_MULTIPOINT) || qname.eq(Q_GML_MULTILINESTRING)
-					|| qname.eq(Q_GML_MULTIPOLYGON) || qname.eq(Q_GML_LINEARRING)) {
-				
-				Geometry geom = gmlReader(node);
+      if(checkNode(node, new QNm[0])) {
+        Geometry geom = gmlReader(node);
 				WKBWriter wkbWriter = new WKBWriter();
-				byte[] bin = wkbWriter.write(geom);
-				B64 binary = new B64(bin);
+				B64 binary = new B64(wkbWriter.write(geom));
 				return binary;
 			}
-			throw GeoErrors.unrecognizedGeo(node);
+			return null;
 		}
 	
 //		/**
@@ -317,20 +297,12 @@ public class GeoModule extends QueryModule {
 		 */
 		public Bln isSimple(final ANode node) throws QueryException {
 			
-			if(node.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node.type);
-			// Retrieve element name
-			QNm qname = node.qname();
-			
-			// Check QName
-			if(qname.eq(Q_GML_POINT) || qname.eq(Q_GML_LINESTRING) || qname.eq(Q_GML_POLYGON)
-				|| qname.eq(Q_GML_MULTIPOINT) || qname.eq(Q_GML_MULTILINESTRING)
-				|| qname.eq(Q_GML_MULTIPOLYGON) || qname.eq(Q_GML_LINEARRING)) {
-		    
-				Geometry geom = gmlReader(node);
-			    return Bln.get(geom.isSimple());
+		  // Check QName
+      if(checkNode(node, new QNm[0])) {
+        Geometry geom = gmlReader(node);			    
+        return Bln.get(geom.isSimple());
 			}
-			throw GeoErrors.unrecognizedGeo(node);
+			return null;
 		}
 
 		/**
@@ -341,22 +313,13 @@ public class GeoModule extends QueryModule {
 		 */
 		public Value boundary(final ANode node) throws QueryException {
 			
-			if(node.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node.type);
-			// Retrieve element name
-			QNm qname = node.qname();
-
-			// Check QName
-			if(qname.eq(Q_GML_POINT) || qname.eq(Q_GML_LINESTRING) || qname.eq(Q_GML_POLYGON)
-			      || qname.eq(Q_GML_MULTIPOINT) || qname.eq(Q_GML_MULTILINESTRING)
-			      || qname.eq(Q_GML_MULTIPOLYGON) || qname.eq(Q_GML_LINEARRING)) {
-			    
-			    Geometry geom = gmlReader(node);
-			    Geometry bound = geom.getBoundary();
-			    // Write the Geometry in GML2 format
-			    return gmlWriter(bound);
+		  // Check QName
+      if(checkNode(node, new QNm[0])) {
+        Geometry geom = gmlReader(node);
+			  // Write the Geometry in GML2 format
+			  return gmlWriter(geom.getBoundary());
 			}
-			throw GeoErrors.unrecognizedGeo(node);
+			return null;
 		}
 
 		/**
@@ -366,35 +329,18 @@ public class GeoModule extends QueryModule {
 		 * @return boolean value
 		 * @throws QueryException query exception
 		 */
-		public Bln isEqual(final ANode node1, final ANode node2) throws QueryException {
-			
-			if(node1.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node2.type);
-			if(node2.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node2.type);
-
-			// Retrieve element names
-			QNm qname1 = node1.qname();
-			QNm qname2 = node2.qname();
-
-			// Check QName
-			if (qname1.eq(Q_GML_POINT) || qname1.eq(Q_GML_LINESTRING) || qname1.eq(Q_GML_POLYGON)
-				      || qname1.eq(Q_GML_MULTIPOINT) || qname1.eq(Q_GML_MULTILINESTRING)
-				      || qname1.eq(Q_GML_MULTIPOLYGON) || qname1.eq(Q_GML_LINEARRING)) {
-					  
-				  if (qname2.eq(Q_GML_POINT) || qname2.eq(Q_GML_LINESTRING)
-					 || qname2.eq(Q_GML_POLYGON) || qname2.eq(Q_GML_MULTIPOINT)
-					 || qname2.eq(Q_GML_MULTILINESTRING) || qname2.eq(Q_GML_MULTIPOLYGON)
-					 || qname2.eq(Q_GML_LINEARRING)) {
-					 
-					  Geometry geom1 = gmlReader(node1);
-					  Geometry geom2 = gmlReader(node2);
-						
-					  return Bln.get(geom1.equals(geom2));
-				  }
-				  throw GeoErrors.unrecognizedGeo(qname2.local());
+		public Bln equals(final ANode node1, final ANode node2) throws QueryException {
+		        
+		  // Check nodes
+		  if (checkNode(node1, new QNm[0])) {
+		    if (checkNode(node2, new QNm[0])) {
+		      Geometry geom1 = gmlReader(node1);
+		      Geometry geom2 = gmlReader(node2);
+		      return Bln.get(geom1.equals(geom2));
+				}
+		    return null;
 			}
-			throw GeoErrors.unrecognizedGeo(qname1.local());
+			return null;
 		}
 
 		/**
@@ -406,33 +352,16 @@ public class GeoModule extends QueryModule {
 		 */
 		public Bln disjoint(final ANode node1, final ANode node2) throws QueryException {
 		  
-			if(node1.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node2.type);
-			if(node2.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node2.type);
-
-			// Retrieve element names
-			QNm qname1 = node1.qname();
-			QNm qname2 = node2.qname();
-
-			// Check QName
-			if (qname1.eq(Q_GML_POINT) || qname1.eq(Q_GML_LINESTRING) || qname1.eq(Q_GML_POLYGON)
-				      || qname1.eq(Q_GML_MULTIPOINT) || qname1.eq(Q_GML_MULTILINESTRING)
-				      || qname1.eq(Q_GML_MULTIPOLYGON) || qname1.eq(Q_GML_LINEARRING)) {
-					  
-				  if (qname2.eq(Q_GML_POINT) || qname2.eq(Q_GML_LINESTRING)
-					 || qname2.eq(Q_GML_POLYGON) || qname2.eq(Q_GML_MULTIPOINT)
-					 || qname2.eq(Q_GML_MULTILINESTRING) || qname2.eq(Q_GML_MULTIPOLYGON)
-					 || qname2.eq(Q_GML_LINEARRING)) {
-					 
-					  Geometry geom1 = gmlReader(node1);
-					  Geometry geom2 = gmlReader(node2);
-					 return Bln.get(geom1.disjoint(geom2));
-				  }
-				  throw GeoErrors.unrecognizedGeo(qname2.local());
-			}
-			throw GeoErrors.unrecognizedGeo(qname1.local());
-		}
+      // Check nodes
+      if (checkNode(node1, new QNm[0])) {
+        if (checkNode(node2, new QNm[0])) {
+          Geometry geom1 = gmlReader(node1);
+          Geometry geom2 = gmlReader(node2);
+          return Bln.get(geom1.disjoint(geom2));
+        }
+        return null;
+      }
+      return null;		}
 		
 		/**
 		 * Returns a boolean value that shows if this geometry intersects the specified geometry.
@@ -443,32 +372,16 @@ public class GeoModule extends QueryModule {
 		 */
 		public Bln intersects(final ANode node1, final ANode node2) throws QueryException {
 			
-			if(node1.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node2.type);
-			if(node2.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node2.type);
-
-			// Retrieve element names
-			QNm qname1 = node1.qname();
-			QNm qname2 = node2.qname();
-
-			// Check QName
-			if (qname1.eq(Q_GML_POINT) || qname1.eq(Q_GML_LINESTRING) || qname1.eq(Q_GML_POLYGON)
-					|| qname1.eq(Q_GML_MULTIPOINT) || qname1.eq(Q_GML_MULTILINESTRING)
-				      || qname1.eq(Q_GML_MULTIPOLYGON) || qname1.eq(Q_GML_LINEARRING)) {
-					  
-				  if (qname2.eq(Q_GML_POINT) || qname2.eq(Q_GML_LINESTRING)
-					 || qname2.eq(Q_GML_POLYGON) || qname2.eq(Q_GML_MULTIPOINT)
-					 || qname2.eq(Q_GML_MULTILINESTRING) || qname2.eq(Q_GML_MULTIPOLYGON)
-					 || qname2.eq(Q_GML_LINEARRING)) {
-					  
-					  Geometry geom1 = gmlReader(node1);
-					  Geometry geom2 = gmlReader(node2);
-					  return Bln.get(geom1.intersects(geom2));
-				  }
-				  throw GeoErrors.unrecognizedGeo(qname2.local());
+	     // Check nodes
+      if (checkNode(node1, new QNm[0])) {
+        if (checkNode(node2, new QNm[0])) {
+          Geometry geom1 = gmlReader(node1);
+					Geometry geom2 = gmlReader(node2);
+					return Bln.get(geom1.intersects(geom2));
+				}
+				return null;
 			}
-		  throw GeoErrors.unrecognizedGeo(qname1.local());
+		  return null;
 	}
 
 		/**
@@ -480,32 +393,16 @@ public class GeoModule extends QueryModule {
 		 */
 		public Bln touches(final ANode node1, final ANode node2) throws QueryException {
 			
-			if(node1.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node2.type);
-			if(node2.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node2.type);
-
-			// Retrieve element names								
-			QNm qname1 = node1.qname();
-			QNm qname2 = node2.qname();
-
-			// Check QName
-			if (qname1.eq(Q_GML_POINT) || qname1.eq(Q_GML_LINESTRING) || qname1.eq(Q_GML_POLYGON)
-				      || qname1.eq(Q_GML_MULTIPOINT) || qname1.eq(Q_GML_MULTILINESTRING)
-				      || qname1.eq(Q_GML_MULTIPOLYGON) || qname1.eq(Q_GML_LINEARRING)) {
-					  
-				  if (qname2.eq(Q_GML_POINT) || qname2.eq(Q_GML_LINESTRING)
-					 || qname2.eq(Q_GML_POLYGON) || qname2.eq(Q_GML_MULTIPOINT)
-					 || qname2.eq(Q_GML_MULTILINESTRING) || qname2.eq(Q_GML_MULTIPOLYGON)
-					 || qname2.eq(Q_GML_LINEARRING)) {
-					 
-					  Geometry geom1 = gmlReader(node1);
-					  Geometry geom2 = gmlReader(node2);
-					  return Bln.get(geom1.touches(geom2));
-				  }
-				  throw GeoErrors.unrecognizedGeo(qname2.local());
+      // Check nodes
+      if (checkNode(node1, new QNm[0])) {
+        if (checkNode(node2, new QNm[0])) {
+          Geometry geom1 = gmlReader(node1);
+					Geometry geom2 = gmlReader(node2);
+					return Bln.get(geom1.touches(geom2));
+				}
+				return null;
 			}
-			throw GeoErrors.unrecognizedGeo(qname1.local());
+			return null;
 		}
 
 		/**
@@ -517,33 +414,16 @@ public class GeoModule extends QueryModule {
 		 */
 		public Bln crosses(final ANode node1, final ANode node2) throws QueryException {
 		  
-			if(node1.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node2.type);
-			if(node2.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node2.type);
-
-			// Retrieve element names
-			QNm qname1 = node1.qname();
-			QNm qname2 = node2.qname();
-
-		// Check QName
-			if (qname1.eq(Q_GML_POINT) || qname1.eq(Q_GML_LINESTRING) || qname1.eq(Q_GML_POLYGON)
-			      || qname1.eq(Q_GML_MULTIPOINT) || qname1.eq(Q_GML_MULTILINESTRING)
-			      || qname1.eq(Q_GML_MULTIPOLYGON) || qname1.eq(Q_GML_LINEARRING)) {
-				
-				  
-				if (qname2.eq(Q_GML_POINT) || qname2.eq(Q_GML_LINESTRING)
-					 || qname2.eq(Q_GML_POLYGON) || qname2.eq(Q_GML_MULTIPOINT)
-					 || qname2.eq(Q_GML_MULTILINESTRING) || qname2.eq(Q_GML_MULTIPOLYGON)
-					 || qname2.eq(Q_GML_LINEARRING)) {
-					
+      // Check nodes
+      if (checkNode(node1, new QNm[0])) {
+        if (checkNode(node2, new QNm[0])) {
 					  Geometry geom1 = gmlReader(node1);
 					  Geometry geom2 = gmlReader(node2);
 					  return Bln.get(geom1.crosses(geom2));
 				}
-				throw GeoErrors.unrecognizedGeo(qname2.local());
+				return null;
 			}
-			throw GeoErrors.unrecognizedGeo(qname1.local());
+			return null;
 		}
 
 		/**
@@ -555,32 +435,16 @@ public class GeoModule extends QueryModule {
 		 */
 		public Bln within(final ANode node1, final ANode node2) throws QueryException {
 		  
-			if(node1.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node2.type);
-			if(node2.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node2.type);
-
-			// Retrieve element names
-			  QNm qname1 = node1.qname();
-			  QNm qname2 = node2.qname();
-
-			  // 	Check QName
-			  if (qname1.eq(Q_GML_POINT) || qname1.eq(Q_GML_LINESTRING) || qname1.eq(Q_GML_POLYGON)
-				      || qname1.eq(Q_GML_MULTIPOINT) || qname1.eq(Q_GML_MULTILINESTRING)
-				      || qname1.eq(Q_GML_MULTIPOLYGON) || qname1.eq(Q_GML_LINEARRING)) {
-					  
-				  if (qname2.eq(Q_GML_POINT) || qname2.eq(Q_GML_LINESTRING)
-					 || qname2.eq(Q_GML_POLYGON) || qname2.eq(Q_GML_MULTIPOINT)
-					 || qname2.eq(Q_GML_MULTILINESTRING) || qname2.eq(Q_GML_MULTIPOLYGON)
-					 || qname2.eq(Q_GML_LINEARRING)) {
-					  
-					  Geometry geom1 = gmlReader(node1);
-					  Geometry geom2 = gmlReader(node2);
-					 return Bln.get(geom1.within(geom2));
-				  }
-				  throw GeoErrors.unrecognizedGeo(qname2.local());
-			  }
-			  throw GeoErrors.unrecognizedGeo(qname1.local());
+      // Check nodes
+      if (checkNode(node1, new QNm[0])) {
+        if (checkNode(node2, new QNm[0])) {
+          Geometry geom1 = gmlReader(node1);
+					Geometry geom2 = gmlReader(node2);
+					return Bln.get(geom1.within(geom2));
+				}
+				return null;
+			}
+			return null;
 		}
 
 		/**
@@ -592,33 +456,17 @@ public class GeoModule extends QueryModule {
 		 */
 		public Bln contains(final ANode node1, final ANode node2) throws QueryException {
 		  
-			if(node1.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node2.type);
-			if(node2.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node2.type);
-
-			// Retrieve element names
-			  QNm qname1 = node1.qname();
-			  QNm qname2 = node2.qname();
-	
-			// Check QName
-			  if (qname1.eq(Q_GML_POINT) || qname1.eq(Q_GML_LINESTRING) || qname1.eq(Q_GML_POLYGON)
-				      || qname1.eq(Q_GML_MULTIPOINT) || qname1.eq(Q_GML_MULTILINESTRING)
-				      || qname1.eq(Q_GML_MULTIPOLYGON) || qname1.eq(Q_GML_LINEARRING)) {
-					  
-				  if (qname2.eq(Q_GML_POINT) || qname2.eq(Q_GML_LINESTRING)
-					 || qname2.eq(Q_GML_POLYGON) || qname2.eq(Q_GML_MULTIPOINT)
-					 || qname2.eq(Q_GML_MULTILINESTRING) || qname2.eq(Q_GML_MULTIPOLYGON)
-					 || qname2.eq(Q_GML_LINEARRING)) {
-
-					  Geometry geom1 = gmlReader(node1);
-					  Geometry geom2 = gmlReader(node2);
-					  return Bln.get(geom1.contains(geom2));
-				  }
-				  throw GeoErrors.unrecognizedGeo(qname2.local());
-			  }
-			  throw GeoErrors.unrecognizedGeo(qname1.local());
-		  }
+      // Check nodes
+      if (checkNode(node1, new QNm[0])) {
+        if (checkNode(node2, new QNm[0])) {
+          Geometry geom1 = gmlReader(node1);
+					Geometry geom2 = gmlReader(node2);
+					return Bln.get(geom1.contains(geom2));
+				}
+				return null;
+			}
+			return null;
+		}
 
 		/**
 		 * Returns a boolean value that shows if this geometry overlaps the specified geometry.
@@ -629,32 +477,16 @@ public class GeoModule extends QueryModule {
 		 */
 		public Bln overlaps(final ANode node1, final ANode node2) throws QueryException {
 		  
-			if(node1.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node2.type);
-			if(node2.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node2.type);
-
-			// Retrieve element names
-			  QNm qname1 = node1.qname();
-			  QNm qname2 = node2.qname();
-	
-			// Check QName
-			  if (qname1.eq(Q_GML_POINT) || qname1.eq(Q_GML_LINESTRING) || qname1.eq(Q_GML_POLYGON)
-				      || qname1.eq(Q_GML_MULTIPOINT) || qname1.eq(Q_GML_MULTILINESTRING)
-				      || qname1.eq(Q_GML_MULTIPOLYGON) || qname1.eq(Q_GML_LINEARRING)) {
-					  
-				  if (qname2.eq(Q_GML_POINT) || qname2.eq(Q_GML_LINESTRING)
-					 || qname2.eq(Q_GML_POLYGON) || qname2.eq(Q_GML_MULTIPOINT)
-					 || qname2.eq(Q_GML_MULTILINESTRING) || qname2.eq(Q_GML_MULTIPOLYGON)
-					 || qname2.eq(Q_GML_LINEARRING)) {
-
-					  Geometry geom1 = gmlReader(node1);
-					  Geometry geom2 = gmlReader(node2);
-					  return Bln.get(geom1.overlaps(geom2));
-				  }
-				  throw GeoErrors.unrecognizedGeo(qname2.local());
-			  }
-			  throw GeoErrors.unrecognizedGeo(qname1.local());
+		// Check nodes
+      if (checkNode(node1, new QNm[0])) {
+        if (checkNode(node2, new QNm[0])) {
+          Geometry geom1 = gmlReader(node1);
+					Geometry geom2 = gmlReader(node2);
+					return Bln.get(geom1.overlaps(geom2));
+				}
+				return null;
+			}
+			return null;
 		 }
 
 		/**
@@ -668,33 +500,16 @@ public class GeoModule extends QueryModule {
 		 */
 		public Bln relate(final ANode node1, final ANode node2, final Str intersectionMatrix) throws QueryException {
 		  
-			if(node1.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node2.type);
-			if(node2.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node2.type);
-
-			// Retrieve element names
-			  QNm qname1 = node1.qname();
-			  QNm qname2 = node2.qname();
-	
-			// Check QName
-			  if (qname1.eq(Q_GML_POINT) || qname1.eq(Q_GML_LINESTRING)
-					 || qname1.eq(Q_GML_POLYGON) || qname1.eq(Q_GML_LINEARRING)
-					 || qname1.eq(Q_GML_MULTIPOINT) || qname1.eq(Q_GML_MULTILINESTRING)
-				     || qname1.eq(Q_GML_MULTIPOLYGON)) {
-					  
-				  if (qname2.eq(Q_GML_POINT) || qname2.eq(Q_GML_LINESTRING)
-						  || qname2.eq(Q_GML_POLYGON)|| qname2.eq(Q_GML_LINEARRING)
-						  || qname2.eq(Q_GML_MULTIPOINT) || qname2.eq(Q_GML_MULTILINESTRING) 
-				  		  || qname2.eq(Q_GML_MULTIPOLYGON)) {
-
-					  Geometry geom1 = gmlReader(node1);
-					  Geometry geom2 = gmlReader(node2);
-					  return Bln.get(geom1.relate(geom2, intersectionMatrix.toJava()));
-				  }
-				  throw GeoErrors.unrecognizedGeo(qname2.local());
-			  }
-			  throw GeoErrors.unrecognizedGeo(qname1.local());
+		// Check nodes
+      if (checkNode(node1, new QNm[0])) {
+        if (checkNode(node2, new QNm[0])) {
+          Geometry geom1 = gmlReader(node1);
+					Geometry geom2 = gmlReader(node2);
+					return Bln.get(geom1.relate(geom2, intersectionMatrix.toJava()));
+				}
+				return null;
+			}
+			return null;
 		}
 
 		/**
@@ -708,32 +523,16 @@ public class GeoModule extends QueryModule {
 		 */
 		public Dbl distance(final ANode node1, final ANode node2) throws QueryException {
 		  
-			if(node1.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node2.type);
-			if(node2.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node2.type);
-
-			// Retrieve element names
-			  QNm qname1 = node1.qname();
-			  QNm qname2 = node2.qname();
-	
-			// Check QName
-			  if (qname1.eq(Q_GML_POINT) || qname1.eq(Q_GML_LINESTRING) || qname1.eq(Q_GML_POLYGON)
-				      || qname1.eq(Q_GML_MULTIPOINT) || qname1.eq(Q_GML_MULTILINESTRING)
-				      || qname1.eq(Q_GML_MULTIPOLYGON) || qname1.eq(Q_GML_LINEARRING)) {
-				  
-				  if (qname2.eq(Q_GML_POINT) || qname2.eq(Q_GML_LINESTRING)
-						 || qname2.eq(Q_GML_POLYGON) || qname2.eq(Q_GML_MULTIPOINT)
-						 || qname2.eq(Q_GML_MULTILINESTRING) || qname2.eq(Q_GML_MULTIPOLYGON)
-						 || qname2.eq(Q_GML_LINEARRING)) {
-						  
-					  Geometry geom1 = gmlReader(node1);
-					  Geometry geom2 = gmlReader(node2);
-					  return Dbl.get(geom1.distance(geom2));
-				  }
-				  throw GeoErrors.unrecognizedGeo(qname2.local());
-			  }
-			  throw GeoErrors.unrecognizedGeo(qname1.local());
+		// Check nodes
+      if (checkNode(node1, new QNm[0])) {
+        if (checkNode(node2, new QNm[0])) {
+          Geometry geom1 = gmlReader(node1);
+					Geometry geom2 = gmlReader(node2);
+					return Dbl.get(geom1.distance(geom2));
+				}
+				return null;
+			}
+			return null;
 		}
 
 		/**
@@ -746,23 +545,13 @@ public class GeoModule extends QueryModule {
 		 */
 		public Value buffer(final ANode node, final Dbl distance) throws QueryException {
 		  
-			if(node.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node.type);
-
-			// Retrieve element name
-			  QNm qname = node.qname();
-	
-			  // Check QName
-			  if(qname.eq(Q_GML_POINT) || qname.eq(Q_GML_LINESTRING) || qname.eq(Q_GML_POLYGON)
-			      || qname.eq(Q_GML_MULTIPOINT) || qname.eq(Q_GML_MULTILINESTRING)
-			      || qname.eq(Q_GML_MULTIPOLYGON) || qname.eq(Q_GML_LINEARRING)) {
-				  
-				  Geometry geom = gmlReader(node);
-				  Geometry buff = geom.buffer(distance.toJava().doubleValue());
+		// Check QName
+      if(checkNode(node, new QNm[0])) {
+        Geometry geom = gmlReader(node);
 				// Write the Geometry in GML2 format
-				  return gmlWriter(buff);
-			  }
-			  throw GeoErrors.unrecognizedGeo(qname.local());
+				return gmlWriter(geom.buffer(distance.toJava().doubleValue()));
+			}
+			return null;
 		 }
 
 		/**
@@ -774,22 +563,13 @@ public class GeoModule extends QueryModule {
 		 */
 		public Value convexHull(final ANode node) throws QueryException {
 		  
-			if(node.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node.type);
-			// Retrieve element name
-			  QNm qname = node.qname();
-	
-			  // Check QName
-			  if(qname.eq(Q_GML_POINT) || qname.eq(Q_GML_LINESTRING) || qname.eq(Q_GML_POLYGON)
-			      || qname.eq(Q_GML_MULTIPOINT) || qname.eq(Q_GML_MULTILINESTRING)
-			      || qname.eq(Q_GML_MULTIPOLYGON) || qname.eq(Q_GML_LINEARRING)) {
-				  
-				  Geometry geom = gmlReader(node);
-				  Geometry con = geom.convexHull();
+		// Check QName
+      if(checkNode(node, new QNm[0])) {
+        Geometry geom = gmlReader(node);
 				// Write the Geometry in GML2 format
-				  return gmlWriter(con);
-			  }
-			  throw GeoErrors.unrecognizedGeo(qname.local());
+				return gmlWriter(geom.convexHull());
+			}
+			return null;
 		 }
 
 		/**
@@ -801,34 +581,17 @@ public class GeoModule extends QueryModule {
 		 */
 		public Value intersection(final ANode node1, final ANode node2) throws QueryException {
 		 
-			if(node1.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node2.type);
-			if(node2.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node2.type);
-
-			// Retrieve element names
-			  QNm qname1 = node1.qname();
-			  QNm qname2 = node2.qname();
-			  
-			// Check QName
-			  if (qname1.eq(Q_GML_POINT) || qname1.eq(Q_GML_LINESTRING) || qname1.eq(Q_GML_POLYGON)
-				      || qname1.eq(Q_GML_MULTIPOINT) || qname1.eq(Q_GML_MULTILINESTRING)
-				      || qname1.eq(Q_GML_MULTIPOLYGON) || qname1.eq(Q_GML_LINEARRING)) {
-				  
-				  if (qname2.eq(Q_GML_POINT) || qname2.eq(Q_GML_LINESTRING)
-						 || qname2.eq(Q_GML_POLYGON) || qname2.eq(Q_GML_MULTIPOINT)
-						 || qname2.eq(Q_GML_MULTILINESTRING) || qname2.eq(Q_GML_MULTIPOLYGON)
-						 || qname2.eq(Q_GML_LINEARRING)) {
-					
-					  Geometry geom1 = gmlReader(node1);
-					  Geometry geom2 = gmlReader(node2);
-					  Geometry inter = geom1.intersection(geom2);
+	    // Check nodes
+      if (checkNode(node1, new QNm[0])) {
+        if (checkNode(node2, new QNm[0])) {
+          Geometry geom1 = gmlReader(node1);
+					Geometry geom2 = gmlReader(node2);
 					// Write the Geometry in GML2 format
-					  return gmlWriter(inter);				  
-				  }
-				  throw GeoErrors.unrecognizedGeo(qname2.local());
-			  }
-			  throw GeoErrors.unrecognizedGeo(qname1.local());
+					return gmlWriter(geom1.intersection(geom2));				  
+				}
+				return null;
+			}
+			return null;
 		 }
 
 		/**
@@ -840,34 +603,17 @@ public class GeoModule extends QueryModule {
 		 */
 		public Value union(final ANode node1, final ANode node2) throws QueryException {
 		  
-			if(node1.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node2.type);
-			if(node2.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node2.type);
-
-			// Retrieve element names
-			  QNm qname1 = node1.qname();
-			  QNm qname2 = node2.qname();
-	
-			// Check QName
-			  if (qname1.eq(Q_GML_POINT) || qname1.eq(Q_GML_LINESTRING) || qname1.eq(Q_GML_POLYGON)
-				      || qname1.eq(Q_GML_MULTIPOINT) || qname1.eq(Q_GML_MULTILINESTRING)
-				      || qname1.eq(Q_GML_MULTIPOLYGON) || qname1.eq(Q_GML_LINEARRING)) {
-					  
-				  if (qname2.eq(Q_GML_POINT) || qname2.eq(Q_GML_LINESTRING)
-						 || qname2.eq(Q_GML_POLYGON) || qname2.eq(Q_GML_MULTIPOINT)
-						 || qname2.eq(Q_GML_MULTILINESTRING) || qname2.eq(Q_GML_MULTIPOLYGON)
-						 || qname2.eq(Q_GML_LINEARRING)) {
-					
-					  Geometry geom1 = gmlReader(node1);
-					  Geometry geom2 = gmlReader(node2);
-					  Geometry un = geom1.union(geom2);
-					  // Write the Geometry in GML2 format
-					  return gmlWriter(un);
-				  }
-				  throw GeoErrors.unrecognizedGeo(qname2.local());
-			  }
-			  throw GeoErrors.unrecognizedGeo(qname1.local());
+	    // Check nodes
+      if (checkNode(node1, new QNm[0])) {
+        if (checkNode(node2, new QNm[0])) {
+          Geometry geom1 = gmlReader(node1);
+					Geometry geom2 = gmlReader(node2);
+					// Write the Geometry in GML2 format
+					return gmlWriter(geom1.union(geom2));
+				}
+				return null;
+			}
+			return null;
 		}
 
 		/**
@@ -879,35 +625,18 @@ public class GeoModule extends QueryModule {
 		 */
 		public Value difference(final ANode node1, final ANode node2) throws QueryException {
 			
-			if(node1.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node2.type);
-			if(node2.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node2.type);
-
-			  // Retrieve element names
-			  QNm qname1 = node1.qname();
-			  QNm qname2 = node2.qname();
-	
-			// Check QName
-			  if (qname1.eq(Q_GML_POINT) || qname1.eq(Q_GML_LINESTRING) || qname1.eq(Q_GML_POLYGON)
-				      || qname1.eq(Q_GML_MULTIPOINT) || qname1.eq(Q_GML_MULTILINESTRING)
-				      || qname1.eq(Q_GML_MULTIPOLYGON) || qname1.eq(Q_GML_LINEARRING)) {
-				  
-				  if (qname2.eq(Q_GML_POINT) || qname2.eq(Q_GML_LINESTRING)
-						 || qname2.eq(Q_GML_POLYGON) || qname2.eq(Q_GML_MULTIPOINT)
-						 || qname2.eq(Q_GML_MULTILINESTRING) || qname2.eq(Q_GML_MULTIPOLYGON)
-						 || qname2.eq(Q_GML_LINEARRING)) {
-					
-					  Geometry geom1 = gmlReader(node1);
-					  Geometry geom2 = gmlReader(node2);
-					  Geometry diff = geom1.difference(geom2);
+	    // Check nodes
+      if (checkNode(node1, new QNm[0])) {
+        if (checkNode(node2, new QNm[0])) {
+          Geometry geom1 = gmlReader(node1);
+					Geometry geom2 = gmlReader(node2);
 					// Write the Geometry in GML2 format
-					  return gmlWriter(diff);
-				  }
-				  throw GeoErrors.unrecognizedGeo(qname2.local());
-			  }
-			  throw GeoErrors.unrecognizedGeo(qname1.local());
-		  }
+					return gmlWriter(geom1.difference(geom2));
+				}
+        return null;
+			}
+			return null;
+		}
 
 		/**
 		 * Returns a geometric object that represents the Point set symmetric difference of two geometries.
@@ -918,34 +647,17 @@ public class GeoModule extends QueryModule {
 		 */
 		public Value symDifference(final ANode node1, final ANode node2) throws QueryException {
 		  
-			if(node1.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node2.type);
-			if(node2.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node2.type);
-
-			// Retrieve element names
-			  QNm qname1 = node1.qname();
-			  QNm qname2 = node2.qname();
-	
-			// Check QName
-			  if (qname1.eq(Q_GML_POINT) || qname1.eq(Q_GML_LINESTRING) || qname1.eq(Q_GML_POLYGON)
-			      || qname1.eq(Q_GML_MULTIPOINT) || qname1.eq(Q_GML_MULTILINESTRING)
-			      || qname1.eq(Q_GML_MULTIPOLYGON) || qname1.eq(Q_GML_LINEARRING)) {
-				  
-				  if (qname2.eq(Q_GML_POINT) || qname2.eq(Q_GML_LINESTRING)
-						 || qname2.eq(Q_GML_POLYGON) || qname2.eq(Q_GML_MULTIPOINT)
-						 || qname2.eq(Q_GML_MULTILINESTRING) || qname2.eq(Q_GML_MULTIPOLYGON)
-						 || qname2.eq(Q_GML_LINEARRING)) {
-					 
-					  Geometry geom1 = gmlReader(node1);
-					  Geometry geom2 = gmlReader(node2);
-					  Geometry diff = geom1.symDifference(geom2);
+	    // Check nodes
+      if (checkNode(node1, new QNm[0])) {
+        if (checkNode(node2, new QNm[0])) {
+          Geometry geom1 = gmlReader(node1);
+					Geometry geom2 = gmlReader(node2);
 					// Write the Geometry in GML2 format
-					  return gmlWriter(diff);
-		   		  }
-				  throw GeoErrors.unrecognizedGeo(qname2.local());
-			 }
-			 throw GeoErrors.unrecognizedGeo(qname1.local());
+					return gmlWriter(geom1.symDifference(geom2));
+		   	}
+				return null;
+      }
+			return null;
 		} 
 
 		/**
@@ -957,23 +669,13 @@ public class GeoModule extends QueryModule {
 		 */
 		public Int numGeometries(final ANode node) throws QueryException {
 
-			if(node.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node.type);
-
-			// Retrieve element name
-			  QNm qname = node.qname();
-	
-			// Check QName
-			  if (qname.eq(Q_GML_POINT)  || qname.eq(Q_GML_LINESTRING) || qname.eq(Q_GML_POLYGON)
-			      || qname.eq(Q_GML_MULTIPOINT) || qname.eq(Q_GML_MULTILINESTRING)
-			      || qname.eq(Q_GML_MULTIPOLYGON) || qname.eq(Q_GML_LINEARRING)) {
-				  
-				  Geometry geom = gmlReader(node);
-			      return Int.get(geom.getNumGeometries());
-			  }
-			  throw GeoErrors.unrecognizedGeo(qname.local());
-		 }
-
+		// Check QName
+      if(checkNode(node, new QNm[0])) {
+        Geometry geom = gmlReader(node);
+			  return Int.get(geom.getNumGeometries());
+			}
+			return null;
+		}
 
 		/**
 		 * Returns the nth geometry of a geometry collection, 
@@ -985,27 +687,20 @@ public class GeoModule extends QueryModule {
 		 */
 		public Value geometryN(final ANode node, Int geoNumber) throws QueryException {
 
-			if(node.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node.type);
-
-			// Retrieve element name
-			  QNm qname = node.qname();
-	
-			// Check QName
-			  if (qname.eq(Q_GML_POINT)  || qname.eq(Q_GML_LINESTRING) || qname.eq(Q_GML_POLYGON)
-			      || qname.eq(Q_GML_MULTIPOINT) || qname.eq(Q_GML_MULTILINESTRING)
-			      || qname.eq(Q_GML_MULTIPOLYGON) || qname.eq(Q_GML_LINEARRING)) {
-				  
-				  Geometry geom = gmlReader(node);
-			      int temp = geom.getNumGeometries();
-			      if (((BigInteger) geoNumber.toJava()).intValue() < 1 || ((BigInteger) geoNumber.toJava()).intValue() > temp)
-			    	  throw GeoErrors.outOfRangeIdx(geoNumber); 	  
-			      Geometry geo = geom.getGeometryN(((BigInteger) geoNumber.toJava()).intValue() - 1);
-			        // Write the Geometry in GML2 format
-			      return gmlWriter(geo);
-			  }
-			  throw GeoErrors.unrecognizedGeo(qname.local());
-		 }
+		// Check QName
+      if(checkNode(node, new QNm[0])) {
+        Geometry geom = gmlReader(node);
+			  
+        int temp = geom.getNumGeometries();
+			  if (((BigInteger) geoNumber.toJava()).intValue() < 1 || ((BigInteger) geoNumber.toJava()).intValue() > temp)
+			    throw GeoErrors.outOfRangeIdx(geoNumber); 	  
+			  
+			  Geometry geo = geom.getGeometryN(((BigInteger) geoNumber.toJava()).intValue() - 1);
+			  // Write the Geometry in GML2 format
+			  return gmlWriter(geo);
+			}
+			return null;
+		}
 
 		/**
 		 * Returns the x-coordinate value for point.
@@ -1015,22 +710,18 @@ public class GeoModule extends QueryModule {
 		 */
 		public Dbl x(final ANode node) throws QueryException {
 		  
-			if(node.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node.type);
-			// Retrieve element name
-			  QNm qname = node.qname();
-	
-			// Check QName
-			  if (qname.eq(Q_GML_POINT)) {
+		// Check QName
+      QNm[] point = {Q_GML_POINT};
+      QNm[] other = {Q_GML_LINEARRING, Q_GML_LINESTRING, Q_GML_POLYGON,
+          Q_GML_MULTILINESTRING, Q_GML_MULTIPOINT, Q_GML_MULTIPOLYGON};
+		  if(checkNode(node, point)) {
 				  Geometry geom = gmlReader(node);
 				  return Dbl.get(geom.getCoordinate().x);
 			  }
-			  if (qname.eq(Q_GML_MULTIPOINT) || qname.eq(Q_GML_POLYGON) || qname.eq(Q_GML_LINESTRING)
-			      || qname.eq(Q_GML_MULTIPOLYGON) || qname.eq(Q_GML_MULTILINESTRING)
-			      || qname.eq(Q_GML_LINEARRING))
-				  throw GeoErrors.pointNeeded(qname.local());
-			  throw GeoErrors.unrecognizedGeo(qname.local());
-		 }
+			if (checkNode(node, other))
+				  throw GeoErrors.pointNeeded(node.qname().local());
+			return null;
+		}
 
 		/**
 		 * Returns the y-coordinate value for point.
@@ -1040,23 +731,18 @@ public class GeoModule extends QueryModule {
 		 */
 		public Dbl y(final ANode node) throws QueryException {
 		  
-			if(node.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node.type);
-			// Retrieve element name
-			  QNm qname = node.qname();
-	
-			// Check QName
-			  if (qname.eq(Q_GML_POINT)) {
-				  Geometry geom = gmlReader(node);
-				  return Dbl.get(geom.getCoordinate().y);
-			  }
-			  if (qname.eq(Q_GML_MULTIPOINT) || qname.eq(Q_GML_POLYGON) || qname.eq(Q_GML_LINESTRING)
-			      || qname.eq(Q_GML_MULTIPOLYGON) || qname.eq(Q_GML_MULTILINESTRING)
-			      || qname.eq(Q_GML_LINEARRING))
-				  throw GeoErrors.pointNeeded(qname.local());
-			  
-			  throw GeoErrors.unrecognizedGeo(qname.local());
-		 }
+		// Check QName
+      QNm[] point = {Q_GML_POINT};
+      QNm[] other = {Q_GML_LINEARRING, Q_GML_LINESTRING, Q_GML_POLYGON,
+          Q_GML_MULTILINESTRING, Q_GML_MULTIPOINT, Q_GML_MULTIPOLYGON};
+      if(checkNode(node, point)) {
+          Geometry geom = gmlReader(node);
+          return Dbl.get(geom.getCoordinate().y);
+        }
+      if (checkNode(node, other))
+          throw GeoErrors.pointNeeded(node.qname().local());
+      return null;
+		}
 
 		/**
 		 * Returns the z-coordinate value for point.
@@ -1066,24 +752,18 @@ public class GeoModule extends QueryModule {
 		 */
 		public Dbl z(final ANode node) throws QueryException {
 		  
-			if(node.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node.type);
-
-			// Retrieve element name
-			  QNm qname = node.qname();
-	
-			// Check QName
-			  if (qname.eq(Q_GML_POINT)) {
-				  Geometry geom = gmlReader(node);
-				  return Dbl.get(geom.getCoordinate().z);
-			  }
-			  if (qname.eq(Q_GML_MULTIPOINT) || qname.eq(Q_GML_POLYGON) || qname.eq(Q_GML_LINESTRING)
-			      || qname.eq(Q_GML_MULTIPOLYGON) || qname.eq(Q_GML_MULTILINESTRING)
-			      || qname.eq(Q_GML_LINEARRING))
-				  throw GeoErrors.pointNeeded(qname.local());
-			  
-			  throw GeoErrors.unrecognizedGeo(qname.local());
-		 }
+		// Check QName
+      QNm[] point = {Q_GML_POINT};
+      QNm[] other = {Q_GML_LINEARRING, Q_GML_LINESTRING, Q_GML_POLYGON,
+          Q_GML_MULTILINESTRING, Q_GML_MULTIPOINT, Q_GML_MULTIPOLYGON};
+      if(checkNode(node, point)) {
+          Geometry geom = gmlReader(node);
+          return Dbl.get(geom.getCoordinate().z);
+        }
+      if (checkNode(node, other))
+          throw GeoErrors.pointNeeded(node.qname().local());
+      return null;
+		}
 		
 		/**
 		 * Returns the length of this Geometry. Linear geometries return their length.
@@ -1094,22 +774,13 @@ public class GeoModule extends QueryModule {
 		 */
 		public Dbl length(final ANode node) throws QueryException {
 		  
-			if(node.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node.type);
-
-			// Retrieve element name
-			  QNm qname = node.qname();
-	
-			// Check QName
-			  if(qname.eq(Q_GML_POINT) || qname.eq(Q_GML_LINESTRING) || qname.eq(Q_GML_POLYGON)
-			      || qname.eq(Q_GML_MULTIPOINT) || qname.eq(Q_GML_MULTILINESTRING)
-			      || qname.eq(Q_GML_MULTIPOLYGON) || qname.eq(Q_GML_LINEARRING)) {
-				  
-				  Geometry geom = gmlReader(node);
-				  return Dbl.get(geom.getLength());
-			  }
-			  throw GeoErrors.unrecognizedGeo(qname.local());
-		 }
+		// Check QName
+      if(checkNode(node, new QNm[0])) {
+        Geometry geom = gmlReader(node);
+				return Dbl.get(geom.getLength());
+			}
+			return null;
+		}
 		
 		/**
 		 * Returns the start Point of a line.
@@ -1119,31 +790,26 @@ public class GeoModule extends QueryModule {
 		 */
 		public Value startPoint(final ANode node) throws QueryException {
 		  
-			if(node.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node.type);
-
-			// Retrieve element name
-			  QNm qname = node.qname();
-	
-			// Check QName
-			  if(qname.eq(Q_GML_LINESTRING) || qname.eq(Q_GML_LINEARRING)) {
-				  Geometry geom = gmlReader(node);
-				  if (geom instanceof LineString) {
-					  Point point = ((LineString) geom).getStartPoint();
+	    // Check QName
+      QNm[] line = {Q_GML_LINEARRING, Q_GML_LINESTRING};
+      QNm[] other = {Q_GML_POLYGON, Q_GML_MULTILINESTRING, Q_GML_MULTIPOINT,
+          Q_GML_MULTIPOLYGON};
+      if(checkNode(node, line)) {
+        Geometry geom = gmlReader(node);
+				if (geom instanceof LineString) {
+				  Point point = ((LineString) geom).getStartPoint();
+				  // Write the Geometry in GML2 format
+					return gmlWriter(point);
+				} 
+				else if (geom instanceof LinearRing) {
+				  Point point = ((LinearRing) geom).getStartPoint();
 					// Write the Geometry in GML2 format
-					  return gmlWriter(point);
-				  } else if (geom instanceof LinearRing) {
-					  Point point = ((LinearRing) geom).getStartPoint();
-					// Write the Geometry in GML2 format
-					  return gmlWriter(point);
-				  }
-			  }
-			  if (qname.eq(Q_GML_POINT) || qname.eq(Q_GML_MULTIPOINT) 
-			      ||qname.eq(Q_GML_POLYGON) || qname.eq(Q_GML_MULTIPOLYGON)
-			      || qname.eq(Q_GML_MULTILINESTRING))
-				  throw GeoErrors.lineNeeded(qname.local());
-			  
-			  throw GeoErrors.unrecognizedGeo(qname.local());
+					return gmlWriter(point);
+				}
+			}
+      if(checkNode(node, other)) 
+        throw GeoErrors.lineNeeded(node.qname().local());
+			return null;
 		 }
 
 		/**
@@ -1154,30 +820,26 @@ public class GeoModule extends QueryModule {
 		 */
 		public Value endPoint(final ANode node) throws QueryException {
 		 			
-			if(node.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node.type);
-			// Retrieve element name
-			  QNm qname = node.qname();
-	
-			// Check QName
-			  if(qname.eq(Q_GML_LINESTRING) || qname.eq(Q_GML_LINEARRING)) {
-				  Geometry geom = gmlReader(node);
-				  if (geom instanceof LineString) {
-					  Point point = ((LineString) geom).getEndPoint();
-					// Write the Geometry in GML2 format
-					  return gmlWriter(point);
-				  } else if (geom instanceof LinearRing) {
-					  Point point = ((LinearRing) geom).getEndPoint();
-					// Write the Geometry in GML2 format
-					  return gmlWriter(point);
-				  }
-			  }
-			  if (qname.eq(Q_GML_POINT) || qname.eq(Q_GML_MULTIPOINT) 
-				  || qname.eq(Q_GML_POLYGON) || qname.eq(Q_GML_MULTIPOLYGON)
-			      || qname.eq(Q_GML_MULTILINESTRING))
-				  throw GeoErrors.lineNeeded(qname.local());
-			  
-			  throw GeoErrors.unrecognizedGeo(qname.local());
+      // Check QName
+      QNm[] line = {Q_GML_LINEARRING, Q_GML_LINESTRING};
+      QNm[] other = {Q_GML_POLYGON, Q_GML_MULTILINESTRING, Q_GML_MULTIPOINT,
+          Q_GML_MULTIPOLYGON};
+      if(checkNode(node, line)) {
+        Geometry geom = gmlReader(node);
+        if (geom instanceof LineString) {
+          Point point = ((LineString) geom).getEndPoint();
+          // Write the Geometry in GML2 format
+          return gmlWriter(point);
+        } 
+        else if (geom instanceof LinearRing) {
+          Point point = ((LinearRing) geom).getEndPoint();
+          // Write the Geometry in GML2 format
+          return gmlWriter(point);
+        }
+      }
+      if(checkNode(node, other)) 
+        throw GeoErrors.lineNeeded(node.qname().local());
+      return null;
 		 }
 
 		/**
@@ -1188,32 +850,23 @@ public class GeoModule extends QueryModule {
 		 */
 		public Bln isClosed(final ANode node) throws QueryException {
 			
-			if(node.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node.type);
-
-			  // Retrieve element name
-			  QNm qname = node.qname();
-	
-			// Check QName
-			  if (qname.eq(Q_GML_LINESTRING) || qname.eq(Q_GML_LINEARRING)
-			      || qname.eq(Q_GML_MULTILINESTRING)) {
-		
-				  Geometry geom = gmlReader(node);
-				  if (geom instanceof LineString) 
-					  return Bln.get(((LineString) geom).isClosed());
+      // Check QName
+      QNm[] line = {Q_GML_LINEARRING, Q_GML_LINESTRING, Q_GML_MULTILINESTRING};
+      QNm[] other = {Q_GML_POLYGON, Q_GML_MULTIPOINT, Q_GML_MULTIPOLYGON};
+      if(checkNode(node, line)) {
+        Geometry geom = gmlReader(node);
+				if (geom instanceof LineString) 
+				 return Bln.get(((LineString) geom).isClosed());
 					  
-				  if (geom instanceof LinearRing) 
-					  return Bln.get(((LinearRing) geom).isClosed());
+				if (geom instanceof LinearRing) 
+				 return Bln.get(((LinearRing) geom).isClosed());
 				  
-				  if (geom instanceof MultiLineString) 
-					  return Bln.get(((MultiLineString) geom).isClosed());
-			   
-			  }
-			  if (qname.eq(Q_GML_POINT) || qname.eq(Q_GML_MULTIPOINT)
-			       || qname.eq(Q_GML_POLYGON) || qname.eq(Q_GML_MULTIPOLYGON))
-				  throw GeoErrors.lineNeeded(qname.local());
-			  
-			  throw GeoErrors.unrecognizedGeo(qname.local());
+				if (geom instanceof MultiLineString) 
+				 return Bln.get(((MultiLineString) geom).isClosed());
+			}
+			if (checkNode(node, other))
+			 throw GeoErrors.lineNeeded(node.qname().local());
+			return null;
 		}
 
 		/**
@@ -1225,29 +878,21 @@ public class GeoModule extends QueryModule {
 		 */
 		public Bln isRing(final ANode node) throws QueryException {
 		  
-			
-			if(node.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node.type);
-			// Retrieve element name
-			  QNm qname = node.qname();
-	
-			// Check QName
-			  if (qname.eq(Q_GML_LINESTRING) || qname.eq(Q_GML_LINEARRING)) {
-				  
-				  Geometry geom = gmlReader(node);
-				  if (geom instanceof LineString)
-					  return Bln.get(((LineString) geom).isRing());
+      // Check QName
+      QNm[] line = {Q_GML_LINEARRING, Q_GML_LINESTRING};
+      QNm[] other = {Q_GML_POLYGON, Q_GML_MULTILINESTRING, Q_GML_MULTIPOINT,
+          Q_GML_MULTIPOLYGON};
+      if(checkNode(node, line)) {
+        Geometry geom = gmlReader(node);
+				if (geom instanceof LineString)
+				 return Bln.get(((LineString) geom).isRing());
 					  
-				  if (geom instanceof LinearRing)
-					  return Bln.get(((LinearRing) geom).isRing());
-			  }
-	
-			  if (qname.eq(Q_GML_POINT) || qname.eq(Q_GML_MULTIPOINT)
-			      || qname.eq(Q_GML_MULTILINESTRING) || qname.eq(Q_GML_POLYGON)
-			      || qname.eq(Q_GML_MULTIPOLYGON))
-				  throw GeoErrors.lineNeeded(qname.local());
-			  
-			  throw GeoErrors.unrecognizedGeo(qname.local());
+				if (geom instanceof LinearRing)
+				 return Bln.get(((LinearRing) geom).isRing());
+			}
+      if (checkNode(node, other))
+				  throw GeoErrors.lineNeeded(node.qname().local());
+			return null;
 		}
 
 		/**
@@ -1258,27 +903,16 @@ public class GeoModule extends QueryModule {
 		 */
 		public Int numPoints(final ANode node) throws QueryException {
 
-			if(node.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node.type);
-
-			// Retrieve element name
-			  QNm qname = node.qname();
-	
-			// Check QName
-			  if (qname.eq(Q_GML_LINESTRING) || qname.eq(Q_GML_LINEARRING)
-			      || qname.eq(Q_GML_MULTILINESTRING) || qname.eq(Q_GML_POINT)
-			      || qname.eq(Q_GML_MULTIPOINT) || qname.eq(Q_GML_POLYGON)
-			      || qname.eq(Q_GML_MULTIPOLYGON)) {
-				  
-				  Geometry geom = gmlReader(node);
-				  return Int.get(geom.getNumPoints());
-			  }
+	    // Check QName
+      if(checkNode(node, new QNm[0])) {
+			  Geometry geom = gmlReader(node);
+			  return Int.get(geom.getNumPoints());
+		  }
 //			  if (qname.eq(Q_GML_POINT) || qname.eq(Q_GML_MULTIPOINT)
 //			      || qname.eq(Q_GML_POLYGON) || qname.eq(Q_GML_MULTIPOLYGON))
 //				  throw GeoErrors.lineNeeded(qname.local());
-			  
-			  throw GeoErrors.unrecognizedGeo(qname.local());
-		}
+      return null;
+    }
 
 		/**
 		 * Returns the nth point of a line.
@@ -1289,36 +923,32 @@ public class GeoModule extends QueryModule {
 		 */
 		public Value pointN(final ANode node, final Int pointNumber) throws QueryException {
 
-			if(node.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node.type);
-
-			// Retrieve element name
-			  QNm qname = node.qname();
-	
-			  // Check QName
-			  if (qname.eq(Q_GML_LINESTRING) || qname.eq(Q_GML_LINEARRING)) {
-				  
-				  Geometry geom = gmlReader(node);
-				  int temp = geom.getNumPoints();
-			      if (((BigInteger) pointNumber.toJava()).intValue() < 1 || ((BigInteger) pointNumber.toJava()).intValue() > temp)
-			    	  throw GeoErrors.outOfRangeIdx(pointNumber); 
-			      if (geom instanceof LineString) {
-						  Point point = ((LineString) geom).getPointN(((BigInteger) pointNumber.toJava()).intValue() - 1);
-						// Write the Geometry in GML2 format
-						 return gmlWriter(point);
-					  }
-					  if (geom instanceof LinearRing) {
-						  Point point = ((LinearRing) geom).getPointN(((BigInteger) pointNumber.toJava()).intValue() - 1);
-						// Write the Geometry in GML2 format
-						  return gmlWriter(point);  
-			      }
-			  }
-			  if (qname.eq(Q_GML_POINT) || qname.eq(Q_GML_MULTIPOINT)
-				  || qname.eq(Q_GML_MULTILINESTRING)
-			      || qname.eq(Q_GML_POLYGON) || qname.eq(Q_GML_MULTIPOLYGON))
-				  throw GeoErrors.lineNeeded(qname.local());
+		// Check QName
+      QNm[] line = {Q_GML_LINEARRING, Q_GML_LINESTRING};
+      QNm[] other = {Q_GML_POLYGON, Q_GML_MULTILINESTRING, Q_GML_MULTIPOINT,
+                      Q_GML_MULTIPOLYGON};
+      if (checkNode(node, line)) {
+        Geometry geom = gmlReader(node);
+        
+				int temp = geom.getNumPoints();
+			  if (((BigInteger) pointNumber.toJava()).intValue() < 1 || ((BigInteger) pointNumber.toJava()).intValue() > temp)
+			    throw GeoErrors.outOfRangeIdx(pointNumber); 
 			  
-			  throw GeoErrors.unrecognizedGeo(qname.local());
+			  if (geom instanceof LineString) {
+			    Point point = ((LineString) geom).getPointN(((BigInteger) pointNumber.toJava()).intValue() - 1);
+					// Write the Geometry in GML2 format
+				  return gmlWriter(point);
+				}
+				
+			  if (geom instanceof LinearRing) {
+				  Point point = ((LinearRing) geom).getPointN(((BigInteger) pointNumber.toJava()).intValue() - 1);
+					// Write the Geometry in GML2 format
+					return gmlWriter(point);  
+			  }
+			}
+      if (checkNode(node, other)) 
+				  throw GeoErrors.lineNeeded(node.qname().local());
+			return null;
 		}
 
 		/**
@@ -1330,22 +960,13 @@ public class GeoModule extends QueryModule {
 		 */
 		public Dbl area(final ANode node) throws QueryException {
 		  
-			if(node.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node.type);
-
-			// Retrieve element name
-			QNm qname = node.qname();
-	
-			// Check QName
-			if(qname.eq(Q_GML_POINT) || qname.eq(Q_GML_LINESTRING) || qname.eq(Q_GML_POLYGON)
-			    || qname.eq(Q_GML_MULTIPOINT) || qname.eq(Q_GML_MULTILINESTRING)
-			    || qname.eq(Q_GML_MULTIPOLYGON) || qname.eq(Q_GML_LINEARRING)) {
-				
-				Geometry geom = gmlReader(node);
+		// Check QName
+      if (checkNode(node, new QNm[0])) {
+    		Geometry geom = gmlReader(node);
 				return Dbl.get(geom.getArea());
 			}
-			throw GeoErrors.unrecognizedGeo(qname.local());
-		 }
+			return null;
+		}
 
 		/**
 		 * Returns the mathematical centroid of the geometry as a gml:Point.
@@ -1356,24 +977,14 @@ public class GeoModule extends QueryModule {
 		 */
 		public Value centroid(final ANode node) throws QueryException {
 		  
-			if(node.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node.type);
-
-			// Retrieve element name
-			QNm qname = node.qname();
-	
-			// Check QName
-			if(qname.eq(Q_GML_POINT) || qname.eq(Q_GML_LINESTRING) || qname.eq(Q_GML_POLYGON)
-			    || qname.eq(Q_GML_MULTIPOINT) || qname.eq(Q_GML_MULTILINESTRING)
-			    || qname.eq(Q_GML_MULTIPOLYGON) || qname.eq(Q_GML_LINEARRING)) {
-				 
-				Geometry geom = gmlReader(node);
-				Point center = geom.getCentroid();
+		// Check QName
+      if (checkNode(node, new QNm[0])) {
+    		Geometry geom = gmlReader(node);
 				// Write the Geometry in GML2 format
-				return gmlWriter(center);
+				return gmlWriter(geom.getCentroid());
 			}
-			throw GeoErrors.unrecognizedGeo(qname.local());
-		 }
+			return null;
+		}
 
 		/**
 		 * Returns a gml:Point that is interior of this geometry.
@@ -1384,25 +995,15 @@ public class GeoModule extends QueryModule {
 		 */
 		public Value pointOnSurface(final ANode node) throws QueryException {
 		  
-			if(node.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node.type);
-
-			// Retrieve element name
-			QNm qname = node.qname();
-	
-			// Check QName
-			if(qname.eq(Q_GML_POINT) || qname.eq(Q_GML_LINESTRING) || qname.eq(Q_GML_POLYGON)
-			    || qname.eq(Q_GML_MULTIPOINT) || qname.eq(Q_GML_MULTILINESTRING)
-			    || qname.eq(Q_GML_MULTIPOLYGON) || qname.eq(Q_GML_LINEARRING)) {
-				  
-			  Geometry geom = gmlReader(node);
-			  Point point = geom.getInteriorPoint();
+		// Check QName
+      if (checkNode(node, new QNm[0])) {
+    	  Geometry geom = gmlReader(node);
 			// Write the Geometry in GML2 format
-			  return gmlWriter(point);
+			  return gmlWriter(geom.getInteriorPoint());
 			}
-			  
-			throw GeoErrors.unrecognizedGeo(qname.local());
+			return null;
 		}
+		
 		/**
 		 * Returns the outer ring of a polygon, in GML.
 		 * @param node xml element containing gml object(s)
@@ -1411,24 +1012,18 @@ public class GeoModule extends QueryModule {
 		 */
 		public Value exteriorRing(final ANode node) throws QueryException {
 		  
-			if(node.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node.type);
-			// Retrieve element name
-			  QNm qname = node.qname();
-	
-			  if(qname.eq(Q_GML_POLYGON)) {
-				  
-				  Geometry geom = gmlReader(node);
-				  LineString ring = ((Polygon) geom).getExteriorRing();
+      // Check Node
+      QNm[] polygon = {Q_GML_POLYGON};
+      QNm[] other = {Q_GML_POINT, Q_GML_LINEARRING, Q_GML_LINESTRING,
+            Q_GML_MULTILINESTRING, Q_GML_MULTIPOINT, Q_GML_MULTIPOLYGON};
+      if (checkNode(node, polygon)) {
+			  Geometry geom = gmlReader(node);
 				// Write the Geometry in GML2 format
-				  return gmlWriter(ring);
-			  }
-			  if (qname.eq(Q_GML_POINT) || qname.eq(Q_GML_LINESTRING)
-			      || qname.eq(Q_GML_MULTIPOINT) || qname.eq(Q_GML_MULTILINESTRING)
-			      || qname.eq(Q_GML_LINEARRING) || qname.eq(Q_GML_MULTIPOLYGON))
-				  throw GeoErrors.polygonNeeded(qname.local());
-			  
-			  throw GeoErrors.unrecognizedGeo(node.qname().local());
+				return gmlWriter(((Polygon) geom).getExteriorRing());
+			}
+			if (checkNode(node, other))
+			  throw GeoErrors.polygonNeeded(node);
+			return null;
 		}
 
 		/**
@@ -1439,22 +1034,17 @@ public class GeoModule extends QueryModule {
 		 */
 		public Int numInteriorRing(final ANode node) throws QueryException {
 			
-			if(node.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node.type);
-
-		  // Retrieve element name
-			QNm qname = node.qname();
-
-			if(qname.eq(Q_GML_POLYGON)) {
-				Geometry geom = gmlReader(node);
+		  // Check Node
+      QNm[] polygon = {Q_GML_POLYGON};
+      QNm[] other = {Q_GML_POINT, Q_GML_LINEARRING, Q_GML_LINESTRING,
+            Q_GML_MULTILINESTRING, Q_GML_MULTIPOINT, Q_GML_MULTIPOLYGON};
+      if (checkNode(node, polygon)) {
+        Geometry geom = gmlReader(node);
 				return Int.get(((Polygon) geom).getNumInteriorRing());
 			}
-			if (qname.eq(Q_GML_POINT) || qname.eq(Q_GML_LINESTRING)
-					|| qname.eq(Q_GML_MULTIPOINT) || qname.eq(Q_GML_MULTILINESTRING)
-					|| qname.eq(Q_GML_LINEARRING) || qname.eq(Q_GML_MULTIPOLYGON))
-				throw GeoErrors.polygonNeeded(qname.local());
-		 
-			throw GeoErrors.unrecognizedGeo(qname.local());
+      if (checkNode(node, other))
+				throw GeoErrors.polygonNeeded(node.qname().local());
+      return null;
 		}
 
 		/**
@@ -1466,26 +1056,24 @@ public class GeoModule extends QueryModule {
 		 */
 		public Value interiorRingN(final ANode node, Int ringNumber) throws QueryException {
 			
-			if(node.type != NodeType.ELM) 
-				 Err.FUNCMP.thrw(null, this, NodeType.ELM, node.type);
-			// Retrieve element name
-			QNm qname = node.qname();
-
-			// Check QName
-			if(qname.eq(Q_GML_POLYGON)) {
-				Geometry geom = gmlReader(node);
-				int temp = ((Polygon) geom).getNumInteriorRing();
-			    if (((BigInteger) ringNumber.toJava()).intValue() < 1 || ((BigInteger) ringNumber.toJava()).intValue() > temp)
-			    	throw GeoErrors.outOfRangeIdx(ringNumber); 	  
-			    LineString ring = ((Polygon) geom).getInteriorRingN(((BigInteger) ringNumber.toJava()).intValue() - 1);
-			    	// Write the Geometry in GML2 format
-					return gmlWriter(ring);
-		  	}
-			if (qname.eq(Q_GML_POINT) || qname.eq(Q_GML_LINESTRING)
-					|| qname.eq(Q_GML_MULTIPOINT) || qname.eq(Q_GML_MULTILINESTRING)
-					|| qname.eq(Q_GML_LINEARRING) || qname.eq(Q_GML_MULTIPOLYGON))
-				throw GeoErrors.polygonNeeded(qname.local());
-		
-			throw GeoErrors.unrecognizedGeo(qname.local());
+			// Check Node
+			  QNm[] polygon = {Q_GML_POLYGON};
+				QNm[] other = {Q_GML_POINT, Q_GML_LINEARRING, Q_GML_LINESTRING,
+	            Q_GML_MULTILINESTRING, Q_GML_MULTIPOINT, Q_GML_MULTIPOLYGON};
+				if (checkNode(node, polygon)) {
+				  Geometry geom = gmlReader(node);
+				  
+				  int temp = ((Polygon) geom).getNumInteriorRing();
+				  if (((BigInteger) ringNumber.toJava()).intValue() < 1 
+				      || ((BigInteger) ringNumber.toJava()).intValue() > temp)
+				    throw GeoErrors.outOfRangeIdx(ringNumber); 	  
+			    
+				  LineString ring = ((Polygon) geom).getInteriorRingN(((BigInteger) ringNumber.toJava()).intValue() - 1);
+			    // Write the Geometry in GML2 format
+			    return gmlWriter(ring);
+				}
+        if (checkNode(node, other))
+          throw GeoErrors.polygonNeeded(node.qname().local());
+        throw GeoErrors.unrecognizedGeo(node.qname().local());       
 		}
 	}
