@@ -34,7 +34,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class ValueBuilder extends IndexBuilder {
+public final class ValueIndexBuilder extends IndexBuilder {
   /** Temporary value tree. */
   private IndexTree index = new IndexTree();
   /** Index type (attributes/texts). */
@@ -45,7 +45,7 @@ public final class ValueBuilder extends IndexBuilder {
    * @param d data reference
    * @param txt value type (text/attribute)
    */
-  public ValueBuilder(final Data d, final boolean txt) {
+  public ValueIndexBuilder(final Data d, final boolean txt) {
     super(d);
     text = txt;
   }
@@ -106,8 +106,8 @@ public final class ValueBuilder extends IndexBuilder {
     // initialize cached index iterators
     final IntList ml = new IntList();
     final IntList il = new IntList();
-    final ValueMerger[] vm = new ValueMerger[csize];
-    for(int i = 0; i < csize; ++i) vm[i] = new ValueMerger(data, text, i);
+    final ValueIndexMerger[] vm = new ValueIndexMerger[csize];
+    for(int i = 0; i < csize; ++i) vm[i] = new ValueIndexMerger(data, text, i);
     int sz = 0;
 
     // parse through all values
@@ -135,7 +135,7 @@ public final class ValueBuilder extends IndexBuilder {
       // parse through all values, cache and sort id values
       final int ms = ml.size();
       for(int m = 0; m < ms; ++m) {
-        final ValueMerger t = vm[ml.get(m)];
+        final ValueIndexMerger t = vm[ml.get(m)];
         final int vl = t.values.length;
         for(int l = 4, v; l < vl; l += Num.length(v)) {
           v = Num.get(t.values, l);

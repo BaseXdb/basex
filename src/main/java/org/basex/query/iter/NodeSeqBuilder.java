@@ -18,7 +18,7 @@ import org.basex.util.*;
  */
 public final class NodeSeqBuilder extends AxisIter {
   /** Node container. */
-  public ANode[] item;
+  public ANode[] nodes;
   /** Number of nodes. */
   private int size;
   /** Current iterator position. */
@@ -32,7 +32,7 @@ public final class NodeSeqBuilder extends AxisIter {
    * Constructor.
    */
   public NodeSeqBuilder() {
-    item = new ANode[1];
+    nodes = new ANode[1];
   }
 
   /**
@@ -41,7 +41,7 @@ public final class NodeSeqBuilder extends AxisIter {
    * @param s size
    */
   public NodeSeqBuilder(final ANode[] it, final int s) {
-    item = it;
+    nodes = it;
     size = s;
   }
 
@@ -60,7 +60,7 @@ public final class NodeSeqBuilder extends AxisIter {
    * @return node
    */
   public ANode get(final int i) {
-    return item[i];
+    return nodes[i];
   }
 
   /**
@@ -68,7 +68,7 @@ public final class NodeSeqBuilder extends AxisIter {
    * @param p deletion position
    */
   public void delete(final int p) {
-    Array.move(item, p + 1, -1, --size - p);
+    Array.move(nodes, p + 1, -1, --size - p);
   }
 
   /**
@@ -76,13 +76,13 @@ public final class NodeSeqBuilder extends AxisIter {
    * @param n node to be added
    */
   public void add(final ANode n) {
-    if(size == item.length) {
+    if(size == nodes.length) {
       final ANode[] tmp = new ANode[Array.newSize(size)];
-      System.arraycopy(item, 0, tmp, 0, size);
-      item = tmp;
+      System.arraycopy(nodes, 0, tmp, 0, size);
+      nodes = tmp;
     }
-    if(check && !sort && size != 0) sort = item[size - 1].diff(n) > 0;
-    item[size++] = n;
+    if(check && !sort && size != 0) sort = nodes[size - 1].diff(n) > 0;
+    nodes[size++] = n;
   }
 
   @Override
@@ -94,12 +94,12 @@ public final class NodeSeqBuilder extends AxisIter {
   @Override
   public ANode next() {
     if(check) sort(sort);
-    return ++pos < size ? item[pos] : null;
+    return ++pos < size ? nodes[pos] : null;
   }
 
   @Override
   public ANode get(final long i) {
-    return i < size ? item[(int) i] : null;
+    return i < size ? nodes[(int) i] : null;
   }
 
   @Override
@@ -118,7 +118,7 @@ public final class NodeSeqBuilder extends AxisIter {
   @Override
   public Value value() {
     if(check) sort(sort);
-    return Seq.get(item, size, NodeType.NOD);
+    return Seq.get(nodes, size, NodeType.NOD);
   }
 
   /**
@@ -129,22 +129,22 @@ public final class NodeSeqBuilder extends AxisIter {
   public boolean dbnodes() {
     if(check) sort(sort);
 
-    final Data data = size > 0 ? item[0].data() : null;
+    final Data data = size > 0 ? nodes[0].data() : null;
     if(data == null) return false;
-    for(int s = 1; s < size; ++s) if(data != item[s].data()) return false;
+    for(int s = 1; s < size; ++s) if(data != nodes[s].data()) return false;
     return true;
   }
 
   /**
    * Checks if the iterator contains a database node with the specified pre value.
-   * @param node node to be found
+   * @param n node to be found
    * @param db indicates if all nodes are sorted {@link DBNode} references
    * @return position, or {@code -1}
    */
-  public int indexOf(final ANode node, final boolean db) {
-    if(db) return node instanceof DBNode ?
-        Math.max(binarySearch((DBNode) node, 0, size), -1) : -1;
-    for(int s = 0; s < size(); ++s) if(item[s].is(node)) return s;
+  public int indexOf(final ANode n, final boolean db) {
+    if(db) return n instanceof DBNode ?
+        Math.max(binarySearch((DBNode) n, 0, size), -1) : -1;
+    for(int s = 0; s < size(); ++s) if(nodes[s].is(n)) return s;
     return -1;
   }
 
@@ -152,19 +152,19 @@ public final class NodeSeqBuilder extends AxisIter {
    * Performs a binary search on the given range of this sequence iterator,
    * assuming that all nodes are {@link DBNode}s from the same {@link Data}
    * instance (i.e., {@link #dbnodes()} returns {@code true}).
-   * @param nd node to find
+   * @param n node to find
    * @param start start of the search interval
    * @param length length of the search interval
    * @return position of the item or {@code -insertPosition - 1} if not found
    */
-  public int binarySearch(final DBNode nd, final int start, final int length) {
-    if(size == 0 || nd.data != item[0].data()) return -start - 1;
+  public int binarySearch(final DBNode n, final int start, final int length) {
+    if(size == 0 || n.data != nodes[0].data()) return -start - 1;
     int l = start, r = start + length - 1;
     while(l <= r) {
       final int m = l + r >>> 1;
-      final int npre = ((DBNode) item[m]).pre;
-      if(npre == nd.pre) return m;
-      if(npre < nd.pre) l = m + 1;
+      final int npre = ((DBNode) nodes[m]).pre;
+      if(npre == n.pre) return m;
+      if(npre < n.pre) l = m + 1;
       else r = m - 1;
     }
     return -(l + 1);
@@ -192,11 +192,11 @@ public final class NodeSeqBuilder extends AxisIter {
       // remove duplicates and merge scores
       int i = 1;
       for(int j = 1; j < size; ++j) {
-        while(j < size && item[i - 1].is(item[j])) {
-          item[i - 1].score(Math.max(item[j++].score(), item[i - 1].score()));
+        while(j < size && nodes[i - 1].is(nodes[j])) {
+          nodes[i - 1].score(Math.max(nodes[j++].score(), nodes[i - 1].score()));
         }
         if(j == size) break;
-        item[i++] = item[j];
+        nodes[i++] = nodes[j];
       }
       size = i;
     }
@@ -211,7 +211,7 @@ public final class NodeSeqBuilder extends AxisIter {
   private void sort(final int s, final int e) {
     if(e < 7) {
       for(int i = s; i < e + s; ++i)
-        for(int j = i; j > s && item[j - 1].diff(item[j]) > 0; j--) s(j, j - 1);
+        for(int j = i; j > s && nodes[j - 1].diff(nodes[j]) > 0; j--) s(j, j - 1);
       return;
     }
 
@@ -227,18 +227,18 @@ public final class NodeSeqBuilder extends AxisIter {
       }
       m = m(l, m, n);
     }
-    final ANode v = item[m];
+    final ANode v = nodes[m];
 
     int a = s, b = a, c = s + e - 1, d = c;
     while(true) {
       while(b <= c) {
-        final int h = item[b].diff(v);
+        final int h = nodes[b].diff(v);
         if(h > 0) break;
         if(h == 0) s(a++, b);
         ++b;
       }
       while(c >= b) {
-        final int h = item[c].diff(v);
+        final int h = nodes[c].diff(v);
         if(h < 0) break;
         if(h == 0) s(c, d--);
         --c;
@@ -276,9 +276,9 @@ public final class NodeSeqBuilder extends AxisIter {
    * @return median
    */
   private int m(final int a, final int b, final int c) {
-    return item[a].diff(item[b]) < 0 ?
-      item[b].diff(item[c]) < 0 ? b : item[a].diff(item[c]) < 0 ? c : a :
-      item[b].diff(item[c]) > 0 ? b : item[a].diff(item[c]) > 0 ? c : a;
+    return nodes[a].diff(nodes[b]) < 0 ?
+      nodes[b].diff(nodes[c]) < 0 ? b : nodes[a].diff(nodes[c]) < 0 ? c : a :
+      nodes[b].diff(nodes[c]) > 0 ? b : nodes[a].diff(nodes[c]) > 0 ? c : a;
   }
 
   /**
@@ -287,13 +287,13 @@ public final class NodeSeqBuilder extends AxisIter {
    * @param b second position
    */
   private void s(final int a, final int b) {
-    final ANode tmp = item[a];
-    item[a] = item[b];
-    item[b] = tmp;
+    final ANode tmp = nodes[a];
+    nodes[a] = nodes[b];
+    nodes[b] = tmp;
   }
 
   @Override
   public String toString() {
-    return Util.name(this) + Arrays.toString(Arrays.copyOf(item, size));
+    return Util.name(this) + Arrays.toString(Arrays.copyOf(nodes, size));
   }
 }

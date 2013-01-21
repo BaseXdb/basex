@@ -218,7 +218,9 @@ public final class Util {
    */
   public static void stack(final int i) {
     errln("You're here:");
-    stack(new Throwable(), i);
+    final String[] stack = toArray(new Throwable());
+    final int l = Math.min(Math.max(2, i + 2), stack.length);
+    for(int s = 2; s < l; ++s) errln(stack[s]);
   }
 
   /**
@@ -226,19 +228,7 @@ public final class Util {
    * @param th error/exception instance
    */
   public static void stack(final Throwable th) {
-    stack(th, 0);
-  }
-
-  /**
-   * Prints the stack of the specified error to standard error.
-   * @param th error/exception instance
-   * @param i number of steps to print
-   */
-  private static void stack(final Throwable th, final int i) {
-    final String[] stack = toArray(th);
-    int l = stack.length;
-    if(i > 0 && i < l) l = i;
-    for(int s = 0; s < l; ++s) errln(stack[s]);
+    for(final String s : toArray(th)) errln(s);
   }
 
   /**

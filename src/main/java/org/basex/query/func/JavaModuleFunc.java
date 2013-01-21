@@ -51,6 +51,7 @@ public final class JavaModuleFunc extends JavaMapping {
         return mth.invoke(module, args);
       } catch(final InvocationTargetException ex) {
         final Throwable cause = ex.getCause();
+        Util.debug(cause);
         throw cause instanceof QueryException ? ((QueryException) cause).info(info) :
           JAVAERR.thrw(info, cause);
       } catch(final IllegalAccessException ex) {

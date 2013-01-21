@@ -14,7 +14,7 @@ import org.basex.io.in.DataInput;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-final class ValueMerger {
+final class ValueIndexMerger {
   /** Index instance. */
   private final DiskValues dv;
   /** Index keys. */
@@ -36,7 +36,7 @@ final class ValueMerger {
    * @param i merge id
    * @throws IOException I/O exception
    */
-  ValueMerger(final Data d, final boolean txt, final int i) throws IOException {
+  ValueIndexMerger(final Data d, final boolean txt, final int i) throws IOException {
     pref = (txt ? DATATXT : DATAATV) + i;
     dk = new DataInput(d.meta.dbfile(pref + 't'));
     dv = new DiskValues(d, txt, pref);
@@ -61,7 +61,7 @@ final class ValueMerger {
   }
 
   /**
-   * Returns next values. Called by the {@link ValueBuilder}.
+   * Returns next values. Called by the {@link ValueIndexBuilder}.
    * @return compressed values
    */
   private byte[] nextValues() {

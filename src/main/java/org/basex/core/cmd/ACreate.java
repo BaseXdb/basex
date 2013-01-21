@@ -115,8 +115,8 @@ public abstract class ACreate extends Command {
 
     final IndexBuilder ib;
     switch(index) {
-      case TEXT:      ib = new ValueBuilder(data, true); break;
-      case ATTRIBUTE: ib = new ValueBuilder(data, false); break;
+      case TEXT:      ib = new ValueIndexBuilder(data, true); break;
+      case ATTRIBUTE: ib = new ValueIndexBuilder(data, false); break;
       case FULLTEXT:  ib = new FTBuilder(data); break;
       default:        throw Util.notexpected();
     }

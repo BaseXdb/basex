@@ -84,7 +84,7 @@ public final class FNSeq extends StandardFunc {
       // the first/last node is thus always included in the output
       final DBNode fst = (DBNode) nc.get(outer ? 0 : len - 1);
       final Data data = fst.data;
-      final ANode[] nodes = nc.item.clone();
+      final ANode[] nodes = nc.nodes.clone();
 
       if(outer) {
         // skip the subtree of the last added node
@@ -99,7 +99,7 @@ public final class FNSeq extends StandardFunc {
         }
       } else {
         // skip ancestors of the last added node
-        nc.item[0] = fst;
+        nc.nodes[0] = fst;
         nc.size(1);
         int before = fst.pre;
         for(int i = len - 1; i-- != 0;) {
@@ -111,7 +111,7 @@ public final class FNSeq extends StandardFunc {
         }
 
         // nodes were added in reverse order, correct that
-        Array.reverse(nc.item, 0, (int) nc.size());
+        Array.reverse(nc.nodes, 0, (int) nc.size());
       }
 
       return nc;
@@ -120,11 +120,11 @@ public final class FNSeq extends StandardFunc {
     // multiple documents and/or constructed fragments
     final NodeSeqBuilder out = new NodeSeqBuilder(new ANode[len], 0);
     OUTER: for(int i = 0; i < len; i++) {
-      final ANode nd = nc.item[i];
+      final ANode nd = nc.nodes[i];
       final AxisIter ax = outer ? nd.ancestor() : nd.descendant();
       for(ANode a; (a = ax.next()) != null;)
         if(nc.indexOf(a, false) != -1) continue OUTER;
-      out.add(nc.item[i]);
+      out.add(nc.nodes[i]);
     }
 
     return out;

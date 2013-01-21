@@ -127,7 +127,7 @@ public class AxisStep extends Preds {
         if(i != null) {
           // assign score value
           nc.get(n).score(i.score());
-          nc.item[c++] = nc.get(n);
+          nc.nodes[c++] = nc.get(n);
         }
         ctx.pos++;
       }

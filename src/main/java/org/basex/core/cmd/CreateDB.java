@@ -160,9 +160,9 @@ public final class CreateDB extends ACreate {
     try {
       final Data data = builder.build();
       if(data.meta.createtext) data.setIndex(IndexType.TEXT,
-        new ValueBuilder(data, true).build());
+        new ValueIndexBuilder(data, true).build());
       if(data.meta.createattr) data.setIndex(IndexType.ATTRIBUTE,
-        new ValueBuilder(data, false).build());
+        new ValueIndexBuilder(data, false).build());
       if(data.meta.createftxt) data.setIndex(IndexType.FULLTEXT,
         new FTBuilder(data).build());
       data.close();

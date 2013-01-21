@@ -105,42 +105,42 @@ public final class Array {
 
   /**
    * Sorts the specified tokens and returns an integer array
-   * with offsets to of the sorted tokens.
-   * @param tok token array to sort by
+   * with offsets to the sorted tokens.
+   * @param vals values to sort by
    * @param num numeric sort
    * @param asc ascending
-   * @return sorted integer array
+   * @return array containing the order
    */
-  public static int[] createOrder(final byte[][] tok, final boolean num,
+  public static int[] createOrder(final byte[][] vals, final boolean num,
       final boolean asc) {
-    final IntList il = number(tok.length);
-    il.sort(tok, num, asc);
+    final IntList il = number(vals.length);
+    il.sort(vals, num, asc);
     return il.toArray();
   }
 
   /**
-   * Sorts the specified numeric tokens and returns an integer array
-   * with offsets to of the sorted tokens.
-   * @param tok token array to sort by
+   * Sorts the specified doubles and returns an integer array
+   * with offsets to the sorted doubles.
+   * @param vals values to sort by
    * @param asc ascending
-   * @return sorted integer array
+   * @return array containing the order
    */
-  public static int[] createOrder(final double[] tok, final boolean asc) {
-    final IntList il = number(tok.length);
-    il.sort(tok, asc);
+  public static int[] createOrder(final double[] vals, final boolean asc) {
+    final IntList il = number(vals.length);
+    il.sort(vals, asc);
     return il.toArray();
   }
 
   /**
-   * Sorts the specified numeric tokens and returns an integer array
-   * with offsets to of the sorted tokens.
-   * @param tok token array to sort by
+   * Sorts the specified integers and returns an integer array
+   * with offsets to the sorted integers.
+   * @param vals values to sort by
    * @param asc ascending
-   * @return sorted integer array
+   * @return array containing the order
    */
-  public static int[] createOrder(final int[] tok, final boolean asc) {
-    final IntList il = number(tok.length);
-    il.sort(tok, asc);
+  public static int[] createOrder(final int[] vals, final boolean asc) {
+    final IntList il = number(vals.length);
+    il.sort(vals, asc);
     return il.toArray();
   }
 
