@@ -220,10 +220,12 @@ public final class Context {
     if(!pr.databases(sl)) {
       // databases cannot be determined... pass null reference
       sl = null;
-    } else if(data != null) {
+    } else {
       // replace empty string with currently opened database and return array
       for(int d = 0; d < sl.size(); d++) {
-        if(sl.get(d).isEmpty()) sl.set(d, data.meta.name);
+        if(sl.get(d).isEmpty())
+          if(null == data) sl.deleteAt(d);
+          else sl.set(d, data.meta.name);
       }
     }
     locks.acquire(pr, pr.updating ? new StringList(0) : sl,
