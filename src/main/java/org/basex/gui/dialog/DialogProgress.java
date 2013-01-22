@@ -22,7 +22,7 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
   /** Maximum value of progress bar. */
   private static final int MAX = 600;
   /** Refresh action. */
-  private final Timer timer = new Timer(50, this);
+  private final Timer timer = new Timer(100, this);
    /** Information label. */
   private BaseXLabel info;
   /** Memory usage. */
