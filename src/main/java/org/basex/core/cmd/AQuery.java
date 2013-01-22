@@ -118,8 +118,6 @@ abstract class AQuery extends Command {
 
       } catch(final QueryException ex) {
         err = Util.message(ex);
-        final String stack = ex.getStack();
-        if(!stack.isEmpty()) err += NL + NL + STACK_TRACE_C + stack;
       } catch(final IOException ex) {
         err = Util.message(ex);
       } catch(final ProgressException ex) {
@@ -147,15 +145,16 @@ abstract class AQuery extends Command {
    */
   final boolean extError(final String query, final String err) {
     // will only be evaluated when an error has occurred
-    final StringBuilder sb = new StringBuilder(err);
+    final StringBuilder sb = new StringBuilder();
     if(prop.is(Prop.QUERYINFO)) {
       final String info = info();
       if(!info.isEmpty()) sb.append(info);
       sb.append(NL + QUERY_CC + query);
       final String i = qp.info();
       if(!i.isEmpty()) sb.append(i);
-      sb.append(NL + ERROR_C + NL + err);
+      sb.append(NL + ERROR_C + NL);
     }
+    sb.append(err);
     return error(sb.toString());
   }
 

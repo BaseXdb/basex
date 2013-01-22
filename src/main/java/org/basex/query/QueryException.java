@@ -135,7 +135,7 @@ public final class QueryException extends Exception {
    * @param ii input info
    */
   public void add(final InputInfo ii) {
-    stack.add(ii);
+    if(ii != null) stack.add(ii);
   }
 
   /**
@@ -194,19 +194,14 @@ public final class QueryException extends Exception {
     return value;
   }
 
-  /**
-   * Returns a string representation of the XQuery error stack.
-   * @return error stack
-   */
-  public String getStack() {
-    final TokenBuilder tb = new TokenBuilder();
-    for(final InputInfo ii : stack) tb.add(NL).add(LI).add(ii.toString());
-    return tb.toString();
-  }
-
   @Override
   public String getLocalizedMessage() {
-    return super.getMessage();
+    final TokenBuilder tb = new TokenBuilder(super.getMessage());
+    if(!stack.isEmpty()) {
+      tb.add(NL).add(NL).add(STACK_TRACE_C);
+      for(final InputInfo ii : stack) tb.add(NL).add(LI).add(ii.toString());
+    }
+    return tb.toString();
   }
 
   @Override

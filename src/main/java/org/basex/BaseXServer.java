@@ -101,11 +101,11 @@ public final class BaseXServer extends Main implements Runnable {
       for(final String c : commands) execute(c);
 
       socket = new ServerSocket();
-      // reuse address on non-Windows machines
-      socket.setReuseAddress(!Prop.WIN);
+      // reuse address (on non-Windows machines: !Prop.WIN);
+      socket.setReuseAddress(true);
       socket.bind(new InetSocketAddress(addr, port));
       esocket = new ServerSocket();
-      esocket.setReuseAddress(!Prop.WIN);
+      esocket.setReuseAddress(true);
       esocket.bind(new InetSocketAddress(addr, eport));
       stop = stopFile(port);
 
