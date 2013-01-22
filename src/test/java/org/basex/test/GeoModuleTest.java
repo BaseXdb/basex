@@ -18,7 +18,7 @@ import org.junit.Test;
 
 public final class GeoModuleTest extends AdvancedQueryTest {
 
-	/** Test method. */
+/** Test method. */
   @Test
   public void dimension() {
 	  runQuery("geo:dimension(<gml:Point><gml:coordinates>1,2</gml:coordinates></gml:Point>)", "0");

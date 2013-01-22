@@ -50,10 +50,10 @@ import com.vividsolutions.jts.io.gml2.GMLWriter;
 
 public class GeoModule extends QueryModule {
 
-	  /** GML URI. */
-	  private static final byte[] GMLURI = token("http://www.opengis.net/gml");
+    /** GML URI. */
+    private static final byte[] GMLURI = token("http://www.opengis.net/gml");
 
-	  /** QName gml:Point. */
+    /** QName gml:Point. */
 	  private static final QNm Q_GML_POINT = new QNm("gml:Point", GMLURI);
 	  /** QName gml:MultiPoint. */
 	  private static final QNm Q_GML_MULTIPOINT = new QNm("gml:MultiPoint", GMLURI);
@@ -796,8 +796,7 @@ public class GeoModule extends QueryModule {
 				  Point point = ((LineString) geom).getStartPoint();
 				  // Write the Geometry in GML2 format
 					return gmlWriter(point);
-				} 
-				else if (geom instanceof LinearRing) {
+				} else if (geom instanceof LinearRing) {
 				  Point point = ((LinearRing) geom).getStartPoint();
 					// Write the Geometry in GML2 format
 					return gmlWriter(point);
@@ -826,8 +825,7 @@ public class GeoModule extends QueryModule {
           Point point = ((LineString) geom).getEndPoint();
           // Write the Geometry in GML2 format
           return gmlWriter(point);
-        } 
-        else if (geom instanceof LinearRing) {
+        } else if (geom instanceof LinearRing) {
           Point point = ((LinearRing) geom).getEndPoint();
           // Write the Geometry in GML2 format
           return gmlWriter(point);
