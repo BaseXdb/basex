@@ -44,7 +44,6 @@ public final class BaseXHTTP {
     try {
       new BaseXHTTP(args);
     } catch(final Exception ex) {
-      Util.debug(ex);
       Util.errln(ex);
       System.exit(1);
     }

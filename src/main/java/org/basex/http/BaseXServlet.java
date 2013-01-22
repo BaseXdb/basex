@@ -39,17 +39,13 @@ public abstract class BaseXServlet extends HttpServlet {
       run(http);
       http.log("", SC_OK);
     } catch(final HTTPException ex) {
-      Util.debug(ex);
-      http.status(ex.getStatus(), ex.getMessage());
+      http.status(ex.getStatus(), Util.message(ex));
     } catch(final LoginException ex) {
-      Util.debug(ex);
-      http.status(SC_UNAUTHORIZED, ex.getMessage());
+      http.status(SC_UNAUTHORIZED, Util.message(ex));
     } catch(final IOException ex) {
-      Util.debug(ex);
       http.status(SC_BAD_REQUEST, Util.message(ex));
     } catch(final QueryException ex) {
-      Util.debug(ex);
-      http.status(SC_BAD_REQUEST, ex.getMessage());
+      http.status(SC_BAD_REQUEST, Util.message(ex));
     } catch(final Exception ex) {
       Util.errln(Util.bug(ex));
       http.status(SC_INTERNAL_SERVER_ERROR, Util.info(UNEXPECTED, ex));

@@ -139,7 +139,6 @@ public class RESTPost extends RESTCode {
       RESTSchema.newValidator().validate(new DOMSource(db.parse(new ArrayInput(input))));
     } catch(final Exception ex) {
       Util.debug("Error while validating \"" + Token.string(input) + '"');
-      Util.debug(ex);
       // validation fails
       HTTPErr.BAD_REQUEST_X.thrw(ex);
     }
