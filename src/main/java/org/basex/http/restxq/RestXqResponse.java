@@ -157,7 +157,7 @@ final class RestXqResponse {
    * Processes the response element and creates the serialization parameters.
    * @param response response element
    * @return serialization properties
-   * @throws Exception exception
+   * @throws Exception exception (also unexpected ones)
    */
   private SerializerProp process(final ANode response) throws Exception {
     SerializerProp sp = function.output;
