@@ -163,7 +163,6 @@ public final class ClientListener extends Thread {
       }
     } catch(final IOException ex) {
       log(ex, false);
-      Util.debug(ex);
       command = null;
       quit();
     }

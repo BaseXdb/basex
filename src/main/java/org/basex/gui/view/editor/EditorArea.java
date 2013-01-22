@@ -144,7 +144,7 @@ final class EditorArea extends Editor {
           else ctx.parse(input);
           view.info(OK, true, false);
         } catch(final QueryException ex) {
-          view.info(ex.getMessage(), false, false);
+          view.info(Util.message(ex), false, false);
         }
       }
     } else if(action == Action.EXECUTE && script) {
@@ -157,7 +157,7 @@ final class EditorArea extends Editor {
         if(script) new CommandParser(input, gui.context).parse();
         view.info(OK, true, false);
       } catch(final Exception ex) {
-        view.info(ex.getMessage(), false, false);
+        view.info(Util.message(ex), false, false);
       }
     } else if(action != Action.CHECK) {
       view.info(OK, true, false);

@@ -139,8 +139,7 @@ abstract class TextDecoder {
       try {
         csd = Charset.forName(enc).newDecoder();
       } catch(final Exception ex) {
-        Util.debug(ex);
-        throw new IOException(ex.toString());
+        throw new IOException(Util.message(ex));
       }
     }
 

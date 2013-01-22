@@ -48,9 +48,7 @@ public final class ShowUsers extends Command {
         Close.close(data, context);
         return true;
       } catch(final IOException ex) {
-        Util.debug(ex);
-        final String msg = ex.getMessage();
-        return msg.isEmpty() ? error(DB_NOT_OPENED_X, name) : error(msg);
+        return error(Util.message(ex));
       }
     }
     return true;

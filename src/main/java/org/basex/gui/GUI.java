@@ -292,7 +292,7 @@ public final class GUI extends AGUI {
         execute(false, cp.parse());
       } catch(final QueryException ex) {
         if(!info.visible()) GUICommands.C_SHOWINFO.execute(this);
-        info.setInfo(ex.getMessage(), null, null, false);
+        info.setInfo(Util.message(ex), null, null, false);
         info.reset();
       }
     } else if(gprop.num(GUIProp.SEARCHMODE) == 1 || in.startsWith("/")) {
@@ -391,7 +391,7 @@ public final class GUI extends AGUI {
         inf = cmd.info();
       } catch(final BaseXException ex) {
         ok = false;
-        inf = ex.getMessage();
+        inf = Util.message(ex);
       } finally {
         updating = false;
       }
@@ -467,9 +467,8 @@ public final class GUI extends AGUI {
       }
     } catch(final Exception ex) {
       // unexpected error
-      Util.stack(ex);
-      BaseXDialog.error(this, Util.info(EXEC_ERROR, cmd,
-          !ex.toString().isEmpty() ? ex.toString() : ex.getMessage()));
+      Util.bug(ex);
+      BaseXDialog.error(this, Util.info(EXEC_ERROR, cmd, Util.message(ex)));
       updating = false;
     }
 

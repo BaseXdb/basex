@@ -235,7 +235,6 @@ public final class ModuleLoader {
       NOMODULE.thrw(ii, uri);
       // expected exception
     } catch(final Throwable th) {
-      Util.debug(th);
       MODINIT.thrw(ii, th);
     }
 
@@ -335,7 +334,7 @@ public final class ModuleLoader {
     try {
       urls.add(new URL(jar.url()));
     } catch(final MalformedURLException ex) {
-      Util.errln(ex.getMessage());
+      Util.errln(ex);
     }
   }
 }

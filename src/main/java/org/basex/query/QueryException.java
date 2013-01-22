@@ -41,7 +41,6 @@ public final class QueryException extends Exception {
    */
   public QueryException(final Throwable th) {
     this(Util.message(th));
-    Util.debug(th);
   }
 
   /**

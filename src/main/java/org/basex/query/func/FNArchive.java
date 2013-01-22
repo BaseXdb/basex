@@ -145,7 +145,6 @@ public class FNArchive extends StandardFunc {
       if(en != null) do e++; while(entr.next() != null);
       if(e != c) throw ARCH_DIFF.thrw(info, e, c);
     } catch(final IOException ex) {
-      Util.debug(ex);
       throw ARCH_FAIL.thrw(info, ex);
     } finally {
       out.close();
@@ -174,7 +173,6 @@ public class FNArchive extends StandardFunc {
         break;
       }
     } catch(final IOException ex) {
-      Util.debug(ex);
       ARCH_FAIL.thrw(info, ex);
     } finally {
       arch.close();
@@ -217,7 +215,6 @@ public class FNArchive extends StandardFunc {
       }
       return vb;
     } catch(final IOException ex) {
-      Util.debug(ex);
       throw ARCH_FAIL.thrw(info, ex);
     } finally {
       in.close();
@@ -292,7 +289,6 @@ public class FNArchive extends StandardFunc {
         add(it[0], it[1], out, ZipEntry.DEFLATED, ctx);
       }
     } catch(final IOException ex) {
-      Util.debug(ex);
       ARCH_FAIL.thrw(info, ex);
     } finally {
       in.close();
@@ -323,7 +319,6 @@ public class FNArchive extends StandardFunc {
         ARCH_MODIFY.thrw(info, in.format().toUpperCase(Locale.ENGLISH));
       while(in.more()) if(!hm.contains(token(in.entry().getName()))) out.write(in);
     } catch(final IOException ex) {
-      Util.debug(ex);
       ARCH_FAIL.thrw(info, ex);
     } finally {
       in.close();
@@ -359,7 +354,6 @@ public class FNArchive extends StandardFunc {
         if(hs == null || hs.delete(token(ze.getName())) != 0) tl.add(in.read());
       }
     } catch(final IOException ex) {
-      Util.debug(ex);
       ARCH_FAIL.thrw(info, ex);
     } finally {
       in.close();

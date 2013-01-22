@@ -289,7 +289,7 @@ public final class DialogServer extends BaseXDialog {
           msg = SRV_STARTED;
           running = true;
         } catch(final BaseXException ex) {
-          msg = ex.getMessage();
+          msg = Util.message(ex);
           icon = Msg.ERROR;
         }
       } else if(cmp == stop) {

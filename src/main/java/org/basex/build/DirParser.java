@@ -168,7 +168,7 @@ public final class DirParser extends Parser {
             parser = Parser.singleParser(in, prop, targ);
             MemBuilder.build("", parser);
           } catch(final IOException ex) {
-            Util.debug(ex.getMessage());
+            Util.debug(ex);
             skipped.add(src.path());
             ok = false;
           }

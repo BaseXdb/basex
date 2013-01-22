@@ -43,7 +43,6 @@ public final class OptimizeAll extends ACreate {
     try {
       optimizeAll(data, context, this);
     } catch(final IOException ex) {
-      Util.debug(ex);
       return error(Util.message(ex));
     }
 

@@ -86,7 +86,6 @@ public final class HTTPClient {
         conn.disconnect();
       }
     } catch(final IOException ex) {
-      Util.debug(ex);
       throw HC_ERROR.thrw(info, ex);
     }
   }

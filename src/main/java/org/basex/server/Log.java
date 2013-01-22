@@ -53,7 +53,7 @@ public final class Log {
    * @param th throwable
    */
   public synchronized void writeError(final Throwable th) {
-    Util.debug(th);
+    Util.errln(th);
     writeServer(ERROR, Util.bug(th));
   }
 

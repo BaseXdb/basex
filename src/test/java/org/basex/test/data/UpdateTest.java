@@ -107,7 +107,7 @@ public abstract class UpdateTest extends SandboxTest {
     try {
       cmd.execute(context);
     } catch(final BaseXException ex) {
-      Util.errln(ex.getMessage());
+      Util.errln(ex);
     }
   }
 }

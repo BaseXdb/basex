@@ -79,7 +79,6 @@ public class FNFetch extends StandardFunc {
         final URLConnection hc = url.openConnection();
         mt = hc.getContentType();
       } catch(final IOException ex) {
-        Util.debug(ex);
         throw BXFE_IO.thrw(info, ex);
       }
     } else if(io instanceof IOContent) {

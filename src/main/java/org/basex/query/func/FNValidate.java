@@ -99,9 +99,11 @@ public final class FNValidate extends StandardFunc {
     } catch(final Exception ex) {
       if(ex instanceof QueryException) throw (QueryException) ex;
       // may be IOException, SAXException; get original exception
-      Util.debug(ex);
       Throwable e = ex;
-      while(e.getCause() != null) e = e.getCause();
+      while(e.getCause() != null) {
+        Util.debug(e);
+        e = e.getCause();
+      }
       throw BXVA_FAIL.thrw(info, e);
     } finally {
       if(tmp != null) tmp.delete();
@@ -158,7 +160,6 @@ public final class FNValidate extends StandardFunc {
       throw ex;
     } catch(final Exception ex) {
       // may be IOException, SAXException, ParserConfigurationException
-      Util.debug(ex);
       throw BXVA_FAIL.thrw(info, ex);
     } finally {
       if(tmp != null) tmp.delete();

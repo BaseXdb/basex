@@ -82,7 +82,7 @@ public final class SAXWrapper extends SingleParser {
       else r.parse(saxs.getSystemId());
     } catch(final SAXParseException ex) {
       final String msg = Util.info(SCANPOS_X_X, in, ex.getLineNumber(),
-          ex.getColumnNumber()) + COLS + ex.getMessage();
+          ex.getColumnNumber()) + COLS + Util.message(ex);
       final IOException ioe = new IOException(msg);
       ioe.setStackTrace(ex.getStackTrace());
       throw ioe;
@@ -91,7 +91,7 @@ public final class SAXWrapper extends SingleParser {
     } catch(final Exception ex) {
       // occurs, e.g. if document encoding is invalid:
       // prefix message with source id
-      String msg = ex.getMessage();
+      String msg = Util.message(ex);
       if(in != null) msg = '"' + in + '"' + COLS + msg;
       // wrap and return original message
       final IOException ioe = new IOException(msg);

@@ -107,10 +107,13 @@ public final class FNXslt extends StandardFunc {
     } catch(final QueryException ex) {
       throw ex;
     } catch(final Exception ex) {
-      Util.debug(ex);
+      Throwable e = ex;
       // return cause of reflection error, or error itself
-      throw IOERR.thrw(info, ex instanceof InvocationTargetException ?
-          ex.getCause() : ex);
+      if(e instanceof InvocationTargetException) {
+        Util.debug(e);
+        e = e.getCause();
+      }
+      throw IOERR.thrw(info, e);
     }
   }
 

@@ -32,7 +32,6 @@ public final class CreateUser extends AUser {
       create(args[0], args[1], context);
       return info(USER_CREATED_X, args[0]);
     } catch(final BaseXException ex) {
-      Util.debug(ex);
       return error(Util.message(ex));
     }
   }

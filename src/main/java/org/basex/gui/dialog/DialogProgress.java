@@ -180,7 +180,7 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
             info = cmd.info();
           } catch(final BaseXException ex) {
             ok = false;
-            info = ex.getMessage();
+            info = Util.message(ex);
           } finally {
             gui.updating = false;
           }

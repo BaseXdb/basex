@@ -9,6 +9,7 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.test.*;
 import org.basex.test.query.simple.*;
+import org.basex.util.*;
 import org.junit.*;
 import org.junit.rules.*;
 import org.junit.runners.model.*;
@@ -94,8 +95,8 @@ public final class FTIndexQueryTest extends SandboxTest {
     try {
       assertEquals("Query failed:\n" + q + '\n',
           new XQuery(q).execute(context), new XQuery(q).execute(CTX_IX));
-    } catch(final BaseXException e) {
-      fail("Query failed:\n" + q + "\nMessage: " + e.getMessage());
+    } catch(final BaseXException ex) {
+      fail("Query failed:\n" + q + "\nMessage: " + Util.message(ex));
     }
   }
 }

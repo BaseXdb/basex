@@ -51,7 +51,6 @@ public final class BaseXServer extends Main implements Runnable {
     try {
       new BaseXServer(args);
     } catch(final IOException ex) {
-      Util.debug(ex);
       Util.errln(ex);
       System.exit(1);
     }

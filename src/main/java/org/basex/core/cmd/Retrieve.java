@@ -42,7 +42,7 @@ public final class Retrieve extends ACreate {
       }
       return info(QUERY_EXECUTED_X, perf);
     } catch(final IOException ex) {
-      return error(FILE_NOT_STORED_X, ex.getMessage());
+      return error(FILE_NOT_STORED_X, ex);
     }
   }
 }

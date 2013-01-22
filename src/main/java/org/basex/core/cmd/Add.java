@@ -62,7 +62,6 @@ public final class Add extends ACreate {
     try {
       io = sourceToIO(name);
     } catch(final IOException ex) {
-      Util.debug(ex);
       return error(Util.message(ex));
     }
 
@@ -123,7 +122,6 @@ public final class Add extends ACreate {
       // return info message
       return info(parser.info() + PATH_ADDED_X_X, name, perf);
     } catch(final IOException ex) {
-      Util.debug(ex);
       return error(Util.message(ex));
     } finally {
       // close and drop intermediary database instance

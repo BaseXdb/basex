@@ -11,6 +11,7 @@ import org.basex.data.*;
 import org.basex.query.up.*;
 import org.basex.query.up.primitives.*;
 import org.basex.test.query.*;
+import org.basex.util.*;
 import org.junit.*;
 import org.junit.rules.*;
 
@@ -488,8 +489,8 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
   private static Data data(final String s) {
     try {
       new CreateDB(NAME, s).execute(context);
-    } catch(final BaseXException e) {
-      fail(e.getMessage());
+    } catch(final BaseXException ex) {
+      fail(Util.message(ex));
     }
     return context.data();
   }

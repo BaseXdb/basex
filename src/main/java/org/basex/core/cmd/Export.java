@@ -44,8 +44,7 @@ public final class Export extends Command {
       export(data, args[0], this);
       return info(DB_EXPORTED_X, data.meta.name, perf);
     } catch(final IOException ex) {
-      Util.debug(ex);
-      return error(ex.getMessage());
+      return error(Util.message(ex));
     }
   }
 

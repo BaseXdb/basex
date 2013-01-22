@@ -39,9 +39,7 @@ public final class Open extends Command {
       if(data.meta.corrupt)  info(DB_CORRUPT);
       return info(DB_OPENED_X, db, perf);
     } catch(final IOException ex) {
-      Util.debug(ex);
-      final String msg = ex.getMessage();
-      return msg.isEmpty() ? error(DB_NOT_OPENED_X, db) : error(msg);
+      return error(Util.message(ex));
     }
   }
 

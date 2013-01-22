@@ -201,7 +201,7 @@ public final class DialogManage extends BaseXDialog {
           meta.read(in);
           detail.setText(Token.token(InfoDB.db(meta, true, true, true)));
         } catch(final IOException ex) {
-          detail.setText(Token.token(ex.getMessage()));
+          detail.setText(Token.token(Util.message(ex)));
         } finally {
           if(in != null) try { in.close(); } catch(final IOException ignored) { }
         }

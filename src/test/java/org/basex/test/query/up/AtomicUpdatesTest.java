@@ -353,8 +353,8 @@ private void checkTextAdjacency(final Data data, final byte[][] texts) {
  private DataClip data(final String s) {
    try {
      return new DataClip(CreateDB.mainMem(new IOContent(s), context));
-    } catch(final IOException e) {
-      fail(e.getMessage());
+    } catch(final IOException ex) {
+      fail(Util.message(ex));
       return null;
     }
  }

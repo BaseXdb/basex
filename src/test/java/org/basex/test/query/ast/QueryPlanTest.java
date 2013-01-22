@@ -7,6 +7,7 @@ import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.test.query.*;
+import org.basex.util.*;
 
 /**
  * Abstract test class for properties on the Query Plan.
@@ -40,7 +41,7 @@ public abstract class QueryPlanTest extends AdvancedQueryTest {
         }
       }
     } catch(final Exception ex) {
-      throw new Error(ex.getMessage(), ex);
+      throw new Error(Util.message(ex), ex);
     } finally {
       qp.close();
     }

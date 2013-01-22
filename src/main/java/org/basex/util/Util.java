@@ -152,6 +152,7 @@ public final class Util {
    * @return error message
    */
   public static String message(final Throwable ex) {
+    debug(ex);
     if(ex instanceof BindException) return SRV_RUNNING;
     if(ex instanceof LoginException) return ACCESS_DENIED;
     if(ex instanceof ConnectException) return CONNECTION_ERROR;

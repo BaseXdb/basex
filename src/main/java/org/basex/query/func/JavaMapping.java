@@ -217,7 +217,6 @@ public abstract class JavaMapping extends Arr {
       // only throw exception if "java:" prefix was explicitly specified
       if(java) throw WHICHJAVA.thrw(ii, uri);
     } catch(final Throwable th) {
-      Util.debug(th);
       throw INITJAVA.thrw(ii, th);
     }
 

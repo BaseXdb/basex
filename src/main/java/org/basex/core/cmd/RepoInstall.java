@@ -38,8 +38,7 @@ public final class RepoInstall extends Command {
       final boolean exists = new RepoManager(context, info).install(Token.token(args[0]));
       return info(exists ? PKG_REPLACED_X_X : PKG_INSTALLED_X_X, args[0], perf);
     } catch(final QueryException ex) {
-      Util.debug(ex);
-      return error(ex.getMessage());
+      return error(Util.message(ex));
     }
   }
 

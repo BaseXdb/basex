@@ -10,6 +10,7 @@ import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
+import org.basex.util.*;
 import org.xml.sax.*;
 
 /**
@@ -71,7 +72,7 @@ public final class Store extends ACreate {
       store(in, file);
       return info(QUERY_EXECUTED_X, perf);
     } catch(final IOException ex) {
-      return error(FILE_NOT_STORED_X, ex.getMessage());
+      return error(FILE_NOT_STORED_X, Util.message(ex));
     } finally {
       data.finishUpdate();
     }

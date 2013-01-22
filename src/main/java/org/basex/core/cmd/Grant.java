@@ -77,9 +77,7 @@ public final class Grant extends AUser {
     try {
       data = Open.open(db, context);
     } catch(final IOException ex) {
-      Util.debug(ex);
-      final String msg = ex.getMessage();
-      return !info(msg.isEmpty() ? DB_NOT_OPENED_X : msg, db);
+      return !info(Util.message(ex));
     }
 
     // try to lock database

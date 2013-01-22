@@ -264,11 +264,8 @@ public final class QueryResources {
         } catch(final IOException exc) { /* ignore exception */ }
       }
 
-      if(d == null) {
-        // handle exception
-        Util.debug(ex);
-        IOERR.thrw(info, ex);
-      }
+      // handle exception
+      if(d == null) IOERR.thrw(info, ex);
     }
 
     input.path = "";

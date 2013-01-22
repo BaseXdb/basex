@@ -112,7 +112,7 @@ public final class FNProc extends StandardFunc {
     try {
       proc = new ProcessBuilder(args).start();
     } catch(final IOException ex) {
-      result.error.add(ex.getMessage());
+      result.error.add(Util.message(ex));
       result.code = 9999;
       return result;
     }
@@ -126,7 +126,7 @@ public final class FNProc extends StandardFunc {
       outt.join();
       errt.join();
     } catch(final InterruptedException ex) {
-      result.error.add(ex.getMessage());
+      result.error.add(Util.message(ex));
     }
     result.code = proc.exitValue();
     return result;

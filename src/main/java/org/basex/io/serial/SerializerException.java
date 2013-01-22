@@ -22,7 +22,7 @@ public final class SerializerException extends IOException {
    * @param qe query exception
    */
   public SerializerException(final QueryException qe) {
-    super(qe.getMessage());
+    super(Util.message(qe));
     exception = qe;
   }
 

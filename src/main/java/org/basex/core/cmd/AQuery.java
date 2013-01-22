@@ -117,39 +117,46 @@ abstract class AQuery extends Command {
         return info(NL + QUERY_EXECUTED_X, Performance.getTime(time, runs));
 
       } catch(final QueryException ex) {
-        Util.debug(ex);
-        err = ex.getMessage();
+        err = Util.message(ex);
         final String stack = ex.getStack();
         if(!stack.isEmpty()) err += NL + NL + STACK_TRACE_C + stack;
       } catch(final IOException ex) {
-        Util.debug(ex);
         err = Util.message(ex);
       } catch(final ProgressException ex) {
         err = INTERRUPTED;
-        // store any useful info (e.g. query plan):
-      } catch(final RuntimeException ex) {
-        Util.debug(info() + NL + qp.info());
-        throw ex;
       } catch(final StackOverflowError ex) {
         Util.debug(ex);
         err = CIRCLDECL.desc;
+      } catch(final RuntimeException ex) {
+        extError(query, "");
+        Util.debug(info());
+        throw ex;
       } finally {
         // close processor after exceptions
         if(qp != null) qp.close();
       }
     }
+    return extError(query, err);
+  }
 
+  /**
+   * Returns an extended error message.
+   * @param query query
+   * @param err error message
+   * @return result of check
+   */
+  final boolean extError(final String query, final String err) {
     // will only be evaluated when an error has occurred
+    final StringBuilder sb = new StringBuilder(err);
     if(prop.is(Prop.QUERYINFO)) {
-      final StringBuilder sb = new StringBuilder();
       final String info = info();
       if(!info.isEmpty()) sb.append(info);
       sb.append(NL + QUERY_CC + query);
       final String i = qp.info();
       if(!i.isEmpty()) sb.append(i);
-      err = sb.append(NL + ERROR_C + NL + err).toString();
+      sb.append(NL + ERROR_C + NL + err);
     }
-    return error(err);
+    return error(sb.toString());
   }
 
   /**
@@ -198,9 +205,8 @@ abstract class AQuery extends Command {
     try {
       result = queryProcessor(args[0], context).queryNodes();
     } catch(final QueryException ex) {
-      Util.debug(ex);
       qp = null;
-      error(ex.getMessage());
+      error(Util.message(ex));
     }
   }
 

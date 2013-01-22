@@ -5,6 +5,7 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.query.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -71,7 +72,7 @@ public class Execute extends Command {
       try {
         Collections.addAll(list, new CommandParser(args[0], ctx).parse());
       } catch(final QueryException ex) {
-        error = ex.getMessage();
+        error = Util.message(ex);
         return false;
       }
     }

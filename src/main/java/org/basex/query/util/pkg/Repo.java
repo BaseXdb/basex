@@ -152,7 +152,7 @@ public final class Repo {
       // add package to package dictionary
       pkgDict.add(name, token(dir.name()));
     } catch(final QueryException ex) {
-      Util.errln(ex.getMessage());
+      Util.errln(ex);
     }
   }
 }

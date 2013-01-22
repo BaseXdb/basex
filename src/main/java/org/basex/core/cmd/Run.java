@@ -47,7 +47,7 @@ public final class Run extends Execute {
           // otherwise, interpret input as xquery
           list.add(new XQuery(args[0]));
         } catch(final IOException ex) {
-          error = ex.getMessage();
+          error = Util.message(ex);
         }
       }
     }

@@ -151,9 +151,7 @@ public final class List extends Command {
       }
       Close.close(data, context);
     } catch(final IOException ex) {
-      Util.debug(ex);
-      final String msg = ex.getMessage();
-      return msg.isEmpty() ? error(DB_NOT_OPENED_X, db) : error(msg);
+      return error(Util.message(ex));
     }
     out.println(table.sort().finish());
     return true;

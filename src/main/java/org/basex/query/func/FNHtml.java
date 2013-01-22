@@ -62,7 +62,6 @@ public class FNHtml extends StandardFunc {
     try {
       return new DBNode(new HTMLParser(io, tb.toString(), ctx.context.prop));
     } catch(final IOException ex) {
-      Util.debug(ex);
       throw BXHL_IO.thrw(info, ex);
     }
   }

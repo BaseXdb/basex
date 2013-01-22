@@ -67,7 +67,6 @@ public final class CreateDB extends ACreate {
         io = li.lookup() == -1 ? null : new IOStream(li, io.name());
       }
     } catch(final IOException ex) {
-      Util.debug(ex);
       return error(Util.message(ex));
     }
 
@@ -112,17 +111,14 @@ public final class CreateDB extends ACreate {
     } catch(final ProgressException ex) {
       throw ex;
     } catch(final IOException ex) {
-      Util.debug(ex);
       abort();
-      final String msg = ex.getMessage();
-      return error(msg != null && !msg.isEmpty() ? msg :
-        Util.info(NOT_PARSED_X, parser.src));
+      return error(Util.message(ex));
     } catch(final Exception ex) {
       // known exceptions:
       // - IllegalArgumentException (UTF8, zip files)
       Util.debug(ex);
       abort();
-      return error(Util.info(NOT_PARSED_X, parser.src));
+      return error(NOT_PARSED_X, parser.src);
     }
   }
 
