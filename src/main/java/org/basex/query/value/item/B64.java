@@ -54,7 +54,7 @@ public class B64 extends Bin {
   }
 
   @Override
-  public boolean eq(final InputInfo ii, final Item it) throws QueryException {
+  public final boolean eq(final InputInfo ii, final Item it) throws QueryException {
     return Token.eq(binary(ii), it instanceof Bin ? ((Bin) it).binary(ii) :
       decode(it.string(ii), ii));
   }
