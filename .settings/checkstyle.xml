@@ -53,7 +53,6 @@
     <module name="AvoidNestedBlocks"/>
     <module name="LeftCurly"/>
     <module name="RightCurly"/>
-    <module name="DoubleCheckedLocking"/>
     <module name="EqualsHashCode"/>
     <module name="IllegalInstantiation"/>
     <module name="MagicNumber">
