@@ -1,7 +1,8 @@
-package org.basex.geo;
+package org.expath.ns;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.util.*;
 
 /**
  * This module contains static error functions for the Geo module.
@@ -9,12 +10,12 @@ import org.basex.query.value.item.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Masoumeh Seydi
  */
-
 public final class GeoErrors {
   /** Error namespace. */
-  private static final byte[] NS = QueryText.BXERRORS;
+  private static final byte[] NS = QueryText.EXPERROR;
   /** Namespace and error code prefix. */
-  private static final String PREFIX = "bxerr:BXSE";
+  private static final String PREFIX =
+      new TokenBuilder(QueryText.EXPERR).add(":GEO").toString();
 
   /** Private constructor, preventing instantiation. */
   private GeoErrors() { }
@@ -25,7 +26,7 @@ public final class GeoErrors {
    * @return query exception
    */
   static QueryException unrecognizedGeo(final Object element) {
-    return thrw(1, "Unrecognized Geo type:%", element);
+    return thrw(1, "Unrecognized Geo type: %", element);
   }
 
   /**
@@ -97,7 +98,7 @@ public final class GeoErrors {
   }
 
   /**
-   * Query exception.
+   * Returns a query exception.
    * @param code code
    * @param msg message
    * @param ext extension
@@ -105,8 +106,15 @@ public final class GeoErrors {
    */
   private static QueryException thrw(final int code, final String msg,
       final Object... ext) {
-    final QNm name = new QNm(String.format("%s:GEO%04d", PREFIX, code), NS);
-    return new QueryException(null, name, msg, ext);
+    return new QueryException(null, qname(code), msg, ext);
   }
 
+  /**
+   * Creates an error QName for the specified code.
+   * @param code code
+   * @return query exception
+   */
+  public static QNm qname(final int code) {
+    return new QNm(String.format("%s:GEO%04d", PREFIX, code), NS);
+  }
 }
