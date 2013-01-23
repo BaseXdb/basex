@@ -1,4 +1,4 @@
-package org.basex.tests;
+package org.basex.test;
 
 import static org.junit.Assert.*;
 
