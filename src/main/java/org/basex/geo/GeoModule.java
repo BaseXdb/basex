@@ -50,6 +50,8 @@ import com.vividsolutions.jts.io.gml2.GMLWriter;
 
 public class GeoModule extends QueryModule {
 
+	  /** GML URI. */
+	  private static final byte[] GMLURI = token("http://www.opengis.net/gml");
   /** GML URI. */
   private static final byte[] GMLURI = token("http://www.opengis.net/gml");
 
@@ -592,6 +594,30 @@ public class GeoModule extends QueryModule {
    */
   public Value union(final ANode node1, final ANode node2) throws QueryException {
 
+		/**
+		 * Returns the end Point of a line.
+		 * @param node xml element containing gml object(s)
+		 * @return end point geometry as a gml element
+		 * @throws QueryException query exception
+		 */
+		public Value endPoint(final ANode node) throws QueryException {
+		 			
+      // Check QName
+      QNm[] line = {Q_GML_LINEARRING, Q_GML_LINESTRING};
+      QNm[] other = {Q_GML_POLYGON, Q_GML_MULTILINESTRING, Q_GML_MULTIPOINT,
+          Q_GML_MULTIPOLYGON};
+      if(checkNode(node, line)) {
+        Geometry geom = gmlReader(node);
+        if (geom instanceof LineString) {
+          Point point = ((LineString) geom).getEndPoint();
+          // Write the Geometry in GML2 format
+          return gmlWriter(point);
+        } 
+        else if (geom instanceof LinearRing) {
+          Point point = ((LinearRing) geom).getEndPoint();
+          // Write the Geometry in GML2 format
+          return gmlWriter(point);
+        }
     // Check nodes
     if (checkNode(node1, new QNm[0])) {
       if (checkNode(node2, new QNm[0])) {
