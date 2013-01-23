@@ -10,7 +10,9 @@
   <filter name="WriteProtectedFiles" enabled="true"/>
   <filter name="UnOpenedFiles" enabled="true"/>
   <filter name="FilesFromPackage" enabled="true">
+    <filter-data value="src/main/resources"/>
     <filter-data value="src/test/java/org/basex/test/qt3ts"/>
+    <filter-data value="src/test/resources"/>
   </filter>
   <filter name="FilesInSync" enabled="true"/>
 </fileset-config>
