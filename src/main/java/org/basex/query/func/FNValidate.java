@@ -289,6 +289,12 @@ public final class FNValidate extends StandardFunc {
     throw STRNODTYPE.thrw(info, this, it.type);
   }
 
+
+  @Override
+  public boolean uses(final Use u) {
+    return u == Use.NDT || super.uses(u);
+  }
+
   /** Schema error handler. */
   static class ErrorHandler extends DefaultHandler {
     /** Will contain all raised validation exception messages. */

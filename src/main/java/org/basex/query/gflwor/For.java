@@ -1,10 +1,13 @@
 package org.basex.query.gflwor;
 
+import java.util.List;
 import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.gflwor.GFLWOR.Eval;
 import org.basex.query.iter.Iter;
+import org.basex.query.path.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -174,5 +177,48 @@ public class For extends GFLWOR.Clause {
   @Override
   public boolean databases(final StringList db) {
     return expr.databases(db);
+  }
+
+  /**
+   * Tries to convert this for loop into a let binding.
+   * @param clauses FLWOR clauses
+   * @param p position
+   * @return {@code true} if the clause was converted, {@code false} otherwise
+   */
+  boolean asLet(final List<GFLWOR.Clause> clauses, final int p) {
+    if(expr.size() != 1 && !expr.type().one()) return false;
+    clauses.set(p, Let.fromFor(this));
+    if(score != null) clauses.add(p + 1, Let.fromForScore(this));
+    if(pos != null) clauses.add(p + 1, new Let(pos, Int.get(1), false, info));
+    return true;
+  }
+
+  /**
+   * Tries to add the given expression as an attribute to this loop's sequence.
+   * @param e expression to add
+   * @return success
+   */
+  boolean toPred(final Expr e) {
+    if(pos != null || score != null || !e.removable(var)) return false;
+    e.remove(var);
+
+    // attach predicates to axis path or filter, or create a new filter
+    final Expr a = e.type().mayBeNumber() ? Function.BOOLEAN.get(info, e) : e;
+
+    // add to clause expression
+    if(expr instanceof AxisPath) {
+      expr = ((AxisPath) expr).addPreds(a);
+    } else if(expr instanceof Filter) {
+      expr = ((Filter) expr).addPred(a);
+    } else {
+      expr = new Filter(info, expr, a);
+    }
+    return true;
+  }
+
+  @Override
+  long calcSize(final long count) {
+    final long sz = expr.size();
+    return sz < 0 ? -1 : sz > 0 ? sz * count : empty ? 1 : 0;
   }
 }

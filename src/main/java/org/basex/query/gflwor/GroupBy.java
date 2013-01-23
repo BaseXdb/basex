@@ -232,7 +232,7 @@ public class GroupBy extends GFLWOR.Clause {
   }
 
   @Override
-  boolean skippable(final Let let) {
+  boolean skippable(final GFLWOR.Clause cl) {
     return false;
   }
 
@@ -245,6 +245,11 @@ public class GroupBy extends GFLWOR.Clause {
   public boolean databases(final StringList db) {
     for(final Spec spec : by) if(!spec.databases(db)) return false;
     return true;
+  }
+
+  @Override
+  long calcSize(final long cnt) {
+    return -1;
   }
 
   /**

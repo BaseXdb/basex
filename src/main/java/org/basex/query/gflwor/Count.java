@@ -93,4 +93,9 @@ public class Count extends GFLWOR.Clause {
   public boolean databases(final StringList db) {
     return true;
   }
+
+  @Override
+  long calcSize(final long cnt) {
+    return cnt;
+  }
 }

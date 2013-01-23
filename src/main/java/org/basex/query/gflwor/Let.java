@@ -43,6 +43,27 @@ public class Let extends GFLWOR.Clause {
     score = scr;
   }
 
+  /**
+   * Creates a let expression from a for loop over a single item.
+   * @param fr for loop
+   * @return let binding
+   */
+  static Let fromFor(final For fr) {
+    final Let lt = new Let(fr.var, fr.expr, false, fr.info);
+    lt.type = fr.expr.type();
+    return lt;
+  }
+
+  /**
+   * Creates a let binding for the score variable of a for clause.
+   * @param fr for clause
+   * @return let binding for the score variable
+   */
+  static Let fromForScore(final For fr) {
+    final Expr varRef = new LocalVarRef(fr.info, fr.var);
+    return new Let(fr.score, varRef, true, fr.info);
+  }
+
   @Override
   Eval eval(final Eval sub) {
     return new Eval() {
@@ -129,5 +150,10 @@ public class Let extends GFLWOR.Clause {
   @Override
   public boolean databases(final StringList db) {
     return expr.databases(db);
+  }
+
+  @Override
+  long calcSize(final long cnt) {
+    return cnt;
   }
 }

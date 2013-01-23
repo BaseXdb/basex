@@ -78,15 +78,21 @@ public final class Var extends ExprInfo {
    * @throws QueryException if the types are incompatible
    */
   public void refineType(final SeqType t, final InputInfo ii) throws QueryException {
-    if(t == null || type == null || type.eq(t) || t.instance(type)) {
+    if(t == null || type == null || type.eq(t) || type.instance(t)) {
       if(type == null) type = t;
       return;
     }
 
-    final Type tp = type.type.instanceOf(t.type) ? t.type
-        : t.type.instanceOf(type.type) ? type.type : null;
-    final Occ occ = type.occ.instance(t.occ) ? t.occ
-        : t.occ.instance(type.occ) ? type.occ : null;
+    final Type tp = type.type.instanceOf(t.type)
+        ? t.type
+        : t.type.instanceOf(type.type)
+            ? t.type
+            : null;
+    final Occ occ = type.occ.instance(t.occ)
+        ? t.occ
+        : t.occ.instance(type.occ)
+            ? t.occ
+            : null;
 
     if(tp == null || occ == null) throw Err.XPTYPE.thrw(ii, toString(), type, t);
     type = SeqType.get(tp, occ);

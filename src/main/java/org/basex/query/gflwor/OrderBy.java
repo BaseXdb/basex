@@ -259,8 +259,8 @@ public class OrderBy extends GFLWOR.Clause {
   }
 
   @Override
-  boolean skippable(final Let let) {
-    return false;
+  boolean skippable(final GFLWOR.Clause cl) {
+    return cl instanceof Where;
   }
 
   @Override
@@ -272,6 +272,11 @@ public class OrderBy extends GFLWOR.Clause {
   public boolean databases(final StringList db) {
     for(final Key key : keys) if(!key.databases(db)) return false;
     return true;
+  }
+
+  @Override
+  long calcSize(final long cnt) {
+    return cnt;
   }
 
   /**

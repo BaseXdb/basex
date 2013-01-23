@@ -1004,7 +1004,7 @@ public class QueryParser extends InputParser {
   private Expr flwor() throws QueryException {
 
     final int s = scope.open();
-    ArrayList<Clause> clauses = initialClause(null);
+    LinkedList<Clause> clauses = initialClause(null);
     if(clauses == null) return null;
 
     TokenObjMap<Var> curr = new TokenObjMap<Var>();
@@ -1096,20 +1096,20 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException query exception
    */
-  private ArrayList<Clause> initialClause(final ArrayList<Clause> clauses)
+  private LinkedList<Clause> initialClause(final LinkedList<Clause> clauses)
       throws QueryException {
-    ArrayList<Clause> cls = clauses;
+    LinkedList<Clause> cls = clauses;
     // ForClause / LetClause
     final boolean let = wsConsumeWs(LET, SCORE, NOLET) || wsConsumeWs(LET, DOLLAR, NOLET);
     if(let || wsConsumeWs(FOR, DOLLAR, NOFOR)) {
-      if(cls == null) cls = new ArrayList<Clause>();
+      if(cls == null) cls = new LinkedList<Clause>();
       if(let) letClause(cls);
       else    forClause(cls);
     } else if(ctx.sc.xquery3()) {
       // WindowClause
       final boolean slide = wsConsumeWs(FOR, SLIDING, NOWINDOW);
       if(slide || wsConsumeWs(FOR, TUMBLING, NOWINDOW)) {
-        if(cls == null) cls = new ArrayList<Clause>();
+        if(cls == null) cls = new LinkedList<Clause>();
         cls.add(windowClause(slide));
       }
     }
@@ -1122,7 +1122,7 @@ public class QueryParser extends InputParser {
    * @param cls list of clauses
    * @throws QueryException parse exception
    */
-  private void forClause(final ArrayList<Clause> cls) throws QueryException {
+  private void forClause(final LinkedList<Clause> cls) throws QueryException {
     do {
       final QNm nm = varName();
       final SeqType tp = optAsType();
@@ -1154,7 +1154,7 @@ public class QueryParser extends InputParser {
    * @param cls list of clauses
    * @throws QueryException parse exception
    */
-  private void letClause(final ArrayList<Clause> cls) throws QueryException {
+  private void letClause(final LinkedList<Clause> cls) throws QueryException {
     do {
       final boolean score = wsConsumeWs(SCORE);
       final QNm nm = varName();
@@ -1247,7 +1247,7 @@ public class QueryParser extends InputParser {
    * @return new group array
    * @throws QueryException query exception
    */
-  private GroupBy.Spec[] groupSpec(final ArrayList<Clause> cl,
+  private GroupBy.Spec[] groupSpec(final LinkedList<Clause> cl,
       final GroupBy.Spec[] group) throws QueryException {
 
     final InputInfo ii = info();

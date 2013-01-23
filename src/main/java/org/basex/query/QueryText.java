@@ -713,6 +713,8 @@ public interface QueryText {
   /** Optimization info. */
   String OPTFORLET = "moving for/let clauses";
   /** Optimization info. */
+  String OPTFORTOLET = "rewriting singleton for to let";
+  /** Optimization info. */
   String OPTSWAP = "swapping operands: %";
   /** Optimization info. */
   String OPTTEXT = "adding text() step";
@@ -722,6 +724,8 @@ public interface QueryText {
   String OPTINLINE = "inlining function %(...)";
   /** Optimization info. */
   String OPTWHERE = "rewriting where clause to predicate(s)";
+  /** Optimization info. */
+  String OPTWHERE2 = "rewriting where clause(s)";
   /** Optimization info. */
   String OPTPRED = "rewriting % to predicate(s)";
   /** Optimization info. */

@@ -53,7 +53,6 @@ public final class LocalVarRef extends VarRef {
      * evaluation of the same expression is avoided.
      *
      * [CG][LW] Variables are currently pre-evaluated if...
-     * - they are global (mandatory)
      * - namespaces are used
      * - they are given a type
      * - they contain an element constructor (mandatory)
@@ -64,6 +63,17 @@ public final class LocalVarRef extends VarRef {
     }
 
     return e;
+  }
+
+  /**
+   * Sets the referenced variable.
+   * @param v new variable
+   */
+  public void setVar(final Var v) {
+    var = v;
+    name = v.name;
+    type = var.type();
+    size = var.size;
   }
 
   @Override

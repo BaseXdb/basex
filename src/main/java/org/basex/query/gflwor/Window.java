@@ -315,6 +315,11 @@ public class Window extends GFLWOR.Clause {
         && (end == null || end.databases(db));
   }
 
+  @Override
+  long calcSize(final long cnt) {
+    return expr.size() == 0 ? 0 : -1;
+  }
+
   /**
    * A window {@code start} of {@code end} condition.
    *

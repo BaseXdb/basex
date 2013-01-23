@@ -31,7 +31,7 @@ public final class Quantifier extends Single {
    * @param e every flag
    */
   public Quantifier(final InputInfo ii, final For[] f, final Expr s, final boolean e) {
-    super(ii, new GFLWOR(ii, new ArrayList<GFLWOR.Clause>(Arrays.asList(f)),
+    super(ii, new GFLWOR(ii, new LinkedList<GFLWOR.Clause>(Arrays.asList(f)),
         compBln(s, ii)));
     every = e;
     type = SeqType.BLN;

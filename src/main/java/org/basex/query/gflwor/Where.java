@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.gflwor.GFLWOR.Eval;
 import org.basex.query.util.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.InputInfo;
@@ -60,7 +61,7 @@ public class Where extends GFLWOR.Clause {
 
   @Override
   public Where compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    pred = pred.compile(ctx, scp);
+    pred = pred.compile(ctx, scp).compEbv(ctx);
     return this;
   }
 
@@ -81,7 +82,7 @@ public class Where extends GFLWOR.Clause {
   }
 
   @Override
-  final boolean skippable(final Let let) {
+  final boolean skippable(final GFLWOR.Clause cl) {
     return true;
   }
 
@@ -93,5 +94,10 @@ public class Where extends GFLWOR.Clause {
   @Override
   public boolean databases(final StringList db) {
     return pred.databases(db);
+  }
+
+  @Override
+  long calcSize(final long cnt) {
+    return pred == Bln.FALSE ? 0 : -1;
   }
 }
