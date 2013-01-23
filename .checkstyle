@@ -8,6 +8,7 @@
     <file-match-pattern match-pattern="." include-pattern="true"/>
   </fileset>
   <filter name="FilesFromPackage" enabled="true">
-    <filter-data value="src/test/java/org/basex/test/api/xqj"/>
+    <filter-data value="src/main/resources"/>
+    <filter-data value="src/test/resources"/>
   </filter>
 </fileset-config>
