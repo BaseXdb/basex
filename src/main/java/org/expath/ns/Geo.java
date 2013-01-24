@@ -75,7 +75,7 @@ public class Geo extends QueryModule {
    * @return integer value of CRS of the geometry
    * @throws QueryException query exception
    */
-  public Int getSRID(final ANode node) throws QueryException {
+  public Int srid(final ANode node) throws QueryException {
     return Int.get(checkGeo(node).getSRID());
   }
 
@@ -384,7 +384,7 @@ public class Geo extends QueryModule {
   public Dbl x(final ANode node) throws QueryException {
     final Geometry geo = geo(node, Q_GML_POINT);
     if(geo == null && checkGeo(node) != null)
-      throw GeoErrors.pointNeeded(node.qname().local());
+      throw GeoErrors.geoType(node.qname().local(), "Point");
 
     return Dbl.get(geo.getCoordinate().x);
   }
@@ -398,7 +398,7 @@ public class Geo extends QueryModule {
   public Dbl y(final ANode node) throws QueryException {
     final Geometry geo = geo(node, Q_GML_POINT);
     if(geo == null && checkGeo(node) != null)
-      throw GeoErrors.pointNeeded(node.qname().local());
+      throw GeoErrors.geoType(node.qname().local(), "Point");
 
     return Dbl.get(geo.getCoordinate().y);
   }
@@ -412,7 +412,7 @@ public class Geo extends QueryModule {
   public Dbl z(final ANode node) throws QueryException {
     final Geometry geo = geo(node, Q_GML_POINT);
     if(geo == null && checkGeo(node) != null)
-      throw GeoErrors.pointNeeded(node.qname().local());
+      throw GeoErrors.geoType(node.qname().local(), "Line");
 
     return Dbl.get(geo.getCoordinate().z);
   }
@@ -438,7 +438,7 @@ public class Geo extends QueryModule {
   public Value startPoint(final ANode node) throws QueryException {
     final Geometry geo = geo(node, Q_GML_LINEARRING, Q_GML_LINESTRING);
     if(geo == null && checkGeo(node) != null)
-      throw GeoErrors.lineNeeded(node.qname().local());
+      throw GeoErrors.geoType(node.qname().local(), "Line");
 
     return gmlWriter(geo instanceof LineString ?
        ((LineString) geo).getStartPoint() :
@@ -454,7 +454,7 @@ public class Geo extends QueryModule {
   public Value endPoint(final ANode node) throws QueryException {
     final Geometry geo = geo(node, Q_GML_LINEARRING, Q_GML_LINESTRING);
     if(geo == null && checkGeo(node) != null)
-      throw GeoErrors.lineNeeded(node.qname().local());
+      throw GeoErrors.geoType(node.qname().local(), "Line");
 
     return gmlWriter(geo instanceof LineString ?
        ((LineString) geo).getEndPoint() :
@@ -472,7 +472,7 @@ public class Geo extends QueryModule {
     final Geometry geo = geo(node,
         Q_GML_LINEARRING, Q_GML_LINESTRING, Q_GML_MULTILINESTRING);
     if(geo == null && checkGeo(node) != null)
-      throw GeoErrors.lineNeeded(node.qname().local());
+      throw GeoErrors.geoType(node.qname().local(), "Line");
 
     return Bln.get(geo instanceof LineString ?
        ((LineString) geo).isClosed() : geo instanceof LinearRing ?
@@ -490,7 +490,7 @@ public class Geo extends QueryModule {
   public Bln isRing(final ANode node) throws QueryException {
     final Geometry geo = geo(node, Q_GML_LINEARRING, Q_GML_LINESTRING);
     if(geo == null && checkGeo(node) != null)
-      throw GeoErrors.lineNeeded(node.qname().local());
+      throw GeoErrors.geoType(node.qname().local(), "Line");
 
     return Bln.get(geo instanceof LineString ?
        ((LineString) geo).isRing() :
@@ -518,7 +518,7 @@ public class Geo extends QueryModule {
   public Value pointN(final ANode node, final Int number) throws QueryException {
     final Geometry geo = geo(node, Q_GML_LINEARRING, Q_GML_LINESTRING);
     if(geo == null && checkGeo(node) != null)
-      throw GeoErrors.lineNeeded(node.qname().local());
+      throw GeoErrors.geoType(node.qname().local(), "Line");
 
     final int max = geo.getNumPoints();
     final long n = number.itr();
@@ -574,7 +574,7 @@ public class Geo extends QueryModule {
   public Value exteriorRing(final ANode node) throws QueryException {
     final Geometry geo = geo(node, Q_GML_POLYGON);
     if(geo == null && checkGeo(node) != null)
-      throw GeoErrors.polygonNeeded(node.qname().local());
+      throw GeoErrors.geoType(node.qname().local(), "Polygon");
 
     return gmlWriter(((Polygon) geo).getExteriorRing());
   }
@@ -588,7 +588,7 @@ public class Geo extends QueryModule {
   public Int numInteriorRing(final ANode node) throws QueryException {
     final Geometry geo = geo(node, Q_GML_POLYGON);
     if(geo == null && checkGeo(node) != null)
-      throw GeoErrors.polygonNeeded(node.qname().local());
+      throw GeoErrors.geoType(node.qname().local(), "Polygon");
 
     return Int.get(((Polygon) geo).getNumInteriorRing());
   }
@@ -603,7 +603,7 @@ public class Geo extends QueryModule {
   public Value interiorRingN(final ANode node, final Int number) throws QueryException {
     final Geometry geo = geo(node, Q_GML_POLYGON);
     if(geo == null && checkGeo(node) != null)
-      throw GeoErrors.polygonNeeded(node.qname().local());
+      throw GeoErrors.geoType(node.qname().local(), "Polygon");
 
     final long n = number.itr();
     final int max = ((Polygon) geo).getNumInteriorRing();
@@ -659,7 +659,7 @@ public class Geo extends QueryModule {
   /**
    * Writes an geometry and returns a string representation of the geometry.
    * @param geometry geometry
-   * @return string output written string
+   * @return DBNode database node
    * @throws QueryException exception
    */
   private DBNode gmlWriter(final Geometry geometry) throws QueryException {
