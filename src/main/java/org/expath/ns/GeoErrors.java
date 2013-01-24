@@ -39,62 +39,33 @@ public final class GeoErrors {
   }
 
   /**
-   * GEO0003: Input geometry should be a Polygon.
-   * @param element Geometry object
+   * GEO0003: Inappropriate input geometry.
+   * @param input Geometry object
+   * @param geo exact Geometry object
    * @return query exception
    */
-  static QueryException polygonNeeded(final Object element) {
+  static QueryException geoType(final Object input, final String geo) {
     return thrw(3, "% is not an appropiate geometry for this function. "
-              + "The input geometry should be a Polygon.", element);
+              + "The input geometry should be a %.", input, geo);
   }
 
   /**
-   * GEO0004: Input geometry should be a Line.
-   * @param element Geometry object
-   * @return query exception
-   */
-  static QueryException lineNeeded(final Object element) {
-    return thrw(4, "% is not an appropiate geometry for this function. "
-              + "The input geometry should be a Line.", element);
-  }
-
-  /**
-   * GEO0005: Input geometry should be a Point.
-   * @param element Geometry object
-   * @return query exception
-   */
-  static QueryException pointNeeded(final Object element) {
-    return thrw(5, "% is not an appropiate geometry for this function. "
-            + "The input geometry should be a Point.", element);
-  }
-
-  /**
-   * GEO0006: Out of range index.
+   * GEO0004: Out of range index.
    * @param geoNumber index
    * @return query exception
    */
   static QueryException outOfRangeIdx(final Int geoNumber) {
-    return thrw(6, "Out of range input index: %", geoNumber);
+    return thrw(4, "Out of range input index: %", geoNumber);
   }
 
-  /**
-   * GEO0007: A single Geometry needed.
-   * @param element Geometry object
-   * @return query exception
-   */
-  static QueryException singleGeo(final Object element) {
-    return thrw(7, "% is not an appropiate geometry for this function. " +
-            "The input geometry should be a single geometry, not a geometry collection."
-            , element);
-  }
 
   /**
-   * GEO0008: gml writer error massage (JTS).
+   * GEO0005: gml writer error massage (JTS).
    * @param e error
    * @return query exception
    */
   static QueryException gmlWriterErr(final Object e) {
-    return thrw(8, "%", e);
+    return thrw(5, "%", e);
   }
 
   /**

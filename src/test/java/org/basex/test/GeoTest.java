@@ -45,16 +45,16 @@ public final class GeoTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test
-  public void getSRID() {
-    runQuery("geo:getSRID(<gml:Polygon srsName=" +
+  public void srid() {
+    runQuery("geo:srid(<gml:Polygon srsName=" +
             "\"http://www.opengis.net/gml/srs/epsg.xml#4326\">" +
             "<outerboundaryIs><gml:LinearRing><coordinates>" +
             "-150,50 -150,60 -125,60 -125,50 -150,50" +
             "</coordinates></gml:LinearRing></outerboundaryIs></gml:Polygon>)", "0");
 
-    runError("geo:getSRID(text {'a'})", FUNCMP.qname());
-    runError("geo:getSRID(<gml:unknown/>)", GeoErrors.qname(1));
-    runError("geo:getSRID(<gml:LinearRing><gml:pos>1,1 20,1 50,30 1,1</gml:pos>" +
+    runError("geo:srid(text {'a'})", FUNCMP.qname());
+    runError("geo:srid(<gml:unknown/>)", GeoErrors.qname(1));
+    runError("geo:srid(<gml:LinearRing><gml:pos>1,1 20,1 50,30 1,1</gml:pos>" +
             "</gml:LinearRing>)", GeoErrors.qname(2));
   }
 
@@ -461,10 +461,10 @@ public final class GeoTest extends AdvancedQueryTest {
             GeoErrors.qname(1));
     runError("geo:geometryN(" +
             "<gml:Point><gml:coordinates>2,1</gml:coordinates></gml:Point>, 0)",
-            GeoErrors.qname(6));
+            GeoErrors.qname(4));
     runError("geo:geometryN(" +
             "<gml:Point><gml:coordinates>2,1</gml:coordinates></gml:Point>, 2)",
-            GeoErrors.qname(6));
+            GeoErrors.qname(4));
     runError("geo:geometryN(text {'a'}, <gml:Point><gml:coordinates>2,3" +
             "</gml:coordinates></gml:Point>)", FUNCMP.qname());
   }
@@ -476,11 +476,11 @@ public final class GeoTest extends AdvancedQueryTest {
 
     runError("geo:x(<gml:MultiPoint><gml:Point><gml:coordinates>1,1" +
             "</gml:coordinates></gml:Point><gml:Point><gml:coordinates>1,2" +
-            "</gml:coordinates></gml:Point></gml:MultiPoint>)", GeoErrors.qname(5));
+            "</gml:coordinates></gml:Point></gml:MultiPoint>)", GeoErrors.qname(3));
 
     runError("geo:x(" +
             "<gml:LinearRing><gml:coordinates>0,0 20,0 0,20 0,0</gml:coordinates>" +
-            "</gml:LinearRing>)", GeoErrors.qname(5));
+            "</gml:LinearRing>)", GeoErrors.qname(3));
 
     runError("geo:x(<gml:Point><gml:coordinates></gml:coordinates></gml:Point>)",
         GeoErrors.qname(2));
@@ -499,11 +499,11 @@ public final class GeoTest extends AdvancedQueryTest {
 
     runError("geo:z(<gml:MultiPoint><gml:Point><gml:coordinates>1,1" +
             "</gml:coordinates></gml:Point><gml:Point><gml:coordinates>1,2" +
-            "</gml:coordinates></gml:Point></gml:MultiPoint>)", GeoErrors.qname(5));
+            "</gml:coordinates></gml:Point></gml:MultiPoint>)", GeoErrors.qname(3));
 
     runError("geo:y(" +
             "<gml:LinearRing><gml:coordinates>0,0 20,0 0,20 0,0" +
-            "</gml:coordinates></gml:LinearRing>)", GeoErrors.qname(5));
+            "</gml:coordinates></gml:LinearRing>)", GeoErrors.qname(3));
     runError("geo:y(<gml:Point><gml:coordinates></gml:coordinates></gml:Point>)",
         GeoErrors.qname(2));
     runError("geo:y(<gml:geo><gml:coordinates>2,1</gml:coordinates></gml:geo>)",
@@ -521,10 +521,10 @@ public final class GeoTest extends AdvancedQueryTest {
 
     runError("geo:z(<gml:MultiPoint><gml:Point><gml:coordinates>1,1" +
             "</gml:coordinates></gml:Point><gml:Point><gml:coordinates>1,2" +
-        "</gml:coordinates></gml:Point></gml:MultiPoint>)", GeoErrors.qname(5));
+        "</gml:coordinates></gml:Point></gml:MultiPoint>)", GeoErrors.qname(3));
     runError("geo:z(" +
         "<gml:LinearRing><gml:coordinates>0,0 20,0 0,20 0,0" +
-        "</gml:coordinates></gml:LinearRing>)", GeoErrors.qname(5));
+        "</gml:coordinates></gml:LinearRing>)", GeoErrors.qname(3));
     runError("geo:z(<gml:Point><gml:coordinates></gml:coordinates></gml:Point>)",
             GeoErrors.qname(2));
     runError("geo:z(<gml:geo><gml:coordinates>2,1</gml:coordinates></gml:geo>)",
@@ -569,7 +569,7 @@ public final class GeoTest extends AdvancedQueryTest {
     runError("geo:startPoint(<gml:MultiLineString><gml:LineString><gml:coordinates>" +
             "1,1 0,0 2,1</gml:coordinates></gml:LineString><gml:LineString>" +
             "<gml:coordinates>2,1 3,3 4,4</gml:coordinates></gml:LineString>" +
-            "</gml:MultiLineString>)", GeoErrors.qname(4));
+            "</gml:MultiLineString>)", GeoErrors.qname(3));
 
     runError("geo:startPoint(" +
             "<gml:LineString><gml:coordinates>1,1</gml:coordinates></gml:LineString>)",
@@ -596,7 +596,7 @@ public final class GeoTest extends AdvancedQueryTest {
     runError("geo:endPoint(<gml:MultiLineString><gml:LineString><gml:coordinates>" +
             "1,1 0,0 2,1</gml:coordinates></gml:LineString><gml:LineString>" +
             "<gml:coordinates>2,1 3,3 4,4</gml:coordinates></gml:LineString>" +
-            "</gml:MultiLineString>)", GeoErrors.qname(4));
+            "</gml:MultiLineString>)", GeoErrors.qname(3));
     runError("geo:endPoint(" +
             "<gml:LineString><gml:coordinates>1,1</gml:coordinates></gml:LineString>)",
             GeoErrors.qname(2));
@@ -620,7 +620,7 @@ public final class GeoTest extends AdvancedQueryTest {
             "</gml:coordinates></gml:LineString>)", "false");
     runError("geo:isClosed(<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing>" +
             "<gml:coordinates>1,1 2,1 5,3 1,1</gml:coordinates></gml:LinearRing>" +
-            "</gml:outerBoundaryIs></gml:Polygon>)", GeoErrors.qname(4));
+            "</gml:outerBoundaryIs></gml:Polygon>)", GeoErrors.qname(3));
 
     runError("geo:isClosed(" +
             "<gml:LineString><gml:coordinates>1,1</gml:coordinates></gml:LineString>)",
@@ -629,7 +629,7 @@ public final class GeoTest extends AdvancedQueryTest {
     runError("geo:isClosed(text {'gml:Point'})", FUNCMP.qname());
     runError("geo:isClosed(" +
             "<gml:Point><gml:coordinates>2,1</gml:coordinates></gml:Point>)",
-            GeoErrors.qname(4));
+            GeoErrors.qname(3));
   }
 
   /** Test method. */
@@ -644,10 +644,10 @@ public final class GeoTest extends AdvancedQueryTest {
     runError("geo:isRing(<gml:MultiLineString><gml:LineString><gml:coordinates>" +
             "1,1 0,0 2,1</gml:coordinates></gml:LineString><gml:LineString>" +
             "<gml:coordinates>2,1 3,3 4,4</gml:coordinates></gml:LineString>" +
-            "</gml:MultiLineString>)", GeoErrors.qname(4));
+            "</gml:MultiLineString>)", GeoErrors.qname(3));
     runError("geo:isClosed(" +
             "<gml:Point><gml:coordinates>2,3</gml:coordinates></gml:Point>)",
-            GeoErrors.qname(4));
+            GeoErrors.qname(3));
     runError("geo:isRing(" +
             "<gml:LineString><gml:coordinates>1,1</gml:coordinates></gml:LineString>)",
             GeoErrors.qname(2));
@@ -695,15 +695,15 @@ public final class GeoTest extends AdvancedQueryTest {
     runError("geo:pointN(<gml:MultiLineString><gml:LineString><gml:coordinates>" +
             "1,1 0,0 2,1</gml:coordinates></gml:LineString><gml:LineString>" +
             "<gml:coordinates>2,1 3,3 4,4</gml:coordinates></gml:LineString>" +
-            "</gml:MultiLineString>, 4)", GeoErrors.qname(4));
+            "</gml:MultiLineString>, 4)", GeoErrors.qname(3));
 
     runError("geo:pointN(" +
             "<gml:unknown><gml:coordinates>1,1</gml:coordinates></gml:unknown>,1)",
             GeoErrors.qname(1));
     runError("geo:pointN(<gml:LineString><gml:coordinates>11,10 20,1 20,20 12,13" +
-            "</gml:coordinates></gml:LineString>, 5)", GeoErrors.qname(6));
+            "</gml:coordinates></gml:LineString>, 5)", GeoErrors.qname(4));
     runError("geo:pointN(<gml:LineString><gml:coordinates>11,10 20,1 20,20 12,13" +
-            "</gml:coordinates></gml:LineString>, 0)", GeoErrors.qname(6));
+            "</gml:coordinates></gml:LineString>, 0)", GeoErrors.qname(4));
     runError("geo:pointN(text {'a'},3)", FUNCMP.qname());
   }
 
@@ -842,12 +842,12 @@ public final class GeoTest extends AdvancedQueryTest {
     runError("geo:interiorRingN(<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing>" +
             "<gml:coordinates>11,11 18,11 18,18 11,18 11,11</gml:coordinates>" +
             "</gml:LinearRing></gml:outerBoundaryIs></gml:Polygon>, 1)",
-            GeoErrors.qname(6));
+            GeoErrors.qname(4));
 
     runError("geo:interiorRingN(<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing>" +
             "<gml:coordinates>11,11 18,11 18,18 11,18 11,11</gml:coordinates>" +
             "</gml:LinearRing></gml:outerBoundaryIs></gml:Polygon>, 0)",
-            GeoErrors.qname(6));
+            GeoErrors.qname(4));
 
     runError("geo:interiorRingN(" +
             "<gml:Point><gml:coordinates>2.0,3.0</gml:coordinates></gml:Point>, 1)",
