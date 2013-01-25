@@ -6,11 +6,11 @@ import static org.basex.util.Reflect.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.lang.reflect.*;
 
 import javax.xml.transform.*;
 import javax.xml.transform.stream.*;
 
+import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
@@ -97,23 +97,25 @@ public final class FNXslt extends StandardFunc {
   private Item transform(final QueryContext ctx) throws QueryException {
     checkCreate(ctx);
 
+    final IO in = read(expr[0], ctx);
+    final IO xsl = read(expr[1], ctx);
+    final Item opt = expr.length > 2 ? expr[2].item(ctx, info) : null;
+    final TokenMap map = new FuncParams(E_PARAM, info).parse(opt);
+
+    final PrintStream tmp = System.err;
+    final ArrayOutput ao = new ArrayOutput();
     try {
-      final IO in = read(expr[0], ctx);
-      final IO xsl = read(expr[1], ctx);
-      final Item opt = expr.length > 2 ? expr[2].item(ctx, info) : null;
-      final TokenMap map = new FuncParams(E_PARAM, info).parse(opt);
+      System.setErr(new PrintStream(ao));
       final byte[] result = transform(in, xsl, map);
       return new DBNode(new IOContent(result), ctx.context.prop);
-    } catch(final QueryException ex) {
-      throw ex;
-    } catch(final Exception ex) {
-      Throwable e = ex;
-      // return cause of reflection error, or error itself
-      if(e instanceof InvocationTargetException) {
-        Util.debug(e);
-        e = e.getCause();
-      }
-      throw IOERR.thrw(info, e);
+    } catch(final IOException ex) {
+      System.setErr(tmp);
+      throw IOERR.thrw(info, ex);
+    } catch(final TransformerException ex) {
+      System.setErr(tmp);
+      throw BXSL_ERROR.thrw(info, Token.trim(Token.utf8(ao.toArray(), Prop.ENCODING)));
+    } finally {
+      System.setErr(tmp);
     }
   }
 
