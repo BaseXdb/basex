@@ -137,15 +137,15 @@ public final class InfoView extends View {
   public void setInfo(final String info, final Command cmd, final String time,
       final boolean ok) {
 
-    final StringList eval = new StringList();
-    final StringList comp = new StringList();
-    final StringList plan = new StringList();
-    final StringList sl = new StringList();
-    final StringList stats = new StringList();
-    final StringList stack = new StringList();
-       final IntList il = new IntList();
-    final StringList err = new StringList();
-    final StringList query = new StringList();
+    final StringList eval = new StringList(1);
+    final StringList comp = new StringList(1);
+    final StringList plan = new StringList(1);
+    final StringList sl = new StringList(1);
+    final StringList stats = new StringList(1);
+    final StringList stack = new StringList(1);
+    final StringList err = new StringList(1);
+    final StringList query = new StringList(1);
+    final IntList il = new IntList(5);
 
     final String[] split = info.split(NL);
     for(int i = 0; i < split.length; ++i) {

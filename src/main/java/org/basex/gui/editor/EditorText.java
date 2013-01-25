@@ -438,6 +438,10 @@ public final class EditorText {
    * @return indentation flag
    */
   boolean indent(final StringBuilder sb, final boolean shift) {
+    // no selection, shift pressed: select current character
+    if(!selected() && shift) select(ps + 1, ps);
+
+    // check if something is selected
     boolean i = false;
     if(selected()) {
       // check if lines are to be indented
