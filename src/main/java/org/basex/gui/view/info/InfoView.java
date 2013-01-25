@@ -145,8 +145,7 @@ public final class InfoView extends View {
     final StringList stack = new StringList();
        final IntList il = new IntList();
     final StringList err = new StringList();
-    String qu = "";
-    String res = "";
+    final StringList query = new StringList();
 
     final String[] split = info.split(NL);
     for(int i = 0; i < split.length; ++i) {
@@ -158,14 +157,12 @@ public final class InfoView extends View {
         final int t = line.indexOf(" ms");
         sl.add(line.substring(0, s).trim());
         il.add((int) (Double.parseDouble(line.substring(s + 1, t)) * 100));
-      } else if(line.startsWith(QUERY_C)) {
-        qu = line.substring(s + 1).trim();
       } else if(line.startsWith(QUERY_PLAN_C)) {
         while(i + 1 < split.length && !split[++i].isEmpty()) plan.add(split[i]);
       } else if(line.startsWith(COMPILING_C)) {
         while(++i < split.length && !split[i].isEmpty()) comp.add(split[i]);
       } else if(line.startsWith(RESULT_C)) {
-        res = line.substring(s + 1).trim();
+        query.add(line.substring(s + 1).trim());
       } else if(line.startsWith(EVALUATING_C)) {
         while(i + 1 < split.length && split[++i].startsWith(QUERYSEP)) eval.add(split[i]);
       } else if(line.startsWith(HITS_X_CC) || line.startsWith(UPDATED_CC) ||
@@ -187,9 +184,8 @@ public final class InfoView extends View {
     if(!il.isEmpty()) {
       text.reset();
       add(EVALUATING_C, eval);
-      add(QUERY_C + ' ', qu);
       add(COMPILING_C, comp);
-      if(!comp.isEmpty()) add(RESULT_C, res);
+      add(QUERY_C + ' ', query);
       add(RESULT_C, stats);
       add(TIMING_C, sl);
       add(QUERY_PLAN_C, plan);
@@ -205,7 +201,7 @@ public final class InfoView extends View {
         add(EVALUATING_C, eval);
         add(cmd);
         add(COMPILING_C, comp);
-        if(!comp.isEmpty()) add(RESULT_C, res);
+        if(!comp.isEmpty()) add(RESULT_C, query);
         add(QUERY_PLAN_C, plan);
       }
     }

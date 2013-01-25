@@ -1,6 +1,5 @@
 package org.basex.test.server;
 
-import static org.basex.core.Text.*;
 import static org.basex.query.func.Function.*;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
@@ -29,7 +28,7 @@ public abstract class SessionTest extends SandboxTest {
   /** Output stream. */
   ArrayOutput out;
   /** Serialization parameters to wrap query result with an element. */
-  private static final String WRAPPER =
+  static final String WRAPPER =
     "declare option output:wrap-prefix 'db';" +
     "declare option output:wrap-uri 'ns';";
   /** Client session. */
@@ -517,8 +516,6 @@ public abstract class SessionTest extends SandboxTest {
   public void queryInfo() throws IOException {
     final Query query = session.query("1 to 2");
     query.execute();
-    final String info = query.info();
-    assertTrue("Time time missing: '" + info + "'.", info.contains(TOTAL_TIME_CC));
     query.close();
   }
 

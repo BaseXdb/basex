@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 import static org.basex.query.util.Err.*;
 
 import java.io.*;
-import java.util.*;
 
 import org.basex.core.*;
 import org.basex.core.parse.*;
@@ -25,25 +24,15 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 abstract class AQuery extends Command {
+  /** Query info. */
+  private final QueryInfo qi = new QueryInfo();
   /** Query result. */
   Result result;
-  /** Locked databases. */
-  StringList locked;
 
   /** Query processor. */
   private QueryProcessor qp;
   /** Query exception. */
   private QueryException qe;
-  /** Initial parsing time. */
-  private long init;
-  /** Parsing time. */
-  private long pars;
-  /** Compilation time. */
-  private long comp;
-  /** Evaluation time. */
-  private long eval;
-  /** Printing time. */
-  private long prnt;
 
   /**
    * Protected constructor.
@@ -68,19 +57,17 @@ abstract class AQuery extends Command {
     } else {
       try {
         final boolean serial = prop.is(Prop.SERIALIZE);
+        qi.runs = Math.max(1, prop.num(Prop.RUNS));
         long hits = 0;
-        int updates = 0;
-        final int runs = Math.max(1, prop.num(Prop.RUNS));
-        for(int r = 0; r < runs; ++r) {
+        for(int r = 0; r < qi.runs; ++r) {
           // reuse existing processor instance
           if(r != 0) qp = null;
           qp = queryProcessor(query, context);
           qp.parse();
-          pars += init + p.time();
-          init = 0;
+          qi.pars += p.time();
           if(r == 0) plan(false);
           qp.compile();
-          comp += p.time();
+          qi.cmpl += p.time();
           if(r == 0) plan(true);
 
           final PrintOutput po = r == 0 && serial ? out : new NullOutput();
@@ -88,14 +75,14 @@ abstract class AQuery extends Command {
 
           if(prop.is(Prop.CACHEQUERY)) {
             result = qp.execute();
-            eval += p.time();
+            qi.evlt += p.time();
             ser = qp.getSerializer(po);
             result.serialize(ser);
             hits = result.size();
           } else {
-            final Iter ir = qp.iter();
-            eval += p.time();
             hits = 0;
+            final Iter ir = qp.iter();
+            qi.evlt += p.time();
             Item it = ir.next();
             ser = qp.getSerializer(po);
             while(it != null) {
@@ -105,16 +92,15 @@ abstract class AQuery extends Command {
               ++hits;
             }
           }
-          updates = qp.updates();
           ser.close();
           qp.close();
-          prnt += p.time();
+          qi.srlz += p.time();
         }
         // dump some query info
-        if(prop.is(Prop.QUERYINFO)) evalInfo(query, hits, updates, runs);
         out.flush();
-        final long time = pars + comp + eval + prnt;
-        return info(NL + QUERY_EXECUTED_X, Performance.getTime(time, runs));
+        // remove string list if process locking is used and if query is updating
+        if(!mprop.is(MainProp.DBLOCKING) && qp.updating) qi.locked = null;
+        return info(qi.toString(qp, out, hits, prop.is(Prop.QUERYINFO)));
 
       } catch(final QueryException ex) {
         err = Util.message(ex);
@@ -170,7 +156,7 @@ abstract class AQuery extends Command {
       final Performance p = new Performance();
       qp = progress(new QueryProcessor(qu, ctx));
       qp.parse();
-      init = p.time();
+      qi.pars = p.time();
       return qp.updating;
     } catch(final QueryException ex) {
       Util.debug(ex);
@@ -193,7 +179,7 @@ abstract class AQuery extends Command {
   @Override
   protected boolean databases(final StringList db) {
     final boolean ok = qp != null && qp.databases(db);
-    if(ok) locked = db;
+    if(ok) qi.locked = db;
     return ok;
   }
 
@@ -225,33 +211,6 @@ abstract class AQuery extends Command {
     final Result r = result;
     result = null;
     return r;
-  }
-
-  /**
-   * Adds evaluation information to the information string.
-   * @param query query string
-   * @param hits information
-   * @param updates updated items
-   * @param runs number of runs
-   */
-  private void evalInfo(final String query, final long hits, final long updates,
-      final int runs) {
-
-    final long total = pars + comp + eval + prnt;
-    info(NL + QUERY_CC + QueryProcessor.removeComments(query, Integer.MAX_VALUE));
-    info(qp.info());
-    info(PARSING_CC + Performance.getTime(pars, runs));
-    info(COMPILING_CC + Performance.getTime(comp, runs));
-    info(EVALUATING_CC + Performance.getTime(eval, runs));
-    info(PRINTING_CC + Performance.getTime(prnt, runs));
-    info(TOTAL_TIME_CC + Performance.getTime(total, runs) + NL);
-    if(context.mprop.is(MainProp.DBLOCKING)) {
-      info(LOCKING_CC + (locked == null ? "global" :
-        "local " + (locked.isEmpty() ? "" : Arrays.toString(locked.toArray()))));
-    }
-    info(HITS_X_CC + hits + ' ' + (hits == 1 ? ITEM : ITEMS));
-    info(UPDATED_CC + updates + ' ' + (updates == 1 ? ITEM : ITEMS));
-    info(PRINTED_CC + Performance.format(out.size()));
   }
 
   /**

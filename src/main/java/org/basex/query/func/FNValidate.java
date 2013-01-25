@@ -52,9 +52,10 @@ public final class FNValidate extends StandardFunc {
 
   /**
    * Validates a document against an XML Schema.
-   * There exist two variants:
+   * The following two variants exist:
    *
-   * <ul>{@code validate:xsd($doc)}
+   * <div>{@code validate:xsd($doc)}:</div>
+   * <ul>
    *  <li>Looks for {@code xsi:(noNamespace)schemaLocation} in {@code $doc} and
    *    uses this schema for validation.</li>
    *  <li>{@code $doc} must contain a schemaLocation declaration for validation
@@ -62,15 +63,16 @@ public final class FNValidate extends StandardFunc {
    *  <li>{@code $doc} is allowed to be either a {@code XML node} or a {@code
    *    xs:string} pointing to an URL or a local file that will then be parsed
    *    and validated.</li>
-   *  </ul>
-   *  <ul>{@code validate:xsd($doc, $schema)}
+   * </ul>
+   * <div>{@code validate:xsd($doc, $schema)}:</div>
+   * <ul>
    *  <li>if {@code $doc} contains an {@code xsi:(noNamespace)schemaLocation} it
    *  will be ignored.</li>
    *  <li>{@code $doc} is allowed to be either a {@code XML node} or a {@code
    *    xs:string} pointing to an URL or a local file</li>
    *  <li>{@code $schema as xs:string} is expected to point to an URL or a local
    *  file containing the schema definitions. </li>
-   *  </ul>
+   * </ul>
    *
    * @param ctx query context
    * @return {@code null}

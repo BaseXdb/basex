@@ -423,10 +423,11 @@ public abstract class Path extends ParseExpr {
   @Override
   public final String toString() {
     final StringBuilder sb = new StringBuilder();
-    if(root != null) sb.append(root);
+    if(root != null) sb.append(PAR1).append(root).append(PAR2);
     for(final Expr s : steps) {
       if(sb.length() != 0) sb.append(s instanceof Bang ? '!' : '/');
-      sb.append(s);
+      if(s instanceof AxisStep) sb.append(s);
+      else sb.append(PAR1).append(s).append(PAR2);
     }
     return sb.toString();
   }
