@@ -53,11 +53,10 @@ public abstract class IO {
   public static final String[] XMLSUFFIXES =
     { XMLSUFFIX, ".xsd", ".xsl", ".xslt", ".svg", ".rdf", ".rss", ".rng", ".sch" };
   /** HTML suffixes. */
-  public static final String[] HTMLSUFFIXES =
-    { ".xhtml", ".html", ".htm" };
+  public static final String[] HTMLSUFFIXES = { ".xhtml", ".html", ".htm" };
   /** Text suffixes. */
   public static final String[] TXTSUFFIXES = {
-    ".txt", ".text", ".ini", ".conf" };
+    ".txt", ".text", ".ini", ".conf", ".md", ".log" };
 
   /** Disk block/page size (4096). */
   public static final int BLOCKSIZE = 1 << 12;

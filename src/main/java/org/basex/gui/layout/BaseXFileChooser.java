@@ -59,6 +59,20 @@ public final class BaseXFileChooser {
     }
   }
 
+
+  /**
+   * Convenience method for setting textual filters.
+   * @return self reference
+   */
+  public BaseXFileChooser textFilters() {
+    filter(XML_DOCUMENTS, IO.XMLSUFFIXES);
+    filter(HTML_DOCUMENTS, IO.HTMLSUFFIXES);
+    filter(JSON_DOCUMENTS, IO.JSONSUFFIX);
+    filter(CSV_DOCUMENTS, IO.CSVSUFFIX);
+    filter(PLAIN_TEXT, IO.TXTSUFFIXES);
+    return this;
+  }
+
   /**
    * Sets a file filter.
    * @param dsc description

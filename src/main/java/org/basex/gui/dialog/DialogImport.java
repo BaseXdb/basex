@@ -138,11 +138,7 @@ public final class DialogImport extends BaseXBack {
   IOFile inputFile() {
     final String path = gui.gprop.get(GUIProp.INPUTPATH);
     final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR, path, gui);
-    fc.filter(XML_DOCUMENTS, IO.XMLSUFFIXES);
-    fc.filter(HTML_DOCUMENTS, IO.HTMLSUFFIXES);
-    fc.filter(JSON_DOCUMENTS, IO.JSONSUFFIX);
-    fc.filter(CSV_DOCUMENTS, IO.CSVSUFFIX);
-    fc.filter(PLAIN_TEXT, IO.TXTSUFFIXES);
+    fc.textFilters();
     fc.filter(ZIP_ARCHIVES, IO.ZIPSUFFIXES);
     final IOFile file = fc.select(Mode.FDOPEN);
     if(file != null) gui.gprop.set(GUIProp.INPUTPATH, file.path());

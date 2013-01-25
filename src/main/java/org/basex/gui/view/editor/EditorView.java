@@ -285,9 +285,9 @@ public final class EditorView extends View {
     // open file chooser for XML creation
     final BaseXFileChooser fc = new BaseXFileChooser(OPEN,
         gui.gprop.get(GUIProp.WORKPATH), gui);
-    fc.filter(BXS_FILES, IO.BXSSUFFIX);
     fc.filter(XQUERY_FILES, IO.XQSUFFIXES);
-    fc.filter(XML_DOCUMENTS, IO.XMLSUFFIXES);
+    fc.filter(BXS_FILES, IO.BXSSUFFIX);
+    fc.textFilters();
 
     final IOFile[] files = fc.multi().selectAll(Mode.FOPEN);
     for(final IOFile f : files) open(f);
@@ -316,8 +316,10 @@ public final class EditorView extends View {
   public boolean saveAs() {
     // open file chooser for XML creation
     final EditorArea edit = getEditor();
-    final BaseXFileChooser fc = new BaseXFileChooser(
-        SAVE_AS, edit.file.path(), gui).filter(XQUERY_FILES, IO.XQSUFFIXES);
+    final BaseXFileChooser fc = new BaseXFileChooser(SAVE_AS, edit.file.path(), gui);
+    fc.filter(XQUERY_FILES, IO.XQSUFFIXES);
+    fc.filter(BXS_FILES, IO.BXSSUFFIX);
+    fc.textFilters();
 
     final IOFile file = fc.select(Mode.FSAVE);
     return file != null && save(file);
