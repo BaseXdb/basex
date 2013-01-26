@@ -127,6 +127,7 @@ final class BXQueryService implements XPathQueryService, BXXMLDBText {
     } catch(final QueryException ex) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
     } finally {
+      qp.close();
       coll.ctx.unregister(qp);
     }
   }

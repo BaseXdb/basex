@@ -45,11 +45,15 @@ final class RestXqModule {
 
     // loop through all functions
     final QueryContext qc = parse(http);
-    for(final UserFunc uf : qc.funcs.funcs()) {
-      // consider only functions that are defined in this module
-      if(!file.name().equals(new IOFile(uf.info.file()).name())) continue;
-      final RestXqFunction rxf = new RestXqFunction(uf, qc, this);
-      if(rxf.analyze()) functions.add(rxf);
+    try {
+      for(final UserFunc uf : qc.funcs.funcs()) {
+        // consider only functions that are defined in this module
+        if(!file.name().equals(new IOFile(uf.info.file()).name())) continue;
+        final RestXqFunction rxf = new RestXqFunction(uf, qc, this);
+        if(rxf.analyze()) functions.add(rxf);
+      }
+    } finally {
+      qc.close();
     }
     return !functions.isEmpty();
   }
@@ -89,16 +93,20 @@ final class RestXqModule {
   void process(final HTTPContext http, final RestXqFunction func) throws Exception {
     // create new XQuery instance
     final QueryContext qc = parse(http);
-    // loop through all functions
-    for(final UserFunc uf : qc.funcs.funcs()) {
-      // compare input info
-      if(func.function.info.equals(uf.info)) {
-        // find and evaluate relevant function
-        final RestXqFunction rxf = new RestXqFunction(uf, qc, this);
-        rxf.analyze();
-        new RestXqResponse(rxf, qc, http).create();
-        break;
+    try {
+      // loop through all functions
+      for(final UserFunc uf : qc.funcs.funcs()) {
+        // compare input info
+        if(func.function.info.equals(uf.info)) {
+          // find and evaluate relevant function
+          final RestXqFunction rxf = new RestXqFunction(uf, qc, this);
+          rxf.analyze();
+          new RestXqResponse(rxf, qc, http).create();
+          break;
+        }
       }
+    } finally {
+      qc.close();
     }
   }
 
@@ -111,13 +119,14 @@ final class RestXqModule {
    * @throws QueryException query exception
    */
   private QueryContext parse(final HTTPContext http) throws QueryException {
+    final QueryContext qc = new QueryContext(http.context());
     try {
       final String query = string(file.read());
-      final QueryContext qc = new QueryContext(http.context());
       qc.sc.baseURI(file.path());
       qc.module(query);
       return qc;
     } catch(final IOException ex) {
+      qc.close();
       // Unexpected: XQuery module could not be opened
       throw new RuntimeException(Util.message(ex));
     }
