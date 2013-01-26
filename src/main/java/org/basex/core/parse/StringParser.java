@@ -281,11 +281,16 @@ final class StringParser extends CmdParser {
     consumeWS();
     final StringBuilder sb = new StringBuilder();
     if(!eoc()) {
-      final QueryParser p = new QueryParser(parser.input, new QueryContext(ctx));
-      p.ip = parser.ip;
-      p.parse();
-      sb.append(parser.input.substring(parser.ip, p.ip));
-      parser.ip = p.ip;
+      final QueryContext qc = new QueryContext(ctx);
+      try {
+        final QueryParser p = new QueryParser(parser.input, qc);
+        p.ip = parser.ip;
+        p.parse();
+        sb.append(parser.input.substring(parser.ip, p.ip));
+        parser.ip = p.ip;
+      } finally {
+        qc.close();
+      }
     }
     return finish(cmd, sb);
   }

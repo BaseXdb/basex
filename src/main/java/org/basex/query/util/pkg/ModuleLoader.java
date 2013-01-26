@@ -125,7 +125,6 @@ public final class ModuleLoader {
       loader = new JarLoader(urls.toArray(new URL[us]), loader);
       urls.clear();
     }
-
     // no external classes added: use default class loader
     return loader == LOADER ? Reflect.forName(clz) : Class.forName(clz, true, loader);
   }

@@ -154,7 +154,7 @@ abstract class AQuery extends Command {
     // keyword found; parse query to get sure
     try {
       final Performance p = new Performance();
-      qp = progress(new QueryProcessor(qu, ctx));
+      qp = queryProcessor(qu, ctx);
       qp.parse();
       qi.pars = p.time();
       return qp.updating;

@@ -154,13 +154,15 @@ final class EditorArea extends Editor {
       } else {
         // parse query
         gui.context.prop.set(Prop.QUERYPATH, file.path());
-        final QueryContext ctx = new QueryContext(gui.context);
+        final QueryContext qc = new QueryContext(gui.context);
         try {
-          if(!xquery) ctx.module(input);
-          else ctx.parse(input);
+          if(!xquery) qc.module(input);
+          else qc.parse(input);
           view.info(OK, true, false);
         } catch(final QueryException ex) {
           view.info(Util.message(ex), false, false);
+        } finally {
+          qc.close();
         }
       }
     } else if(action == Action.EXECUTE && script) {
