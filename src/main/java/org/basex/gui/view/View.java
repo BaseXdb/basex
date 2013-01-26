@@ -108,7 +108,10 @@ public abstract class View extends BaseXPanel {
     if(gui.updating) return;
     if(ESCAPE.is(e)) {
       gui.fullscreen(false);
-    } else if(SPACE.is(e)) {
+    }
+    if(gui.context.data() == null) return;
+
+    if(SPACE.is(e)) {
       gui.notify.mark(sc(e) ? 2 : e.isShiftDown() ? 1 : 0, null);
     } else if(ENTER.is(e)) {
       GUICommands.C_FILTER.execute(gui);

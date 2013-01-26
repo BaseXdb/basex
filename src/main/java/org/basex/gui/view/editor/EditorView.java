@@ -39,7 +39,7 @@ public final class EditorView extends View {
   /** XQuery error pattern. */
   private static final Pattern XQERROR = Pattern.compile(
       ".*" + (LINE_X + ", " + COLUMN_X).replaceAll("%", "([0-9]+)") + ' ' +
-      IN_FILE_X.replaceAll("%", "(.*?)") + "($|" + COL + "\r?\n.*)", Pattern.DOTALL);
+      IN_FILE_X.replaceAll("%", "(.*?)") + COL + "\r?\n.*", Pattern.DOTALL);
   /** XML error pattern. */
   private static final Pattern XMLERROR = Pattern.compile(
       LINE_X.replaceAll("%", "(.*?)") + COL + ".*");
@@ -66,6 +66,8 @@ public final class EditorView extends View {
   /** Thread counter. */
   int threadID;
 
+  /** Last error message. */
+  String errMsg;
   /** File in which the most recent error occurred. */
   String errFile;
   /** Most recent error position; used for clicking on error message. */
@@ -171,7 +173,7 @@ public final class EditorView extends View {
         final ActionListener al = new ActionListener() {
           @Override
           public void actionPerformed(final ActionEvent ac) {
-            open(new IOFile(ac.getActionCommand()));
+            open(new IOFile(ac.getActionCommand()), true);
           }
         };
         final StringList sl = new StringList();
@@ -189,15 +191,7 @@ public final class EditorView extends View {
     info.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(final MouseEvent e) {
-        EditorArea ea = getEditor();
-        if(errFile != null) {
-          ea = find(IO.get(errFile), false);
-          if(ea == null) ea = open(new IOFile(errFile));
-          tabs.setSelectedComponent(ea);
-        }
-        if(errPos == -1) return;
-        ea.jumpError(errPos);
-        posCode.invokeLater();
+        jumpToError();
       }
     });
     stop.addActionListener(new ActionListener() {
@@ -228,7 +222,7 @@ public final class EditorView extends View {
     BaseXLayout.addDrop(this, new DropHandler() {
       @Override
       public void drop(final Object file) {
-        if(file instanceof File) open(new IOFile((File) file));
+        if(file instanceof File) open(new IOFile((File) file), true);
       }
     });
   }
@@ -287,7 +281,7 @@ public final class EditorView extends View {
     fc.textFilters();
 
     final IOFile[] files = fc.multi().selectAll(Mode.FOPEN);
-    for(final IOFile f : files) open(f);
+    for(final IOFile f : files) open(f, true);
   }
 
   /**
@@ -333,9 +327,10 @@ public final class EditorView extends View {
   /**
    * Opens the specified query file.
    * @param file query file
+   * @param parse parse contents
    * @return opened editor
    */
-  public EditorArea open(final IOFile file) {
+  public EditorArea open(final IOFile file, final boolean parse) {
     if(!visible()) GUICommands.C_SHOWEDITOR.execute(gui);
 
     EditorArea edit = find(file, true);
@@ -351,6 +346,7 @@ public final class EditorView extends View {
         if(edit.opened() || edit.modified) edit = addTab();
         edit.initText(file.read());
         edit.file(file);
+        if(parse) edit.release(Action.PARSE);
       }
     } catch(final IOException ex) {
       BaseXDialog.error(gui, FILE_NOT_OPENED);
@@ -456,6 +452,7 @@ public final class EditorView extends View {
     ++threadID;
     errPos = -1;
     errFile = null;
+    errMsg = null;
     getEditor().resetError();
 
     if(ok) {
@@ -465,8 +462,7 @@ public final class EditorView extends View {
       error(msg, false);
       info.setCursor(GUIConstants.CURSORHAND);
       info.setText(ERRORINFO.matcher(msg).replaceAll(""), Msg.ERROR);
-      info.setToolTipText(
-          "<html>" + STOPPED_AT + ERRORTT.matcher(msg).replaceAll("").
+      info.setToolTipText("<html>" + STOPPED_AT + ERRORTT.matcher(msg).replaceAll("").
           replaceAll("\r?\n", "<br/>") + "</html>");
     }
 
@@ -477,11 +473,32 @@ public final class EditorView extends View {
   }
 
   /**
+   * Jumps to the current error.
+   */
+  void jumpToError() {
+    if(errMsg != null) error(errMsg, true);
+
+    /*
+    EditorArea ea = getEditor();
+    if(errFile != null) {
+      ea = find(IO.get(errFile), false);
+      if(ea == null) ea = open(new IOFile(errFile), false);
+      tabs.setSelectedComponent(ea);
+    }
+    if(errPos == -1) return;
+    ea.jumpError(errPos);
+    posCode.invokeLater();
+    */
+  }
+
+  /**
    * Handles info messages resulting from a query execution.
    * @param open open addressed file
    * @param msg info message
    */
   public void error(final String msg, final boolean open) {
+    errMsg = msg;
+
     Matcher m = XQERROR.matcher(msg);
     int el, ec = 2;
     if(m.matches()) {
@@ -497,7 +514,7 @@ public final class EditorView extends View {
 
     EditorArea edit = find(IO.get(errFile), false);
     if(open) {
-      if(edit == null) edit = open(new IOFile(errFile));
+      if(edit == null) edit = open(new IOFile(errFile), false);
       tabs.setSelectedComponent(edit);
     } else {
       if(edit == null) return;

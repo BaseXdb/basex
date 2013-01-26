@@ -130,15 +130,6 @@ public class Editor extends BaseXPanel {
   }
 
   /**
-   * Initializes the text.
-   * @param t text to be set
-   */
-  public final void initText(final byte[] t) {
-    setText(t);
-    hist = new History(text.text());
-  }
-
-  /**
    * Sets the output text.
    * @param t output text
    */
@@ -562,9 +553,6 @@ public class Editor extends BaseXPanel {
       down = false;
     } else if(NEXTLINE.is(e)) {
       down(1, marking);
-    } else if(FINDERROR.is(e)) {
-      final int p = text.error();
-      if(p != -1) setCaret(p);
     } else {
       consumed = false;
     }

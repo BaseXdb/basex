@@ -69,19 +69,30 @@ final class EditorArea extends Editor {
         gui.context.prop.set(Prop.QUERYPATH, path);
         gui.gprop.set(GUIProp.WORKPATH, file.dirPath());
         // reload file if it has been changed
-        reopen(false);
-        // skip parsing if editor contains file that is currently marked as erroneous
-        if(!path.equals(view.errFile)) release(Action.PARSE);
+        if(!reopen(false)) {
+          // skip parsing if editor contains file that is currently marked as erroneous
+          if(!path.equals(view.errFile)) release(Action.PARSE);
+        }
       }
     });
   }
 
   /**
-   * Returns {@code true} if a file exists for the given text.
+   * Returns {@code true} if a file instance exists for the edited text.
    * @return result of check
    */
   boolean opened() {
     return tstamp != 0;
+  }
+
+  /**
+   * Initializes the text.
+   * @param t text to be set
+   */
+  public void initText(final byte[] t) {
+    last = t;
+    super.setText(t);
+    hist = new History(text.text());
   }
 
   @Override
@@ -100,6 +111,9 @@ final class EditorArea extends Editor {
   public void keyPressed(final KeyEvent e) {
     final byte[] t = text.text();
     super.keyPressed(e);
+
+    if(FINDERROR.is(e)) view.jumpToError();
+
     if(t != text.text()) resetError();
     view.posCode.invokeLater();
   }
@@ -114,7 +128,7 @@ final class EditorArea extends Editor {
   @Override
   public void keyReleased(final KeyEvent e) {
     super.keyReleased(e);
-    if(!e.isActionKey() && !modifier(e)) {
+    if(!e.isActionKey() && !modifier(e) && !FINDERROR.is(e)) {
       release(EXEC.is(e) ? Action.EXECUTE : Action.CHECK);
     }
   }
@@ -139,6 +153,7 @@ final class EditorArea extends Editor {
         gui.execute(true, new XQuery(input));
       } else {
         // parse query
+        gui.context.prop.set(Prop.QUERYPATH, file.path());
         final QueryContext ctx = new QueryContext(gui.context);
         try {
           if(!xquery) ctx.module(input);
@@ -168,20 +183,25 @@ final class EditorArea extends Editor {
   /**
    * Reverts the contents of the currently opened editor.
    * @param enforce enforce reload
+   * @return {@code true} if file was opened
    */
-  public void reopen(final boolean enforce) {
-    if(!opened()) return;
-    final long ts = file.timeStamp();
-    if((tstamp != ts || enforce) && (!modified ||
-        BaseXDialog.confirm(gui, Util.info(REOPEN_FILE_X, file.name())))) {
-      try {
-        setText(file.read());
-        file(file);
-      } catch(final IOException ex) {
-        BaseXDialog.error(gui, FILE_NOT_OPENED);
+  public boolean reopen(final boolean enforce) {
+    if(opened()) {
+      final long ts = file.timeStamp();
+      if((tstamp != ts || enforce) && (!modified ||
+          BaseXDialog.confirm(gui, Util.info(REOPEN_FILE_X, file.name())))) {
+        try {
+          setText(file.read());
+          file(file);
+          release(Action.PARSE);
+          return true;
+        } catch(final IOException ex) {
+          BaseXDialog.error(gui, FILE_NOT_OPENED);
+        }
       }
+      tstamp = ts;
     }
-    tstamp = ts;
+    return false;
   }
 
   /**
@@ -195,7 +215,6 @@ final class EditorArea extends Editor {
     hist.save();
     view.refreshHistory(file);
     view.refreshControls(true);
-    release(Action.PARSE);
   }
 
   /**

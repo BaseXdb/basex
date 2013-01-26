@@ -273,7 +273,7 @@ public final class InfoView extends View implements LinkListener {
 
   @Override
   public void linkClicked(final String link) {
-    gui.editor.error(link, true);
+    gui.editor.error(link + COL + '\n', true);
   }
 
   @Override

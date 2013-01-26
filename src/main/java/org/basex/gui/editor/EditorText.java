@@ -711,7 +711,7 @@ public final class EditorText {
    * Returns the error position.
    * @return error position
    */
-  int error() {
+  public int error() {
     return es;
   }
 
