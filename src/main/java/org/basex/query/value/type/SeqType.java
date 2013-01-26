@@ -100,15 +100,15 @@ public final class SeqType {
   public static final SeqType DBL_ZO = new SeqType(AtomType.DBL, Occ.ZERO_ONE);
   /** Zero or one decimal number. */
   public static final SeqType DEC_ZO = new SeqType(AtomType.DEC, Occ.ZERO_ONE);
-  /** Single number; for simplicity, numbers are summarized by this type. */
+  /** Single integer; for simplicity, numbers are summarized by this type. */
   public static final SeqType ITR = AtomType.ITR.seqType();
-  /** Zero or one number. */
+  /** Zero or one integer. */
   public static final SeqType ITR_ZO = new SeqType(AtomType.ITR, Occ.ZERO_ONE);
-  /** Zero or more numbers. */
+  /** Zero or more integers. */
   public static final SeqType ITR_ZM = new SeqType(AtomType.ITR, Occ.ZERO_MORE);
-  /** One or more numbers. */
+  /** One or more integers. */
   public static final SeqType ITR_OM = new SeqType(AtomType.ITR, Occ.ONE_MORE);
-  /** One or more numbers. */
+  /** One or more bytes. */
   public static final SeqType BYT_OM = new SeqType(AtomType.BYT, Occ.ONE_MORE);
   /** Single node. */
   public static final SeqType NOD = NodeType.NOD.seqType();

@@ -42,6 +42,7 @@ public final class FNProf extends StandardFunc {
       case _PROF_CURRENT_MS: return Int.get(System.currentTimeMillis());
       case _PROF_CURRENT_NS: return Int.get(System.nanoTime());
       case _PROF_DUMP:       return dump(ctx);
+      case _PROF_HUMAN:      return human(ctx);
       default:               return super.item(ctx, ii);
     }
   }
@@ -115,6 +116,16 @@ public final class FNProf extends StandardFunc {
     final long max = Performance.memory();
     final long mb = Math.max(0, max - min);
     FNInfo.dump(token(Performance.format(mb)), msg, ctx);
+  }
+
+  /**
+   * Returns a human-readable version of the specified integer.
+   * @param ctx query context
+   * @return memory consumption
+   * @throws QueryException query exception
+   */
+  private Item human(final QueryContext ctx) throws QueryException {
+    return Str.get(Performance.format(checkItr(expr[0], ctx), true));
   }
 
   /**

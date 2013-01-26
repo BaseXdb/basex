@@ -88,11 +88,13 @@ public final class Performance {
    * @param off offset
    * @return formatted size value
    */
-  private static String format(final long size, final boolean det,
-      final int off) {
-    if(size > 1L << 30 + off) return (size + (1L << 29) >> 30) + " GB";
-    if(size > 1L << 20 + off) return (size + (1L << 19) >> 20) + " MB";
-    if(size > 1L << 10 + off) return (size + (1L <<  9) >> 10) + " KB";
+  private static String format(final long size, final boolean det, final int off) {
+    if(size >= 1L << 60 + off) return (size + (1L << 59) >> 60) + " EB";
+    if(size >= 1L << 50 + off) return (size + (1L << 49) >> 50) + " PB";
+    if(size >= 1L << 40 + off) return (size + (1L << 39) >> 40) + " TB";
+    if(size >= 1L << 30 + off) return (size + (1L << 29) >> 30) + " GB";
+    if(size >= 1L << 20 + off) return (size + (1L << 19) >> 20) + " MB";
+    if(size >= 1L << 10 + off) return (size + (1L <<  9) >> 10) + " KB";
     return size + (det ? " Byte"  + (size == 1 ? "" : "s") : " B");
   }
 
