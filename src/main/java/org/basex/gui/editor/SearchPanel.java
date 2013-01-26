@@ -247,8 +247,18 @@ public final class SearchPanel extends BaseXBack {
    */
   void search(final boolean jump) {
     final String text = isVisible() ? search.getText() : "";
-    rplc.setEnabled(!text.isEmpty());
     editor.search(new SearchContext(this, text), jump);
+  }
+
+  /**
+   * Refreshes the panel for the specified context.
+   * @param sc search context
+   */
+  void refresh(final SearchContext sc) {
+    final boolean nohits = sc.nr == 0;
+    final boolean empty = sc.search.isEmpty();
+    rplc.setEnabled(!nohits && !empty);
+    search.setBackground(nohits && !empty ? GUIConstants.LRED : GUIConstants.WHITE);
   }
 
   // PRIVATE METHODS ====================================================================

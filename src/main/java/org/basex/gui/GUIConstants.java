@@ -201,7 +201,7 @@ public final class GUIConstants {
   /** Color for control characters. */
   public static final Color RED = new Color(208, 0, 0);
   /** Color for highlighting errors. */
-  public static final Color LRED = new Color(255, 208, 200);
+  public static final Color LRED = new Color(255, 216, 216);
   /** Color for highlighting full-text hits. */
   public static final Color GREEN = new Color(0, 176, 0);
   /** Color for highlighting quotes. */

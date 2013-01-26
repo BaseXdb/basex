@@ -119,6 +119,7 @@ public final class EditorText {
     // skip search if criteria have not changed
     if(sc.equals(search)) {
       sc.nr = search.nr;
+      sc.panel.refresh(sc);
     } else {
       spos = sc.search(text);
       search = sc;
