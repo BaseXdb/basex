@@ -35,8 +35,6 @@ public final class BaseXFileChooser {
   private JFileChooser fc;
   /** Simple file dialog. */
   private FileDialog fd;
-  /** File suffix. */
-  private String suffix;
 
   /**
    * Default constructor.
@@ -84,11 +82,7 @@ public final class BaseXFileChooser {
       final FileFilter ff = fc.getFileFilter();
       fc.addChoosableFileFilter(new Filter(suf, dsc));
       fc.setFileFilter(ff);
-    } else {
-      fd.setFile('*' + suf[0]);
     }
-    // treat first filter as default
-    if(suffix == null) suffix = suf[0];
     return this;
   }
 
@@ -156,12 +150,15 @@ public final class BaseXFileChooser {
 
     if(mode == Mode.FSAVE) {
       // add file suffix to files
-      if(suffix != null) {
-        for(int f = 0; f < files.length; f++) {
+      final FileFilter ff = fc.getFileFilter();
+      if(ff instanceof Filter) {
+        final String[] sufs = ((Filter) ff).sufs;
+        for(int f = 0; f < files.length && sufs.length != 0; f++) {
           final String path = files[f].path();
-          if(!path.contains(".")) files[f] = new IOFile(path + suffix);
+          if(!path.contains(".")) files[f] = new IOFile(path + sufs[0]);
         }
       }
+
       // show replace dialog
       for(final IOFile io : files) {
         if(io.exists() && !BaseXDialog.confirm(gui, Util.info(FILE_EXISTS_X, io))) {
@@ -177,9 +174,9 @@ public final class BaseXFileChooser {
    */
   private static class Filter extends FileFilter {
     /** Suffixes. */
-    private final String[] sufs;
+    final String[] sufs;
     /** Description. */
-    private final String desc;
+    final String desc;
 
     /**
      * Constructor.

@@ -8,7 +8,7 @@ package org.basex.util;
  */
 public final class History {
   /** Maximum size for storing entries in a history (currently: 10 MB). */
-  private static final int MAXBYTES = 10000000;
+  private static final int MAXBYTES = 10;
   /** Maximum number of entries to be stored. */
   private static final int MAX = 1024;
 
