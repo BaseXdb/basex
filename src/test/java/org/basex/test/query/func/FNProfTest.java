@@ -52,15 +52,11 @@ public final class FNProfTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void human() {
-    try {
-      query(_PROF_HUMAN.args(" 1"), "1 Byte");
-      query(_PROF_HUMAN.args(" 2"), "2 Bytes");
-      query(_PROF_HUMAN.args(" 512"), "512 Bytes");
-      query(_PROF_HUMAN.args(" 32768"), "32 KB");
-      query(_PROF_HUMAN.args(" 1048576"), "1 MB");
-    } finally {
-      System.setErr(ERR);
-    }
+    query(_PROF_HUMAN.args(" 1"), "1 Byte");
+    query(_PROF_HUMAN.args(" 2"), "2 Bytes");
+    query(_PROF_HUMAN.args(" 512"), "512 Bytes");
+    query(_PROF_HUMAN.args(" 32768"), "32 KB");
+    query(_PROF_HUMAN.args(" 1048576"), "1 MB");
   }
 
   /** Test method. */

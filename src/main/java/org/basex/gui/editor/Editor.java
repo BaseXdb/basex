@@ -63,6 +63,8 @@ public class Editor extends BaseXPanel {
   final boolean editable;
   /** Search field. */
   private SearchPanel search;
+  /** Link listener. */
+  private LinkListener linkListener;
 
   /**
    * Default constructor.
@@ -167,8 +169,10 @@ public class Editor extends BaseXPanel {
     boolean eq = true;
     for(int r = 0; r < s; ++r) {
       final byte b = t[r];
+      // ignore carriage return
+      if(b != 0x0D) t[ns++] = t[r];
       // support characters, highlighting codes, tabs and newlines
-      if(b >= ' ' || b <= TokenBuilder.MARK || b == 0x09 || b == 0x0A) t[ns++] = t[r];
+      //if(b >= ' ' || b <= TokenBuilder.ULINE || b == 0x09 || b == 0x0A) t[ns++] = t[r];
       eq &= ns < ts && ns < s && t[ns] == old[ns];
     }
     eq &= ns == ts;
@@ -305,6 +309,14 @@ public class Editor extends BaseXPanel {
   // SEARCH OPERATIONS ==================================================================
 
   /**
+   * Installs a link listener.
+   * @param ll link listener
+   */
+  public final void setLinkListener(final LinkListener ll) {
+    linkListener = ll;
+  }
+
+  /**
    * Installs a search panel.
    * @param s search panel
    */
@@ -385,8 +397,20 @@ public class Editor extends BaseXPanel {
   }
 
   @Override
+  public final void mouseMoved(final MouseEvent e) {
+    if(linkListener == null) return;
+    final boolean link = rend.link(scroll.pos(), e.getPoint());
+    gui.cursor(link ? GUIConstants.CURSORHAND : GUIConstants.CURSORARROW);
+  }
+
+  @Override
   public void mouseReleased(final MouseEvent e) {
-    if(SwingUtilities.isLeftMouseButton(e)) text.checkSelect();
+    if(SwingUtilities.isLeftMouseButton(e)) {
+      text.checkSelect();
+      // evaluate link
+      if(!text.selected() && rend.link(scroll.pos(), e.getPoint()))
+        linkListener.linkClicked(rend.link());
+    }
   }
 
   @Override
@@ -400,7 +424,7 @@ public class Editor extends BaseXPanel {
     if(!SwingUtilities.isLeftMouseButton(e)) return;
 
     // selection mode
-    rend.select(scroll.pos(), e.getPoint(), true);
+    rend.select(scroll.pos(), e.getPoint(), false);
     final int y = Math.max(20, Math.min(e.getY(), getHeight() - 20));
     if(y != e.getY()) scroll.pos(scroll.pos() + e.getY() - y);
   }
@@ -421,14 +445,14 @@ public class Editor extends BaseXPanel {
       if(c == 1) {
         // selection mode
         if(marking && nomark) text.startSelect();
-        rend.select(scroll.pos(), e.getPoint(), marking);
+        rend.select(scroll.pos(), e.getPoint(), !marking);
       } else if(c == 2) {
         text.selectWord();
       } else {
         text.selectLine();
       }
     } else if(nomark) {
-      rend.select(scroll.pos(), e.getPoint(), false);
+      rend.select(scroll.pos(), e.getPoint(), true);
     }
   }
 

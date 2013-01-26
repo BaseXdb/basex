@@ -17,13 +17,15 @@ public final class TokenBuilder {
   /** Half new line. */
   public static final byte HLINE = 0x01;
   /** Bold flag. */
-  private static final byte BOLD = 0x02;
+  public static final byte BOLD = 0x02;
   /** Standard flag. */
-  private static final byte NORM = 0x03;
+  public static final byte NORM = 0x03;
   /** Mark flag. */
   public static final byte MARK = 0x04;
+  /** Underline flag. */
+  public static final byte ULINE = 0x05;
   /** New line. */
-  public static final byte NLINE = 0x0a;
+  public static final byte NLINE = 0x0A;
 
   /** Byte (code point) array. */
   private byte[] chars;
@@ -103,6 +105,15 @@ public final class TokenBuilder {
    */
   public TokenBuilder bold() {
     return addByte(BOLD);
+  }
+
+  /**
+   * Adds an underline toggle flag. This method should only be called to control text
+   * rendering in the visual front end.
+   * @return self reference
+   */
+  public TokenBuilder uline() {
+    return addByte(ULINE);
   }
 
   /**

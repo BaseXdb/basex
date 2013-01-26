@@ -5,6 +5,7 @@ import static org.basex.gui.GUIConstants.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.regex.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
@@ -22,7 +23,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class InfoView extends View {
+public final class InfoView extends View implements LinkListener {
   /** Search panel. */
   final SearchEditor search;
 
@@ -40,9 +41,9 @@ public final class InfoView extends View {
   final BaseXBack buttons;
 
   /** Query statistics. */
-  private IntList stat = new IntList();
+  private IntList stat = new IntList(4);
   /** Query statistics strings. */
-  private StringList strings;
+  private StringList strings = new StringList(4);
   /** Focused bar. */
   private int focus = -1;
   /** Panel Width. */
@@ -80,6 +81,7 @@ public final class InfoView extends View {
 
     final BaseXBack center = new BaseXBack(Fill.NONE).layout(new BorderLayout(0, 2));
     area = new Editor(false, gui);
+    area.setLinkListener(this);
     search = new SearchEditor(gui, area).button(srch);
     add(search, BorderLayout.CENTER);
 
@@ -140,13 +142,15 @@ public final class InfoView extends View {
     final StringList eval = new StringList(1);
     final StringList comp = new StringList(1);
     final StringList plan = new StringList(1);
-    final StringList sl = new StringList(1);
-    final StringList stats = new StringList(1);
+    final StringList result = new StringList(1);
     final StringList stack = new StringList(1);
     final StringList err = new StringList(1);
     final StringList query = new StringList(1);
-    final IntList il = new IntList(5);
 
+    final StringList timings = new StringList(5);
+    final IntList times = new IntList(5);
+
+    final int runs = Math.max(1, gui.context.prop.num(Prop.RUNS));
     final String[] split = info.split(NL);
     for(int i = 0; i < split.length; ++i) {
       final String line = split[i];
@@ -154,9 +158,13 @@ public final class InfoView extends View {
       if(line.startsWith(PARSING_CC) || line.startsWith(COMPILING_CC) ||
           line.startsWith(EVALUATING_CC) || line.startsWith(PRINTING_CC) ||
           line.startsWith(TOTAL_TIME_CC)) {
+
         final int t = line.indexOf(" ms");
-        sl.add(line.substring(0, s).trim());
-        il.add((int) (Double.parseDouble(line.substring(s + 1, t)) * 100));
+        int tm = (int) (Double.parseDouble(line.substring(s + 1, t)) * 100);
+        times.add(tm);
+        final String key = line.substring(0, s).trim();
+        final String val = Performance.getTime(tm * 10000L * runs, runs);
+        timings.add(LI + key + COLS + val);
       } else if(line.startsWith(QUERY_PLAN_C)) {
         while(i + 1 < split.length && !split[++i].isEmpty()) plan.add(split[i]);
       } else if(line.startsWith(COMPILING_C)) {
@@ -164,33 +172,45 @@ public final class InfoView extends View {
       } else if(line.startsWith(RESULT_C)) {
         query.add(line.substring(s + 1).trim());
       } else if(line.startsWith(EVALUATING_C)) {
-        while(i + 1 < split.length && split[++i].startsWith(QUERYSEP)) eval.add(split[i]);
+        while(i + 1 < split.length && split[++i].startsWith(LI)) eval.add(split[i]);
       } else if(line.startsWith(HITS_X_CC) || line.startsWith(UPDATED_CC) ||
           line.startsWith(PRINTED_CC) || line.startsWith(LOCKING_CC)) {
-        stats.add(LI + line);
+        result.add(LI + line);
       } else if(line.startsWith(ERROR_C)) {
-        while(i + 1 < split.length && !split[++i].isEmpty()) err.add(split[i]);
+        while(i + 1 < split.length && !split[++i].isEmpty()) {
+          final Pattern p = Pattern.compile(STOPPED_AT + " (.*)" + COL);
+          final Matcher m = p.matcher(split[i]);
+          if(m.find()) {
+            final TokenBuilder tb = new TokenBuilder();
+            tb.add(STOPPED_AT).add(' ').uline().add(m.group(1)).uline().add(COL);
+            split[i] = tb.toString();
+          }
+          err.add(split[i]);
+        }
       } else if(line.startsWith(STACK_TRACE_C)) {
-        while(i + 1 < split.length && !split[++i].isEmpty()) stack.add(split[i]);
+        while(i + 1 < split.length && !split[++i].isEmpty()) {
+          final TokenBuilder tb = new TokenBuilder();
+          tb.add(LI).uline().add(split[i].substring(2)).uline();
+          stack.add(tb.toString());
+        }
       } else if(!ok && !line.isEmpty()) {
         err.add(line);
       }
     }
 
-    stat = il;
-    strings = sl;
+    stat = times;
+    strings = timings;
     String total = time;
 
-    if(!il.isEmpty()) {
+    if(!times.isEmpty()) {
       text.reset();
       add(EVALUATING_C, eval);
       add(COMPILING_C, comp);
       add(QUERY_C + ' ', query);
-      add(RESULT_C, stats);
-      add(TIMING_C, sl);
+      add(RESULT_C, result);
+      add(TIMING_C, timings);
       add(QUERY_PLAN_C, plan);
-      final int runs = Math.max(1, gui.context.prop.num(Prop.RUNS));
-      total = Performance.getTime(il.get(il.size() - 1) * 10000L * runs, runs);
+      total = Performance.getTime(times.get(times.size() - 1) * 10000L * runs, runs);
     } else {
       if(ok) {
         add(cmd);
@@ -236,16 +256,9 @@ public final class InfoView extends View {
    * @param list list reference
    */
   private void add(final String head, final StringList list) {
-    final int runs = Math.max(1, gui.context.prop.num(Prop.RUNS));
     if(list.isEmpty()) return;
     text.bold().add(head).norm().nline();
-    final int is = list.size();
-    for(int i = 0; i < is; ++i) {
-      String line = list.get(i);
-      if(list == strings) line = ' ' + QUERYSEP + line + ":  " +
-        Performance.getTime(stat.get(i) * 10000L * runs, runs);
-      text.add(line).nline();
-    }
+    for(final String s : list) text.add(s).nline();
     text.hline();
   }
 
@@ -256,6 +269,11 @@ public final class InfoView extends View {
    */
   private void add(final String head, final String txt) {
     if(!txt.isEmpty()) text.bold().add(head).norm().add(txt).nline().hline();
+  }
+
+  @Override
+  public void linkClicked(final String link) {
+    gui.editor.error(link, true);
   }
 
   @Override
@@ -271,10 +289,8 @@ public final class InfoView extends View {
       }
     }
 
-    final int runs = Math.max(1, gui.context.prop.num(Prop.RUNS));
     final int f = focus == -1 ? l - 1 : focus;
-    timer.setText(strings.get(f) + COLS +
-        Performance.getTime(stat.get(f) * 10000L * runs, runs));
+    timer.setText(strings.get(f).replace(LI, ""));
     repaint();
   }
 

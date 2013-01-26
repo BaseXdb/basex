@@ -324,7 +324,7 @@ public final class QueryContext extends Progress {
    */
   public void compInfo(final String string, final Object... ext) {
     if(!inf) return;
-    if(!firstOpt) info.add(QUERYSEP);
+    if(!firstOpt) info.add(LI);
     firstOpt = false;
     info.addExt(string, ext).add(NL);
   }
@@ -336,7 +336,7 @@ public final class QueryContext extends Progress {
   public void evalInfo(final String string) {
     if(!inf) return;
     if(firstEval) info.add(NL).add(EVALUATING_C).add(NL);
-    info.add(QUERYSEP).add(string.replaceAll("\r?\n\\s*", " ")).add(NL);
+    info.add(LI).add(string.replaceAll("\r?\n\\s*", " ")).add(NL);
     firstEval = false;
   }
 

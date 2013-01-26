@@ -613,8 +613,6 @@ public interface Text {
   String RESULT_C = lang("result") + COLS;
   /** Query info: plan. */
   String QUERY_PLAN_C = lang("query_plan") + COLS;
-  /** Query info: separator. */
-  String QUERYSEP = LI;
 
   /** "Query: ". */
   String QUERY_CC = lang("query") + COLS;

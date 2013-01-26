@@ -1,7 +1,6 @@
 package org.basex.gui.editor;
 
 import java.awt.*;
-
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.editor.Editor.SearchDir;
@@ -34,6 +33,8 @@ final class Renderer extends BaseXBack {
   private Color color;
   /** Color highlighting flag. */
   private boolean high;
+  /** Current link. */
+  private boolean link;
 
   /** Width of current word. */
   private int wordW;
@@ -199,6 +200,7 @@ final class Renderer extends BaseXBack {
     color = Color.black;
     syntax.init();
     text.init();
+    link = false;
     x = off;
     y = off + fontH - pos - 2;
     if(g != null) g.setFont(font);
@@ -246,10 +248,12 @@ final class Renderer extends BaseXBack {
     while(text.more()) {
       final int ch = text.next();
       // internal special codes...
-      if(ch == 0x02) {
+      if(ch == TokenBuilder.BOLD) {
         font(bfont);
-      } else if(ch == 0x03) {
+      } else if(ch == TokenBuilder.NORM) {
         font(dfont);
+      } else if(ch == TokenBuilder.ULINE) {
+        link ^= true;
       } else {
         ww += charW(g, ch);
       }
@@ -287,21 +291,19 @@ final class Renderer extends BaseXBack {
    * @param g graphics reference
    */
   private void write(final Graphics g) {
-    if(high) {
-      high = false;
-    } else {
-      color = isEnabled() ? syntax.getColor(text) : Color.gray;
-    }
+    // choose color for enabled text, depending on highlighting, link, or current syntax
+    color = isEnabled() ?
+      high ? GUIConstants.GREEN : link ? GUIConstants.color4 : syntax.getColor(text) :
+      Color.gray;
+    high = false;
 
+    // retrieve first character of current token
     final int ch = text.curr();
+    if(ch == TokenBuilder.MARK) high = true;
+
     final int cp = text.pos();
     final int cc = text.getCaret();
     if(y > 0 && y < h) {
-      if(ch == TokenBuilder.MARK) {
-        color = GUIConstants.GREEN;
-        high = true;
-      }
-
       // mark selected text
       if(text.selectStart()) {
         int xx = x, cw = 0;
@@ -324,10 +326,11 @@ final class Renderer extends BaseXBack {
       }
       text.pos(cp);
 
+      // retrieve first character of current token
       if(text.erroneous()) drawError(g);
 
       // don't write whitespaces
-      if(ch > ' ') {
+      if(ch >= ' ') {
         g.setColor(color);
         String n = text.nextString();
         int ww = w - x;
@@ -339,8 +342,12 @@ final class Renderer extends BaseXBack {
           }
           n = n.substring(0, c);
         }
-        g.drawString(n, x, y);
-      } else if(ch <= TokenBuilder.MARK) {
+        if(ch != ' ') g.drawString(n, x, y);
+
+        // underline linked text
+        if(link) g.drawLine(x, y + 1, x + wordW, y + 1);
+
+      } else if(ch <= TokenBuilder.ULINE) {
         g.setFont(font);
       }
 
@@ -392,7 +399,7 @@ final class Renderer extends BaseXBack {
   }
 
   /**
-   * Paints the error marker.
+   * Draws an error marker.
    * @param g graphics reference
    */
   private void drawError(final Graphics g) {
@@ -410,19 +417,19 @@ final class Renderer extends BaseXBack {
    * Selects the text at the specified position.
    * @param pos current text position
    * @param p mouse position
-   * @param finish states if selection is in progress
+   * @return {@code true} if mouse is placed over a link
    */
-  void select(final int pos, final Point p, final boolean finish) {
-    if(!finish) text.noSelect();
-    p.y -= 3;
+  boolean link(final int pos, final Point p) {
+    final int xx = p.x;
+    final int yy = p.y - fontH / 5;
 
     final Graphics g = getGraphics();
     init(g, pos);
-    if(p.y > y - fontH) {
+    if(yy > y - fontH) {
       int s = text.pos();
       while(true) {
         // end of line
-        if(p.x > x && p.y < y - fontH) {
+        if(xx > x && yy < y - fontH) {
           text.pos(s);
           break;
         }
@@ -432,12 +439,12 @@ final class Renderer extends BaseXBack {
           break;
         }
         // beginning of line
-        if(p.x <= x && p.y < y) break;
+        if(xx <= x && yy < y) break;
         // middle of line
-        if(p.x > x && p.x <= x + wordW && p.y > y - fontH && p.y <= y) {
+        if(xx > x && xx <= x + wordW && yy > y - fontH && yy <= y) {
           while(text.more()) {
             final int ww = charW(g, text.curr());
-            if(p.x < x + ww) break;
+            if(xx < x + ww) break;
             x += ww;
             text.next();
           }
@@ -446,12 +453,41 @@ final class Renderer extends BaseXBack {
         s = text.pos();
         next();
       }
-
-      if(!finish) text.startSelect();
-      else text.extendSelect();
-      text.setCaret();
     }
+    return link;
+  }
+
+  /**
+   * Selects the text at the specified position.
+   * @param pos current text position
+   * @param p mouse position
+   * @param start states if selection has just been started
+   * @return {@code true} if mouse is placed over a link
+   */
+  boolean select(final int pos, final Point p, final boolean start) {
+    if(start) text.noSelect();
+    link(pos, p);
+
+    if(start) text.startSelect();
+    else text.extendSelect();
+    text.setCaret();
     repaint();
+    return link;
+  }
+
+  /**
+   * Retrieves the current link found via {@link #link(int, Point)} or
+   * {@link #select(int, Point, boolean)}.
+   * @return clicked link
+   */
+  String link() {
+    // find beginning and end of link
+    final int s = text.size();
+    final byte[] txt = text.text();
+    int ls = text.pos(), le = ls;
+    while(ls > 0 && txt[ls - 1] != TokenBuilder.ULINE) ls--;
+    while(le < s && txt[le] != TokenBuilder.ULINE) le++;
+    return Token.string(txt, ls, le - ls);
   }
 
   /**

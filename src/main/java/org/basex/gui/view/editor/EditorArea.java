@@ -65,12 +65,13 @@ final class EditorArea extends Editor {
       @Override
       public void focusGained(final FocusEvent e) {
         // refresh query path and work directory
-        gui.context.prop.set(Prop.QUERYPATH, file.path());
+        final String path = file.path();
+        gui.context.prop.set(Prop.QUERYPATH, path);
         gui.gprop.set(GUIProp.WORKPATH, file.dirPath());
         // reload file if it has been changed
         reopen(false);
-        // parse content
-        release(Action.PARSE);
+        // skip parsing if editor contains file that is currently marked as erroneous
+        if(!path.equals(view.errFile)) release(Action.PARSE);
       }
     });
   }

@@ -36,13 +36,10 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class EditorView extends View {
-  /** Error string. */
-  private static final String ERRSTRING = STOPPED_AT + ' ' +
-      (LINE_X + ", " + COLUMN_X).replaceAll("%", "([0-9]+)");
   /** XQuery error pattern. */
   private static final Pattern XQERROR = Pattern.compile(
-      ".*" + ERRSTRING + ' ' + IN_FILE_X.replaceAll("%", "(.*?)") + COL +
-      "\r?\n.*", Pattern.DOTALL);
+      ".*" + (LINE_X + ", " + COLUMN_X).replaceAll("%", "([0-9]+)") + ' ' +
+      IN_FILE_X.replaceAll("%", "(.*?)") + "($|" + COL + "\r?\n.*)", Pattern.DOTALL);
   /** XML error pattern. */
   private static final Pattern XMLERROR = Pattern.compile(
       LINE_X.replaceAll("%", "(.*?)") + COL + ".*");
@@ -465,7 +462,8 @@ public final class EditorView extends View {
       info.setCursor(GUIConstants.CURSORARROW);
       info.setText(msg, Msg.SUCCESS).setToolTipText(null);
     } else {
-      info.setCursor(error(msg) ? GUIConstants.CURSORHAND : GUIConstants.CURSORARROW);
+      error(msg, false);
+      info.setCursor(GUIConstants.CURSORHAND);
       info.setText(ERRORINFO.matcher(msg).replaceAll(""), Msg.ERROR);
       info.setToolTipText(
           "<html>" + STOPPED_AT + ERRORTT.matcher(msg).replaceAll("").
@@ -480,25 +478,30 @@ public final class EditorView extends View {
 
   /**
    * Handles info messages resulting from a query execution.
+   * @param open open addressed file
    * @param msg info message
-   * @return true if error was found
    */
-  private boolean error(final String msg) {
+  public void error(final String msg, final boolean open) {
     Matcher m = XQERROR.matcher(msg);
     int el, ec = 2;
-    if(!m.matches()) {
-      m = XMLERROR.matcher(msg);
-      if(!m.matches()) return true;
-      el = Integer.parseInt(m.group(1));
-      errFile = getEditor().file.path();
-    } else {
-      el = Integer.parseInt(m.group(1));
-      ec = Integer.parseInt(m.group(2));
+    if(m.matches()) {
+      el = Token.toInt(m.group(1));
+      ec = Token.toInt(m.group(2));
       errFile = m.group(3);
+    } else {
+      m = XMLERROR.matcher(msg);
+      if(!m.matches()) return;
+      el = Token.toInt(m.group(1));
+      errFile = getEditor().file.path();
     }
 
-    final EditorArea edit = find(IO.get(errFile), false);
-    if(edit == null) return true;
+    EditorArea edit = find(IO.get(errFile), false);
+    if(open) {
+      if(edit == null) edit = open(new IOFile(errFile));
+      tabs.setSelectedComponent(edit);
+    } else {
+      if(edit == null) return;
+    }
 
     // find approximate error position
     final int ll = edit.last.length;
@@ -518,7 +521,11 @@ public final class EditorView extends View {
     }
     edit.error(ep);
     errPos = ep;
-    return true;
+
+    if(open) {
+      edit.jumpError(errPos);
+      posCode.invokeLater();
+    }
   }
 
   /**
