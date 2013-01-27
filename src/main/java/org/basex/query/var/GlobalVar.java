@@ -159,6 +159,18 @@ public final class GlobalVar extends VarRef {
   }
 
   @Override
+  public VarUsage count(final Var v) {
+    return VarUsage.NEVER;
+  }
+
+  @Override
+  public Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    // global variables cannot contain free references to local ones
+    return null;
+  }
+
+  @Override
   public boolean visitVars(final VarVisitor visitor) {
     return expr.visitVars(visitor);
   }

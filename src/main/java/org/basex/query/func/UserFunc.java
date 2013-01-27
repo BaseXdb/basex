@@ -125,9 +125,9 @@ public class UserFunc extends Single implements Scope {
 
     // compile closure
     ArrayList<Entry<Var, Value>> propagate = null;
-    final Iterator<Entry<Var, LocalVarRef>> cls = scope.closure().entrySet().iterator();
+    final Iterator<Entry<Var, Expr>> cls = scope.closure().entrySet().iterator();
     while(cls.hasNext()) {
-      final Entry<Var, LocalVarRef> e = cls.next();
+      final Entry<Var, Expr> e = cls.next();
       final Expr c = e.getValue().compile(ctx, outer);
       if(c.isValue()) {
         if(propagate == null) propagate = new ArrayList<Entry<Var, Value>>();
@@ -144,7 +144,7 @@ public class UserFunc extends Single implements Scope {
           ctx.set(e.getKey(), e.getValue(), info);
 
       expr = expr.compile(ctx, scope);
-      scope.cleanUp(ctx, this);
+      scope.cleanUp(this);
     } finally {
       scope.exit(ctx, sf);
     }
@@ -221,6 +221,28 @@ public class UserFunc extends Single implements Scope {
   }
 
   @Override
+  public VarUsage count(final Var v) {
+    VarUsage all = VarUsage.NEVER;
+    for(final Entry<Var, Expr> e : scope.closure().entrySet())
+      if((all = all.plus(e.getValue().count(v))) == VarUsage.MORE_THAN_ONCE) break;
+    return all;
+  }
+
+  @Override
+  public Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    boolean change = false;
+    for(final Entry<Var, Expr> entry : scope.closure().entrySet()) {
+      final Expr val = entry.getValue().inline(ctx, scp, v, e);
+      if(val != null) {
+        change = true;
+        entry.setValue(val);
+      }
+    }
+    return change ? optimize(ctx, scp) : null;
+  }
+
+  @Override
   public void plan(final FElem plan) {
     final FElem el = planElem(NAM, name.string());
     addPlan(plan, el, expr);
@@ -260,7 +282,7 @@ public class UserFunc extends Single implements Scope {
 
   @Override
   public boolean visitVars(final VarVisitor visitor) {
-    for(final Entry<Var, LocalVarRef> e : scope.closure().entrySet())
+    for(final Entry<Var, Expr> e : scope.closure().entrySet())
       if(!e.getValue().visitVars(visitor)) return false;
     return visitor.subScope(this);
   }

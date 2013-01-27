@@ -124,6 +124,18 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   @Override
+  public final VarUsage count(final Var v) {
+    return VarUsage.NEVER;
+  }
+
+  @Override
+  public Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    // values do not contain variable references
+    return null;
+  }
+
+  @Override
   public boolean databases(final StringList db) {
     final Data data = data();
     if(data != null) db.add(data.meta.name);

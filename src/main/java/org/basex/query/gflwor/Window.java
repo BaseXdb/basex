@@ -32,11 +32,11 @@ public class Window extends GFLWOR.Clause {
   /** The sequence. */
   Expr expr;
   /** The start condition. */
-  final Condition start;
+  Condition start;
   /** the {@code only} flag. */
   final boolean only;
   /** The end condition, possibly {@code null}. */
-  final Condition end;
+  Condition end;
 
   /**
    * Constructor.
@@ -275,6 +275,24 @@ public class Window extends GFLWOR.Clause {
   }
 
   @Override
+  public VarUsage count(final Var v) {
+    final VarUsage us = end == null ? start.count(v) : start.count(v).plus(end.count(v));
+    return us != VarUsage.NEVER ? VarUsage.MORE_THAN_ONCE : expr.count(v);
+  }
+
+  @Override
+  public GFLWOR.Clause inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    final Expr ex = expr.inline(ctx, scp, v, e);
+    final Condition st = start.inline(ctx, scp, v, e),
+        en = end == null ? null : end.inline(ctx, scp, v, e);
+    if(ex != null) expr = ex;
+    if(st != null) start = st;
+    if(en != null) end = en;
+    return ex != null || st != null || en != null ? optimize(ctx, scp) : null;
+  }
+
+  @Override
   public boolean visitVars(final VarVisitor visitor) {
     return expr.visitVars(visitor) && start.visitVars(visitor)
         && (end == null || end.visitVars(visitor)) && visitor.declared(var);
@@ -362,6 +380,18 @@ public class Window extends GFLWOR.Clause {
     public Expr compile(final QueryContext cx, final VarScope scp) throws QueryException {
       expr = expr.compile(cx, scp).compEbv(cx);
       return this;
+    }
+
+    @Override
+    public Condition optimize(final QueryContext ctx, final VarScope scp)
+        throws QueryException {
+      return this;
+    }
+
+    @Override
+    public Condition inline(final QueryContext ctx, final VarScope scp,
+        final Var v, final Expr e) throws QueryException {
+      return (Condition) super.inline(ctx, scp, v, e);
     }
 
     /**

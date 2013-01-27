@@ -151,7 +151,7 @@ public abstract class Preds extends ParseExpr {
 
   @Override
   public boolean removable(final Var v) {
-    for(final Expr p : preds) if(p.count(v) != 0) return false;
+    for(final Expr p : preds) if(p.uses(v)) return false;
     return true;
   }
 
@@ -159,6 +159,17 @@ public abstract class Preds extends ParseExpr {
   public Expr remove(final Var v) {
     for(int p = 0; p < preds.length; ++p) preds[p] = preds[p].remove(v);
     return this;
+  }
+
+  @Override
+  public VarUsage count(final Var v) {
+    return VarUsage.sum(v, preds);
+  }
+
+  @Override
+  public Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    return inlineAll(ctx, scp, preds, v, e) ? optimize(ctx, scp) : null;
   }
 
   @Override

@@ -116,6 +116,26 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
+  public VarUsage count(final Var v) {
+    VarUsage all = cond.count(v);
+    for(final SwitchCase cs : cases)
+      if((all = all.plus(cs.countCases(v))) == VarUsage.MORE_THAN_ONCE) break;
+    return all.plus(VarUsage.maximum(v, cases));
+  }
+
+  @Override
+  public Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    boolean change = inlineAll(ctx, scp, cases, v, e);
+    final Expr cn = cond.inline(ctx, scp, v, e);
+    if(cn != null) {
+      change = true;
+      cond = cn;
+    }
+    return change ? optimize(ctx, scp) : null;
+  }
+
+  @Override
   public boolean databases(final StringList db) {
     for(final SwitchCase sc : cases) if(!sc.databases(db)) return false;
     return cond.databases(db);

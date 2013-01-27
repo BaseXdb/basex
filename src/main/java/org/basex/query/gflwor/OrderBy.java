@@ -25,7 +25,9 @@ import org.basex.util.list.*;
  */
 public class OrderBy extends GFLWOR.Clause {
   /** Variables to sort. */
-  LocalVarRef[] tvars;
+  Var[] tvars;
+  /** Expressions bound to the variables. */
+  Expr[] texpr;
   /** Sort keys. */
   final Key[] keys;
   /** Stable sort flag. */
@@ -41,7 +43,12 @@ public class OrderBy extends GFLWOR.Clause {
   public OrderBy(final LocalVarRef[] vs, final Key[] ks, final boolean stbl,
       final InputInfo ii) {
     super(ii);
-    tvars = vs;
+    tvars = new Var[vs.length];
+    texpr = new Expr[vs.length];
+    for(int i = 0; i < vs.length; i++) {
+      tvars[i] = vs[i].var;
+      texpr[i] = vs[i];
+    }
     keys = ks;
     stable = stbl;
   }
@@ -63,7 +70,7 @@ public class OrderBy extends GFLWOR.Clause {
         final Value[] tuple = tpls[p];
         // free the space occupied by the tuple
         tpls[p] = null;
-        for(int i = 0; i < tvars.length; i++) ctx.set(tvars[i].var, tuple[i], info);
+        for(int i = 0; i < tvars.length; i++) ctx.set(tvars[i], tuple[i], info);
         return true;
       }
 
@@ -82,7 +89,7 @@ public class OrderBy extends GFLWOR.Clause {
           tuples.add(key);
 
           final Value[] vals = new Value[tvars.length];
-          for(int i = 0; i < tvars.length; i++) vals[i] = tvars[i].value(ctx);
+          for(int i = 0; i < tvars.length; i++) vals[i] = texpr[i].value(ctx);
           tuples.add(vals);
         }
 
@@ -244,17 +251,31 @@ public class OrderBy extends GFLWOR.Clause {
   }
 
   @Override
+  public VarUsage count(final Var v) {
+    return VarUsage.maximum(v, texpr) != VarUsage.NEVER
+        ? VarUsage.MORE_THAN_ONCE : VarUsage.sum(v, keys);
+  }
+
+  @Override
+  public GFLWOR.Clause inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    return inlineAll(ctx, scp, keys, v, e) | inlineAll(ctx, scp, texpr, v, e)
+        ? optimize(ctx, scp) : null;
+  }
+
+  @Override
   public boolean visitVars(final VarVisitor visitor) {
-    for(final LocalVarRef ref : tvars) if(!visitor.used(ref)) return false;
-    return visitor.visitAll(keys);
+    return visitor.visitAll(texpr) && visitor.visitAll(keys);
   }
 
   @Override
   boolean clean(final QueryContext ctx, final BitArray used) {
     final int len = tvars.length;
     for(int i = 0; i < tvars.length; i++)
-      if(!used.get(tvars[i].var.id))
+      if(!used.get(tvars[i].id)) {
+        texpr = Array.delete(texpr, i);
         tvars = Array.delete(tvars, i--);
+      }
     return tvars.length < len;
   }
 
@@ -316,7 +337,7 @@ public class OrderBy extends GFLWOR.Clause {
     public String toString() {
       final StringBuilder sb = new StringBuilder(expr.toString());
       if(desc) sb.append(' ').append(DESCENDING);
-      if(least) sb.append(' ').append(EMPTYORD).append(' ').append(LEAST);
+      sb.append(' ').append(EMPTYORD).append(' ').append(least ? LEAST : GREATEST);
       return sb.toString();
     }
   }

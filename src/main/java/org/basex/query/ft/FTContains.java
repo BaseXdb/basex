@@ -127,6 +127,22 @@ public class FTContains extends ParseExpr {
   }
 
   @Override
+  public VarUsage count(final Var v) {
+    return expr.count(v).plus(ftexpr.count(v));
+  }
+
+  @Override
+  public Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    final Expr ex = expr.inline(ctx, scp, v, e);
+    if(ex != null) expr = ex;
+    final FTExpr fte = ftexpr.inline(ctx, scp, v, e);
+    if(fte != null) ftexpr = fte;
+
+    return ex != null || fte != null ? optimize(ctx, scp) : null;
+  }
+
+  @Override
   public boolean databases(final StringList db) {
     return expr.databases(db) && ftexpr.databases(db);
   }

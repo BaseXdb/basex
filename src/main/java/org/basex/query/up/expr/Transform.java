@@ -103,6 +103,18 @@ public final class Transform extends Arr {
   }
 
   @Override
+  public VarUsage count(final Var v) {
+    return VarUsage.sum(v, copies).plus(super.count(v));
+  }
+
+  @Override
+  public Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    final boolean cp = inlineAll(ctx, scp, copies, v, e);
+    return inlineAll(ctx, scp, expr, v, e) || cp ? optimize(ctx, scp) : null;
+  }
+
+  @Override
   public boolean databases(final StringList db) {
     for(final Let c : copies) if(!c.databases(db)) return false;
     return super.databases(db);

@@ -415,6 +415,23 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
+  public VarUsage count(final Var v) {
+    return occ != null ? VarUsage.sum(v, occ).plus(query.count(v)) : query.count(v);
+  }
+
+  @Override
+  public FTExpr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    boolean change = occ != null && inlineAll(ctx, scp, occ, v, e);
+    final Expr q = query.inline(ctx, scp, v, e);
+    if(q != null) {
+      query = q;
+      change = true;
+    }
+    return change ? optimize(ctx, scp) : null;
+  }
+
+  @Override
   public boolean databases(final StringList db) {
     if(occ != null) for(final Expr o : occ) if(!o.databases(db)) return false;
     return query.databases(db);

@@ -98,6 +98,18 @@ public final class FTDistance extends FTFilter {
   }
 
   @Override
+  public VarUsage count(final Var v) {
+    return super.count(v).plus(VarUsage.sum(v, dist));
+  }
+
+  @Override
+  public FTExpr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    return inlineAll(ctx, scp, expr, v, e) | inlineAll(ctx, scp, dist, v, e)
+        ? optimize(ctx, scp) : null;
+  }
+
+  @Override
   public boolean databases(final StringList db) {
     for(final Expr d : dist) if(!d.databases(db)) return false;
     return super.databases(db);

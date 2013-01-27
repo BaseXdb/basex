@@ -72,7 +72,7 @@ public class InlineFunc extends UserFunc {
 
     // collect closure
     final Map<Var, Value> clos = new HashMap<Var, Value>();
-    for(final Entry<Var, LocalVarRef> e : scope.closure().entrySet())
+    for(final Entry<Var, Expr> e : scope.closure().entrySet())
       clos.put(e.getKey(), e.getValue().value(ctx));
 
     return new FuncItem(args, expr, ft, clos, c, scope);
@@ -136,13 +136,13 @@ public class InlineFunc extends UserFunc {
 
   @Override
   public boolean visit(final VarVisitor visitor) {
-    final Map<Var, LocalVarRef> clos = scope.closure();
+    final Map<Var, Expr> clos = scope.closure();
     if(clos.isEmpty()) return visitor.withVars(args, expr);
 
     final Var[] cls = new Var[clos.size()];
     int i = cls.length;
-    for(final Entry<Var, LocalVarRef> v : clos.entrySet()) {
-      if(!(visitor.used(v.getValue()) && visitor.declared(v.getKey()))) return false;
+    for(final Entry<Var, Expr> v : clos.entrySet()) {
+      if(!(v.getValue().visitVars(visitor) && visitor.declared(v.getKey()))) return false;
       cls[--i] = v.getKey();
     }
     if(!visitor.withVars(args, expr)) return false;

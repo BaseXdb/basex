@@ -59,6 +59,17 @@ public abstract class Arr extends ParseExpr {
   }
 
   @Override
+  public VarUsage count(final Var v) {
+    return VarUsage.sum(v, expr);
+  }
+
+  @Override
+  public Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    return inlineAll(ctx, scp, expr, v, e) ? optimize(ctx, scp) : null;
+  }
+
+  @Override
   public boolean databases(final StringList db) {
     for(final Expr e : expr) if(!e.databases(db)) return false;
     return true;

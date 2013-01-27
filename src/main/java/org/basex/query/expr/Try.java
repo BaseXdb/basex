@@ -76,6 +76,15 @@ public final class Try extends Single {
   }
 
   @Override
+  public Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    final boolean ct = inlineAll(ctx, scp, ctch, v, e);
+    final Expr sub = expr.inline(ctx, scp, v, e);
+    if(sub != null) expr = sub;
+    return ct || sub != null ? optimize(ctx, scp) : null;
+  }
+
+  @Override
   public boolean uses(final Use u) {
     for(final Catch c : ctch) if(c.uses(u)) return true;
     return super.uses(u);
@@ -114,5 +123,10 @@ public final class Try extends Single {
   @Override
   public boolean visitVars(final VarVisitor visitor) {
     return expr.visitVars(visitor) && visitor.visitAll(ctch);
+  }
+
+  @Override
+  public VarUsage count(final Var v) {
+    return VarUsage.maximum(v, ctch).plus(super.count(v));
   }
 }

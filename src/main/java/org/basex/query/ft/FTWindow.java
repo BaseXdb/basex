@@ -97,6 +97,20 @@ public final class FTWindow extends FTFilter {
   }
 
   @Override
+  public VarUsage count(final Var v) {
+    return win.count(v).plus(super.count(v));
+  }
+
+  @Override
+  public FTExpr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    final boolean ex = inlineAll(ctx, scp, expr, v, e);
+    final Expr w = win.inline(ctx, scp, v, e);
+    if(w != null) win = w;
+    return ex || w != null ? optimize(ctx, scp) : null;
+  }
+
+  @Override
   public boolean databases(final StringList db) {
     return win.databases(db) && super.databases(db);
   }

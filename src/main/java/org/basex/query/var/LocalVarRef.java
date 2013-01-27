@@ -3,7 +3,6 @@ package org.basex.query.var;
 import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.UserFuncCall;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -33,7 +32,6 @@ public final class LocalVarRef extends VarRef {
     var = v;
   }
 
-  @SuppressWarnings({ "unused", "null"})
   @Override
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
 
@@ -41,39 +39,7 @@ public final class LocalVarRef extends VarRef {
     size = var.size;
 
     // constant propagation
-    if(ctx.isBound(var)) return ctx.get(var);
-
-    Expr e = null; // [LW] ctx.getExpr(var);
-    // return if variable expression has not yet been assigned
-    if(e == null) return this;
-
-    /* Choose expressions to be pre-evaluated.
-     * If a variable is pre-evaluated, it may not be available for further
-     * optimizations (index access, count, ...). On the other hand, repeated
-     * evaluation of the same expression is avoided.
-     *
-     * [CG][LW] Variables are currently pre-evaluated if...
-     * - namespaces are used
-     * - they are given a type
-     * - they contain an element constructor (mandatory)
-     * - they contain a function call
-     */
-    if(var.checksType() || e.uses(Use.CNS) || e instanceof UserFuncCall) {
-      e = ctx.get(var);
-    }
-
-    return e;
-  }
-
-  /**
-   * Sets the referenced variable.
-   * @param v new variable
-   */
-  public void setVar(final Var v) {
-    var = v;
-    name = v.name;
-    type = var.type();
-    size = var.size;
+    return ctx.isBound(var) ? ctx.get(var) : this;
   }
 
   @Override
@@ -105,6 +71,17 @@ public final class LocalVarRef extends VarRef {
   @Override
   public Expr remove(final Var v) {
     return var.is(v) ? new Context(info) : this;
+  }
+
+  @Override
+  public VarUsage count(final Var v) {
+    return var.is(v) ? VarUsage.ONCE : VarUsage.NEVER;
+  }
+
+  @Override
+  public Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    return v.is(var) ? e : null;
   }
 
   @Override

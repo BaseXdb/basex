@@ -30,11 +30,11 @@ public final class FlworOptimizeTest extends QueryPlanTest {
     check("let $seq := ('a', 'b', 'c') " +
         "for $i in 1 to count($seq) " +
         "for $j in $i + 1 to count($seq) " +
-        "let $a := $seq[$i] " +
+        "let $a as xs:string := $seq[$i] " +
         "return concat($i, $j, $a)",
 
         "12a 13a 23b",
-        "let $a := //Let[Var/@name = '$a'] return " +
+        "let $a := //Let[starts-with(Var/@name, '$a')] return " +
         "//For[Var/@name eq '$i'] << $a and $a << //For[Var/@name eq '$j']"
     );
   }
@@ -44,20 +44,21 @@ public final class FlworOptimizeTest extends QueryPlanTest {
     check("let $seq := ('a', 'b', 'c') " +
         "for $i in 1 to count($seq) " +
         "for $j in $i + 1 to count($seq) " +
-        "let $b := $seq[$j] " +
+        "let $b as xs:string := $seq[$j] " +
         "return concat($i, $j, $b)",
 
         "12b 13c 23c",
-        Util.info("every $f in //% satisfies $f << //%[Var/@name eq '$b']",
+        Util.info("every $f in //% satisfies $f << //%[starts-with(Var/@name, '$b')]",
             For.class, Let.class)
     );
   }
 
   /** Tests the relocation of a let clause. */
   @Test public void dontMove2() {
-    check("let $a := <a/> let $b := <b/> let $c as element(a) := $a return ($c,$b)",
-        "<a/>" + Prop.NL + "<b/>",
-        Util.info("//Let[Var/@name='$a'] << //Let[Var/@name='$b'] and " +
+    check("let $a as element(a) := <a/> let $b := <b/> let $c as element(a) := $a " +
+        "for $i in 1 to 2 return ($c,$b)",
+        "<a/>" + Prop.NL + "<b/>" + Prop.NL + "<a/>" + Prop.NL + "<b/>",
+        Util.info("//Let[starts-with(Var/@name,'$a')] << //Let[Var/@name='$b'] and " +
             "//Let[Var/@name='$b'] << //Let[starts-with(Var/@name, '$c')]")
     );
   }
@@ -78,7 +79,7 @@ public final class FlworOptimizeTest extends QueryPlanTest {
   /** Tests the relocation of a where clause. */
   @Test public void slideWhere() {
     check("for $i at $p in 1 to 1000 " +
-        "let $sum := sum(1 to $i * $i) " +
+        "let $sum as xs:integer := sum(1 to $i * $i) " +
         "where $i lt 5 " +
         "return $sum",
 
@@ -95,6 +96,7 @@ public final class FlworOptimizeTest extends QueryPlanTest {
     );
   }
 
+  /** Tests if multiple successive where clauses are merged into one. */
   @Test public void mergeWheresTest() {
     Prop.debug = true;
     check("let $rnd := random:double() where $rnd div 2 >= 0.2 where $rnd < 0.5 " +
@@ -105,20 +107,25 @@ public final class FlworOptimizeTest extends QueryPlanTest {
     );
   }
 
+  /** Tests if where clauses are converted to predicates where applicable. */
   @Test public void whereToPred() {
     check("for $i in 1 to 10 where <x/>[$i] and $i < 3 return $i",
         "1",
         "exists(//Where) and exists(//For/Filter)"
     );
-  }
-
-  @Test public void noWhereToPred() {
     check("for $i in 1 to 10 where (<a/>)[$i] return $i",
         "1",
         "exists(//Where)"
     );
+    check("for $i in 1 to 3 " +
+        "where count(for $j in 1 to $i group by $k := $j mod 2 return $i) > 1 " +
+        "return $i",
+        "2 3",
+        "empty(//Where) and exists(//Filter)"
+    );
   }
 
+  /** Tests if let clauses are moved out of any loop they don't depend on. */
   @Test public void slideLet() {
     check("for $i in 0 to 3, $j in 0 to 3 where (<x/>)[$i + $j] " +
         "let $foo := $i * $i return $foo * $foo",
@@ -133,7 +140,7 @@ public final class FlworOptimizeTest extends QueryPlanTest {
 
     check("for $len in 1 to 3 " +
         "for sliding window $w in 1 to 3 start at $p when true() only " +
-        "end at $q when $q - $p + 1 eq $len let $x := $len div 2 " +
+        "end at $q when $q - $p + 1 eq $len let $x as xs:decimal := $len div 2 " +
         "return count($w) div (2 * $x)",
 
         "1 1 1 1 1 1",
@@ -141,15 +148,18 @@ public final class FlworOptimizeTest extends QueryPlanTest {
     );
   }
 
+  /** Tests if multiple let clauses are all moved to their optimal position. */
   @Test public void slideMultipleLets() {
     check("for $i in 1 to 2 for $j in 1 to 2 " +
-        "let $a := 3 * $i, $b := 2 * $i return $a - $b",
+        "let $a as xs:integer := 3 * $i, $b as xs:integer := 2 * $i return $a - $b",
         "1 1 2 2",
         "exists(//For[every $let in //Let satisfies . << $let])",
-        "exists(//For[every $let in //Let satisfies . >> $let])"
+        "exists(//For[every $let in //Let satisfies . >> $let])",
+        "//Let[starts-with(Var/@name, '$a')] << //Let[starts-with(Var/@name, '$b')]"
     );
   }
 
+  /** Tests if where clauses containing non-deterministic expressions are left alone. */
   @Test public void dontSlideWhereNDT() {
     check("for $x in 1 to 100 where random:double() gt 0.5 return $x",
         null,
@@ -157,6 +167,7 @@ public final class FlworOptimizeTest extends QueryPlanTest {
     );
   }
 
+  /** Tests if let clauses containing non-deterministic expressions are left alone. */
   @Test public void dontSlideLetNDT() {
     check("for $i in 1 to 10 let $rnd := random:double() return $i * $rnd",
         null,
@@ -164,8 +175,9 @@ public final class FlworOptimizeTest extends QueryPlanTest {
     );
   }
 
+  /** Tests if let clauses containing node constructors are left alone. */
   @Test public void dontSlideLetCNS() {
-    check("for $i in 1 to 10 let $x := <x/> return ($i, $x)",
+    check("for $i in 1 to 10 let $x as element(x) := <x/> return ($i, $x)",
         null,
         "exactly-one(//For) << exactly-one(//Let)"
     );
@@ -204,13 +216,30 @@ public final class FlworOptimizeTest extends QueryPlanTest {
     );
   }
 
+  /** Tests if redundant FLWOR expressions are eliminated. */
   @Test public void eliminateFLWORTest() {
     check("let $x := (23, 42) where true() for $y in $x return $y",
         "23 42",
-        "empty(//(GFLWOR, For, Let))"
+        "empty(//GFLWOR)"
     );
   }
 
+  /** Tests FLWOR expressions containing updates or non-determinism are left alone. */
+  @Test public void dontEliminateFLWORTest() {
+    check("copy $x := <x/> modify " +
+        "  for $i in 1 to 3 let $y := <y>{$i}</y> return insert node $y into $x " +
+        "return $x",
+        String.format("<x>%1$s  <y>1</y>%1$s  <y>2</y>%1$s  <y>3</y>%1$s</x>", Prop.NL),
+        "exists(//GFLWOR) and exists(//Insert)"
+    );
+
+    check("for $i in 1 to 3 let $x := $i * $i return error()",
+        null,
+        "exists(//GFLWOR)"
+    );
+  }
+
+  /** Tests if empty FLWOR expressions are replaced by the empty sequence. */
   @Test public void eliminateEmptyFLWORTest() {
     // literal false()
     check("for $x in 1 to 100 where false() return $x",

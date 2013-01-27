@@ -51,7 +51,7 @@ public class Filter extends Preds {
       if(root.isEmpty()) return optPre(null, ctx);
       // convert filters without numeric predicates to axis paths
       if(root instanceof AxisPath && !super.uses(Use.POS))
-        return ((AxisPath) root).copy().addPreds(preds).compile(ctx, scp);
+        return ((AxisPath) root).copy().addPreds(ctx, scp, preds).compile(ctx, scp);
 
       // optimize filter expressions
       ctx.value = null;
@@ -111,6 +111,12 @@ public class Filter extends Preds {
   }
 
   @Override
+  public Filter optimize(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+    return this;
+  }
+
+  @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     Value val = root.value(ctx);
     final Value cv = ctx.value;
@@ -161,12 +167,16 @@ public class Filter extends Preds {
 
   /**
    * Adds a predicate to the filter.
+   * @param ctx query context
+   * @param scp variable scope
    * @param p predicate to be added
    * @return self reference
+   * @throws QueryException query exception
    */
-  public final Filter addPred(final Expr p) {
+  public final Filter addPred(final QueryContext ctx, final VarScope scp, final Expr p)
+      throws QueryException {
     preds = Array.add(preds, p);
-    return this;
+    return optimize(ctx, scp);
   }
 
   @Override
@@ -183,6 +193,24 @@ public class Filter extends Preds {
   public final Expr remove(final Var v) {
     root = root.remove(v);
     return super.remove(v);
+  }
+
+  @Override
+  public VarUsage count(final Var v) {
+    final VarUsage inPreds = super.count(v), inRoot = root.count(v);
+    if(inPreds == VarUsage.NEVER) return inRoot;
+    final long sz = root.size();
+    return sz >= 0 && sz <= 1 || root.type().zeroOrOne()
+        ? inRoot.plus(inPreds) : VarUsage.MORE_THAN_ONCE;
+  }
+
+  @Override
+  public Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    final boolean pr = super.inline(ctx, scp, v, e) != null;
+    final Expr rt = root == null ? null : root.inline(ctx, scp, v, e);
+    if(rt != null) root = rt;
+    return pr || rt != null ? optimize(ctx, scp) : null;
   }
 
   @Override

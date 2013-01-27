@@ -1233,8 +1233,8 @@ public class QueryParser extends InputParser {
       if(least) wsCheck(LEAST);
     }
     if(wsConsumeWs(COLLATION)) {
-      final byte[] coll = stringLiteral();
-      if(!eq(URLCOLL, coll)) error(Uri.uri(coll).isValid() ? WHICHCOLL : INVURI, coll);
+      final Uri coll = uriLiteral();
+      if(!eq(URLCOLL, coll.string())) error(coll.isValid() ? WHICHCOLL : INVURI, coll);
     }
     final OrderBy.Key ord = new OrderBy.Key(info(), e, desc, least);
     return order == null ? new OrderBy.Key[] { ord } : Array.add(order, ord);
@@ -2256,6 +2256,17 @@ public class QueryParser extends InputParser {
       tok.add(del);
     }
     return tok.finish();
+  }
+
+  /**
+   * Reads and potentially resolves a URI literal.
+   * @return resolved URI
+   * @throws QueryException query exception
+   */
+  private Uri uriLiteral() throws QueryException {
+    Uri uri = Uri.uri(stringLiteral());
+    if(!uri.isValid()) throw INVURI.thrw(info(), uri);
+    return uri.isAbsolute() ? uri : ctx.sc.baseURI().resolve(uri);
   }
 
   /**

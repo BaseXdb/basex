@@ -80,13 +80,7 @@ public abstract class Path extends ParseExpr {
   @Override
   public final Expr compile(final QueryContext ctx, final VarScope scp)
       throws QueryException {
-    if(root != null) {
-      root = root.compile(ctx, scp);
-      if(root instanceof Context) {
-        ctx.compInfo(OPTREMCTX);
-        root = null;
-      }
-    }
+    if(root != null) setRoot(ctx, root.compile(ctx, scp));
 
     final Value v = ctx.value;
     try {
@@ -95,6 +89,15 @@ public abstract class Path extends ParseExpr {
     } finally {
       ctx.value = v;
     }
+  }
+
+  @Override
+  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+    if(root instanceof Context) {
+      ctx.compInfo(OPTREMCTX);
+      root = null;
+    }
+    return this;
   }
 
   /**
@@ -123,6 +126,19 @@ public abstract class Path extends ParseExpr {
     if(!(root instanceof Root) || v == null) return null;
     // return context sequence or root of current context
     return v.size() != 1 ? v : Root.root(v);
+  }
+
+  /**
+   * Sets a new root expression and eliminates a superfluous context item.
+   * @param ctx query context
+   * @param rt root expression
+   */
+  private void setRoot(final QueryContext ctx, final Expr rt) {
+    root = rt;
+    if(root instanceof Context) {
+      ctx.compInfo(OPTREMCTX);
+      root = null;
+    }
   }
 
   @Override
@@ -385,12 +401,16 @@ public abstract class Path extends ParseExpr {
 
   /**
    * Adds a predicate to the last step.
+   * @param ctx query context
+   * @param scp variable scope
    * @param pred predicate to be added
    * @return resulting path instance
+   * @throws QueryException query exception
    */
-  public final Path addPreds(final Expr... pred) {
+  public final Expr addPreds(final QueryContext ctx, final VarScope scp,
+      final Expr... pred) throws QueryException {
     steps[steps.length - 1] = axisStep(steps.length - 1).addPreds(pred);
-    return get(info, root, steps);
+    return get(info, root, steps).optimize(ctx, scp);
   }
 
   @Override
@@ -403,6 +423,31 @@ public abstract class Path extends ParseExpr {
     if(root != null) root = root.remove(v);
     if(root instanceof Context) root = null;
     return this;
+  }
+
+  @Override
+  public VarUsage count(final Var v) {
+    final VarUsage inRoot = root == null ? VarUsage.NEVER : root.count(v);
+    return VarUsage.sum(v, steps) == VarUsage.NEVER ? inRoot : VarUsage.MORE_THAN_ONCE;
+  }
+
+  @Override
+  public final Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+
+    final Value oldVal = ctx.value;
+    try {
+      ctx.value = root(ctx);
+      final Expr rt = root == null ? null : root.inline(ctx, scp, v, e);
+      if(rt != null) {
+        setRoot(ctx, rt);
+        ctx.value = oldVal;
+        ctx.value = root(ctx);
+      }
+      return inlineAll(ctx, scp, steps, v, e) || rt != null ? optimize(ctx, scp) : null;
+    } finally {
+      ctx.value = oldVal;
+    }
   }
 
   @Override

@@ -2,6 +2,7 @@ package org.basex.query.gflwor;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.gflwor.GFLWOR.Clause;
 import org.basex.query.gflwor.GFLWOR.Eval;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -47,6 +48,12 @@ public class Count extends GFLWOR.Clause {
   }
 
   @Override
+  boolean skippable(final Clause cl) {
+    // the clause should not change tuple counts
+    return super.skippable(cl) && cl.calcSize(1) == 1;
+  }
+
+  @Override
   public void plan(final FElem plan) {
     final FElem e = planElem();
     count.plan(e);
@@ -80,6 +87,12 @@ public class Count extends GFLWOR.Clause {
   }
 
   @Override
+  public Clause inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    return null;
+  }
+
+  @Override
   public boolean visitVars(final VarVisitor visitor) {
     return visitor.declared(count);
   }
@@ -97,5 +110,10 @@ public class Count extends GFLWOR.Clause {
   @Override
   long calcSize(final long cnt) {
     return cnt;
+  }
+
+  @Override
+  public VarUsage count(final Var v) {
+    return VarUsage.NEVER;
   }
 }

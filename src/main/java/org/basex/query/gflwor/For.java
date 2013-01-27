@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.gflwor.GFLWOR.Clause;
 import org.basex.query.gflwor.GFLWOR.Eval;
 import org.basex.query.iter.Iter;
 import org.basex.query.path.*;
@@ -151,10 +152,32 @@ public class For extends GFLWOR.Clause {
   }
 
   @Override
+  public VarUsage count(final Var v) {
+    return expr.count(v);
+  }
+
+  @Override
+  public Clause inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    final Expr sub = expr.inline(ctx, scp, v, e);
+    if(sub == null) return null;
+    expr = sub;
+    return optimize(ctx, scp);
+  }
+
+  @Override
   public boolean visitVars(final VarVisitor visitor) {
     return expr.visitVars(visitor) && visitor.declared(var)
         && (pos == null || visitor.declared(pos))
         && (score == null || visitor.declared(score));
+  }
+
+  /**
+   * Tests if this for clause binds only one variable and does not check types.
+   * @return {@code true} if the clause is a simple loop, {@code false} otherwise
+   */
+  protected boolean simple() {
+    return !empty && !var.checksType() && pos == null && score == null;
   }
 
   /**
@@ -195,24 +218,29 @@ public class For extends GFLWOR.Clause {
 
   /**
    * Tries to add the given expression as an attribute to this loop's sequence.
-   * @param e expression to add
+   * @param ctx query context
+   * @param scp variable scope
+   * @param p expression to add
    * @return success
+   * @throws QueryException query exception
    */
-  boolean toPred(final Expr e) {
-    if(pos != null || score != null || !e.removable(var)) return false;
-    e.remove(var);
+  boolean toPred(final QueryContext ctx, final VarScope scp, final Expr p)
+      throws QueryException {
+    if(empty || vars.length > 1 || !p.removable(var)) return false;
+    final Expr r = p.inline(ctx, scp, var, new Context(info)), e = r == null ? p : r;
 
     // attach predicates to axis path or filter, or create a new filter
     final Expr a = e.type().mayBeNumber() ? Function.BOOLEAN.get(info, e) : e;
 
     // add to clause expression
     if(expr instanceof AxisPath) {
-      expr = ((AxisPath) expr).addPreds(a);
+      expr = ((AxisPath) expr).addPreds(ctx, scp, a);
     } else if(expr instanceof Filter) {
-      expr = ((Filter) expr).addPred(a);
+      expr = ((Filter) expr).addPred(ctx, scp, a);
     } else {
       expr = new Filter(info, expr, a);
     }
+
     return true;
   }
 

@@ -43,7 +43,8 @@ public final class Quantifier extends Single {
     super.compile(ctx, scp);
 
     // return pre-evaluated result
-    return expr.size() == 0 ? optPre(Bln.get(every), ctx) : this;
+    return expr.size() == 0 ? optPre(Bln.get(every), ctx) : expr.size() == 1
+        ? optPre(expr, ctx) : this;
   }
 
   @Override

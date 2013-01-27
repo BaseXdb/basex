@@ -43,6 +43,12 @@ public abstract class FTExpr extends ParseExpr {
     return this;
   }
 
+  @Override
+  public FTExpr optimize(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+    return this;
+  }
+
   /**
    * This method is called by the sequential full-text evaluation.
    * @param ctx query context
@@ -78,6 +84,17 @@ public abstract class FTExpr extends ParseExpr {
   public FTExpr remove(final Var v) {
     for(int e = 0; e != expr.length; ++e) expr[e] = expr[e].remove(v);
     return this;
+  }
+
+  @Override
+  public VarUsage count(final Var v) {
+    return VarUsage.sum(v, expr);
+  }
+
+  @Override
+  public FTExpr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    return inlineAll(ctx, scp, expr, v, e) ? optimize(ctx, scp) : null;
   }
 
   @Override

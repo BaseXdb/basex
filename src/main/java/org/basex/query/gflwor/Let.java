@@ -123,7 +123,10 @@ public class Let extends GFLWOR.Clause {
    * @throws QueryException evaluation exception
    */
   void bindConst(final QueryContext ctx) throws QueryException {
-    if(expr.isValue()) ctx.set(var, score ? score(expr.iter(ctx)) : (Value) expr, info);
+    if(expr.isValue()) {
+      ctx.compInfo(QueryText.OPTBIND, var);
+      ctx.set(var, score ? score(expr.iter(ctx)) : (Value) expr, info);
+    }
   }
 
   @Override
@@ -135,6 +138,15 @@ public class Let extends GFLWOR.Clause {
   public Let remove(final Var v) {
     expr = expr.remove(v);
     return this;
+  }
+
+  @Override
+  public GFLWOR.Clause inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    final Expr sub = expr.inline(ctx, scp, v, e);
+    if(sub == null) return null;
+    expr = sub;
+    return optimize(ctx, scp);
   }
 
   @Override
@@ -155,5 +167,10 @@ public class Let extends GFLWOR.Clause {
   @Override
   long calcSize(final long cnt) {
     return cnt;
+  }
+
+  @Override
+  public VarUsage count(final Var v) {
+    return expr.count(v);
   }
 }

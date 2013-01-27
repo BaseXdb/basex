@@ -47,6 +47,17 @@ public abstract class Simple extends ParseExpr {
   }
 
   @Override
+  public VarUsage count(final Var v) {
+    return VarUsage.NEVER;
+  }
+
+  @Override
+  public Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    return null;
+  }
+
+  @Override
   public boolean databases(final StringList db) {
     return true;
   }

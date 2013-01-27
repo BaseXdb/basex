@@ -124,6 +124,20 @@ public final class ValueAccess extends IndexAccess {
   }
 
   @Override
+  public VarUsage count(final Var v) {
+    return expr.count(v);
+  }
+
+  @Override
+  public Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    final Expr sub = expr.inline(ctx, scp, v, e);
+    if(sub == null) return null;
+    expr = sub;
+    return optimize(ctx, scp);
+  }
+
+  @Override
   public boolean databases(final StringList db) {
     return expr.databases(db);
   }

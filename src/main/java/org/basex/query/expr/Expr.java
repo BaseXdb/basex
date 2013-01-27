@@ -44,14 +44,27 @@ public abstract class Expr extends ExprInfo {
   public abstract void checkUp() throws QueryException;
 
   /**
-   * Compiles and optimizes the expression, assigns data types and
-   * cardinalities.
+   * Compiles and optimizes the expression, assigns data types and cardinalities.
    * @param ctx query context
    * @param scp variable scope
    * @return optimized expression
    * @throws QueryException query exception
    */
   public abstract Expr compile(QueryContext ctx, VarScope scp) throws QueryException;
+
+  /**
+   * Recompiles and optimizes an already compiled expression without recompiling its
+   * sub-expressions.
+   * @param ctx query context
+   * @param scp variable scope
+   * @return optimized expression
+   * @throws QueryException query exception
+   */
+  @SuppressWarnings("unused")
+  public Expr optimize(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+    return this;
+  };
 
   /**
    * Evaluates the expression and returns an iterator on the resulting items.
@@ -166,39 +179,27 @@ public abstract class Expr extends ExprInfo {
   public abstract boolean uses(final Use u);
 
   /**
-   * Counts how often the specified variable is used by an expression.
-   * This method is called by:
-   * <ul>
-   * <li> {@link GFLWOR#compile} to rewrite where clauses as predicates and
-   *  remove statically bound or unused clauses</li>
-   * <li> {@link GFLWOR#compHoist} to hoist independent variables</li>
-   * </ul>
+   * Checks if the given variable is used by this expression.
    * @param v variable to be checked
-   * @return number of occurrences
+   * @return {@code true} if the variable is used, {@code false} otherwise
    */
-  public final int count(final Var v) {
-    // circumventing the final-variables restriction
-    final int[] res = new int[1];
-    visitVars(new VarVisitor() {
+  public final boolean uses(final Var v) {
+    // return true iff the the search was aborted, i.e. the variable is used
+    return !visitVars(new VarVisitor() {
       @Override
       public boolean used(final LocalVarRef ref) {
-        if(ref.var.is(v)) res[0]++;
-        return true;
+        // abort when the variable is used
+        return !ref.var.is(v);
       }
     });
-    return res[0];
   }
 
   /**
    * Checks if the specified variable is replaceable by a context item.
    * The following tests might return false:
    * <ul>
-   * <li>{@link Preds#removable}, if one of the variables is used within
-   * a predicate.</li>
-   * <li>{@link MixedPath#removable}, if the variable occurs within
-   * the path.</li>
-   * <li>{@link Group#removable}, as the group by expression depends on
-   * variable references.</li>
+   * <li>{@link Preds#removable}, if one of the variables is used within a predicate.</li>
+   * <li>{@link MixedPath#removable}, if the variable occurs within the path.</li>
    * </ul>
    * This method is called by {@link GFLWOR#compile} to rewrite where clauses
    * into predicates.
@@ -215,6 +216,39 @@ public abstract class Expr extends ExprInfo {
    * @return new expression
    */
   public abstract Expr remove(final Var v);
+
+  /**
+   * Checks how often a variable is used in this expression.
+   * @param v variable to look for
+   * @return how often the variable is used, see {@link VarUsage}
+   */
+  public abstract VarUsage count(final Var v);
+
+  /**
+   * Inlines an expression into this one, replacing all references to the given variable.
+   * @param ctx query context for recompilation
+   * @param scp variable scope for recompilation
+   * @param v variable to replace
+   * @param e expression to inline
+   * @return resulting expression in something changed, {@code null} otherwise
+   * @throws QueryException query exception
+   */
+  public abstract Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException;
+
+  @SuppressWarnings("javadoc")
+  public static boolean inlineAll(final QueryContext ctx, final VarScope scp,
+      final Expr[] expr, final Var v, final Expr e) throws QueryException {
+    boolean change = false;
+    for(int i = 0; i < expr.length; i++) {
+      final Expr nw = expr[i].inline(ctx, scp, v, e);
+      if(nw != null) {
+        expr[i] = nw;
+        change = true;
+      }
+    }
+    return change;
+  }
 
   /**
    * Adds the names of the databases that will be touched by the query.

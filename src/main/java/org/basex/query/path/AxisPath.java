@@ -105,26 +105,40 @@ public class AxisPath extends Path {
     }
     optSteps(ctx);
 
-    // retrieve data reference
-    final Data data = ctx.data();
-    if(data != null && ctx.value.type == NodeType.DOC) {
-      // check index access
-      Expr e = index(ctx, data);
-      // check children path rewriting
-      if(e == this) e = children(ctx, data);
-      // return optimized expression
-      if(e != this) return e.compile(ctx, scp);
-    }
-
-    // analyze if result set can be cached - no predicates/variables...
-    cache = root != null && !uses(Use.VAR);
-
-    // if applicable, use iterative evaluation
-    final Path path = finish(ctx);
+    final Expr path = optimize(ctx, scp);
 
     // heuristics: wrap with filter expression if only one result is expected
     return size() != 1 ? path :
       new Filter(info, this, Pos.get(1, size(), info)).comp2(ctx);
+  }
+
+  @Override
+  public Expr optimize(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+
+    super.optimize(ctx, scp);
+    final Value v = ctx.value;
+    try {
+      ctx.value = root(ctx);
+      // retrieve data reference
+      final Data data = ctx.data();
+      if(data != null && ctx.value.type == NodeType.DOC) {
+        // check index access
+        Expr e = index(ctx, data);
+        // check children path rewriting
+        if(e == this) e = children(ctx, data);
+        // return optimized expression
+        if(e != this) return e.compile(ctx, scp);
+      }
+
+      // analyze if result set can be cached - no predicates/variables...
+      cache = root != null && !uses(Use.VAR);
+
+      // if applicable, use iterative evaluation
+      return finish(ctx);
+    } finally {
+      ctx.value = v;
+    }
   }
 
   /**

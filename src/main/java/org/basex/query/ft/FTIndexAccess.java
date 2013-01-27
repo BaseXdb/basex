@@ -75,6 +75,17 @@ public final class FTIndexAccess extends Simple {
   }
 
   @Override
+  public VarUsage count(final Var v) {
+    return ftexpr.count(v);
+  }
+
+  @Override
+  public Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    return ftexpr.inline(ctx, scp, v, e) == null ? null : optimize(ctx, scp);
+  }
+
+  @Override
   public boolean databases(final StringList db) {
     db.add(ictx.data.meta.name);
     return ftexpr.databases(db);

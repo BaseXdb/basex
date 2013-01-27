@@ -50,4 +50,26 @@ public final class SwitchCase extends Arr {
     sb.append(' ' + RETURN + ' ' + expr[0]);
     return sb.toString();
   }
+
+  /**
+   * {@inheritDoc}
+   * This method counts only the occurrences in the return expression.
+   */
+  @Override
+  public VarUsage count(final Var v) {
+    return expr[0].count(v);
+  }
+
+  /**
+   * Checks how often a variable is used in this expression.
+   * This method counts only the occurrences in the case expressions.
+   * @param v variable to look for
+   * @return number of occurrences
+   */
+  protected VarUsage countCases(final Var v) {
+    VarUsage all = VarUsage.NEVER;
+    for(int i = 1; i < expr.length; i++)
+      if((all.plus(expr[i].count(v))) == VarUsage.MORE_THAN_ONCE) break;
+    return all;
+  }
 }

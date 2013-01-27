@@ -102,6 +102,23 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
+  public VarUsage count(final Var v) {
+    return weight.count(v).plus(super.count(v));
+  }
+
+  @Override
+  public FTExpr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    boolean change = inlineAll(ctx, scp, expr, v, e);
+    final Expr w = weight.inline(ctx, scp, v, e);
+    if(w != null) {
+      weight = w;
+      change = true;
+    }
+    return change ? optimize(ctx, scp) : null;
+  }
+
+  @Override
   public boolean databases(final StringList db) {
     return weight.databases(db) && super.databases(db);
   }

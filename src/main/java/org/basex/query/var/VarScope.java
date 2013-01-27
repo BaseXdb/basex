@@ -9,6 +9,7 @@ import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.util.*;
 
@@ -25,7 +26,7 @@ public final class VarScope {
   private final ArrayList<Var> vars = new ArrayList<Var>();
 
   /** This scope's closure. */
-  private final Map<Var, LocalVarRef> closure = new HashMap<Var, LocalVarRef>();
+  private final Map<Var, Expr> closure = new HashMap<Var, Expr>();
 
   /** This scope's parent scope, used for looking up non-local variables. */
   private final VarScope parent;
@@ -77,9 +78,8 @@ public final class VarScope {
 
       // a variable in the closure
       final Var local = new Var(ctx, name, nonLocal.type());
-      // [LW] WTF? local.refineType(nonLocal.type(), ii);
       add(local);
-      closure.put(local, (LocalVarRef) nonLocal);
+      closure.put(local, nonLocal);
       return new LocalVarRef(ii, local);
     }
 
@@ -153,7 +153,7 @@ public final class VarScope {
    * Get the closure of this scope.
    * @return mapping from non-local to local variables
    */
-  public Map<Var, LocalVarRef> closure() {
+  public Map<Var, Expr> closure() {
     return closure;
   }
 
@@ -180,10 +180,9 @@ public final class VarScope {
   /**
    * Deletes all unused variables from this scope and assigns stack slots.
    * This method should be run after compiling the scope.
-   * @param ctx query context
    * @param expr the scope
    */
-  public void cleanUp(final QueryContext ctx, final Scope expr) {
+  public void cleanUp(final Scope expr) {
     final BitSet declared = new BitSet();
     final AtomicInteger counter = new AtomicInteger();
     expr.visit(new VarVisitor() {
@@ -200,7 +199,6 @@ public final class VarScope {
     while(iter.hasNext()) {
       final Var v = iter.next();
       if(!declared.get(v.id)) {
-        ctx.compInfo(QueryText.OPTVAR, v);
         v.slot = -1;
         iter.remove();
       }

@@ -18,7 +18,6 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
-
 /**
  * The GFLWOR {@code group by} expression.
  *
@@ -28,8 +27,10 @@ import org.basex.util.list.*;
 public class GroupBy extends GFLWOR.Clause {
   /** Grouping specs. */
   final Spec[] by;
-  /** Non-grouping variables. */
-  LocalVarRef[] pre;
+  /** Pre-grouping variables, only for type propagation. */
+  Var[] pre;
+  /** Non-grouping variable expressions. */
+  Expr[] preExpr;
   /** Non-grouping variables. */
   Var[] post;
   /** Number of non-occluded grouping variables. */
@@ -46,7 +47,10 @@ public class GroupBy extends GFLWOR.Clause {
       final InputInfo ii) {
     super(ii, vars(specs, pst));
     by = specs;
-    pre = pr;
+    pre = new Var[pr.length];
+    for(int i = 0; i < pre.length; i++) pre[i] = pr[i].var;
+    preExpr = new Expr[pr.length];
+    System.arraycopy(pr, 0, preExpr, 0, pr.length);
     post = pst;
     int n = 0;
     for(final Spec spec : by) if(!spec.occluded) n++;
@@ -127,7 +131,7 @@ public class GroupBy extends GFLWOR.Clause {
 
           if(grp == null) {
             // new group, add it to the list
-            final ValueBuilder[] ngs = new ValueBuilder[pre.length];
+            final ValueBuilder[] ngs = new ValueBuilder[preExpr.length];
             for(int i = 0; i < ngs.length; i++) ngs[i] = new ValueBuilder();
             grp = new Group(key, ngs);
             grps.add(grp);
@@ -142,7 +146,7 @@ public class GroupBy extends GFLWOR.Clause {
             }
           }
 
-          for(int j = 0; j < pre.length; j++) grp.ngv[j].add(pre[j].value(ctx));
+          for(int j = 0; j < preExpr.length; j++) grp.ngv[j].add(preExpr[j].value(ctx));
         }
 
         // we're finished, copy the array so the list can be garbage-collected
@@ -191,10 +195,9 @@ public class GroupBy extends GFLWOR.Clause {
   public GroupBy compile(final QueryContext cx, final VarScope sc) throws QueryException {
     for(int i = 0; i < by.length; i++) by[i].compile(cx, sc);
     for(int i = 0; i < pre.length; i++) {
-      final Var inv = pre[i].var, outv = post[i];
-      final SeqType it = inv.type();
-      outv.refineType(SeqType.get(it.type, it.mayBeZero() ? Occ.ZERO_MORE : Occ.ONE_MORE),
-          info);
+      final SeqType it = pre[i].type();
+      post[i].refineType(
+          SeqType.get(it.type, it.mayBeZero() ? Occ.ZERO_MORE : Occ.ONE_MORE), info);
     }
     return this;
   }
@@ -212,23 +215,38 @@ public class GroupBy extends GFLWOR.Clause {
   }
 
   @Override
+  public VarUsage count(final Var v) {
+    return VarUsage.sum(v, by).plus(VarUsage.sum(v, preExpr));
+  }
+
+  @Override
+  public GFLWOR.Clause inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    final boolean b = inlineAll(ctx, scp, by, v, e),
+        p = inlineAll(ctx, scp, preExpr, v, e);
+    return b || p ? optimize(ctx, scp) : null;
+  }
+
+  @Override
   public boolean visitVars(final VarVisitor visitor) {
     if(!visitor.visitAll(by)) return false;
-    for(final LocalVarRef ng : pre) if(!visitor.used(ng)) return false;
+    for(final Expr ng : preExpr) if(!ng.visitVars(visitor)) return false;
     for(final Var ng : post) if(!visitor.declared(ng)) return false;
     return true;
   }
 
   @Override
   boolean clean(final QueryContext ctx, final BitArray used) {
+    // [LW] does not fix {@link #vars}
     final int len = pre.length;
     for(int i = 0; i < post.length; i++) {
       if(!used.get(post[i].id)) {
         pre  = Array.delete(pre, i);
+        preExpr = Array.delete(preExpr, i);
         post = Array.delete(post, i--);
       }
     }
-    return pre.length < len;
+    return preExpr.length < len;
   }
 
   @Override

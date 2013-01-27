@@ -81,8 +81,6 @@ public class GFLWOR extends ParseExpr {
 
   @Override
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    // [LW] necessary for binding singleton for loops, remove after inlining works
-    forToLet(ctx);
     final ListIterator<Clause> iter = clauses.listIterator();
     while(iter.hasNext()) {
       // the first round of constant propagation is free
@@ -108,7 +106,7 @@ public class GFLWOR extends ParseExpr {
       changed = forToLet(ctx);
 
       // inline let expressions if they are used only once (and not in a loop)
-      changed |= inlineLets(ctx);
+      changed |= inlineLets(ctx, scp);
 
       // clean unused variables from group-by and order-by expression
       changed |= cleanDeadVars(ctx);
@@ -117,7 +115,7 @@ public class GFLWOR extends ParseExpr {
       changed |= slideLetsOut(ctx);
 
       // float where expressions upwards to filter earlier
-      changed |= optimizeWhere(ctx);
+      changed |= optimizeWhere(ctx, scp);
 
       // remove FLWOR expressions when all clauses were removed
       if(clauses.isEmpty()) {
@@ -133,13 +131,6 @@ public class GFLWOR extends ParseExpr {
           ret = last.expr;
           changed = true;
         }
-      } else if(ret instanceof GFLWOR) {
-        // flatten nested FLWOR expressions
-        ctx.compInfo(QueryText.OPTFLAT, this);
-        final GFLWOR sub = (GFLWOR) ret;
-        clauses.addAll(sub.clauses);
-        ret = sub.ret;
-        changed = true;
       } else if(clauses.getFirst() instanceof For) {
         final For fst = (For) clauses.getFirst();
         if(!fst.empty && fst.expr instanceof GFLWOR) {
@@ -150,7 +141,22 @@ public class GFLWOR extends ParseExpr {
           clauses.addAll(0, sub.clauses);
           changed = true;
         }
+      } else if(ret instanceof GFLWOR) {
+        final GFLWOR sub = (GFLWOR) ret;
+        if(sub.isFLWR()) {
+          // flatten nested FLWOR expressions
+          ctx.compInfo(QueryText.OPTFLAT, this);
+          clauses.addAll(sub.clauses);
+          ret = sub.ret;
+          changed = true;
+        }
       }
+
+      /*
+       * [LW] not safe:
+       * for $x in 1 to 4 return
+       *   for $y in 1 to 4 count $index return $index
+       * */
     } while(changed);
 
     mergeWheres();
@@ -205,45 +211,39 @@ public class GFLWOR extends ParseExpr {
   /**
    * Inline let expressions if they are used only once (and not in a loop).
    * @param ctx query context
+   * @param scp variable scope
    * @return change flag
+   * @throws QueryException query exception
    */
-  private boolean inlineLets(final QueryContext ctx) {
+  private boolean inlineLets(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
     boolean change = false;
-    for(int i = 0; i < clauses.size(); i++) {
-      Clause c = clauses.get(i);
+    final ListIterator<Clause> iter = clauses.listIterator();
+    while(iter.hasNext()) {
+      final Clause c = iter.next();
+      final int next = iter.nextIndex();
       if(c instanceof Let) {
         final Let lt = (Let) c;
         if(!lt.score && !lt.var.checksType() && lt.expr instanceof LocalVarRef) {
-          // [LW] remove when inlining works
-          replaceVar(lt.var, ((LocalVarRef) lt.expr).var, i + 1);
+          ctx.compInfo(QueryText.OPTINLINE, lt);
+          inline(ctx, scp, lt.var, lt.expr, next);
+          change = true;
         }
         if(lt.expr.uses(Use.NDT)) continue;
-        final int uses = count(lt.var, i);
-        if(uses == 0) {
+        final VarUsage uses = count(lt.var, next);
+        if(uses == VarUsage.NEVER) {
           ctx.compInfo(QueryText.OPTVAR, lt.var);
-          clauses.remove(i--);
+          iter.remove();
           change = true;
-        } else if(uses > 0 && !lt.expr.uses(Use.CTX) && !lt.score) {
-          for(int j = i + 1; j < uses; j++) {
-            // [LW] implement inlining
-          }
+        } else if(uses == VarUsage.ONCE && !lt.var.checksType() && !lt.expr.uses(Use.CTX)
+            && !lt.score) {
+          ctx.compInfo(QueryText.OPTINLINE, lt);
+          inline(ctx, scp, lt.var, lt.expr, next);
+          change = true;
         }
       }
     }
     return change;
-  }
-
-  private void replaceVar(final Var from, final Var to, final int start) {
-    final VarVisitor replace = new VarVisitor() {
-      @Override
-      public boolean used(final LocalVarRef ref) {
-        if(ref.var.is(from)) ref.setVar(to);
-        return true;
-      }
-    };
-    final Iterator<Clause> it = clauses.listIterator(start);
-    while(it.hasNext()) it.next().visitVars(replace);
-    ret.visitVars(replace);
   }
 
   /**
@@ -307,10 +307,12 @@ public class GFLWOR extends ParseExpr {
   /**
    * Slides where clauses upwards and removes those that do not filter anything.
    * @param ctx query context
+   * @param scp variable scope
    * @return change flag
    * @throws QueryException query exception
    */
-  private boolean optimizeWhere(final QueryContext ctx) throws QueryException {
+  private boolean optimizeWhere(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
     boolean change = false;
     for(int i = 0; i < clauses.size(); i++) {
       final Clause c = clauses.get(i);
@@ -347,7 +349,7 @@ public class GFLWOR extends ParseExpr {
         final int newPos = insert < 0 ? i : insert;
         for(int b4 = newPos; --b4 >= 0;) {
           final Clause before = clauses.get(b4);
-          if(before instanceof For && ((For) before).toPred(wh.pred)) {
+          if(before instanceof For && ((For) before).toPred(ctx, scp, wh.pred)) {
             clauses.remove(newPos);
             i--;
             change = true;
@@ -389,33 +391,6 @@ public class GFLWOR extends ParseExpr {
     }
   }
 
-  /**
-   * Checks how often a variable is used within this FLWOR expression.
-   * @param v variable
-   * @param p position of the declaring clause
-   * @return {@code 0} for no uses, {@code -1} for more than one and {@code n} > 0
-   *   if the only usage is in the {@code n}-th clause ({@code clauses.size()}
-   *   means return expression)
-   */
-  private int count(final Var v, final int p) {
-    final int[] count = new int[1];
-    final VarVisitor uses = new VarVisitor() {
-      @Override
-      public boolean used(final LocalVarRef ref) {
-        return !ref.var.is(v) || ++count[0] == 1;
-      }
-    };
-
-    final int sz = clauses.size();
-    int n = sz;
-    for(int i = p + 1; i < sz; i++) {
-      if(!clauses.get(i).visitVars(uses)) return -1;
-      if(count[0] == 1 && n == sz) n = i;
-    }
-    if(!ret.visitVars(uses)) return -1;
-    return n * count[0];
-  }
-
   @Override
   public boolean uses(final Use u) {
     if(u == Use.VAR || u == Use.X30 && xq30) return true;
@@ -434,6 +409,76 @@ public class GFLWOR extends ParseExpr {
     for(final Clause cl : clauses) cl.remove(v);
     ret = ret.remove(v);
     return this;
+  }
+
+  @Override
+  public VarUsage count(final Var v) {
+    return count(v, 0);
+  }
+
+  /**
+   * Counts the number of usages of the given variable starting from the given clause.
+   * @param v variable
+   * @param p start position
+   * @return usage count
+   */
+  private VarUsage count(final Var v, final int p) {
+    long c = 1;
+    VarUsage uses = VarUsage.NEVER;
+    final ListIterator<Clause> iter = clauses.listIterator(p);
+    while(iter.hasNext()) {
+      final Clause cl = iter.next();
+      uses = uses.plus(cl.count(v).times(c));
+      c = cl.calcSize(c);
+    }
+    return uses.plus(ret.count(v).times(c));
+  }
+
+  @Override
+  public Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    return inline(ctx, scp, v, e, 0) ? optimize(ctx, scp) : null;
+  }
+
+  /**
+   * Inlines an expression bound to a given variable, starting at a specified clause.
+   * @param ctx query context
+   * @param scp variable scope
+   * @param v variable
+   * @param e expression to inline
+   * @param p clause position
+   * @return if changes occurred
+   * @throws QueryException query exception
+   */
+  private boolean inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e, final int p) throws QueryException {
+    boolean change = false;
+    final ListIterator<Clause> iter = clauses.listIterator(p);
+    while(iter.hasNext()) {
+      final Clause c = iter.next().inline(ctx, scp, v, e);
+      if(c != null) {
+        change = true;
+        iter.set(c);
+      }
+    }
+
+    final Expr rt = ret.inline(ctx, scp, v, e);
+    if(rt != null) {
+      change = true;
+      ret = rt;
+    }
+
+    return change;
+  }
+
+  /**
+   * Checks if this FLWOR expression only used for, let and where clauses.
+   * @return result of check
+   */
+  private boolean isFLWR() {
+    for(final Clause cl : clauses)
+      if(!(cl instanceof For || cl instanceof Let || cl instanceof Where)) return false;
+    return true;
   }
 
   @Override
@@ -498,7 +543,7 @@ public class GFLWOR extends ParseExpr {
    */
   public abstract static class Clause extends ParseExpr {
     /** All variables declared in this clause. */
-    Var[] vars;
+    final Var[] vars;
     /**
      * Constructor.
      * @param ii input info
@@ -529,6 +574,16 @@ public class GFLWOR extends ParseExpr {
 
     @Override
     public abstract Clause compile(QueryContext ctx, final VarScope scp)
+        throws QueryException;
+
+    @Override
+    public Clause optimize(final QueryContext ctx, final VarScope scp)
+        throws QueryException {
+      return this;
+    }
+
+    @Override
+    public abstract Clause inline(QueryContext ctx, VarScope scp, Var v, Expr e)
         throws QueryException;
 
     @Deprecated

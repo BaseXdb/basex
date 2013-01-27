@@ -234,6 +234,29 @@ public class AxisStep extends Preds {
   }
 
   @Override
+  public VarUsage count(final Var v) {
+    return super.count(v);
+  }
+
+  @Override
+  public Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    // leaf flag indicates that a context node can be replaced by a text() step
+    final Type ct = ctx.value != null ? ctx.value.type : null;
+    final boolean leaf = ctx.leaf;
+    ctx.leaf = false;
+    try {
+      // as predicates will not necessarily start from the document node,
+      // the context item type is temporarily generalized
+      if(ct == NodeType.DOC) ctx.value.type = NodeType.NOD;
+      return super.inline(ctx, scp, v, e);
+    } finally {
+      if(ct == NodeType.DOC) ctx.value.type = ct;
+      ctx.leaf = leaf;
+    }
+  }
+
+  @Override
   public final void plan(final FElem plan) {
     final FElem el = planElem(AXIS, axis.name, TEST, test);
     addPlan(plan, el);

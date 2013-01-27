@@ -77,6 +77,20 @@ public class Where extends GFLWOR.Clause {
   }
 
   @Override
+  public VarUsage count(final Var v) {
+    return pred.count(v);
+  }
+
+  @Override
+  public GFLWOR.Clause inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    final Expr sub = pred.inline(ctx, scp, v, e);
+    if(sub == null) return null;
+    pred = sub;
+    return optimize(ctx, scp);
+  }
+
+  @Override
   public boolean visitVars(final VarVisitor visitor) {
     return pred.visitVars(visitor);
   }

@@ -120,8 +120,8 @@ public final class MixedPath extends Path {
 
   @Override
   public boolean removable(final Var v) {
-    for(final Expr e : steps) if(e.uses(Use.VAR)) return false;
-    return true;
+    for(final Expr e : steps) if(e.uses(v)) return false;
+    return super.removable(v);
   }
 
   @Override

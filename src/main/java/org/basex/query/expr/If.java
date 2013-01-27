@@ -112,6 +112,16 @@ public final class If extends Arr {
   private Expr eval(final QueryContext ctx) throws QueryException {
     return expr[cond.ebv(ctx, info).bool(info) ? 0 : 1];
   }
+
+  @Override
+  public Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    final boolean te = inlineAll(ctx, scp, expr, v, e);
+    final Expr sub = cond.inline(ctx, scp, v, e);
+    if(sub != null) cond = sub;
+    return te || sub != null ? optimize(ctx, scp) : null;
+  }
+
   @Override
   public boolean uses(final Use u) {
     return cond.uses(u) || super.uses(u);
@@ -126,6 +136,11 @@ public final class If extends Arr {
   public Expr remove(final Var v) {
     cond = cond.remove(v);
     return super.remove(v);
+  }
+
+  @Override
+  public VarUsage count(final Var v) {
+    return cond.count(v).plus(VarUsage.maximum(v, expr));
   }
 
   @Override

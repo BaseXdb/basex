@@ -48,8 +48,9 @@ public final class TypeSwitch extends ParseExpr {
     ts = ts.compile(ctx, scp);
     // static condition: return branch in question
     if(ts.isValue()) {
+      final Value val = ts.value(ctx);
       for(final TypeCase tc : cases) {
-        if(tc.matches(ts.value(ctx)))
+        if(tc.matches(val))
           return optPre(tc.compile(ctx, scp, (Value) ts).expr, ctx);
       }
     }
@@ -105,6 +106,23 @@ public final class TypeSwitch extends ParseExpr {
     for(final TypeCase tc : cases) tc.remove(v);
     ts = ts.remove(v);
     return this;
+  }
+
+  @Override
+  public VarUsage count(final Var v) {
+    return ts.count(v).plus(VarUsage.maximum(v, cases));
+  }
+
+  @Override
+  public Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    boolean change = inlineAll(ctx, scp, cases, v, e);
+    final Expr t = ts.inline(ctx, scp, v, e);
+    if(t != null) {
+      change = true;
+      ts = t;
+    }
+    return change ? optimize(ctx, scp) : null;
   }
 
   @Override

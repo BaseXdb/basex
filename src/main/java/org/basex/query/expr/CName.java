@@ -134,4 +134,18 @@ public abstract class CName extends CFrag {
   public final boolean visitVars(final VarVisitor visitor) {
     return name.visitVars(visitor) && visitor.visitAll(expr);
   }
+
+  @Override
+  public final VarUsage count(final Var v) {
+    return name.count(v).plus(super.count(v));
+  }
+
+  @Override
+  public Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    final boolean ex = inlineAll(ctx, scp, expr, v, e);
+    final Expr sub = name.inline(ctx, scp, v, e);
+    if(sub != null) name = sub;
+    return sub != null || ex ? optimize(ctx, scp) : null;
+  }
 }
