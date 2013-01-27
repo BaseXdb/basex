@@ -25,6 +25,8 @@ public abstract class Test {
   public static final KindTest ATT = new KindTest(NodeType.ATT);
   /** Static comment node test. */
   public static final KindTest COM = new KindTest(NodeType.COM);
+  /** Static comment node test. */
+  public static final KindTest NSP = new KindTest(NodeType.NSP);
   /** Static node test. */
   public static final Test NOD = new KindTest(NodeType.NOD) {
     @Override
@@ -63,7 +65,8 @@ public abstract class Test {
       case ATT: return ATT;
       case COM: return COM;
       case NOD: return NOD;
-      default:  throw Util.notexpected();
+      case NSP: return NSP;
+      default: throw Util.notexpected();
     }
   }
 

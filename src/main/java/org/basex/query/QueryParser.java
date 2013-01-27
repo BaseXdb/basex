@@ -2803,7 +2803,10 @@ public class QueryParser extends InputParser {
       default:  break;
     }
     wsCheck(PAR2);
-    return tp == null ? Test.get(t) : tp;
+    if(tp != null) return tp;
+    tp = Test.get(t);
+    if(tp == Test.NSP && !ctx.sc.xquery3) throw error(NSNOTALL);
+    return tp;
   }
 
   /**

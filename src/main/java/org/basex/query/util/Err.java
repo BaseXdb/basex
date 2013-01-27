@@ -707,6 +707,8 @@ public enum Err {
   ANNVALUE(XPST, 3, "Literal expected after annotation."),
   /** XPST0003. */
   UPDATINGVAR(XPST, 3, "Variable cannot be updating."),
+  /** XPST0003. */
+  NSNOTALL(XPST, 3, "Namespace test is not supported in XQuery 1.0."),
 
   /** XPST0005. */
   COMPSELF(XPST, 5, "Warning: '%' will never yield results."),
