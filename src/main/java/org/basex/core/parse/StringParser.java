@@ -318,7 +318,7 @@ final class StringParser extends CmdParser {
    */
   private String password() throws QueryException {
     final String pw = string(null);
-    return pw != null ? pw : passwords == null ? "" : passwords.password();
+    return pw != null ? pw : pwReader == null ? "" : pwReader.password();
   }
 
   /**

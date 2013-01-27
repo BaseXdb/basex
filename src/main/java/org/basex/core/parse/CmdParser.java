@@ -17,14 +17,14 @@ abstract class CmdParser {
   /** Single command flag. */
   protected boolean single;
   /** Password reader. */
-  protected PasswordReader passwords;
+  protected PasswordReader pwReader;
 
   /**
    * Attaches a password reader.
    * @param pr password reader
    */
-  final void password(final PasswordReader pr) {
-    passwords = pr;
+  final void pwReader(final PasswordReader pr) {
+    pwReader = pr;
   }
 
   /**

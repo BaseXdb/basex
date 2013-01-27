@@ -16,7 +16,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-final class ProcessLocking implements ILocking {
+final class ProcessLocking implements Locking {
   /** Queue for all waiting processes. */
   private final LinkedList<Object> queue = new LinkedList<Object>();
   /** Mutex object. */

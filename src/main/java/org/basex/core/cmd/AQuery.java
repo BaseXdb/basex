@@ -23,7 +23,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-abstract class AQuery extends Command {
+public abstract class AQuery extends Command {
   /** Query info. */
   private final QueryInfo qi = new QueryInfo();
   /** Query result. */

@@ -8,8 +8,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public interface ILocking {
-
+public interface Locking {
   /**
    * Puts read and write locks the specified databases.
    * Store and return the {@code token} for unlocking these objects again.

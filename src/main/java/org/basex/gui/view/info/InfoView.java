@@ -133,11 +133,24 @@ public final class InfoView extends View implements LinkListener {
    * Displays the specified information.
    * @param info info string
    * @param cmd command
+   * @param ok indicates if evaluation was successful
+   * @param reset reset text cache after showing text
+   */
+  public void setInfo(final String info, final Command cmd, final boolean ok,
+      final boolean reset) {
+    setInfo(info, cmd, null, ok, reset);
+  }
+
+  /**
+   * Displays the specified information.
+   * @param info info string
+   * @param cmd command
    * @param time time required
-   * @param ok flag indicating if command execution was successful
+   * @param ok indicates if evaluation was successful
+   * @param reset reset text cache after showing text
    */
   public void setInfo(final String info, final Command cmd, final String time,
-      final boolean ok) {
+      final boolean ok, final boolean reset) {
 
     final StringList eval = new StringList(1);
     final StringList comp = new StringList(1);
@@ -145,7 +158,9 @@ public final class InfoView extends View implements LinkListener {
     final StringList result = new StringList(1);
     final StringList stack = new StringList(1);
     final StringList err = new StringList(1);
-    final StringList query = new StringList(1);
+    final StringList origqu = new StringList(1);
+    final StringList optqu = new StringList(1);
+    final StringList command = new StringList(1);
 
     final StringList timings = new StringList(5);
     final IntList times = new IntList(5);
@@ -169,8 +184,10 @@ public final class InfoView extends View implements LinkListener {
         while(i + 1 < split.length && !split[++i].isEmpty()) plan.add(split[i]);
       } else if(line.startsWith(COMPILING_C)) {
         while(++i < split.length && !split[i].isEmpty()) comp.add(split[i]);
+      } else if(line.startsWith(QUERY_C)) {
+        origqu.add(line.substring(s + 1).trim());
       } else if(line.startsWith(RESULT_C)) {
-        query.add(line.substring(s + 1).trim());
+        optqu.add(line.substring(s + 1).trim());
       } else if(line.startsWith(EVALUATING_C)) {
         while(i + 1 < split.length && split[++i].startsWith(LI)) eval.add(split[i]);
       } else if(line.startsWith(HITS_X_CC) || line.startsWith(UPDATED_CC) ||
@@ -190,7 +207,11 @@ public final class InfoView extends View implements LinkListener {
       } else if(line.startsWith(STACK_TRACE_C)) {
         while(i + 1 < split.length && !split[++i].isEmpty()) {
           final TokenBuilder tb = new TokenBuilder();
-          tb.add(LI).uline().add(split[i].substring(2)).uline();
+          if(split[i].startsWith(LI)) {
+            tb.add(LI).uline().add(split[i].substring(2)).uline();
+          } else {
+            tb.add(split[i]);
+          }
           stack.add(tb.toString());
         }
       } else if(!ok && !line.isEmpty()) {
@@ -200,54 +221,34 @@ public final class InfoView extends View implements LinkListener {
 
     stat = times;
     strings = timings;
-    String total = time;
 
-    if(!times.isEmpty()) {
-      text.reset();
-      add(EVALUATING_C, eval);
-      add(COMPILING_C, comp);
-      add(QUERY_C + ' ', query);
-      add(RESULT_C, result);
-      add(TIMING_C, timings);
-      add(QUERY_PLAN_C, plan);
-      total = Performance.getTime(times.get(times.size() - 1) * 10000L * runs, runs);
-    } else {
-      if(ok) {
-        add(cmd);
-        text.add(info).nline();
-      } else {
-        add(ERROR_C, err);
-        add(STACK_TRACE_C, stack);
-        add(EVALUATING_C, eval);
-        add(cmd);
-        add(COMPILING_C, comp);
-        if(!comp.isEmpty()) add(RESULT_C, query);
-        add(QUERY_PLAN_C, plan);
-      }
+    if(!times.isEmpty() || !ok) text.reset();
+
+    if(!(cmd instanceof AQuery)) {
+      if(cmd != null) command.add(cmd.toString());
+      if(ok && !info.isEmpty()) result.add(info.trim());
     }
 
+    add(COMMAND + COL, command);
+    add(ERROR_C, err);
+    add(STACK_TRACE_C, stack);
+    add(EVALUATING_C, eval);
+    add(QUERY_C + ' ', origqu);
+    add(COMPILING_C, comp);
+    if(!comp.isEmpty()) add(QUERY_C + ' ', optqu);
+    add(RESULT_C, result);
+    add(TIMING_C, timings);
+    add(QUERY_PLAN_C, plan);
     area.setText(text.finish());
+    if(reset) text.reset();
+
+    // show total time required for running the process
+    String total = time;
+    if(!times.isEmpty()) {
+      total = Performance.getTime(times.get(times.size() - 1) * 10000L * runs, runs);
+    }
     if(total != null) timer.setText(TOTAL_TIME_CC + total);
     repaint();
-  }
-
-  /**
-   * Adds the command representation.
-   * @param cmd command
-   */
-  private void add(final Command cmd) {
-    if(cmd instanceof XQuery) {
-      add(QUERY_C + ' ', cmd.args[0].trim());
-    } else if(cmd != null) {
-      text.bold().add(COMMAND + COLS).norm().addExt(cmd).nline();
-    }
-  }
-
-  /**
-   * Resets the info string without repainting the view.
-   */
-  public void reset() {
-    text.reset();
   }
 
   /**
@@ -260,15 +261,6 @@ public final class InfoView extends View implements LinkListener {
     text.bold().add(head).norm().nline();
     for(final String s : list) text.add(s).nline();
     text.hline();
-  }
-
-  /**
-   * Adds a string.
-   * @param head string header
-   * @param txt text
-   */
-  private void add(final String head, final String txt) {
-    if(!txt.isEmpty()) text.bold().add(head).norm().add(txt).nline().hline();
   }
 
   @Override

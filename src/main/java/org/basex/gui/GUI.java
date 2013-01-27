@@ -104,6 +104,14 @@ public final class GUI extends AGUI {
     }
   };
 
+  /** Info listener. */
+  public final InfoListener infoListener = new InfoListener() {
+    @Override
+    public void info(final String inf) {
+      info.setInfo(inf, null, true, false);
+    }
+  };
+
   /**
    * Default constructor.
    * @param ctx database context
@@ -141,7 +149,6 @@ public final class GUI extends AGUI {
 
     hits = new BaseXLabel(" ");
     hits.setFont(hits.getFont().deriveFont(18f));
-    BaseXLayout.setWidth(hits, 150);
     hits.setHorizontalAlignment(SwingConstants.RIGHT);
 
     BaseXBack b = new BaseXBack();
@@ -292,8 +299,7 @@ public final class GUI extends AGUI {
         execute(false, cp.parse());
       } catch(final QueryException ex) {
         if(!info.visible()) GUICommands.C_SHOWINFO.execute(this);
-        info.setInfo(Util.message(ex), null, null, false);
-        info.reset();
+        info.setInfo(Util.message(ex), null, false, true);
       }
     } else if(gprop.num(GUIProp.SEARCHMODE) == 1 || in.startsWith("/")) {
       xquery(in, false);
@@ -383,6 +389,8 @@ public final class GUI extends AGUI {
 
       // reset visualizations if data reference will be changed
       if(cmd.newData(context)) notify.init();
+      // attaches the info listener to the command
+      cmd.listen(infoListener);
 
       // evaluate command
       String inf = null;
@@ -399,8 +407,7 @@ public final class GUI extends AGUI {
 
       // show query info
 
-      if(info.visible()) info.setInfo(inf, cmd, time, ok);
-      info.reset();
+      if(info.visible()) info.setInfo(inf, cmd, time, ok, true);
 
       // sends feedback to the query editor
       final boolean interrupted = inf.endsWith(INTERRUPTED);
@@ -467,8 +474,7 @@ public final class GUI extends AGUI {
       }
     } catch(final Exception ex) {
       // unexpected error
-      Util.bug(ex);
-      BaseXDialog.error(this, Util.info(EXEC_ERROR, cmd, Util.message(ex)));
+      BaseXDialog.error(this, Util.info(EXEC_ERROR, cmd, Util.bug(ex)));
       updating = false;
     }
 
@@ -505,7 +511,7 @@ public final class GUI extends AGUI {
    if(!prop.sameAs(pr, val)) {
      final Set cmd = new Set(pr, val);
      cmd.run(context);
-     info.setInfo(cmd.info(), cmd, null, true);
+     info.setInfo(cmd.info(), cmd, true, false);
    }
  }
 

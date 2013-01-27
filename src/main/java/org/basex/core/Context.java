@@ -56,7 +56,7 @@ public final class Context {
   /** Node context. Set if it does not contain all documents of the current database. */
   private Nodes current;
   /** Process locking. */
-  private final ILocking locks;
+  private final Locking locks;
   /** Data reference. */
   private Data data;
 

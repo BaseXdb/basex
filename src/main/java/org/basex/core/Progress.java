@@ -14,6 +14,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public abstract class Progress {
+  /** Info listener. */
+  public InfoListener listen;
   /** This flag indicates that a command may perform updates. */
   public boolean updating;
 
@@ -50,6 +52,15 @@ public abstract class Progress {
   }
 
   /**
+   * Attaches the specified info listener.
+   * @param il info listener
+   */
+  public final void listen(final InfoListener il) {
+    if(sub != null) sub.listen(il);
+    listen = il;
+  }
+
+  /**
    * Sets a new sub progress.
    * @param <P> progress type
    * @param prog progress
@@ -57,6 +68,7 @@ public abstract class Progress {
    */
   protected final <P extends Progress> P progress(final P prog) {
     sub = prog;
+    sub.listen = listen;
     if(stopped) sub.stop();
     return prog;
   }

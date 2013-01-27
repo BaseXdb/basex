@@ -69,6 +69,6 @@ public final class Range extends Arr {
 
   @Override
   public String toString() {
-    return PAR1 + toString(' ' + TO + ' ') + PAR2;
+    return toString(' ' + TO + ' ');
   }
 }

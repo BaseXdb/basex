@@ -85,11 +85,10 @@ public final class Performance {
    * adding the specified offset to the orders of magnitude.
    * @param size file size
    * @param det detailed suffix
-   * @param off offset
+   * @param off offset: higher values will result in more digits
    * @return formatted size value
    */
   private static String format(final long size, final boolean det, final int off) {
-    if(size >= 1L << 60 + off) return (size + (1L << 59) >> 60) + " EB";
     if(size >= 1L << 50 + off) return (size + (1L << 49) >> 50) + " PB";
     if(size >= 1L << 40 + off) return (size + (1L << 39) >> 40) + " TB";
     if(size >= 1L << 30 + off) return (size + (1L << 29) >> 30) + " GB";

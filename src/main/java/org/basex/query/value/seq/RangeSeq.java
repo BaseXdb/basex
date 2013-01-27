@@ -100,12 +100,16 @@ public final class RangeSeq extends Seq {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(MIN, start, MAX, start + (asc ? size : -size) - 1));
+    final long s = start;
+    final long e = asc ? start + size - 1 : start - size + 1;
+    addPlan(plan, planElem(FROM, s, TO, e));
   }
 
   @Override
   public String toString() {
-    final String s = PAR1 + start + ' ' + TO + ' ' + (start + size - 1) + PAR2;
-    return asc ? s : Function.REVERSE.args(s);
+    final long s = asc ? start : start - size + 1;
+    final long e = asc ? start + size - 1 : start;
+    final String str = PAR1 + s + ' ' + TO + ' ' + e + PAR2;
+    return asc ? str : Function.REVERSE.args(str);
   }
 }

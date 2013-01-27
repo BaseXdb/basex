@@ -1,5 +1,7 @@
 package org.basex.query.expr;
 
+import static org.basex.query.QueryText.*;
+
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
@@ -111,6 +113,6 @@ public abstract class Arr extends ParseExpr {
    * @return string representation
    */
   protected String toString(final String sep) {
-    return new TokenBuilder().addSep(expr, sep).toString();
+    return new TokenBuilder(PAR1).addSep(expr, sep).add(PAR2).toString();
   }
 }

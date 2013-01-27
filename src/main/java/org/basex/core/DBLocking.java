@@ -26,7 +26,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Jens Erat
  */
-public final class DBLocking implements ILocking {
+public final class DBLocking implements Locking {
   /** Fair scheduling; prevents starvation, but reduces parallelism. */
   private static final boolean FAIR = true;
 

@@ -138,12 +138,14 @@ public final class FNInfo extends StandardFunc {
     final TokenBuilder tb = new TokenBuilder();
     if(label != null) tb.add(label);
     tb.add(value);
+    final String info = tb.toString();
 
-    // if GUI is used, or if user is no admin, trace info is cached
-    if(Prop.gui || !ctx.context.user.has(Perm.ADMIN)) {
-      ctx.evalInfo(tb.toString());
+    // if GUI is used or client is calling, cache trace info
+    if(Prop.gui || ctx.context.listener != null) {
+      ctx.evalInfo(info);
+      if(ctx.listen != null) ctx.listen.info(info);
     } else {
-      Util.errln(tb.toString());
+      Util.errln(info);
     }
   }
 

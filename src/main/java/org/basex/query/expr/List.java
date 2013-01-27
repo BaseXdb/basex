@@ -122,6 +122,6 @@ public final class List extends Arr {
 
   @Override
   public String toString() {
-    return new TokenBuilder(PAR1).addSep(expr, SEP).add(PAR2).toString();
+    return toString(SEP);
   }
 }
