@@ -310,7 +310,7 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Throws an exception if the context item is not set.
+   * Throws an exception if the context value is not set.
    * @param ctx query context
    * @return context
    * @throws QueryException query exception
@@ -319,6 +319,19 @@ public abstract class ParseExpr extends Expr {
     final Value v = ctx.value;
     if(v != null) return v;
     throw XPNOCTX.thrw(info, this);
+  }
+
+  /**
+   * Throws an exception if the context value is not a node.
+   * @param ctx query context
+   * @return context
+   * @throws QueryException query exception
+   */
+  public final ANode checkNode(final QueryContext ctx) throws QueryException {
+    final Value v = ctx.value;
+    if(v == null) XPNOCTX.thrw(info, this);
+    if(!(v instanceof ANode)) STEPNODE.thrw(info, this, v.type);
+    return (ANode) v;
   }
 
   /**

@@ -38,7 +38,7 @@ public final class MixedPath extends Path {
 
     for(int s = 0; s != steps.length; ++s) {
       steps[s] = steps[s].compile(ctx);
-      if(steps[s].isEmpty()) return Empty.SEQ;
+      if(steps[s].isEmpty()) return optPre(Empty.SEQ, ctx);
     }
     optSteps(ctx);
 
@@ -66,34 +66,41 @@ public final class MixedPath extends Path {
     final long cp = ctx.pos;
     try {
       // loop through all expressions
-      for(final Expr e : steps) {
-        // map operator: don't remove duplicates and check for nodes
-        final boolean path = !(e instanceof Bang);
-        //final boolean last = ex + 1 == el;
+      final int sl = steps.length;
+      for(int s = 0; s < sl; s++) {
+        final Expr e = steps[s];
         final ValueBuilder vb = new ValueBuilder();
 
-        // this flag indicates if the resulting items contain nodes
+        // map operator: don't remove duplicates and check for nodes
+        final boolean path = !(e instanceof Bang);
         int nodes = 0;
         ctx.size = res.size();
         ctx.pos = 1;
 
         // loop through all input items
         for(Item it; (it = res.next()) != null;) {
-          if(path && !(it instanceof ANode)) NODESPATH.thrw(info, this, it.type);
+          if(path && !(it instanceof ANode)) PATHNODE.thrw(info, it.type);
           ctx.value = it;
 
           // loop through all resulting items
           final Iter ir = ctx.iter(e);
           for(Item i; (i = ir.next()) != null;) {
-            if(path && i instanceof ANode) nodes++;
+            if(i instanceof ANode) nodes++;
             vb.add(i);
           }
           ctx.pos++;
         }
-        // check if both nodes and atomic values occur in last result
-        if(nodes > 0 && nodes < vb.size()) EVALNODESVALS.thrw(info);
 
-        if(nodes == vb.size() && path) {
+        final long vs = vb.size();
+        if(nodes < vs) {
+          // check if both nodes and atomic values occur in last result
+          if(path && nodes > 0) EVALNODESVALS.thrw(info);
+          // check if input for next axis step consists items other than nodes
+          if(s + 1 < sl && !(steps[s + 1] instanceof Bang))
+            PATHNODE.thrw(info, vb.get(0).type);
+        }
+
+        if(path && nodes == vs) {
           // remove potential duplicates from node sets
           final NodeSeqBuilder nc = new NodeSeqBuilder().check();
           for(Item it; (it = vb.next()) != null;) nc.add((ANode) it);

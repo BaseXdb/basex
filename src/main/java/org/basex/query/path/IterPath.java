@@ -37,6 +37,7 @@ final class IterPath extends AxisPath {
   @Override
   public NodeIter iter(final QueryContext ctx) {
     return new NodeIter() {
+      final boolean r = root != null;
       Expr[] expr;
       Iter[] iter;
       ANode node;
@@ -47,7 +48,7 @@ final class IterPath extends AxisPath {
         if(iter == null) {
           if(expr == null) {
             expr = steps;
-            if(root != null) {
+            if(r) {
               // add root as first expression
               expr = new Expr[steps.length + 1];
               expr[0] = root;
@@ -71,12 +72,13 @@ final class IterPath extends AxisPath {
                 break;
               }
             } else if(p < iter.length - 1) {
-              ++p;
+              // ensure that root only returns nodes
+              if(r && p == 0 && !(it instanceof ANode)) PATHNODE.thrw(info, it.type);
               ctx.value = it;
+              ++p;
               if(iter[p] == null || !iter[p].reset()) iter[p] = ctx.iter(expr[p]);
             } else {
-              // not expected to happen, as steps will always yield nodes
-              if(!(it instanceof ANode)) NODESPATH.thrw(info, this, it.type);
+              // remaining steps will always yield nodes
               final ANode n = (ANode) it;
               if(node == null || !node.is(n)) {
                 node = n;

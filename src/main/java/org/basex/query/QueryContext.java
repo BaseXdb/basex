@@ -180,9 +180,6 @@ public final class QueryContext extends Progress {
    * @throws QueryException query exception
    */
   public void compile() throws QueryException {
-    // dump compilation info
-    if(inf) compInfo(NL + COMPILING_C);
-
     // set database options
     final StringList o = dbOptions;
     for(int s = 0; s < o.size(); s += 2) context.prop.set(o.get(s), o.get(s + 1));
@@ -324,9 +321,11 @@ public final class QueryContext extends Progress {
    */
   public void compInfo(final String string, final Object... ext) {
     if(!inf) return;
-    if(!firstOpt) info.add(LI);
-    firstOpt = false;
-    info.addExt(string, ext).add(NL);
+    if(firstOpt) {
+      info.add(NL).add(COMPILING_C).add(NL);
+      firstOpt = false;
+    }
+    info.add(LI).addExt(string, ext).add(NL);
   }
 
   /**
@@ -335,9 +334,11 @@ public final class QueryContext extends Progress {
    */
   public void evalInfo(final String string) {
     if(!inf) return;
-    if(firstEval) info.add(NL).add(EVALUATING_C).add(NL);
+    if(firstEval) {
+      info.add(NL).add(EVALUATING_C).add(NL);
+      firstEval = false;
+    }
     info.add(LI).add(string.replaceAll("\r?\n\\s*", " ")).add(NL);
-    firstEval = false;
   }
 
   /**

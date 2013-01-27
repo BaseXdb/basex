@@ -281,6 +281,8 @@ public class AxisPath extends Path {
         if(r != null) {
           final Iter ir = ctx.iter(r);
           for(Item it; (it = ir.next()) != null;) {
+            // ensure that root only returns nodes
+            if(root != null && !(it instanceof ANode)) PATHNODE.thrw(info, it.type);
             ctx.value = it;
             iter(0, citer, ctx);
           }
@@ -310,7 +312,7 @@ public class AxisPath extends Path {
   private void iter(final int l, final NodeSeqBuilder nc, final QueryContext ctx)
       throws QueryException {
 
-    // cast is safe (steps will always return a {@link NodIter} instance
+    // cast is safe (steps will always return a {@link NodeIter} instance
     final NodeIter ni = (NodeIter) ctx.iter(steps[l]);
     final boolean more = l + 1 != steps.length;
     for(ANode node; (node = ni.next()) != null;) {

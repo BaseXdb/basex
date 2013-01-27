@@ -1,7 +1,6 @@
 package org.basex.query.path;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 
 import java.util.*;
 
@@ -13,7 +12,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.path.Test.Mode;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -109,12 +107,12 @@ public class AxisStep extends Preds {
 
   @Override
   public NodeIter iter(final QueryContext ctx) throws QueryException {
-    final Value v = checkCtx(ctx);
-    if(!(v instanceof ANode)) NODESPATH.thrw(info, this, v.type);
-    final AxisIter ai = axis.iter((ANode) v);
-
+    // evaluate step
+    final AxisIter ai = axis.iter(checkNode(ctx));
     final NodeSeqBuilder nc = new NodeSeqBuilder();
-    for(ANode n; (n = ai.next()) != null;) if(test.eq(n)) nc.add(n.finish());
+    for(ANode n; (n = ai.next()) != null;) {
+      if(test.eq(n)) nc.add(n.finish());
+    }
 
     // evaluate predicates
     for(final Expr p : preds) {

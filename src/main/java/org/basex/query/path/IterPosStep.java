@@ -1,10 +1,7 @@
 package org.basex.query.path;
 
-import static org.basex.query.util.Err.*;
-
 import org.basex.query.*;
 import org.basex.query.iter.*;
-import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 
 /**
@@ -34,12 +31,7 @@ final class IterPosStep extends AxisStep {
       @Override
       public ANode next() throws QueryException {
         if(skip) return null;
-
-        if(ai == null) {
-          final Value v = checkCtx(ctx);
-          if(!(v instanceof ANode)) NODESPATH.thrw(info, IterPosStep.this, v.type);
-          ai = axis.iter((ANode) v);
-        }
+        if(ai == null) ai = axis.iter(checkNode(ctx));
 
         ANode lnode = null, node;
         while(true) {

@@ -793,7 +793,9 @@ public enum Err {
   /** XPTY0018. */
   EVALNODESVALS(XPTY, 18, "Path yields both nodes and atomic values."),
   /** XPTY0019. */
-  NODESPATH(XPTY, 19, "Context node required for %; % found."),
+  PATHNODE(XPTY, 19, "Steps within a path expression must yield nodes; % found."),
+  /** XPTY0020. */
+  STEPNODE(XPTY, 20, "Context node required for %; % found."),
 
   /** XQDY0025. */
   CATTDUPL(XQDY, 25, "Duplicate attribute '%'."),
