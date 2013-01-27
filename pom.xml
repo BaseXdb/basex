@@ -11,11 +11,17 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <jettyVersion>8.1.6.v20120903</jettyVersion> 
   </properties>
+  
   <repositories>
     <repository>
       <id>basex</id>
       <name>BaseX Maven Repository</name>
       <url>http://files.basex.org/maven</url>
+    </repository>
+    <repository>
+      <id>central</id>
+      <name>Central Maven Repository</name>
+      <url>http://repo1.maven.org/maven2/</url>
     </repository>
   </repositories>
   <dependencies>
@@ -46,6 +52,11 @@
       <artifactId>jetty-webapp</artifactId>
       <version>${jettyVersion}</version>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+    	<groupId>com.vividsolutions</groupId>
+    	<artifactId>jts</artifactId>
+    	<version>1.12</version>
     </dependency>
   </dependencies>
   <build>
