@@ -5,6 +5,8 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.basex.build.xml.*;
 import org.basex.core.*;
@@ -155,11 +157,15 @@ public final class FNGen extends StandardFunc {
     if(u == Uri.EMPTY || !u.isValid()) UPFOURI.thrw(info, file);
     final DBNode target = ctx.updates.determineDataRef(nd, ctx);
 
-    // check if all target paths are unique
-    final String uri = new IOFile(u.toJava()).path();
-    if(ctx.updates.putPaths.add(uri) < 0) UPURIDUP.thrw(info, uri);
+    try {
+      final String uri = new IOFile(new URI(u.toJava())).path();
+      // check if all target paths are unique
+      if(ctx.updates.putPaths.add(uri) < 0) UPURIDUP.thrw(info, uri);
 
-    ctx.updates.add(new Put(info, target.pre, target.data, uri), ctx);
+      ctx.updates.add(new Put(info, target.pre, target.data, uri), ctx);
+    } catch(URISyntaxException ex) {
+      Util.debug(ex);
+    }
     return null;
   }
 
