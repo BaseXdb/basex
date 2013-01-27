@@ -4,10 +4,8 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.*;
 import org.basex.build.*;
 import org.basex.build.xml.*;
-import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
@@ -732,13 +730,5 @@ public class Geo extends QueryModule {
     } catch(final IOException ex) {
       throw Err.IOERR.thrw(null, ex);
     }
-  }
-  /**
-   * asd.
-   * @param args asd
-   * @throws BaseXException exception
-   */
-  public static void main(final String[] args) throws BaseXException {
-    new BaseXGUI();
   }
 }
