@@ -39,7 +39,9 @@ public final class IOUrl extends IO {
   public InputStream inputStream() throws IOException {
     final URL url = new URL(path);
     try {
-      return url.openStream();
+      final URLConnection conn = url.openConnection();
+      conn.setConnectTimeout(30000);
+      return conn.getInputStream();
     } catch(final IOException ex) {
       final IOException io = new IOException(Util.message(ex));
       io.setStackTrace(ex.getStackTrace());
