@@ -184,7 +184,8 @@ public class Editor extends BaseXPanel {
       !opened || file.hasSuffix(IO.XQSUFFIXES) ? new SyntaxXQuery() :
       file.hasSuffix(IO.JSONSUFFIX) ? new SyntaxJSON() :
       file.hasSuffix(IO.XMLSUFFIXES) || file.hasSuffix(IO.HTMLSUFFIXES) ||
-      file.hasSuffix(IO.BXSSUFFIX) ? new SyntaxXML() : Syntax.SIMPLE);
+      file.hasSuffix(IO.XSLSUFFIXES) || file.hasSuffix(IO.BXSSUFFIX) ?
+        new SyntaxXML() : Syntax.SIMPLE);
   }
 
   /**

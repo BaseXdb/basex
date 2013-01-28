@@ -64,6 +64,7 @@ public final class BaseXFileChooser {
    */
   public BaseXFileChooser textFilters() {
     filter(XML_DOCUMENTS, IO.XMLSUFFIXES);
+    filter(XSL_DOCUMENTS, IO.XSLSUFFIXES);
     filter(HTML_DOCUMENTS, IO.HTMLSUFFIXES);
     filter(JSON_DOCUMENTS, IO.JSONSUFFIX);
     filter(CSV_DOCUMENTS, IO.CSVSUFFIX);

@@ -1028,6 +1028,8 @@ public interface Text {
 
   /** File description: XML Documents. */
   String XML_DOCUMENTS = "XML Documents";
+  /** File description: XSL Documents. */
+  String XSL_DOCUMENTS = "XSL Documents";
   /** File description: JSON Documents. */
   String JSON_DOCUMENTS = "JSON Documents";
   /** File description: HTML Documents. */
