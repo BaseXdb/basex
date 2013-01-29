@@ -816,6 +816,10 @@ public interface Text {
   String ERROR = lang("error");
   /** "Error:". */
   String ERROR_C = ERROR + COLS;
+  /** "Fatal:". */
+  String FATAL_C = "Fatal" + COLS;
+  /** "Warning:". */
+  String WARNING_C = "Warning" + COLS;
 
   // MENU ENTRIES =============================================================
 
