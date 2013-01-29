@@ -33,14 +33,11 @@ public final class B64Stream extends B64 {
 
   @Override
   public byte[] binary(final InputInfo ii) throws QueryException {
-    if(data == null) {
-      try {
-        data = input.read();
-      } catch(final IOException ex) {
-        error.thrw(ii, ex);
-      }
+    try {
+      return input.read();
+    } catch(final IOException ex) {
+      throw error.thrw(ii, ex);
     }
-    return data;
   }
 
   @Override

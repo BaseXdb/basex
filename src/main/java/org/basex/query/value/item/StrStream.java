@@ -22,8 +22,6 @@ public final class StrStream extends AStr {
   private final String encoding;
   /** Error message. */
   private final Err error;
-  /** String representation. */
-  private byte[] val;
 
   /**
    * Constructor.
@@ -39,14 +37,11 @@ public final class StrStream extends AStr {
 
   @Override
   public byte[] string(final InputInfo ii) throws QueryException {
-    if(val == null) {
-      try {
-        val = input(ii).content();
-      } catch(final IOException ex) {
-        throw error.thrw(ii, input);
-      }
+    try {
+      return input(ii).content();
+    } catch(final IOException ex) {
+      throw error.thrw(ii, input);
     }
-    return val;
   }
 
   @Override
