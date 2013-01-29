@@ -224,9 +224,13 @@ public final class InfoView extends View implements LinkListener {
 
     if(!times.isEmpty() || !ok) text.reset();
 
+    String inf = null;
     if(!(cmd instanceof AQuery)) {
       if(cmd != null) command.add(cmd.toString());
-      if(ok && !info.isEmpty()) result.add(info.trim());
+      if(ok && !info.isEmpty()) {
+        if(reset) result.add(info.trim());
+        else if(cmd == null) inf = info.trim();
+      }
     }
 
     add(COMMAND + COL, command);
@@ -239,7 +243,9 @@ public final class InfoView extends View implements LinkListener {
     add(RESULT_C, result);
     add(TIMING_C, timings);
     add(QUERY_PLAN_C, plan);
+    if(inf != null) text.add(inf).nline();
     area.setText(text.finish());
+    System.out.println(text.size());
     if(reset) text.reset();
 
     // show total time required for running the process

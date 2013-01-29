@@ -54,11 +54,7 @@ public final class B64Stream extends B64 {
 
   @Override
   public Item materialize(final InputInfo ii) throws QueryException {
-    try {
-      return new B64(input(ii).content());
-    } catch(final IOException ex) {
-      throw error.thrw(ii, ex);
-    }
+    return new B64(binary(ii));
   }
 
   @Override
