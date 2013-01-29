@@ -170,7 +170,9 @@ public enum Err {
   // Validation module
 
   /** BXVA0001. */
-  BXVA_FAIL(BXVA, 1, "Validation failed: %"),
+  BXVA_FAIL(BXVA, 1, "Validation failed. %"),
+  /** BXVA0002. */
+  BXVA_START(BXVA, 2, "Validation could not be started. %"),
 
   // XQuery module
 

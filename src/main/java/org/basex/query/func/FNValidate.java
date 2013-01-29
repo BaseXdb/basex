@@ -11,15 +11,20 @@ import javax.xml.parsers.*;
 import javax.xml.transform.stream.*;
 import javax.xml.validation.*;
 
+import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
 
@@ -28,6 +33,7 @@ import org.xml.sax.helpers.*;
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Michael Seiferle
+ * @author Marco Lettere (greedy/verbose validation)
  */
 public final class FNValidate extends StandardFunc {
   /**
@@ -41,6 +47,25 @@ public final class FNValidate extends StandardFunc {
   }
 
   @Override
+  public Iter iter(final QueryContext ctx) throws QueryException {
+    checkCreate(ctx);
+    switch(sig) {
+      case _VALIDATE_XSD_INFO: return xsdInfo(ctx).iter();
+      case _VALIDATE_DTD_INFO: return dtdInfo(ctx).iter();
+      default:                 return super.iter(ctx);
+    }
+  }
+
+  @Override
+  public Value value(final QueryContext ctx) throws QueryException {
+    switch(sig) {
+      case _VALIDATE_XSD_INFO: return xsdInfo(ctx);
+      case _VALIDATE_DTD_INFO: return dtdInfo(ctx);
+      default:                 return super.value(ctx);
+    }
+  }
+
+  @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     checkCreate(ctx);
     switch(sig) {
@@ -48,6 +73,18 @@ public final class FNValidate extends StandardFunc {
       case _VALIDATE_DTD: return dtd(ctx);
       default:            return super.item(ctx, ii);
     }
+  }
+
+  /**
+   * Validates a document against an XML Schema.
+   * @param ctx query context
+   * @return {@code null}
+   * @throws QueryException query exception
+   */
+  private Item xsd(final QueryContext ctx) throws QueryException {
+    final Value seq = xsdInfo(ctx);
+    if(seq == Empty.SEQ) return null;
+    throw BXVA_FAIL.thrw(info, seq.iter().next());
   }
 
   /**
@@ -75,46 +112,51 @@ public final class FNValidate extends StandardFunc {
    * </ul>
    *
    * @param ctx query context
-   * @return {@code null}
+   * @return info string sequence, or null
    * @throws QueryException query exception
    */
-  private Item xsd(final QueryContext ctx) throws QueryException {
-    IOFile tmp = null;
-    try {
-      final IO in = read(0, ctx, null);
-      final SchemaFactory sf = SchemaFactory.newInstance(
-          XMLConstants.W3C_XML_SCHEMA_NS_URI);
-      final Schema schema;
-      if(expr.length < 2) { // the schema location is computed at runtime
-        schema = sf.newSchema();
-      } else { // schema explicitly given and passed to the SchemaFactory
-        IO sc = read(1, ctx, null);
-        if(!sc.exists()) WHICHRES.thrw(info, sc);
-        tmp = createTmp(sc);
-        if(tmp != null) sc = tmp;
-        schema = sf.newSchema(new URL(sc.url()));
+  private Value xsdInfo(final QueryContext ctx) throws QueryException {
+    return process(new Validate() {
+      @Override
+      void process(final ErrorHandler handler)
+          throws IOException, SAXException, QueryException {
+        final IO in = read(0, ctx, null);
+        final SchemaFactory sf = SchemaFactory.newInstance(
+            XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        final Schema schema;
+        if(expr.length < 2) {
+          // assume that schema declaration is included in document
+          schema = sf.newSchema();
+        } else { // schema explicitly given and passed to the SchemaFactory
+          IO sc = read(1, ctx, null);
+          if(!sc.exists()) WHICHRES.thrw(info, sc);
+          tmp = createTmp(sc);
+          if(tmp != null) sc = tmp;
+          schema = sf.newSchema(new URL(sc.url()));
+        }
+
+        final Validator v = schema.newValidator();
+        v.setErrorHandler(handler);
+        v.validate(new StreamSource(in.inputStream()));
       }
-      final Validator v = schema.newValidator();
-      v.setErrorHandler(new SchemaHandler());
-      v.validate(new StreamSource(in.inputStream()));
-      return null;
-    } catch(final Exception ex) {
-      if(ex instanceof QueryException) throw (QueryException) ex;
-      // may be IOException, SAXException; get original exception
-      Throwable e = ex;
-      while(e.getCause() != null) {
-        Util.debug(e);
-        e = e.getCause();
-      }
-      throw BXVA_FAIL.thrw(info, e);
-    } finally {
-      if(tmp != null) tmp.delete();
-    }
+    });
   }
 
   /**
    * Validates a document against a DTD.
-   * There exist two variants:
+   * @param ctx query context
+   * @return {@code null}
+   * @throws QueryException query exception
+   */
+  private Item dtd(final QueryContext ctx) throws QueryException {
+    final Value seq = dtdInfo(ctx);
+    if(seq == Empty.SEQ) return null;
+    throw BXVA_FAIL.thrw(info, seq.iter().next());
+  }
+
+  /**
+   * Validates a document against a DTD.
+   * The following two variants exist:
    *
    * <ul>{@code validate:dtd($doc)}
    *  <li>Looks for the document type declaration in {@code $doc} and
@@ -132,40 +174,69 @@ public final class FNValidate extends StandardFunc {
    *  </ul>
 
    * @param ctx query context
-   * @return {@code null}
+   * @return info string sequence, or null
    * @throws QueryException query exception
    */
-  private Item dtd(final QueryContext ctx) throws QueryException {
-    IOFile tmp = null;
-    try {
+  private Value dtdInfo(final QueryContext ctx) throws QueryException {
+    return process(new Validate() {
+      @Override
+      void process(final ErrorHandler handler)
+          throws IOException, ParserConfigurationException, SAXException, QueryException {
+
       final IO in;
-      if(expr.length < 2) {
-        // assume that doctype declaration is included in document
-        in = read(0, ctx, null);
-      } else {
-        // integrate doctype declaration via serialization properties
-        final SerializerProp sp = new SerializerProp();
-        final String dtd = string(checkStr(expr[1], ctx));
-        IO sc = IO.get(dtd);
-        if(!sc.exists()) WHICHRES.thrw(info, dtd);
-        tmp = createTmp(sc);
-        if(tmp != null) sc = tmp;
-        sp.set(SerializerProp.S_DOCTYPE_SYSTEM, sc.url());
-        in = read(0, ctx, sp);
+        if(expr.length < 2) {
+          // assume that doctype declaration is included in document
+          in = read(0, ctx, null);
+        } else {
+          // integrate doctype declaration via serialization properties
+          final SerializerProp sp = new SerializerProp();
+          final String dtd = string(checkStr(expr[1], ctx));
+          IO sc = IO.get(dtd);
+          if(!sc.exists()) WHICHRES.thrw(info, dtd);
+          tmp = createTmp(sc);
+          if(tmp != null) sc = tmp;
+          sp.set(SerializerProp.S_DOCTYPE_SYSTEM, sc.url());
+          in = read(0, ctx, sp);
+        }
+        final SAXParserFactory sf = SAXParserFactory.newInstance();
+        sf.setValidating(true);
+        final InputSource is = in.inputSource();
+        final SAXParser sp = sf.newSAXParser();
+
+        sp.parse(is, handler);
       }
-      final SAXParserFactory sf = SAXParserFactory.newInstance();
-      sf.setValidating(true);
-      final InputSource is = in.inputSource();
-      sf.newSAXParser().parse(is, new SchemaHandler());
-      return null;
+    });
+  }
+
+  /**
+   * Runs the specified validator.
+   * @param v validator code
+   * @return string sequence with warnings and errors
+   * @throws QueryException query exception
+   */
+  private Value process(final Validate v) throws QueryException {
+    final ErrorHandler handler = new ErrorHandler();
+    try {
+      v.process(handler);
     } catch(final QueryException ex) {
       throw ex;
-    } catch(final Exception ex) {
-      // may be IOException, SAXException, ParserConfigurationException
-      throw BXVA_FAIL.thrw(info, ex);
+    } catch(final IOException ex) {
+      throw BXVA_START.thrw(info, ex);
+    } catch(final ParserConfigurationException ex) {
+      throw BXVA_START.thrw(info, ex);
+    } catch(final SAXException ex) {
+      // fatal exception: get original message
+      Throwable e = ex;
+      while(e.getCause() != null) {
+        Util.debug(e);
+        e = e.getCause();
+      }
+      return Str.get(Text.FATAL_C + ex.getLocalizedMessage());
     } finally {
-      if(tmp != null) tmp.delete();
+      if(v.tmp != null) v.tmp.delete();
     }
+    // return error strings
+    return StrSeq.get(handler.getExceptions());
   }
 
   /**
@@ -175,37 +246,11 @@ public final class FNValidate extends StandardFunc {
    * @return resulting file
    * @throws IOException I/O exception
    */
-  private static IOFile createTmp(final IO in) throws IOException {
+  static IOFile createTmp(final IO in) throws IOException {
     if(!(in instanceof IOContent || in instanceof IOStream)) return null;
     final IOFile tmp = new IOFile(File.createTempFile("validate", IO.BASEXSUFFIX));
     tmp.write(in.read());
     return tmp;
-  }
-
-  /** Schema error handler. */
-  public static class SchemaHandler extends DefaultHandler {
-    @Override
-    public void fatalError(final SAXParseException ex) throws SAXException {
-      error(ex);
-    }
-
-    @Override
-    public void error(final SAXParseException ex) throws SAXException {
-      // may be recursively called if external validator (e.g. Saxon) is used
-      final String msg = ex.getMessage();
-      if(msg.contains("Exception:")) {
-        Throwable e = ex;
-        while(e.getCause() != null) e = e.getCause();
-        throw e instanceof SAXException ? (SAXException) e : new SAXException(msg);
-      }
-
-      final TokenBuilder report = new TokenBuilder();
-      final String id = ex.getSystemId();
-      if(id != null) report.add(IO.get(id).name()).add(", ");
-      report.addExt(ex.getLineNumber()).add(':').addExt(ex.getColumnNumber());
-      report.add(": ").add(msg);
-      throw new SAXException(report.toString());
-    }
   }
 
   /**
@@ -217,7 +262,7 @@ public final class FNValidate extends StandardFunc {
    * @throws QueryException query exception
    * @throws IOException exception
    */
-  private IO read(final int i, final QueryContext ctx, final SerializerProp sp)
+  IO read(final int i, final QueryContext ctx, final SerializerProp sp)
       throws QueryException, IOException {
 
     final Item it = checkItem(expr[i], ctx);
@@ -229,11 +274,11 @@ public final class FNValidate extends StandardFunc {
       Serializer.get(ao, sp).serialize((ANode) it);
       return new IOContent(ao.toArray());
     }
+
     if(it instanceof AStr) {
       final String path = string(it.string(info));
       IO io = IO.get(path);
       if(!io.exists()) WHICHRES.thrw(info, path);
-
       if(sp != null) {
         // add doctype declaration if specified
         Serializer.get(ao, sp).serialize(new DBNode(io, ctx.context.prop));
@@ -243,5 +288,74 @@ public final class FNValidate extends StandardFunc {
       return io;
     }
     throw STRNODTYPE.thrw(info, this, ip);
+  }
+
+  /** Schema error handler. */
+  static class ErrorHandler extends DefaultHandler {
+    /** Will contain all raised validation exception messages. */
+    private final TokenList exceptions = new TokenList();
+
+    @Override
+    public void fatalError(final SAXParseException ex) {
+      error(ex, Text.FATAL_C);
+    }
+
+    @Override
+    public void error(final SAXParseException ex) {
+      error(ex, Text.ERROR_C);
+    }
+
+    @Override
+    public void warning(final SAXParseException ex) {
+      error(ex, Text.WARNING_C);
+    }
+
+    /**
+     * Adds an error message.
+     * @param ex exception
+     * @param type type of error
+     */
+    private void error(final SAXParseException ex, final String type) {
+      // may be recursively called if external validator (e.g. Saxon) is used
+      String msg = ex.getMessage();
+      if(msg.contains("Exception:")) {
+        Throwable e = ex;
+        while(e.getCause() != null) e = e.getCause();
+        if(e instanceof SAXException) msg = e.getLocalizedMessage();
+      } else {
+        final TokenBuilder report = new TokenBuilder();
+        final String id = ex.getSystemId();
+        if(id != null) report.add(IO.get(id).name()).add(", ");
+        report.addExt(ex.getLineNumber()).add(Text.COL).addExt(ex.getColumnNumber());
+        report.add(": ").add(msg);
+        msg = report.toString();
+      }
+      exceptions.add(type + msg);
+    }
+
+    /**
+     * Returns the exception messages.
+     * @return exception messages
+     */
+    protected TokenList getExceptions() {
+      return exceptions;
+    }
+  }
+
+  /** Abstract validator class. */
+  abstract static class Validate {
+    /** Temporary file instance. */
+    IOFile tmp;
+
+    /**
+     * Starts the validation.
+     * @param h error handler
+     * @throws IOException I/O exception
+     * @throws ParserConfigurationException parser configuration exception
+     * @throws SAXException SAX exception
+     * @throws QueryException query exception
+     */
+    abstract void process(ErrorHandler h)
+        throws IOException, ParserConfigurationException, SAXException, QueryException;
   }
 }

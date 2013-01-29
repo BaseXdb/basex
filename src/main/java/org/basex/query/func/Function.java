@@ -874,7 +874,11 @@ public enum Function {
   /** XQuery function. */
   _VALIDATE_XSD(FNValidate.class, "xsd(input[,schema])", EMP, 1, ITEM, ITEM),
   /** XQuery function. */
+  _VALIDATE_XSD_INFO(FNValidate.class, "xsd-info(input[,schema])", STR_ZM, 1, ITEM, ITEM),
+  /** XQuery function. */
   _VALIDATE_DTD(FNValidate.class, "dtd(input[,schema])", EMP, 1, ITEM, ITEM),
+  /** XQuery function. */
+  _VALIDATE_DTD_INFO(FNValidate.class, "dtd-info(input[,schema])", STR_ZM, 1, ITEM, ITEM),
 
   /* FNXslt functions. */
 
