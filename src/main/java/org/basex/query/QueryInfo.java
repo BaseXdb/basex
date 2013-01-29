@@ -43,8 +43,6 @@ public final class QueryInfo {
     final long total = pars + cmpl + evlt + srlz;
     if(detailed) {
       final int up = qp.updates();
-      tb.add(NL).add(QUERY_CC);
-      tb.add(QueryProcessor.removeComments(qp.query(), Integer.MAX_VALUE)).add(NL);
       tb.add(qp.info()).add(NL);
       tb.add(PARSING_CC).add(Performance.getTime(pars, runs)).add(NL);
       tb.add(COMPILING_CC).add(Performance.getTime(cmpl, runs)).add(NL);

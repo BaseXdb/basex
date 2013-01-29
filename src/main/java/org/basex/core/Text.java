@@ -603,6 +603,8 @@ public interface Text {
 
   /** Query info: query. */
   String QUERY_C = lang("query") + COL;
+  /** Query info: optimized query. */
+  String OPTIMIZED_QUERY_C = lang("optimized_query") + COL;
   /** Query info: compiling. */
   String COMPILING_C = lang("compiling") + COL;
   /** Query info: evaluating. */

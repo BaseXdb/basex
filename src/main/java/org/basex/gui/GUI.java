@@ -304,8 +304,7 @@ public final class GUI extends AGUI {
     } else if(gprop.num(GUIProp.SEARCHMODE) == 1 || in.startsWith("/")) {
       xquery(in, false);
     } else {
-      final String qu = Find.find(in, context, gprop.is(GUIProp.FILTERRT));
-      execute(false, new XQuery(qu));
+      execute(false, new Find(in, gprop.is(GUIProp.FILTERRT)));
     }
   }
 

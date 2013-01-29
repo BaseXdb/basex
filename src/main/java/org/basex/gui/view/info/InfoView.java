@@ -185,9 +185,9 @@ public final class InfoView extends View implements LinkListener {
       } else if(line.startsWith(COMPILING_C)) {
         while(++i < split.length && !split[i].isEmpty()) comp.add(split[i]);
       } else if(line.startsWith(QUERY_C)) {
-        origqu.add(line.substring(s + 1).trim());
-      } else if(line.startsWith(RESULT_C)) {
-        optqu.add(line.substring(s + 1).trim());
+        while(i + 1 < split.length && !split[++i].isEmpty()) origqu.add(split[i]);
+      } else if(line.startsWith(OPTIMIZED_QUERY_C)) {
+        while(i + 1 < split.length && !split[++i].isEmpty()) optqu.add(split[i]);
       } else if(line.startsWith(EVALUATING_C)) {
         while(i + 1 < split.length && split[++i].startsWith(LI)) eval.add(split[i]);
       } else if(line.startsWith(HITS_X_CC) || line.startsWith(UPDATED_CC) ||
@@ -239,13 +239,12 @@ public final class InfoView extends View implements LinkListener {
     add(EVALUATING_C, eval);
     add(QUERY_C + ' ', origqu);
     add(COMPILING_C, comp);
-    if(!comp.isEmpty()) add(QUERY_C + ' ', optqu);
+    if(!comp.isEmpty()) add(OPTIMIZED_QUERY_C + ' ', optqu);
     add(RESULT_C, result);
     add(TIMING_C, timings);
     add(QUERY_PLAN_C, plan);
     if(inf != null) text.add(inf).nline();
     area.setText(text.finish());
-    System.out.println(text.size());
     if(reset) text.reset();
 
     // show total time required for running the process

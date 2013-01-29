@@ -130,15 +130,15 @@ public final class QueryContext extends Progress {
   /** Root expression of the query. */
   Expr root;
 
-  /** String container for query background information. */
+  /** String container for verbose query info. */
   private final TokenBuilder info = new TokenBuilder();
-  /** Info flag. */
+  /** Indicates if verbose query info was requested. */
   private final boolean inf;
-  /** Optimization flag. */
-  private boolean firstOpt = true;
-  /** Evaluation flag. */
-  private boolean firstEval = true;
-  /** Closed flag. */
+  /** Indicates if some compilation info has been output. */
+  private boolean compInfo;
+  /** Indicates if some evaluation info has been output. */
+  private boolean evalInfo;
+  /** Indicates if the query context has been closed. */
   private boolean closed;
 
   /**
@@ -209,7 +209,7 @@ public final class QueryContext extends Progress {
     analyze();
 
     // dump resulting query
-    if(inf) info.add(NL + RESULT_C + funcs + root + NL);
+    if(inf && compInfo) info.add(NL + OPTIMIZED_QUERY_C + NL + funcs + root + NL);
   }
 
   /**
@@ -321,9 +321,9 @@ public final class QueryContext extends Progress {
    */
   public void compInfo(final String string, final Object... ext) {
     if(!inf) return;
-    if(firstOpt) {
+    if(!compInfo) {
       info.add(NL).add(COMPILING_C).add(NL);
-      firstOpt = false;
+      compInfo = true;
     }
     info.add(LI).addExt(string, ext).add(NL);
   }
@@ -334,9 +334,9 @@ public final class QueryContext extends Progress {
    */
   public void evalInfo(final String string) {
     if(!inf) return;
-    if(firstEval) {
+    if(!evalInfo) {
       info.add(NL).add(EVALUATING_C).add(NL);
-      firstEval = false;
+      evalInfo = true;
     }
     info.add(LI).add(string.replaceAll("\r?\n\\s*", " ")).add(NL);
   }

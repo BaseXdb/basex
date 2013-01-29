@@ -229,6 +229,7 @@ only_backup          = Hanya tersedia sebagai cadangan.
 open                 = Buka
 open_manage          = Buka & Kelola
 optimize             = Optimisasi
+optimized_query      = Dioptimalkan kueri
 options              = Pilihan
 out_of_date          = kuno
 out_of_mem           = Keluar dari Memori utama.

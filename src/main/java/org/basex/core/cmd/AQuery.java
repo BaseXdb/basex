@@ -112,7 +112,7 @@ public abstract class AQuery extends Command {
         Util.debug(ex);
         err = CIRCLDECL.desc;
       } catch(final RuntimeException ex) {
-        extError(query, "");
+        extError("");
         Util.debug(info());
         throw ex;
       } finally {
@@ -120,25 +120,19 @@ public abstract class AQuery extends Command {
         if(qp != null) qp.close();
       }
     }
-    return extError(query, err);
+    return extError(err);
   }
 
   /**
    * Returns an extended error message.
-   * @param query query
    * @param err error message
    * @return result of check
    */
-  final boolean extError(final String query, final String err) {
+  final boolean extError(final String err) {
     // will only be evaluated when an error has occurred
     final StringBuilder sb = new StringBuilder();
     if(prop.is(Prop.QUERYINFO)) {
-      final String info = info();
-      if(!info.isEmpty()) sb.append(info);
-      sb.append(NL + QUERY_CC + query);
-      final String i = qp.info();
-      if(!i.isEmpty()) sb.append(i);
-      sb.append(NL + ERROR_C + NL);
+      sb.append(info()).append(qp.info()).append(NL).append(ERROR_C).append(NL);
     }
     sb.append(err);
     return error(sb.toString());

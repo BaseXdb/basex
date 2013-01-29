@@ -230,6 +230,7 @@ only_backup          = Зөвхөн нөөцлөлтөд хүчинтэй
 open                 = Нээх
 open_manage          = Удирдах
 optimize             = Шинэчлэх
+optimized_query      = Квери
 options              = Тохиргоонууд
 out_of_date          = Шинэчлэгдээгүй байна, шинэчлэгдэх шаардлагатай
 out_of_mem           = Санах ой дүүрсэн.

@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import java.util.*;
 
+import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -411,10 +412,10 @@ public class GFLWOR extends ParseExpr {
   @Override
   public final String toString() {
     final StringBuilder sb = new StringBuilder();
-    for(int i = 0; i != fl.length; ++i) sb.append(i != 0 ? " " : "").append(fl[i]);
-    if(where != null) sb.append(' ' + WHERE + ' ' + where);
-    if(group != null) sb.append(group);
-    if(order != null) sb.append(order);
-    return sb.append(' ' + RETURN + ' ' + ret).toString();
+    for(int i = 0; i != fl.length; ++i) sb.append(i != 0 ? Text.NL : "").append(fl[i]);
+    if(where != null) sb.append(Text.NL + WHERE + ' ' + where);
+    if(group != null) sb.append(Text.NL + group);
+    if(order != null) sb.append(Text.NL + order);
+    return sb.append(Text.NL + RETURN + ' ' + ret).toString();
   }
 }

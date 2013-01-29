@@ -229,6 +229,7 @@ only_backup          = バックアップとしてのみ使用できます。
 open                 = 開く
 open_manage          = 管理
 optimize             = 最適化
+optimized_query      = クエリー
 options              = オプション
 out_of_date          = 期限切れ
 out_of_mem           = メモリー不足。

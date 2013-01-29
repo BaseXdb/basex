@@ -229,6 +229,7 @@ only_backup          = Disponibil numai ca o copie de rezervă.
 open                 = Deschide
 open_manage          = Deschide & administreaza
 optimize             = Optimizaţi
+optimized_query      = Interogare
 options              = Opţiuni
 out_of_date          = Data insuficiente.
 out_of_mem           = Memorie insuficientă.

@@ -229,6 +229,7 @@ only_backup          = Only available as a backup.
 open                 = Ouvrir
 open_manage          = Administrer
 optimize             = Optimiser
+optimized_query      = Requête Optimisée
 options              = Options
 out_of_date          = périmé
 out_of_mem           = Dépassement de mémoire principale.

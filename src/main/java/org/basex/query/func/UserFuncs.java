@@ -3,6 +3,7 @@ package org.basex.query.func;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -213,7 +214,7 @@ public final class UserFuncs extends ExprInfo {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    for(final UserFunc f : funcs) sb.append(f.toString());
+    for(final UserFunc f : funcs) sb.append(f.toString()).append(Text.NL);
     return sb.toString();
   }
 }

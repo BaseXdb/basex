@@ -1,5 +1,6 @@
 package org.basex.core.cmd;
 
+import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 
 import org.basex.core.*;
@@ -14,22 +15,43 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class Find extends AQuery {
+  /** Start from root node. */
+  private final boolean root;
+
   /**
    * Default constructor.
    * @param query simplified query
    */
   public Find(final String query) {
+    this(query, false);
+  }
+
+  /**
+   * Default constructor.
+   * @param query simplified query
+   * @param rt start from root node
+   */
+  public Find(final String query, final boolean rt) {
     super(Perm.NONE, true, query);
+    root = rt;
   }
 
   @Override
   protected boolean run() {
-    return query(find(args[0], context, false));
+    final String query = find(args[0], context, root);
+    final boolean ok = query(query);
+    final StringBuilder sb = new StringBuilder();
+    if(prop.is(Prop.QUERYINFO)) {
+      sb.append(NL).append(QUERY_CC).append(NL).append(query).append(NL);
+    }
+    sb.append(info());
+    error(sb.toString());
+    return ok;
   }
 
   @Override
   public boolean updating(final Context ctx) {
-    return updating(ctx, find(args[0], ctx, false));
+    return updating(ctx, find(args[0], ctx, root));
   }
 
   @Override
@@ -42,7 +64,7 @@ public final class Find extends AQuery {
    * Creates an XQuery representation for the specified query.
    * @param query query
    * @param ctx database context
-   * @param root root flag
+   * @param root start from root node
    * @return query
    */
   public static String find(final String query, final Context ctx, final boolean root) {
