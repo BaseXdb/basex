@@ -104,7 +104,11 @@ final class DatabaseUpdates {
    * @throws QueryException query exception
    */
   void check(final MemData tmp) throws QueryException {
-    // get and sort keys (pre/id values)
+    // Prepare/check database operations
+    for(final BasicOperation d : dbops)
+      d.prepare(tmp);
+
+    // Prepare/check XQUP primitives:
     final int s = updatePrimitives.size();
     nodes = new IntList(s);
     for(int i = 1; i <= s; i++)
@@ -181,10 +185,8 @@ final class DatabaseUpdates {
 
     // execute database operations
     Collections.sort(dbops);
-    for(final BasicOperation d : dbops) {
-      d.prepare(tmp);
+    for(final BasicOperation d : dbops)
       d.apply();
-    }
 
     // execute fn:put operations
     final int s = puts.size();
