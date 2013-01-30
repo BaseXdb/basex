@@ -1082,7 +1082,7 @@ public class QueryParser extends InputParser {
 
     if(!wsConsumeWs(RETURN)) {
       if(alter != null) error();
-      error(where == null ? FLWORWHERE : order == null ? FLWORORD : FLWORRET);
+      error(FLWORRETURN);
     }
     final Expr ret = check(single(), NORETURN);
     ctx.vars.size(s);

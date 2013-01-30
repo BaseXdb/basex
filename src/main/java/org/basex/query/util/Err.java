@@ -662,11 +662,7 @@ public enum Err {
   /** XPST0003. */
   GRPBY(XPST, 3, "Expecting valid expression after 'group by'."),
   /** XPST0003. */
-  FLWORWHERE(XPST, 3, "Expecting 'where', 'order' or 'return' expression."),
-  /** XPST0003. */
-  FLWORORD(XPST, 3, "Expecting 'order' or 'return' expression."),
-  /** XPST0003. */
-  FLWORRET(XPST, 3, "Expecting 'return' expression."),
+  FLWORRETURN(XPST, 3, "Incomplete FLWOR expression: expecting 'return'."),
   /** XPST0003. */
   NOSOME(XPST, 3, "Incomplete quantifier expression."),
   /** XPST0003. */
