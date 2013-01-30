@@ -17,6 +17,9 @@ import org.xml.sax.*;
  * @author Christian Gruen
  */
 public final class IOUrl extends IO {
+  /** Timeout for connecting to a resource (seconds). */
+  private static final int TIMEOUT = 10;
+
   /**
    * Constructor.
    * @param u url
@@ -38,12 +41,25 @@ public final class IOUrl extends IO {
   @Override
   public InputStream inputStream() throws IOException {
     final URL url = new URL(path);
+
+    URLConnection conn = null;
     try {
-      final URLConnection conn = url.openConnection();
-      conn.setConnectTimeout(30000);
+      conn = url.openConnection();
+      conn.setConnectTimeout(TIMEOUT * 1000);
       return conn.getInputStream();
     } catch(final IOException ex) {
-      final IOException io = new IOException(Util.message(ex));
+      final TokenBuilder msg = new TokenBuilder(Util.message(ex));
+      try {
+        // try to retrieve more information on why the request failed
+        if(conn instanceof HttpURLConnection) {
+          final InputStream es = ((HttpURLConnection) conn).getErrorStream();
+          if(es != null) {
+            final byte[] err = new IOStream(es).read();
+            if(err.length != 0) msg.add(NL).add(INFORMATION).add(COL).add(NL).add(err);
+          }
+        }
+      } finally { /* ignored */ }
+      final IOException io = new IOException(msg.toString());
       io.setStackTrace(ex.getStackTrace());
       throw io;
     } catch(final RuntimeException ex) {
