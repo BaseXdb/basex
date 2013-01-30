@@ -128,6 +128,11 @@
       <version>4.8.2</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+    	<groupId>com.vividsolutions</groupId>
+    	<artifactId>jts</artifactId>
+    	<version>1.12</version>
+    </dependency>
   </dependencies>
   <build>
     <finalName>${project.artifactId}-${project.version}</finalName>
