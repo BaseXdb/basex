@@ -75,7 +75,7 @@ public final class LockingTest extends SandboxTest {
    */
   @BeforeClass
   public static void start() throws Exception {
-    AProp.setSystem(MainProp.DBLOCKING, true);
+    AProp.setSystem(MainProp.GLOBALLOCK, false);
     server = createServer();
     final CountDownLatch latch = new CountDownLatch(2);
     new Client(new CreateDB(NAME, DOC), null, latch);

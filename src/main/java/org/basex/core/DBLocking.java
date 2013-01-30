@@ -20,8 +20,7 @@ import org.basex.util.list.*;
  * them in parallel by the same thread (it is fine to call arbitrary locking methods by
  * different threads at the same time).
  *
- * This locking can be activated by setting {@link MainProp#DBLOCKING} to {@code true}.
- * It will get the default implementation in future versions.
+ * This locking can be deactivated by setting {@link MainProp#GLOBALLOCK} to {@code true}.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Jens Erat

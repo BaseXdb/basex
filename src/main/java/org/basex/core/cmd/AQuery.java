@@ -98,8 +98,8 @@ public abstract class AQuery extends Command {
         }
         // dump some query info
         out.flush();
-        // remove string list if process locking is used and if query is updating
-        if(!mprop.is(MainProp.DBLOCKING) && qp.updating) qi.locked = null;
+        // remove string list if global locking is used and if query is updating
+        if(mprop.is(MainProp.GLOBALLOCK) && qp.updating) qi.locked = null;
         return info(qi.toString(qp, out, hits, prop.is(Prop.QUERYINFO)));
 
       } catch(final QueryException ex) {

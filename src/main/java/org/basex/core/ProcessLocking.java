@@ -10,8 +10,8 @@ import org.basex.util.list.*;
  * Supports multiple readers, limited by {@link MainProp#PARALLEL},
  * and a single writer (readers/writer lock).
  *
- * This locking is activated by default. It will be replace by {@link DBLocking}
- * in future versions.
+ * Since Version 7.6, this locking class has been replaced by {@link DBLocking}.
+ * It can still be activated by setting {@link MainProp#GLOBALLOCK} to {@code true}.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen

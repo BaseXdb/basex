@@ -30,6 +30,8 @@ public final class MainProp extends AProp {
   public static final Object[] LANG = { "LANG", Prop.language };
   /** Flag to include key names in the language strings. */
   public static final Object[] LANGKEYS = { "LANGKEYS", false };
+  /** Applied locking algorithm: local (database) vs. global (process) locking. */
+  public static final Object[] GLOBALLOCK = { "GLOBALLOCK", false };
 
   /** Comment: written to property file. */
   public static final Object[] C_CLIENT = { "Client/Server Architecture" };
@@ -79,13 +81,6 @@ public final class MainProp extends AProp {
   public static final Object[] HTTPLOCAL = { "HTTPLOCAL", false };
   /** Port for stopping the web server. */
   public static final Object[] STOPPORT = { "STOPPORT", 8985 };
-
-  /** Comment: written to property file. */
-  public static final Object[] C_EXP = { "Experimental Options" };
-
-  /** Hidden option: defines the locking algorithm (process vs. database locking);
-   *  will be removed as soon as database locking is stable. */
-  public static final Object[] DBLOCKING = { "DBLOCKING", false };
 
   /**
    * Constructor, adopting system properties starting with "org.basex.".
