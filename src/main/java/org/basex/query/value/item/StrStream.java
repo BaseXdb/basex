@@ -40,7 +40,7 @@ public final class StrStream extends AStr {
     try {
       return input(ii).content();
     } catch(final IOException ex) {
-      throw error.thrw(ii, input);
+      throw error.thrw(ii, ex);
     }
   }
 
@@ -58,7 +58,7 @@ public final class StrStream extends AStr {
       return nli;
     } catch(final IOException ex) {
       if(nli != null) try { nli.close(); } catch(final IOException ignored) { }
-      throw error.thrw(ii, input);
+      throw error.thrw(ii, ex);
     }
   }
 
