@@ -27,20 +27,23 @@ public class Geo extends QueryModule {
   /** GML URI. */
   private static final byte[] GMLURI = token("http://www.opengis.net/gml");
 
+  /** Prefix: "gml:". */
+  private static final String GML = "gml:";
   /** QName gml:Point. */
-  private static final QNm Q_GML_POINT = new QNm("gml:Point", GMLURI);
+  private static final QNm Q_GML_POINT = new QNm(GML + "Point", GMLURI);
   /** QName gml:MultiPoint. */
-  private static final QNm Q_GML_MULTIPOINT = new QNm("gml:MultiPoint", GMLURI);
+  private static final QNm Q_GML_MULTIPOINT = new QNm(GML + "MultiPoint", GMLURI);
   /** QName gml:LineString. */
-  private static final QNm Q_GML_LINESTRING = new QNm("gml:LineString", GMLURI);
+  private static final QNm Q_GML_LINESTRING = new QNm(GML + "LineString", GMLURI);
   /** QName gml:LinearRing. */
-  private static final QNm Q_GML_LINEARRING = new QNm("gml:LinearRing", GMLURI);
-  /** QName gml:MultiLineString. */
-  private static final QNm Q_GML_MULTILINESTRING = new QNm("gml:MultiLineString", GMLURI);
+  private static final QNm Q_GML_LINEARRING = new QNm(GML + "LinearRing", GMLURI);
   /** QName gml:Polygon. */
-  private static final QNm Q_GML_POLYGON = new QNm("gml:Polygon", GMLURI);
+  private static final QNm Q_GML_POLYGON = new QNm(GML + "Polygon", GMLURI);
   /** QName gml:MultiPolygon. */
-  private static final QNm Q_GML_MULTIPOLYGON = new QNm("gml:MultiPolygon", GMLURI);
+  private static final QNm Q_GML_MULTIPOLYGON = new QNm(GML + "MultiPolygon", GMLURI);
+  /** QName gml:MultiLineString. */
+  private static final QNm Q_GML_MULTILINESTRING =
+      new QNm(GML + "MultiLineString", GMLURI);
 
   /** Array containing all QNames. */
   private static final QNm[] QNAMES = {
@@ -67,7 +70,7 @@ public class Geo extends QueryModule {
    */
   @Deterministic
   public QNm geometryType(final ANode node) throws QueryException {
-    return new QNm("gml:" + checkGeo(node).getGeometryType());
+    return new QNm(GML + checkGeo(node).getGeometryType());
   }
 
   /**
@@ -307,8 +310,7 @@ public class Geo extends QueryModule {
    */
   @Deterministic
   public ANode buffer(final ANode node, final Dbl distance) throws QueryException {
-    final Geometry geo = checkGeo(node);
-    return gmlWriter(geo.buffer(distance.dbl()));
+    return gmlWriter(checkGeo(node).buffer(distance.dbl()));
   }
 
   /**
@@ -320,8 +322,7 @@ public class Geo extends QueryModule {
    */
   @Deterministic
   public ANode convexHull(final ANode node) throws QueryException {
-    final Geometry geo = checkGeo(node);
-    return gmlWriter(geo.convexHull());
+    return gmlWriter(checkGeo(node).convexHull());
   }
 
   /**
@@ -391,8 +392,7 @@ public class Geo extends QueryModule {
    */
   @Deterministic
   public Int numGeometries(final ANode node) throws QueryException {
-    final Geometry geo = checkGeo(node);
-    return Int.get(geo.getNumGeometries());
+    return Int.get(checkGeo(node).getNumGeometries());
   }
 
   /**
@@ -465,8 +465,7 @@ public class Geo extends QueryModule {
    */
   @Deterministic
   public Dbl length(final ANode node) throws QueryException {
-    final Geometry geo = checkGeo(node);
-    return Dbl.get(geo.getLength());
+    return Dbl.get(checkGeo(node).getLength());
   }
 
   /**
@@ -549,8 +548,7 @@ public class Geo extends QueryModule {
    */
   @Deterministic
   public Int numPoints(final ANode node) throws QueryException {
-    final Geometry geo = checkGeo(node);
-    return Int.get(geo.getNumPoints());
+    return Int.get(checkGeo(node).getNumPoints());
   }
 
   /**
@@ -584,8 +582,7 @@ public class Geo extends QueryModule {
    */
   @Deterministic
   public Dbl area(final ANode node) throws QueryException {
-    final Geometry geo = checkGeo(node);
-    return Dbl.get(geo.getArea());
+    return Dbl.get(checkGeo(node).getArea());
   }
 
   /**
@@ -597,8 +594,7 @@ public class Geo extends QueryModule {
    */
   @Deterministic
   public ANode centroid(final ANode node) throws QueryException {
-    final Geometry geo = checkGeo(node);
-    return gmlWriter(geo.getCentroid());
+    return gmlWriter(checkGeo(node).getCentroid());
   }
 
   /**
@@ -610,8 +606,7 @@ public class Geo extends QueryModule {
    */
   @Deterministic
   public ANode pointOnSurface(final ANode node) throws QueryException {
-    final Geometry geo = checkGeo(node);
-    return gmlWriter(geo.getInteriorPoint());
+    return gmlWriter(checkGeo(node).getInteriorPoint());
   }
 
   /**
@@ -686,9 +681,7 @@ public class Geo extends QueryModule {
    * @return geometry, or {@code null}
    * @throws QueryException query exception
    */
-  private Geometry geo(final ANode node, final QNm... names)
-      throws QueryException {
-
+  private Geometry geo(final ANode node, final QNm... names) throws QueryException {
     if(node.type != NodeType.ELM)
       Err.FUNCMP.thrw(null, this, NodeType.ELM, node.type);
 
@@ -715,8 +708,6 @@ public class Geo extends QueryModule {
    * @throws QueryException exception
    */
   private DBNode gmlWriter(final Geometry geometry) throws QueryException {
-    //if(geometry.isEmpty()) return null;
-
     String geo;
     try {
       geo = new GMLWriter().write(geometry);
