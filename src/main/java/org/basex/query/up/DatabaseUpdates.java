@@ -176,10 +176,9 @@ final class DatabaseUpdates {
 
   /**
    * Applies all updates for this specific database.
-   * @param tmp temporary mem data
    * @throws QueryException query exception
    */
-  void apply(final MemData tmp) throws QueryException {
+  void apply() throws QueryException {
     // execute database updates
     createAtomicUpdates(preparePrimitives()).execute(true);
 

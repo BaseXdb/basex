@@ -347,6 +347,13 @@ public final class FNDbTest extends AdvancedQueryTest {
     query(_DB_CREATE.args(dbname, FLDR, "test/dir"));
     query(COUNT.args(COLLECTION.args(dbname + "/test/dir")), NFLDR);
 
+    // create DB w/ more than one input
+    query(_DB_CREATE.args(dbname, "(<a/>,<b/>)", "('1.xml','2.xml')"));
+    query(_DB_CREATE.args(dbname, "(<a/>,'" + FILE + "')", "('1.xml','2.xml')"));
+
+    error(_DB_CREATE.args(dbname, "()", "1.xml"), Err.BXDB_CREATEARGS);
+    error(_DB_CREATE.args(dbname, "(<a/>,<b/>)", "1.xml"), Err.BXDB_CREATEARGS);
+
     // create and drop more than one database
     query("for $i in 1 to 5 return " + _DB_CREATE.args(" '" + dbname + "' || $i"));
     query("for $i in 1 to 5 return " + _DB_DROP.args(" '" + dbname + "' || $i"));

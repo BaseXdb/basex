@@ -87,7 +87,7 @@ public abstract class ContextModifier {
         i++;
       }
       // apply updates
-      for(final DatabaseUpdates c : updates) c.apply(tmp);
+      for(final DatabaseUpdates c : updates) c.apply();
     } finally {
       // remove write locks and updating files
       for(final DatabaseUpdates c : updates) {

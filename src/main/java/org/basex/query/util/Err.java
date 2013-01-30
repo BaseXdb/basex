@@ -84,6 +84,8 @@ public enum Err {
   BXDB_NAME(BXDB, 11, "Invalid database name: '%'."),
   /** BXDB0012. */
   BXDB_CREATE(BXDB, 12, "Database '%' can only be create once."),
+  /** BXDB0013. */
+  BXDB_CREATEARGS(BXDB, 12, "Number of specified inputs and paths differs: % vs. %."),
 
   // Fetch module
 
@@ -182,7 +184,7 @@ public enum Err {
   // EXPath modules
 
   /** ARCH0001. */
-  ARCH_DIFF(ARCH, 1, "Number of entries (%) and contents (%) differs."),
+  ARCH_DIFF(ARCH, 1, "Number of specified entries and contents differs: % vs. %."),
   /** ARCH0002. */
   ARCH_UNKNOWN(ARCH, 2, "Packing format not supported."),
   /** ARCH0002. */

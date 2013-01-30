@@ -563,7 +563,7 @@ public enum Function {
   /** XQuery function. */
   _DB_DELETE(FNDb.class, "delete(database,path)", EMP, ITEM, STR),
   /** XQuery function. */
-  _DB_CREATE(FNDb.class, "create(name[,input[,path]])", EMP, 1, STR, NOD, STR),
+  _DB_CREATE(FNDb.class, "create(name[,inputs[,paths]])", EMP, 1, STR, ITEM_ZM, STR_ZM),
   /** XQuery function. */
   _DB_DROP(FNDb.class, "drop(database)", EMP, ITEM),
   /** XQuery function. */
