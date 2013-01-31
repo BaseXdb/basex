@@ -362,7 +362,7 @@ public final class GUI extends AGUI {
     final int thread = ++threadID;
     while(command != null) {
       command.stop();
-      Performance.sleep(50);
+      Thread.yield();
       if(threadID != thread) return true;
     }
     cursor(CURSORWAIT);
