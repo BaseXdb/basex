@@ -8,7 +8,7 @@ import org.basex.util.list.*;
 /**
  * This class is implemented by all kinds of processes.
  * It gives feedback on the current process. Moreover, it allows to
- * interrupt the process by calling the {@link #stop} method.
+ * interrupt the process by calling the {@link #stop()} method.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen

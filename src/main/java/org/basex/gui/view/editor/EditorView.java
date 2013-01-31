@@ -51,6 +51,8 @@ public final class EditorView extends View {
   private static final Pattern ERRORTT = Pattern.compile(
       "^.*\r?\n" + STOPPED_AT + " |\r?\n" + STACK_TRACE_C + ".*", Pattern.DOTALL);
 
+  /** Search panel. */
+  final SearchPanel search;
   /** History Button. */
   final BaseXButton hist;
   /** Execute Button. */
@@ -77,9 +79,6 @@ public final class EditorView extends View {
   private final BaseXLabel header;
   /** Filter button. */
   private final BaseXButton filter;
-
-  /** Search panel. */
-  public final SearchPanel search;
 
   /**
    * Default constructor.
@@ -447,14 +446,22 @@ public final class EditorView extends View {
    * Evaluates the info message resulting from a parsed or executed query.
    * @param msg info message
    * @param ok {@code true} if evaluation was successful
-   * @param up update
+   * @param refresh refresh buttons
    */
-  public void info(final String msg, final boolean ok, final boolean up) {
+  public void info(final String msg, final boolean ok, final boolean refresh) {
+    // do not refresh view when query is running
+    if(!refresh && stop.isEnabled()) return;
+
     ++threadID;
     errPos = -1;
     errFile = null;
     errMsg = null;
     getEditor().resetError();
+
+    if(refresh) {
+      stop.setEnabled(false);
+      refreshMark();
+    }
 
     if(ok) {
       info.setCursor(GUIConstants.CURSORARROW);
@@ -466,11 +473,6 @@ public final class EditorView extends View {
       final String tt = ERRORTT.matcher(msg).replaceAll("").replaceAll(
           "\r?\n", "<br/>").replaceAll("(<br/>.*?)<br/>.*", "$1");
       info.setToolTipText("<html>" + STOPPED_AT + ' ' + tt + "</html>");
-    }
-
-    if(up) {
-      stop.setEnabled(false);
-      refreshMark();
     }
   }
 
