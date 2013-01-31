@@ -70,7 +70,7 @@ public abstract class BXNode implements Node {
 
   @Override
   public final BXNode cloneNode(final boolean deep) {
-    return node.copy().toJava();
+    return node.toJava();
   }
 
   @Override
@@ -96,14 +96,14 @@ public abstract class BXNode implements Node {
 
   @Override
   public BXNode getFirstChild() {
-    return toJava(node.children().next().finish());
+    return toJava(node.children().next());
   }
 
   @Override
   public final BXNode getLastChild() {
     ANode n = null;
     for(final ANode t : node.children()) n = t;
-    return n != null ? toJava(n.finish()) : null;
+    return n != null ? toJava(n) : null;
   }
 
   @Override
@@ -113,12 +113,12 @@ public abstract class BXNode implements Node {
 
   @Override
   public BXNode getNextSibling() {
-    return toJava(node.followingSibling().next().finish());
+    return toJava(node.followingSibling().next());
   }
 
   @Override
   public BXNode getPreviousSibling() {
-    return toJava(node.precedingSibling().next().finish());
+    return toJava(node.precedingSibling().next());
   }
 
   @Override
@@ -131,7 +131,7 @@ public abstract class BXNode implements Node {
    * @param n node instance
    * @return resulting node
    */
-  private static BXNode toJava(final ANode n) {
+  protected static BXNode toJava(final ANode n) {
     return n != null ? n.toJava() : null;
   }
 
