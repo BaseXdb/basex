@@ -83,9 +83,7 @@ public final class SAXWrapper extends SingleParser {
     } catch(final SAXParseException ex) {
       final String msg = Util.info(SCANPOS_X_X, in, ex.getLineNumber(),
           ex.getColumnNumber()) + COLS + Util.message(ex);
-      final IOException ioe = new IOException(msg);
-      ioe.setStackTrace(ex.getStackTrace());
-      throw ioe;
+      throw new IOException(msg, ex);
     } catch(final ProgressException ex) {
       throw ex;
     } catch(final Exception ex) {
@@ -94,9 +92,7 @@ public final class SAXWrapper extends SingleParser {
       String msg = Util.message(ex);
       if(in != null) msg = '"' + in + '"' + COLS + msg;
       // wrap and return original message
-      final IOException ioe = new IOException(msg);
-      ioe.setStackTrace(ex.getStackTrace());
-      throw ioe;
+      throw new IOException(msg, ex);
     } finally {
       if(is != null) {
         try {

@@ -18,7 +18,12 @@ public final class BaseXException extends IOException {
    */
   public BaseXException(final String message, final Object... ext) {
     super(Util.info(message, ext));
-    init(ext);
+    for(final Object o : ext) {
+      if(o instanceof Throwable) {
+        initCause((Throwable) o);
+        break;
+      }
+    }
   }
 
   /**
@@ -27,22 +32,7 @@ public final class BaseXException extends IOException {
    */
   public BaseXException(final Exception ex) {
     super(Util.message(ex));
-    init(ex);
-  }
-
-  /**
-   * Initializes the cause to the first throwable argument.
-   * @param ext message extension
-   */
-  public void init(final Object... ext) {
-    for(final Object o : ext) {
-      if(o instanceof Throwable) {
-        final Throwable t = (Throwable) o;
-        setStackTrace(t.getStackTrace());
-        initCause(t);
-        break;
-      }
-    }
+    initCause(ex);
   }
 
   /**

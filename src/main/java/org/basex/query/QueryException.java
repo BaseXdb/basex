@@ -76,6 +76,12 @@ public final class QueryException extends Exception {
     super(BaseXException.message(msg, ext));
     name = errc;
     if(ii != null) info(ii);
+    for(final Object o : ext) {
+      if(o instanceof Throwable) {
+        initCause((Throwable) o);
+        break;
+      }
+    }
   }
 
   /**
