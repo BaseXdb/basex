@@ -8,7 +8,6 @@ import java.net.*;
 
 import javax.xml.*;
 import javax.xml.parsers.*;
-import javax.xml.transform.dom.*;
 import javax.xml.transform.stream.*;
 import javax.xml.validation.*;
 
@@ -26,7 +25,6 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
-import org.w3c.dom.Node;
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
 
@@ -132,21 +130,12 @@ public final class FNValidate extends StandardFunc {
           schema = sf.newSchema();
         } else {
           final Item it = checkItem(expr[1], ctx);
-          if(it.type.isNode()) {
-            // schema given as node
-            schema = sf.newSchema(new DOMSource((Node) it.toJava()));
-          } else {
-            // schema specified as string
-            IO sc = read(it, ctx, null);
-            if(!sc.exists()) WHICHRES.thrw(info, sc);
-            tmp = createTmp(sc);
-            if(tmp != null) sc = tmp;
-            if(sc instanceof IOFile) {
-              schema = sf.newSchema(((IOFile) sc).file());
-            } else {
-              schema = sf.newSchema(new URL(sc.url()));
-            }
-          }
+          // schema specified as string
+          IO sc = read(it, ctx, null);
+          if(!sc.exists()) WHICHRES.thrw(info, sc);
+          tmp = createTmp(sc);
+          if(tmp != null) sc = tmp;
+          schema = sf.newSchema(new URL(sc.url()));
         }
 
         final Validator v = schema.newValidator();
@@ -278,13 +267,13 @@ public final class FNValidate extends StandardFunc {
 
     final Type ip = it.type;
     final ArrayOutput ao = new ArrayOutput();
-    if(it instanceof ANode) {
+    if(it.type.isNode()) {
       // return node in string representation
       Serializer.get(ao, sp).serialize((ANode) it);
       return new IOContent(ao.toArray());
     }
 
-    if(it instanceof AStr) {
+    if(it.type.isStringOrUntyped()) {
       final String path = string(it.string(info));
       IO io = IO.get(path);
       if(!io.exists()) WHICHRES.thrw(info, path);
