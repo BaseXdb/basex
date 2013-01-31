@@ -8,6 +8,7 @@ import java.net.*;
 
 import javax.xml.*;
 import javax.xml.parsers.*;
+import javax.xml.transform.dom.*;
 import javax.xml.transform.stream.*;
 import javax.xml.validation.*;
 
@@ -25,6 +26,7 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
+import org.w3c.dom.Node;
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
 
@@ -120,19 +122,31 @@ public final class FNValidate extends StandardFunc {
       @Override
       void process(final ErrorHandler handler)
           throws IOException, SAXException, QueryException {
-        final IO in = read(0, ctx, null);
+
+        final IO in = read(checkItem(expr[0], ctx), ctx, null);
         final SchemaFactory sf = SchemaFactory.newInstance(
             XMLConstants.W3C_XML_SCHEMA_NS_URI);
         final Schema schema;
         if(expr.length < 2) {
           // assume that schema declaration is included in document
           schema = sf.newSchema();
-        } else { // schema explicitly given and passed to the SchemaFactory
-          IO sc = read(1, ctx, null);
-          if(!sc.exists()) WHICHRES.thrw(info, sc);
-          tmp = createTmp(sc);
-          if(tmp != null) sc = tmp;
-          schema = sf.newSchema(new URL(sc.url()));
+        } else {
+          final Item it = checkItem(expr[1], ctx);
+          if(it.type.isNode()) {
+            // schema given as node
+            schema = sf.newSchema(new DOMSource((Node) it.toJava()));
+          } else {
+            // schema specified as string
+            IO sc = read(it, ctx, null);
+            if(!sc.exists()) WHICHRES.thrw(info, sc);
+            tmp = createTmp(sc);
+            if(tmp != null) sc = tmp;
+            if(sc instanceof IOFile) {
+              schema = sf.newSchema(((IOFile) sc).file());
+            } else {
+              schema = sf.newSchema(new URL(sc.url()));
+            }
+          }
         }
 
         final Validator v = schema.newValidator();
@@ -183,27 +197,24 @@ public final class FNValidate extends StandardFunc {
       void process(final ErrorHandler handler)
           throws IOException, ParserConfigurationException, SAXException, QueryException {
 
-      final IO in;
-        if(expr.length < 2) {
-          // assume that doctype declaration is included in document
-          in = read(0, ctx, null);
-        } else {
-          // integrate doctype declaration via serialization properties
-          final SerializerProp sp = new SerializerProp();
+        final Item it = checkItem(expr[0], ctx);
+        SerializerProp sp = null;
+
+        // integrate doctype declaration via serialization properties
+        if(expr.length > 1) {
+          sp = new SerializerProp();
           final String dtd = string(checkStr(expr[1], ctx));
           IO sc = IO.get(dtd);
           if(!sc.exists()) WHICHRES.thrw(info, dtd);
           tmp = createTmp(sc);
           if(tmp != null) sc = tmp;
           sp.set(SerializerProp.S_DOCTYPE_SYSTEM, sc.url());
-          in = read(0, ctx, sp);
         }
+
+        final IO in = read(it, ctx, sp);
         final SAXParserFactory sf = SAXParserFactory.newInstance();
         sf.setValidating(true);
-        final InputSource is = in.inputSource();
-        final SAXParser sp = sf.newSAXParser();
-
-        sp.parse(is, handler);
+        sf.newSAXParser().parse(in.inputSource(), handler);
       }
     });
   }
@@ -255,18 +266,16 @@ public final class FNValidate extends StandardFunc {
 
   /**
    * Returns an input reference (possibly cached) to the first argument.
-   * @param i argument index
+   * @param it item
    * @param ctx query context
    * @param sp serializer properties
    * @return item
    * @throws QueryException query exception
    * @throws IOException exception
    */
-  IO read(final int i, final QueryContext ctx, final SerializerProp sp)
+  IO read(final Item it, final QueryContext ctx, final SerializerProp sp)
       throws QueryException, IOException {
 
-    final Item it = checkItem(expr[i], ctx);
-    if(it.isEmpty()) STRNODTYPE.thrw(info, this, it);
     final Type ip = it.type;
     final ArrayOutput ao = new ArrayOutput();
     if(it instanceof ANode) {
