@@ -323,6 +323,7 @@ public final class FNFileTest extends AdvancedQueryTest {
     query(_FILE_MOVE.args(PATH1, PATH2));
     query(_FILE_MOVE.args(PATH2, PATH1));
     query(_FILE_MOVE.args(PATH1, PATH1));
+    query(_FILE_MOVE.args(PATH1 + "/../" + NAME, PATH1));
     error(_FILE_MOVE.args(PATH1, PATH4), Err.FILE_NODIR);
     query(_FILE_SIZE.args(PATH1), "1");
     query(_FILE_EXISTS.args(PATH2), false);

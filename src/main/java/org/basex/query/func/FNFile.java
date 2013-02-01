@@ -217,7 +217,7 @@ public final class FNFile extends StandardFunc {
     final File[] ch = dir.listFiles();
     if(ch == null) return;
 
-    // parse directories
+    // parse directories, do not follow links
     if(rec) {
       for(final File f : ch) {
         if(f.isDirectory() && !mayBeLink(f)) list(root, f, list, rec, pat);
@@ -502,14 +502,14 @@ public final class FNFile extends StandardFunc {
       FILE_DIR.thrw(info, src);
     }
 
-    // ignore operations on same source and target path
-    final String spath = src.getAbsolutePath();
-    final String tpath = trg.getAbsolutePath();
+    // ignore operations on identical, canonical source and target path
+    final String spath = src.getCanonicalPath();
+    final String tpath = trg.getCanonicalPath();
     if(!spath.equals(tpath)) {
       if(copy) {
         copy(src, trg);
       } else {
-        // delete target if it is equal to source (case is ignored on Windows and Mac)
+        // delete target if it is different to source (case is ignored on Windows and Mac)
         if(trg.exists() && (Prop.CASE || !spath.equalsIgnoreCase(tpath)) && !trg.delete())
           FILE_DEL.thrw(info, src, trg);
         if(!src.renameTo(trg)) FILE_MOVE.thrw(info, src, trg);
