@@ -354,13 +354,12 @@ public final class GeoTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void intersection() {
-    /* [MSG] doesn't work with JTS 1.13
     runQuery("geo:intersection(<gml:LinearRing><gml:coordinates>1,1 55,99 2,3 1,1" +
             "</gml:coordinates></gml:LinearRing>," +
             "<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing><gml:coordinates>" +
             "10,10 20,10 30,40 10,10</gml:coordinates></gml:LinearRing>" +
-            "</gml:outerBoundaryIs></gml:Polygon>)", "<gml:MultiGeometry/>");
-            */
+            "</gml:outerBoundaryIs></gml:Polygon>)",
+            "<gml:LineString><gml:coordinates/></gml:LineString>");
 
     runQuery("geo:intersection(<gml:LinearRing><gml:coordinates>1,1 55,99 2,3 1,1" +
             "</gml:coordinates></gml:LinearRing>," +
@@ -378,20 +377,19 @@ public final class GeoTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void union() {
-    /* [MSG] doesn't work with JTS 1.13
     runQuery("geo:union(<gml:Point><gml:coordinates>2</gml:coordinates></gml:Point>," +
             "<gml:Point><gml:coordinates>2,3</gml:coordinates></gml:Point>)",
-            "<gml:Point><gml:coordinates>2.0,NaN</gml:coordinates></gml:Point>");
-            */
+            "<gml:MultiPoint><gml:pointMember><gml:Point><gml:coordinates>2.0,0.0" +
+            "</gml:coordinates></gml:Point></gml:pointMember><gml:pointMember>" +
+            "<gml:Point><gml:coordinates>2.0,3.0</gml:coordinates></gml:Point>" +
+            "</gml:pointMember></gml:MultiPoint>");
 
-    /* [MSG] doesn't work with JTS 1.13
     runQuery("geo:union(<gml:Point><gml:coordinates>2</gml:coordinates></gml:Point>," +
             "<gml:Point><gml:coordinates>3</gml:coordinates></gml:Point>)",
             "<gml:MultiPoint><gml:pointMember><gml:Point>" +
-            "<gml:coordinates>2.0,NaN</gml:coordinates></gml:Point></gml:pointMember>" +
-            "<gml:pointMember><gml:Point><gml:coordinates>3.0,NaN</gml:coordinates>" +
+            "<gml:coordinates>2.0,0.0</gml:coordinates></gml:Point></gml:pointMember>" +
+            "<gml:pointMember><gml:Point><gml:coordinates>3.0,0.0</gml:coordinates>" +
             "</gml:Point></gml:pointMember></gml:MultiPoint>");
-            */
 
     runError("geo:union(<gml:Point><gml:coordinates></gml:coordinates></gml:Point>," +
             "<gml:Point><gml:coordinates>2,3</gml:coordinates></gml:Point>)",
@@ -484,11 +482,9 @@ public final class GeoTest extends AdvancedQueryTest {
   public void y() {
     runQuery("geo:y(<gml:Point><gml:coordinates>2,1</gml:coordinates></gml:Point>)",
             "1");
-    // [MSG] doesn't work with JTS 1.13
-    //runQuery("geo:y(<gml:Point><gml:coordinates>2</gml:coordinates></gml:Point>)",
-    //        "NaN");
+    runQuery("geo:y(<gml:Point><gml:coordinates>2</gml:coordinates></gml:Point>)", "0");
 
-    runError("geo:z(<gml:MultiPoint><gml:Point><gml:coordinates>1,1" +
+    runError("geo:y(<gml:MultiPoint><gml:Point><gml:coordinates>1,1" +
             "</gml:coordinates></gml:Point><gml:Point><gml:coordinates>1,2" +
             "</gml:coordinates></gml:Point></gml:MultiPoint>)", GeoErrors.qname(3));
 
