@@ -6,7 +6,8 @@ import java.awt.*;
 import java.lang.reflect.*;
 import java.util.*;
 
-import org.basex.gui.*;
+import org.basex.core.*;
+import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.util.*;
@@ -22,12 +23,6 @@ public final class SyntaxXQuery extends Syntax {
   private static final HashSet<String> KEYS = new HashSet<String>();
   /** Error color. */
   private static final HashSet<String> FUNC = new HashSet<String>();
-  /** Variable color. */
-  private static final Color VAR = new Color(0, 160, 0);
-  /** Keyword. */
-  private static final Color KEY = new Color(0, 144, 144);
-  /** Keyword. */
-  private static final Color FUNS = new Color(160, 0, 160);
 
   /** Comment. */
   private int comment;
@@ -35,21 +30,44 @@ public final class SyntaxXQuery extends Syntax {
   private int quote;
   /** Variable flag. */
   private boolean var;
+  /** Function flag. */
+  private boolean fun;
 
   // initialize xquery keys
   static {
     try {
+      // add query tokens
       for(final Field f : QueryText.class.getFields()) {
         if(f.getName().equals("IGNORE")) break;
         final String s = (String) f.get(null);
         Collections.addAll(KEYS, s.split("-"));
       }
+      // add function names
       for(final Function f : Function.values()) {
         final String s = f.toString();
-        Collections.addAll(FUNC, s.substring(0, s.indexOf('(')).split("-"));
+        Collections.addAll(FUNC, s.substring(0, s.indexOf('(')).split(":|-"));
       }
+      // add serialization and database parameters
+      addProps(SerializerProp.class);
+      addProps(MainProp.class);
+      addProps(Prop.class);
     } catch(final Exception ex) {
       Util.stack(ex);
+    }
+  }
+
+  /**
+   * Adds the specified properties.
+   * @param props property class
+   * @throws Exception exception
+   */
+  private static void addProps(final Class<?> props) throws Exception {
+    for(final Field f : props.getFields()) {
+      final Object obj = f.get(null);
+      if(!(obj instanceof Object[])) continue;
+      final Object[] o = (Object[]) obj;
+      if(o.length == 2) Collections.addAll(FUNC,
+          o[0].toString().toLowerCase().split("-"));
     }
   }
 
@@ -67,7 +85,7 @@ public final class SyntaxXQuery extends Syntax {
     // opened quote
     if(quote != 0) {
       if(ch == quote) quote = 0;
-      return GUIConstants.RED;
+      return STRING;
     }
 
     // comment
@@ -80,35 +98,43 @@ public final class SyntaxXQuery extends Syntax {
     } else if(comment == 3 && ch != ':') {
       comment = ch == ')' ? 0 : 2;
     }
-    if(comment != 0) return KEY;
+    if(comment != 0) return COMMENT;
 
     // quotes
     if(ch == '"' || ch == '\'') {
       quote = ch;
-      return GUIConstants.RED;
+      return STRING;
     }
 
     // variables
     if(ch == '$') {
       var = true;
-      return VAR;
+      return VARIABLE;
     }
     if(var) {
       var = XMLToken.isChar(ch);
-      return VAR;
+      return VARIABLE;
     }
 
     // special characters
-    final String word = text.nextString();
-    if(KEYS.contains(word)) return GUIConstants.BLUE;
-    // special characters
-    if(FUNC.contains(word)) return FUNS;
+    if(!XMLToken.isNCChar(ch)) {
+      fun = false;
+      return COMMENT;
+    }
 
-    // special characters
-    if(!XMLToken.isNCChar(ch)) return KEY;
+    // check for keywords and function names
+    final String word = text.nextString();
+    final boolean keys = KEYS.contains(word);
+    final boolean func = FUNC.contains(word);
+    if(fun && func) return FUNCTION;
+    if(keys) return KEYWORD;
+    if(func) {
+      fun = true;
+      return FUNCTION;
+    }
 
     // letters and numbers
-    return Color.black;
+    return TEXT;
   }
 
   @Override

@@ -4,6 +4,8 @@ import static org.basex.util.Token.*;
 
 import java.awt.*;
 
+import org.basex.gui.*;
+
 /**
  * This abstract class defines a framework for a simple syntax
  * highlighting in text panels.
@@ -12,12 +14,25 @@ import java.awt.*;
  * @author Christian Gruen
  */
 abstract class Syntax {
+  /** Standard color. */
+  protected static final Color TEXT = Color.BLACK;
+  /** Comment color. */
+  protected static final Color COMMENT = new Color(0, 160, 160);
+  /** String color. */
+  protected static final Color STRING = GUIConstants.RED;
+  /** Keyword color. */
+  protected static final Color KEYWORD = GUIConstants.BLUE;
+  /** Function color. */
+  protected static final Color FUNCTION = new Color(160, 0, 160);
+  /** Variable color. */
+  protected static final Color VARIABLE = GUIConstants.GREEN;
+
   /** Simple syntax. */
   static final Syntax SIMPLE = new Syntax() {
     @Override
     public void init() { }
     @Override
-    public Color getColor(final EditorText tokens) { return Color.black; }
+    public Color getColor(final EditorText tokens) { return TEXT; }
   };
 
   /**

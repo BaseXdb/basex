@@ -1,8 +1,6 @@
 package org.basex.gui.editor;
 
 import static org.basex.data.DataText.*;
-import static org.basex.gui.GUIConstants.*;
-
 import java.awt.*;
 
 /**
@@ -38,43 +36,43 @@ public final class SyntaxXML extends Syntax {
       } else if(ch == '>') {
         comm--;
       }
-      return comm > 0 ? LBLUE : BLUE;
+      return comm > 0 ? COMMENT : KEYWORD;
     }
 
     if(tag) {
       if(quote != 0) {
         if(quote == ch) quote = 0;
-        return RED;
+        return STRING;
       }
       if(ch == '"' || ch == '\'') {
         quote = ch;
-        return RED;
+        return STRING;
       }
       if(ch == '>') {
         tag = false;
-        return BLUE;
+        return KEYWORD;
       }
       if(ch == '=' || ch == '/') {
-        return BLUE;
+        return KEYWORD;
       }
       if(ch == '!') {
         comm++;
         tag = false;
-        return LBLUE;
+        return COMMENT;
       }
 
       if(elem) {
         if(ch <= ' ') elem = false;
-        return BLUE;
+        return KEYWORD;
       }
-      return PINK;
+      return FUNCTION;
     }
     if(ch == '<') {
       tag = true;
       elem = true;
-      return BLUE;
+      return KEYWORD;
     }
-    return Color.black;
+    return TEXT;
   }
 
   @Override

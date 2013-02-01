@@ -889,6 +889,9 @@ public enum Function {
   /** XQuery function. */
   _XSLT_TRANSFORM(FNXslt.class, "transform(input,stylesheet[,params])",
       NOD, 2, ITEM, ITEM, NOD),
+  /** XQuery function. */
+  _XSLT_TRANSFORM_TEXT(FNXslt.class, "transform-text(input,stylesheet[,params])",
+      STR, 2, ITEM, ITEM, NOD),
 
   /* FNZip functions (EXPath). */
 
@@ -977,8 +980,8 @@ public enum Function {
    * @param r return type
    * @param typ arguments types
    */
-  Function(final Class<? extends StandardFunc> fun, final String dsc,
-      final SeqType r, final SeqType... typ) {
+  Function(final Class<? extends StandardFunc> fun, final String dsc, final SeqType r,
+      final SeqType... typ) {
     this(fun, dsc, r, typ.length, typ);
   }
 
@@ -991,8 +994,8 @@ public enum Function {
    *   the maximum number of arguments is variable
    * @param typ arguments types
    */
-  Function(final Class<? extends StandardFunc> fun, final String dsc,
-      final SeqType r, final int m, final SeqType... typ) {
+  Function(final Class<? extends StandardFunc> fun, final String dsc, final SeqType r,
+      final int m, final SeqType... typ) {
 
     func = fun;
     desc = dsc;
@@ -1083,7 +1086,22 @@ public enum Function {
 
   @Override
   public final String toString() {
-    final byte[] pref = NSGlobal.prefix(uri());
-    return new TokenBuilder(pref).add(':').add(desc).toString();
+    return new TokenBuilder(NSGlobal.prefix(uri())).add(':').add(desc).toString();
   }
+
+  /*
+   * Returns the names of all functions. Used to update MediaWiki syntax highlighter.
+   * All function names are listed in reverse order to give precedence to longer names.
+   * @param args ignored
+  public static void main(final String... args) {
+    final StringList sl = new StringList();
+    for(Function f : Function.values()) {
+      sl.add(f.toString().replaceAll("^fn:|\\(.*", ""));
+    }
+    for(final String s : sl.sort(false, false)) {
+      System.out.print(s + ' ');
+    }
+    System.out.println("fn:");
+  }
+   */
 }
