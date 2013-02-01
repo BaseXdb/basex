@@ -81,22 +81,25 @@ public final class FNXslt extends StandardFunc {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
-      case _XSLT_PROCESSOR: return Str.get(get(true));
-      case _XSLT_VERSION:   return Str.get(get(false));
-      case _XSLT_TRANSFORM: return transform(ctx);
-      default:              return super.item(ctx, ii);
+      case _XSLT_PROCESSOR:      return Str.get(get(true));
+      case _XSLT_VERSION:        return Str.get(get(false));
+      case _XSLT_TRANSFORM:      return transform(ctx, true);
+      case _XSLT_TRANSFORM_TEXT: return transform(ctx, false);
+      default:                   return super.item(ctx, ii);
     }
   }
 
   /**
    * Performs an XSL transformation.
    * @param ctx query context
+   * @param node return result as node
    * @return item
    * @throws QueryException query exception
    */
-  private Item transform(final QueryContext ctx) throws QueryException {
-    checkCreate(ctx);
+  private Item transform(final QueryContext ctx, final boolean node)
+      throws QueryException {
 
+    checkCreate(ctx);
     final IO in = read(checkItem(expr[0], ctx));
     final IO xsl = read(checkItem(expr[1], ctx));
     final Item opt = expr.length > 2 ? expr[2].item(ctx, info) : null;
@@ -107,7 +110,7 @@ public final class FNXslt extends StandardFunc {
     try {
       System.setErr(new PrintStream(ao));
       final byte[] result = transform(in, xsl, map);
-      return new DBNode(new IOContent(result), ctx.context.prop);
+      return node ? new DBNode(new IOContent(result), ctx.context.prop) : Str.get(result);
     } catch(final IOException ex) {
       System.setErr(tmp);
       throw IOERR.thrw(info, ex);

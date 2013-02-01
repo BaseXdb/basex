@@ -41,6 +41,22 @@ public final class FNXsltTest extends AdvancedQueryTest {
     query(_XSLT_TRANSFORM.args(doc, style, param), "<X>1</X>");
   }
 
+  /** Test method. */
+  @Test
+  public void transformText() {
+    final String doc = "<a/>";
+    String style = wrap("<xsl:template match='/'>" +
+        "<xsl:output omit-xml-declaration='yes'/>1</xsl:template>");
+    query(_XSLT_TRANSFORM_TEXT.args(doc, style), "1");
+    query(_XSLT_TRANSFORM_TEXT.args(doc, '"' + style + '"'), "1");
+
+    style = wrap("<xsl:param name='t'/><xsl:output omit-xml-declaration='yes'/>" +
+      "<xsl:template match='/'><xsl:value-of select='$t'/></xsl:template>");
+    final String param = "<xslt:parameters><xslt:t>1</xslt:t></xslt:parameters>";
+
+    query(_XSLT_TRANSFORM_TEXT.args(doc, style, param), "1");
+  }
+
   /**
    * Wraps the specified string with an XSLT header and footer.
    * @param content content string
