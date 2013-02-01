@@ -4,6 +4,8 @@ import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 
+import javax.xml.transform.stream.*;
+
 import org.basex.core.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
@@ -109,6 +111,11 @@ public final class IOFile extends IO {
   @Override
   public InputSource inputSource() {
     return new InputSource(path);
+  }
+
+  @Override
+  public StreamSource streamSource() {
+    return new StreamSource(path);
   }
 
   @Override

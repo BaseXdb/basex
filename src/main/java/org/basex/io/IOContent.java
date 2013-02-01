@@ -1,5 +1,7 @@
 package org.basex.io;
 
+import javax.xml.transform.stream.*;
+
 import org.basex.io.in.*;
 import org.basex.util.*;
 import org.xml.sax.*;
@@ -49,8 +51,13 @@ public final class IOContent extends IO {
   @Override
   public InputSource inputSource() {
     final InputSource is = new InputSource(inputStream());
-    is.setSystemId(name());
+    is.setSystemId(path);
     return is;
+  }
+
+  @Override
+  public StreamSource streamSource() {
+    return new StreamSource(inputStream(), path);
   }
 
   @Override

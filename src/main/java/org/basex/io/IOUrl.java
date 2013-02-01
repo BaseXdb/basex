@@ -5,6 +5,8 @@ import static org.basex.core.Text.*;
 import java.io.*;
 import java.net.*;
 
+import javax.xml.transform.stream.*;
+
 import org.basex.core.*;
 import org.basex.io.in.*;
 import org.basex.util.*;
@@ -36,6 +38,11 @@ public final class IOUrl extends IO {
   @Override
   public InputSource inputSource() {
     return new InputSource(path);
+  }
+
+  @Override
+  public StreamSource streamSource() {
+    return new StreamSource(path);
   }
 
   @Override

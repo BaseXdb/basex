@@ -22,7 +22,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 import org.xml.sax.*;
@@ -265,12 +264,13 @@ public final class FNValidate extends StandardFunc {
   IO read(final Item it, final QueryContext ctx, final SerializerProp sp)
       throws QueryException, IOException {
 
-    final Type ip = it.type;
-    final ArrayOutput ao = new ArrayOutput();
     if(it.type.isNode()) {
       // return node in string representation
-      Serializer.get(ao, sp).serialize((ANode) it);
-      return new IOContent(ao.toArray());
+      final ArrayOutput ao = new ArrayOutput();
+      Serializer.get(ao, sp).serialize(it);
+      final IOContent io = new IOContent(ao.toArray());
+      io.name(string(((ANode) it).baseURI()));
+      return io;
     }
 
     if(it.type.isStringOrUntyped()) {
@@ -279,13 +279,14 @@ public final class FNValidate extends StandardFunc {
       if(!io.exists()) WHICHRES.thrw(info, path);
       if(sp != null) {
         // add doctype declaration if specified
+        final ArrayOutput ao = new ArrayOutput();
         Serializer.get(ao, sp).serialize(new DBNode(io, ctx.context.prop));
         io = new IOContent(ao.toArray());
         io.name(path);
       }
       return io;
     }
-    throw STRNODTYPE.thrw(info, this, ip);
+    throw STRNODTYPE.thrw(info, this, it.type);
   }
 
   /** Schema error handler. */

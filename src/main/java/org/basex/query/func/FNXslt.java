@@ -97,8 +97,8 @@ public final class FNXslt extends StandardFunc {
   private Item transform(final QueryContext ctx) throws QueryException {
     checkCreate(ctx);
 
-    final IO in = read(expr[0], ctx);
-    final IO xsl = read(expr[1], ctx);
+    final IO in = read(checkItem(expr[0], ctx));
+    final IO xsl = read(checkItem(expr[1], ctx));
     final Item opt = expr.length > 2 ? expr[2].item(ctx, info) : null;
     final TokenMap map = new FuncParams(E_PARAM, info).parse(opt);
 
@@ -121,15 +121,23 @@ public final class FNXslt extends StandardFunc {
 
   /**
    * Returns an input reference (possibly cached) to the specified input.
-   * @param e expression to be evaluated
-   * @param ctx query context
+   * @param it item to be evaluated
    * @return item
    * @throws QueryException query exception
    */
-  private IO read(final Expr e, final QueryContext ctx) throws QueryException {
-    final Item it = checkNoEmpty(e.item(ctx, info));
-    if(it instanceof ANode) return new IOContent(it.serialize().toArray());
-    if(it instanceof AStr) return IO.get(string(it.string(info)));
+  private IO read(final Item it) throws QueryException {
+    if(it.type.isNode()) {
+      final IO io = new IOContent(it.serialize().toArray());
+      io.name(string(((ANode) it).baseURI()));
+      return io;
+    }
+
+    if(it.type.isStringOrUntyped()) {
+      final String path = string(it.string(info));
+      final IO io = IO.get(path);
+      if(!io.exists()) WHICHRES.thrw(info, path);
+      return io;
+    }
     throw STRNODTYPE.thrw(info, this, it.type);
   }
 
@@ -145,21 +153,20 @@ public final class FNXslt extends StandardFunc {
    * @param par parameters
    * @return transformed result
    * @throws TransformerException transformer exception
-   * @throws IOException I/O exception
    */
   private static byte[] transform(final IO in, final IO xsl, final TokenMap par)
-      throws TransformerException, IOException {
+      throws TransformerException {
 
     // create transformer
     final TransformerFactory tc = TransformerFactory.newInstance();
-    final Transformer tr =  tc.newTransformer(new StreamSource(xsl.inputStream()));
+    final Transformer tr =  tc.newTransformer(xsl.streamSource());
 
     // bind parameters
     for(final byte[] key : par) tr.setParameter(string(key), string(par.get(key)));
 
     // do transformation and return result
     final ArrayOutput ao = new ArrayOutput();
-    tr.transform(new StreamSource(in.inputStream()), new StreamResult(ao));
+    tr.transform(in.streamSource(), new StreamResult(ao));
     return ao.toArray();
   }
 }

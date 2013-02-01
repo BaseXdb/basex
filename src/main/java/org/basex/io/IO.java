@@ -3,6 +3,8 @@ package org.basex.io;
 import java.io.*;
 import java.util.*;
 
+import javax.xml.transform.stream.*;
+
 import org.basex.data.*;
 import org.basex.io.in.*;
 import org.xml.sax.*;
@@ -208,6 +210,12 @@ public abstract class IO {
    * @return input source
    */
   public abstract InputSource inputSource();
+
+  /**
+   * Returns a stream source.
+   * @return stream source
+   */
+  public abstract StreamSource streamSource();
 
   /**
    * Returns an input stream.
