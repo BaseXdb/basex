@@ -306,7 +306,8 @@ public final class EditorView extends View {
   public boolean saveAs() {
     // open file chooser for XML creation
     final EditorArea edit = getEditor();
-    final String path = edit.opened() ? edit.file.path() : "";
+    final String path = edit.opened() ? edit.file.path() :
+      gui.gprop.get(GUIProp.WORKPATH);
     final BaseXFileChooser fc = new BaseXFileChooser(SAVE_AS, path, gui);
     fc.filter(XQUERY_FILES, IO.XQSUFFIXES);
     fc.filter(BXS_FILES, IO.BXSSUFFIX);
