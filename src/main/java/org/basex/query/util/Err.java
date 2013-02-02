@@ -281,6 +281,8 @@ public enum Err {
 
   /** HC0001. */
   HC_ERROR(HC, 1, "%"),
+  /** HC0002. */
+  HC_PARSE(HC, 2, "Conversion failed: %"),
   /** HC0003. */
   HC_ATTR(HC, 3, "No attribute beside 'src' and 'media-type' allowed."),
   /** HC0004. */

@@ -171,15 +171,15 @@ public final class HTTPResponse {
    * @param p payload
    * @param ct content type
    * @return interpreted payload
+   * @throws QueryException query exception
    */
-  private Item interpretPayload(final byte[] p, final String ct) {
+  private Item interpretPayload(final byte[] p, final String ct) throws QueryException {
     try {
       final IOContent io = new IOContent(p);
       io.name(PAYLOAD + IO.XMLSUFFIX);
       return Parser.item(io, prop, ct);
     } catch(final IOException ex) {
-      // automagic (to be discussed): return as binary content
-      return new B64(p);
+      throw HC_PARSE.thrw(info, ex);
     }
   }
 
@@ -223,10 +223,11 @@ public final class HTTPResponse {
    * @param nl node list
    * @return part
    * @throws IOException I/O Exception
+   * @throws QueryException query exception
    */
   private boolean extractNextPart(final InputStream io, final boolean status,
       final ValueBuilder payloads, final byte[] sep, final byte[] end,
-      final ANodeList nl) throws IOException {
+      final ANodeList nl) throws IOException, QueryException {
 
     // content type of part payload - if not defined by header 'Content-Type',
     // it is equal to 'text/plain' (RFC 1341)
