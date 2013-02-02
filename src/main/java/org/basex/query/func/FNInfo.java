@@ -3,7 +3,6 @@ package org.basex.query.func;
 import static org.basex.query.func.Function.*;
 import static org.basex.query.util.Err.*;
 
-import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -141,7 +140,7 @@ public final class FNInfo extends StandardFunc {
     final String info = tb.toString();
 
     // if GUI is used or client is calling, cache trace info
-    if(Prop.gui || ctx.context.listener != null) {
+    if(ctx.context.listener != null) {
       ctx.evalInfo(info);
       if(ctx.listen != null) ctx.listen.info(info);
     } else {

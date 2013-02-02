@@ -44,6 +44,10 @@ public final class InfoView extends View implements LinkListener {
   private IntList stat = new IntList(4);
   /** Query statistics strings. */
   private StringList strings = new StringList(4);
+  /** Indicates if text has changed. */
+  private boolean changed;
+  /** Clear text before adding new text. */
+  private boolean clear;
   /** Focused bar. */
   private int focus = -1;
   /** Panel Width. */
@@ -130,11 +134,11 @@ public final class InfoView extends View implements LinkListener {
   }
 
   /**
-   * Displays the specified information.
-   * @param info info string
-   * @param cmd command
+   * Displays the specified info string.
+   * @param info string to be displayed
+   * @param cmd command that created the output (may be {@code null})
    * @param ok indicates if evaluation was successful
-   * @param reset reset text cache after showing text
+   * @param reset clear text area when method is called next time
    */
   public void setInfo(final String info, final Command cmd, final boolean ok,
       final boolean reset) {
@@ -142,12 +146,12 @@ public final class InfoView extends View implements LinkListener {
   }
 
   /**
-   * Displays the specified information.
-   * @param info info string
-   * @param cmd command
-   * @param time time required
+   * Displays the specified info string.
+   * @param info string to be displayed
+   * @param cmd command that created the output (may be {@code null})
+   * @param time time required for running the command
    * @param ok indicates if evaluation was successful
-   * @param reset reset text cache after showing text
+   * @param reset clear text area when method is called next time
    */
   public void setInfo(final String info, final Command cmd, final String time,
       final boolean ok, final boolean reset) {
@@ -222,7 +226,7 @@ public final class InfoView extends View implements LinkListener {
     stat = times;
     strings = timings;
 
-    if(!times.isEmpty() || !ok) text.reset();
+    if(clear || !times.isEmpty() || !ok) text.reset();
 
     String inf = null;
     if(!(cmd instanceof AQuery)) {
@@ -239,13 +243,13 @@ public final class InfoView extends View implements LinkListener {
     add(EVALUATING_C, eval);
     add(QUERY_C + ' ', origqu);
     add(COMPILING_C, comp);
-    if(!comp.isEmpty()) add(OPTIMIZED_QUERY_C + ' ', optqu);
+    add(OPTIMIZED_QUERY_C + ' ', optqu);
     add(RESULT_C, result);
     add(TIMING_C, timings);
     add(QUERY_PLAN_C, plan);
     if(inf != null) text.add(inf).nline();
-    area.setText(text.finish());
-    if(reset) text.reset();
+    changed = true;
+    clear = reset;
 
     // show total time required for running the process
     String total = time;
@@ -293,6 +297,11 @@ public final class InfoView extends View implements LinkListener {
 
   @Override
   public void paintComponent(final Graphics g) {
+    if(changed) {
+      area.setText(text.finish());
+      changed = false;
+    }
+
     super.paintComponent(g);
     final int l = stat.size();
     if(l == 0) return;

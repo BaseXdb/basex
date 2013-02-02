@@ -405,8 +405,7 @@ public final class GUI extends AGUI {
       final String time = perf.getTime();
 
       // show query info
-
-      if(info.visible()) info.setInfo(inf, cmd, time, ok, true);
+      info.setInfo(inf, cmd, time, ok, true);
 
       // sends feedback to the query editor
       final boolean interrupted = inf.endsWith(INTERRUPTED);

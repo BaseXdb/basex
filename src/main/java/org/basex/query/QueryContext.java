@@ -305,6 +305,42 @@ public final class QueryContext extends Progress {
   }
 
   /**
+   * Binds a value to the context item, using the same rules as for
+   * {@link #bind binding variables}.
+   * @param val value to be bound
+   * @param type data type (may be {@code null})
+   * @throws QueryException query exception
+   */
+  public void context(final Object val, final String type) throws QueryException {
+    // bind http context to extra variable
+    if(val.getClass().getName().equals("org.basex.http.HTTPContext")) {
+      http = val;
+    } else {
+      ctxItem = cast(val, type);
+    }
+  }
+
+  /**
+   * Binds a value to a global variable. The specified type is interpreted as follows:
+   * <ul>
+   * <li>If {@code "json"} is specified, the value is converted according to the rules
+   *     specified in {@link JsonMapConverter}.</li>
+   * <li>If {@code "xml"} is specified, the value is converted to a document node.</li>
+   * <li>Otherwise, the type is interpreted as atomic XDM data type.</li>
+   * </ul>
+   * If the value is an XQuery expression or value {@link Expr}, it is directly assigned.
+   * Otherwise, it is cast to the XQuery data model, using a Java/XQuery mapping.
+   * @param name name of variable
+   * @param val value to be bound
+   * @param type data type (may be {@code null})
+   * @throws QueryException query exception
+   */
+  public void bind(final String name, final Object val, final String type)
+      throws QueryException {
+    bind(name, cast(val, type));
+  }
+
+  /**
    * Creates a variable with a unique, non-clashing variable name.
    * @param ii input info
    * @param type type
@@ -454,9 +490,9 @@ public final class QueryContext extends Progress {
    * @throws QueryException query exception
    */
   Result execute() throws QueryException {
-    // GUI: limit number of hits to be returned and displayed
+    // limit number of hits to be returned and displayed
     int max = context.prop.num(Prop.MAXHITS);
-    if(!Prop.gui || max < 0) max = Integer.MAX_VALUE;
+    if(max < 0) max = Integer.MAX_VALUE;
 
     // evaluates the query
     final Iter ir = iter();
@@ -490,42 +526,6 @@ public final class QueryContext extends Progress {
       if(vb.size() < max) vb.add(it.materialize(null));
     }
     return vb;
-  }
-
-  /**
-   * Binds a value to the context item, using the same rules as for
-   * {@link #bind binding variables}.
-   * @param val value to be bound
-   * @param type data type (may be {@code null})
-   * @throws QueryException query exception
-   */
-  public void context(final Object val, final String type) throws QueryException {
-    // bind http context to extra variable
-    if(val.getClass().getName().equals("org.basex.http.HTTPContext")) {
-      http = val;
-    } else {
-      ctxItem = cast(val, type);
-    }
-  }
-
-  /**
-   * Binds a value to a global variable. The specified type is interpreted as follows:
-   * <ul>
-   * <li>If {@code "json"} is specified, the value is converted according to the rules
-   *     specified in {@link JsonMapConverter}.</li>
-   * <li>If {@code "xml"} is specified, the value is converted to a document node.</li>
-   * <li>Otherwise, the type is interpreted as atomic XDM data type.</li>
-   * </ul>
-   * If the value is an XQuery expression or value {@link Expr}, it is directly assigned.
-   * Otherwise, it is cast to the XQuery data model, using a Java/XQuery mapping.
-   * @param name name of variable
-   * @param val value to be bound
-   * @param type data type (may be {@code null})
-   * @throws QueryException query exception
-   */
-  public void bind(final String name, final Object val, final String type)
-      throws QueryException {
-    bind(name, cast(val, type));
   }
 
   /**
