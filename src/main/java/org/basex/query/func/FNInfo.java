@@ -140,7 +140,7 @@ public final class FNInfo extends StandardFunc {
     final String info = tb.toString();
 
     // if GUI is used or client is calling, cache trace info
-    if(ctx.context.listener != null) {
+    if(ctx.listen != null || ctx.context.listener != null) {
       ctx.evalInfo(info);
       if(ctx.listen != null) ctx.listen.info(info);
     } else {
