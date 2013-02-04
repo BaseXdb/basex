@@ -26,7 +26,7 @@ class BXNList implements NodeList {
   public BXNode item(final int i) {
     ANode n = null;
     if(i < nl.size()) n = nl.get(i);
-    return n != null ? n.toJava() : null;
+    return n != null ? BXNode.get(n) : null;
   }
 
   @Override

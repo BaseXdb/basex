@@ -422,15 +422,7 @@ public abstract class ANode extends Item {
 
   @Override
   public final BXNode toJava() {
-    switch(nodeType()) {
-      case DOC: return new BXDoc(this);
-      case ELM: return new BXElem(this);
-      case TXT: return new BXText(this);
-      case ATT: return new BXAttr(this);
-      case COM: return new BXComm(this);
-      case PI : return new BXPI(this);
-      default : return null;
-    }
+    return BXNode.get(deepCopy());
   }
 
   /**

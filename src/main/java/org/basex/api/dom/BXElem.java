@@ -54,7 +54,7 @@ public final class BXElem extends BXNode implements Element {
 
   @Override
   public BXAttr getAttributeNode(final String name) {
-    return (BXAttr) toJava(attribute(name));
+    return (BXAttr) get(attribute(name));
   }
 
   @Override

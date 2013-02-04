@@ -30,14 +30,33 @@ public abstract class BXNode implements Node {
     "#document-fragment"
   };
   /** Node reference. */
-  final ANode node;
+  protected final ANode node;
 
   /**
    * Constructor.
    * @param n node reference
    */
-  BXNode(final ANode n) {
-    node = n.deepCopy();
+  protected BXNode(final ANode n) {
+    node = n;
+  }
+
+  /**
+   * Creates a new DOM node instance for the input node. Returns a {@code null} reference
+   * if the input is also {@code null}.
+   * @param node input node
+   * @return DOM node
+   */
+  public static final BXNode get(final ANode node) {
+    if(node == null) return null;
+    switch(node.nodeType()) {
+      case DOC: return new BXDoc(node);
+      case ELM: return new BXElem(node);
+      case TXT: return new BXText(node);
+      case ATT: return new BXAttr(node);
+      case COM: return new BXComm(node);
+      case PI : return new BXPI(node);
+      default : return null;
+    }
   }
 
   @Override
@@ -54,7 +73,7 @@ public abstract class BXNode implements Node {
    * Returns a numeric value for the node kind.
    * @return node kind
    */
-  int kind() {
+  protected int kind() {
     return node.kind();
   }
 
@@ -96,14 +115,14 @@ public abstract class BXNode implements Node {
 
   @Override
   public BXNode getFirstChild() {
-    return toJava(node.children().next());
+    return get(node.children().next());
   }
 
   @Override
   public final BXNode getLastChild() {
     ANode n = null;
     for(final ANode t : node.children()) n = t;
-    return n != null ? toJava(n) : null;
+    return n != null ? get(n) : null;
   }
 
   @Override
@@ -113,26 +132,17 @@ public abstract class BXNode implements Node {
 
   @Override
   public BXNode getNextSibling() {
-    return toJava(node.followingSibling().next());
+    return get(node.followingSibling().next());
   }
 
   @Override
   public BXNode getPreviousSibling() {
-    return toJava(node.precedingSibling().next());
+    return get(node.precedingSibling().next());
   }
 
   @Override
   public final BXNode getParentNode() {
-    return toJava(node.parent());
-  }
-
-  /**
-   * Returns a Java node for the specified argument or {@code null}.
-   * @param n node instance
-   * @return resulting node
-   */
-  protected static BXNode toJava(final ANode n) {
-    return n != null ? n.toJava() : null;
+    return get(node.parent());
   }
 
   @Override
@@ -149,7 +159,7 @@ public abstract class BXNode implements Node {
   public BXDoc getOwnerDocument() {
     ANode n = node;
     for(ANode p; (p = n.parent()) != null;) n = p;
-    return n.type == NodeType.DOC ? (BXDoc) n.toJava() : null;
+    return n.type == NodeType.DOC ? (BXDoc) BXNode.get(n) : null;
   }
 
   @Override
@@ -258,7 +268,7 @@ public abstract class BXNode implements Node {
    * @param tag tag name
    * @return nodes
    */
-  final BXNList getElements(final String tag) {
+  protected final BXNList getElements(final String tag) {
     final ANodeList nb = new ANodeList();
     final AxisIter ai = node.descendant();
     final byte[] nm = tag.equals("*") ? null : token(tag);
@@ -273,17 +283,17 @@ public abstract class BXNode implements Node {
    * @param ai axis iterator
    * @return node cache
    */
-  static ANodeList finish(final AxisIter ai) {
+  protected static ANodeList finish(final AxisIter ai) {
     final ANodeList nl = new ANodeList();
     for(ANode n; (n = ai.next()) != null;) nl.add(n.finish());
     return nl;
   }
 
   /**
-   * Returns the XQuery node.
+   * Returns the internal node representation.
    * @return xquery node
    */
-  public final ANode getNod() {
+  public final ANode getNode() {
     return node;
   }
 
@@ -291,7 +301,7 @@ public abstract class BXNode implements Node {
    * Throws a DOM modification exception.
    * @return DOM exception
    */
-  static final DOMException readOnly() {
+  protected static final DOMException readOnly() {
     throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
         "DOM implementation is read-only.");
   }

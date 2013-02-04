@@ -33,7 +33,7 @@ public enum NodeType implements Type {
   TXT("text", NOD, 9) {
     @Override
     public ANode cast(final Object o, final InputInfo ii) {
-      if(o instanceof BXText) return ((BXText) o).getNod();
+      if(o instanceof BXText) return ((BXText) o).getNode();
       if(o instanceof Text) return new FTxt((Text) o);
       return new FTxt(Token.token(o.toString()));
     }
@@ -43,7 +43,7 @@ public enum NodeType implements Type {
   PI("processing-instruction", NOD, 10) {
     @Override
     public ANode cast(final Object o, final InputInfo ii) throws QueryException {
-      if(o instanceof BXPI) return ((BXPI) o).getNod();
+      if(o instanceof BXPI) return ((BXPI) o).getNode();
       if(o instanceof ProcessingInstruction) return new FPI((ProcessingInstruction) o);
       final Matcher m = Pattern.compile("<\\?(.*?) (.*)\\?>").matcher(o.toString());
       if(m.find()) {
@@ -57,7 +57,7 @@ public enum NodeType implements Type {
   ELM("element", NOD, 11) {
     @Override
     public ANode cast(final Object o, final InputInfo ii) throws QueryException {
-      if(o instanceof BXElem)  return ((BXElem) o).getNod();
+      if(o instanceof BXElem)  return ((BXElem) o).getNode();
       if(o instanceof Element) return new FElem((Element) o, null, new TokenMap());
       try {
         final DBNode db = new DBNode(new IOContent(o.toString()), new Prop());
@@ -73,7 +73,7 @@ public enum NodeType implements Type {
   DOC("document-node", NOD, 12) {
     @Override
     public ANode cast(final Object o, final InputInfo ii) throws QueryException {
-      if(o instanceof BXDoc) return ((BXDoc) o).getNod();
+      if(o instanceof BXDoc) return ((BXDoc) o).getNode();
       try {
         if(o instanceof Document) {
           final DOMWrapper p = new DOMWrapper((Document) o, "", new Prop());
@@ -106,7 +106,7 @@ public enum NodeType implements Type {
   ATT("attribute", NOD, 14) {
     @Override
     public ANode cast(final Object o, final InputInfo ii) throws QueryException {
-      if(o instanceof BXAttr) return ((BXAttr) o).getNod();
+      if(o instanceof BXAttr) return ((BXAttr) o).getNode();
       if(o instanceof Attr) return new FAttr((Attr) o);
       final Matcher m = Pattern.compile(" (.*?)=\"(.*)\"").matcher(o.toString());
       if(m.find()) return new FAttr(Token.token(m.group(1)), Token.token(m.group(2)));
@@ -118,7 +118,7 @@ public enum NodeType implements Type {
   COM("comment", NOD, 15) {
     @Override
     public ANode cast(final Object o, final InputInfo ii) throws QueryException {
-      if(o instanceof BXComm) return ((BXComm) o).getNod();
+      if(o instanceof BXComm) return ((BXComm) o).getNode();
       if(o instanceof Comment) return new FComm((Comment) o);
       final Matcher m = Pattern.compile("<!--(.*?)-->").matcher(o.toString());
       if(m.find()) return new FComm(Token.token(m.group(1)));

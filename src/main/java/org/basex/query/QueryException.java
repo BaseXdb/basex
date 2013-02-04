@@ -202,12 +202,7 @@ public final class QueryException extends Exception {
 
   @Override
   public String getLocalizedMessage() {
-    final TokenBuilder tb = new TokenBuilder(super.getMessage());
-    if(!stack.isEmpty()) {
-      tb.add(NL).add(NL).add(STACK_TRACE_C);
-      for(final InputInfo ii : stack) tb.add(NL).add(LI).add(ii.toString());
-    }
-    return tb.toString();
+    return super.getMessage();
   }
 
   @Override
@@ -217,6 +212,10 @@ public final class QueryException extends Exception {
     final byte[] code = name.local();
     if(code.length != 0) tb.add('[').add(code).add("] ");
     tb.add(getLocalizedMessage());
+    if(!stack.isEmpty()) {
+      tb.add(NL).add(NL).add(STACK_TRACE_C);
+      for(final InputInfo ii : stack) tb.add(NL).add(LI).add(ii.toString());
+    }
     return tb.toString();
   }
 }
