@@ -14,7 +14,7 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public abstract class Progress {
-  /** Info listener. */
+  /** Listener, reacting on progress information. */
   public InfoListener listen;
   /** This flag indicates that a command may perform updates. */
   public boolean updating;
